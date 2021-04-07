@@ -852,7 +852,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
 
     $form_state->get('rerender', TRUE);
     $form_state->setRebuild();
-    // Write to cache
+    // Write to cache.
     $view->cacheSet();
   }
 

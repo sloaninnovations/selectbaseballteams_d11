@@ -68,7 +68,7 @@ class LanguageConditionTest extends KernelTestBase {
     // Check for the proper summary.
     $this->assertEquals('The language is Italian.', $condition->summary());
 
-    // Negate the condition
+    // Negate the condition.
     $condition->setConfig('negate', TRUE);
     $this->assertTrue($condition->execute(), 'Language condition passes as expected.');
     // Check for the proper summary.
@@ -91,7 +91,7 @@ class LanguageConditionTest extends KernelTestBase {
     // Check for the proper summary.
     $this->assertEquals('The language is Italian.', $condition->summary());
 
-    // Negate the condition
+    // Negate the condition.
     $condition->setConfig('negate', TRUE);
     $this->assertFalse($condition->execute(), 'Language condition fails as expected.');
     // Check for the proper summary.

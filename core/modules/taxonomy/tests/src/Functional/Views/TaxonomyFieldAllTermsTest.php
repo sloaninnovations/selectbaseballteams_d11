@@ -70,7 +70,7 @@ class TaxonomyFieldAllTermsTest extends TaxonomyTestBase {
     // The machine name for the vocabulary the term belongs to: {{ term_node_tid__vocabulary_vid }}
     $this->assertSession()->pageTextContains('The machine name for the vocabulary the term belongs to: ' . $this->term1->bundle());
 
-    // The name for the vocabulary the term belongs to: {{ term_node_tid__vocabulary }}
+    // The name for the vocabulary the term belongs to: {{ term_node_tid__vocabulary }}.
     $vocabulary = Vocabulary::load($this->term1->bundle());
     $this->assertSession()->pageTextContains('The name for the vocabulary the term belongs to: ' . $vocabulary->label());
   }

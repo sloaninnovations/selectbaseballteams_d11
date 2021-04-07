@@ -222,10 +222,10 @@ class ThemeInitialization implements ThemeInitializationInterface {
       }
     }
 
-    // Do basically the same as the above for libraries
+    // Do basically the same as the above for libraries.
     $values['libraries'] = [];
 
-    // Grab libraries from base theme
+    // Grab libraries from base theme.
     foreach ($base_themes as $base) {
       if (!empty($base->libraries)) {
         foreach ($base->libraries as $library) {

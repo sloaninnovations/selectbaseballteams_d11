@@ -1552,7 +1552,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     }
 
     $alt = $this->viewsTokenReplace($alter['alt'], $tokens);
-    // Set the title attribute of the link only if it improves accessibility
+    // Set the title attribute of the link only if it improves accessibility.
     if ($alt && $alt != $text) {
       $options['attributes']['title'] = Html::decodeEntities($alt);
     }
@@ -1616,7 +1616,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     $final_url = CoreUrl::fromUri($path, $options);
 
     // Build the link based on our altered Url object, adding on the optional
-    // prefix and suffix
+    // prefix and suffix.
     $render = [
       '#type' => 'link',
       '#title' => $text,
@@ -1864,7 +1864,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
           $value = $matches[1];
         }
       }
-      // Remove scraps of HTML entities from the end of a strings
+      // Remove scraps of HTML entities from the end of a strings.
       $value = rtrim(preg_replace('/(?:<(?!.+>)|&(?!.+;)).*$/us', '', $value));
 
       if (!empty($alter['ellipsis'])) {

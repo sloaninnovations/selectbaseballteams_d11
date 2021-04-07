@@ -108,7 +108,7 @@ function views_ui_theme() {
       'file' => 'views_ui.theme.inc',
     ],
 
-    // On behalf of a plugin
+    // On behalf of a plugin.
     'views_ui_style_plugin_table' => [
       'render element' => 'form',
       'file' => 'views_ui.theme.inc',

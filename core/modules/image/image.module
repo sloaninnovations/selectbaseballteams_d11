@@ -143,7 +143,7 @@ function image_file_download($uri) {
   if (str_starts_with($path, 'styles/')) {
     $args = explode('/', $path);
 
-    // Discard "styles", style name, and scheme from the path
+    // Discard "styles", style name, and scheme from the path.
     $args = array_slice($args, 3);
 
     // Then the remaining parts are the path to the image.

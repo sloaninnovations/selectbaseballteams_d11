@@ -501,7 +501,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     $expected = 'short_entity_type_revision__short_field_name';
     $this->assertEquals($expected, $this->tableMapping->getDedicatedRevisionTableName($field_storage));
 
-    // Short entity type, long field name
+    // Short entity type, long field name.
     $entity_type = 'short_entity_type';
     $field_name = 'long_field_name_abcdefghijklmnopqrstuvwxyz';
     $field_storage = FieldStorageConfig::create([

@@ -568,7 +568,7 @@ abstract class StylePluginBase extends PluginBase {
       $groupings = [['field' => $groupings, 'rendered' => $rendered]];
     }
 
-    // Make sure fields are rendered
+    // Make sure fields are rendered.
     $this->renderFields($this->view->result);
     $sets = [];
     if ($groupings) {

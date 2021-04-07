@@ -490,7 +490,7 @@ class ViewUI implements ViewEntityInterface {
         if ($handler && $handler->hasExtraOptions()) {
           $this->addFormToStack('handler-extra', $display_id, $type, $id);
         }
-        // Then add the form to the stack
+        // Then add the form to the stack.
         $this->addFormToStack('handler', $display_id, $type, $id);
       }
     }
@@ -499,7 +499,7 @@ class ViewUI implements ViewEntityInterface {
       unset($this->form_cache);
     }
 
-    // Store in cache
+    // Store in cache.
     $this->cacheSet();
   }
 

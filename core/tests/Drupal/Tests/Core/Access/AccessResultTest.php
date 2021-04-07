@@ -207,7 +207,7 @@ class AccessResultTest extends UnitTestCase {
     $this->assertEquals('forbidden message', $access->getReason());
     $this->assertDefaultCacheability($access);
 
-    // NEUTRAL && ALLOW == NEUTRAL
+    // NEUTRAL && ALLOW == NEUTRAL.
     $access = $neutral->andIf($allowed);
     $this->assertFalse($access->isAllowed());
     $this->assertFalse($access->isForbidden());

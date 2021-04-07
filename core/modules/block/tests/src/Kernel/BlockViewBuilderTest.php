@@ -306,7 +306,7 @@ class BlockViewBuilderTest extends KernelTestBase {
     $required_cache_contexts = ['languages:' . LanguageInterface::TYPE_INTERFACE, 'theme', 'user.permissions'];
 
     // Check that the expected cacheability metadata is present in:
-    // - the built render array;
+    // - the built render array.
     $build = $this->getBlockRenderArray();
     $this->assertSame($expected_keys, $build['#cache']['keys']);
     $this->assertEqualsCanonicalizing($expected_contexts, $build['#cache']['contexts']);

@@ -669,7 +669,7 @@ function drupal_check_module($module) {
   // Check requirements
   $requirements = \Drupal::moduleHandler()->invoke($module, 'requirements', ['install']);
   if (is_array($requirements) && drupal_requirements_severity($requirements) == REQUIREMENT_ERROR) {
-    // Print any error messages
+    // Print any error messages.
     foreach ($requirements as $requirement) {
       if (isset($requirement['severity']) && $requirement['severity'] == REQUIREMENT_ERROR) {
         $message = $requirement['description'];

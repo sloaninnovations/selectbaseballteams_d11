@@ -89,7 +89,7 @@ class ManyToOneHelper {
     // to create a new relationship to use.
     $relationship = $this->handler->relationship;
 
-    // Determine the primary table to seek
+    // Determine the primary table to seek.
     if (empty($this->handler->query->relationships[$relationship])) {
       $base_table = $this->handler->view->storage->get('base_table');
     }

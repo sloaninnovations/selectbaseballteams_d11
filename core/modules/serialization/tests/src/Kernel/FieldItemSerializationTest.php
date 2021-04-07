@@ -186,7 +186,7 @@ class FieldItemSerializationTest extends NormalizerTestBase {
     };
 
     // Asserts denormalizing the entity DOES yield the value we set:
-    // - when using the detailed representation
+    // - when using the detailed representation.
     $core_normalization['field_test_boolean'][0]['value'] = TRUE;
     $assert_denormalization($core_normalization);
     // - and when using the shorthand representation
@@ -201,7 +201,7 @@ class FieldItemSerializationTest extends NormalizerTestBase {
     $this->assertSame('👎', $core_normalization['field_test_boolean'][0]['value']);
 
     // Asserts denormalizing the entity DOES NOT ANYMORE yield the value we set:
-    // - when using the detailed representation
+    // - when using the detailed representation.
     $core_normalization['field_test_boolean'][0]['value'] = '👍';
     $assert_denormalization($core_normalization);
     // - and when using the shorthand representation

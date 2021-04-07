@@ -438,7 +438,7 @@ class Views {
           'ltitle' => static::t('fields'),
           // Singular title.
           'stitle' => static::t('Field'),
-          // Singular lowercase title for mid sentence
+          // Singular lowercase title for mid sentence.
           'lstitle' => static::t('field'),
           'plural' => 'fields',
         ],

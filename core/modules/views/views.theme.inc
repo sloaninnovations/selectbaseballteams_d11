@@ -160,7 +160,7 @@ function template_preprocess_views_view_fields(&$variables) {
         $object->wrapper_attributes = new Attribute($attributes);
       }
 
-      // Set up field label
+      // Set up field label.
       $object->label = $view->field[$id]->label();
 
       // Set up field label wrapper and its attributes.

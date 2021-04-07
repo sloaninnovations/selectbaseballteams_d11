@@ -327,7 +327,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     // base + translation <-> base + translation + revision
     // base + revision <-> base + translation + revision
     // base <-> base + revision
-    // base <-> base + translation + revision
+    // base <-> base + translation + revision.
 
     // Base <-> base + translation
     $this->updateEntityTypeToTranslatable(TRUE);

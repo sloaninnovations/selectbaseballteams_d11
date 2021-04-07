@@ -408,7 +408,7 @@ class ManageDisplayTest extends BrowserTestBase {
       $options[] = $option->getValue();
     }
 
-    // Loops trough all the option groups
+    // Loops trough all the option groups.
     foreach ($element->optgroup as $optgroup) {
       $options = array_merge($this->getAllOptionsList($optgroup), $options);
     }

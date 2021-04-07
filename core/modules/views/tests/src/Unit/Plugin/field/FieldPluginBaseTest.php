@@ -181,7 +181,7 @@ class FieldPluginBaseTest extends UnitTestCase {
       ->willReturnCallback(
         // Pretend to do a render.
         function (&$elements, $is_root_call = FALSE) {
-          // Mock the ability to theme links
+          // Mock the ability to theme links.
           $link = $this->linkGenerator->generate($elements['#title'], $elements['#url']);
           if (isset($elements['#prefix'])) {
             $link = $elements['#prefix'] . $link;

@@ -207,7 +207,7 @@ class UrlGenerator implements UrlGeneratorInterface {
         }
       }
       else {
-        // Static text
+        // Static text.
         $url = $token[1] . $url;
         $optional = FALSE;
       }
@@ -308,7 +308,7 @@ class UrlGenerator implements UrlGeneratorInterface {
       // resolving a URI; see http://tools.ietf.org/html/rfc3986#section-3.3
       // so we need to encode them as they are not used for this purpose here
       // otherwise we would generate a URI that, when followed by a user agent
-      // (e.g. browser), does not match this route
+      // (e.g. browser), does not match this route.
       $path = strtr($path, ['/../' => '/%2E%2E/', '/./' => '/%2E/']);
       if (str_ends_with($path, '/..')) {
         $path = substr($path, 0, -2) . '%2E%2E';
