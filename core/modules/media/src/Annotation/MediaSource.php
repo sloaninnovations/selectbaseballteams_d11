@@ -113,7 +113,9 @@ class MediaSource extends Plugin {
   public $thumbnail_alt_metadata_attribute;
 
   /**
-   * (optional) The metadata attribute name to provide the thumbnail title.
+   * The metadata attribute name to provide the thumbnail title.
+   *
+   * (optional)
    *
    * The name of the media item will be used if the attribute name is not
    * provided.

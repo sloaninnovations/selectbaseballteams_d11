@@ -551,7 +551,7 @@ class RendererBubblingTest extends RendererTestBase {
 class BubblingTest implements TrustedCallbackInterface {
 
   /**
-   * #pre_render callback for testBubblingWithPrerender().
+   * The #pre_render callback for testBubblingWithPrerender().
    */
   public static function bubblingPreRender($elements) {
     $elements += [
@@ -590,7 +590,7 @@ class BubblingTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #pre_render callback for testBubblingWithPrerender().
+   * The #pre_render callback for testBubblingWithPrerender().
    */
   public static function bubblingNestedPreRenderUncached($elements) {
     \Drupal::state()->set('bubbling_nested_pre_render_uncached', TRUE);
@@ -599,7 +599,7 @@ class BubblingTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #pre_render callback for testBubblingWithPrerender().
+   * The #pre_render callback for testBubblingWithPrerender().
    */
   public static function bubblingNestedPreRenderCached($elements) {
     \Drupal::state()->set('bubbling_nested_pre_render_cached', TRUE);
@@ -607,7 +607,7 @@ class BubblingTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback for testBubblingWithPrerender().
+   * The #lazy_builder callback for testBubblingWithPrerender().
    */
   public static function bubblingPlaceholder($foo, $baz) {
     return [
@@ -616,7 +616,7 @@ class BubblingTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #pre_render callback for testOverWriteCacheKeys().
+   * The #pre_render callback for testOverWriteCacheKeys().
    */
   public static function bubblingCacheOverwritePrerender($elements) {
     // Overwrite the #cache entry with new data.

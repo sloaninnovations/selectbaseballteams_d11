@@ -167,7 +167,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback; throws exception.
+   * The #lazy_builder callback; throws exception.
    *
    * @throws \Exception
    */
@@ -176,7 +176,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback; returns content that will trigger an exception.
+   * The #lazy_builder callback; returns content that will trigger an exception.
    *
    * @see \Drupal\big_pipe_test\EventSubscriber\BigPipeTestSubscriber::onRespondTriggerException()
    *
@@ -187,7 +187,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback; returns the current count.
+   * The #lazy_builder callback; returns the current count.
    *
    * @see \Drupal\Tests\big_pipe\Functional\BigPipeTest::testBigPipeMultiOccurrencePlaceholders()
    *

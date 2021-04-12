@@ -398,7 +398,7 @@ interface DisplayPluginInterface {
   public function render();
 
   /**
-   * #pre_render callback for view display rendering.
+   * The #pre_render callback for view display rendering.
    *
    * @see self::render()
    *

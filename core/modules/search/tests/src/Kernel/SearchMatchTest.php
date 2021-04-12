@@ -74,7 +74,7 @@ class SearchMatchTest extends KernelTestBase {
   }
 
   /**
-   * _test_: Helper method for generating snippets of content.
+   * Test: Helper method for generating snippets of content.
    *
    * Generated items to test against:
    *   1  ipsum
@@ -91,7 +91,7 @@ class SearchMatchTest extends KernelTestBase {
   }
 
   /**
-   * _test2_: Helper method for generating snippets of content.
+   * Test2: Helper method for generating snippets of content.
    *
    * Generated items to test against:
    *   8  dear

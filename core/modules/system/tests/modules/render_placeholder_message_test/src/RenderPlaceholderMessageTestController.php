@@ -104,7 +104,7 @@ class RenderPlaceholderMessageTestController implements TrustedCallbackInterface
   }
 
   /**
-   * #lazy_builder callback; sets and prints a message.
+   * The #lazy_builder callback; sets and prints a message.
    *
    * @param string $message
    *   The message to send.
