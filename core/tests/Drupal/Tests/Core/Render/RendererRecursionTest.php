@@ -28,7 +28,7 @@ class RendererRecursionTest extends RendererTestBase {
   }
 
   /**
-   * Function ::renderRoot() may not be called inside another ::renderRoot().
+   * Tests that ::renderRoot() may not be called recursively.
    *
    * @covers ::renderRoot
    * @covers ::render
@@ -57,7 +57,7 @@ class RendererRecursionTest extends RendererTestBase {
   }
 
   /**
-   * Function ::render() may be called from anywhere.
+   * Tests that ::render() may be called from anywhere.
    *
    * Including from inside of another ::renderRoot() call. Bubbling must be
    * performed.
