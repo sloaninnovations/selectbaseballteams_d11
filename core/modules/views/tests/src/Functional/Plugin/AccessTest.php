@@ -68,7 +68,7 @@ class AccessTest extends ViewTestBase {
     // @todo when all the plugin information is cached make a reset function and
     // call it here.
 
-    // Create Article node type.
+    // Create Page content type.
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Page']);
     $this->drupalCreateNode();
     $this->drupalCreateNode();
@@ -119,7 +119,7 @@ class AccessTest extends ViewTestBase {
   }
 
   /**
-   * Tests that node_access table is joined when node_grant hook is implemented.
+   * Tests that node_access table is joined when hook_node_grants() is implemented.
    */
   public function testContentAccessFilter() {
     $view = Views::getView('test_content_access_filter');
