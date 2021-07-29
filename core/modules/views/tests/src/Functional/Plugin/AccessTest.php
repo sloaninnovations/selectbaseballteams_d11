@@ -144,7 +144,6 @@ class AccessTest extends ViewTestBase {
     $main_query = $view->build_info['query'];
     $tables = array_keys($main_query->getTables());
     $this->assertContains('node_access', $tables);
-
   }
 
 }
