@@ -38,13 +38,6 @@ abstract class Data implements \IteratorAggregate, \Countable {
   protected $hasNextPage;
 
   /**
-   * Holds the total count of entities.
-   *
-   * @var int
-   */
-  protected $count;
-
-  /**
    * Instantiates a Data object.
    *
    * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifierInterface[] $data
@@ -83,20 +76,6 @@ abstract class Data implements \IteratorAggregate, \Countable {
   #[\ReturnTypeWillChange]
   public function count() {
     return count($this->data);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getTotalCount() {
-    return $this->count;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setTotalCount($count) {
-    $this->count = $count;
   }
 
   /**

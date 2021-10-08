@@ -391,12 +391,6 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       Node::load(59)->uuid(),
       Node::load(60)->uuid(),
     ], $output_uuids);
-    // 25. Test collection count.
-    $this->container->get('module_installer')->install(['jsonapi_test_collection_count']);
-    $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article'));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertEquals(61, $collection_output['meta']['count']);
-    $this->container->get('module_installer')->uninstall(['jsonapi_test_collection_count']);
 
     // Test documentation filtering examples.
     // 1. Only get published nodes.
@@ -546,6 +540,61 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertTrue($this->drupalUserIsLoggedIn($admin_user));
     $this->container->get('state')->set('system.maintenance_mode', FALSE);
     $this->drupalLogout();
+  }
+
+  /**
+   * Tests the GET method.
+   *
+   * @group legacy
+   */
+  public function testReadLegacy(): void {
+    $this->expectDeprecation("The Drupal\jsonapi_test_collection_count\ResourceType\CountableResourceType::includeCount() is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName('count') as a replacement.");
+    $this->createDefaultContent(61, 5, TRUE, TRUE, static::IS_NOT_MULTILINGUAL, FALSE);
+
+    $this->container->get('module_installer')->install(['jsonapi_test_collection_count']);
+    $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertEquals(61, $collection_output['meta']['count']);
+    $this->container->get('module_installer')->uninstall(['jsonapi_test_collection_count']);
+  }
+
+  /**
+   * Tests the meta counter for collection responses.
+   */
+  public function testCollectionSizeMember(): void {
+    $this->createDefaultContent(10, 5, FALSE, FALSE, static::IS_NOT_MULTILINGUAL);
+
+    // 1. No `count` member by default.
+    $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article'));
+    static::assertArrayNotHasKey('meta', $collection_output);
+
+    // 2. Use `collectionSize` as a name.
+    static::assertTrue($this->container->get('module_installer')->install([
+      'jsonapi_test_resource_type_building',
+    ], TRUE));
+    \Drupal::state()->set('jsonapi_test_resource_type_builder.collection_size_member_names', [
+      'node--article' => 'collectionSize',
+    ]);
+    $this->rebuildAll();
+    $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article'));
+    static::assertEquals(10, $collection_output['meta']['collectionSize']);
+
+    // 3. Use `dataMax` as a name.
+    \Drupal::state()->set('jsonapi_test_resource_type_builder.collection_size_member_names', [
+      'node--article' => 'dataMax',
+    ]);
+    $this->rebuildAll();
+    $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article'));
+    static::assertEquals(10, $collection_output['meta']['dataMax']);
+    static::assertArrayNotHasKey('collectionSize', $collection_output['meta']);
+
+    // 4. Exclude a collection size from the response.
+    \Drupal::state()->set('jsonapi_test_resource_type_builder.collection_size_member_names', [
+      'node--article' => NULL,
+    ]);
+    $this->rebuildAll();
+    $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article'));
+    static::assertArrayNotHasKey('meta', $collection_output);
   }
 
   /**
