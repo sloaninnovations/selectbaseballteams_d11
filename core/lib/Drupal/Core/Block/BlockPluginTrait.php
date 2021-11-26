@@ -227,7 +227,9 @@ trait BlockPluginTrait {
       $this->configuration['label'] = $form_state->getValue('label');
       $this->configuration['label_display'] = $form_state->getValue('label_display');
       $this->configuration['provider'] = $form_state->getValue('provider');
-      $this->configuration['context_mapping'] = $form_state->getValue('context_mapping');
+      if ($form_state->getValue('context_mapping')) {
+        $this->configuration['context_mapping'] = $form_state->getValue('context_mapping');
+      }
       $this->blockSubmit($form, $form_state);
     }
   }
