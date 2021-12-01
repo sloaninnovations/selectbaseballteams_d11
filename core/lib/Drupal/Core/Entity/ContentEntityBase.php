@@ -805,9 +805,13 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         if ($this->isDefaultTranslation()) {
           // Update the default internal language cache.
           $this->setDefaultLangcode();
-          if (isset($this->translations[$this->defaultLangcode])) {
-            $message = new FormattableMarkup('A translation already exists for the specified language (@langcode).', ['@langcode' => $this->defaultLangcode]);
-            throw new \InvalidArgumentException($message);
+          $moduleHandler = \Drupal::service('module_handler');
+          if ($moduleHandler->moduleExists('content_translation')) {
+            // Throw the error only if content_translation is enabled.
+            if (isset($this->translations[$this->defaultLangcode])) {
+              $message = new FormattableMarkup('A translation already exists for the specified language (@langcode).', ['@langcode' => $this->defaultLangcode]);
+              throw new \InvalidArgumentException($message);
+            }
           }
           $this->updateFieldLangcodes($this->defaultLangcode);
         }
