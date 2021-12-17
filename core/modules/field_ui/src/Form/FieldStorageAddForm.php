@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Utility\Token;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field_ui\FieldUI;
@@ -83,13 +84,16 @@ class FieldStorageAddForm extends FormBase {
    *   (optional) The entity field manager.
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
    *   (optional) The entity display repository.
+   * @param \Drupal\Core\Utility\Token|null $token
+   *   (optional) The token service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_plugin_manager, ConfigFactoryInterface $config_factory, EntityFieldManagerInterface $entity_field_manager = NULL, EntityDisplayRepositoryInterface $entity_display_repository = NULL) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_plugin_manager, ConfigFactoryInterface $config_factory, EntityFieldManagerInterface $entity_field_manager = NULL, EntityDisplayRepositoryInterface $entity_display_repository = NULL, Token $token = NULL) {
     $this->entityTypeManager = $entity_type_manager;
     $this->fieldTypePluginManager = $field_type_plugin_manager;
     $this->configFactory = $config_factory;
     $this->entityFieldManager = $entity_field_manager;
     $this->entityDisplayRepository = $entity_display_repository;
+    $this->token = $token;
   }
 
   /**
@@ -108,7 +112,8 @@ class FieldStorageAddForm extends FormBase {
       $container->get('plugin.manager.field.field_type'),
       $container->get('config.factory'),
       $container->get('entity_field.manager'),
-      $container->get('entity_display.repository')
+      $container->get('entity_display.repository'),
+      $container->get('token')
     );
   }
 
@@ -581,7 +586,7 @@ class FieldStorageAddForm extends FormBase {
     $field_prefix = $this->configFactory->get('field_ui.settings')->get('field_prefix');
     $field_name = $field_prefix . $value;
 
-    $is_a_token_name = !empty($field_prefix)
+    return $is_a_token_name = !empty($field_prefix)
       ? FALSE
       : $this->fieldNameIsAToken($value, $element, $form_state);
 
@@ -610,12 +615,7 @@ class FieldStorageAddForm extends FormBase {
       return FALSE;
     }
 
-    // Can't inject the dependency or TypeError : Argument 6 passed to
-    // Drupal\field_ui\Form\FieldStorageAddForm::__construct()
-    // must be an instance of Drupal\Core\Utiliy\Token or null,
-    // instance of Drupal\token\Token given
-    // when token contrib module is enabled.
-    $tokens = \Drupal::token()->getInfo();
+    $tokens = $this->token->getInfo();
     return isset($tokens['tokens'][$form_state_storage['entity_type_id']][$value]);
   }
 
