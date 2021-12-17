@@ -737,6 +737,29 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that a field machine name can't be equal to a token name.
+   */
+  public function testTokenFieldName() {
+    // Reset the field prefix so we can test properly.
+    $this->config('field_ui.settings')->set('field_prefix', '')->save();
+
+    // The token [node:summary] already exists but summary is not a field name.
+    // We're expecting an error when trying to create a new field which would have
+    // the same name than a token.
+    $edit = [
+      'field_name' => 'summary',
+      'label' => $this->randomMachineName(),
+      'new_storage_type' => 'string_long',
+    ];
+    $url = 'admin/structure/types/manage/' . $this->contentType . '/fields/add-field';
+    $this->drupalGet($url);
+    $this->submitForm($edit, 'Save and continue');
+
+    $this->assertSession()->pageTextContains('The machine-readable name is already in use. It must be unique.');
+    $this->assertSession()->addressEquals($url);
+  }
+
+  /**
    * Tests that external URLs in the 'destinations' query parameter are blocked.
    */
   public function testExternalDestinations() {
