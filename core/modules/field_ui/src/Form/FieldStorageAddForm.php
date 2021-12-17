@@ -578,10 +578,45 @@ class FieldStorageAddForm extends FormBase {
     }
 
     // Add the field prefix.
-    $field_name = $this->configFactory->get('field_ui.settings')->get('field_prefix') . $value;
+    $field_prefix = $this->configFactory->get('field_ui.settings')->get('field_prefix');
+    $field_name = $field_prefix . $value;
+
+    $is_a_token_name = !empty($field_prefix)
+      ? FALSE
+      : $this->fieldNameIsAToken($value, $element, $form_state);
 
     $field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions($this->entityTypeId);
-    return isset($field_storage_definitions[$field_name]);
+    return isset($field_storage_definitions[$field_name]) || $is_a_token_name;
+  }
+
+  /**
+   * Checks if a field machine name is a token.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3254575
+   *
+   * @param string $value
+   *   The machine name, not prefixed.
+   * @param array $element
+   *   An array containing the structure of the 'field_name' element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return bool
+   *   Whether or not the field machine name is a token.
+   */
+  protected function fieldNameIsAToken($value, $element, FormStateInterface $form_state) {
+    $form_state_storage = $form_state->getStorage();
+    if (!isset($form_state_storage['entity_type_id'])) {
+      return FALSE;
+    }
+
+    // Can't inject the dependency or TypeError : Argument 6 passed to
+    // Drupal\field_ui\Form\FieldStorageAddForm::__construct()
+    // must be an instance of Drupal\Core\Utiliy\Token or null,
+    // instance of Drupal\token\Token given
+    // when token contrib module is enabled.
+    $tokens = \Drupal::token()->getInfo();
+    return isset($tokens['tokens'][$form_state_storage['entity_type_id']][$value]);
   }
 
 }
