@@ -586,7 +586,7 @@ class FieldStorageAddForm extends FormBase {
     $field_prefix = $this->configFactory->get('field_ui.settings')->get('field_prefix');
     $field_name = $field_prefix . $value;
 
-    return $is_a_token_name = !empty($field_prefix)
+    $is_a_token_name = !empty($field_prefix)
       ? FALSE
       : $this->fieldNameIsAToken($value, $element, $form_state);
 
