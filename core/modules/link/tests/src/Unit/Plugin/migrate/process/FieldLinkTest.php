@@ -102,6 +102,10 @@ class FieldLinkTest extends UnitTestCase {
         '<none>',
         'route:<nolink>',
       ],
+      'button' => [
+        '<button>',
+        'route:<button>',
+      ],
     ];
   }
 
