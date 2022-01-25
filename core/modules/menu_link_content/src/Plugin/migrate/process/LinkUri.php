@@ -95,13 +95,7 @@ class LinkUri extends ProcessPluginBase implements ContainerFactoryPluginInterfa
       if ($path == '<front>') {
         $path = '';
       }
-      elseif ($path == '') {
-        return 'route:<nolink>';
-      }
-      elseif ($path == '<none>') {
-        return 'route:<nolink>';
-      }
-      elseif ($path == '<nolink>') {
+      elseif (empty($path) || in_array($path, ['<nolink>', '<none>'])) {
         return 'route:<nolink>';
       }
       elseif ($path == '<button>') {
