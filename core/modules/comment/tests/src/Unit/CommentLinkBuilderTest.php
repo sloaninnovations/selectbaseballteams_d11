@@ -264,6 +264,10 @@ class CommentLinkBuilderTest extends UnitTestCase {
    *   One of CommentItemInterface::FORM_BELOW|FORM_SEPARATE_PAGE
    * @param int $comment_count
    *   Number of comments against the field.
+   * @param bool $has_access_comments
+   *   TRUE if the user has 'access comments' permission.
+   * @param bool $has_post_comments
+   *   TRUE if the use has 'post comments' permission.
    *
    * @return \Drupal\node\NodeInterface|\PHPUnit\Framework\MockObject\MockObject
    *   Mock node for testing.
