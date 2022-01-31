@@ -318,7 +318,9 @@ class CommentController extends ControllerBase {
     if ($pid) {
       $parent_comment = $this->entityTypeManager()->getStorage('comment')->load($pid);
       $access = $access
-        // The parent comment is published.
+        // The user has the proper permissions.
+        ->andIf(AccessResult::allowedIfHasPermission($this->currentUser(), 'access comments'))
+        // And the parent comment is published.
         ->andIf(AccessResult::allowedIf($parent_comment->isPublished()))
         // And the parent comment host belongs to the entity.
         ->andIf(AccessResult::allowedIf($parent_comment->getCommentedEntityId() === $entity->id()))
