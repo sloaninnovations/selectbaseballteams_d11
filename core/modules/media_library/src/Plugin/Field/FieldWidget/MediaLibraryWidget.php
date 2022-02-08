@@ -683,9 +683,9 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       foreach ($values['selection'] as $delta => &$value) {
         $value['_original_delta'] = $delta;
       }
-      #usort($values['selection'], function ($a, $b) {
-      #  return SortArray::sortByKeyInt($a, $b, '_weight');
-      #});
+      usort($values['selection'], function ($a, $b) {
+        return SortArray::sortByKeyInt($a, $b, '_weight');
+      });
       return $values['selection'];
     }
     return [];
@@ -911,16 +911,18 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     $media = static::getNewMediaItems($element, $form_state);
     if (!empty($media)) {
       // Get the weight of the last items and count from there.
+      $last_element = end($field_state['items']);
+      $weight = $last_element ? $last_element['weight'] : 0;
       foreach ($media as $media_item) {
         // Any ID can be passed to the widget, so we have to check access.
         if ($media_item->access('view')) {
           $field_state['items'][] = [
             'target_id' => $media_item->id(),
-            '_weight' => $field_state['items_count'],
+            '_weight' => ++$weight,
           ];
         }
       }
-      $field_state['items_count']++;
+      $field_state['items_count'] = count($field_state['items']);
       static::setFieldState($element, $form_state, $field_state);
     }
 
