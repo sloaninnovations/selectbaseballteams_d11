@@ -279,7 +279,9 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // Load the items for form rebuilds from the field state.
     $field_state = static::getWidgetState($form['#parents'], $this->fieldDefinition->getName(), $form_state);
     if (isset($field_state['items'])) {
-      usort($field_state['items'], [SortArray::class, 'sortByWeightElement']);
+      usort($field_state['items'], function ($a, $b) {
+        return SortArray::sortByKeyInt($a, $b, '_weight');
+      });
       $items->setValue($field_state['items']);
     }
 
@@ -390,6 +392,19 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
         ],
       ],
     ];
+    $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
+
+    // Determine the number of widgets to display.
+    switch ($cardinality) {
+      case FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED:
+        $field_state = static::getWidgetState($parents, $field_name, $form_state);
+        $max = $field_state['items_count'];
+        break;
+
+      default:
+        $max = $cardinality - 1;
+        break;
+    }
 
     foreach ($referenced_entities as $delta => $media_item) {
       $element['selection'][$delta] = [
@@ -435,13 +450,15 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
           '#type' => 'hidden',
           '#value' => $media_item->id(),
         ],
-        // This hidden value can be toggled visible for accessibility.
-        'weight' => [
-          '#type' => 'number',
-          '#theme' => 'input__number__media_library_item_weight',
+        '_weight' => [
+          '#type' => 'weight',
           '#title' => $this->t('Weight'),
+          '#title_display' => 'invisible',
+          // Note: this 'delta' is the FAPI #type 'weight' element's property.
+          '#delta' => $max,
           '#access' => $multiple_items,
-          '#default_value' => $delta,
+          '#default_value' => $items[$delta]->_weight ?: $delta,
+          '#weight' => 100,
           '#attributes' => [
             'class' => [
               'js-media-library-item-weight',
@@ -661,7 +678,14 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     if (isset($values['selection'])) {
-      usort($values['selection'], [SortArray::class, 'sortByWeightElement']);
+      // The original delta, before drag-and-drop reordering, is needed to
+      // route errors to the correct form element.
+      foreach ($values['selection'] as $delta => &$value) {
+        $value['_original_delta'] = $delta;
+      }
+      #usort($values['selection'], function ($a, $b) {
+      #  return SortArray::sortByKeyInt($a, $b, '_weight');
+      #});
       return $values['selection'];
     }
     return [];
@@ -726,7 +750,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $delta_to_focus = 0;
       foreach ($field_state['items'] as $delta => $item_fields) {
         $delta_to_focus = $delta;
-        if ($item_fields['weight'] > $removed_item_weight) {
+        if ($item_fields['_weight'] > $removed_item_weight) {
           // Stop directly when we find an item with a bigger weight. We also
           // have to subtract 1 from the delta in this case, since the delta's
           // are renumbered when rebuilding the form.
@@ -787,10 +811,11 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     if (isset($values['selection'][$delta])) {
       // Add the weight of the removed item to the field state so we can shift
       // focus to the next/previous item in an easy way.
-      $field_state['removed_item_weight'] = $values['selection'][$delta]['weight'];
+      $field_state['removed_item_weight'] = $values['selection'][$delta]['_weight'];
       $field_state['removed_item_id'] = $triggering_element['#media_id'];
       unset($values['selection'][$delta]);
       $field_state['items'] = $values['selection'];
+      $field_state['items_count']--;
       static::setFieldState($element, $form_state, $field_state);
     }
 
@@ -886,17 +911,16 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     $media = static::getNewMediaItems($element, $form_state);
     if (!empty($media)) {
       // Get the weight of the last items and count from there.
-      $last_element = end($field_state['items']);
-      $weight = $last_element ? $last_element['weight'] : 0;
       foreach ($media as $media_item) {
         // Any ID can be passed to the widget, so we have to check access.
         if ($media_item->access('view')) {
           $field_state['items'][] = [
             'target_id' => $media_item->id(),
-            'weight' => ++$weight,
+            '_weight' => $field_state['items_count'],
           ];
         }
       }
+      $field_state['items_count']++;
       static::setFieldState($element, $form_state, $field_state);
     }
 
