@@ -96,6 +96,22 @@ parameters:
 			path: lib/Drupal/Core/Datetime/DateHelper.php
 
 		-
+			message: """
+				#^Call to deprecated method getDeprecationMessage\\(\\) of class Symfony\\\\Component\\\\DependencyInjection\\\\Alias\\:
+				since Symfony 5\\.1, use "getDeprecation\\(\\)" instead\\.$#
+			"""
+			count: 1
+			path: lib/Drupal/Core/DependencyInjection/Compiler/DeprecatedServicePass.php
+
+		-
+			message: """
+				#^Call to deprecated method getDeprecationMessage\\(\\) of class Symfony\\\\Component\\\\DependencyInjection\\\\Definition\\:
+				since Symfony 5\\.1, use "getDeprecation\\(\\)" instead\\.$#
+			"""
+			count: 1
+			path: lib/Drupal/Core/DependencyInjection/Compiler/DeprecatedServicePass.php
+
+		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 2
 			path: lib/Drupal/Core/EventSubscriber/FinishResponseSubscriber.php
@@ -129,6 +145,22 @@ parameters:
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 4
 			path: lib/Drupal/Core/Flood/DatabaseBackend.php
+
+		-
+			message: """
+				#^Call to deprecated function GuzzleHttp\\\\default_user_agent\\(\\)\\:
+				default_user_agent will be removed in guzzlehttp/guzzle\\:8\\.0\\. Use Utils\\:\\:defaultUserAgent instead\\.$#
+			"""
+			count: 1
+			path: lib/Drupal/Core/Http/ClientFactory.php
+
+		-
+			message: """
+				#^Call to deprecated method getMasterRequest\\(\\) of class Symfony\\\\Component\\\\HttpFoundation\\\\RequestStack\\:
+				since symfony/http\\-foundation 5\\.3, use getMainRequest\\(\\) instead$#
+			"""
+			count: 1
+			path: lib/Drupal/Core/Http/RequestStack.php
 
 		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
@@ -426,6 +458,59 @@ parameters:
 			path: modules/file/tests/src/Kernel/DeleteTest.php
 
 		-
+			message: """
+				#^Call to deprecated function _file_save_upload_single\\(\\)\\:
+				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Drupal\\\\file\\\\Upload\\\\FileUploadHandler\\:\\:handleFileUpload\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: modules/file/tests/src/Kernel/LegacyFileTest.php
+
+		-
+			message: """
+				#^Call to deprecated function _views_file_status\\(\\)\\:
+				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\.
+				  There is no replacement\\.$#
+			"""
+			count: 1
+			path: modules/file/tests/src/Kernel/LegacyFileTest.php
+
+		-
+			message: """
+				#^Call to deprecated function file_copy\\(\\)\\:
+				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Drupal\\\\file\\\\FileRepositoryInterface\\:\\:copy\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: modules/file/tests/src/Kernel/LegacyFileTest.php
+
+		-
+			message: """
+				#^Call to deprecated function file_move\\(\\)\\:
+				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Drupal\\\\file\\\\FileRepositoryInterface\\:\\:move\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: modules/file/tests/src/Kernel/LegacyFileTest.php
+
+		-
+			message: """
+				#^Call to deprecated function file_save_data\\(\\)\\:
+				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Drupal\\\\file\\\\FileRepositoryInterface\\:\\:writeData\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: modules/file/tests/src/Kernel/LegacyFileTest.php
+
+		-
+			message: """
+				#^Call to deprecated method assertFileNotExists\\(\\) of class PHPUnit\\\\Framework\\\\Assert\\:
+				https\\://github\\.com/sebastianbergmann/phpunit/issues/4077$#
+			"""
+			count: 1
+			path: modules/file/tests/src/Kernel/LegacyFileTest.php
+
+		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 2
 			path: modules/file/tests/src/Kernel/UsageTest.php
@@ -506,9 +591,27 @@ parameters:
 			path: modules/menu_link_content/tests/src/Kernel/MenuLinksTest.php
 
 		-
+			message: """
+				#^Call to deprecated method registerLoader\\(\\) of class Doctrine\\\\Common\\\\Annotations\\\\AnnotationRegistry\\:
+				This method is deprecated and will be removed in
+				            doctrine/annotations 2\\.0\\. Annotations will be autoloaded in 2\\.0\\.$#
+			"""
+			count: 1
+			path: modules/migrate/src/Plugin/Discovery/AnnotatedClassDiscoveryAutomatedProviders.php
+
+		-
 			message: "#^Call to an undefined static method static\\(Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\MigrateTestBase\\)\\:\\:migrateDumpAlter\\(\\)\\.$#"
 			count: 1
 			path: modules/migrate/tests/src/Kernel/MigrateTestBase.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\migrate_drupal\\\\Plugin\\\\migrate\\\\field\\\\NodeReference\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				\\\\Drupal\\\\migrate_drupal\\\\Plugin\\\\migrate\\\\field\\\\d6\\\\NodeReference instead\\.$#
+			"""
+			count: 1
+			path: modules/migrate_drupal/tests/src/Unit/Plugin/migrate/field/d6/NodeReferenceFieldTest.php
 
 		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
@@ -591,6 +694,42 @@ parameters:
 			path: modules/search/tests/src/Functional/SearchRankingTest.php
 
 		-
+			message: """
+				#^Call to deprecated function search_expand_cjk\\(\\)\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use a
+				  custom implementation of SearchTextProcessorInterface instead\\.$#
+			"""
+			count: 1
+			path: modules/search/tests/src/Kernel/SearchDeprecationTest.php
+
+		-
+			message: """
+				#^Call to deprecated function search_index_split\\(\\)\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use a
+				  \\\\Drupal\\\\search\\\\SearchTextProcessorInterface\\:\\:process\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: modules/search/tests/src/Kernel/SearchDeprecationTest.php
+
+		-
+			message: """
+				#^Call to deprecated function search_invoke_preprocess\\(\\)\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use a
+				  custom implementation of SearchTextProcessor instead\\.$#
+			"""
+			count: 1
+			path: modules/search/tests/src/Kernel/SearchDeprecationTest.php
+
+		-
+			message: """
+				#^Call to deprecated function search_simplify\\(\\)\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Drupal\\\\search\\\\SearchTextProcessorInterface\\:\\:analyze\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: modules/search/tests/src/Kernel/SearchDeprecationTest.php
+
+		-
 			message: "#^Class Drupal\\\\block\\\\Entity\\\\Block referenced with incorrect case\\: Drupal\\\\block\\\\entity\\\\Block\\.$#"
 			count: 2
 			path: modules/settings_tray/settings_tray.module
@@ -624,6 +763,15 @@ parameters:
 			message: "#^Class Drupal\\\\advisory_feed_test\\\\AdvisoriesTestHttpClient extends @final class GuzzleHttp\\\\Client\\.$#"
 			count: 1
 			path: modules/system/tests/modules/advisory_feed_test/src/AdvisoriesTestHttpClient.php
+
+		-
+			message: """
+				#^Call to deprecated function deprecation_test_function\\(\\)\\:
+				in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
+				  the deprecation message for deprecated_test_function\\(\\)\\.$#
+			"""
+			count: 1
+			path: modules/system/tests/modules/deprecation_test/src/DeprecatedController.php
 
 		-
 			message: "#^File core/modules/system/tests/modules/entity_test/entity_test\\.inc could not be loaded from Drupal\\\\Core\\\\Extension\\\\ModuleHandlerInterface\\:\\:loadInclude$#"
@@ -664,6 +812,73 @@ parameters:
 			message: "#^Call to function unset\\(\\) contains undefined variable \\$handler\\.$#"
 			count: 1
 			path: modules/taxonomy/src/Plugin/views/argument/IndexTidDepthModifier.php
+
+		-
+			message: """
+				#^Call to deprecated function taxonomy_term_load_multiple_by_name\\(\\)\\:
+				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Drupal\\:\\:entityTypeManager\\(\\)\\-\\>getStorage\\('taxonomy_vocabulary'\\)\\-\\>loadByProperties\\(\\['name' \\=\\> \\$name, 'vid' \\=\\> \\$vid\\]\\)
+				  instead, to get a list of taxonomy term entities having the same name and
+				  keyed by their term ID\\.$#
+			"""
+			count: 10
+			path: modules/taxonomy/tests/src/Functional/TermTest.php
+
+		-
+			message: """
+				#^Call to deprecated function taxonomy_implode_tags\\(\\)\\:
+				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Drupal\\\\Core\\\\Entity\\\\Element\\\\EntityAutocomplete\\:\\:getEntityLabels\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: modules/taxonomy/tests/src/Kernel/TaxonomyDeprecationTest.php
+
+		-
+			message: """
+				#^Call to deprecated function taxonomy_term_title\\(\\)\\:
+				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\$term\\-\\>label\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: modules/taxonomy/tests/src/Kernel/TaxonomyDeprecationTest.php
+
+		-
+			message: """
+				#^Call to deprecated function taxonomy_term_uri\\(\\)\\:
+				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\$term\\-\\>toUrl\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: modules/taxonomy/tests/src/Kernel/TaxonomyDeprecationTest.php
+
+		-
+			message: """
+				#^Call to deprecated function taxonomy_terms_static_reset\\(\\)\\:
+				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Drupal\\:\\:entityTypeManager\\(\\)\\-\\>getStorage\\('taxonomy_term'\\)\\-\\>resetCache\\(\\)
+				  instead\\.$#
+			"""
+			count: 1
+			path: modules/taxonomy/tests/src/Kernel/TaxonomyDeprecationTest.php
+
+		-
+			message: """
+				#^Call to deprecated function taxonomy_vocabulary_get_names\\(\\)\\:
+				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Drupal\\:\\:entityQuery\\('taxonomy_vocabulary'\\)\\-\\>execute\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: modules/taxonomy/tests/src/Kernel/TaxonomyDeprecationTest.php
+
+		-
+			message: """
+				#^Call to deprecated function taxonomy_vocabulary_static_reset\\(\\)\\:
+				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Drupal\\:\\:entityTypeManager\\(\\)\\-\\>getStorage\\('taxonomy_vocabulary'\\)\\-\\>resetCache\\(\\$ids\\)
+				  instead\\.$#
+			"""
+			count: 1
+			path: modules/taxonomy/tests/src/Kernel/TaxonomyDeprecationTest.php
 
 		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
@@ -739,6 +954,15 @@ parameters:
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 1
 			path: modules/user/tests/src/FunctionalJavascript/UserPasswordResetTest.php
+
+		-
+			message: """
+				#^Call to deprecated function user_password\\(\\)\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Drupal\\\\Core\\\\Password\\\\PasswordGeneratorInterface\\:\\:generate\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: modules/user/tests/src/Kernel/UserLegacyTest.php
 
 		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
@@ -831,6 +1055,36 @@ parameters:
 			path: modules/views/tests/src/Kernel/RenderCacheIntegrationTest.php
 
 		-
+			message: """
+				#^Call to deprecated method needsEntityLinkUrlUpdate\\(\\) of class Drupal\\\\views\\\\ViewsConfigUpdater\\:
+				in drupal\\:9\\.0\\.0 and is removed from drupal\\:10\\.0\\.0\\.
+				  Module\\-provided Views configuration should be updated to accommodate the
+				  changes described below\\.$#
+			"""
+			count: 2
+			path: modules/views/tests/src/Kernel/ViewsConfigUpdaterTest.php
+
+		-
+			message: """
+				#^Call to deprecated method needsMultivalueBaseFieldUpdate\\(\\) of class Drupal\\\\views\\\\ViewsConfigUpdater\\:
+				in drupal\\:9\\.0\\.0 and is removed from drupal\\:10\\.0\\.0\\.
+				  Module\\-provided Views configuration should be updated to accommodate the
+				  changes described below\\.$#
+			"""
+			count: 2
+			path: modules/views/tests/src/Kernel/ViewsConfigUpdaterTest.php
+
+		-
+			message: """
+				#^Call to deprecated method needsOperatorDefaultsUpdate\\(\\) of class Drupal\\\\views\\\\ViewsConfigUpdater\\:
+				in drupal\\:9\\.0\\.0 and is removed from drupal\\:10\\.0\\.0\\.
+				  Module\\-provided Views configuration should be updated to accommodate the
+				  changes described below\\.$#
+			"""
+			count: 2
+			path: modules/views/tests/src/Kernel/ViewsConfigUpdaterTest.php
+
+		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 1
 			path: modules/views/views.theme.inc
@@ -846,6 +1100,24 @@ parameters:
 			path: rebuild.php
 
 		-
+			message: """
+				#^Call to deprecated method drupalGetHeader\\(\\) of class Drupal\\\\Tests\\\\BrowserTestBase\\:
+				in drupal\\:9\\.2\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\$this\\-\\>getSession\\(\\)\\-\\>getResponseHeader\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/FunctionalTests/BrowserTestBaseTest.php
+
+		-
+			message: """
+				#^Call to deprecated method drupalPostForm\\(\\) of class Drupal\\\\Tests\\\\BrowserTestBase\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\$this\\-\\>submitForm\\(\\) instead\\.$#
+			"""
+			count: 2
+			path: tests/Drupal/FunctionalTests/BrowserTestBaseTest.php
+
+		-
 			message: "#^The \"%%alias_id%%\" alias is deprecated in drupal\\:9\\.0\\.0 and is removed from drupal\\:20\\.0\\.0\\. This is a test\\.$#"
 			count: 1
 			path: tests/Drupal/FunctionalTests/Core/Container/ServiceDeprecationTest.php
@@ -854,6 +1126,15 @@ parameters:
 			message: "#^The \"deprecation_test\\.service\" service is deprecated in drupal\\:9\\.0\\.0 and is removed from drupal\\:20\\.0\\.0\\. This is a test\\.$#"
 			count: 1
 			path: tests/Drupal/FunctionalTests/Core/Container/ServiceDeprecationTest.php
+
+		-
+			message: """
+				#^Call to deprecated function deprecation_test_function\\(\\)\\:
+				in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
+				  the deprecation message for deprecated_test_function\\(\\)\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/FunctionalTests/Core/Test/PhpUnitBridgeTest.php
 
 		-
 			message: "#^Drupal\\\\Tests\\\\BrowserTestBase\\:\\:\\$defaultTheme is required\\. See https\\://www\\.drupal\\.org/node/3083055, which includes recommendations on which theme to use\\.$#"
@@ -876,6 +1157,438 @@ parameters:
 			path: tests/Drupal/KernelTests/Core/Config/ConfigStorageStagingTest.php
 
 		-
+			message: """
+				#^Call to deprecated method getUnprefixedTablesMap\\(\\) of class Drupal\\\\Core\\\\Database\\\\Connection\\:
+				in drupal\\:10\\.0\\.0 and is removed from drupal\\:11\\.0\\.0\\. There is
+				  no replacement\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/ConnectionTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\mysql\\\\Connection\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The MySQL
+				  database driver has been moved to the mysql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/MysqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\mysql\\\\ExceptionHandler\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The MySQL
+				  database driver has been moved to the mysql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/MysqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\mysql\\\\Insert\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The MySQL
+				  database driver has been moved to the mysql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/MysqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\mysql\\\\Install\\\\Tasks\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The MySQL
+				  database driver has been moved to the mysql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/MysqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\mysql\\\\Schema\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The MySQL
+				  database driver has been moved to the mysql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/MysqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\mysql\\\\Upsert\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The MySQL
+				  database driver has been moved to the mysql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/MysqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\mysql\\\\Connection\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The MySQL
+				  database driver has been moved to the mysql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/MysqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\mysql\\\\ExceptionHandler\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The MySQL
+				  database driver has been moved to the mysql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/MysqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\mysql\\\\Insert\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The MySQL
+				  database driver has been moved to the mysql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/MysqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\mysql\\\\Install\\\\Tasks\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The MySQL
+				  database driver has been moved to the mysql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/MysqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\mysql\\\\Schema\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The MySQL
+				  database driver has been moved to the mysql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/MysqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\mysql\\\\Upsert\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The MySQL
+				  database driver has been moved to the mysql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/MysqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Connection\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Delete\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Insert\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Install\\\\Tasks\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Schema\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Select\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Truncate\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Update\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Upsert\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Connection\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Delete\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Insert\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Install\\\\Tasks\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Schema\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Select\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Truncate\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Update\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\pgsql\\\\Upsert\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The PostgreSQL
+				  database driver has been moved to the pgsql module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/PgsqlDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching deprecated class constant RETURN_INSERT_ID of class Drupal\\\\Core\\\\Database\\\\Database\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. There is no
+				  replacement\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/QueryTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Connection\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Insert\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Install\\\\Tasks\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Schema\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Select\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Statement\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Truncate\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Upsert\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Connection\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Insert\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Install\\\\Tasks\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Schema\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Select\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Statement\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Truncate\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Upsert\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
+				  database driver has been moved to the sqlite module\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
+
+		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 4
 			path: tests/Drupal/KernelTests/Core/Entity/ContentEntityChangedTest.php
@@ -891,9 +1604,29 @@ parameters:
 			path: tests/Drupal/KernelTests/Core/Entity/EntityTypeConstraintsTest.php
 
 		-
+			message: """
+				#^Call to deprecated function module_load_include\\(\\)\\:
+				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\.
+				  Use \\\\Drupal\\:\\:moduleHandler\\(\\)\\-\\>loadInclude\\(\\$module, \\$type, \\$name \\= NULL\\)\\.
+				  Note that including code from uninstalled extensions is no longer
+				  supported\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Extension/ModuleLegacyTest.php
+
+		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 1
 			path: tests/Drupal/KernelTests/Core/KeyValueStore/GarbageCollectionTest.php
+
+		-
+			message: """
+				#^Usage of deprecated trait Drupal\\\\Tests\\\\Traits\\\\ExpectDeprecationTrait in class Drupal\\\\KernelTests\\\\Core\\\\Plugin\\\\Context\\\\ContextAwarePluginTraitTest\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Symfony\\\\Bridge\\\\PhpUnit\\\\ExpectDeprecationTrait instead\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Plugin/Context/ContextAwarePluginTraitTest.php
 
 		-
 			message: "#^\\#pre_render callback 'element_info_test…' at key '1' is not trusted\\.$#"
@@ -914,6 +1647,15 @@ parameters:
 			message: "#^Instantiated class Drupal\\\\FunctionalTests\\\\BrowserMissingDependentModuleTest not found\\.$#"
 			count: 1
 			path: tests/Drupal/KernelTests/Core/Test/BrowserTestBaseTest.php
+
+		-
+			message: """
+				#^Call to deprecated function deprecation_test_function\\(\\)\\:
+				in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
+				  the deprecation message for deprecated_test_function\\(\\)\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Test/PhpUnitBridgeTest.php
 
 		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
@@ -956,7 +1698,24 @@ parameters:
 			path: tests/Drupal/Tests/BrowserTestBase.php
 
 		-
+			message: """
+				#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\Client\\:
+				Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/BrowserTestBase.php
+
+		-
 			message: "#^Array has 2 duplicate keys with value 'ClassWithConstants\\.SOME_KEY' \\(\\\\Drupal\\\\Tests\\\\Component\\\\Annotation\\\\Doctrine\\\\Fixtures\\\\ClassWithConstants\\:\\:SOME_KEY, \\\\Drupal\\\\Tests\\\\Component\\\\Annotation\\\\Doctrine\\\\Fixtures\\\\ClassWithConstants\\:\\:SOME_KEY\\)\\.$#"
+			count: 1
+			path: tests/Drupal/Tests/Component/Annotation/Doctrine/DocParserTest.php
+
+		-
+			message: """
+				#^Call to deprecated method registerAutoloadNamespace\\(\\) of class Doctrine\\\\Common\\\\Annotations\\\\AnnotationRegistry\\:
+				This method is deprecated and will be removed in
+				            doctrine/annotations 2\\.0\\. Annotations will be autoloaded in 2\\.0\\.$#
+			"""
 			count: 1
 			path: tests/Drupal/Tests/Component/Annotation/Doctrine/DocParserTest.php
 
@@ -971,6 +1730,15 @@ parameters:
 			path: tests/Drupal/Tests/Composer/ComposerTest.php
 
 		-
+			message: """
+				#^Call to deprecated function db_installer_object\\(\\)\\:
+				in drupal\\:10\\.0\\.0 and is removed from drupal\\:11\\.0\\.0\\. There is no
+				  replacement\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/Core/Database/InstallerObjectTest.php
+
+		-
 			message: "#^Class Drupal\\\\Driver\\\\Database\\\\corefake\\\\Install\\\\Tasks not found\\.$#"
 			count: 1
 			path: tests/Drupal/Tests/Core/Database/InstallerObjectTest.php
@@ -979,6 +1747,32 @@ parameters:
 			message: "#^Class Drupal\\\\Driver\\\\Database\\\\fake\\\\Install\\\\Tasks not found\\.$#"
 			count: 1
 			path: tests/Drupal/Tests/Core/Database/InstallerObjectTest.php
+
+		-
+			message: """
+				#^Call to deprecated method isSubclassOf\\(\\) of class Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\:
+				in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\.
+				  Use Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\:\\:entityClassImplements\\(\\)
+				  instead\\.$#
+			"""
+			count: 2
+			path: tests/Drupal/Tests/Core/Entity/EntityTypeTest.php
+
+		-
+			message: """
+				#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\Client\\:
+				Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/Core/Http/ClientFactoryTest.php
+
+		-
+			message: """
+				#^Call to deprecated method getMasterRequest\\(\\) of class Drupal\\\\Core\\\\Http\\\\RequestStack\\:
+				since symfony/http\\-foundation 5\\.3, use getMainRequest\\(\\) instead$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/Core/Http/RequestStackLegacyTest.php
 
 		-
 			message: "#^Array has 2 duplicate keys with value 'default' \\('default', 'default'\\)\\.$#"
@@ -1026,7 +1820,58 @@ parameters:
 			path: tests/Drupal/Tests/Core/Render/RendererTest.php
 
 		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\StringTranslation\\\\TranslationWrapper\\:
+				in drupal\\:8\\.0\\.0 and is removed from drupal\\:10\\.0\\.0\\.
+				  Use the \\\\Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup class instead\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/Core/StringTranslation/TranslationWrapperTest.php
+
+		-
+			message: """
+				#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\ClientInterface\\:
+				ClientInterface\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/DrupalTestBrowser.php
+
+		-
+			message: """
+				#^Usage of deprecated trait Drupal\\\\Tests\\\\Traits\\\\ExpectDeprecationTrait in class Drupal\\\\Tests\\\\ExpectDeprecationTest\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Symfony\\\\Bridge\\\\PhpUnit\\\\ExpectDeprecationTrait instead\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/ExpectDeprecationTest.php
+
+		-
 			message: "#^Call to an undefined static method PHPUnit\\\\Util\\\\ErrorHandler\\:\\:handleError\\(\\)\\.$#"
 			count: 1
 			path: tests/Drupal/Tests/Listeners/DrupalListener.php
+
+		-
+			message: """
+				#^Class Drupal\\\\Tests\\\\Listeners\\\\DrupalListener implements deprecated interface PHPUnit\\\\Framework\\\\TestListener\\:
+				Use the `TestHook` interfaces instead$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/Listeners/DrupalListener.php
+
+		-
+			message: """
+				#^Usage of deprecated trait PHPUnit\\\\Framework\\\\TestListenerDefaultImplementation in class Drupal\\\\Tests\\\\Listeners\\\\DrupalListener\\:
+				The `TestListener` interface is deprecated$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/Listeners/DrupalListener.php
+
+		-
+			message: """
+				#^Call to deprecated method assertArrayEquals\\(\\) of class Drupal\\\\Tests\\\\UnitTestCase\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\:\\:assertEquals, \\:\\:assertEqualsCanonicalizing, or \\:\\:assertSame instead\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/UnitTestCaseTest.php
 

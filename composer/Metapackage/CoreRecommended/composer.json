@@ -24,6 +24,8 @@
         "pear/console_getopt": "v1.4.3",
         "pear/pear-core-minimal": "v1.10.11",
         "pear/pear_exception": "v1.0.2",
+        "phpstan/phpstan": "1.4.0",
+        "phpstan/phpstan-deprecation-rules": "1.0.0",
         "psr/cache": "3.0.0",
         "psr/container": "1.1.2",
         "psr/event-dispatcher": "1.0.0",

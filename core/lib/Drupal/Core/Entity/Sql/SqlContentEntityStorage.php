@@ -935,6 +935,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         // @todo Remove the 'return' option in Drupal 11.
         // @see https://www.drupal.org/project/drupal/issues/3256524
         $insert_id = $this->database
+          // @phpstan-ignore-next-line
           ->insert($this->baseTable, ['return' => Database::RETURN_INSERT_ID])
           ->fields((array) $record)
           ->execute();
@@ -1140,6 +1141,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       // @todo Remove the 'return' option in Drupal 11.
       // @see https://www.drupal.org/project/drupal/issues/3256524
       $insert_id = $this->database
+        // @phpstan-ignore-next-line
         ->insert($this->revisionTable, ['return' => Database::RETURN_INSERT_ID])
         ->fields((array) $record)
         ->execute();
