@@ -806,6 +806,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       unset($values['selection'][$delta]);
       $field_state['items'] = $values['selection'];
       $field_state['items_count']--;
+      unset($field_state['original_deltas']);
       static::setFieldState($element, $form_state, $field_state);
     }
 
@@ -902,7 +903,9 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
           ];
         }
       }
+      unset($field_state['original_deltas']);
       $field_state['items_count'] = count($field_state['items']);
+      NestedArray::setValue($form_state->getUserInput(), $element['selection']['#parents'], $field_state['items']);
       static::setFieldState($element, $form_state, $field_state);
     }
 

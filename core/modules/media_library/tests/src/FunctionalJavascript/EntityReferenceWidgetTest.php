@@ -414,9 +414,11 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
 
     // Finally, save the form.
     $assert_session->elementExists('css', '.js-media-library-widget-toggle-weight')->click();
+    file_put_contents('foo.html', $this->getRawContent());
+    sleep(10);
     $this->submitForm([
       'title[0][value]' => 'My page',
-      'field_twin_media[selection][0][weight]' => '3',
+      'field_twin_media[selection][0][_weight]' => 3,
     ], 'Save');
     $assert_session->pageTextContains('Basic Page My page has been created');
     // We removed this item earlier.
