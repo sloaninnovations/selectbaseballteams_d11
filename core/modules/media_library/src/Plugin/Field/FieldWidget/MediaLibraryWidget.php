@@ -891,20 +891,16 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
 
     $media = static::getNewMediaItems($element, $form_state);
     if (!empty($media)) {
-      // Get the weight of the last items and count from there.
-      $last_element = end($field_state['items']);
-      $weight = $last_element ? $last_element['weight'] : 0;
       foreach ($media as $media_item) {
         // Any ID can be passed to the widget, so we have to check access.
         if ($media_item->access('view')) {
           $field_state['items'][] = [
             'target_id' => $media_item->id(),
-            '_weight' => ++$weight,
+            '_weight' => $field_state['items_count']++,
           ];
         }
       }
       unset($field_state['original_deltas']);
-      $field_state['items_count'] = count($field_state['items']);
       NestedArray::setValue($form_state->getUserInput(), $element['selection']['#parents'], $field_state['items']);
       static::setFieldState($element, $form_state, $field_state);
     }
