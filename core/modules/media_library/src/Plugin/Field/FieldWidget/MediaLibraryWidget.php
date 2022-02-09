@@ -279,9 +279,6 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // Load the items for form rebuilds from the field state.
     $field_state = static::getWidgetState($form['#parents'], $this->fieldDefinition->getName(), $form_state);
     if (isset($field_state['items'])) {
-      usort($field_state['items'], function ($a, $b) {
-        return SortArray::sortByKeyInt($a, $b, '_weight');
-      });
       $items->setValue($field_state['items']);
     }
 
@@ -393,11 +390,11 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       ],
     ];
     $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
+    $field_state = static::getWidgetState($parents, $field_name, $form_state);
 
     // Determine the number of widgets to display.
     switch ($cardinality) {
       case FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED:
-        $field_state = static::getWidgetState($parents, $field_name, $form_state);
         $max = $field_state['items_count'];
         break;
 
@@ -407,7 +404,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     }
 
     foreach ($referenced_entities as $delta => $media_item) {
-      $element['selection'][$delta] = [
+      $original_delta = $field_state['original_deltas'][$delta] ?? $delta;
+      $element['selection'][$original_delta] = [
         '#theme' => 'media_library_item__widget',
         '#attributes' => [
           'class' => [
@@ -784,15 +782,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The form state.
    */
   public static function removeItem(array $form, FormStateInterface $form_state) {
-    // During the form rebuild, formElement() will create field item widget
-    // elements using re-indexed deltas, so clear out FormState::$input to
-    // avoid a mismatch between old and new deltas. The rebuilt elements will
-    // have #default_value set appropriately for the current state of the field,
-    // so nothing is lost in doing this.
-    // @see Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::extractFormValues
     $triggering_element = $form_state->getTriggeringElement();
-    $parents = array_slice($triggering_element['#parents'], 0, -2);
-    NestedArray::setValue($form_state->getUserInput(), $parents, NULL);
 
     // Get the parents required to find the top-level widget element.
     if (count($triggering_element['#array_parents']) < 4) {
@@ -893,17 +883,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The form state.
    */
   public static function addItems(array $form, FormStateInterface $form_state) {
-    // During the form rebuild, formElement() will create field item widget
-    // elements using re-indexed deltas, so clear out FormState::$input to
-    // avoid a mismatch between old and new deltas. The rebuilt elements will
-    // have #default_value set appropriately for the current state of the field,
-    // so nothing is lost in doing this.
-    // @see Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::extractFormValues
     $button = $form_state->getTriggeringElement();
-    $parents = array_slice($button['#parents'], 0, -1);
-    $parents[] = 'selection';
-    NestedArray::setValue($form_state->getUserInput(), $parents, NULL);
-
     $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
 
     $field_state = static::getFieldState($element, $form_state);
