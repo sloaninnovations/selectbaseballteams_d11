@@ -279,7 +279,6 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // Load the items for form rebuilds from the field state.
     $field_state = static::getWidgetState($form['#parents'], $this->fieldDefinition->getName(), $form_state);
     if (isset($field_state['items'])) {
-      usort($field_state['items'], [SortArray::class, 'sortByWeightElement']);
       $items->setValue($field_state['items']);
     }
 
@@ -390,9 +389,23 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
         ],
       ],
     ];
+    $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
+    $field_state = static::getWidgetState($parents, $field_name, $form_state);
+
+    // Determine the number of widgets to display.
+    switch ($cardinality) {
+      case FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED:
+        $max = $field_state['items_count'];
+        break;
+
+      default:
+        $max = $cardinality - 1;
+        break;
+    }
 
     foreach ($referenced_entities as $delta => $media_item) {
-      $element['selection'][$delta] = [
+      $original_delta = $field_state['original_deltas'][$delta] ?? $delta;
+      $element['selection'][$original_delta] = [
         '#theme' => 'media_library_item__widget',
         '#attributes' => [
           'class' => [
@@ -435,13 +448,15 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
           '#type' => 'hidden',
           '#value' => $media_item->id(),
         ],
-        // This hidden value can be toggled visible for accessibility.
-        'weight' => [
-          '#type' => 'number',
-          '#theme' => 'input__number__media_library_item_weight',
+        '_weight' => [
+          '#type' => 'weight',
           '#title' => $this->t('Weight'),
+          '#title_display' => 'invisible',
+          // Note: this 'delta' is the FAPI #type 'weight' element's property.
+          '#delta' => $max,
           '#access' => $multiple_items,
-          '#default_value' => $delta,
+          '#default_value' => $items[$delta]->_weight ?: $delta,
+          '#weight' => 100,
           '#attributes' => [
             'class' => [
               'js-media-library-item-weight',
@@ -661,7 +676,14 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     if (isset($values['selection'])) {
-      usort($values['selection'], [SortArray::class, 'sortByWeightElement']);
+      // The original delta, before drag-and-drop reordering, is needed to
+      // route errors to the correct form element.
+      foreach ($values['selection'] as $delta => &$value) {
+        $value['_original_delta'] = $delta;
+      }
+      usort($values['selection'], function ($a, $b) {
+        return SortArray::sortByKeyInt($a, $b, '_weight');
+      });
       return $values['selection'];
     }
     return [];
@@ -726,7 +748,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $delta_to_focus = 0;
       foreach ($field_state['items'] as $delta => $item_fields) {
         $delta_to_focus = $delta;
-        if ($item_fields['weight'] > $removed_item_weight) {
+        if ($item_fields['_weight'] > $removed_item_weight) {
           // Stop directly when we find an item with a bigger weight. We also
           // have to subtract 1 from the delta in this case, since the delta's
           // are renumbered when rebuilding the form.
@@ -760,15 +782,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The form state.
    */
   public static function removeItem(array $form, FormStateInterface $form_state) {
-    // During the form rebuild, formElement() will create field item widget
-    // elements using re-indexed deltas, so clear out FormState::$input to
-    // avoid a mismatch between old and new deltas. The rebuilt elements will
-    // have #default_value set appropriately for the current state of the field,
-    // so nothing is lost in doing this.
-    // @see Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::extractFormValues
     $triggering_element = $form_state->getTriggeringElement();
-    $parents = array_slice($triggering_element['#parents'], 0, -2);
-    NestedArray::setValue($form_state->getUserInput(), $parents, NULL);
 
     // Get the parents required to find the top-level widget element.
     if (count($triggering_element['#array_parents']) < 4) {
@@ -787,10 +801,11 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     if (isset($values['selection'][$delta])) {
       // Add the weight of the removed item to the field state so we can shift
       // focus to the next/previous item in an easy way.
-      $field_state['removed_item_weight'] = $values['selection'][$delta]['weight'];
+      $field_state['removed_item_weight'] = $values['selection'][$delta]['_weight'];
       $field_state['removed_item_id'] = $triggering_element['#media_id'];
       unset($values['selection'][$delta]);
       $field_state['items'] = $values['selection'];
+      $field_state['items_count']--;
       static::setFieldState($element, $form_state, $field_state);
     }
 
@@ -868,17 +883,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The form state.
    */
   public static function addItems(array $form, FormStateInterface $form_state) {
-    // During the form rebuild, formElement() will create field item widget
-    // elements using re-indexed deltas, so clear out FormState::$input to
-    // avoid a mismatch between old and new deltas. The rebuilt elements will
-    // have #default_value set appropriately for the current state of the field,
-    // so nothing is lost in doing this.
-    // @see Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::extractFormValues
     $button = $form_state->getTriggeringElement();
-    $parents = array_slice($button['#parents'], 0, -1);
-    $parents[] = 'selection';
-    NestedArray::setValue($form_state->getUserInput(), $parents, NULL);
-
     $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
 
     $field_state = static::getFieldState($element, $form_state);
@@ -893,10 +898,11 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
         if ($media_item->access('view')) {
           $field_state['items'][] = [
             'target_id' => $media_item->id(),
-            'weight' => ++$weight,
+            '_weight' => ++$weight,
           ];
         }
       }
+      $field_state['items_count'] = count($field_state['items']);
       static::setFieldState($element, $form_state, $field_state);
     }
 
