@@ -393,14 +393,11 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     $field_state = static::getWidgetState($parents, $field_name, $form_state);
 
     // Determine the number of widgets to display.
-    switch ($cardinality) {
-      case FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED:
-        $max = $field_state['items_count'];
-        break;
-
-      default:
-        $max = $cardinality - 1;
-        break;
+    if ($cardinality === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
+      $max = $field_state['items_count'];
+    }
+    else {
+      $max = $cardinality - 1;
     }
 
     foreach ($referenced_entities as $delta => $media_item) {
@@ -854,7 +851,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
 
     // Check if more items were selected than we allow.
     $cardinality_unlimited = ($element['#cardinality'] === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
-    $selection = count($field_state['items']) + count($media);
+    $selection = $field_state['items_count'] + count($media);
     if (!$cardinality_unlimited && ($selection > $element['#cardinality'])) {
       $form_state->setError($element, \Drupal::translation()->formatPlural($element['#cardinality'], 'Only one item can be selected.', 'Only @count items can be selected.'));
     }
@@ -1003,7 +1000,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // Trigger error if the field is required and no media is present. Although
     // the Form API's default validation would also catch this, the validation
     // error message is too vague, so a more precise one is provided here.
-    if (count($field_state['items']) === 0) {
+    if ($field_state['items_count'] === 0) {
       $form_state->setError($element, t('@name field is required.', ['@name' => $element['#title']]));
     }
   }
