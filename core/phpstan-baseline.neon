@@ -694,42 +694,6 @@ parameters:
 			path: modules/search/tests/src/Functional/SearchRankingTest.php
 
 		-
-			message: """
-				#^Call to deprecated function search_expand_cjk\\(\\)\\:
-				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use a
-				  custom implementation of SearchTextProcessorInterface instead\\.$#
-			"""
-			count: 1
-			path: modules/search/tests/src/Kernel/SearchDeprecationTest.php
-
-		-
-			message: """
-				#^Call to deprecated function search_index_split\\(\\)\\:
-				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use a
-				  \\\\Drupal\\\\search\\\\SearchTextProcessorInterface\\:\\:process\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: modules/search/tests/src/Kernel/SearchDeprecationTest.php
-
-		-
-			message: """
-				#^Call to deprecated function search_invoke_preprocess\\(\\)\\:
-				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use a
-				  custom implementation of SearchTextProcessor instead\\.$#
-			"""
-			count: 1
-			path: modules/search/tests/src/Kernel/SearchDeprecationTest.php
-
-		-
-			message: """
-				#^Call to deprecated function search_simplify\\(\\)\\:
-				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\\\Drupal\\\\search\\\\SearchTextProcessorInterface\\:\\:analyze\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: modules/search/tests/src/Kernel/SearchDeprecationTest.php
-
-		-
 			message: "#^Class Drupal\\\\block\\\\Entity\\\\Block referenced with incorrect case\\: Drupal\\\\block\\\\entity\\\\Block\\.$#"
 			count: 2
 			path: modules/settings_tray/settings_tray.module
