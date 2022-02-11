@@ -745,7 +745,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $delta_to_focus = 0;
       foreach ($field_state['items'] as $delta => $item_fields) {
         $delta_to_focus = $delta;
-        if ($delta > $removed_item_weight) {
+        if ($item_fields['_weight'] > $removed_item_weight) {
           // Stop directly when we find an item with a bigger weight. We also
           // have to subtract 1 from the delta in this case, since the delta's
           // are renumbered when rebuilding the form.
