@@ -421,7 +421,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
         ],
         'remove_button' => [
           '#type' => 'submit',
-          '#name' => $field_name . '-' . $delta . '-media-library-remove-button' . $id_suffix,
+          '#name' => $field_name . '-' . $original_delta . '-media-library-remove-button' . $id_suffix,
           '#value' => $this->t('Remove'),
           '#media_id' => $media_item->id(),
           '#attributes' => [
@@ -789,18 +789,20 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     $element = NestedArray::getValue($form, $parents);
 
     // Get the field state.
+    $path = $element['#parents'];
+    $values = NestedArray::getValue($form_state->getValues(), $path);
     $field_state = static::getFieldState($element, $form_state);
 
     // Get the delta of the item being removed.
     $delta = array_slice($triggering_element['#array_parents'], -2, 1)[0];
-    if (isset($field_state['items'][$delta])) {
+    if (isset($values['selection'][$delta])) {
       // Add the weight of the removed item to the field state so we can shift
       // focus to the next/previous item in an easy way.
-      $field_state['removed_item_weight'] = $delta;
+      $field_state['removed_item_weight'] = $values['selection'][$delta]['_weight'];
       $field_state['removed_item_id'] = $triggering_element['#media_id'];
-      unset($field_state['items'][$delta]);
+      unset($values['selection'][$delta]);
       $field_state['items_count']--;
-      $field_state['items'] = array_values($field_state['items']);
+      $field_state['items'] = $values['selection'];
       unset($field_state['original_deltas']);
       NestedArray::setValue($form_state->getUserInput(), $element['selection']['#parents'], $field_state['items']);
       static::setFieldState($element, $form_state, $field_state);
