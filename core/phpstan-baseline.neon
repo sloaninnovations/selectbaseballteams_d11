@@ -1553,17 +1553,6 @@ parameters:
 			path: tests/Drupal/KernelTests/Core/Entity/EntityTypeConstraintsTest.php
 
 		-
-			message: """
-				#^Call to deprecated function module_load_include\\(\\)\\:
-				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\.
-				  Use \\\\Drupal\\:\\:moduleHandler\\(\\)\\-\\>loadInclude\\(\\$module, \\$type, \\$name \\= NULL\\)\\.
-				  Note that including code from uninstalled extensions is no longer
-				  supported\\.$#
-			"""
-			count: 1
-			path: tests/Drupal/KernelTests/Core/Extension/ModuleLegacyTest.php
-
-		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 1
 			path: tests/Drupal/KernelTests/Core/KeyValueStore/GarbageCollectionTest.php
