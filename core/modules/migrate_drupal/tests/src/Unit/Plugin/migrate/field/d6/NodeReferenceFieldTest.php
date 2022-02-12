@@ -13,6 +13,7 @@ use Prophecy\Argument;
  * @coversDefaultClass \Drupal\migrate_drupal\Plugin\migrate\field\NodeReference
  * @group migrate_drupal
  * @group legacy
+ *
  */
 class NodeReferenceFieldTest extends UnitTestCase {
 
@@ -32,6 +33,8 @@ class NodeReferenceFieldTest extends UnitTestCase {
 
   /**
    * {@inheritdoc}
+   *
+   * @deprecated in drupal:9.1.0 and is removed from drupal:11.0.0.
    */
   protected function setUp(): void {
     $this->plugin = new NodeReference([], 'nodereference', []);

@@ -21,6 +21,15 @@ parameters:
 			path: includes/update.inc
 
 		-
+			message: """
+				#^Call to deprecated method registerLoader\\(\\) of class Doctrine\\\\Common\\\\Annotations\\\\AnnotationRegistry\\:
+				This method is deprecated and will be removed in
+				            doctrine/annotations 2\\.0\\. Annotations will be autoloaded in 2\\.0\\.$#
+			"""
+			count: 1
+			path: lib/Drupal/Component/Annotation/Plugin/Discovery/AnnotatedClassDiscovery.php
+
+		-
 			message: "#^Call to method getDefinitions\\(\\) on an unknown class Drupal\\\\Core\\\\Plugin\\\\CategorizingPluginManagerTrait\\.$#"
 			count: 3
 			path: lib/Drupal/Core/Action/ActionManager.php
@@ -458,59 +467,6 @@ parameters:
 			path: modules/file/tests/src/Kernel/DeleteTest.php
 
 		-
-			message: """
-				#^Call to deprecated function _file_save_upload_single\\(\\)\\:
-				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\\\Drupal\\\\file\\\\Upload\\\\FileUploadHandler\\:\\:handleFileUpload\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: modules/file/tests/src/Kernel/LegacyFileTest.php
-
-		-
-			message: """
-				#^Call to deprecated function _views_file_status\\(\\)\\:
-				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\.
-				  There is no replacement\\.$#
-			"""
-			count: 1
-			path: modules/file/tests/src/Kernel/LegacyFileTest.php
-
-		-
-			message: """
-				#^Call to deprecated function file_copy\\(\\)\\:
-				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\\\Drupal\\\\file\\\\FileRepositoryInterface\\:\\:copy\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: modules/file/tests/src/Kernel/LegacyFileTest.php
-
-		-
-			message: """
-				#^Call to deprecated function file_move\\(\\)\\:
-				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\\\Drupal\\\\file\\\\FileRepositoryInterface\\:\\:move\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: modules/file/tests/src/Kernel/LegacyFileTest.php
-
-		-
-			message: """
-				#^Call to deprecated function file_save_data\\(\\)\\:
-				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\\\Drupal\\\\file\\\\FileRepositoryInterface\\:\\:writeData\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: modules/file/tests/src/Kernel/LegacyFileTest.php
-
-		-
-			message: """
-				#^Call to deprecated method assertFileNotExists\\(\\) of class PHPUnit\\\\Framework\\\\Assert\\:
-				https\\://github\\.com/sebastianbergmann/phpunit/issues/4077$#
-			"""
-			count: 1
-			path: modules/file/tests/src/Kernel/LegacyFileTest.php
-
-		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 2
 			path: modules/file/tests/src/Kernel/UsageTest.php
@@ -729,15 +685,6 @@ parameters:
 			path: modules/system/tests/modules/advisory_feed_test/src/AdvisoriesTestHttpClient.php
 
 		-
-			message: """
-				#^Call to deprecated function deprecation_test_function\\(\\)\\:
-				in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
-				  the deprecation message for deprecated_test_function\\(\\)\\.$#
-			"""
-			count: 1
-			path: modules/system/tests/modules/deprecation_test/src/DeprecatedController.php
-
-		-
 			message: "#^File core/modules/system/tests/modules/entity_test/entity_test\\.inc could not be loaded from Drupal\\\\Core\\\\Extension\\\\ModuleHandlerInterface\\:\\:loadInclude$#"
 			count: 2
 			path: modules/system/tests/modules/entity_test/entity_test.install
@@ -787,62 +734,6 @@ parameters:
 			"""
 			count: 10
 			path: modules/taxonomy/tests/src/Functional/TermTest.php
-
-		-
-			message: """
-				#^Call to deprecated function taxonomy_implode_tags\\(\\)\\:
-				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\\\Drupal\\\\Core\\\\Entity\\\\Element\\\\EntityAutocomplete\\:\\:getEntityLabels\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: modules/taxonomy/tests/src/Kernel/TaxonomyDeprecationTest.php
-
-		-
-			message: """
-				#^Call to deprecated function taxonomy_term_title\\(\\)\\:
-				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\$term\\-\\>label\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: modules/taxonomy/tests/src/Kernel/TaxonomyDeprecationTest.php
-
-		-
-			message: """
-				#^Call to deprecated function taxonomy_term_uri\\(\\)\\:
-				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\$term\\-\\>toUrl\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: modules/taxonomy/tests/src/Kernel/TaxonomyDeprecationTest.php
-
-		-
-			message: """
-				#^Call to deprecated function taxonomy_terms_static_reset\\(\\)\\:
-				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\\\Drupal\\:\\:entityTypeManager\\(\\)\\-\\>getStorage\\('taxonomy_term'\\)\\-\\>resetCache\\(\\)
-				  instead\\.$#
-			"""
-			count: 1
-			path: modules/taxonomy/tests/src/Kernel/TaxonomyDeprecationTest.php
-
-		-
-			message: """
-				#^Call to deprecated function taxonomy_vocabulary_get_names\\(\\)\\:
-				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\\\Drupal\\:\\:entityQuery\\('taxonomy_vocabulary'\\)\\-\\>execute\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: modules/taxonomy/tests/src/Kernel/TaxonomyDeprecationTest.php
-
-		-
-			message: """
-				#^Call to deprecated function taxonomy_vocabulary_static_reset\\(\\)\\:
-				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\\\Drupal\\:\\:entityTypeManager\\(\\)\\-\\>getStorage\\('taxonomy_vocabulary'\\)\\-\\>resetCache\\(\\$ids\\)
-				  instead\\.$#
-			"""
-			count: 1
-			path: modules/taxonomy/tests/src/Kernel/TaxonomyDeprecationTest.php
 
 		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
@@ -918,15 +809,6 @@ parameters:
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 1
 			path: modules/user/tests/src/FunctionalJavascript/UserPasswordResetTest.php
-
-		-
-			message: """
-				#^Call to deprecated function user_password\\(\\)\\:
-				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\\\Drupal\\\\Core\\\\Password\\\\PasswordGeneratorInterface\\:\\:generate\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: modules/user/tests/src/Kernel/UserLegacyTest.php
 
 		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
@@ -1019,36 +901,6 @@ parameters:
 			path: modules/views/tests/src/Kernel/RenderCacheIntegrationTest.php
 
 		-
-			message: """
-				#^Call to deprecated method needsEntityLinkUrlUpdate\\(\\) of class Drupal\\\\views\\\\ViewsConfigUpdater\\:
-				in drupal\\:9\\.0\\.0 and is removed from drupal\\:10\\.0\\.0\\.
-				  Module\\-provided Views configuration should be updated to accommodate the
-				  changes described below\\.$#
-			"""
-			count: 2
-			path: modules/views/tests/src/Kernel/ViewsConfigUpdaterTest.php
-
-		-
-			message: """
-				#^Call to deprecated method needsMultivalueBaseFieldUpdate\\(\\) of class Drupal\\\\views\\\\ViewsConfigUpdater\\:
-				in drupal\\:9\\.0\\.0 and is removed from drupal\\:10\\.0\\.0\\.
-				  Module\\-provided Views configuration should be updated to accommodate the
-				  changes described below\\.$#
-			"""
-			count: 2
-			path: modules/views/tests/src/Kernel/ViewsConfigUpdaterTest.php
-
-		-
-			message: """
-				#^Call to deprecated method needsOperatorDefaultsUpdate\\(\\) of class Drupal\\\\views\\\\ViewsConfigUpdater\\:
-				in drupal\\:9\\.0\\.0 and is removed from drupal\\:10\\.0\\.0\\.
-				  Module\\-provided Views configuration should be updated to accommodate the
-				  changes described below\\.$#
-			"""
-			count: 2
-			path: modules/views/tests/src/Kernel/ViewsConfigUpdaterTest.php
-
-		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 1
 			path: modules/views/views.theme.inc
@@ -1062,24 +914,6 @@ parameters:
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 1
 			path: rebuild.php
-
-		-
-			message: """
-				#^Call to deprecated method drupalGetHeader\\(\\) of class Drupal\\\\Tests\\\\BrowserTestBase\\:
-				in drupal\\:9\\.2\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\$this\\-\\>getSession\\(\\)\\-\\>getResponseHeader\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: tests/Drupal/FunctionalTests/BrowserTestBaseTest.php
-
-		-
-			message: """
-				#^Call to deprecated method drupalPostForm\\(\\) of class Drupal\\\\Tests\\\\BrowserTestBase\\:
-				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\$this\\-\\>submitForm\\(\\) instead\\.$#
-			"""
-			count: 2
-			path: tests/Drupal/FunctionalTests/BrowserTestBaseTest.php
 
 		-
 			message: """
@@ -1812,3 +1646,4 @@ parameters:
 			"""
 			count: 1
 			path: tests/Drupal/Tests/UnitTestCaseTest.php
+

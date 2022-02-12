@@ -19,6 +19,8 @@ class TaxonomyDeprecationTest extends KernelTestBase {
   protected static $modules = ['filter', 'taxonomy', 'text', 'user'];
 
   /**
+   * @deprecated in drupal:9.1.0 and is removed from drupal:10.0.0.
+   *
    * @see taxonomy_vocabulary_get_names()
    * @see taxonomy_term_uri()
    * @see taxonomy_terms_static_reset()

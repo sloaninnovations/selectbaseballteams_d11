@@ -10,11 +10,13 @@ class DeprecatedController {
   /**
    * Controller callback.
    *
+   *
    * @return array
    *   Render array.
    */
   public function deprecatedMethod() {
     return [
+      // @phpstan-ignore-next-line
       '#markup' => deprecation_test_function(),
     ];
   }

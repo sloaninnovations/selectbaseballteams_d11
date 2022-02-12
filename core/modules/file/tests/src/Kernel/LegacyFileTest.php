@@ -18,6 +18,8 @@ class LegacyFileTest extends FileManagedUnitTestBase {
   /**
    * Tests file size upload errors.
    *
+   * @deprecated in drupal:9.3.0 and is removed from drupal:11.0.0.
+   *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function testFileSaveUploadSingleErrorFormSize() {
@@ -34,6 +36,8 @@ class LegacyFileTest extends FileManagedUnitTestBase {
   /**
    * Tests the deprecation of _views_file_status().
    *
+   * @deprecated in drupal:9.3.0 and is removed from drupal:11.0.0.
+   *
    * @group legacy
    */
   public function testViewsFileStatus() {
@@ -43,6 +47,8 @@ class LegacyFileTest extends FileManagedUnitTestBase {
 
   /**
    * Tests file_save_data deprecation and that it works without a destination.
+   *
+   * @deprecated in drupal:9.3.0 and is removed from drupal:11.0.0.
    */
   public function testSaveData() {
     $this->expectDeprecation('file_save_data is deprecated in drupal:9.3.0 and will be removed in drupal:10.0.0. Use \Drupal\file\FileRepositoryInterface::writeData() instead. See https://www.drupal.org/node/3223520');
@@ -53,6 +59,8 @@ class LegacyFileTest extends FileManagedUnitTestBase {
 
   /**
    * Tests the file_copy deprecation and legacy behavior.
+   *
+   * @deprecated in drupal:9.3.0 and is removed from drupal:11.0.0.
    */
   public function testCopy() {
     $this->expectDeprecation('file_copy is deprecated in drupal:9.3.0 and will be removed in drupal:10.0.0. Use \Drupal\file\FileRepositoryInterface::copy() instead. See https://www.drupal.org/node/3223520');
@@ -72,6 +80,8 @@ class LegacyFileTest extends FileManagedUnitTestBase {
 
   /**
    * Tests the file_copy deprecation and legacy behavior.
+   *
+   * @deprecated in drupal:9.3.0 and is removed from drupal:11.0.0.
    */
   public function testMove() {
     $this->expectDeprecation('file_move is deprecated in drupal:9.3.0 and will be removed in drupal:10.0.0. Use \Drupal\file\FileRepositoryInterface::move() instead. See https://www.drupal.org/node/3223520');
