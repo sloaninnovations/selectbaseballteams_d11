@@ -1064,43 +1064,6 @@ parameters:
 			path: rebuild.php
 
 		-
-			message: """
-				#^Call to deprecated method drupalGetHeader\\(\\) of class Drupal\\\\Tests\\\\BrowserTestBase\\:
-				in drupal\\:9\\.2\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\$this\\-\\>getSession\\(\\)\\-\\>getResponseHeader\\(\\) instead\\.$#
-			"""
-			count: 1
-			path: tests/Drupal/FunctionalTests/BrowserTestBaseTest.php
-
-		-
-			message: """
-				#^Call to deprecated method drupalPostForm\\(\\) of class Drupal\\\\Tests\\\\BrowserTestBase\\:
-				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\$this\\-\\>submitForm\\(\\) instead\\.$#
-			"""
-			count: 2
-			path: tests/Drupal/FunctionalTests/BrowserTestBaseTest.php
-
-		-
-			message: "#^The \"%%alias_id%%\" alias is deprecated in drupal\\:9\\.0\\.0 and is removed from drupal\\:20\\.0\\.0\\. This is a test\\.$#"
-			count: 1
-			path: tests/Drupal/FunctionalTests/Core/Container/ServiceDeprecationTest.php
-
-		-
-			message: "#^The \"deprecation_test\\.service\" service is deprecated in drupal\\:9\\.0\\.0 and is removed from drupal\\:20\\.0\\.0\\. This is a test\\.$#"
-			count: 1
-			path: tests/Drupal/FunctionalTests/Core/Container/ServiceDeprecationTest.php
-
-		-
-			message: """
-				#^Call to deprecated function deprecation_test_function\\(\\)\\:
-				in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
-				  the deprecation message for deprecated_test_function\\(\\)\\.$#
-			"""
-			count: 1
-			path: tests/Drupal/FunctionalTests/Core/Test/PhpUnitBridgeTest.php
-
-		-
 			message: "#^Drupal\\\\Tests\\\\BrowserTestBase\\:\\:\\$defaultTheme is required\\. See https\\://www\\.drupal\\.org/node/3083055, which includes recommendations on which theme to use\\.$#"
 			count: 1
 			path: tests/Drupal/FunctionalTests/Installer/InstallerExistingConfigNoSystemSiteTest.php
@@ -1838,4 +1801,3 @@ parameters:
 			"""
 			count: 1
 			path: tests/Drupal/Tests/UnitTestCaseTest.php
-
