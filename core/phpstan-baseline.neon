@@ -1064,6 +1064,33 @@ parameters:
 			path: rebuild.php
 
 		-
+			message: """
+				#^Call to deprecated method drupalGetHeader\\(\\) of class Drupal\\\\Tests\\\\BrowserTestBase\\:
+				in drupal\\:9\\.2\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\$this\\-\\>getSession\\(\\)\\-\\>getResponseHeader\\(\\) instead\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/FunctionalTests/BrowserTestBaseTest.php
+
+		-
+			message: """
+				#^Call to deprecated method drupalPostForm\\(\\) of class Drupal\\\\Tests\\\\BrowserTestBase\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\$this\\-\\>submitForm\\(\\) instead\\.$#
+			"""
+			count: 2
+			path: tests/Drupal/FunctionalTests/BrowserTestBaseTest.php
+
+		-
+			message: """
+				#^Call to deprecated function deprecation_test_function\\(\\)\\:
+				in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
+				  the deprecation message for deprecated_test_function\\(\\)\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/FunctionalTests/Core/Test/PhpUnitBridgeTest.php
+
+		-
 			message: "#^Drupal\\\\Tests\\\\BrowserTestBase\\:\\:\\$defaultTheme is required\\. See https\\://www\\.drupal\\.org/node/3083055, which includes recommendations on which theme to use\\.$#"
 			count: 1
 			path: tests/Drupal/FunctionalTests/Installer/InstallerExistingConfigNoSystemSiteTest.php
@@ -1077,11 +1104,6 @@ parameters:
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 12
 			path: tests/Drupal/KernelTests/Core/Cache/GenericCacheBackendUnitTestBase.php
-
-		-
-			message: "#^The \"%%alias_id%%\" service is deprecated in drupal\\:8\\.0\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use the \"config\\.storage\\.sync\" service instead\\. See https\\://www\\.drupal\\.org/node/2574957$#"
-			count: 1
-			path: tests/Drupal/KernelTests/Core/Config/ConfigStorageStagingTest.php
 
 		-
 			message: """
