@@ -19,8 +19,10 @@ class TaxonomyDeprecationTest extends KernelTestBase {
   protected static $modules = ['filter', 'taxonomy', 'text', 'user'];
 
   /**
-   * @deprecated in drupal:9.1.0 and is removed from drupal:10.0.0.
+   * @deprecated in drupal:9.3.0 and is removed from drupal:10.0.0.
+   *   Use \Drupal::entityQuery('taxonomy_vocabulary')->execute() instead.
    *
+   * @see https://www.drupal.org/node/3039041
    * @see taxonomy_vocabulary_get_names()
    * @see taxonomy_term_uri()
    * @see taxonomy_terms_static_reset()

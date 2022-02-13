@@ -19,6 +19,9 @@ class UserLegacyTest extends KernelTestBase {
 
   /**
    * @deprecated in drupal:9.1.0 and is removed from drupal:10.0.0.
+   *   Use \Drupal\Core\Password\PasswordGeneratorInterface::generate() instead.
+   *
+   * @see https://www.drupal.org/node/3153113
    */
   public function testUserPassword() {
     $this->expectDeprecation('user_password() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use \Drupal\Core\Password\PasswordGeneratorInterface::generate() instead. See https://www.drupal.org/node/3153113');

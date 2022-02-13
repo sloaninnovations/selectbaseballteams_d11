@@ -62,6 +62,10 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   /**
    * @covers ::needsEntityLinkUrlUpdate
    * @deprecated in drupal:9.0.0 and is removed from drupal:10.0.0.
+   *   Module-provided Views configuration should be updated to accommodate the
+   *   changes described below.
+   *
+   * @see https://www.drupal.org/node/2857891
    */
   public function testNeedsEntityLinkUrlUpdate() {
     $test_view = $this->loadTestView('views.view.node_link_update_test');
@@ -73,6 +77,10 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   /**
    * @covers ::needsEntityLinkUrlUpdate
    * @deprecated in drupal:9.0.0 and is removed from drupal:10.0.0.
+   *   Module-provided Views configuration should be updated to accommodate the
+   *   changes described below.
+   *
+   * @see https://www.drupal.org/node/2857891
    */
   public function testNeedsEntityLinkUrlUpdateDeprecation() {
     $this->expectDeprecation('The entity link url update for the "node_link_update_test" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2857891.');
@@ -84,6 +92,10 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   /**
    * @covers ::needsOperatorDefaultsUpdate
    * @deprecated in drupal:9.0.0 and is removed from drupal:10.0.0.
+   *   Module-provided Views configuration should be updated to accommodate the
+   *   changes described below.
+   *
+   * @see https://www.drupal.org/node/2869168
    */
   public function testNeedsOperatorUpdateDefaults() {
     $test_view = $this->loadTestView('views.view.test_exposed_filters');
@@ -95,6 +107,10 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   /**
    * @covers ::needsOperatorDefaultsUpdate
    * @deprecated in drupal:9.0.0 and is removed from drupal:10.0.0.
+   *   Module-provided Views configuration should be updated to accommodate the
+   *   changes described below.
+   *
+   * @see https://www.drupal.org/node/2869168
    */
   public function testNeedsOperatorDefaultsUpdateDeprecation() {
     $this->expectDeprecation('The operator defaults update for the "test_exposed_filters" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2869168.');
@@ -106,6 +122,10 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   /**
    * @covers ::needsMultivalueBaseFieldUpdate
    * @deprecated in drupal:9.0.0 and is removed from drupal:10.0.0.
+   *   Module-provided Views configuration should be updated to accommodate the
+   *   changes described below.
+   *
+   * @see https://www.drupal.org/node/2900684
    */
   public function testNeedsFieldNamesForMultivalueBaseFieldsUpdate() {
     $test_view = $this->loadTestView('views.view.test_user_multi_value');
@@ -117,6 +137,9 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   /**
    * @covers ::needsMultivalueBaseFieldUpdate
    * @deprecated in drupal:9.0.0 and is removed from drupal:10.0.0.
+   *   Module-provided Views configuration should be updated.
+   *
+   * @see https://www.drupal.org/node/2900684
    */
   public function testNeedsFieldNamesForMultivalueBaseUpdateFieldsDeprecation() {
     $this->expectDeprecation('The multivalue base field update for the "test_user_multi_value" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2900684.');
@@ -127,6 +150,13 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
 
   /**
    * @covers ::updateAll
+   *
+   * @deprecated in drupal:9.0.0 and is removed from drupal:10.0.0.
+   *   Module-provided Views configuration should be updated.
+   *
+   * @see https://www.drupal.org/node/2857891
+   * @see https://www.drupal.org/node/2869168
+   * @see https://www.drupal.org/node/2900684
    */
   public function testUpdateAll() {
     $this->expectDeprecation('The entity link url update for the "node_link_update_test" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2857891.');
