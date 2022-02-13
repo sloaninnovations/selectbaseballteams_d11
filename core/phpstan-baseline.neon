@@ -716,17 +716,6 @@ parameters:
 			path: modules/taxonomy/src/Plugin/views/argument/IndexTidDepthModifier.php
 
 		-
-			message: """
-				#^Call to deprecated function taxonomy_term_load_multiple_by_name\\(\\)\\:
-				in drupal\\:9\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
-				  \\\\Drupal\\:\\:entityTypeManager\\(\\)\\-\\>getStorage\\('taxonomy_vocabulary'\\)\\-\\>loadByProperties\\(\\['name' \\=\\> \\$name, 'vid' \\=\\> \\$vid\\]\\)
-				  instead, to get a list of taxonomy term entities having the same name and
-				  keyed by their term ID\\.$#
-			"""
-			count: 10
-			path: modules/taxonomy/tests/src/Functional/TermTest.php
-
-		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 1
 			path: modules/toolbar/src/Controller/ToolbarController.php
