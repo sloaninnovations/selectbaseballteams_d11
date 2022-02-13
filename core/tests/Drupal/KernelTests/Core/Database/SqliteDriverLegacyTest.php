@@ -88,6 +88,11 @@ class SqliteDriverLegacyTest extends DatabaseTestBase {
 
   /**
    * @covers Drupal\Core\Database\Driver\sqlite\Select
+   *
+   * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The SQLite
+   *   database driver has been moved to the sqlite module.
+   *
+   * @see https://www.drupal.org/node/3129492
    */
   public function testDeprecationSelect() {
     $this->expectDeprecation('\Drupal\Core\Database\Driver\sqlite\Select is deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The SQLite database driver has been moved to the sqlite module. See https://www.drupal.org/node/3129492');

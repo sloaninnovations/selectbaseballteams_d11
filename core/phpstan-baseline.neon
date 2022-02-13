@@ -896,15 +896,6 @@ parameters:
 			path: rebuild.php
 
 		-
-			message: """
-				#^Call to deprecated function deprecation_test_function\\(\\)\\:
-				in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
-				  the deprecation message for deprecated_test_function\\(\\)\\.$#
-			"""
-			count: 1
-			path: tests/Drupal/FunctionalTests/Core/Test/PhpUnitBridgeTest.php
-
-		-
 			message: "#^Drupal\\\\Tests\\\\BrowserTestBase\\:\\:\\$defaultTheme is required\\. See https\\://www\\.drupal\\.org/node/3083055, which includes recommendations on which theme to use\\.$#"
 			count: 1
 			path: tests/Drupal/FunctionalTests/Installer/InstallerExistingConfigNoSystemSiteTest.php
@@ -918,24 +909,6 @@ parameters:
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 12
 			path: tests/Drupal/KernelTests/Core/Cache/GenericCacheBackendUnitTestBase.php
-
-		-
-			message: """
-				#^Fetching class constant class of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Select\\:
-				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
-				  database driver has been moved to the sqlite module\\.$#
-			"""
-			count: 1
-			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
-
-		-
-			message: """
-				#^Instantiation of deprecated class Drupal\\\\Core\\\\Database\\\\Driver\\\\sqlite\\\\Select\\:
-				in drupal\\:9\\.4\\.0 and is removed from drupal\\:11\\.0\\.0\\. The SQLite
-				  database driver has been moved to the sqlite module\\.$#
-			"""
-			count: 1
-			path: tests/Drupal/KernelTests/Core/Database/SqliteDriverLegacyTest.php
 
 		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
