@@ -171,6 +171,11 @@ class QueryTest extends DatabaseTestBase {
    * @covers ::prepareStatement
    *
    * @group legacy
+   *
+   * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3185520
    */
   public function testReturnOptionDeprecation() {
     $this->expectDeprecation('Passing "return" option to %Aquery() is deprecated in drupal:9.4.0 and is removed in drupal:11.0.0. For data manipulation operations, use dynamic queries instead. See https://www.drupal.org/node/3185520');

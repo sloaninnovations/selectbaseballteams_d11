@@ -504,6 +504,12 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * @covers ::isSubclassOf
    * @group legacy
+   *
+   * @deprecated in drupal:8.3.0 and is removed from drupal:10.0.0.
+   *   Use Drupal\Core\Entity\EntityTypeInterface::entityClassImplements()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/2842808
    */
   public function testIsSubClassOf() {
     $this->expectDeprecation('Drupal\Core\Entity\EntityType::isSubclassOf() is deprecated in drupal:8.3.0 and is removed from drupal:10.0.0. Use Drupal\Core\Entity\EntityTypeInterface::entityClassImplements() instead. See https://www.drupal.org/node/2842808');
