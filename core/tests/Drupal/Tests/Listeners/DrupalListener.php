@@ -21,8 +21,10 @@ use Symfony\Bridge\PhpUnit\SymfonyTestsListener;
  *
  * @internal
  */
+// @phpstan-ignore-next-line
 class DrupalListener implements TestListener {
 
+  // @phpstan-ignore-next-line
   use TestListenerDefaultImplementation;
   use DeprecationListenerTrait;
   use DrupalComponentTestListenerTrait;

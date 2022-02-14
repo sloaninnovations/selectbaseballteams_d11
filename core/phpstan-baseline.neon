@@ -960,15 +960,6 @@ parameters:
 			path: tests/Drupal/KernelTests/Core/Test/BrowserTestBaseTest.php
 
 		-
-			message: """
-				#^Call to deprecated function deprecation_test_function\\(\\)\\:
-				in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
-				  the deprecation message for deprecated_test_function\\(\\)\\.$#
-			"""
-			count: 1
-			path: tests/Drupal/KernelTests/Core/Test/PhpUnitBridgeTest.php
-
-		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 5
 			path: tests/Drupal/KernelTests/Core/TypedData/TypedDataTest.php
@@ -1139,22 +1130,6 @@ parameters:
 
 		-
 			message: "#^Call to an undefined static method PHPUnit\\\\Util\\\\ErrorHandler\\:\\:handleError\\(\\)\\.$#"
-			count: 1
-			path: tests/Drupal/Tests/Listeners/DrupalListener.php
-
-		-
-			message: """
-				#^Class Drupal\\\\Tests\\\\Listeners\\\\DrupalListener implements deprecated interface PHPUnit\\\\Framework\\\\TestListener\\:
-				Use the `TestHook` interfaces instead$#
-			"""
-			count: 1
-			path: tests/Drupal/Tests/Listeners/DrupalListener.php
-
-		-
-			message: """
-				#^Usage of deprecated trait PHPUnit\\\\Framework\\\\TestListenerDefaultImplementation in class Drupal\\\\Tests\\\\Listeners\\\\DrupalListener\\:
-				The `TestListener` interface is deprecated$#
-			"""
 			count: 1
 			path: tests/Drupal/Tests/Listeners/DrupalListener.php
 

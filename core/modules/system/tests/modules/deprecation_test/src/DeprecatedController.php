@@ -10,7 +10,6 @@ class DeprecatedController {
   /**
    * Controller callback.
    *
-   *
    * @return array
    *   Render array.
    */
