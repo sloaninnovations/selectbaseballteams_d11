@@ -21,6 +21,15 @@ parameters:
 			path: includes/update.inc
 
 		-
+			message: """
+				#^Call to deprecated method registerLoader\\(\\) of class Doctrine\\\\Common\\\\Annotations\\\\AnnotationRegistry\\:
+				This method is deprecated and will be removed in
+				            doctrine/annotations 2\\.0\\. Annotations will be autoloaded in 2\\.0\\.$#
+			"""
+			count: 1
+			path: lib/Drupal/Component/Annotation/Plugin/Discovery/AnnotatedClassDiscovery.php
+
+		-
 			message: "#^Call to method getDefinitions\\(\\) on an unknown class Drupal\\\\Core\\\\Plugin\\\\CategorizingPluginManagerTrait\\.$#"
 			count: 3
 			path: lib/Drupal/Core/Action/ActionManager.php
@@ -96,6 +105,22 @@ parameters:
 			path: lib/Drupal/Core/Datetime/DateHelper.php
 
 		-
+			message: """
+				#^Call to deprecated method getDeprecationMessage\\(\\) of class Symfony\\\\Component\\\\DependencyInjection\\\\Alias\\:
+				since Symfony 5\\.1, use "getDeprecation\\(\\)" instead\\.$#
+			"""
+			count: 1
+			path: lib/Drupal/Core/DependencyInjection/Compiler/DeprecatedServicePass.php
+
+		-
+			message: """
+				#^Call to deprecated method getDeprecationMessage\\(\\) of class Symfony\\\\Component\\\\DependencyInjection\\\\Definition\\:
+				since Symfony 5\\.1, use "getDeprecation\\(\\)" instead\\.$#
+			"""
+			count: 1
+			path: lib/Drupal/Core/DependencyInjection/Compiler/DeprecatedServicePass.php
+
+		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 2
 			path: lib/Drupal/Core/EventSubscriber/FinishResponseSubscriber.php
@@ -129,6 +154,22 @@ parameters:
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 4
 			path: lib/Drupal/Core/Flood/DatabaseBackend.php
+
+		-
+			message: """
+				#^Call to deprecated function GuzzleHttp\\\\default_user_agent\\(\\)\\:
+				default_user_agent will be removed in guzzlehttp/guzzle\\:8\\.0\\. Use Utils\\:\\:defaultUserAgent instead\\.$#
+			"""
+			count: 1
+			path: lib/Drupal/Core/Http/ClientFactory.php
+
+		-
+			message: """
+				#^Call to deprecated method getMasterRequest\\(\\) of class Symfony\\\\Component\\\\HttpFoundation\\\\RequestStack\\:
+				since symfony/http\\-foundation 5\\.3, use getMainRequest\\(\\) instead$#
+			"""
+			count: 1
+			path: lib/Drupal/Core/Http/RequestStack.php
 
 		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
@@ -499,6 +540,15 @@ parameters:
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 2
 			path: modules/menu_link_content/tests/src/Kernel/MenuLinksTest.php
+
+		-
+			message: """
+				#^Call to deprecated method registerLoader\\(\\) of class Doctrine\\\\Common\\\\Annotations\\\\AnnotationRegistry\\:
+				This method is deprecated and will be removed in
+				            doctrine/annotations 2\\.0\\. Annotations will be autoloaded in 2\\.0\\.$#
+			"""
+			count: 1
+			path: modules/migrate/src/Plugin/Discovery/AnnotatedClassDiscoveryAutomatedProviders.php
 
 		-
 			message: "#^Call to an undefined static method static\\(Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\MigrateTestBase\\)\\:\\:migrateDumpAlter\\(\\)\\.$#"
@@ -876,6 +926,15 @@ parameters:
 			path: tests/Drupal/KernelTests/Core/KeyValueStore/GarbageCollectionTest.php
 
 		-
+			message: """
+				#^Usage of deprecated trait Drupal\\\\Tests\\\\Traits\\\\ExpectDeprecationTrait in class Drupal\\\\KernelTests\\\\Core\\\\Plugin\\\\Context\\\\ContextAwarePluginTraitTest\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Symfony\\\\Bridge\\\\PhpUnit\\\\ExpectDeprecationTrait instead\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/KernelTests/Core/Plugin/Context/ContextAwarePluginTraitTest.php
+
+		-
 			message: "#^\\#pre_render callback 'element_info_test…' at key '1' is not trusted\\.$#"
 			count: 1
 			path: tests/Drupal/KernelTests/Core/Render/Element/WeightTest.php
@@ -936,7 +995,24 @@ parameters:
 			path: tests/Drupal/Tests/BrowserTestBase.php
 
 		-
+			message: """
+				#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\Client\\:
+				Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/BrowserTestBase.php
+
+		-
 			message: "#^Array has 2 duplicate keys with value 'ClassWithConstants\\.SOME_KEY' \\(\\\\Drupal\\\\Tests\\\\Component\\\\Annotation\\\\Doctrine\\\\Fixtures\\\\ClassWithConstants\\:\\:SOME_KEY, \\\\Drupal\\\\Tests\\\\Component\\\\Annotation\\\\Doctrine\\\\Fixtures\\\\ClassWithConstants\\:\\:SOME_KEY\\)\\.$#"
+			count: 1
+			path: tests/Drupal/Tests/Component/Annotation/Doctrine/DocParserTest.php
+
+		-
+			message: """
+				#^Call to deprecated method registerAutoloadNamespace\\(\\) of class Doctrine\\\\Common\\\\Annotations\\\\AnnotationRegistry\\:
+				This method is deprecated and will be removed in
+				            doctrine/annotations 2\\.0\\. Annotations will be autoloaded in 2\\.0\\.$#
+			"""
 			count: 1
 			path: tests/Drupal/Tests/Component/Annotation/Doctrine/DocParserTest.php
 
@@ -959,6 +1035,22 @@ parameters:
 			message: "#^Class Drupal\\\\Driver\\\\Database\\\\fake\\\\Install\\\\Tasks not found\\.$#"
 			count: 1
 			path: tests/Drupal/Tests/Core/Database/InstallerObjectTest.php
+
+		-
+			message: """
+				#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\Client\\:
+				Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/Core/Http/ClientFactoryTest.php
+
+		-
+			message: """
+				#^Call to deprecated method getMasterRequest\\(\\) of class Drupal\\\\Core\\\\Http\\\\RequestStack\\:
+				since symfony/http\\-foundation 5\\.3, use getMainRequest\\(\\) instead$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/Core/Http/RequestStackLegacyTest.php
 
 		-
 			message: "#^Array has 2 duplicate keys with value 'default' \\('default', 'default'\\)\\.$#"
@@ -1004,6 +1096,32 @@ parameters:
 			message: "#^\\#access_callback value 'literal\\-string&non\\-empty\\-string' at key '0' is invalid\\.$#"
 			count: 1
 			path: tests/Drupal/Tests/Core/Render/RendererTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Drupal\\\\Core\\\\StringTranslation\\\\TranslationWrapper\\:
+				in drupal\\:8\\.0\\.0 and is removed from drupal\\:10\\.0\\.0\\.
+				  Use the \\\\Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup class instead\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/Core/StringTranslation/TranslationWrapperTest.php
+
+		-
+			message: """
+				#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\ClientInterface\\:
+				ClientInterface\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/DrupalTestBrowser.php
+
+		-
+			message: """
+				#^Usage of deprecated trait Drupal\\\\Tests\\\\Traits\\\\ExpectDeprecationTrait in class Drupal\\\\Tests\\\\ExpectDeprecationTest\\:
+				in drupal\\:9\\.1\\.0 and is removed from drupal\\:10\\.0\\.0\\. Use
+				  \\\\Symfony\\\\Bridge\\\\PhpUnit\\\\ExpectDeprecationTrait instead\\.$#
+			"""
+			count: 1
+			path: tests/Drupal/Tests/ExpectDeprecationTest.php
 
 		-
 			message: "#^Call to an undefined static method PHPUnit\\\\Util\\\\ErrorHandler\\:\\:handleError\\(\\)\\.$#"

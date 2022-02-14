@@ -194,6 +194,11 @@ class ConnectionTest extends DatabaseTestBase {
    * Tests deprecation of ::getUnprefixedTablesMap().
    *
    * @group legacy
+   *
+   * @deprecated in drupal:10.0.0 and is removed from drupal:11.0.0. There is
+   *   no replacement.
+   *
+   * @see https://www.drupal.org/node/3257198
    */
   public function testDeprecatedGetUnprefixedTablesMap() {
     $this->expectDeprecation('Drupal\Core\Database\Connection::getUnprefixedTablesMap() is deprecated in drupal:10.0.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3257198');

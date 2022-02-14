@@ -674,6 +674,9 @@ class BrowserTestBaseTest extends BrowserTestBase {
    * Tests deprecation of drupalPostForm().
    *
    * @group legacy
+   * @deprecated in drupal:9.2.0 and is removed from drupal:10.0.0. Use $this->submitForm() instead.
+   *
+   * @see https://www.drupal.org/node/3168858
    */
   public function testLegacyDrupalPostForm(): void {
     $this->expectDeprecation('UiHelperTrait::drupalPostForm() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use $this->submitForm() instead. See https://www.drupal.org/node/3168858');
@@ -719,6 +722,10 @@ class BrowserTestBaseTest extends BrowserTestBase {
    * Tests legacy drupalGetHeader().
    *
    * @group legacy
+   * @deprecated in drupal:9.2.0 and is removed from drupal:10.0.0.
+   *   Use $this->getSession()->getResponseHeader() instead.
+   *
+   * @see https://www.drupal.org/node/3168383
    */
   public function testDrupalGetHeader() {
     $this->expectDeprecation('BrowserTestBase::drupalGetHeader() is deprecated in drupal:9.2.0 and is removed from drupal:10.0.0. Use $this->getSession()->getResponseHeader() instead. See https://www.drupal.org/node/3168383');

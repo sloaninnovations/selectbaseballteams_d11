@@ -766,21 +766,26 @@ abstract class Connection {
       // Depending on the type of query we may need to return a different value.
       // See DatabaseConnection::defaultOptions() for a description of each
       // value.
+      // @phpstan-ignore-next-line
       switch ($options['return'] ?? Database::RETURN_STATEMENT) {
+        // @phpstan-ignore-next-line
         case Database::RETURN_STATEMENT:
           return $stmt;
 
         // Database::RETURN_AFFECTED should not be used; enable row counting
         // by passing the appropriate argument to the constructor instead.
         // @see https://www.drupal.org/node/3186368
+        // @phpstan-ignore-next-line
         case Database::RETURN_AFFECTED:
           $stmt->allowRowCount = TRUE;
           return $stmt->rowCount();
 
+        // @phpstan-ignore-next-line
         case Database::RETURN_INSERT_ID:
           $sequence_name = $options['sequence_name'] ?? NULL;
           return $this->connection->lastInsertId($sequence_name);
 
+        // @phpstan-ignore-next-line
         case Database::RETURN_NULL:
           return NULL;
 

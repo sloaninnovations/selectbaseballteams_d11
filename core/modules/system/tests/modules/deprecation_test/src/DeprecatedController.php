@@ -15,6 +15,7 @@ class DeprecatedController {
    */
   public function deprecatedMethod() {
     return [
+      // @phpstan-ignore-next-line
       '#markup' => deprecation_test_function(),
     ];
   }

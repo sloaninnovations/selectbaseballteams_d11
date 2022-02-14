@@ -133,6 +133,7 @@ class Select extends Query implements SelectInterface {
   public function __construct(Connection $connection, $table, $alias = NULL, $options = []) {
     // @todo Remove $options['return'] in Drupal 11.
     // @see https://www.drupal.org/project/drupal/issues/3256524
+    // @phpstan-ignore-next-line
     $options['return'] = Database::RETURN_STATEMENT;
     parent::__construct($connection, $options);
     $conjunction = $options['conjunction'] ?? 'AND';

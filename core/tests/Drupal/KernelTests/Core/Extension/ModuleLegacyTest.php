@@ -13,6 +13,13 @@ class ModuleLegacyTest extends KernelTestBase {
 
   /**
    * Test deprecation of module_load_include() function.
+   *
+   * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0.
+   *   Use \Drupal::moduleHandler()->loadInclude($module, $type, $name = NULL).
+   *   Note that including code from uninstalled extensions is no longer
+   *   supported.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/697946
    */
   public function testModuleLoadInclude() {
     $this->assertFalse($this->container->get('module_handler')->moduleExists('module_test'), 'Ensure module is uninstalled so we test the ability to include uninstalled code.');

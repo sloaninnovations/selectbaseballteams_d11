@@ -20,9 +20,11 @@ use Symfony\Bridge\PhpUnit\SymfonyTestsListener;
  * handler is in the expected state.
  *
  * @internal
+ * @phpstan-ignore-next-line
  */
 class DrupalListener implements TestListener {
 
+  // @phpstan-ignore-next-line
   use TestListenerDefaultImplementation;
   use DeprecationListenerTrait;
   use DrupalComponentTestListenerTrait;

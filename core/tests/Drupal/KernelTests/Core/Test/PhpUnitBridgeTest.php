@@ -23,6 +23,7 @@ class PhpUnitBridgeTest extends KernelTestBase {
 
   public function testDeprecatedFunction() {
     $this->expectDeprecation('This is the deprecation message for deprecation_test_function().');
+    // @phpstan-ignore-next-line
     $this->assertEquals('known_return_value', \deprecation_test_function());
   }
 

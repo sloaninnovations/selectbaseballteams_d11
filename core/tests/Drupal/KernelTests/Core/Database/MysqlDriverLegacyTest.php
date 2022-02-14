@@ -30,6 +30,11 @@ class MysqlDriverLegacyTest extends DatabaseTestBase {
 
   /**
    * @covers Drupal\Core\Database\Driver\mysql\Install\Tasks
+   *
+   * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The MySQL
+   *   database driver has been moved to the mysql module.
+   *
+   * @see https://www.drupal.org/node/3129492
    */
   public function testDeprecationInstallTasks() {
     $this->expectDeprecation('\Drupal\Core\Database\Driver\mysql\Install\Tasks is deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The MySQL database driver has been moved to the mysql module. See https://www.drupal.org/node/3129492');
@@ -39,6 +44,11 @@ class MysqlDriverLegacyTest extends DatabaseTestBase {
 
   /**
    * @covers Drupal\Core\Database\Driver\mysql\Connection
+   *
+   * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The MySQL
+   *   database driver has been moved to the mysql module.
+   *
+   * @see https://www.drupal.org/node/3129492
    */
   public function testDeprecationConnection() {
     $this->expectDeprecation('\Drupal\Core\Database\Driver\mysql\Connection is deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The MySQL database driver has been moved to the mysql module. See https://www.drupal.org/node/3129492');
@@ -51,6 +61,11 @@ class MysqlDriverLegacyTest extends DatabaseTestBase {
 
   /**
    * @covers Drupal\Core\Database\Driver\mysql\ExceptionHandler
+   *
+   * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The MySQL
+   *   database driver has been moved to the mysql module.
+   *
+   * @see https://www.drupal.org/node/3129492
    */
   public function testDeprecationExceptionHandler() {
     $this->expectDeprecation('\Drupal\Core\Database\Driver\mysql\ExceptionHandler is deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The MySQL database driver has been moved to the mysql module. See https://www.drupal.org/node/3129492');
@@ -60,6 +75,11 @@ class MysqlDriverLegacyTest extends DatabaseTestBase {
 
   /**
    * @covers Drupal\Core\Database\Driver\mysql\Insert
+   *
+   * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The MySQL
+   *   database driver has been moved to the mysql module.
+   *
+   * @see https://www.drupal.org/node/3129492
    */
   public function testDeprecationInsert() {
     $this->expectDeprecation('\Drupal\Core\Database\Driver\mysql\Insert is deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The MySQL database driver has been moved to the mysql module. See https://www.drupal.org/node/3129492');
@@ -69,6 +89,11 @@ class MysqlDriverLegacyTest extends DatabaseTestBase {
 
   /**
    * @covers Drupal\Core\Database\Driver\mysql\Schema
+   *
+   * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The MySQL
+   *   database driver has been moved to the mysql module.
+   *
+   * @see https://www.drupal.org/node/3129492
    */
   public function testDeprecationSchema() {
     $this->expectDeprecation('\Drupal\Core\Database\Driver\mysql\Schema is deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The MySQL database driver has been moved to the mysql module. See https://www.drupal.org/node/3129492');
@@ -78,6 +103,11 @@ class MysqlDriverLegacyTest extends DatabaseTestBase {
 
   /**
    * @covers Drupal\Core\Database\Driver\mysql\Upsert
+   *
+   * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The MySQL
+   *   database driver has been moved to the mysql module.
+   *
+   * @see https://www.drupal.org/node/3129492
    */
   public function testDeprecationUpsert() {
     $this->expectDeprecation('\Drupal\Core\Database\Driver\mysql\Upsert is deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The MySQL database driver has been moved to the mysql module. See https://www.drupal.org/node/3129492');

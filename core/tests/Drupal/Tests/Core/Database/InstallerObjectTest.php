@@ -41,6 +41,11 @@ class InstallerObjectTest extends UnitTestCase {
 
   /**
    * @dataProvider providerDbInstallerObject
+   *
+   * @deprecated in drupal:10.0.0 and is removed from drupal:11.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3256641
    */
   public function testDbInstallerObject($driver, $namespace, $expected_class_name) {
     $this->expectDeprecation('db_installer_object() is deprecated in drupal:10.0.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3256641');

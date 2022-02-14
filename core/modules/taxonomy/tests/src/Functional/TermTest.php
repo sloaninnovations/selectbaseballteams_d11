@@ -533,6 +533,13 @@ class TermTest extends TaxonomyTestBase {
    * Tests taxonomy_term_load_multiple_by_name().
    *
    * @group legacy
+   *
+   * @deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Use
+   *   \Drupal::entityTypeManager()->getStorage('taxonomy_vocabulary')->loadByProperties(['name' => $name, 'vid' => $vid])
+   *   instead, to get a list of taxonomy term entities having the same name and
+   *   keyed by their term ID.
+   *
+   * @see https://www.drupal.org/node/3039041
    */
   public function testTaxonomyGetTermByName() {
     $term = $this->createTerm($this->vocabulary);
