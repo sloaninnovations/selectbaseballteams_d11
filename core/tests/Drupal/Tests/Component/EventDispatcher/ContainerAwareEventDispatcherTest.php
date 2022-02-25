@@ -543,6 +543,9 @@ class ContainerAwareEventDispatcherTest extends TestCase {
 
 }
 
+/**
+ * Defines a test callable class to mock the listeners.
+ */
 class CallableClass {
 
   public function __invoke() {
@@ -551,6 +554,9 @@ class CallableClass {
 
 }
 
+/**
+ * Defines a test class to mock the event listeners.
+ */
 class TestEventListener {
 
   public $preFooInvoked = FALSE;
@@ -571,6 +577,9 @@ class TestEventListener {
 
 }
 
+/**
+ * Defines a test class to mock the listeners.
+ */
 class TestWithDispatcher {
 
   public $name;
@@ -583,6 +592,9 @@ class TestWithDispatcher {
 
 }
 
+/**
+ * Test event subscriber to mock subscribed events.
+ */
 class TestEventSubscriber implements EventSubscriberInterface {
 
   public static function getSubscribedEvents(): array {
@@ -591,6 +603,9 @@ class TestEventSubscriber implements EventSubscriberInterface {
 
 }
 
+/**
+ * Test event subscriber to mock subscribed events with priorities.
+ */
 class TestEventSubscriberWithPriorities implements EventSubscriberInterface {
 
   public static function getSubscribedEvents(): array {
@@ -602,6 +617,9 @@ class TestEventSubscriberWithPriorities implements EventSubscriberInterface {
 
 }
 
+/**
+ * Test event subscriber to mock subscribed events with multiple listeners.
+ */
 class TestEventSubscriberWithMultipleListeners implements EventSubscriberInterface {
 
   public static function getSubscribedEvents(): array {
@@ -615,4 +633,7 @@ class TestEventSubscriberWithMultipleListeners implements EventSubscriberInterfa
 
 }
 
+/**
+ * Empty test class for testing Symfony inherited events.
+ */
 class SymfonyInheritedEvent extends SymfonyEvent {}
