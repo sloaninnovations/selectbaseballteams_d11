@@ -182,6 +182,9 @@ class LoggerChannelTest extends UnitTestCase {
 
 }
 
+/**
+ * Stub class for testing LoggerChannel.
+ */
 class NaughtyRecursiveLogger implements LoggerInterface {
   use LoggerTrait;
 

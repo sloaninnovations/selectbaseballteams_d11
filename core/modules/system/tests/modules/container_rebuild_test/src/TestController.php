@@ -4,6 +4,9 @@ namespace Drupal\container_rebuild_test;
 
 use Drupal\Core\Controller\ControllerBase;
 
+/**
+ * Controller for testing container rebuilds.
+ */
 class TestController extends ControllerBase {
 
   /**

@@ -193,6 +193,9 @@ class ControllerResolverTest extends UnitTestCase {
 
 }
 
+/**
+ * Mock for the controller.
+ */
 class MockController {
 
   public function getResult() {
@@ -204,6 +207,10 @@ class MockController {
   }
 
 }
+
+/**
+ * Mock for the PSR-7 controller.
+ */
 class MockControllerPsr7 {
 
   public function getResult() {
@@ -216,6 +223,9 @@ class MockControllerPsr7 {
 
 }
 
+/**
+ * Mock for the injected service.
+ */
 class MockContainerInjection implements ContainerInjectionInterface {
   protected $result;
 
@@ -232,6 +242,10 @@ class MockContainerInjection implements ContainerInjectionInterface {
   }
 
 }
+
+/**
+ * Mock with the container aware interface implementation.
+ */
 class MockContainerAware implements ContainerAwareInterface {
   use ContainerAwareTrait;
 
@@ -240,6 +254,10 @@ class MockContainerAware implements ContainerAwareInterface {
   }
 
 }
+
+/**
+ * Mock for the controller that can be invoked.
+ */
 class MockInvokeController {
 
   public function __invoke() {

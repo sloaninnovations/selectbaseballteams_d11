@@ -344,6 +344,9 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
 
 }
 
+/**
+ * Provides a test class for providerTestValidatePropertyWithInvalidObjects.
+ */
 class TestClass {
 
 }

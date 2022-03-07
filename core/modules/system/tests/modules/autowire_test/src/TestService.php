@@ -2,6 +2,9 @@
 
 namespace Drupal\autowire_test;
 
+/**
+ * A service to test autowiring.
+ */
 class TestService {
 
   /**
