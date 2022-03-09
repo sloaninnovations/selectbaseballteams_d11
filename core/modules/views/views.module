@@ -508,7 +508,7 @@ function views_invalidate_cache() {
  *
  * @return \Drupal\views\ViewExecutable
  */
-function &views_set_current_view($view = NULL) {
+function &views_set_current_view($view = NULL): ?ViewExecutable {
   static $cache = NULL;
   if (isset($view)) {
     $cache = $view;
@@ -526,7 +526,7 @@ function &views_set_current_view($view = NULL) {
  * @return \Drupal\views\ViewExecutable
  *   The current view object.
  */
-function &views_get_current_view() {
+function &views_get_current_view(): ?ViewExecutable {
   return views_set_current_view();
 }
 
