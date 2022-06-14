@@ -82,6 +82,9 @@ class LinkWidget extends WidgetBase {
     elseif ($scheme === 'route') {
       $displayable_string = ltrim($displayable_string, 'route:');
     }
+    elseif ($scheme === 'token') {
+      $displayable_string = ltrim($displayable_string, 'token:');
+    }
 
     return $displayable_string;
   }
@@ -117,6 +120,12 @@ class LinkWidget extends WidgetBase {
     // Support linking to nothing.
     elseif (in_array($string, ['<nolink>', '<none>', '<button>'], TRUE)) {
       $uri = 'route:' . $string;
+    }
+    // Detects if this string is a replaceable token, and sets the 'token:' prefix if it is.
+    elseif (\Drupal::token()->scan($string)) {
+      if (strpos($string, "token:") === FALSE) {
+        $uri = 'token:' . $string;
+      }
     }
     // Detect a schemeless string, map to 'internal:' URI.
     elseif (!empty($string) && parse_url($string, PHP_URL_SCHEME) === NULL) {
@@ -204,8 +213,8 @@ class LinkWidget extends WidgetBase {
       // @todo The user should be able to select an entity type. Will be fixed
       //   in https://www.drupal.org/node/2423093.
       $element['uri']['#target_type'] = 'node';
-      // Disable autocompletion when the first character is '/', '#' or '?'.
-      $element['uri']['#attributes']['data-autocomplete-first-character-blacklist'] = '/#?';
+      // Disable autocompletion when the first character is '[', '/', '#' or '?'.
+      $element['uri']['#attributes']['data-autocomplete-first-character-blacklist'] = '[/#?';
 
       // The link widget is doing its own processing in
       // static::getUriAsDisplayableString().
@@ -399,9 +408,14 @@ class LinkWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    $entity = $form_state->getFormObject()->getEntity();
     foreach ($values as &$value) {
       $value['uri'] = static::getUserEnteredStringAsUri($value['uri']);
+
       $value += ['options' => []];
+      $value['options']['context'] = [
+        $entity->getEntityTypeId() => $entity->id(),
+      ];
     }
     return $values;
   }
