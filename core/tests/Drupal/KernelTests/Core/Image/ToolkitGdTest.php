@@ -189,7 +189,7 @@ class ToolkitGdTest extends KernelTestBase {
         'corners' => $default_corners,
       ],
       'convert_avif' => [
-        'function' => 'convert',
+        'operation' => 'convert',
         'width' => 40,
         'height' => 20,
         'arguments' => ['extension' => 'avif'],
