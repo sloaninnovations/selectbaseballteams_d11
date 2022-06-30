@@ -188,6 +188,13 @@ class ToolkitGdTest extends KernelTestBase {
         'arguments' => ['extension' => 'webp'],
         'corners' => $default_corners,
       ],
+      'convert_avif' => [
+        'function' => 'convert',
+        'width' => 40,
+        'height' => 20,
+        'arguments' => ['extension' => 'avif'],
+        'corners' => $default_corners,
+      ],
     ];
 
     // Systems using non-bundled GD2 may miss imagerotate(). Test if available.
@@ -258,6 +265,7 @@ class ToolkitGdTest extends KernelTestBase {
       'image-test-no-transparency.gif',
       'image-test.jpg',
       'img-test.webp',
+      'img-test.avif',
     ] as $file_name) {
       foreach ($test_cases as $test_case => $values) {
         $operation = $values['operation'];
@@ -348,8 +356,8 @@ class ToolkitGdTest extends KernelTestBase {
         continue;
       }
 
-      // JPEG has small differences in color after processing.
-      $tolerance = $image_original_type === IMAGETYPE_JPEG ? 3 : 0;
+      // JPEG and AVIF have small differences in color after processing.
+      $tolerance = in_array($image_original_type, [IMAGETYPE_JPEG, IMAGETYPE_AVIF]) ? 3 : 0;
 
       $this->assertColorsAreEqual($expected_color, $actual_color, $tolerance, "Image '$file_name' object after '$test_case' action has the correct color placement at corner '$key'");
     }
@@ -365,7 +373,7 @@ class ToolkitGdTest extends KernelTestBase {
    */
   public function testSupportedExtensions(): void {
     // Test the list of supported extensions.
-    $expected_extensions = ['png', 'gif', 'jpeg', 'jpg', 'jpe', 'webp'];
+    $expected_extensions = ['png', 'gif', 'jpeg', 'jpg', 'jpe', 'webp', 'avif'];
     $this->assertEqualsCanonicalizing($expected_extensions, $this->imageFactory->getSupportedExtensions());
 
     // Test that the supported extensions map to correct internal GD image
@@ -377,6 +385,7 @@ class ToolkitGdTest extends KernelTestBase {
       'jpg' => IMAGETYPE_JPEG,
       'jpe' => IMAGETYPE_JPEG,
       'webp' => IMAGETYPE_WEBP,
+      'avif' => IMAGETYPE_AVIF,
     ];
     $image = $this->imageFactory->get();
     foreach ($expected_image_types as $extension => $expected_image_type) {
@@ -393,6 +402,7 @@ class ToolkitGdTest extends KernelTestBase {
       [IMAGETYPE_GIF],
       [IMAGETYPE_JPEG],
       [IMAGETYPE_WEBP],
+      [IMAGETYPE_AVIF],
     ];
   }
 
