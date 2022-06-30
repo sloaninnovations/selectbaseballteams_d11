@@ -240,7 +240,11 @@ class GDToolkit extends ImageToolkitBase {
     }
     else {
       // Image types that support alpha need to be saved accordingly.
-      if (in_array($this->getType(), [IMAGETYPE_PNG, IMAGETYPE_WEBP], TRUE)) {
+      if (in_array($this->getType(), [
+        IMAGETYPE_PNG,
+        IMAGETYPE_WEBP,
+        IMAGETYPE_AVIF,
+      ], TRUE)) {
         imagealphablending($this->getResource(), FALSE);
         imagesavealpha($this->getResource(), TRUE);
       }
@@ -265,8 +269,15 @@ class GDToolkit extends ImageToolkitBase {
   public function parseFile() {
     $data = @getimagesize($this->getSource());
     if ($data && in_array($data[2], static::supportedTypes())) {
-      $this->setType($data[2]);
+      $type = $data[2];
+      $this->setType($type);
       $this->preLoadInfo = $data;
+      // Before PHP 8.2, getimagesize() returns 0 for AVIF images width and
+      // height. In this case, we need to load the image to GD straight away.
+      // @todo remove once PHP8.2 is the minimum supported version.
+      if ($type === IMAGETYPE_AVIF && PHP_VERSION_ID < 80200) {
+        return $this->load();
+      }
       return TRUE;
     }
     return FALSE;
@@ -450,7 +461,13 @@ class GDToolkit extends ImageToolkitBase {
    *   IMAGETYPE_* constant (e.g. IMAGETYPE_JPEG, IMAGETYPE_PNG, etc.).
    */
   protected static function supportedTypes() {
-    return [IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF, IMAGETYPE_WEBP];
+    return [
+      IMAGETYPE_PNG,
+      IMAGETYPE_JPEG,
+      IMAGETYPE_GIF,
+      IMAGETYPE_WEBP,
+      IMAGETYPE_AVIF,
+    ];
   }
 
 }

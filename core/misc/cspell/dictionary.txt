@@ -82,6 +82,7 @@ autosubmit
 autowire
 autowired
 autowiring
+avif
 backlink
 backlinks
 backreferences
