@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Contains user_cancel_test.module.
+ */
+
+/**
+ * Implements hook_user_cancel_methods_alter().
+ */
+function user_cancel_test_user_cancel_methods_alter(array &$methods): void {
+  $methods['user_cancel_test'] = [
+    'title' => 'User cancel test',
+    'description' => 'User cancel test method',
+  ];
+}

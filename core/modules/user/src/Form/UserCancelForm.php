@@ -2,8 +2,13 @@
 
 namespace Drupal\user\Form;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\user\AccountCancellationInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a confirmation form for cancelling user account.
@@ -32,6 +37,48 @@ class UserCancelForm extends ContentEntityConfirmFormBase {
    * @var \Drupal\user\UserInterface
    */
   protected $entity;
+
+  /**
+   * The account cancellation service.
+   *
+   * @var \Drupal\user\AccountCancellationInterface
+   */
+  protected AccountCancellationInterface $accountCancellation;
+
+  /**
+   * Constructs a new form instance.
+   *
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository service.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle service.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
+   * @param \Drupal\user\AccountCancellationInterface $account_cancellation
+   *   The account cancellation service.
+   *
+   * @see https://www.drupal.org/node/3279455
+   */
+  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, AccountCancellationInterface $account_cancellation = NULL) {
+    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
+    if (!$account_cancellation) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $account_cancellation argument is deprecated in drupal:10.0.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3279455', E_USER_DEPRECATED);
+      $account_cancellation = \Drupal::service('user.account_cancellation');
+    }
+    $this->accountCancellation = $account_cancellation;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): self {
+    return new static(
+      $container->get('entity.repository'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('datetime.time'),
+      $container->get('user.account_cancellation')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -137,7 +184,7 @@ class UserCancelForm extends ContentEntityConfirmFormBase {
     // privileges, no confirmation mail shall be sent, and the user does not
     // attempt to cancel the own account.
     if (!$form_state->isValueEmpty('access') && $form_state->isValueEmpty('user_cancel_confirm') && $this->entity->id() != $this->currentUser()->id()) {
-      user_cancel($form_state->getValues(), $this->entity->id(), $form_state->getValue('user_cancel_method'));
+      $this->accountCancellation->cancel($this->entity, $form_state->getValue('user_cancel_method'), $form_state->getValues());
 
       $form_state->setRedirectUrl($this->entity->toUrl('collection'));
     }

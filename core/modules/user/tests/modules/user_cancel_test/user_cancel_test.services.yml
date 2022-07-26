@@ -1,0 +1,6 @@
+services:
+
+  user_cancel_test.account_cancel.subscriber:
+    class: Drupal\user_cancel_test\UserCancelTestAccountCancelSubscriber
+    tags:
+      - { name: event_subscriber }

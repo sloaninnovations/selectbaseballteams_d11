@@ -1,0 +1,6 @@
+name: 'User cancel deprecated test'
+type: module
+description: 'Support module for testing deprecation of user cancel custom method.'
+package: Testing
+version: VERSION
+core_version_requirement: ^10

@@ -22,3 +22,9 @@ services:
   comment.link_builder:
     class: Drupal\comment\CommentLinkBuilder
     arguments: ['@current_user', '@comment.manager', '@module_handler', '@string_translation', '@entity_type.manager']
+
+  comment.account_cancel.subscriber:
+    class: Drupal\comment\EventSubscriber\CommentAccountCancelSubscriber
+    arguments: ['@entity_type.manager', '@config.factory']
+    tags:
+      - { name: event_subscriber }

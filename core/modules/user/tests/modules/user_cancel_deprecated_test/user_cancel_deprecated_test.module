@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ * Contains user_cancel_deprecated_test.module.
+ */
+
+use Drupal\user\UserInterface;
+
+/**
+ * Implements hook_user_cancel_methods_alter().
+ */
+function user_cancel_deprecated_test_user_cancel_methods_alter(array &$methods): void {
+  $methods['user_cancel_test_deprecated'] = [
+    'title' => 'User cancel test (deprecated)',
+    'description' => 'User cancel test method (deprecated)',
+  ];
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function user_cancel_deprecated_test_user_cancel(array $edit, UserInterface $account, string $method): void {
+  if ($method === 'user_cancel_test_deprecated') {
+    \Drupal::messenger()->addStatus('Custom user deprecated cancel method executed.');
+  }
+}

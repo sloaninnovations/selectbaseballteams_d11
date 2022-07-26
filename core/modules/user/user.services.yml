@@ -71,3 +71,10 @@ services:
   logger.channel.user:
     parent: logger.channel_base
     arguments: ['user']
+  user.account_cancellation:
+    class: Drupal\user\AccountCancellation
+    arguments: ['@module_handler', '@event_dispatcher']
+  user.account_cancel.subscriber:
+    class: Drupal\user\EventSubscriber\AccountCancelSubscriber
+    tags:
+      - { name: event_subscriber }
