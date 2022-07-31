@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2cc3716937a97cd8e1d15111acbcc33c",
+    "content-hash": "52ee090aa2c068a39b76ecc45ed1a0f2",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -441,7 +441,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "7a14ac685e89051f02233b6122279d70570eab1a"
+                "reference": "e2a0c8f35b82a821f3c5dafbd2c8951f1a86b49c"
             },
             "require": {
                 "asm89/stack-cors": "^2.0.2",
@@ -485,120 +485,6 @@
             },
             "conflict": {
                 "drush/drush": "<8.1.10"
-            },
-            "replace": {
-                "drupal/action": "self.version",
-                "drupal/automated_cron": "self.version",
-                "drupal/ban": "self.version",
-                "drupal/bartik": "self.version",
-                "drupal/basic_auth": "self.version",
-                "drupal/big_pipe": "self.version",
-                "drupal/block": "self.version",
-                "drupal/block_content": "self.version",
-                "drupal/book": "self.version",
-                "drupal/breakpoint": "self.version",
-                "drupal/ckeditor": "self.version",
-                "drupal/ckeditor5": "self.version",
-                "drupal/claro": "self.version",
-                "drupal/classy": "self.version",
-                "drupal/color": "self.version",
-                "drupal/comment": "self.version",
-                "drupal/config": "self.version",
-                "drupal/config_translation": "self.version",
-                "drupal/contact": "self.version",
-                "drupal/content_moderation": "self.version",
-                "drupal/content_translation": "self.version",
-                "drupal/contextual": "self.version",
-                "drupal/core-annotation": "self.version",
-                "drupal/core-assertion": "self.version",
-                "drupal/core-bridge": "self.version",
-                "drupal/core-class-finder": "self.version",
-                "drupal/core-datetime": "self.version",
-                "drupal/core-dependency-injection": "self.version",
-                "drupal/core-diff": "self.version",
-                "drupal/core-discovery": "self.version",
-                "drupal/core-event-dispatcher": "self.version",
-                "drupal/core-file-cache": "self.version",
-                "drupal/core-file-security": "self.version",
-                "drupal/core-filesystem": "self.version",
-                "drupal/core-front-matter": "self.version",
-                "drupal/core-gettext": "self.version",
-                "drupal/core-graph": "self.version",
-                "drupal/core-http-foundation": "self.version",
-                "drupal/core-php-storage": "self.version",
-                "drupal/core-plugin": "self.version",
-                "drupal/core-proxy-builder": "self.version",
-                "drupal/core-render": "self.version",
-                "drupal/core-serialization": "self.version",
-                "drupal/core-transliteration": "self.version",
-                "drupal/core-utility": "self.version",
-                "drupal/core-uuid": "self.version",
-                "drupal/core-version": "self.version",
-                "drupal/datetime": "self.version",
-                "drupal/datetime_range": "self.version",
-                "drupal/dblog": "self.version",
-                "drupal/dynamic_page_cache": "self.version",
-                "drupal/editor": "self.version",
-                "drupal/field": "self.version",
-                "drupal/field_layout": "self.version",
-                "drupal/field_ui": "self.version",
-                "drupal/file": "self.version",
-                "drupal/filter": "self.version",
-                "drupal/forum": "self.version",
-                "drupal/help": "self.version",
-                "drupal/help_topics": "self.version",
-                "drupal/history": "self.version",
-                "drupal/image": "self.version",
-                "drupal/inline_form_errors": "self.version",
-                "drupal/jsonapi": "self.version",
-                "drupal/language": "self.version",
-                "drupal/layout_builder": "self.version",
-                "drupal/layout_discovery": "self.version",
-                "drupal/link": "self.version",
-                "drupal/locale": "self.version",
-                "drupal/media": "self.version",
-                "drupal/media_library": "self.version",
-                "drupal/menu_link_content": "self.version",
-                "drupal/menu_ui": "self.version",
-                "drupal/migrate": "self.version",
-                "drupal/migrate_drupal": "self.version",
-                "drupal/migrate_drupal_ui": "self.version",
-                "drupal/minimal": "self.version",
-                "drupal/mysql": "self.version",
-                "drupal/node": "self.version",
-                "drupal/olivero": "self.version",
-                "drupal/options": "self.version",
-                "drupal/page_cache": "self.version",
-                "drupal/path": "self.version",
-                "drupal/path_alias": "self.version",
-                "drupal/pgsql": "self.version",
-                "drupal/quickedit": "self.version",
-                "drupal/rdf": "self.version",
-                "drupal/responsive_image": "self.version",
-                "drupal/rest": "self.version",
-                "drupal/search": "self.version",
-                "drupal/serialization": "self.version",
-                "drupal/settings_tray": "self.version",
-                "drupal/seven": "self.version",
-                "drupal/shortcut": "self.version",
-                "drupal/sqlite": "self.version",
-                "drupal/standard": "self.version",
-                "drupal/stark": "self.version",
-                "drupal/statistics": "self.version",
-                "drupal/syslog": "self.version",
-                "drupal/system": "self.version",
-                "drupal/taxonomy": "self.version",
-                "drupal/telephone": "self.version",
-                "drupal/text": "self.version",
-                "drupal/toolbar": "self.version",
-                "drupal/tour": "self.version",
-                "drupal/tracker": "self.version",
-                "drupal/update": "self.version",
-                "drupal/user": "self.version",
-                "drupal/views": "self.version",
-                "drupal/views_ui": "self.version",
-                "drupal/workflows": "self.version",
-                "drupal/workspaces": "self.version"
             },
             "type": "drupal-core",
             "extra": {
@@ -681,10 +567,10 @@
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/ProjectMessage",
-                "reference": "b4efdbe26634b41a1b89e4f3770a8074769088a6"
+                "reference": "56ffb5a4a8cab53a97554862ce1003541af3438d"
             },
             "require": {
-                "composer-plugin-api": "^1.1 || ^2",
+                "composer-plugin-api": "^2",
                 "php": ">=7.3.0"
             },
             "type": "composer-plugin",
@@ -714,10 +600,10 @@
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/VendorHardening",
-                "reference": "d54f0b3cc8b4237f3a41a0860a808db242f9da9e"
+                "reference": "db4c3ed9b83937aa292951593a8e35176ef5f907"
             },
             "require": {
-                "composer-plugin-api": "^1.1 || ^2",
+                "composer-plugin-api": "^2",
                 "php": ">=7.3.0"
             },
             "type": "composer-plugin",
@@ -5175,21 +5061,21 @@
         },
         {
             "name": "mglaman/phpstan-drupal",
-            "version": "1.1.16",
+            "version": "1.1.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mglaman/phpstan-drupal.git",
-                "reference": "2c72ac675e5630e1f421adb1bf4e6546310d6b05"
+                "reference": "8acaa1e4a15b266cfbd404c6fcb4e1be398f05f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mglaman/phpstan-drupal/zipball/2c72ac675e5630e1f421adb1bf4e6546310d6b05",
-                "reference": "2c72ac675e5630e1f421adb1bf4e6546310d6b05",
+                "url": "https://api.github.com/repos/mglaman/phpstan-drupal/zipball/8acaa1e4a15b266cfbd404c6fcb4e1be398f05f8",
+                "reference": "8acaa1e4a15b266cfbd404c6fcb4e1be398f05f8",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.4 || ^8.0",
-                "phpstan/phpstan": "^1.0",
+                "phpstan/phpstan": "^1.6.0",
                 "symfony/finder": "~3.4.5 ||^4.2 || ^5.0 || ^6.0",
                 "symfony/yaml": "~3.4.5 || ^4.2|| ^5.0 || ^6.0",
                 "webflo/drupal-finder": "^1.2"
@@ -5242,9 +5128,6 @@
                 }
             },
             "autoload": {
-                "files": [
-                    "drupal-phpunit-hack.php"
-                ],
                 "psr-4": {
                     "mglaman\\PHPStanDrupal\\": "src/"
                 }
@@ -5262,7 +5145,7 @@
             "description": "Drupal extension and rules for PHPStan",
             "support": {
                 "issues": "https://github.com/mglaman/phpstan-drupal/issues",
-                "source": "https://github.com/mglaman/phpstan-drupal/tree/1.1.16"
+                "source": "https://github.com/mglaman/phpstan-drupal/tree/1.1.21"
             },
             "funding": [
                 {
@@ -5278,7 +5161,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-04-13T20:19:23+00:00"
+            "time": "2022-07-07T19:39:04+00:00"
         },
         {
             "name": "mikey179/vfsstream",
@@ -5927,16 +5810,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.6.8",
+            "version": "1.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "d76498c5531232cb8386ceb6004f7e013138d3ba"
+                "reference": "8dbba631fa32f4b289404469c2afd6122fd61d67"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/d76498c5531232cb8386ceb6004f7e013138d3ba",
-                "reference": "d76498c5531232cb8386ceb6004f7e013138d3ba",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/8dbba631fa32f4b289404469c2afd6122fd61d67",
+                "reference": "8dbba631fa32f4b289404469c2afd6122fd61d67",
                 "shasum": ""
             },
             "require": {
@@ -5962,7 +5845,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.6.8"
+                "source": "https://github.com/phpstan/phpstan/tree/1.8.1"
             },
             "funding": [
                 {
@@ -5982,7 +5865,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-05-10T06:54:21+00:00"
+            "time": "2022-07-12T16:08:06+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

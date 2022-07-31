@@ -724,10 +724,11 @@ function system_requirements($phase) {
 
     // Determine severity based on time since cron last ran.
     $severity = REQUIREMENT_INFO;
-    if (REQUEST_TIME - $cron_last > $threshold_error) {
+    $request_time = \Drupal::time()->getRequestTime();
+    if ($request_time - $cron_last > $threshold_error) {
       $severity = REQUIREMENT_ERROR;
     }
-    elseif (REQUEST_TIME - $cron_last > $threshold_warning) {
+    elseif ($request_time - $cron_last > $threshold_warning) {
       $severity = REQUIREMENT_WARNING;
     }
 
@@ -1235,7 +1236,7 @@ function system_requirements($phase) {
       $requirements['trusted_host_patterns'] = [
         'title' => t('Trusted Host Settings'),
         'value' => t('Not enabled'),
-        'description' => t('The trusted_host_patterns setting is not configured in settings.php. This can lead to security vulnerabilities. It is <strong>highly recommended</strong> that you configure this. See <a href=":url">Protecting against HTTP HOST Header attacks</a> for more information.', [':url' => 'https://www.drupal.org/docs/8/install/trusted-host-settings']),
+        'description' => t('The trusted_host_patterns setting is not configured in settings.php. This can lead to security vulnerabilities. It is <strong>highly recommended</strong> that you configure this. See <a href=":url">Protecting against HTTP HOST Header attacks</a> for more information.', [':url' => 'https://www.drupal.org/docs/installing-drupal/trusted-host-settings']),
         'severity' => REQUIREMENT_ERROR,
       ];
     }

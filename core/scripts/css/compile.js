@@ -1,8 +1,6 @@
-const chalk = require('chalk');
 const log = require('./log');
 const fs = require('fs');
 const postcss = require('postcss');
-const postcssCalc = require("postcss-calc");
 const postcssImport = require('postcss-import');
 const postcssHeader = require('postcss-header');
 const postcssUrl = require('postcss-url');
@@ -48,7 +46,6 @@ module.exports = (filePath, callback) => {
           'prefers-color-scheme-query': false,
         }
       }),
-      postcssCalc,
       postcssPixelsToRem({
           propList: [
             '*',
@@ -81,7 +78,7 @@ module.exports = (filePath, callback) => {
       callback(result.css);
     })
     .catch(error => {
-      log(chalk.red(error));
+      log(error);
       process.exitCode = 1;
     });
   });
