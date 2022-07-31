@@ -871,6 +871,7 @@ nmsgstr
 nntp
 noaccess
 noadd
+noblanks
 nocache
 nocase
 nocdata
