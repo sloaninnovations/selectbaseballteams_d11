@@ -48,7 +48,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
    *
    * @var string
    */
-  protected $defaultElementsAfterUpdatingToCkeditor5 = '<br> <p> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <cite> <dl> <dt> <dd> <a hreflang href> <blockquote cite> <ul type> <ol type start> <img src alt data-entity-type data-entity-uuid> <strong> <em> <code> <li>';
+  protected $defaultElementsAfterUpdatingToCkeditor5 = '<br> <p> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <cite> <dl> <dt> <dd> <img src alt data-entity-type data-entity-uuid> <a hreflang href> <blockquote cite> <ul type> <ol type start> <strong> <em> <code> <li>';
 
   /**
    * Test enabling CKEditor 5 in a way that triggers validation.
@@ -480,7 +480,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
 
     // But note that the `style` attribute was stripped by
     // \Drupal\editor\EditorXssFilter\Standard.
-    $assert_session->responseContains('<p><a href="https://example.com" hreflang="en" foo="bar"><abbr title="National Aeronautics and Space Administration">NASA</abbr> is an acronym.</a></p>');
+    $assert_session->responseContains('<p><a foo="bar" hreflang="en" href="https://example.com"><abbr title="National Aeronautics and Space Administration">NASA</abbr> is an acronym.</a></p>');
 
     // Ensure attributes are retained after enabling link plugin.
     $this->drupalGet('admin/config/content/formats/manage/full_html');
@@ -492,7 +492,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $this->drupalGet('node/1/edit');
     $page->pressButton('Save');
 
-    $assert_session->responseContains('<p><a href="https://example.com" hreflang="en" foo="bar"><abbr title="National Aeronautics and Space Administration">NASA</abbr> is an acronym.</a></p>');
+    $assert_session->responseContains('<p><a foo="bar" hreflang="en" href="https://example.com"><abbr title="National Aeronautics and Space Administration">NASA</abbr> is an acronym.</a></p>');
 
     // Configure Basic HTML text format to use CKE5 and enable the link plugin.
     $this->drupalGet('admin/config/content/formats/manage/basic_html');

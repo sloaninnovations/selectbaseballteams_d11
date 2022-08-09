@@ -587,6 +587,7 @@ class MediaTest extends WebDriverTestBase {
     $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
 
     // Type into the widget's caption element.
+    $this->selectTextInsideElement('.drupal-media figcaption');
     $figcaption->setValue('Llamas are the most awesome ever');
     $editor_dom = $this->getEditorDataAsDom();
     $this->assertEquals('Llamas are the most awesome ever', $editor_dom->getElementsByTagName('drupal-media')->item(0)->getAttribute('data-caption'));
@@ -1621,26 +1622,6 @@ class MediaTest extends WebDriverTestBase {
 })()
 JS;
     return $this->getSession()->evaluateScript($javascript);
-  }
-
-  /**
-   * Selects text inside an element.
-   *
-   * @param string $selector
-   *   A CSS selector for the element which contents should be selected.
-   */
-  protected function selectTextInsideElement(string $selector): void {
-    $javascript = <<<JS
-(function() {
-  const el = document.querySelector("$selector");
-  const range = document.createRange();
-  range.selectNodeContents(el);
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
-})();
-JS;
-    $this->getSession()->evaluateScript($javascript);
   }
 
 }
