@@ -337,7 +337,7 @@ class TaggedHandlersPassTest extends UnitTestCase {
    *
    * @covers ::process
    */
-  public function testProcessChildDefinitionParentInterfaceMissmatch() {
+  public function testProcessChildDefinitionParentInterfaceMismatch() {
     $container = $this->buildContainer();
 
     $container
@@ -346,7 +346,7 @@ class TaggedHandlersPassTest extends UnitTestCase {
     $container
       ->register('root_handler', __NAMESPACE__ . '\InvalidHandler');
     $container->addDefinitions([
-      'parent_handler' => (new ChildDefinition('root_handler'))->addTag('consumer_id'),
+      'parent_handler' => new ChildDefinition('root_handler'),
       'child_handler' => (new ChildDefinition('parent_handler'))->addTag('consumer_id'),
     ]);
 
