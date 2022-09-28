@@ -58,13 +58,6 @@ class Sql extends QueryPluginBase {
    * or OR.
    */
   public $having = [];
-  /**
-   * The default operator to use when connecting the WHERE groups. May be
-   * AND or OR.
-   *
-   * @var string
-   */
-  protected $groupOperator = 'AND';
 
   /**
    * A simple array of order by clauses.
@@ -159,6 +152,9 @@ class Sql extends QueryPluginBase {
    *   The messenger.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, DateSqlInterface $date_sql, MessengerInterface $messenger) {
+    // By default, use AND operator to connect WHERE groups.
+    $this->groupOperator = 'AND';
+
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
@@ -584,7 +580,7 @@ class Sql extends QueryPluginBase {
    * @param \Drupal\views\Plugin\views\join\JoinPluginBase $join
    *   A Join object (or derived object) to join the alias in.
    *
-   * @return
+   * @return string|null
    *   The alias used to refer to this specific table, or NULL if the table
    *   cannot be ensured.
    */

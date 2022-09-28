@@ -15,12 +15,19 @@ parameters:
     debug: false
     auto_reload: null
     cache: true
+    allowed_file_extensions:
+      - css
+      - html
+      - js
+      - svg
+      - twig
   renderer.config:
     required_cache_contexts: ['languages:language_interface', 'theme', 'user.permissions']
     auto_placeholder_conditions:
       max-age: 0
       contexts: ['session', 'user']
       tags: []
+    debug: false
   factory.keyvalue:
     default: keyvalue.database
   http.response.debug_cacheability_headers: false
@@ -736,7 +743,7 @@ services:
     class: Drupal\Core\StackMiddleware\StackedHttpKernel
   http_kernel.basic:
     class: Symfony\Component\HttpKernel\HttpKernel
-    arguments: ['@event_dispatcher', '@controller_resolver', '@request_stack', '@http_kernel.controller.argument_resolver']
+    arguments: ['@event_dispatcher', '@controller_resolver', '@request_stack', '@http_kernel.controller.argument_resolver', true]
   http_kernel.controller.argument_resolver:
     class: Symfony\Component\HttpKernel\Controller\ArgumentResolver
     arguments: ['@http_kernel.controller.argument_metadata_factory', ['@argument_resolver.request_attribute', '@argument_resolver.request', '@argument_resolver.psr7_request', '@argument_resolver.route_match', '@argument_resolver.default']]
@@ -1536,12 +1543,18 @@ services:
     arguments: ['@renderer', '@url_generator', '@theme.manager', '@date.formatter', '@file_url_generator']
     tags:
       - { name: twig.extension, priority: 100 }
-  # @todo Figure out what to do about debugging functions.
-  # @see https://www.drupal.org/node/1804998
   twig.extension.debug:
     class: Twig\Extension\DebugExtension
     tags:
-      - { name: twig.extension }
+      - { name: twig.extension, priority: 50 }
+  twig.extension.varDumper:
+    class: Drupal\Core\Template\DebugExtension
+    tags:
+      # This extension is loaded after the Twig Debug Extension because for Twig
+      # Extensions, last extension loaded takes precedent. This allows this
+      # extension to override the default Twig Debug Extension conditionally
+      # when Symfony VarDumper is available.
+      - { name: twig.extension, priority: 25 }
   twig.loader:
     class: Twig\Loader\ChainLoader
     public: false
@@ -1552,7 +1565,7 @@ services:
     # We use '.' instead of '%app.root%' as the path for non-namespaced template
     # files so that they match the relative paths of templates loaded via the
     # theme registry or via Twig namespaces.
-    arguments: ['.', '@module_handler', '@theme_handler']
+    arguments: ['.', '@module_handler', '@theme_handler', '%twig.config%']
     tags:
       - { name: twig.loader, priority: 100 }
   twig.loader.theme_registry:

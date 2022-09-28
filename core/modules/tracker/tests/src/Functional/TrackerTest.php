@@ -17,6 +17,7 @@ use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
  * Create and delete nodes and check for their display in the tracker listings.
  *
  * @group tracker
+ * @group legacy
  */
 class TrackerTest extends BrowserTestBase {
 
@@ -55,6 +56,9 @@ class TrackerTest extends BrowserTestBase {
    */
   protected $otherUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 

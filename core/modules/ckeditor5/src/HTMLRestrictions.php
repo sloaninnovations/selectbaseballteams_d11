@@ -305,7 +305,6 @@ final class HTMLRestrictions {
    * @return \Drupal\ckeditor5\HTMLRestrictions
    */
   private static function unrestricted(): self {
-    // @todo Refine in https://www.drupal.org/project/drupal/issues/3231336, including adding support for all operations.
     $restrictions = HTMLRestrictions::emptySet();
     $restrictions->unrestricted = TRUE;
     return $restrictions;
@@ -334,16 +333,14 @@ final class HTMLRestrictions {
       throw new \InvalidArgumentException();
     }
 
-    if ($object->getHtmlRestrictions() === FALSE) {
-      // @todo Refine in https://www.drupal.org/project/drupal/issues/3231336
+    $restrictions = $object->getHTMLRestrictions();
+    if ($restrictions === FALSE || $restrictions === []) {
       return self::unrestricted();
     }
 
-    $restrictions = $object->getHTMLRestrictions();
-    $allowed = $restrictions['allowed'];
-
     // When allowing all tags on an attribute, transform FilterHtml output from
     // ['tag' => ['*'=> TRUE]] to ['tag' => TRUE]
+    $allowed = $restrictions['allowed'];
     foreach ($allowed as $element => $attributes) {
       if (is_array($attributes) && isset($attributes['*']) && $attributes['*'] === TRUE) {
         $allowed[$element] = TRUE;
@@ -759,8 +756,11 @@ final class HTMLRestrictions {
     }
     // Make sure the order of the union array matches the order of the keys in
     // the arrays provided.
-    $keys_order = array_merge($array1_keys, $array2_keys);
-    return array_merge(array_flip($keys_order), $union);
+    $ordered = [];
+    foreach (array_merge($array1_keys, $array2_keys) as $key) {
+      $ordered[$key] = $union[$key];
+    }
+    return $ordered;
   }
 
   /**

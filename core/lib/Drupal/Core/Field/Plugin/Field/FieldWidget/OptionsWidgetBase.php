@@ -9,6 +9,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\OptGroup;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Base class for the 'options_*' widgets.
@@ -29,6 +30,26 @@ abstract class OptionsWidgetBase extends WidgetBase {
    * @var string
    */
   protected $column;
+
+  /**
+   * Tracks whether the field is required.
+   */
+  protected bool $required;
+
+  /**
+   * Tracks whether the data is multi-valued.
+   */
+  protected bool $multiple;
+
+  /**
+   * Tracks whether the field has a value.
+   */
+  protected bool $has_value;
+
+  /**
+   * The array of options for the widget.
+   */
+  protected array $options;
 
   /**
    * {@inheritdoc}
@@ -68,7 +89,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
    */
   public static function validateElement(array $element, FormStateInterface $form_state) {
     if ($element['#required'] && $element['#value'] == '_none') {
-      $form_state->setError($element, t('@name field is required.', ['@name' => $element['#title']]));
+      $form_state->setError($element, new TranslatableMarkup('@name field is required.', ['@name' => $element['#title']]));
     }
 
     // Massage submitted form values.

@@ -19,6 +19,9 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
    */
   protected $grouper;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -52,7 +55,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'group' => -100,
         'type' => 'file',
         'weight' => 0.004,
-        'media' => 'all',
+        'media' => 'screen',
         'preprocess' => TRUE,
         'data' => 'core/misc/ui/themes/base/jquery.ui.core.css',
         'basename' => 'jquery.ui.core.css',

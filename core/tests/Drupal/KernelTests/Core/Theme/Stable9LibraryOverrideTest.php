@@ -15,6 +15,8 @@ class Stable9LibraryOverrideTest extends StableLibraryOverrideTestBase {
    * @var string[]
    */
   protected $librariesToSkip = [
+    'core/drupal.dialog.off_canvas',
+    'layout_builder/drupal.layout_builder',
     'views/views.responsive-grid',
   ];
 
@@ -58,6 +60,10 @@ class Stable9LibraryOverrideTest extends StableLibraryOverrideTestBase {
       foreach ($libraries as $library_name => $library) {
         // Allow skipping libraries.
         if (in_array("$extension/$library_name", $this->librariesToSkip)) {
+          continue;
+        }
+        // Skip internal libraries.
+        if (substr($library_name, 0, 9) === 'internal.') {
           continue;
         }
         $library_after = $libraries_after[$extension][$library_name];

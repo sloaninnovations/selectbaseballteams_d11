@@ -585,7 +585,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     }
     $definition = $container->getDefinition($id);
     $definition->clearTag('needs_destruction');
-    $container->setDefinition("simpletest.$route_provider_service_name", $definition);
+    $container->setDefinition("test.$route_provider_service_name", $definition);
 
     $route_provider_definition = new Definition(RouteProvider::class);
     $route_provider_definition->setPublic(TRUE);
@@ -700,7 +700,12 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       if (!$this->container->get('module_handler')->moduleExists($module)) {
         throw new \LogicException("$module module is not enabled.");
       }
-      $this->container->get('config.installer')->installDefaultConfig('module', $module);
+      try {
+        $this->container->get('config.installer')->installDefaultConfig('module', $module);
+      }
+      catch (\Exception $e) {
+        throw new \Exception(sprintf('Exception when installing config for module %s, message was: %s', $module, $e->getMessage()), 0, $e);
+      }
     }
   }
 
