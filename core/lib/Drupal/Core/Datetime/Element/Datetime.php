@@ -370,7 +370,23 @@ class Datetime extends DateElementBase {
         // If the date is valid, set it.
         $date = $input['object'];
         if ($date instanceof DrupalDateTime && !$date->hasErrors()) {
-          $form_state->setValueForElement($element, $date);
+          $range = static::datetimeRangeYears($element['#date_year_range']);
+          $min = clone($date);
+          $min->setDate($range[0], 1, 1)->setTime(0, 0, 0);
+          $max = clone($date);
+          $max->setDate($range[1], 12, 31)->setTime(23, 59, 59);
+
+          // Check if the date is in the allowed year range.
+          if ($date < $min || $date > $max) {
+            $form_state->setError(
+              $element,
+              t('The %field date is invalid. Please enter a date in the %min-%max year range.',
+                ['%field' => $title, '%min' => $range[0], '%max' => $range[1]])
+            );
+          }
+          else {
+            $form_state->setValueForElement($element, $date);
+          }
         }
         // If the date is invalid, set an error. A reminder of the required
         // format in the message provides a good UX.
