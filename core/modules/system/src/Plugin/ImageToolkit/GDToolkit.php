@@ -398,6 +398,7 @@ class GDToolkit extends ImageToolkitBase {
       IMG_JPG => 'JPEG',
       IMG_PNG => 'PNG',
       IMG_WEBP => 'WEBP',
+      IMG_AVIF => 'AVIF',
     ];
     $supported_formats = array_filter($check_formats, fn($type) => imagetypes() & $type, ARRAY_FILTER_USE_KEY);
     $unsupported_formats = array_diff_key($check_formats, $supported_formats);
