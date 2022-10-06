@@ -61,7 +61,7 @@
   z-index: var(--vertical-tabs-menu--z-index); /* The line should be kept above the vertical tabs menu link to keep it visible even if the link is hovered and gets the 'hover' background color. */
   display: block;
   width: 100%;
-  margin-top: calc(var(--vertical-tabs-menu-separator-size)*-1);
+  margin-top: calc(var(--vertical-tabs-menu-separator-size) * -1);
   content: "";
   border-top: var(--vertical-tabs-menu-separator-size) solid var(--vertical-tabs-menu-separator-color);
 }
@@ -69,7 +69,7 @@
 .media-library-menu__link {
   position: relative;
   display: block;
-  margin-top: calc(var(--vertical-tabs-border-size)*-1);
+  margin-top: calc(var(--vertical-tabs-border-size) * -1);
   padding: var(--space-s) var(--space-s) var(--space-s) calc(var(--space-l) - var(--vertical-tabs-menu-link--active-border-size)); /* LTR */
   text-decoration: none;
   word-wrap: break-word;
@@ -86,12 +86,6 @@
   padding-left: var(--space-s);
   border-width: var(--vertical-tabs-border-size) var(--vertical-tabs-menu-link--active-border-size) var(--vertical-tabs-border-size) 0;
   border-radius: 0 var(--vertical-tabs-border-radius) var(--vertical-tabs-border-radius) 0;
-}
-
-@media screen and (-ms-high-contrast: active) {
-  .media-library-menu__link {
-    border-color: transparent;
-  }
 }
 
 /* Menu link states. */
@@ -116,17 +110,17 @@
 .media-library-menu__link::before {
   position: absolute;
   z-index: calc(var(--vertical-tabs-menu--z-index) - 1); /* This should be on a lower level than the menu-item separator lines. */
-  top: calc(var(--vertical-tabs-border-size)*-1);
+  top: calc(var(--vertical-tabs-border-size) * -1);
   right: 0; /* LTR */
-  bottom: calc(var(--vertical-tabs-border-size)*-1);
-  left: calc(var(--vertical-tabs-menu-link--active-border-size)*-1); /* LTR */
+  bottom: calc(var(--vertical-tabs-border-size) * -1);
+  left: calc(var(--vertical-tabs-menu-link--active-border-size) * -1); /* LTR */
   content: "";
   pointer-events: none;
   background-clip: padding-box;
 }
 
 [dir="rtl"] .media-library-menu__link::before {
-  right: calc(var(--vertical-tabs-menu-link--active-border-size)*-1);
+  right: calc(var(--vertical-tabs-menu-link--active-border-size) * -1);
   left: 0;
 }
 
@@ -136,7 +130,7 @@
   right: 0;
   bottom: 0;
   left: 0;
-  margin: calc(var(--vertical-tabs-border-size)*-1) calc(var(--vertical-tabs-menu-link--active-border-size)*-1);
+  margin: calc(var(--vertical-tabs-border-size) * -1) calc(var(--vertical-tabs-menu-link--active-border-size) * -1);
   content: "";
   pointer-events: none;
   border: var(--vertical-tabs-menu-link-focus-border-size) solid var(--color-focus);
@@ -217,7 +211,7 @@
 .media-library-add-form__added-media .media-library-add-form__remove-button.button--extrasmall {
   margin: var(--space-xs) 0; /* LTR */
   /* Left padding is double the background size of the button icon. */
-  padding: calc(var(--space-xs)/2 - 1px) calc(var(--space-s) - 1px) calc(var(--space-xs)/2 - 1px) calc(var(--space-s)*2);
+  padding: calc(calc(var(--space-xs) / 2) - 1px) calc(var(--space-s) - 1px) calc(calc(var(--space-xs) / 2) - 1px) calc(var(--space-s) * 2);
 }
 
 /* This is needed to override the default extrasmall button left margin. */
@@ -253,17 +247,6 @@
 
 .media-library-add-form .file-upload-help {
   margin: 0.5rem 0 0;
-}
-
-/* Align remove buttons with Save button and compensate for IE scrollbar and focus padding. */
-
-@media all and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-  .ui-dialog > .ui-dialog-content {
-    padding-right: calc(var(--space-s) - var(--focus-border-size) - var(--focus-border-offset-size) - 2px);
-  }
-  [dir="rtl"] .ui-dialog > .ui-dialog-content {
-    padding-left: calc(var(--space-s) - var(--focus-border-size) - var(--focus-border-offset-size) - 2px);
-  }
 }
 
 /* Style the media add oEmbed form. */
@@ -520,7 +503,7 @@
 
 /**
  * By default, the dialog is too narrow to be usable.
- * @see Drupal.ckeditor.openDialog()
+ * @see Drupal.ckeditor5.openDialog()
  */
 
 .ui-dialog--narrow.media-library-widget-modal {
@@ -702,7 +685,7 @@
 .media-library-item__name {
   display: block;
   overflow: hidden;
-  margin: calc(var(--space-xs)/2) var(--space-xs);
+  margin: calc(var(--space-xs) / 2) var(--space-xs);
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 0.875rem;
@@ -801,8 +784,11 @@
 }
 
 .media-library-item__edit {
-  /* !important to override button class border. */
   border: 1px solid var(--color-gray-200) !important;
+}
+
+.media-library-item__edit {
+  /* !important to override button class border. */
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3e%3cg fill='%23545560'%3e%3cpath d='M14.545 3.042l-1.586-1.585a1.003 1.003 0 00-1.414 0L10.252 2.75l3 3 1.293-1.293a1.004 1.004 0 000-1.415zM5.25 13.751l-3-3 6.998-6.998 3 3zM.908 14.775c-.087.262.055.397.316.312l2.001-.667-1.65-1.646-.667 2.001z'/%3e%3c/g%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: center;
@@ -820,8 +806,17 @@
 .media-library-item__remove.button:disabled:active,
 .media-library-item__remove.button:hover,
 .media-library-item__remove.button:focus {
-  /* !important to override button class border. */
   border: 1px solid var(--color-gray-200) !important;
+}
+
+.media-library-item__remove,
+.media-library-item__remove.button,
+.media-library-item__remove.button:first-child,
+.media-library-item__remove.button:disabled,
+.media-library-item__remove.button:disabled:active,
+.media-library-item__remove.button:hover,
+.media-library-item__remove.button:focus {
+  /* !important to override button class border. */
   background-image: url("data:image/svg+xml,%3csvg width='16' height='16' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M2.344 2.343l11.313 11.313M2.344 13.657L13.657 2.343' stroke='%2355565B' stroke-width='3'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: center;
@@ -831,8 +826,13 @@
 .media-library-item__remove:active,
 .media-library-item__remove.button:active,
 .media-library-item__remove.button:disabled:active {
-  /* !important to override button class border. */
   border-color: var(--color-absolutezero) !important;
+}
+
+.media-library-item__remove:active,
+.media-library-item__remove.button:active,
+.media-library-item__remove.button:disabled:active {
+  /* !important to override button class border. */
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3e%3cpath fill='%23ffffff' d='M3.51 13.925c.194.194.512.195.706.001l3.432-3.431c.194-.194.514-.194.708 0l3.432 3.431c.192.194.514.193.707-.001l1.405-1.417c.191-.195.189-.514-.002-.709l-3.397-3.4c-.192-.193-.192-.514-.002-.708l3.401-3.43c.189-.195.189-.515 0-.709l-1.407-1.418c-.195-.195-.513-.195-.707-.001l-3.43 3.431c-.195.194-.516.194-.708 0l-3.432-3.431c-.195-.195-.512-.194-.706.001l-1.407 1.417c-.194.195-.194.515 0 .71l3.403 3.429c.193.195.193.514-.001.708l-3.4 3.399c-.194.195-.195.516-.001.709l1.406 1.419z'/%3e%3c/svg%3e");
 }
 

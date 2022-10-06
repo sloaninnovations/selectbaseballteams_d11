@@ -169,7 +169,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
     parent::postLoad($storage, $entities);
     // Sort the queried roles by their weight.
     // See \Drupal\Core\Config\Entity\ConfigEntityBase::sort().
-    uasort($entities, 'static::sort');
+    uasort($entities, [static::class, 'sort']);
   }
 
   /**
@@ -202,7 +202,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
     $permission_definitions = \Drupal::service('user.permissions')->getPermissions();
     $valid_permissions = array_intersect($this->permissions, array_keys($permission_definitions));
     $invalid_permissions = array_diff($this->permissions, $valid_permissions);
-    if (!empty($invalid_permissions) && !$this->get('skip_missing_permission_deprecation')) {
+    if (!empty($invalid_permissions)) {
       throw new \RuntimeException('Adding non-existent permissions to a role is not allowed. The incorrect permissions are "' . implode('", "', $invalid_permissions) . '".');
     }
     foreach ($valid_permissions as $permission) {

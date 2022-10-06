@@ -26,11 +26,11 @@
 .block-system-powered-by-block {
   letter-spacing: 0.02em;
   font-size: 0.875rem;
-  line-height: var(--sp)
+  line-height: var(--sp);
 }
 
 .block-system-powered-by-block a {
-    text-decoration: underline
+    text-decoration: underline;
   }
 
 .block-system-powered-by-block a:hover,
@@ -38,23 +38,16 @@
       text-decoration: none;
     }
 
-[dir="ltr"] .block-system-powered-by-block .drupal-logo {
-    margin-left: calc(var(--sp)/4)
-}
-
-[dir="rtl"] .block-system-powered-by-block .drupal-logo {
-    margin-right: calc(var(--sp)/4)
-}
-
 .block-system-powered-by-block .drupal-logo {
     display: inline-block;
-    margin-top: calc(var(--sp)*-1/4);
+    margin-block-start: calc(-1 * var(--sp) / 4);
+    margin-inline-start: calc(var(--sp) / 4);
   }
 
 .block-system-powered-by-block svg {
     width: 0.875rem; /* 14 */
     height: 1.1875rem; /* 19 */
-    vertical-align: top
+    vertical-align: top;
   }
 
 .block-system-powered-by-block svg path {

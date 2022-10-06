@@ -11,6 +11,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionLifecycle;
@@ -315,6 +316,19 @@ function system_requirements($phase) {
   elseif ($phase === 'runtime' && version_compare($phpversion, \Drupal::RECOMMENDED_PHP) < 0) {
     $requirements['php']['description'] = t('It is recommended to upgrade to PHP version %recommended or higher for the best ongoing support.  See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.', ['%recommended' => \Drupal::RECOMMENDED_PHP, ':php_requirements' => 'https://www.drupal.org/docs/system-requirements/php-requirements']);
     $requirements['php']['severity'] = REQUIREMENT_INFO;
+
+    // PHP 8.1.0 through 8.1.5 have a known OPcache bug that can cause fatal
+    // errors, so warn about that when running Drupal on those versions.
+    // @todo Remove this when \Drupal::MINIMUM_PHP is at least 8.1.6 in
+    //   https://www.drupal.org/i/3305726.
+    if (version_compare(\Drupal::MINIMUM_PHP, '8.1.6') < 0) {
+      $requirements['php']['description'] = t('PHP %version has <a href=":bug_url">an OPcache bug that can cause fatal errors with class autoloading</a>. This can be fixed by upgrading to PHP 8.1.6 or later. See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.', [
+        '%version' => $phpversion,
+        ':bug_url' => 'https://github.com/php/php-src/issues/8164',
+        ':php_requirements' => 'https://www.drupal.org/docs/system-requirements/php-requirements',
+      ]);
+      $requirements['php']['severity'] = REQUIREMENT_WARNING;
+    }
   }
 
   // Test for PHP extensions.
@@ -724,10 +738,11 @@ function system_requirements($phase) {
 
     // Determine severity based on time since cron last ran.
     $severity = REQUIREMENT_INFO;
-    if (REQUEST_TIME - $cron_last > $threshold_error) {
+    $request_time = \Drupal::time()->getRequestTime();
+    if ($request_time - $cron_last > $threshold_error) {
       $severity = REQUIREMENT_ERROR;
     }
-    elseif (REQUEST_TIME - $cron_last > $threshold_warning) {
+    elseif ($request_time - $cron_last > $threshold_warning) {
       $severity = REQUIREMENT_WARNING;
     }
 
@@ -1189,10 +1204,6 @@ function system_requirements($phase) {
       $requirements['unicode']['description'] = t('Operations on Unicode strings are emulated on a best-effort basis. Install the <a href="http://php.net/mbstring">PHP mbstring extension</a> for improved Unicode support.');
       break;
 
-    case 'mbstring.func_overload':
-      $requirements['unicode']['description'] = t('Multibyte string function overloading in PHP is active and must be disabled. Check the php.ini <em>mbstring.func_overload</em> setting. Please refer to the <a href="http://php.net/mbstring">PHP mbstring documentation</a> for more information.');
-      break;
-
     case 'mbstring.encoding_translation':
       $requirements['unicode']['description'] = t('Multibyte string input conversion in PHP is active and must be disabled. Check the php.ini <em>mbstring.encoding_translation</em> setting. Please refer to the <a href="http://php.net/mbstring">PHP mbstring documentation</a> for more information.');
       break;
@@ -1235,7 +1246,7 @@ function system_requirements($phase) {
       $requirements['trusted_host_patterns'] = [
         'title' => t('Trusted Host Settings'),
         'value' => t('Not enabled'),
-        'description' => t('The trusted_host_patterns setting is not configured in settings.php. This can lead to security vulnerabilities. It is <strong>highly recommended</strong> that you configure this. See <a href=":url">Protecting against HTTP HOST Header attacks</a> for more information.', [':url' => 'https://www.drupal.org/docs/8/install/trusted-host-settings']),
+        'description' => t('The trusted_host_patterns setting is not configured in settings.php. This can lead to security vulnerabilities. It is <strong>highly recommended</strong> that you configure this. See <a href=":url">Protecting against HTTP HOST Header attacks</a> for more information.', [':url' => 'https://www.drupal.org/docs/installing-drupal/trusted-host-settings']),
         'severity' => REQUIREMENT_ERROR,
       ];
     }
@@ -1375,7 +1386,7 @@ function system_requirements($phase) {
         'title' => t('The version of Drupal you are trying to update from is too old'),
         'description' => t('Updating to Drupal @current_major is only supported from Drupal version @required_min_version or higher. If you are trying to update from an older version, first update to the latest version of Drupal @previous_major. (<a href=":url">Drupal upgrade guide</a>)', [
           '@current_major' => 10,
-          '@required_min_version' => '9.3.0',
+          '@required_min_version' => '9.4.0',
           '@previous_major' => 9,
           ':url' => 'https://www.drupal.org/docs/upgrading-drupal/drupal-8-and-higher',
         ]),
@@ -1461,7 +1472,7 @@ function system_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ],
-     ],
+    ],
     'primary key' => ['value'],
   ];
 
@@ -1492,6 +1503,7 @@ function system_schema() {
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
+        'size' => 'big',
       ],
       'session' => [
         'description' => 'The serialized contents of the user\'s session, an array of name/value pairs that persists across page requests by this session ID. Drupal loads the user\'s session from here at the start of each request and saves it at the end.',
@@ -1574,4 +1586,103 @@ function _system_advisories_requirements(array &$requirements): void {
       )->toRenderable();
     }
   }
+}
+
+/**
+ * Remove the year 2038 date limitation.
+ */
+function system_update_10100(&$sandbox = NULL) {
+  $connection = \Drupal::database();
+  $schema = $connection->schema();
+
+  // Update sessions table.
+  if ($schema->tableExists('sessions') && $connection->databaseType() != 'sqlite') {
+    $new = [
+      'description' => 'The Unix timestamp when this session last requested a page. Old records are purged by PHP automatically.',
+      'type' => 'int',
+      'not null' => TRUE,
+      'default' => 0,
+      'size' => 'big',
+    ];
+    $schema->changeField('sessions', 'timestamp', 'timestamp', $new);
+  }
+
+  // Update batch table.
+  if ($schema->tableExists('batch') && $connection->databaseType() != 'sqlite') {
+    $new = [
+      'description' => 'A Unix timestamp indicating when this batch was submitted for processing. Stale batches are purged at cron time.',
+      'type' => 'int',
+      'not null' => TRUE,
+      'size' => 'big',
+    ];
+    $schema->changeField('batch', 'timestamp', 'timestamp', $new);
+  }
+
+  // Update flood table.
+  if ($schema->tableExists('flood') && $connection->databaseType() != 'sqlite') {
+    $new = [
+      'timestamp' => [
+        'description' => 'Timestamp of the event.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'big',
+      ],
+      'expiration' => [
+        'description' => 'Expiration timestamp. Expired events are purged on cron run.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'big',
+      ],
+    ];
+    foreach ($new as $column_name => $value) {
+      $schema->changeField('flood', $column_name, $column_name, $value);
+    }
+  }
+  // Update queue table.
+  if ($schema->tableExists('queue') && $connection->databaseType() != 'sqlite') {
+    $new = [
+      'expire' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp when the claim lease expires on the item.',
+        'size' => 'big',
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp when the item was created.',
+        'size' => 'big',
+      ],
+    ];
+    foreach ($new as $column_name => $value) {
+      $schema->changeField('queue', $column_name, $column_name, $value);
+    }
+  }
+
+  // Update cache tables.
+  $cache_tables = $schema->findTables('cache_%');
+  $cache_tables = array_filter($cache_tables, function ($cache_tables) {
+    return str_starts_with($cache_tables, 'cache_');
+  });
+  if ($connection->databaseType() != 'sqlite') {
+    foreach (array_keys($cache_tables) as $table) {
+      // Truncate cache tables. They will be flushed anyway at the end of
+      // database updates, but emptying the tables now will boost the schema
+      // changes.
+      $connection->truncate($table)->execute();
+      $new = [
+        'description' => 'A Unix timestamp indicating when the cache entry should expire, or ' . Cache::PERMANENT . ' for never.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'big',
+      ];
+      $schema->changeField($table, 'expire', 'expire', $new);
+    }
+  }
+
 }

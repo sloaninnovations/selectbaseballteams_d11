@@ -364,6 +364,15 @@ abstract class Connection {
   }
 
   /**
+   * Returns the prefix of the tables.
+   *
+   * @return string $prefix
+   */
+  public function getPrefix(): string {
+    return $this->prefix;
+  }
+
+  /**
    * Set the prefix used by this database connection.
    *
    * @param string $prefix
@@ -428,8 +437,14 @@ abstract class Connection {
    *
    * @param string $table
    *   (optional) The table to find the prefix for.
+   *
+   * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0.
+   * Instead, you should just use Connection::getPrefix().
+   *
+   * @see https://www.drupal.org/node/3260849
    */
   public function tablePrefix($table = 'default') {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Instead, you should just use Connection::getPrefix(). See https://www.drupal.org/node/3260849', E_USER_DEPRECATED);
     return $this->prefix;
   }
 
@@ -460,7 +475,7 @@ abstract class Connection {
    */
   public function getFullQualifiedTableName($table) {
     $options = $this->getConnectionOptions();
-    $prefix = $this->tablePrefix($table);
+    $prefix = $this->getPrefix();
     return $options['database'] . '.' . $prefix . $table;
   }
 
@@ -1597,7 +1612,7 @@ abstract class Connection {
    * @param string $operator
    *   The condition operator, such as "IN", "BETWEEN", etc. Case-sensitive.
    *
-   * @return
+   * @return array|null
    *   The extra handling directives for the specified operator, or NULL.
    *
    * @see \Drupal\Core\Database\Query\Condition::compile()
@@ -1633,7 +1648,7 @@ abstract class Connection {
    *   is behind, so by passing in the maximum existing ID, it can be assured
    *   that we never issue the same ID.
    *
-   * @return
+   * @return int|string
    *   An integer number larger than any number returned by earlier calls and
    *   also larger than the $existing_id if one was passed in.
    */

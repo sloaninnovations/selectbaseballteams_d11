@@ -427,7 +427,7 @@ class Registry implements DestructableInterface {
    *   The actual name of theme, module, etc. that is being processed.
    * @param string $path
    *   The directory where $name is. For example, modules/system or
-   *   themes/bartik.
+   *   themes/olivero.
    *
    * @see \Drupal\Core\Theme\ThemeManagerInterface::render()
    * @see hook_theme()
@@ -715,7 +715,7 @@ class Registry implements DestructableInterface {
     ksort($suggestion_level);
     foreach ($suggestion_level as $level => $item) {
       foreach ($item as $preprocessor => $hook) {
-        if (isset($cache[$hook]['preprocess functions']) && !in_array($hook, $cache[$hook]['preprocess functions'])) {
+        if (isset($cache[$hook]['preprocess functions']) && !in_array($preprocessor, $cache[$hook]['preprocess functions'])) {
           // Add missing preprocessor to existing hook.
           $cache[$hook]['preprocess functions'][] = $preprocessor;
         }

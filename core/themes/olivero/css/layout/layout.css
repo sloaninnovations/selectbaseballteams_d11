@@ -26,8 +26,15 @@
 .container {
   width: 100%;
   max-width: var(--max-width);
-  padding-left: var(--container-padding);
-  padding-right: var(--container-padding);
+  padding-inline: var(--container-padding);
+
+  /* This fixes an issue where if the toolbar is open in vertical mode, and
+   * the mobile navigation is open, the "close" button gets pushed outside of
+   * the viewport. */
+}
+
+body.is-fixed .container {
+    width: calc(100% - var(--drupal-displace-offset-left, 0px) - var(--drupal-displace-offset-right, 0px));
 }
 
 .page-wrapper {
@@ -42,7 +49,7 @@
 
 .layout-main-wrapper {
   position: relative;
-  z-index: 1;
+  z-index: 2; /* Ensure dropdown is not cut off by footer. */
 }
 
 /* Contains the social sidebar, and the primary content area. */
@@ -52,32 +59,25 @@
 .layout-main {
     display: flex;
     flex-direction: row-reverse;
-    flex-wrap: wrap
+    flex-wrap: wrap;
 }
   }
 
 @media (min-width: 75rem) {
 
-[dir="ltr"] .main-content {
-    margin-right: auto;
-  }
-
-[dir="rtl"] .main-content {
-    margin-left: auto;
-  }
-
 .main-content {
-    width: calc(100% - var(--content-left))
+    width: calc(100% - var(--content-left));
+    margin-inline-end: auto;
 }
   }
 
 .main-content__container {
-  padding-top: var(--sp3)
+  padding-block-start: var(--sp3);
 }
 
 @media (min-width: 43.75rem) {
 
 .main-content__container {
-    padding-top: var(--sp5)
+    padding-block-start: var(--sp5);
 }
   }

@@ -125,7 +125,7 @@ trait AssertContentTrait {
       // DOM can load HTML soup. But, HTML soup can throw warnings, suppress
       // them.
       $html_dom = new \DOMDocument();
-      @$html_dom->loadHTML('<?xml encoding="UTF-8">' . $this->getRawContent());
+      @$html_dom->loadHTML('<?xml encoding="UTF-8">' . $this->getRawContent(), LIBXML_NOBLANKS);
       if ($html_dom) {
         // It's much easier to work with simplexml than DOM, luckily enough
         // we can just simply import our DOM tree.
@@ -134,16 +134,6 @@ trait AssertContentTrait {
     }
     $this->assertNotFalse($this->elements, 'The current HTML page should be available for DOM navigation.');
     return $this->elements;
-  }
-
-  /**
-   * Get the current URL from the cURL handler.
-   *
-   * @return string
-   *   The current URL.
-   */
-  protected function getUrl() {
-    return 'no-url';
   }
 
   /**
@@ -532,7 +522,7 @@ trait AssertContentTrait {
    *   translate this string. Defaults to 'Other'; most tests do not override
    *   this default.
    *
-   * @see \Drupal\simpletest\AssertContentTrait::assertRaw()
+   * @see \Drupal\KernelTests\AssertContentTrait::assertRaw()
    */
   protected function assertText($text, $message = '', $group = 'Other'): void {
     $this->assertTextHelper($text, $message, $group, FALSE);
@@ -557,7 +547,7 @@ trait AssertContentTrait {
    *   translate this string. Defaults to 'Other'; most tests do not override
    *   this default.
    *
-   * @see \Drupal\simpletest\AssertContentTrait::assertNoRaw()
+   * @see \Drupal\KernelTests\AssertContentTrait::assertNoRaw()
    */
   protected function assertNoText($text, $message = '', $group = 'Other'): void {
     $this->assertTextHelper($text, $message, $group, TRUE);

@@ -27,7 +27,7 @@
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: var(--color--gray-45)
+  color: var(--color-text-neutral-soft);
 }
 
 .feed-icon:hover {
@@ -41,14 +41,6 @@
   font-weight: 600;
 }
 
-[dir="ltr"] .feed-icon__icon {
-  margin-left: var(--sp0-5)
-}
-
-[dir="rtl"] .feed-icon__icon {
-  margin-right: var(--sp0-5)
-}
-
 .feed-icon__icon {
   display: flex;
   flex-shrink: 0;
@@ -56,8 +48,9 @@
   justify-content: center;
   width: var(--sp1-5);
   height: var(--sp1-5);
+  margin-inline-start: var(--sp0-5);
   color: var(--color--white);
-  background-color: var(--color--primary-50)
+  background-color: var(--color--primary-50);
 }
 
 .feed-icon__icon svg {

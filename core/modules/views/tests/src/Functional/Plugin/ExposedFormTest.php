@@ -8,7 +8,6 @@ use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
-use Drupal\views\Entity\View;
 
 /**
  * Tests exposed forms functionality.
@@ -24,7 +23,7 @@ class ExposedFormTest extends ViewTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_exposed_form_buttons', 'test_exposed_block', 'test_exposed_form_sort_items_per_page', 'test_exposed_form_pager'];
+  public static $testViews = ['test_exposed_form_buttons', 'test_exposed_form_buttons_required', 'test_exposed_block', 'test_exposed_form_sort_items_per_page', 'test_exposed_form_pager'];
 
   /**
    * Modules to enable.
@@ -36,7 +35,7 @@ class ExposedFormTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'classy';
+  protected $defaultTheme = 'starterkit_theme';
 
   /**
    * Nodes to test.
@@ -45,6 +44,9 @@ class ExposedFormTest extends ViewTestBase {
    */
   protected $nodes = [];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
     parent::setUp($import_test_views, $modules);
 
@@ -248,9 +250,7 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertSession()->pageTextMatchesCount(1, '/' . $view->getTitle() . '/');
 
     // Test there is an exposed form in a block.
-    $xpath = $this->assertSession()->buildXPathQuery('//div[@id=:id]/form/@id', [':id' => Html::getUniqueId('block-' . $block->id())]);
-    $result = $this->xpath($xpath);
-    $this->assertCount(1, $result);
+    $this->assertSession()->elementsCount('xpath', '//div[@id="' . Html::getUniqueId('block-' . $block->id()) . '"]/form/@id', 1);
 
     // Test there is not an exposed form in the view page content area.
     $xpath = $this->assertSession()->buildXPathQuery('//div[@class="view-content"]/form/@id', [
@@ -259,8 +259,9 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertSession()->elementNotExists('xpath', $xpath);
 
     // Test there is only one views exposed form on the page.
-    $elements = $this->xpath('//form[@id=:id]', [':id' => $this->getExpectedExposedFormId($view)]);
-    $this->assertCount(1, $elements, 'One exposed form block found.');
+    $xpath = '//form[@id="' . $this->getExpectedExposedFormId($view) . '"]';
+    $this->assertSession()->elementsCount('xpath', $xpath, 1);
+    $element = $this->assertSession()->elementExists('xpath', $xpath);
 
     // Test that the correct option is selected after form submission.
     $this->assertCacheContext('url');
@@ -271,13 +272,13 @@ class ExposedFormTest extends ViewTestBase {
       'page' => ['page'],
     ];
     foreach ($arguments as $argument => $bundles) {
-      $elements[0]->find('css', 'select')->selectOption($argument);
-      $elements[0]->findButton('Apply')->click();
+      $element->find('css', 'select')->selectOption($argument);
+      $element->findButton('Apply')->click();
       $this->assertCacheContext('url');
       $this->assertTrue($this->assertSession()->optionExists('Content: Type', $argument)->isSelected());
       $this->assertNodesExist($bundles);
     }
-    $elements[0]->findButton('Reset')->click();
+    $element->findButton('Reset')->click();
     $this->assertNodesExist($arguments['All']);
   }
 
@@ -298,23 +299,27 @@ class ExposedFormTest extends ViewTestBase {
    * Tests the input required exposed form type.
    */
   public function testInputRequired() {
-    $view = View::load('test_exposed_form_buttons');
-    $display = &$view->getDisplay('default');
-    $display['display_options']['exposed_form']['type'] = 'input_required';
-    $view->save();
-
-    $this->drupalGet('test_exposed_form_buttons');
+    $this->drupalGet('test_exposed_form_buttons_required');
     $this->assertSession()->statusCodeEquals(200);
-    $this->helperButtonHasLabel('edit-submit-test-exposed-form-buttons', 'Apply');
+    $this->helperButtonHasLabel('edit-submit-test-exposed-form-buttons-required', 'Apply');
 
     // Ensure that no results are displayed by default when no input is
     // provided.
     $this->assertSession()->elementNotExists('xpath', "//div[contains(@class, 'views-row')]");
-
-    $this->drupalGet('test_exposed_form_buttons', ['query' => ['type' => 'article']]);
+    // Ensure that no error element is shown.
+    $this->assertSession()->elementNotExists('css', '.messages--error');
+    $this->assertFalse($this->getSession()->getPage()->findField('type')->hasClass('error'));
+    $edit = [
+      'type' => 'article',
+    ];
+    $this->submitForm($edit, 'Apply');
 
     // Ensure that results are displayed by default when input is provided.
     $this->assertSession()->elementsCount('xpath', "//div[contains(@class, 'views-row')]", 5);
+
+    // Test exposed filter on preview.
+    $this->drupalGet('admin/structure/views/view/test_view/test_exposed_form_buttons_required');
+    $this->assertSession()->elementNotExists('css', '.messages--error');
   }
 
   /**
@@ -325,7 +330,6 @@ class ExposedFormTest extends ViewTestBase {
     $display = &$view->storage->getDisplay('default');
     $display['display_options']['exposed_form']['type'] = 'input_required';
     // Set up the "on demand text".
-    // @see https://www.drupal.org/node/535868
     $on_demand_text = 'Select any filter and click Apply to see results.';
     $display['display_options']['exposed_form']['options']['text_input_required'] = $on_demand_text;
     $display['display_options']['exposed_form']['options']['text_input_required_format'] = filter_default_format();

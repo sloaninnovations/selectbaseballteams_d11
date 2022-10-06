@@ -9,7 +9,7 @@
   position: relative;
   /**
    * Ensure mobile site header is always above other elements including
-   * contextual links, quick-edit, and Tour.
+   * contextual links, and Tour.
    */
   z-index: 101;
 
@@ -57,7 +57,7 @@
 .site-header__inner {
   z-index: 1; /* Appear in front of Drupal's tabs. */
   flex-grow: 1;
-  width: calc(100vw - var(--content-left));
+  width: calc(100vw - var(--content-left) - var(--drupal-displace-offset-left, 0px) - var(--drupal-displace-offset-right, 0px));
   background: var(--color--white);
 }
 

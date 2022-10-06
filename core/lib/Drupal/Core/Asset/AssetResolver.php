@@ -7,6 +7,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
 /**
@@ -109,12 +110,15 @@ class AssetResolver implements AssetResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCssAssets(AttachedAssetsInterface $assets, $optimize) {
+  public function getCssAssets(AttachedAssetsInterface $assets, $optimize, LanguageInterface $language = NULL) {
+    if (!isset($language)) {
+      $language = $this->languageManager->getCurrentLanguage();
+    }
     $theme_info = $this->themeManager->getActiveTheme();
     // Add the theme name to the cache key since themes may implement
     // hook_library_info_alter().
     $libraries_to_load = $this->getLibrariesToLoad($assets);
-    $cid = 'css:' . $theme_info->getName() . ':' . Crypt::hashBase64(serialize($libraries_to_load)) . (int) $optimize;
+    $cid = 'css:' . $theme_info->getName() . ':' . $language->getId() . Crypt::hashBase64(serialize($libraries_to_load)) . (int) $optimize;
     if ($cached = $this->cache->get($cid)) {
       return $cached->data;
     }
@@ -134,6 +138,8 @@ class AssetResolver implements AssetResolverInterface {
       if (isset($definition['css'])) {
         foreach ($definition['css'] as $options) {
           $options += $default_options;
+          // Copy the asset library license information to each file.
+          $options['license'] = $definition['license'];
 
           // Files with a query string cannot be preprocessed.
           if ($options['type'] === 'file' && $options['preprocess'] && strpos($options['data'], '?') !== FALSE) {
@@ -151,14 +157,14 @@ class AssetResolver implements AssetResolverInterface {
     }
 
     // Allow modules and themes to alter the CSS assets.
-    $this->moduleHandler->alter('css', $css, $assets);
-    $this->themeManager->alter('css', $css, $assets);
+    $this->moduleHandler->alter('css', $css, $assets, $language);
+    $this->themeManager->alter('css', $css, $assets, $language);
 
     // Sort CSS items, so that they appear in the correct order.
-    uasort($css, 'static::sort');
+    uasort($css, [static::class, 'sort']);
 
     if ($optimize) {
-      $css = \Drupal::service('asset.css.collection_optimizer')->optimize($css);
+      $css = \Drupal::service('asset.css.collection_optimizer')->optimize($css, $libraries_to_load, $language);
     }
     $this->cache->set($cid, $css, CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
 
@@ -194,13 +200,16 @@ class AssetResolver implements AssetResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function getJsAssets(AttachedAssetsInterface $assets, $optimize) {
+  public function getJsAssets(AttachedAssetsInterface $assets, $optimize, LanguageInterface $language = NULL) {
+    if (!isset($language)) {
+      $language = $this->languageManager->getCurrentLanguage();
+    }
     $theme_info = $this->themeManager->getActiveTheme();
     // Add the theme name to the cache key since themes may implement
     // hook_library_info_alter(). Additionally add the current language to
     // support translation of JavaScript files via hook_js_alter().
     $libraries_to_load = $this->getLibrariesToLoad($assets);
-    $cid = 'js:' . $theme_info->getName() . ':' . $this->languageManager->getCurrentLanguage()->getId() . ':' . Crypt::hashBase64(serialize($libraries_to_load)) . (int) (count($assets->getSettings()) > 0) . (int) $optimize;
+    $cid = 'js:' . $theme_info->getName() . ':' . $language->getId() . ':' . Crypt::hashBase64(serialize($libraries_to_load)) . (int) (count($assets->getSettings()) > 0) . (int) $optimize;
 
     if ($cached = $this->cache->get($cid)) {
       [$js_assets_header, $js_assets_footer, $settings, $settings_in_header] = $cached->data;
@@ -237,6 +246,8 @@ class AssetResolver implements AssetResolverInterface {
         if (isset($definition['js'])) {
           foreach ($definition['js'] as $options) {
             $options += $default_options;
+            // Copy the asset library license information to each file.
+            $options['license'] = $definition['license'];
 
             // 'scope' is a calculated option, based on which libraries are
             // marked to be loaded from the header (see above).
@@ -258,11 +269,11 @@ class AssetResolver implements AssetResolverInterface {
       }
 
       // Allow modules and themes to alter the JavaScript assets.
-      $this->moduleHandler->alter('js', $javascript, $assets);
-      $this->themeManager->alter('js', $javascript, $assets);
+      $this->moduleHandler->alter('js', $javascript, $assets, $language);
+      $this->themeManager->alter('js', $javascript, $assets, $language);
 
       // Sort JavaScript assets, so that they appear in the correct order.
-      uasort($javascript, 'static::sort');
+      uasort($javascript, [static::class, 'sort']);
 
       // Prepare the return value: filter JavaScript assets per scope.
       $js_assets_header = [];
@@ -278,8 +289,8 @@ class AssetResolver implements AssetResolverInterface {
 
       if ($optimize) {
         $collection_optimizer = \Drupal::service('asset.js.collection_optimizer');
-        $js_assets_header = $collection_optimizer->optimize($js_assets_header);
-        $js_assets_footer = $collection_optimizer->optimize($js_assets_footer);
+        $js_assets_header = $collection_optimizer->optimize($js_assets_header, $libraries_to_load);
+        $js_assets_footer = $collection_optimizer->optimize($js_assets_footer, $libraries_to_load);
       }
 
       // If the core/drupalSettings library is being loaded or is already
@@ -339,19 +350,22 @@ class AssetResolver implements AssetResolverInterface {
   /**
    * Sorts CSS and JavaScript resources.
    *
+   * Callback for uasort().
+   *
    * This sort order helps optimize front-end performance while providing
    * modules and themes with the necessary control for ordering the CSS and
    * JavaScript appearing on a page.
    *
-   * @param $a
+   * @param array $a
    *   First item for comparison. The compared items should be associative
    *   arrays of member items.
-   * @param $b
+   * @param array $b
    *   Second item for comparison.
    *
    * @return int
+   *   The comparison result for uasort().
    */
-  public static function sort($a, $b) {
+  public static function sort(array $a, array $b) {
     // First order by group, so that all items in the CSS_AGGREGATE_DEFAULT
     // group appear before items in the CSS_AGGREGATE_THEME group. Modules may
     // create additional groups by defining their own constants.

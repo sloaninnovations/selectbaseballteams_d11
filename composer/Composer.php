@@ -6,6 +6,7 @@ use Composer\Composer as ComposerApp;
 use Composer\Script\Event;
 use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
+use Drupal\Composer\Generator\ComponentGenerator;
 use Drupal\Composer\Generator\PackageGenerator;
 use Symfony\Component\Finder\Finder;
 
@@ -28,6 +29,17 @@ class Composer {
   public static function generateMetapackages(Event $event): void {
     $generator = new PackageGenerator();
     $generator->generate($event->getIO(), getcwd());
+  }
+
+  /**
+   * Update component packages whenever composer.lock is updated.
+   *
+   * @param \Composer\Script\Event $event
+   *   The Composer event.
+   */
+  public static function generateComponentPackages(Event $event): void {
+    $generator = new ComponentGenerator();
+    $generator->generate($event, getcwd());
   }
 
   /**
@@ -91,8 +103,8 @@ class Composer {
   public static function ensureComposerVersion(): void {
     $composerVersion = method_exists(ComposerApp::class, 'getVersion') ?
       ComposerApp::getVersion() : ComposerApp::VERSION;
-    if (Comparator::lessThan($composerVersion, '1.9.0')) {
-      throw new \RuntimeException("Drupal core development requires Composer 1.9.0, but Composer $composerVersion is installed. Please run 'composer self-update'.");
+    if (Comparator::lessThan($composerVersion, '2.3.6')) {
+      throw new \RuntimeException("Drupal core development requires Composer 2.3.6, but Composer $composerVersion is installed. Please run 'composer self-update'.");
     }
   }
 

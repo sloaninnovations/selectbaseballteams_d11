@@ -244,7 +244,7 @@ class UserController extends ControllerBase {
     elseif ($user->isAuthenticated() && ($timestamp >= $user->getLastLoginTime()) && ($timestamp <= $current) && hash_equals($hash, user_pass_rehash($user, $timestamp))) {
       user_login_finalize($user);
       $this->logger->notice('User %name used one-time login link at time %timestamp.', ['%name' => $user->getDisplayName(), '%timestamp' => $timestamp]);
-      $this->messenger()->addStatus($this->t('You have just used your one-time login link. It is no longer necessary to use this link to log in. Please change your password.'));
+      $this->messenger()->addStatus($this->t('You have just used your one-time login link. It is no longer necessary to use this link to log in. Please set your password.'));
       // Let the user's password be changed without the current password
       // check.
       $token = Crypt::randomBytesBase64(55);
@@ -283,8 +283,7 @@ class UserController extends ControllerBase {
    * Redirects users to their profile edit page.
    *
    * This controller assumes that it is only invoked for authenticated users.
-   * This is enforced for the 'user.well-known.change_password' route with the
-   * '_user_is_logged_in' requirement.
+   * This is typically enforced with the '_user_is_logged_in' requirement.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   Returns a redirect to the profile edit form of the currently logged in

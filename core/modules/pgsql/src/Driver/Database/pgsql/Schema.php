@@ -461,7 +461,7 @@ EOD;
       'serial:medium' => 'serial',
       'serial:big' => 'bigserial',
       'serial:normal' => 'serial',
-      ];
+    ];
     return $map;
   }
 
@@ -511,7 +511,7 @@ EOD;
    * {@inheritdoc}
    */
   public function findTables($table_expression) {
-    $prefix = $this->connection->tablePrefix();
+    $prefix = $this->connection->getPrefix();
     $prefix_length = strlen($prefix);
     $tables = [];
 

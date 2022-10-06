@@ -13,7 +13,7 @@
 .form-element {
   box-sizing: border-box;
   max-width: 100%;
-  min-height: calc(var(--input-padding-vertical)*2 + var(--input-border-size)*2 + var(--input-line-height)); /* iOS. */
+  min-height: calc(((var(--input-padding-vertical) + var(--input-border-size)) * 2) + var(--input-line-height)); /* iOS. */
   padding: var(--input-padding-vertical) var(--input-padding-horizontal);
   color: var(--input-fg-color);
   border: var(--input-border-size) solid var(--input-border-color);
@@ -27,7 +27,7 @@
 
 .no-touchevents .form-element--extrasmall,
 .no-touchevents .form-element[name$="][_weight]"] {
-  min-height: calc(var(--input--extrasmall-padding-vertical)*2 + var(--input-border-size)*2 + var(--input--extrasmall-line-height)); /* iOS. */
+  min-height: calc(((var(--input--extrasmall-padding-vertical) + var(--input-border-size)) * 2) + var(--input--extrasmall-line-height)); /* iOS. */
   padding: var(--input--extrasmall-padding-vertical) var(--input--extrasmall-padding-horizontal);
   font-size: var(--input--extrasmall-font-size);
   line-height: var(--input--extrasmall-line-height);
@@ -67,35 +67,11 @@
 }
 
 /**
- * Reset value border and background of the file input on IE11 and Edge.
- */
-
-.form-element--type-file::-ms-value {
-  border: 0;
-  background: inherit;
-}
-
-/**
  * Better upload button alignment for Chrome.
  */
 
 .form-element--type-file::-webkit-file-upload-button {
   vertical-align: top;
-}
-
-/**
- * Target IE 11 and Edge.
- *
- * Reduce the vertical padding of the file input element to make the browse
- * button fit into the needed input height.
- */
-
-/* stylelint-disable-next-line selector-type-no-unknown */
-
-_:-ms-fullscreen,
-:root .form-element--type-file {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
 }
 
 /**

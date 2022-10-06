@@ -21,6 +21,16 @@ use Drupal\Core\Url;
 class Rss extends StylePluginBase {
 
   /**
+   * The RSS namespaces.
+   */
+  public array $namespaces;
+
+  /**
+   * The channel elements.
+   */
+  public array $channel_elements;
+
+  /**
    * {@inheritdoc}
    */
   protected $usesRowPlugin = TRUE;
@@ -74,7 +84,7 @@ class Rss extends StylePluginBase {
   /**
    * Return an array of additional XHTML elements to add to the channel.
    *
-   * @return
+   * @return array
    *   A render array.
    */
   protected function getChannelElements() {

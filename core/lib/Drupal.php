@@ -121,12 +121,12 @@ class Drupal {
    * message, but Drupal can still be installed. Used for (e.g.) PHP versions
    * that have reached their EOL or will in the near future.
    */
-  const RECOMMENDED_PHP = '8.1';
+  const RECOMMENDED_PHP = '8.1.6';
 
   /**
    * The currently active container object, or NULL if not initialized yet.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface|null
+   * @var \Drupal\Component\DependencyInjection\ContainerInterface|null
    */
   protected static $container;
 
@@ -150,7 +150,7 @@ class Drupal {
   /**
    * Returns the currently active global container.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @return \Drupal\Component\DependencyInjection\ContainerInterface
    *
    * @throws \Drupal\Core\DependencyInjection\ContainerNotInitializedException
    */

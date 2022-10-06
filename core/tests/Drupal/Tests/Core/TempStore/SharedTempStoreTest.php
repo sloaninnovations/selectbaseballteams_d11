@@ -4,10 +4,10 @@ namespace Drupal\Tests\Core\TempStore;
 
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\TempStore\Lock;
+use Drupal\Core\Test\TestKernel;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\TempStore\SharedTempStore;
 use Drupal\Core\TempStore\TempStoreException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -147,7 +147,7 @@ class SharedTempStoreTest extends UnitTestCase {
     $this->lock->expects($this->exactly(2))
       ->method('acquire')
       ->with('test')
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
     $this->lock->expects($this->once())
       ->method('wait')
       ->with('test');
@@ -168,7 +168,7 @@ class SharedTempStoreTest extends UnitTestCase {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->lock->expects($this->never())
       ->method('wait');
     $this->lock->expects($this->once())
@@ -191,7 +191,7 @@ class SharedTempStoreTest extends UnitTestCase {
     $this->keyValue->expects($this->once())
       ->method('setWithExpireIfNotExists')
       ->with('test', $this->ownObject, 604800)
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
 
     $this->assertTrue($this->tempStore->setIfNotExists('test', 'test_data'));
   }
@@ -204,7 +204,7 @@ class SharedTempStoreTest extends UnitTestCase {
   public function testSetIfOwnerWhenNotExists() {
     $this->keyValue->expects($this->once())
       ->method('setWithExpireIfNotExists')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
 
     $this->assertTrue($this->tempStore->setIfOwner('test', 'test_data'));
   }
@@ -217,12 +217,12 @@ class SharedTempStoreTest extends UnitTestCase {
   public function testSetIfOwnerNoObject() {
     $this->keyValue->expects($this->once())
       ->method('setWithExpireIfNotExists')
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
 
     $this->keyValue->expects($this->once())
       ->method('get')
       ->with('test')
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
 
     $this->assertFalse($this->tempStore->setIfOwner('test', 'test_data'));
   }
@@ -236,11 +236,11 @@ class SharedTempStoreTest extends UnitTestCase {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
 
     $this->keyValue->expects($this->exactly(2))
       ->method('setWithExpireIfNotExists')
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
 
     $this->keyValue->expects($this->exactly(2))
       ->method('get')
@@ -280,7 +280,7 @@ class SharedTempStoreTest extends UnitTestCase {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $this->lock->expects($this->never())
       ->method('wait');
     $this->lock->expects($this->once())
@@ -303,7 +303,7 @@ class SharedTempStoreTest extends UnitTestCase {
     $this->lock->expects($this->exactly(2))
       ->method('acquire')
       ->with('test')
-      ->will($this->returnValue(FALSE));
+      ->willReturn(FALSE);
     $this->lock->expects($this->once())
       ->method('wait')
       ->with('test');
@@ -324,7 +324,7 @@ class SharedTempStoreTest extends UnitTestCase {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test_2')
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
 
     $this->keyValue->expects($this->exactly(3))
       ->method('get')
@@ -357,12 +357,10 @@ class SharedTempStoreTest extends UnitTestCase {
     $unserializable_request = new UnserializableRequest();
 
     $this->requestStack->push($unserializable_request);
-    $this->requestStack->_serviceId = 'request_stack';
 
-    $container = $this->prophesize(ContainerInterface::class);
-    $container->get('request_stack')->willReturn($this->requestStack);
-    $container->has('request_stack')->willReturn(TRUE);
-    \Drupal::setContainer($container->reveal());
+    $container = TestKernel::setContainerWithKernel();
+    $container->set('request_stack', $this->requestStack);
+    \Drupal::setContainer($container);
 
     $store = unserialize(serialize($this->tempStore));
     $this->assertInstanceOf(SharedTempStore::class, $store);

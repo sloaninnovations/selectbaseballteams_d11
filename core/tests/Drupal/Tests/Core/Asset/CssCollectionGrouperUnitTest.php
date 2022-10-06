@@ -19,6 +19,9 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
    */
   protected $grouper;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -52,7 +55,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'group' => -100,
         'type' => 'file',
         'weight' => 0.004,
-        'media' => 'all',
+        'media' => 'screen',
         'preprocess' => TRUE,
         'data' => 'core/misc/ui/themes/base/jquery.ui.core.css',
         'basename' => 'jquery.ui.core.css',
@@ -81,7 +84,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'type' => 'file',
         'weight' => 0.001,
         'preprocess' => TRUE,
-        'data' => 'core/themes/bartik/css/base/elements.css',
+        'data' => 'core/themes/example/css/base/elements.css',
         'basename' => 'elements.css',
       ],
       'print.css' => [
@@ -90,7 +93,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'type' => 'file',
         'weight' => 0.003,
         'preprocess' => TRUE,
-        'data' => 'core/themes/bartik/css/print.css',
+        'data' => 'core/themes/example/css/print.css',
         'basename' => 'print.css',
       ],
     ];

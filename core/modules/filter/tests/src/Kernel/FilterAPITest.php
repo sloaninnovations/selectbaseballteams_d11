@@ -22,6 +22,9 @@ class FilterAPITest extends EntityKernelTestBase {
 
   protected static $modules = ['system', 'filter', 'filter_test', 'user'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -206,7 +209,7 @@ class FilterAPITest extends EntityKernelTestBase {
         'filter_html' => [
           'status' => 1,
           'settings' => [
-            'allowed_html' => '<a> <b class> <c class="*"> <d class="foo bar-* *">',
+            'allowed_html' => '<a> <b class> <c class="*"> <d class="foo bar-* *"> <e *>',
           ],
         ],
       ],
@@ -220,6 +223,7 @@ class FilterAPITest extends EntityKernelTestBase {
           'b' => ['class' => TRUE],
           'c' => ['class' => TRUE],
           'd' => ['class' => ['foo' => TRUE, 'bar-*' => TRUE]],
+          'e' => ['*' => TRUE],
           '*' => ['style' => FALSE, 'on*' => FALSE, 'lang' => TRUE, 'dir' => ['ltr' => TRUE, 'rtl' => TRUE]],
         ],
       ],

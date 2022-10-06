@@ -111,28 +111,6 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
   }
 
   /**
-   * Performs all required updates.
-   *
-   * @param \Drupal\views\ViewEntityInterface $view
-   *   The View to update.
-   *
-   * @return bool
-   *   Whether the view was updated.
-   */
-  public function updateAll(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
-      $changed = FALSE;
-      if ($this->processSortFieldIdentifierUpdateHandler($handler, $handler_type)) {
-        $changed = TRUE;
-      }
-      if ($this->processImageLazyLoadFieldHandler($handler, $handler_type, $view)) {
-        $changed = TRUE;
-      }
-      return $changed;
-    });
-  }
-
-  /**
    * Processes all display handlers.
    *
    * @param \Drupal\views\ViewEntityInterface $view
@@ -174,7 +152,7 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
   }
 
   /**
-   * Updates the sort handlers by adding default sort field identifiers.
+   * Add eager load option to all oembed type field configurations.
    *
    * @param \Drupal\views\ViewEntityInterface $view
    *   The View to update.
@@ -182,29 +160,14 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
    * @return bool
    *   Whether the view was updated.
    */
-  public function needsSortFieldIdentifierUpdate(ViewEntityInterface $view): bool {
-    return $this->processDisplayHandlers($view, TRUE, function (array &$handler, string $handler_type): bool {
-      return $this->processSortFieldIdentifierUpdateHandler($handler, $handler_type);
-    });
-  }
-
-  /**
-   * Add lazy load options to all image type field configurations.
-   *
-   * @param \Drupal\views\ViewEntityInterface $view
-   *   The View to update.
-   *
-   * @return bool
-   *   Whether the view was updated.
-   */
-  public function needsImageLazyLoadFieldUpdate(ViewEntityInterface $view) {
+  public function needsOembedEagerLoadFieldUpdate(ViewEntityInterface $view) {
     return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) use ($view) {
-      return $this->processImageLazyLoadFieldHandler($handler, $handler_type, $view);
+      return $this->processOembedEagerLoadFieldHandler($handler, $handler_type, $view);
     });
   }
 
   /**
-   * Processes image type fields.
+   * Processes oembed type fields.
    *
    * @param array $handler
    *   A display handler.
@@ -216,39 +179,26 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
    * @return bool
    *   Whether the handler was updated.
    */
-  protected function processImageLazyLoadFieldHandler(array &$handler, string $handler_type, ViewEntityInterface $view) {
+  protected function processOembedEagerLoadFieldHandler(array &$handler, string $handler_type, ViewEntityInterface $view): bool {
     $changed = FALSE;
 
     // Add any missing settings for lazy loading.
     if (($handler_type === 'field')
       && isset($handler['plugin_id'], $handler['type'])
       && $handler['plugin_id'] === 'field'
-      && $handler['type'] === 'image'
-      && !isset($handler['settings']['image_loading'])) {
-      $handler['settings']['image_loading'] = ['attribute' => 'lazy'];
+      && $handler['type'] === 'oembed'
+      && !array_key_exists('loading', $handler['settings'])) {
+      $handler['settings']['loading'] = ['attribute' => 'eager'];
       $changed = TRUE;
     }
 
-    return $changed;
-  }
-
-  /**
-   * Processes sort handlers by adding the sort identifier.
-   *
-   * @param array $handler
-   *   A display handler.
-   * @param string $handler_type
-   *   The handler type.
-   *
-   * @return bool
-   *   Whether the handler was updated.
-   */
-  protected function processSortFieldIdentifierUpdateHandler(array &$handler, string $handler_type): bool {
-    if ($handler_type === 'sort' && !isset($handler['expose']['field_identifier'])) {
-      $handler['expose']['field_identifier'] = $handler['id'];
-      return TRUE;
+    $deprecations_triggered = &$this->triggeredDeprecations['3212351'][$view->id()];
+    if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
+      $deprecations_triggered = TRUE;
+      @trigger_error(sprintf('The oEmbed loading attribute update for view "%s" is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Profile, module and theme provided configuration should be updated to accommodate the changes described at https://www.drupal.org/node/3275103.', $view->id()), E_USER_DEPRECATED);
     }
-    return FALSE;
+
+    return $changed;
   }
 
 }

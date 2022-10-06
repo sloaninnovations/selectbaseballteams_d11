@@ -103,7 +103,7 @@ class AliasManager implements AliasManagerInterface {
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   Cache backend.
    */
-  public function __construct($alias_repository, AliasWhitelistInterface $whitelist, LanguageManagerInterface $language_manager, CacheBackendInterface $cache) {
+  public function __construct(AliasRepositoryInterface $alias_repository, AliasWhitelistInterface $whitelist, LanguageManagerInterface $language_manager, CacheBackendInterface $cache) {
     $this->pathAliasRepository = $alias_repository;
     $this->languageManager = $language_manager;
     $this->whitelist = $whitelist;
@@ -275,9 +275,6 @@ class AliasManager implements AliasManagerInterface {
    *
    * @param string $path
    *   An optional path for which an alias is being inserted.
-   *
-   * @return
-   *   An array containing a white list of path aliases.
    */
   protected function pathAliasWhitelistRebuild($path = NULL) {
     // When paths are inserted, only rebuild the whitelist if the path has a top
