@@ -274,7 +274,7 @@ class ResourceType {
    */
   public function getCollectionSizeMemberName(): ?string {
     if (method_exists($this, 'includeCount')) {
-      @trigger_error(sprintf('The %s::includeCount() is deprecated in drupal:9.5.0 and is removed from drupal:10.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName(\'count\') as a replacement.', static::class), E_USER_DEPRECATED);
+      @trigger_error(sprintf('The %s::includeCount() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName(\'count\') as a replacement.', static::class), E_USER_DEPRECATED);
 
       // If `includeCount()` returns `true`, the method is overridden and
       // we must use the former name for the collection size member.
