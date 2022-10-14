@@ -103,16 +103,6 @@ class ResourceType {
   protected $fieldMapping;
 
   /**
-   * The name of a `meta` member that holds a collection size.
-   *
-   * Note: in case of `null` the `meta.${collectionSizeMemberName}` will not
-   * be present.
-   *
-   * @var string|null
-   */
-  protected $collectionSizeMemberName;
-
-  /**
    * Gets the entity type ID.
    *
    * @return string
@@ -274,7 +264,7 @@ class ResourceType {
    */
   public function getCollectionSizeMemberName(): ?string {
     if (method_exists($this, 'includeCount')) {
-      @trigger_error(sprintf('The %s::includeCount() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName(\'count\') as a replacement.', static::class), E_USER_DEPRECATED);
+      @trigger_error(sprintf('The %s::includeCount() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName(\'count\') as a replacement. See https://www.drupal.org/node/3246951', static::class), E_USER_DEPRECATED);
 
       // If `includeCount()` returns `true`, the method is overridden and
       // we must use the former name for the collection size member.
@@ -369,9 +359,9 @@ class ResourceType {
    *   The resource type name.
    * @param string|null $collection_size_member_name
    *   (optional) The name of a `meta` member that holds a collection size.
-   *   Use `null` to not include the member.
+   *   Use `null` to not include the `meta.${collectionSizeMemberName}` member.
    */
-  public function __construct($entity_type_id, $bundle, $deserialization_target_class, $internal = FALSE, $is_locatable = TRUE, $is_mutable = TRUE, $is_versionable = FALSE, array $fields = [], $type_name = NULL, string $collection_size_member_name = NULL) {
+  public function __construct($entity_type_id, $bundle, $deserialization_target_class, $internal = FALSE, $is_locatable = TRUE, $is_mutable = TRUE, $is_versionable = FALSE, array $fields = [], $type_name = NULL, protected ?string $collection_size_member_name = NULL) {
     assert($collection_size_member_name === NULL || trim($collection_size_member_name) !== '');
 
     $this->entityTypeId = $entity_type_id;
@@ -382,7 +372,6 @@ class ResourceType {
     $this->isMutable = $is_mutable;
     $this->isVersionable = $is_versionable;
     $this->fields = $fields;
-    $this->collectionSizeMemberName = $collection_size_member_name;
 
     $this->typeName = $type_name;
     if ($type_name === NULL) {
@@ -467,6 +456,28 @@ class ResourceType {
    */
   public function getPath() {
     return '/' . implode('/', explode(self::TYPE_NAME_URI_PATH_SEPARATOR, $this->typeName));
+  }
+
+  /**
+   * When includeCount is called trigger a deprecation notice.
+   *
+   * @param string $name
+   *   Name of the called method.
+   * @param array $args
+   *   Array of passed arguments.
+   *
+   * @return mixed
+   *
+   * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName(\'count\') as a replacement.
+   *
+   * @see https://www.drupal.org/node/3246951
+   */
+  public function __call(string $name, array $args): mixed {
+    if ($name === 'includeCount') {
+      @trigger_error(sprintf('The %s::includeCount() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName(\'count\') as a replacement. See https://www.drupal.org/node/3246951', static::class), E_USER_DEPRECATED);
+      return FALSE;
+    }
+    throw new \BadMethodCallException("Method $name does not exist");
   }
 
 }
