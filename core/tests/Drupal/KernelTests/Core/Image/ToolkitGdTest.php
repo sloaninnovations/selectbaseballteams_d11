@@ -527,4 +527,19 @@ class ToolkitGdTest extends KernelTestBase {
     $this->assertFalse($image->apply('missing_op', []), 'Calling a missing image toolkit operation plugin should fail, but it did not.');
   }
 
+  /**
+   * @covers ::getRequirements
+   */
+  public function testGetRequirements(): void {
+    $this->assertEquals([
+      'version' => [
+        'title' => t('GD library'),
+        'value' => gd_info()['GD Version'],
+        'description' => t("Supported image file formats: %formats.", [
+          '%formats' => implode(', ', ['GIF', 'JPEG', 'PNG', 'WEBP', 'AVIF']),
+        ]),
+      ],
+    ], $this->imageFactory->get()->getToolkit()->getRequirements());
+  }
+
 }
