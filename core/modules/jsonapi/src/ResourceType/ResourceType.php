@@ -103,6 +103,16 @@ class ResourceType {
   protected $fieldMapping;
 
   /**
+   * The name of a `meta` member that holds a collection size.
+   *
+   * Note: in case of `null` the `meta.${collectionSizeMemberName}` will not
+   * be present.
+   *
+   * @var string|null
+   */
+  protected ?string $collectionSizeMemberName;
+
+  /**
    * Gets the entity type ID.
    *
    * @return string
@@ -361,7 +371,7 @@ class ResourceType {
    *   (optional) The name of a `meta` member that holds a collection size.
    *   Use `null` to not include the `meta.${collectionSizeMemberName}` member.
    */
-  public function __construct($entity_type_id, $bundle, $deserialization_target_class, $internal = FALSE, $is_locatable = TRUE, $is_mutable = TRUE, $is_versionable = FALSE, array $fields = [], $type_name = NULL, protected ?string $collection_size_member_name = NULL) {
+  public function __construct($entity_type_id, $bundle, $deserialization_target_class, $internal = FALSE, $is_locatable = TRUE, $is_mutable = TRUE, $is_versionable = FALSE, array $fields = [], $type_name = NULL, ?string $collection_size_member_name = NULL) {
     assert($collection_size_member_name === NULL || trim($collection_size_member_name) !== '');
 
     $this->entityTypeId = $entity_type_id;
@@ -372,6 +382,7 @@ class ResourceType {
     $this->isMutable = $is_mutable;
     $this->isVersionable = $is_versionable;
     $this->fields = $fields;
+    $this->collectionSizeMemberName = $collection_size_member_name;
 
     $this->typeName = $type_name;
     if ($type_name === NULL) {
