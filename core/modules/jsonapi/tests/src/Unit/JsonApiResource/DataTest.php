@@ -9,7 +9,6 @@ use Drupal\Tests\UnitTestCase;
  * @coversDefaultClass \Drupal\jsonapi\JsonApiResource\Data
  * @group jsonapi
  * @group legacy
- * @group testtest
  *
  * @internal
  */
