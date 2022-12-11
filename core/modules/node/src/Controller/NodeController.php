@@ -3,6 +3,7 @@
 namespace Drupal\node\Controller;
 
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -207,7 +208,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
           ],
         ];
         // @todo Simplify once https://www.drupal.org/node/2334319 lands.
-        $this->renderer->addCacheableDependency($column['data'], $username);
+        $this->renderer->addCacheableDependency($column['data'], CacheableMetadata::createFromRenderArray($username)->addCacheableDependency($node));
         $row[] = $column;
 
         if ($is_current_revision) {
