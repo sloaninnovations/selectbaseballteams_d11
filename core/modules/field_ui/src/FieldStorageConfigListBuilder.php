@@ -7,7 +7,10 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
+use Drupal\Core\Form\FormInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Link;
 
@@ -17,7 +20,7 @@ use Drupal\Core\Link;
  * @see \Drupal\field\Entity\FieldStorageConfig
  * @see field_ui_entity_type_build()
  */
-class FieldStorageConfigListBuilder extends ConfigEntityListBuilder {
+class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements FormInterface {
 
   /**
    * An array of information about field types.
@@ -48,6 +51,34 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder {
   protected $fieldTypeManager;
 
   /**
+   * The Entity type repository.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeRepositoryInterface
+   */
+  protected $entityTypeRepository;
+
+  /**
+   * The array of field storage configs.
+   *
+   * @var \Drupal\field\FieldStorageConfigInterface[]
+   */
+  protected $fieldStorageConfigs;
+
+  /**
+   * The name of field type.
+   *
+   * @var string
+   */
+  protected $fieldTypeFilter;
+
+  /**
+   * The name of entity type.
+   *
+   * @var string
+   */
+  protected $entityTypeFilter;
+
+  /**
    * Constructs a new FieldStorageConfigListBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -59,14 +90,16 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder {
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info_service
    *   The bundle info service.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager, EntityTypeBundleInfoInterface $bundle_info_service) {
+  public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager, EntityTypeBundleInfoInterface $bundle_info_service, EntityTypeRepositoryInterface $entityTypeRepository) {
     parent::__construct($entity_type, $entity_type_manager->getStorage($entity_type->id()));
 
+    $this->fieldStorageConfigs = $this->load();
     $this->entityTypeManager = $entity_type_manager;
     $this->bundles = $bundle_info_service->getAllBundleInfo();
     $this->fieldTypeManager = $field_type_manager;
     $this->fieldTypes = $this->fieldTypeManager->getDefinitions();
     $this->limit = FALSE;
+    $this->entityTypeRepository = $entityTypeRepository;
   }
 
   /**
@@ -77,8 +110,34 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder {
       $entity_type,
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.field.field_type'),
-      $container->get('entity_type.bundle.info')
+      $container->get('entity_type.bundle.info'),
+      $container->get('entity_type.repository')
     );
+  }
+
+  /**
+   * Loads entity IDs using a pager sorted by the entity id.
+   *
+   * @return string[]
+   *   An array of entity IDs.
+   */
+  protected function getEntityIds() {
+    $query = $this->getStorage()->getQuery()
+      ->sort($this->entityType->getKey('id'));
+
+    if ($this->fieldTypeFilter) {
+      $query->condition('type', $this->fieldTypeFilter);
+    }
+    if ($this->entityTypeFilter) {
+      $query->condition('entity_type', $this->entityTypeFilter);
+    }
+
+    // Only add the pager if a limit is specified.
+    if ($this->limit) {
+      $query->pager($this->limit);
+    }
+
+    return $query->execute();
   }
 
   /**
@@ -147,6 +206,137 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder {
       'class' => ['storage-settings-summary-cell'],
     ];
     return $row;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $form['filters'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['form--inline', 'clearfix']],
+    ];
+
+    $form['filters']['entity_type'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Entity type'),
+      '#options' => $this->entityTypeOptions($this->fieldStorageConfigs),
+      '#empty_option' => $this->t('- Select an entity type -'),
+    ];
+
+    $form['filters']['field_type'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Field type'),
+      '#options' => $this->fieldTypeOptions($this->fieldStorageConfigs),
+      '#empty_option' => $this->t('- Select a field type -'),
+    ];
+
+    $form['filters']['actions']['#type'] = 'actions';
+    $form['filters']['actions']['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Filter'),
+      '#button_type' => 'primary',
+    ];
+
+    $form['table_container'] = parent::render();
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    // No validation.
+  }
+
+  /**
+   * Build entity types options for select list.
+   *
+   * @param \Drupal\field\FieldStorageConfigInterface[] $fieldStorageConfigs
+   *   The array of field storage configs.
+   *
+   * @return string[]
+   *   The array of options.
+   */
+  protected function entityTypeOptions(array $fieldStorageConfigs) {
+    $entityLabels = $this->entityTypeRepository->getEntityTypeLabels();
+
+    // Gather valid entity types.
+    $entityTypeOptions = [];
+    foreach ($fieldStorageConfigs as $fieldStorageConfig) {
+      $entityName = $fieldStorageConfig->getTargetEntityTypeId();
+      if (array_key_exists($entityName, $entityLabels)) {
+        if (isset($entityTypeOptions[$entityName])) {
+          continue;
+        }
+
+        $entityLabel = $entityLabels[$entityName]->render();
+        $entityTypeOptions[$entityName] = "$entityLabel ($entityName)";
+      }
+    }
+
+    return $entityTypeOptions;
+  }
+
+  /**
+   * Build field types options for select list.
+   *
+   * @param \Drupal\field\FieldStorageConfigInterface[] $fieldStorageConfigs
+   *   The array of field storage configs.
+   *
+   * @return string[]
+   *   The array of options.
+   */
+  protected function fieldTypeOptions(array $fieldStorageConfigs) {
+    foreach ($fieldStorageConfigs as $fieldStorageConfig) {
+      $existed_field_types[] = $fieldStorageConfig->getType();
+    }
+
+    // Gather valid field types.
+    $fieldTypeOptions = [];
+    foreach ($this->fieldTypeManager->getGroupedDefinitions($this->fieldTypeManager->getUiDefinitions()) as $category => $field_types) {
+      foreach ($field_types as $name => $field_type) {
+        if (in_array($name, $existed_field_types)) {
+          $fieldTypeOptions[$category][$name] = $field_type['label'];
+        }
+      }
+    }
+
+    return $fieldTypeOptions;
+  }
+
+  public function render() {
+    return $this->formBuilder()->getForm($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    $formValues = $form_state->getValues();
+
+    $this->fieldTypeFilter = $formValues['field_type'];
+    $this->entityTypeFilter = $formValues['entity_type'];
+
+    $form_state->setRebuild();
+  }
+
+  public function getFormId() {
+    return 'field_storage_config_form';
+  }
+
+  /**
+   * Returns the form builder.
+   *
+   * @return \Drupal\Core\Form\FormBuilderInterface
+   *   The form builder.
+   */
+  protected function formBuilder() {
+    if (!isset($this->formBuilder)) {
+      $this->formBuilder = \Drupal::formBuilder();
+    }
+    return $this->formBuilder;
   }
 
 }
