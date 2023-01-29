@@ -79,6 +79,13 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
   protected $entityTypeFilter;
 
   /**
+   * The form builder.
+   *
+   * @var \Drupal\Core\Form\FormBuilderInterface
+   */
+  protected $formBuilder;
+
+  /**
    * Constructs a new FieldStorageConfigListBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -89,6 +96,8 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
    *   The 'field type' plugin manager.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info_service
    *   The bundle info service.
+   * @param \Drupal\Core\Entity\EntityTypeRepositoryInterface $entityTypeRepository
+   *   The entity type repository.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager, EntityTypeBundleInfoInterface $bundle_info_service, EntityTypeRepositoryInterface $entityTypeRepository) {
     parent::__construct($entity_type, $entity_type_manager->getStorage($entity_type->id()));
@@ -289,6 +298,7 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
    *   The array of options.
    */
   protected function fieldTypeOptions(array $fieldStorageConfigs) {
+    $existed_field_types = [];
     foreach ($fieldStorageConfigs as $fieldStorageConfig) {
       $existed_field_types[] = $fieldStorageConfig->getType();
     }
