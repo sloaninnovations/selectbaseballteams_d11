@@ -68,6 +68,7 @@ class AccessTest extends KernelTestBase {
       'uid' => $this->user1->id(),
       'filename' => 'druplicon.txt',
       'filemime' => 'text/plain',
+      'uri' => 'public://druplicon.txt',
     ]);
   }
 
@@ -80,8 +81,16 @@ class AccessTest extends KernelTestBase {
     $this->assertFalse($this->file->access('update'));
 
     \Drupal::currentUser()->setAccount($this->user1);
-    $this->assertTrue($this->file->access('delete'));
+    // You cannot delete an unsaved file.
+    $this->assertFalse($this->file->access('delete'));
     $this->assertTrue($this->file->access('update'));
+    // Now save it.
+    $this->file->save();
+    // Now user 1 can delete it.
+    $this->assertTrue($this->file->access('delete'));
+    // But user 2 still cannot.
+    \Drupal::currentUser()->setAccount($this->user2);
+    $this->assertFalse($this->file->access('delete'));
   }
 
   /**
