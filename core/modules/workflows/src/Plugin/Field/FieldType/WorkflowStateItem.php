@@ -102,7 +102,8 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
   public function isEmpty() {
     // Note that in this field's case the value will never be empty
     // because of the default returned in applyDefaultValue().
-    return $this->value === NULL || $this->value === '';
+    $value = $this->get('value')->getValue();
+    return $value === NULL || $value === '';
   }
 
   /**
@@ -136,8 +137,10 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
    * {@inheritdoc}
    */
   public function isValid() {
+    $field_name = $this->getFieldDefinition()->getName();
+    $value = $this->getEntity()->get($field_name)->value;
     $allowed_states = $this->getAllowedStates($this->originalValue);
-    return isset($allowed_states[$this->value]);
+    return isset($allowed_states[$value]);
   }
 
   /**
@@ -170,7 +173,10 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
    * {@inheritdoc}
    */
   public function getSettableOptions(AccountInterface $account = NULL) {
-    $allowed_states = $this->getAllowedStates($this->value);
+    // $this->value is unpopulated due to https://www.drupal.org/node/2629932
+    $field_name = $this->getFieldDefinition()->getName();
+    $value = $this->getEntity()->get($field_name)->value;
+    $allowed_states = $this->getAllowedStates($value);
     $state_labels = array_map(function (StateInterface $state) {
       return $state->label();
     }, $allowed_states);
@@ -223,14 +229,18 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
    * {@inheritdoc}
    */
   public function getStateId() {
-    return $this->value;
+    $field_name = $this->getFieldDefinition()->getName();
+    $value = $this->getEntity()->get($field_name)->value;
+    return $value;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getStateLabel() {
-    $state = $this->getWorkflow()->getTypePlugin()->getState($this->value);
+    $field_name = $this->getFieldDefinition()->getName();
+    $value = $this->getEntity()->get($field_name)->value;
+    $state = $this->getWorkflow()->getTypePlugin()->getState($value);
     return $state->label();
   }
 
@@ -238,7 +248,9 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
    * {@inheritdoc}
    */
   public function getTransitions() {
-    $state = $this->getWorkflow()->getTypePlugin()->getState($this->value);
+    $field_name = $this->getFieldDefinition()->getName();
+    $value = $this->getEntity()->get($field_name)->value;
+    $state = $this->getWorkflow()->getTypePlugin()->getState($value);
     return $state->getTransitions();
   }
 
@@ -261,7 +273,9 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
    * {@inheritdoc}
    */
   public function preSave() {
-    if ($this->value != $this->originalValue) {
+    $field_name = $this->getFieldDefinition()->getName();
+    $value = $this->getEntity()->get($field_name)->value;
+    if ($value != $this->originalValue) {
       $this->invokeTransitionHook('pre_transition');
     }
   }
@@ -270,10 +284,13 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
    * {@inheritdoc}
    */
   public function postSave($update) {
-    if ($this->value != $this->originalValue) {
+    $field_name = $this->getFieldDefinition()->getName();
+    $value = $this->getEntity()->get($field_name)->value;
+    if ($value != $this->originalValue) {
       $this->invokeTransitionHook('post_transition');
     }
-    $this->originalValue = $this->value;
+    $this->originalValue = $value;
+    return parent::postSave($update);
   }
 
   /**
@@ -284,8 +301,10 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
    */
   protected function invokeTransitionHook($phase) {
     $workflow = $this->getWorkflow();
-    if ($workflow->getTypePlugin()->hasTransitionFromStateToState($this->originalValue, $this->value)) {
-      $transition = $workflow->getTypePlugin()->getTransitionFromStateToState($this->originalValue, $this->value);
+    $field_name = $this->getFieldDefinition()->getName();
+    $value = $this->getEntity()->get($field_name)->value;
+    if ($workflow->getTypePlugin()->hasTransitionFromStateToState($this->originalValue, $value)) {
+      $transition = $workflow->getTypePlugin()->getTransitionFromStateToState($this->originalValue, $value);
 
       // Invoke the hook.
       $entity = $this->getEntity();
