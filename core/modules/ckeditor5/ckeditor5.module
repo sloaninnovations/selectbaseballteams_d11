@@ -128,7 +128,6 @@ function ckeditor5_form_filter_format_form_alter(array &$form, FormStateInterfac
   // values needed by CKEditor 5 plugins.
   // @see \Drupal\ckeditor5\Plugin\Editor\CKEditor5::buildConfigurationForm()
   if ($editor && $editor->getEditor() === 'ckeditor5') {
-    $form['#attached']['library'][] = 'ckeditor5/internal.drupal.ckeditor5.filter.admin';
     if (isset($form['filters']['settings']['filter_html']['allowed_html'])) {
       $filter_allowed_html = &$form['filters']['settings']['filter_html']['allowed_html'];
 
@@ -408,6 +407,10 @@ function _ckeditor5_get_langcode_mapping($lang = FALSE) {
  * Implements hook_library_info_alter().
  */
 function ckeditor5_library_info_alter(&$libraries, $extension) {
+  if ($extension === 'filter') {
+    $libraries['drupal.filter.admin']['dependencies'][] = 'ckeditor5/internal.drupal.ckeditor5.filter.admin';
+  }
+
   $moduleHandler = \Drupal::moduleHandler();
 
   if ($extension === 'ckeditor5') {

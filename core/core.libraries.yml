@@ -423,19 +423,23 @@ internal.jquery_ui:
   js:
     # All weights are based on the requirements defined within each file.
     assets/vendor/jquery.ui/ui/version-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/data-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/disable-selection-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/focusable-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/form-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/jquery-patch-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/keycode-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/plugin-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/safe-active-element-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/scroll-parent-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widget-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/unique-id-min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/scroll-parent-min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/plugin-min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/keycode-min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/disable-selection-min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/data-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/labels-min.js: { minified: true }
   css:
     component:
-      assets/vendor/jquery.ui/themes/base/core.css: { weight: -11.8 }
+      assets/vendor/jquery.ui/themes/base/core.css: {}
     theme:
-      assets/vendor/jquery.ui/themes/base/theme.css: { weight: -11.8 }
+      assets/vendor/jquery.ui/themes/base/theme.css: {}
   dependencies:
     - core/jquery
 
@@ -515,13 +519,15 @@ drupal.dialog:
     # All weights are based on the requirements defined within each file.
     # @todo replace with solution in https://drupal.org/node/2158943
     assets/vendor/tua-body-scroll-lock/tua-bsl.umd.min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/widgets/mouse-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widgets/controlgroup-min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/widgets/resizable-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widgets/draggable-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/widgets/resizable-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/form-reset-mixin-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/labels-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/widgets/mouse-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widgets/checkboxradio-min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/widgets/dialog-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widgets/button-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/widgets/dialog-min.js: { minified: true }
   # All CSS assets previously came from core/jquery.ui, a deprecated library.
   # @todo replace with solution found in https://drupal.org/node/2158943
   css:
@@ -529,8 +535,8 @@ drupal.dialog:
       assets/vendor/jquery.ui/themes/base/dialog.css: {}
       assets/vendor/jquery.ui/themes/base/button.css: {}
       assets/vendor/jquery.ui/themes/base/controlgroup.css: {}
-      assets/vendor/jquery.ui/themes/base/resizable.css: {}
       assets/vendor/jquery.ui/themes/base/checkboxradio.css: {}
+      assets/vendor/jquery.ui/themes/base/resizable.css: {}
   dependencies:
     - core/jquery
     - core/internal.jquery_ui
