@@ -307,6 +307,9 @@ class AssetResolver implements AssetResolverInterface {
         [$extension, $name] = explode('/', $library, 2);
         $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
         foreach ($definition['js'] as $options) {
+          if (array_key_exists($options['data'], $javascript)) {
+            continue;
+          }
           $options += $default_options;
           // Copy the asset library license information to each file.
           $options['license'] = $definition['license'];
@@ -318,10 +321,6 @@ class AssetResolver implements AssetResolverInterface {
           // Preprocess can only be set if caching is enabled and no
           // attributes are set.
           $options['preprocess'] = $options['cache'] && empty($options['attributes']) ? $options['preprocess'] : FALSE;
-
-          // Always add a tiny value to the weight, to conserve the insertion
-          // order.
-          $options['weight'] += count($javascript) / 30000;
 
           // Local and external files must keep their name as the associative
           // key so the same JavaScript file is not added twice.
