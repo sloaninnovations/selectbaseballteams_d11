@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\node\Kernel;
 
+use Drupal\node\Entity\Node;
+
 /**
  * Tests basic node_access functionality.
  *
@@ -111,6 +113,22 @@ class NodeAccessTest extends NodeAccessTestBase {
       'update' => TRUE,
       'delete' => TRUE,
     ], $node7, $web_user7);
+
+    $node8 = Node::create([
+      'type' => 'page',
+      'uid' => $web_user7->id(),
+      'body' => [
+        [
+          'value' => $this->randomMachineName(32),
+          'format' => filter_default_format(),
+        ],
+      ],
+      'title' => $this->randomMachineName(8),
+    ]);
+
+    foreach ([$web_user1, $web_user2, $web_user3, $web_user4, $web_user5, $web_user6, $web_user7] as $user) {
+      $this->assertNodeAccess(['delete' => FALSE], $node8, $user);
+    }
   }
 
   /**
