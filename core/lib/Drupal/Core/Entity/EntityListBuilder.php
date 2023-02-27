@@ -130,7 +130,6 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
     foreach ($operations as &$operation) {
       if (!isset($operation['access'])) {
         $operation['access'] = new AccessResultAllowed();
-        $operation['access']->cachePerUser();
       }
     }
 
