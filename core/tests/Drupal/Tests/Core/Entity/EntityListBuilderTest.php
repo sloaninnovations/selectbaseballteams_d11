@@ -138,6 +138,12 @@ class EntityListBuilderTest extends UnitTestCase {
     $list->setStringTranslation($this->translationManager);
     $list->setRedirectDestination($this->redirectDestination);
 
+    $cache_contexts_manager = $this->createMock('Drupal\Core\Cache\Context\CacheContextsManager');
+    $cache_contexts_manager->method('assertValidTokens')
+      ->with(['user'])
+      ->willReturn(TRUE);
+    $this->container->set('cache_contexts_manager', $cache_contexts_manager);
+
     $operations = $list->getOperations($this->role);
     $this->assertIsArray($operations);
     $this->assertArrayHasKey('edit', $operations);

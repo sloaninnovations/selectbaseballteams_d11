@@ -5,6 +5,7 @@ namespace Drupal\Tests\config\Functional;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\config_test\Entity\ConfigTest;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Tests\BrowserTestBase;
 
@@ -58,16 +59,20 @@ class ConfigEntityListTest extends BrowserTestBase {
     $this->assertInstanceOf(ConfigTest::class, $entity);
 
     // Test getOperations() method.
+    $update_access = $entity->access('update', NULL, TRUE);
+    $delete_access = $entity->access('delete', NULL, TRUE);
     $expected_operations = [
       'edit' => [
         'title' => 'Edit',
         'weight' => 10,
         'url' => $entity->toUrl()->setOption('query', $this->getRedirectDestination()->getAsArray()),
+        'access' => $update_access,
       ],
       'disable' => [
         'title' => 'Disable',
         'weight' => 40,
         'url' => $entity->toUrl('disable')->setOption('query', $this->getRedirectDestination()->getAsArray()),
+        'access' => AccessResult::allowed()->cachePerUser(),
       ],
       'delete' => [
         'title' => 'Delete',
@@ -80,6 +85,7 @@ class ConfigEntityListTest extends BrowserTestBase {
           ]),
         ],
         'url' => $entity->toUrl('delete-form')->setOption('query', $this->getRedirectDestination()->getAsArray()),
+        'access' => $delete_access,
       ],
     ];
 
@@ -145,6 +151,7 @@ class ConfigEntityListTest extends BrowserTestBase {
         'title' => 'Edit',
         'weight' => 10,
         'url' => $entity->toUrl()->setOption('query', $this->getRedirectDestination()->getAsArray()),
+        'access' => $update_access,
       ],
       'delete' => [
         'title' => 'Delete',
@@ -157,6 +164,7 @@ class ConfigEntityListTest extends BrowserTestBase {
           ]),
         ],
         'url' => $entity->toUrl('delete-form')->setOption('query', $this->getRedirectDestination()->getAsArray()),
+        'access' => $delete_access,
       ],
     ];
 
