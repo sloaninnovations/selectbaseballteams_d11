@@ -73,59 +73,24 @@ class PreprocessPagerTest extends UnitTestCase {
   }
 
   /**
-   * Tests template_preprocess_pager() when a #quantity value is passed.
-   *
-   * @covers ::template_preprocess_pager
+   * Tests pager links get modal attributes when request is in a modal.
    */
-  public function testQuantitySet() {
+  public function testPagerModalAttributes(): void {
     require_once $this->root . '/core/includes/theme.inc';
-    $variables = [
-      'pager' => [
-        '#element' => '2',
-        '#parameters' => [],
-        '#quantity' => '2',
-        '#route_name' => '',
-        '#tags' => '',
-      ],
-    ];
-    template_preprocess_pager($variables);
 
-    $this->assertEquals(['first', 'previous', 'pages'], array_keys($variables['items']));
-    /** @var \Drupal\Core\Template\AttributeString $attribute */
-    $attribute = $variables['items']['pages']['2']['attributes']->offsetGet('aria-current');
-    $this->assertInstanceOf(AttributeString::class, $attribute);
-    $this->assertEquals('page', $attribute->value());
-  }
+    $request_stack = $this->createMock(RequestStack::class);
+    $request = Request::createFromGlobals();
+    $request->query->set(MainContentViewSubscriber::WRAPPER_FORMAT, 'drupal_modal');
 
-  /**
-   * Tests template_preprocess_pager() when an empty #pagination_heading_level value is passed.
-   *
-   * @covers ::template_preprocess_pager
-   */
-  public function testEmptyPaginationHeadingLevelSet() {
-    require_once $this->root . '/core/includes/theme.inc';
-    $variables = [
-      'pager' => [
-        '#element' => '2',
-        '#pagination_heading_level' => '',
-        '#parameters' => [],
-        '#quantity' => '2',
-        '#route_name' => '',
-        '#tags' => '',
-      ],
-    ];
-    template_preprocess_pager($variables);
+    // Mocks a the request stack getting the current request.
+    $request_stack->expects($this->any())
+      ->method('getCurrentRequest')
+      ->willReturn($request);
 
-    $this->assertEquals('h4', $variables['pagination_heading_level']);
-  }
+    $container = \Drupal::getContainer();
+    $container->set('request_stack', $request_stack);
+    \Drupal::setContainer($container);
 
-  /**
-   * Tests template_preprocess_pager() when no #pagination_heading_level is passed.
-   *
-   * @covers ::template_preprocess_pager
-   */
-  public function testPaginationHeadingLevelNotSet() {
-    require_once $this->root . '/core/includes/theme.inc';
     $variables = [
       'pager' => [
         '#element' => '',
@@ -137,51 +102,10 @@ class PreprocessPagerTest extends UnitTestCase {
     ];
     template_preprocess_pager($variables);
 
-    $this->assertEquals('h4', $variables['pagination_heading_level']);
-  }
-
-  /**
-   * Tests template_preprocess_pager() when a #pagination_heading_level value is passed.
-   *
-   * @covers ::template_preprocess_pager
-   */
-  public function testPaginationHeadingLevelSet() {
-    require_once $this->root . '/core/includes/theme.inc';
-    $variables = [
-      'pager' => [
-        '#element' => '2',
-        '#pagination_heading_level' => 'h5',
-        '#parameters' => [],
-        '#quantity' => '2',
-        '#route_name' => '',
-        '#tags' => '',
-      ],
-    ];
-    template_preprocess_pager($variables);
-
-    $this->assertEquals('h5', $variables['pagination_heading_level']);
-  }
-
-  /**
-   * Test template_preprocess_pager() with an invalid #pagination_heading_level.
-   *
-   * @covers ::template_preprocess_pager
-   */
-  public function testPaginationHeadingLevelInvalid() {
-    require_once $this->root . '/core/includes/theme.inc';
-    $variables = [
-      'pager' => [
-        '#element' => '2',
-        '#pagination_heading_level' => 'not-a-heading-element',
-        '#parameters' => [],
-        '#quantity' => '2',
-        '#route_name' => '',
-        '#tags' => '',
-      ],
-    ];
-    template_preprocess_pager($variables);
-
-    $this->assertEquals('h4', $variables['pagination_heading_level']);
+    foreach (['first', 'previous'] as $key) {
+      $attributes = $variables['items'][$key]['attributes']->toArray();
+      $this->assertEquals(['use-ajax'], $attributes['class']);
+    }
   }
 
 }
