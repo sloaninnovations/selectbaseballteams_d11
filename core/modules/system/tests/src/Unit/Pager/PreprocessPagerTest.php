@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Unit\Pager;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Template\AttributeString;
+use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Tests\UnitTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Tests pager preprocessing.
@@ -21,6 +23,7 @@ class PreprocessPagerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
+    $request_stack = $this->createMock(RequestStack::class);
     $pager_manager = $this->getMockBuilder('Drupal\Core\Pager\PagerManager')
       ->disableOriginalConstructor()
       ->getMock();
@@ -40,6 +43,7 @@ class PreprocessPagerTest extends UnitTestCase {
     $pager_manager->method('getUpdatedParameters')->willReturn('');
 
     $container = new ContainerBuilder();
+    $container->set('request_stack', $request_stack);
     $container->set('pager.manager', $pager_manager);
     $container->set('url_generator', $url_generator);
     // template_preprocess_pager() renders translatable attribute values.
