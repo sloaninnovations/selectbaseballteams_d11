@@ -13,8 +13,9 @@ module.exports = {
     let mainContentTopPosition;
     browser.drupalLoginAsAdmin(() => {
       // Navigate to the node creation page and wait for WYSIWYG editor to load.
-      browser.drupalRelativeURL('/node/add/page')
-        .waitForElementVisible(wysiwygSelector, 1000)
+      browser
+        .drupalRelativeURL('/node/add/page')
+        .waitForElementVisible(wysiwygSelector, 1000);
       // Scroll down past the #main-content element and store the top position
       // of #main-content (in relation to the viewport) in a variable.
       mainContentTopPosition = browser.execute(
