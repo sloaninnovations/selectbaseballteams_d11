@@ -54,7 +54,7 @@ module.exports = {
       );
       browser.assert.ok(
         mainContentTopPosition === newMainContentTopPosition,
-        'Clicking anchor link inside WYSIWYG caused browser to navigate to target.',
+        'Clicking anchor link inside WYSIWYG should not cause browser to navigate to target.',
       );
     });
   },
