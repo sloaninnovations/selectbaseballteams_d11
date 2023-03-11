@@ -9,7 +9,7 @@ module.exports = {
   'Test clicking anchor in WYSIWYG editor': (browser) => {
     const mainContentSelector = '#main-content';
     const wysiwygSelector = '.ck-content[contenteditable="true"]';
-    const testAnchorSelector = 'a[href="#main-content"]';
+    const testAnchorSelector = `${wysiwygSelector} a[href="#main-content"]`;
     let mainContentTopPosition;
     browser.drupalLoginAsAdmin(() => {
       browser.drupalRelativeURL('/node/add/page');
