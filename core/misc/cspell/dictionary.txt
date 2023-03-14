@@ -239,7 +239,6 @@ corefake
 coretest
 corge
 countquery
-cpan
 cpio
 createkey
 createrole
@@ -381,7 +380,6 @@ endapply
 endautoescape
 endcode
 endembed
-endfor
 endlink
 endmacro
 endofheader
@@ -595,7 +593,6 @@ jsonlint
 jssdk
 jumplinks
 juni
-junidecode
 justinrainbow
 kakec
 kangarookitten
@@ -630,9 +627,7 @@ lcode
 leftjoin
 libc
 libellé
-libicu
 libmysqlclient
-libyaml
 licious
 lified
 lightninggreen
@@ -644,6 +639,7 @@ linkback
 linkgenerator
 linkification
 linksby
+linkset
 linktext
 lisu
 litererally
@@ -714,7 +710,6 @@ meφω
 mglaman
 miaus
 middlewares
-midgardmvc
 mikey
 milli
 mimetypes
@@ -750,7 +745,6 @@ msgctxt
 msgid
 msgstr
 msword
-mtimes
 mucho
 mulrev
 mulrevpub
@@ -794,7 +788,6 @@ nearbykeyword
 necolas
 negotiatiors
 newcol
-newdata
 newfieldinitial
 newnode
 newstr
@@ -827,7 +820,6 @@ nonamespace
 nonconfigurable
 nonexistingfilename
 nonoptional
-nonspacing
 noquotes
 noschema
 nosniff
@@ -839,6 +831,7 @@ notnull
 notsimpletest
 nourriture
 nplurals
+nproc
 ntfs
 nyan
 nyancat
@@ -865,9 +858,7 @@ optionchecker
 orgchart
 ossp
 otsikko
-outdata
 outdent
-outdir
 outro
 overridable
 overrider
@@ -893,6 +884,7 @@ pathnames
 pcre
 pcss
 pdma
+peast
 percona
 permissionless
 persistable
@@ -1019,6 +1011,8 @@ regexes
 reindex
 reindexing
 reinject
+relname
+relpersistence
 renderable
 renderables
 renderered
@@ -1266,7 +1260,6 @@ textfile
 textformat
 textgroup
 textwithsummary
-thaana
 themeable
 themename
 themer
@@ -1352,8 +1345,6 @@ ungenerated
 ungroup
 ungroupable
 unhashed
-unidecode
-unidecoder
 unindented
 unindexed
 uninstallation
@@ -1442,7 +1433,6 @@ wcprops
 webassert
 webcal
 webflo
-webfonts
 webheads
 webhosting
 webmention

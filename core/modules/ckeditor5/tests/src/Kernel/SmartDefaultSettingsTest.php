@@ -97,7 +97,13 @@ class SmartDefaultSettingsTest extends KernelTestBase {
         'filter_html' => [
           'status' => 1,
           'settings' => [
-            'allowed_html' => '<p> <br> <a>',
+            // Misconfiguration aspects:
+            // 1. `<a>`, not `<a href>`, while `DrupalLink` is enabled
+            // 2. `<p style>` even though `style` is globally disallowed by
+            //    filter_html
+            // 3. `<a onclick>` even though `on*` is globally disallowed by
+            //    filter_html
+            'allowed_html' => '<p style> <br> <a onclick>',
           ],
         ],
       ],
@@ -496,6 +502,10 @@ class SmartDefaultSettingsTest extends KernelTestBase {
       $updated_text_editor->getConfigDependencyName(),
       $updated_text_editor->toArray()
     );
+
+    // Save this to ensure the config export order is applied.
+    // @see \Drupal\Core\Config\StorableConfigBase::castValue()
+    $updated_text_editor->save();
 
     // We should now have the expected data in the Editor config entity.
     $this->assertSame('ckeditor5', $updated_text_editor->getEditor());
@@ -922,12 +932,12 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           ),
         ],
         'plugins' => array_merge(
-          $basic_html_test_case['expected_ckeditor5_settings']['plugins'],
           [
             'ckeditor5_alignment' => [
               'enabled_alignments' => ['center', 'justify'],
             ],
           ],
+          $basic_html_test_case['expected_ckeditor5_settings']['plugins'],
         ),
       ],
       'expected_superset' => implode(' ', [
@@ -1124,6 +1134,10 @@ class SmartDefaultSettingsTest extends KernelTestBase {
               'heading6',
             ],
           ],
+          'ckeditor5_list' => [
+            'reversed' => FALSE,
+            'startIndex' => TRUE,
+          ],
           'ckeditor5_sourceEditing' => [
             'allowed_tags' => [
               '<cite>',
@@ -1140,10 +1154,6 @@ class SmartDefaultSettingsTest extends KernelTestBase {
               '<h5 id>',
               '<h6 id>',
             ],
-          ],
-          'ckeditor5_list' => [
-            'reversed' => FALSE,
-            'startIndex' => TRUE,
           ],
         ],
       ],
@@ -1259,6 +1269,10 @@ class SmartDefaultSettingsTest extends KernelTestBase {
               'heading6',
             ],
           ],
+          'ckeditor5_list' => [
+            'reversed' => FALSE,
+            'startIndex' => TRUE,
+          ],
           'ckeditor5_sourceEditing' => [
             'allowed_tags' => [
               '<cite>',
@@ -1275,10 +1289,6 @@ class SmartDefaultSettingsTest extends KernelTestBase {
               '<h5 id>',
               '<h6 id>',
             ],
-          ],
-          'ckeditor5_list' => [
-            'reversed' => FALSE,
-            'startIndex' => TRUE,
           ],
         ],
       ],
@@ -1366,17 +1376,17 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           ],
         ],
         'plugins' => [
+          'ckeditor5_sourceEditing' => [
+            'allowed_tags' => [
+              '<span>',
+            ],
+          ],
           'ckeditor5_style' => [
             'styles' => [
               [
                 'label' => 'Llama span',
                 'element' => '<span class="llama">',
               ],
-            ],
-          ],
-          'ckeditor5_sourceEditing' => [
-            'allowed_tags' => [
-              '<span>',
             ],
           ],
         ],

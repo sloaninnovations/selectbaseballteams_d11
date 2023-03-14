@@ -178,6 +178,17 @@ function node_title_list(StatementInterface $result, $title = NULL) {
 }
 
 /**
+ * Implements hook_local_tasks_alter().
+ */
+function node_local_tasks_alter(&$local_tasks): void {
+  // Removes 'Revisions' local task added by deriver. Local task
+  // 'entity.node.version_history' will be replaced by
+  // 'entity.version_history:node.version_history' after
+  // https://www.drupal.org/project/drupal/issues/3153559.
+  unset($local_tasks['entity.version_history:node.version_history']);
+}
+
+/**
  * Determines the type of marker to be displayed for a given node.
  *
  * @param int $nid
@@ -266,7 +277,10 @@ function node_add_body_field(NodeTypeInterface $type, $label = 'Body') {
       'field_storage' => $field_storage,
       'bundle' => $type->id(),
       'label' => $label,
-      'settings' => ['display_summary' => TRUE],
+      'settings' => [
+        'display_summary' => TRUE,
+        'allowed_formats' => [],
+      ],
     ]);
     $field->save();
 
@@ -332,8 +346,14 @@ function node_entity_extra_field_info() {
  *
  * @return int
  *   The number of nodes whose node type field was modified.
+ *
+ * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
+ *   \Drupal\Core\Entity\EntityStorageInterface::updateType instead.
+ *
+ * @see https://www.drupal.org/node/3323340
  */
 function node_type_update_nodes($old_id, $new_id) {
+  @trigger_error(__METHOD__ . ' is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Entity\EntityStorageInterface::updateType instead. See https://www.drupal.org/node/3323340', E_USER_DEPRECATED);
   return \Drupal::entityTypeManager()->getStorage('node')->updateType($old_id, $new_id);
 }
 
@@ -345,8 +365,14 @@ function node_type_update_nodes($old_id, $new_id) {
  *
  * @return \Drupal\node\NodeInterface|null
  *   A fully-populated node entity, or NULL if the node is not found.
+ *
+ * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
+ *   \Drupal\Core\Entity\EntityStorageInterface::loadRevision instead.
+ *
+ * @see https://www.drupal.org/node/3323340
  */
 function node_revision_load($vid = NULL) {
+  @trigger_error(__METHOD__ . ' is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Entity\EntityStorageInterface::loadRevision instead. See https://www.drupal.org/node/3323340', E_USER_DEPRECATED);
   return \Drupal::entityTypeManager()->getStorage('node')->loadRevision($vid);
 }
 
@@ -355,8 +381,14 @@ function node_revision_load($vid = NULL) {
  *
  * @param int $revision_id
  *   The revision ID to delete.
+ *
+ * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
+ *   \Drupal\Core\Entity\EntityStorageInterface::deleteRevision instead.
+ *
+ * @see https://www.drupal.org/node/3323340
  */
 function node_revision_delete($revision_id) {
+  @trigger_error(__METHOD__ . ' is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Entity\EntityStorageInterface::deleteRevision instead. See https://www.drupal.org/node/3323340', E_USER_DEPRECATED);
   \Drupal::entityTypeManager()->getStorage('node')->deleteRevision($revision_id);
 }
 
@@ -671,7 +703,7 @@ function node_user_predelete($account) {
   $storage_controller->delete($nodes);
   $revisions = $storage_controller->userRevisionIds($account);
   foreach ($revisions as $revision) {
-    node_revision_delete($revision);
+    $storage_controller->deleteRevision($revision);
   }
 }
 
@@ -812,9 +844,6 @@ function node_form_system_themes_admin_form_submit($form, FormStateInterface $fo
  *
  * Note also that access to create nodes is handled by
  * hook_ENTITY_TYPE_create_access().
- *
- * To see how to write a node access module of your own, see
- * node_access_example.module.
  *
  * @see \Drupal\node\NodeAccessControlHandler
  */

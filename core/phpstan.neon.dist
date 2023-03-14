@@ -5,15 +5,15 @@ includes:
 
 parameters:
 
-  level: 0
+  level: 1
 
   paths:
     - .
     - ../composer
 
   excludePaths:
-    # Skip settings.
-    - ../*/settings*.php
+    # Skip sites directory.
+    - ../sites
     # Skip test fixtures.
     - ../*/node_modules/*
     - */tests/fixtures/*.php

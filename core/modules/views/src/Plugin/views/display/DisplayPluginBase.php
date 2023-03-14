@@ -449,7 +449,6 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     // If the display cannot use a pager, then we cannot default it.
     if (!$this->usesPager()) {
       unset($sections['pager']);
-      unset($sections['items_per_page']);
     }
 
     foreach ($this->extenders as $extender) {
@@ -1688,7 +1687,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         if (empty($style)) {
           $form['#title'] .= $this->t('Row style options');
         }
-        $plugin = $this->getPlugin(empty($style) ? 'row' : 'style', $name);
+        $plugin = $this->getPlugin(empty($style) ? 'row' : 'style');
         if ($plugin) {
           $form[$section] = [
             '#tree' => TRUE,

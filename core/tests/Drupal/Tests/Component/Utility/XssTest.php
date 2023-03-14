@@ -23,6 +23,8 @@ use PHPUnit\Framework\TestCase;
  * Relevant CVEs:
  * - CVE-2002-1806, ~CVE-2005-0682, ~CVE-2005-2106, CVE-2005-3973,
  *   CVE-2006-1226 (= rev. 1.112?), CVE-2008-0273, CVE-2008-3740.
+ *
+ * @runTestsInSeparateProcesses
  */
 class XssTest extends TestCase {
 
@@ -431,16 +433,6 @@ class XssTest extends TestCase {
         ['p'],
       ],
     ];
-    // @todo This dataset currently fails under 5.4 because of
-    //   https://www.drupal.org/node/1210798. Restore after its fixed.
-    if (version_compare(PHP_VERSION, '5.4.0', '<')) {
-      $cases[] = [
-        '<img src=" &#14;  javascript:alert(0)">',
-        'javascript',
-        'HTML scheme clearing evasion -- spaces and metacharacters before scheme.',
-        ['img'],
-      ];
-    }
     return $cases;
   }
 

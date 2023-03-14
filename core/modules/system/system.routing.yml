@@ -82,7 +82,7 @@ system.admin_config_regional:
   path: '/admin/config/regional'
   defaults:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
-    _title: 'Regional and language'
+    _title: 'Region and language'
   requirements:
     _permission: 'access administration pages'
 
@@ -521,5 +521,14 @@ system.csrftoken:
   requirements:
     _access: 'TRUE'
 
+system.linkset_settings:
+  path: '/admin/config/services/linkset'
+  defaults:
+    _title: 'Menu Linkset Settings'
+    _form: 'Drupal\system\Form\MenuLinksetSettingsForm'
+  requirements:
+    _permission: 'administer site configuration'
+
 route_callbacks:
   - '\Drupal\system\Routing\AssetRoutes::routes'
+  - '\Drupal\system\Routing\MenuLinksetRoutes::routes'

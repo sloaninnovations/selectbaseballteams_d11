@@ -152,7 +152,7 @@ function hook_module_implements_alter(&$implementations, $hook) {
 function hook_system_info_alter(array &$info, \Drupal\Core\Extension\Extension $file, $type) {
   // Only fill this in if the .info.yml file does not define a 'datestamp'.
   if (empty($info['datestamp'])) {
-    $info['datestamp'] = $file->getMTime();
+    $info['datestamp'] = $file->getFileInfo()->getMTime();
   }
 }
 
@@ -1020,6 +1020,29 @@ function hook_requirements($phase) {
   }
 
   return $requirements;
+}
+
+/**
+ * Alters requirements data.
+ *
+ * Implementations are able to alter the title, value, description or the
+ * severity of certain requirements defined by hook_requirements()
+ * implementations or even remove such entries.
+ *
+ * @param array $requirements
+ *   The requirements data to be altered.
+ *
+ * @see hook_requirements()
+ */
+function hook_requirements_alter(array &$requirements): void {
+  // Change the title from 'PHP' to 'PHP version'.
+  $requirements['php']['title'] = t('PHP version');
+
+  // Decrease the 'update status' requirement severity from warning to info.
+  $requirements['update status']['severity'] = REQUIREMENT_INFO;
+
+  // Remove a requirements entry.
+  unset($requirements['foo']);
 }
 
 /**
