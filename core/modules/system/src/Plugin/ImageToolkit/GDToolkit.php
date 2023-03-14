@@ -274,7 +274,6 @@ class GDToolkit extends ImageToolkitBase {
       $this->preLoadInfo = $data;
       // Before PHP 8.2, getimagesize() returns 0 for AVIF images width and
       // height. In this case, we need to load the image to GD straight away.
-      // @todo remove once PHP8.2 is the minimum supported version.
       // @todo remove in https://www.drupal.org/i/3325219
       if ($type === IMAGETYPE_AVIF && PHP_VERSION_ID < 80200) {
         return $this->load();
