@@ -7,6 +7,7 @@ use Drupal\Component\Render\MarkupTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Random;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * Tests \Drupal\Component\Utility\Html.
@@ -16,6 +17,8 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass \Drupal\Component\Utility\Html
  */
 class HtmlTest extends TestCase {
+
+  use ExpectDeprecationTrait;
 
   /**
    * {@inheritdoc}
@@ -387,6 +390,11 @@ class HtmlTest extends TestCase {
       }
     }
 
+    // Double-character carriage return should be normalized.
+    $data['line break with double special character'] = ["Test without links but with\r\nsome special characters", 'http://example.com', "Test without links but with\nsome special characters"];
+    $data['line break with single special character'] = ["Test without links but with&#13;\nsome special characters", 'http://example.com', FALSE];
+    $data['carriage return within html'] = ["<a\rhref='/node'>My link</a>", 'http://example.com', '<a href="http://example.com/node">My link</a>'];
+
     return $data;
   }
 
@@ -403,6 +411,19 @@ class HtmlTest extends TestCase {
       'host and path' => ['example.com/llama'],
       'scheme, host and path' => ['http://example.com/llama'],
     ];
+  }
+
+  /**
+   * Test deprecations.
+   *
+   * @group legacy
+   */
+  public function testDeprecations(): void {
+    $this->expectDeprecation('Passing NULL to Drupal\Component\Utility\Html::decodeEntities is deprecated in drupal:9.5.0 and will trigger a PHP error from drupal:11.0.0. Pass a string instead. See https://www.drupal.org/node/3318826');
+    $this->assertSame('', Html::decodeEntities(NULL));
+
+    $this->expectDeprecation('Passing NULL to Drupal\Component\Utility\Html::escape is deprecated in drupal:9.5.0 and will trigger a PHP error from drupal:11.0.0. Pass a string instead. See https://www.drupal.org/node/3318826');
+    $this->assertSame('', Html::escape(NULL));
   }
 
 }

@@ -560,8 +560,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
             // returns an array keyed by property names so remove the keys
             // before array_merge() to avoid losing data with fields having the
             // same columns i.e. value.
-            $column_names = array_merge($column_names, array_values($table_mapping->getColumnNames($data_field)));
+            $column_names[] = array_values($table_mapping->getColumnNames($data_field));
           }
+          $column_names = array_merge(...$column_names);
           $query->fields('data', $column_names);
         }
 
@@ -1300,6 +1301,11 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     }
 
     $original = !empty($entity->original) ? $entity->original : NULL;
+
+    // Use the loaded revision instead of default one to check for data change.
+    if ($original && !$entity->isNewRevision() && !$entity->isDefaultRevision()) {
+      $original = $this->loadRevision($entity->getLoadedRevisionId());
+    }
 
     // Determine which fields should be actually stored.
     $definitions = $this->entityFieldManager->getFieldDefinitions($entity_type, $bundle);

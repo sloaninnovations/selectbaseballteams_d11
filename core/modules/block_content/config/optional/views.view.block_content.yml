@@ -5,7 +5,7 @@ dependencies:
     - block_content
     - user
 id: block_content
-label: 'Custom block library'
+label: 'Custom blocks'
 module: views
 description: 'Find and manage custom blocks.'
 tag: default
@@ -18,7 +18,7 @@ display:
     display_plugin: default
     position: 0
     display_options:
-      title: 'Custom block library'
+      title: 'Custom blocks'
       fields:
         info:
           id: info
@@ -206,6 +206,15 @@ display:
             date_format: short
             custom_date_format: ''
             timezone: ''
+            tooltip:
+              date_format: long
+              custom_date_format: ''
+            time_diff:
+              enabled: false
+              future_format: '@interval hence'
+              past_format: '@interval ago'
+              granularity: 2
+              refresh: 60
         operations:
           id: operations
           table: block_content
@@ -520,14 +529,14 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      path: admin/structure/block/block-content
+      path: admin/content/block-content
       menu:
         type: tab
-        title: 'Custom block library'
-        description: ''
+        title: 'Custom blocks'
+        description: 'Create and edit custom block content.'
         weight: 0
         menu_name: admin
-        parent: block.admin_display
+        parent: system.admin_content
         context: '0'
     cache_metadata:
       max-age: -1

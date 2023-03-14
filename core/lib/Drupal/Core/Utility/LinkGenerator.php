@@ -21,7 +21,7 @@ use Drupal\Core\Url;
 class LinkGenerator implements LinkGeneratorInterface {
 
   /**
-   * The url generator.
+   * The URL generator.
    *
    * @var \Drupal\Core\Routing\UrlGeneratorInterface
    */
@@ -61,6 +61,7 @@ class LinkGenerator implements LinkGeneratorInterface {
    * {@inheritdoc}
    */
   public function generateFromLink(Link $link) {
+    @trigger_error('\Drupal\Core\Utility\LinkGeneratorInterface::generateFromLink() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Utility\LinkGeneratorInterface::generate() instead. See https://www.drupal.org/node/3342992', E_USER_DEPRECATED);
     return $this->generate($link->getText(), $link->getUrl());
   }
 
@@ -106,7 +107,7 @@ class LinkGenerator implements LinkGeneratorInterface {
       'absolute' => FALSE,
     ];
 
-    // Add a hreflang attribute if we know the language of this link's url and
+    // Add a hreflang attribute if we know the language of this link's URL and
     // hreflang has not already been set.
     if (!empty($variables['options']['language']) && !isset($variables['options']['attributes']['hreflang'])) {
       $variables['options']['attributes']['hreflang'] = $variables['options']['language']->getId();
@@ -190,14 +191,14 @@ class LinkGenerator implements LinkGeneratorInterface {
   /**
    * Generates the link.
    *
-   * @param Drupal\Core\GeneratedLink $generated_link
+   * @param \Drupal\Core\GeneratedLink $generated_link
    *   The generated link, along with its associated cacheability metadata.
    * @param array $attributes
    *   The attributes of the generated link.
    * @param array $variables
    *   The link text, url, and other options.
    *
-   * @return Drupal\Core\GeneratedLink
+   * @return \Drupal\Core\GeneratedLink
    *   The generated link, along with its associated cacheability metadata.
    */
   protected function doGenerate($generated_link, $attributes, $variables) {

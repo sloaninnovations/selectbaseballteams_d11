@@ -164,8 +164,8 @@
  *   $variables['#attached'] @endcode, e.g.:
  *   @code
  *   function THEME_preprocess_menu_local_action(array &$variables) {
- *     // We require Modernizr's touch test for button styling.
- *     $variables['#attached']['library'][] = 'core/modernizr';
+ *     // We require touch events detection for button styling.
+ *     $variables['#attached']['library'][] = 'core/drupal.touchevents-test';
  *   }
  *   @endcode
  *
@@ -610,7 +610,26 @@ function hook_preprocess_HOOK(&$variables) {
  * must otherwise make sure that the hook implementation is available at
  * any given time.
  *
- * @todo Add @code sample.
+ * Suggestions must begin with the value of HOOK, followed by two underscores to be discoverable.
+ *
+ * In the following example, we provide suggestions to
+ * node templates based bundle, id, and view mode.
+ *
+ * @code
+ * function node_theme_suggestions_node(array $variables) {
+ *   $suggestions = [];
+ *   $node = $variables['elements']['#node'];
+ *   $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+ *   $suggestions[] = 'node__' . $sanitized_view_mode;
+ *   $suggestions[] = 'node__' . $node->bundle();
+ *   $suggestions[] = 'node__' . $node->bundle() . '__' . $sanitized_view_mode;
+ *   $suggestions[] = 'node__' . $node->id();
+ *   $suggestions[] = 'node__' . $node->id() . '__' . $sanitized_view_mode;
+ *
+ *   return $suggestions;
+ * }
+ *
+ * @endcode
  *
  * @param array $variables
  *   An array of variables passed to the theme hook. Note that this hook is
@@ -644,6 +663,8 @@ function hook_theme_suggestions_HOOK(array $variables) {
  * following order: first, hook_theme_suggestions_alter(); second,
  * hook_theme_suggestions_HOOK_alter(). So, for each module or theme, the more
  * general hooks are called first followed by the more specific.
+ *
+ * New suggestions must begin with the value of HOOK, followed by two underscores to be discoverable.
  *
  * In the following example, we provide an alternative template suggestion to
  * node and taxonomy term templates based on the user being logged in.
@@ -690,11 +711,27 @@ function hook_theme_suggestions_alter(array &$suggestions, array $variables, $ho
  * hook called (in this case 'node__article') is available in
  * $variables['theme_hook_original'].
  *
+ * New suggestions must begin with the value of HOOK, followed by two underscores to be discoverable.
+ * For example, consider the below suggestions from hook_theme_suggestions_node_alter:
+ *   - node__article is valid
+ *   - node__article__custom_template is valid
+ *   - node--article is invalid
+ *   - article__custom_template is invalid
+ *
  * Implementations of this hook must be placed in *.module or *.theme files, or
  * must otherwise make sure that the hook implementation is available at
  * any given time.
  *
- * @todo Add @code sample.
+ * In the following example, we provide an alternative template suggestion to
+ * node templates based on the user being logged in.
+ * @code
+ * function MYMODULE_theme_suggestions_node_alter(array &$suggestions, array $variables) {
+ *   if (\Drupal::currentUser()->isAuthenticated()) {
+ *     $suggestions[] = 'node__logged_in';
+ *   }
+ * }
+ *
+ * @endcode
  *
  * @param array $suggestions
  *   An array of theme suggestions.
@@ -760,8 +797,7 @@ function hook_extension() {
  * It is the theme engine's responsibility to escape variables. The only
  * exception is if a variable implements
  * \Drupal\Component\Render\MarkupInterface. Drupal is inherently unsafe if
- * other variables are not escaped. The helper function
- * theme_render_and_autoescape() may be used for this.
+ * other variables are not escaped.
  *
  * @param string $template_file
  *   The path (relative to the Drupal root directory) to the template to be
@@ -1142,10 +1178,10 @@ function hook_page_bottom(array &$page_bottom) {
  *   - file: The file that any preprocess implementations reside in. This file
  *     will be included prior to the template being rendered, to make sure that
  *     the preprocess function (as needed) is actually loaded.
- *   - path: Override the path of the file to be used. Ordinarily the module or
- *     theme path will be used, but if the file will not be in the default
- *     path, include it here. This path should be relative to the Drupal root
- *     directory.
+ *   - path: If specified, overrides the path to the directory that contains the
+ *     file to be used. This path should be relative to the Drupal root
+ *     directory. If not provided, the path will be set to the module or theme's
+ *     templates directory.
  *   - template: The template name, without 'html.twig' on the end. The
  *     extension will be added automatically by the default rendering engine
  *     (which is Twig.) If 'path' is specified, 'template' should also be

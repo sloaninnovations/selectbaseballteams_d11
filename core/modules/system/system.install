@@ -293,25 +293,16 @@ function system_requirements($phase) {
   // with an error or warning if the site is running older PHP versions for
   // which Drupal has already or will soon drop support.
   $phpversion = $phpversion_label = phpversion();
-  if (function_exists('phpinfo')) {
-    if ($phase === 'runtime') {
-      $phpversion_label = t('@phpversion (<a href=":url">more information</a>)', ['@phpversion' => $phpversion, ':url' => (new Url('system.php'))->toString()]);
-    }
-    $requirements['php'] = [
-      'title' => t('PHP'),
-      'value' => $phpversion_label,
-    ];
+  if ($phase === 'runtime') {
+    $phpversion_label = t('@phpversion (<a href=":url">more information</a>)', [
+      '@phpversion' => $phpversion,
+      ':url' => (new Url('system.php'))->toString(),
+    ]);
   }
-  else {
-    // @todo Revisit whether this description makes sense in
-    //   https://www.drupal.org/project/drupal/issues/2927318.
-    $requirements['php'] = [
-      'title' => t('PHP'),
-      'value' => $phpversion_label,
-      'description' => t('The phpinfo() function has been disabled for security reasons. To see your server\'s phpinfo() information, change your PHP settings or contact your server administrator. For more information, <a href=":phpinfo">Enabling and disabling phpinfo()</a> handbook page.', [':phpinfo' => 'https://www.drupal.org/node/243993']),
-      'severity' => REQUIREMENT_INFO,
-    ];
-  }
+  $requirements['php'] = [
+    'title' => t('PHP'),
+    'value' => $phpversion_label,
+  ];
 
   // Check if the PHP version is below what Drupal supports.
   if (version_compare($phpversion, $minimum_supported_php) < 0) {
@@ -425,15 +416,16 @@ function system_requirements($phase) {
 
   // Check to see if APCu is installed and configured correctly.
   if ($phase == 'runtime' && PHP_SAPI != 'cli') {
-    $requirements['php_apcu']['title'] = t('PHP APCu caching');
+    $requirements['php_apcu_enabled']['title'] = t('PHP APCu caching');
+    $requirements['php_apcu_available']['title'] = t('PHP APCu available caching');
     if (extension_loaded('apcu') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN)) {
       $memory_info = apcu_sma_info(TRUE);
       $apcu_actual_size = format_size($memory_info['seg_size']);
       $apcu_recommended_size = '32 MB';
-      $requirements['php_apcu']['value'] = t('Enabled (@size)', ['@size' => $apcu_actual_size]);
+      $requirements['php_apcu_enabled']['value'] = t('Enabled (@size)', ['@size' => $apcu_actual_size]);
       if (Bytes::toNumber($apcu_actual_size) < Bytes::toNumber($apcu_recommended_size)) {
-        $requirements['php_apcu']['severity'] = REQUIREMENT_WARNING;
-        $requirements['php_apcu']['description'] = t('Depending on your configuration, Drupal can run with a @apcu_size APCu limit. However, a @apcu_default_size APCu limit (the default) or above is recommended, especially if your site uses additional custom or contributed modules.', [
+        $requirements['php_apcu_enabled']['severity'] = REQUIREMENT_WARNING;
+        $requirements['php_apcu_enabled']['description'] = t('Depending on your configuration, Drupal can run with a @apcu_size APCu limit. However, a @apcu_default_size APCu limit (the default) or above is recommended, especially if your site uses additional custom or contributed modules.', [
           '@apcu_size' => $apcu_actual_size,
           '@apcu_default_size' => $apcu_recommended_size,
         ]);
@@ -441,21 +433,27 @@ function system_requirements($phase) {
       else {
         $memory_available = $memory_info['avail_mem'] / $memory_info['seg_size'];
         if ($memory_available < 0.1) {
-          $requirements['php_apcu']['severity'] = REQUIREMENT_ERROR;
+          $requirements['php_apcu_available']['severity'] = REQUIREMENT_ERROR;
+          $requirements['php_apcu_available']['description'] = t('APCu is using over 90% of its allotted memory (@apcu_actual_size). To improve APCu performance, consider increasing this limit.', [
+            '@apcu_actual_size' => $apcu_actual_size,
+          ]);
         }
         elseif ($memory_available < 0.25) {
-          $requirements['php_apcu']['severity'] = REQUIREMENT_WARNING;
+          $requirements['php_apcu_available']['severity'] = REQUIREMENT_WARNING;
+          $requirements['php_apcu_available']['description'] = t('APCu is using over 75% of its allotted memory (@apcu_actual_size). To improve APCu performance, consider increasing this limit.', [
+            '@apcu_actual_size' => $apcu_actual_size,
+          ]);
         }
         else {
-          $requirements['php_apcu']['severity'] = REQUIREMENT_OK;
+          $requirements['php_apcu_available']['severity'] = REQUIREMENT_OK;
         }
-        $requirements['php_apcu']['description'] = t('Memory available: @available.', [
+        $requirements['php_apcu_available']['value'] = t('Memory available: @available.', [
           '@available' => format_size($memory_info['avail_mem']),
         ]);
       }
     }
     else {
-      $requirements['php_apcu'] += [
+      $requirements['php_apcu_enabled'] += [
         'value' => t('Not enabled'),
         'severity' => REQUIREMENT_INFO,
         'description' => t('PHP APCu caching can improve your site\'s performance considerably. It is <strong>highly recommended</strong> to have <a href="https://www.php.net/manual/apcu.installation.php" target="_blank">APCu</a> installed on your server.'),
@@ -568,34 +566,6 @@ function system_requirements($phase) {
       ];
       $requirements['database_system_version']['severity'] = REQUIREMENT_ERROR;
       $requirements['database_system_version']['description'] = $error_message;
-    }
-  }
-
-  // Test with PostgreSQL databases for the status of the pg_trgm extension.
-  if ($phase === 'runtime' || $phase === 'update') {
-    if (Database::isActiveConnection()) {
-      $connection = Database::getConnection();
-
-      // Set the requirement just for postgres.
-      if ($connection->driver() == 'pgsql') {
-        $requirements['pgsql_extension_pg_trgm'] = [
-          'severity' => REQUIREMENT_OK,
-          'title' => t('PostgreSQL pg_trgm extension'),
-          'value' => t('Available'),
-          'description' => 'The pg_trgm PostgreSQL extension is present.',
-        ];
-
-        // If the extension is not available, set the requirement error.
-        if (!$connection->schema()->extensionExists('pg_trgm')) {
-          $requirements['pgsql_extension_pg_trgm']['severity'] = REQUIREMENT_ERROR;
-          $requirements['pgsql_extension_pg_trgm']['value'] = t('Not created');
-          $requirements['pgsql_extension_pg_trgm']['description'] = t('The <a href=":pg_trgm">pg_trgm</a> PostgreSQL extension is not present. The extension is required by Drupal 10 to improve performance when using PostgreSQL. See <a href=":requirements">Drupal database server requirements</a> for more information.', [
-            ':pg_trgm' => 'https://www.postgresql.org/docs/current/pgtrgm.html',
-            ':requirements' => 'https://www.drupal.org/docs/system-requirements/database-server-requirements',
-          ]);
-        }
-
-      }
     }
   }
 
@@ -785,7 +755,7 @@ function system_requirements($phase) {
           '#suffix' => ' ',
         ],
         [
-          '#markup' => t('For more information, see the online handbook entry for <a href=":cron-handbook">configuring cron jobs</a>.', [':cron-handbook' => 'https://www.drupal.org/cron']),
+          '#markup' => t('For more information, see the online handbook entry for <a href=":cron-handbook">configuring cron jobs</a>.', [':cron-handbook' => 'https://www.drupal.org/docs/administering-a-drupal-site/cron-automated-tasks/cron-automated-tasks-overview']),
           '#suffix' => ' ',
         ],
       ];
@@ -1337,6 +1307,28 @@ function system_requirements($phase) {
         'description' => t('The rebuild_access setting is enabled in settings.php. It is recommended to have this setting disabled unless you are performing a rebuild.'),
       ];
     }
+  }
+
+  // Check if the SameSite cookie attribute is set to a valid value. Since this
+  // involves checking whether we are using a secure connection this only makes
+  // sense inside an HTTP request, not on the command line.
+  if ($phase === 'runtime' && PHP_SAPI !== 'cli') {
+    $samesite = ini_get('session.cookie_samesite') ?: t('Not set');
+    // Check if the SameSite attribute is set to a valid value. If it is set to
+    // 'None' the request needs to be done over HTTPS.
+    $valid = match ($samesite) {
+      'Lax', 'Strict' => TRUE,
+      'None' => $request_object->isSecure(),
+      default => FALSE,
+    };
+    $requirements['php_session_samesite'] = [
+      'title' => t('SameSite cookie attribute'),
+      'value' => $samesite,
+      'severity' => $valid ? REQUIREMENT_OK : REQUIREMENT_WARNING,
+      'description' => t('This attribute should be explicitly set to Lax, Strict or None. If set to None then the request must be made via HTTPS. See <a href=":url" target="_blank">PHP documentation</a>', [
+        ':url' => 'https://www.php.net/manual/en/session.configuration.php#ini.session.cookie-samesite',
+      ]),
+    ];
   }
 
   // See if trusted hostnames have been configured, and warn the user if they

@@ -54,7 +54,6 @@ class WorkflowAccessControlHandlerTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->installEntitySchema('workflow');
     $this->installEntitySchema('user');
     $this->installSchema('system', ['sequences']);
 
@@ -75,14 +74,12 @@ class WorkflowAccessControlHandlerTest extends KernelTestBase {
     $this->assertEquals(
       AccessResult::neutral()
         ->addCacheContexts(['user.permissions'])
-        ->setReason("The 'administer workflows' permission is required.")
-        ->addCacheTags(['workflow_type_plugins']),
+        ->setReason("The 'administer workflows' permission is required."),
       $this->accessControlHandler->createAccess(NULL, $this->user, [], TRUE)
     );
     $this->assertEquals(
       AccessResult::allowed()
-        ->addCacheContexts(['user.permissions'])
-        ->addCacheTags(['workflow_type_plugins']),
+        ->addCacheContexts(['user.permissions']),
       $this->accessControlHandler->createAccess(NULL, $this->adminUser, [], TRUE)
     );
 
@@ -92,8 +89,7 @@ class WorkflowAccessControlHandlerTest extends KernelTestBase {
     $this->accessControlHandler->resetCache();
     $this->assertEquals(
       AccessResult::neutral()
-        ->addCacheContexts(['user.permissions'])
-        ->addCacheTags(['workflow_type_plugins']),
+        ->addCacheContexts(['user.permissions']),
       $this->accessControlHandler->createAccess(NULL, $this->adminUser, [], TRUE)
     );
   }

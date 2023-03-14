@@ -8,6 +8,19 @@ block_content.add_page:
   requirements:
     _permission: 'administer blocks'
 
+# @todo Deprecate this route once
+#   https://www.drupal.org/project/drupal/issues/3159210 is fixed, or remove
+#   it in Drupal 11.
+# @see https://www.drupal.org/node/3320855
+entity.block_content_type.collection.bc:
+  path: '/admin/structure/block/block-content/types'
+  defaults:
+    _controller: '\Drupal\block_content\Controller\BlockContentController::blockContentTypeRedirect'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer blocks'
+
 block_content.add_form:
   path: '/block/add/{block_content_type}'
   defaults:
@@ -22,6 +35,7 @@ entity.block_content.canonical:
   path: '/block/{block_content}'
   defaults:
     _entity_form: 'block_content.edit'
+    _title_callback: '\Drupal\Core\Entity\Controller\EntityController::title'
   options:
     _admin_route: TRUE
   requirements:
@@ -50,7 +64,7 @@ entity.block_content.delete_form:
     block_content: \d+
 
 block_content.type_add:
-  path: '/admin/structure/block/block-content/types/add'
+  path: '/admin/structure/block-content/add'
   defaults:
     _entity_form: 'block_content_type.add'
     _title: 'Add'
@@ -58,9 +72,20 @@ block_content.type_add:
     _permission: 'administer blocks'
 
 entity.block_content.collection:
+  path: '/admin/content/block-content'
+  defaults:
+    _title: 'Custom blocks'
+    _entity_list: 'block_content'
+  requirements:
+    _permission: 'administer blocks'
+
+# @todo Deprecate this route once
+#   https://www.drupal.org/project/drupal/issues/3159210 is fixed, or remove
+#   it in Drupal 11.
+# @see https://www.drupal.org/node/3320855
+entity.block_content.collection.bc:
   path: '/admin/structure/block/block-content'
   defaults:
-    _title: 'Custom block library'
-    _entity_list: 'block_content'
+    _controller: '\Drupal\block_content\Controller\BlockContentController::blockLibraryRedirect'
   requirements:
     _permission: 'administer blocks'

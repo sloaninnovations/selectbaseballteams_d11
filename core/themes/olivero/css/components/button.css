@@ -10,19 +10,6 @@
  * Buttons.
  */
 
-/*
- * Media query breakpoints.
- * Processed by postcss/postcss-custom-media.
- */
-
-/* Navigation related breakpoints */
-
-/* Grid related breakpoints */
-
-/* Grid shifts from 6 to 14 columns. */
-
-/* Width of the entire grid maxes out. */
-
 .button {
   display: inline-block;
   height: var(--sp3);
@@ -108,6 +95,7 @@
 
 .button--primary {
   color: var(--color--white);
+  border-color: var(--color--primary-40);
   background-color: var(--color--primary-40);
 }
 

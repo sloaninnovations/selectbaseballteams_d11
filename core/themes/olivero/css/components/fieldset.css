@@ -10,19 +10,6 @@
  * Fieldset.
  */
 
-/*
- * Media query breakpoints.
- * Processed by postcss/postcss-custom-media.
- */
-
-/* Navigation related breakpoints */
-
-/* Grid related breakpoints */
-
-/* Grid shifts from 6 to 14 columns. */
-
-/* Width of the entire grid maxes out. */
-
 .fieldset {
   min-width: 0;
   margin-block: var(--sp1);
@@ -126,12 +113,9 @@
 }
 
 .fieldset__wrapper {
-  padding: var(--sp);
-}
-
-.fieldset__legend--invisible ~ .fieldset__wrapper {
   margin-block-start: 0;
-  padding: 0;
+  padding-block: var(--sp);
+  padding-inline-start: var(--sp);
 }
 
 .fieldset--group .fieldset__legend--visible ~ .fieldset__wrapper {

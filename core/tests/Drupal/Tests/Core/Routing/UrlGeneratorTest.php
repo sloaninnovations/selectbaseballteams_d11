@@ -34,7 +34,7 @@ class UrlGeneratorTest extends UnitTestCase {
   protected $provider;
 
   /**
-   * The url generator to test.
+   * The URL generator to test.
    *
    * @var \Drupal\Core\Routing\UrlGenerator
    */
@@ -290,6 +290,20 @@ class UrlGeneratorTest extends UnitTestCase {
   }
 
   /**
+   * Tests URL generation deprecations.
+   *
+   * @group legacy
+   */
+  public function testRouteObjectDeprecation() {
+    $this->expectDeprecation('Passing a route object to Drupal\Core\Routing\UrlGenerator::getPathFromRoute() is deprecated in drupal:10.1.0 and will not be supported in drupal:11.0.0. Pass the route name instead. See https://www.drupal.org/node/3172280');
+    $path = $this->generator->getPathFromRoute(new Route('/test/one'));
+    $this->assertSame($this->generator->getPathFromRoute('test_1'), $path);
+    $this->expectDeprecation('Passing a route object to Drupal\Core\Routing\UrlGenerator::generateFromRoute() is deprecated in drupal:10.1.0 and will not be supported in drupal:11.0.0. Pass the route name instead. See https://www.drupal.org/node/3172280');
+    $url = $this->generator->generateFromRoute(new Route('/test/one'));
+    $this->assertSame($this->generator->generateFromRoute('test_1'), $url);
+  }
+
+  /**
    * Tests URL generation in a subdirectory.
    */
   public function testGetPathFromRouteWithSubdirectory() {
@@ -452,7 +466,19 @@ class UrlGeneratorTest extends UnitTestCase {
   }
 
   /**
-   * Tests that the 'scheme' route requirement is respected during url
+   * Tests deprecated methods.
+   *
+   * @group legacy
+   */
+  public function testDeprecatedMethods() {
+    $this->expectDeprecation('Drupal\Core\Routing\UrlGenerator::getRouteDebugMessage() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use the route name instead. See https://www.drupal.org/node/3172303');
+    $this->assertSame('test', $this->generator->getRouteDebugMessage('test'));
+    $this->expectDeprecation('Drupal\Core\Routing\UrlGenerator::supports() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Only string route names are supported. See https://www.drupal.org/node/3172303');
+    $this->assertTrue($this->generator->supports('test'));
+  }
+
+  /**
+   * Tests that the 'scheme' route requirement is respected during URL
    * generation.
    */
   public function testUrlGenerationWithHttpsRequirement() {
@@ -512,18 +538,19 @@ class UrlGeneratorTest extends UnitTestCase {
    * Note: We use absolute covers to let
    * \Drupal\Tests\Core\Render\MetadataBubblingUrlGeneratorTest work.
    */
-  public function testGenerateWithPathProcessorChangingQueryParameter() {
+  public function testGenerateWithPathProcessorChangingOptions() {
     $path_processor = $this->createMock(OutboundPathProcessorInterface::CLASS);
     $path_processor->expects($this->atLeastOnce())
       ->method('processOutbound')
       ->willReturnCallback(function ($path, &$options = [], Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
         $options['query'] = ['zoo' => 5];
+        $options['fragment'] = 'foo';
         return $path;
       });
     $this->processorManager->addOutbound($path_processor);
 
     $options = [];
-    $this->assertGenerateFromRoute('test_2', ['narf' => 5], $options, '/goodbye/cruel/world?zoo=5', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
+    $this->assertGenerateFromRoute('test_2', ['narf' => 5], $options, '/goodbye/cruel/world?zoo=5#foo', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
   }
 
   /**

@@ -37,7 +37,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @ingroup views_plugins
  */
-#[\AllowDynamicProperties]
 abstract class PluginBase extends ComponentPluginBase implements ContainerFactoryPluginInterface, ViewsPluginInterface, DependentPluginInterface, TrustedCallbackInterface {
 
   /**
@@ -87,7 +86,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
   public $displayHandler;
 
   /**
-   * Plugins's definition.
+   * Plugins' definition.
    *
    * @var array
    */
@@ -106,6 +105,11 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
    * @var \Drupal\Core\Render\RendererInterface
    */
   protected $renderer;
+
+  /**
+   * The handler position.
+   */
+  public int $position;
 
   /**
    * Constructs a PluginBase object.

@@ -98,7 +98,7 @@ class TwigExtension extends AbstractExtension {
     return [
       // This function will receive a renderable array, if an array is detected.
       new TwigFunction('render_var', [$this, 'renderVar']),
-      // The url and path function are defined in close parallel to those found
+      // The URL and path function are defined in close parallel to those found
       // in \Symfony\Bridge\Twig\Extension\RoutingExtension
       new TwigFunction('url', [$this, 'getUrl'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
       new TwigFunction('path', [$this, 'getPath'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
@@ -228,7 +228,7 @@ class TwigExtension extends AbstractExtension {
   }
 
   /**
-   * Gets a rendered link from a url object.
+   * Gets a rendered link from a URL object.
    *
    * @param string $text
    *   The link text for the anchor tag as a translated string.
@@ -387,9 +387,6 @@ class TwigExtension extends AbstractExtension {
    *
    * Replacement function for Twig's escape filter.
    *
-   * Note: This function should be kept in sync with
-   * theme_render_and_autoescape().
-   *
    * @param \Twig\Environment $env
    *   A Twig Environment instance.
    * @param mixed $arg
@@ -408,9 +405,6 @@ class TwigExtension extends AbstractExtension {
    * @throws \Exception
    *   When $arg is passed as an object which does not implement __toString(),
    *   RenderableInterface or toString().
-   *
-   * @todo Refactor this to keep it in sync with theme_render_and_autoescape()
-   *   in https://www.drupal.org/node/2575065
    */
   public function escapeFilter(Environment $env, $arg, $strategy = 'html', $charset = NULL, $autoescape = FALSE) {
     // Check for a numeric zero int or float.

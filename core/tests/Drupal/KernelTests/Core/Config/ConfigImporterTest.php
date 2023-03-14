@@ -683,8 +683,39 @@ class ConfigImporterTest extends KernelTestBase {
     catch (ConfigImporterException $e) {
       $this->assertStringContainsString('There were errors validating the config synchronization.', $e->getMessage());
       $error_log = $config_importer->getErrors();
-      $this->assertEquals('Unable to uninstall the <em class="placeholder">System</em> module because: The System module is required.', $error_log[0]);
+      $this->assertEquals('Unable to uninstall the System module because: The System module is required.', $error_log[0]);
     }
+  }
+
+  /**
+   * Tests installing a base themes and sub themes during configuration import.
+   *
+   * @see \Drupal\Core\EventSubscriber\ConfigImportSubscriber
+   */
+  public function testInstallBaseAndSubThemes() {
+    $sync = $this->container->get('config.storage.sync');
+    $extensions = $sync->read('core.extension');
+    $extensions['theme']['test_basetheme'] = 0;
+    $extensions['theme']['test_subtheme'] = 0;
+    $extensions['theme']['test_subsubtheme'] = 0;
+    $sync->write('core.extension', $extensions);
+    $config_importer = $this->configImporter();
+    $config_importer->import();
+    $this->assertTrue($this->container->get('theme_handler')->themeExists('test_basetheme'));
+    $this->assertTrue($this->container->get('theme_handler')->themeExists('test_subsubtheme'));
+    $this->assertTrue($this->container->get('theme_handler')->themeExists('test_subtheme'));
+
+    // Test uninstalling them.
+    $extensions = $sync->read('core.extension');
+    unset($extensions['theme']['test_basetheme']);
+    unset($extensions['theme']['test_subsubtheme']);
+    unset($extensions['theme']['test_subtheme']);
+    $sync->write('core.extension', $extensions);
+    $config_importer = $this->configImporter();
+    $config_importer->import();
+    $this->assertFalse($this->container->get('theme_handler')->themeExists('test_basetheme'));
+    $this->assertFalse($this->container->get('theme_handler')->themeExists('test_subsubtheme'));
+    $this->assertFalse($this->container->get('theme_handler')->themeExists('test_subtheme'));
   }
 
   /**
@@ -710,7 +741,7 @@ class ConfigImporterTest extends KernelTestBase {
       $this->assertEquals($expected, $e->getMessage(), 'There were errors validating the config synchronization.');
       $error_log = $config_importer->getErrors();
       // Install profiles should not even be scanned at this point.
-      $this->assertEquals(['Unable to install the <em class="placeholder">standard</em> module since it does not exist.'], $error_log);
+      $this->assertEquals(['Unable to install the standard module since it does not exist.'], $error_log);
     }
   }
 
@@ -740,7 +771,7 @@ class ConfigImporterTest extends KernelTestBase {
       // does not use an install profile. This situation should be impossible
       // to get in but site's can removed the install profile setting from
       // settings.php so the test is valid.
-      $this->assertEquals(['Cannot change the install profile from <em class="placeholder"></em> to <em class="placeholder">this_will_not_work</em> once Drupal is installed.'], $error_log);
+      $this->assertEquals(['Cannot change the install profile from  to this_will_not_work once Drupal is installed.'], $error_log);
     }
   }
 

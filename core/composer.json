@@ -30,8 +30,8 @@
         "symfony/process": "^6.2",
         "symfony/polyfill-iconv": "^1.26",
         "symfony/yaml": "^6.2",
-        "twig/twig": "^3.4.3",
-        "doctrine/annotations": "^1.13",
+        "twig/twig": "^3.5.0",
+        "doctrine/annotations": "^1.14",
         "guzzlehttp/guzzle": "^7.5",
         "guzzlehttp/psr7": "^2.4",
         "egulias/email-validator": "^3.2.1",
@@ -42,7 +42,8 @@
         "asm89/stack-cors": "^2.1",
         "pear/archive_tar": "^1.4.14",
         "psr/log": "^3.0",
-        "mck89/peast": "^1.14"
+        "mck89/peast": "^1.14",
+        "sebastian/diff": "^4"
     },
     "conflict": {
         "drush/drush": "<8.1.10"

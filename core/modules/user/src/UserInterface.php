@@ -69,6 +69,8 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
    *
    * @param string $rid
    *   The role ID to add.
+   *
+   * @return $this
    */
   public function addRole($rid);
 
@@ -77,6 +79,8 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
    *
    * @param string $rid
    *   The role ID to remove.
+   *
+   * @return $this
    */
   public function removeRole($rid);
 
@@ -94,8 +98,8 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
   /**
    * Returns the hashed password.
    *
-   * @return string
-   *   The hashed password.
+   * @return string|null
+   *   The hashed password, or NULL if a password is not set.
    */
   public function getPassword();
 
@@ -108,7 +112,7 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
    * @return $this
    *   The called user entity.
    */
-  public function setPassword($password);
+  public function setPassword(#[\SensitiveParameter] $password);
 
   /**
    * Sets the email address of the user.
@@ -209,7 +213,7 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
    *
    * @return $this
    */
-  public function setExistingPassword($password);
+  public function setExistingPassword(#[\SensitiveParameter] $password);
 
   /**
    * Checks the existing password if set.
