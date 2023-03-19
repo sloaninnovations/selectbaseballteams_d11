@@ -359,7 +359,10 @@ class ToolkitGdTest extends KernelTestBase {
       }
 
       // JPEG and AVIF have small differences in color after processing.
-      $tolerance = in_array($image_original_type, [IMAGETYPE_JPEG, IMAGETYPE_AVIF], TRUE) ? 3 : 0;
+      $tolerance = match($image_original_type) {
+        IMAGETYPE_JPEG, IMAGETYPE_AVIF => 3,
+        default => 0,
+      };
 
       $this->assertColorsAreEqual($expected_color, $actual_color, $tolerance, "Image '$file_name' object after '$test_case' action has the correct color placement at corner '$key'");
     }
