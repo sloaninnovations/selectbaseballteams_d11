@@ -51,6 +51,17 @@ class Schema extends DatabaseSchema {
   protected $tempNamespaceName;
 
   /**
+   * {@inheritdoc}
+   */
+  public function __construct($connection) {
+    parent::__construct($connection);
+
+    // If the schema is not set in the connection options then schema defaults
+    // to public.
+    $this->defaultSchema = $connection->getConnectionOptions()['schema'] ?? 'public';
+  }
+
+  /**
    * Make sure to limit identifiers according to PostgreSQL compiled in length.
    *
    * PostgreSQL allows in standard configuration identifiers no longer than 63
@@ -116,16 +127,18 @@ class Schema extends DatabaseSchema {
    */
   public function queryTableInformation($table) {
     // Generate a key to reference this table's information on.
+    $prefixed_table = $this->connection->getPrefix() . $table;
     $key = $this->connection->prefixTables('{' . $table . '}');
 
     // Take into account that temporary tables are stored in a different schema.
     // \Drupal\Core\Database\Connection::generateTemporaryTableName() sets the
     // 'db_temporary_' prefix to all temporary tables.
-    if (!str_contains($key, '.') && !str_contains($table, 'db_temporary_')) {
-      $key = 'public.' . $key;
+    if (str_contains($table, 'db_temporary_')) {
+      $key = $quoted_key = $this->getTempNamespaceName() . '.' . $prefixed_table;
     }
     else {
-      $key = $this->getTempNamespaceName() . '.' . $key;
+      $key = $this->defaultSchema . '.' . $prefixed_table;
+      $quoted_key = '"' . $this->defaultSchema . '"."' . $prefixed_table . '"';
     }
 
     if (!isset($this->tableInformation[$key])) {
@@ -153,7 +166,7 @@ AND (format_type(pg_attribute.atttypid, pg_attribute.atttypmod) = 'bytea'
 OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid) LIKE 'nextval%')
 EOD;
         $result = $this->connection->query($sql, [
-          ':key' => $key,
+          ':key' => $quoted_key,
         ]);
       }
       catch (\Exception $e) {
@@ -206,10 +219,7 @@ EOD;
    *   The non-prefixed name of the table.
    */
   protected function resetTableInformation($table) {
-    $key = $this->connection->prefixTables('{' . $table . '}');
-    if (!str_contains($key, '.')) {
-      $key = 'public.' . $key;
-    }
+    $key = $this->defaultSchema . '.' . $this->connection->getPrefix() . $table;
     unset($this->tableInformation[$key]);
   }
 
@@ -286,7 +296,11 @@ EOD;
     }
     if (isset($table['unique keys']) && is_array($table['unique keys'])) {
       foreach ($table['unique keys'] as $key_name => $key) {
-        $sql_keys[] = 'CONSTRAINT ' . $this->ensureIdentifiersLength($name, $key_name, 'key') . ' UNIQUE (' . implode(', ', $key) . ')';
+        // Use the createPrimaryKeySql(), which already discards any prefix
+        // lengths passed as part of the key column specifiers. (Postgres
+        // doesn't support setting a prefix length for PRIMARY or UNIQUE
+        // indices.)
+        $sql_keys[] = 'CONSTRAINT ' . $this->ensureIdentifiersLength($name, $key_name, 'key') . ' UNIQUE (' . $this->createPrimaryKeySql($key) . ')';
       }
     }
 
@@ -471,7 +485,7 @@ EOD;
   }
 
   /**
-   * Create the SQL expression for primary keys.
+   * Create the SQL expression for primary and unique keys.
    *
    * Postgresql does not support key length. It does support fillfactor, but
    * that requires a separate database lookup for each column in the key. The
@@ -549,15 +563,13 @@ EOD;
     }
 
     // Get the schema and tablename for the old table.
-    $old_full_name = str_replace('"', '', $this->connection->prefixTables('{' . $table . '}'));
-    [$old_schema, $old_table_name] = strpos($old_full_name, '.') ? explode('.', $old_full_name) : ['public', $old_full_name];
-
+    $table_name = $this->connection->getPrefix() . $table;
     // Index names and constraint names are global in PostgreSQL, so we need to
     // rename them when renaming the table.
-    $indexes = $this->connection->query('SELECT indexname FROM pg_indexes WHERE schemaname = :schema AND tablename = :table', [':schema' => $old_schema, ':table' => $old_table_name]);
+    $indexes = $this->connection->query('SELECT indexname FROM pg_indexes WHERE schemaname = :schema AND tablename = :table', [':schema' => $this->defaultSchema, ':table' => $table_name]);
 
     foreach ($indexes as $index) {
-      // Get the index type by suffix, e.g. idx/key/pkey
+      // Get the index type by suffix, e.g. idx/key/pkey.
       $index_type = substr($index->indexname, strrpos($index->indexname, '_') + 1);
 
       // If the index is already rewritten by ensureIdentifiersLength() to not
@@ -572,10 +584,10 @@ EOD;
         // Make sure to remove the suffix from index names, because
         // $this->ensureIdentifiersLength() will add the suffix again and thus
         // would result in a wrong index name.
-        preg_match('/^' . preg_quote($old_full_name) . '__(.*)__' . preg_quote($index_type) . '/', $index->indexname, $matches);
+        preg_match('/^' . preg_quote($table_name) . '__(.*)__' . preg_quote($index_type) . '/', $index->indexname, $matches);
         $index_name = $matches[1];
       }
-      $this->connection->query('ALTER INDEX "' . $index->indexname . '" RENAME TO ' . $this->ensureIdentifiersLength($new_name, $index_name, $index_type) . '');
+      $this->connection->query('ALTER INDEX "' . $this->defaultSchema . '"."' . $index->indexname . '" RENAME TO ' . $this->ensureIdentifiersLength($new_name, $index_name, $index_type));
     }
 
     // Ensure the new table name does not include schema syntax.
@@ -588,7 +600,7 @@ EOD;
         // The initial name of the sequence is generated automatically by
         // PostgreSQL when the table is created, so we need to use
         // pg_get_serial_sequence() to retrieve it.
-        $old_sequence = $this->connection->query("SELECT pg_get_serial_sequence('" . $old_full_name . "', '" . $field . "')")->fetchField();
+        $old_sequence = $this->connection->query("SELECT pg_get_serial_sequence('" . $this->defaultSchema . '.' . $table_name . "', '" . $field . "')")->fetchField();
 
         // If the new sequence name exceeds the maximum identifier length limit,
         // it will not match the pattern that is automatically applied by
@@ -711,7 +723,13 @@ EOD;
     // Remove leading and trailing quotes because the index name is in a WHERE
     // clause and not used as an identifier.
     $index_name = str_replace('"', '', $index_name);
-    return (bool) $this->connection->query("SELECT 1 FROM pg_indexes WHERE indexname = '$index_name'")->fetchField();
+
+    $sql_params = [
+      ':schema' => $this->defaultSchema,
+      ':table' => $this->connection->getPrefix() . $table,
+      ':index' => $index_name,
+    ];
+    return (bool) $this->connection->query("SELECT 1 FROM pg_indexes WHERE schemaname = :schema AND tablename = :table AND indexname = :index", $sql_params)->fetchField();
   }
 
   /**
@@ -794,8 +812,10 @@ EOD;
       throw new SchemaObjectExistsException("Cannot add unique key '$name' to table '$table': unique key already exists.");
     }
 
-    $fields = array_map([$this->connection, 'escapeField'], $fields);
-    $this->connection->query('ALTER TABLE {' . $table . '} ADD CONSTRAINT ' . $this->ensureIdentifiersLength($table, $name, 'key') . ' UNIQUE (' . implode(',', $fields) . ')');
+    // Use the createPrimaryKeySql(), which already discards any prefix lengths
+    // passed as part of the key column specifiers. (Postgres doesn't support
+    // setting a prefix length for PRIMARY or UNIQUE indices.)
+    $this->connection->query('ALTER TABLE {' . $table . '} ADD CONSTRAINT ' . $this->ensureIdentifiersLength($table, $name, 'key') . ' UNIQUE (' . $this->createPrimaryKeySql($fields) . ')');
     $this->resetTableInformation($table);
   }
 
@@ -835,7 +855,7 @@ EOD;
       return FALSE;
     }
 
-    $this->connection->query('DROP INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx'));
+    $this->connection->query('DROP INDEX ' . $this->defaultSchema . '.' . $this->ensureIdentifiersLength($table, $name, 'idx'));
     $this->resetTableInformation($table);
     return TRUE;
   }
@@ -1083,7 +1103,7 @@ EOD;
   protected function getSequenceName(string $table, string $column): ?string {
     return $this->connection
       ->query("SELECT pg_get_serial_sequence(:table, :column)", [
-        ':table' => $this->connection->getPrefix() . $table,
+        ':table' => $this->defaultSchema . '.' . $this->connection->getPrefix() . $table,
         ':column' => $column,
       ])
       ->fetchField();
