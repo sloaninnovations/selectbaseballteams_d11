@@ -172,7 +172,6 @@ class AssetResolver implements AssetResolverInterface {
     $default_options = [
       'type' => 'file',
       'group' => CSS_AGGREGATE_DEFAULT,
-      'weight' => 0,
       'media' => 'all',
       'preprocess' => TRUE,
     ];
@@ -181,6 +180,14 @@ class AssetResolver implements AssetResolverInterface {
       [$extension, $name] = explode('/', $library, 2);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       foreach ($definition['css'] as $options) {
+          // Libraries are being loaded based on dependencies, then their
+          // attaching order. Individual asset files are ordered how they
+          // are defined within the library itself.
+          // Readding an asset file will rewrite the resulting array leading
+          // to the incorrect asset files order, i.e. the last occurance of
+          // the particular asset will win, but the desired behavior is
+          // opposite - the first occurance must win.
+          // So, let's skip processing of already added asset files.
         if (array_key_exists($options['data'], $css)) {
           continue;
         }
@@ -290,7 +297,6 @@ class AssetResolver implements AssetResolverInterface {
       $default_options = [
         'type' => 'file',
         'group' => JS_DEFAULT,
-        'weight' => 0,
         'cache' => TRUE,
         'preprocess' => TRUE,
         'attributes' => [],
@@ -306,6 +312,14 @@ class AssetResolver implements AssetResolverInterface {
         [$extension, $name] = explode('/', $library, 2);
         $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
         foreach ($definition['js'] as $options) {
+            // Libraries are being loaded based on dependencies, then their
+            // attaching order. Individual asset files are ordered how they
+            // are defined within the library itself.
+            // Readding an asset file will rewrite the resulting array leading
+            // to the incorrect asset files order, i.e. the last occurance of
+            // the particular asset will win, but the desired behavior is
+            // opposite - the first occurance must win.
+            // So, let's skip processing of already added asset files.
           if (array_key_exists($options['data'], $javascript)) {
             continue;
           }
@@ -392,7 +406,6 @@ class AssetResolver implements AssetResolverInterface {
       $settings_as_inline_javascript = [
         'type' => 'setting',
         'group' => JS_SETTING,
-        'weight' => 0,
         'data' => $settings,
       ];
       $settings_js_asset = ['drupalSettings' => $settings_as_inline_javascript];
@@ -430,20 +443,13 @@ class AssetResolver implements AssetResolverInterface {
    *   The comparison result for uasort().
    */
   public static function sort(array $a, array $b) {
-    // First order by group, so that all items in the CSS_AGGREGATE_DEFAULT
+    // Order by group, so that all items in the CSS_AGGREGATE_DEFAULT
     // group appear before items in the CSS_AGGREGATE_THEME group. Modules may
     // create additional groups by defining their own constants.
     if ($a['group'] < $b['group']) {
       return -1;
     }
     elseif ($a['group'] > $b['group']) {
-      return 1;
-    }
-    // Finally, order by weight.
-    elseif ($a['weight'] < $b['weight']) {
-      return -1;
-    }
-    elseif ($a['weight'] > $b['weight']) {
       return 1;
     }
     else {
