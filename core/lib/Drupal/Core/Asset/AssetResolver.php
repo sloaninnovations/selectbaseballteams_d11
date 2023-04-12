@@ -172,6 +172,7 @@ class AssetResolver implements AssetResolverInterface {
     $default_options = [
       'type' => 'file',
       'group' => CSS_AGGREGATE_DEFAULT,
+      'weight' => 0,
       'media' => 'all',
       'preprocess' => TRUE,
     ];
@@ -297,6 +298,7 @@ class AssetResolver implements AssetResolverInterface {
       $default_options = [
         'type' => 'file',
         'group' => JS_DEFAULT,
+        'weight' => 0,
         'cache' => TRUE,
         'preprocess' => TRUE,
         'attributes' => [],
