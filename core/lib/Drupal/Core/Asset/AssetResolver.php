@@ -183,10 +183,10 @@ class AssetResolver implements AssetResolverInterface {
           // Libraries are being loaded based on dependencies, then their
           // attaching order. Individual asset files are ordered how they
           // are defined within the library itself.
-          // Readding an asset file will rewrite the resulting array leading
-          // to the incorrect asset files order, i.e. the last occurance of
+          // Re-adding an asset file will rewrite the resulting array leading
+          // to the incorrect asset files order, i.e. the last occurence of
           // the particular asset will win, but the desired behavior is
-          // opposite - the first occurance must win.
+          // opposite - the first occurence must win.
           // So, let's skip processing of already added asset files.
         if (array_key_exists($options['data'], $css)) {
           continue;
@@ -315,10 +315,10 @@ class AssetResolver implements AssetResolverInterface {
             // Libraries are being loaded based on dependencies, then their
             // attaching order. Individual asset files are ordered how they
             // are defined within the library itself.
-            // Readding an asset file will rewrite the resulting array leading
-            // to the incorrect asset files order, i.e. the last occurance of
+            // Re-adding an asset file will rewrite the resulting array leading
+            // to the incorrect asset files order, i.e. the last occurence of
             // the particular asset will win, but the desired behavior is
-            // opposite - the first occurance must win.
+            // opposite - the first occurence must win.
             // So, let's skip processing of already added asset files.
           if (array_key_exists($options['data'], $javascript)) {
             continue;
