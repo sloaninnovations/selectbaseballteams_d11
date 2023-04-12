@@ -184,9 +184,9 @@ class AssetResolver implements AssetResolverInterface {
           // attaching order. Individual asset files are ordered how they
           // are defined within the library itself.
           // Re-adding an asset file will rewrite the resulting array leading
-          // to the incorrect asset files order, i.e. the last occurence of
+          // to the incorrect asset files order, i.e. the last occurrence of
           // the particular asset will win, but the desired behavior is
-          // opposite - the first occurence must win.
+          // opposite - the first occurrence must win.
           // So, let's skip processing of already added asset files.
         if (array_key_exists($options['data'], $css)) {
           continue;
@@ -316,9 +316,9 @@ class AssetResolver implements AssetResolverInterface {
             // attaching order. Individual asset files are ordered how they
             // are defined within the library itself.
             // Re-adding an asset file will rewrite the resulting array leading
-            // to the incorrect asset files order, i.e. the last occurence of
+            // to the incorrect asset files order, i.e. the last occurrence of
             // the particular asset will win, but the desired behavior is
-            // opposite - the first occurence must win.
+            // opposite - the first occurrence must win.
             // So, let's skip processing of already added asset files.
           if (array_key_exists($options['data'], $javascript)) {
             continue;
