@@ -445,13 +445,20 @@ class AssetResolver implements AssetResolverInterface {
    *   The comparison result for uasort().
    */
   public static function sort(array $a, array $b) {
-    // Order by group, so that all items in the CSS_AGGREGATE_DEFAULT
+    // First order by group, so that all items in the CSS_AGGREGATE_DEFAULT
     // group appear before items in the CSS_AGGREGATE_THEME group. Modules may
     // create additional groups by defining their own constants.
     if ($a['group'] < $b['group']) {
       return -1;
     }
     elseif ($a['group'] > $b['group']) {
+      return 1;
+    }
+    // Finally, order by weight.
+    elseif ($a['weight'] < $b['weight']) {
+      return -1;
+    }
+    elseif ($a['weight'] > $b['weight']) {
       return 1;
     }
     else {
