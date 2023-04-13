@@ -19,3 +19,5 @@ translations:
     # overridden by locale_js_alter(), to use the file that contains the actual
     # translations, for the language used in the current request.
     locale.translation.js: {}
+  before:
+    - core/drupal
