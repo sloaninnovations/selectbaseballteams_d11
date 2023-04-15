@@ -281,9 +281,9 @@
             drupalSelector: null,
             scrollY: null,
           };
-          // Use jQuery on to listen as the mousedown event is propagated by
-          // jQuery trigger().
-          $(input).on('mousedown', () => {
+            // Use jQuery on to listen as the click event is propagated by jQuery
+            // trigger().
+            $(input).on('click', () => {
             returnFocus = {
               drupalSelector: document.activeElement.getAttribute(
                 'data-drupal-selector',
@@ -310,7 +310,7 @@
             }
           });
         });
-        $('input[data-drupal-selector="edit-refresh"]').trigger('mousedown');
+        $('input[data-drupal-selector="edit-refresh"]').trigger('click');
 
         // Disabled elements do not appear in POST ajax data, so we mark the
         // elements disabled only after firing the request.
