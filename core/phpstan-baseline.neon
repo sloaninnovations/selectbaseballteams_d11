@@ -481,11 +481,6 @@ parameters:
 			path: lib/Drupal/Core/Extension/ExtensionVersion.php
 
 		-
-			message: "#^Variable \\$graph might not be defined\\.$#"
-			count: 1
-			path: lib/Drupal/Core/Extension/ModuleHandler.php
-
-		-
 			message: "#^Variable \\$callback in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: lib/Drupal/Core/Field/FieldDefinition.php
@@ -784,16 +779,6 @@ parameters:
 			message: "#^Method Drupal\\\\action\\\\Form\\\\ActionFormBase\\:\\:save\\(\\) should return int but return statement is missing\\.$#"
 			count: 1
 			path: modules/action/src/Form/ActionFormBase.php
-
-		-
-			message: "#^\\#lazy_builder callback 'hello_or_yarhar' at key '0' is not callable\\.$#"
-			count: 1
-			path: modules/big_pipe/tests/modules/big_pipe_test/src/BigPipePlaceholderTestCases.php
-
-		-
-			message: "#^\\#pre_render callback 'current_time' at key '0' is not callable\\.$#"
-			count: 1
-			path: modules/big_pipe/tests/modules/big_pipe_test/src/BigPipePlaceholderTestCases.php
 
 		-
 			message: "#^Relying on entity queries to check access by default is deprecated in drupal\\:9\\.2\\.0 and an error will be thrown from drupal\\:10\\.0\\.0\\. Call \\\\Drupal\\\\Core\\\\Entity\\\\Query\\\\QueryInterface\\:\\:accessCheck\\(\\) with TRUE or FALSE to specify whether access should be checked\\.$#"
@@ -1851,11 +1836,6 @@ parameters:
 			path: modules/migrate/tests/src/Unit/MigrateSqlIdMapTest.php
 
 		-
-			message: "#^@dataProvider providerTestLog\\(\\) related method not found\\.$#"
-			count: 1
-			path: modules/migrate/tests/src/Unit/process/LogTest.php
-
-		-
 			message: "#^Variable \\$sub_process_plugins might not be defined\\.$#"
 			count: 2
 			path: modules/migrate/tests/src/Unit/process/SubProcessTest.php
@@ -2311,11 +2291,6 @@ parameters:
 			path: modules/serialization/tests/src/Unit/Normalizer/TypedDataNormalizerTest.php
 
 		-
-			message: "#^Class Drupal\\\\block\\\\Entity\\\\Block referenced with incorrect case\\: Drupal\\\\block\\\\entity\\\\Block\\.$#"
-			count: 2
-			path: modules/settings_tray/settings_tray.module
-
-		-
 			message: "#^Method Drupal\\\\shortcut\\\\Form\\\\SetCustomize\\:\\:save\\(\\) should return int but return statement is missing\\.$#"
 			count: 1
 			path: modules/shortcut/src/Form/SetCustomize.php
@@ -2439,11 +2414,6 @@ parameters:
 			message: "#^Constructor of class Drupal\\\\lazy_route_provider_install_test\\\\PluginManager has an unused parameter \\$url_generator\\.$#"
 			count: 1
 			path: modules/system/tests/modules/lazy_route_provider_install_test/src/PluginManager.php
-
-		-
-			message: "#^Configuration entity must define a `config_export` key\\. See https\\://www\\.drupal\\.org/node/2481909$#"
-			count: 1
-			path: modules/system/tests/modules/module_installer_config_test/src/Entity/TestConfigType.php
 
 		-
 			message: "#^Access to an undefined property Drupal\\\\Tests\\\\system\\\\Functional\\\\FileTransfer\\\\TestFileTransfer\\:\\:\\$connection\\.$#"
@@ -2709,11 +2679,6 @@ parameters:
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:11\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 1
 			path: modules/user/tests/src/Functional/Views/UserChangedTest.php
-
-		-
-			message: "#^@dataProvider providerTestUserRole\\(\\) related method not found\\.$#"
-			count: 1
-			path: modules/user/tests/src/Kernel/Migrate/d6/MigrateUserRoleTest.php
 
 		-
 			message: "#^Variable \\$result in isset\\(\\) always exists and is not nullable\\.$#"
@@ -3014,11 +2979,6 @@ parameters:
 			message: "#^Relying on entity queries to check access by default is deprecated in drupal\\:9\\.2\\.0 and an error will be thrown from drupal\\:10\\.0\\.0\\. Call \\\\Drupal\\\\Core\\\\Entity\\\\Query\\\\QueryInterface\\:\\:accessCheck\\(\\) with TRUE or FALSE to specify whether access should be checked\\.$#"
 			count: 3
 			path: modules/views/src/Views.php
-
-		-
-			message: "#^Configuration entity must define a `config_export` key\\. See https\\://www\\.drupal\\.org/node/2481909$#"
-			count: 1
-			path: modules/views/tests/modules/views_config_entity_test/src/Entity/ViewsConfigEntityTest.php
 
 		-
 			message: "#^Variable \\$view in isset\\(\\) always exists and is not nullable\\.$#"
@@ -3401,11 +3361,6 @@ parameters:
 			path: tests/Drupal/KernelTests/Core/KeyValueStore/GarbageCollectionTest.php
 
 		-
-			message: "#^\\#pre_render callback 'element_info_test…' at key '1' is not trusted\\.$#"
-			count: 1
-			path: tests/Drupal/KernelTests/Core/Render/Element/WeightTest.php
-
-		-
 			message: "#^@covers value drupal_rewrite_settings\\(\\) references an invalid class or function\\.$#"
 			count: 1
 			path: tests/Drupal/KernelTests/Core/Site/LegacySettingsRewriteTest.php
@@ -3531,11 +3486,6 @@ parameters:
 			path: tests/Drupal/Tests/Component/Plugin/Factory/ReflectionFactoryTest.php
 
 		-
-			message: "#^@dataProvider providerTestValidateHex\\(\\) related method not found\\.$#"
-			count: 1
-			path: tests/Drupal/Tests/Component/Utility/ColorTest.php
-
-		-
 			message: "#^@coversDefaultClass defined on class method testHtmlClass\\.$#"
 			count: 1
 			path: tests/Drupal/Tests/Component/Utility/HtmlTest.php
@@ -3584,11 +3534,6 @@ parameters:
 			message: "#^Missing call to parent\\:\\:setUp\\(\\) method\\.$#"
 			count: 1
 			path: tests/Drupal/Tests/Core/Asset/LibraryDiscoveryCollectorTest.php
-
-		-
-			message: "#^@dataProvider providerTestGetMachineNameSuggestion\\(\\) related method not found\\.$#"
-			count: 1
-			path: tests/Drupal/Tests/Core/Block/BlockBaseTest.php
 
 		-
 			message: "#^Missing call to parent\\:\\:setUp\\(\\) method\\.$#"
@@ -3656,16 +3601,6 @@ parameters:
 			path: tests/Drupal/Tests/Core/Controller/TitleResolverTest.php
 
 		-
-			message: "#^@dataProvider dataProviderTestCompileWithKnownOperators\\(\\) related method not found\\.$#"
-			count: 1
-			path: tests/Drupal/Tests/Core/Database/ConditionTest.php
-
-		-
-			message: "#^@dataProvider providerSimpleCondition\\(\\) related method not found\\.$#"
-			count: 1
-			path: tests/Drupal/Tests/Core/Database/ConditionTest.php
-
-		-
 			message: "#^Missing call to parent\\:\\:setUp\\(\\) method\\.$#"
 			count: 1
 			path: tests/Drupal/Tests/Core/Database/DatabaseEventsTest.php
@@ -3689,11 +3624,6 @@ parameters:
 			message: "#^Missing call to parent\\:\\:setUp\\(\\) method\\.$#"
 			count: 1
 			path: tests/Drupal/Tests/Core/Database/OrderByTest.php
-
-		-
-			message: "#^@dataProvider providerTestExceptionMessage\\(\\) related method not found\\.$#"
-			count: 1
-			path: tests/Drupal/Tests/Core/Database/RowCountExceptionTest.php
 
 		-
 			message: "#^Missing call to parent\\:\\:setUp\\(\\) method\\.$#"
@@ -3739,11 +3669,6 @@ parameters:
 			message: "#^Missing call to parent\\:\\:setUp\\(\\) method\\.$#"
 			count: 1
 			path: tests/Drupal/Tests/Core/Entity/Sql/SqlContentEntityStorageSchemaTest.php
-
-		-
-			message: "#^@dataProvider providerTestGetTableMappingSimple\\(\\) related method not found\\.$#"
-			count: 8
-			path: tests/Drupal/Tests/Core/Entity/Sql/SqlContentEntityStorageTest.php
 
 		-
 			message: "#^Missing call to parent\\:\\:setUp\\(\\) method\\.$#"
@@ -3879,16 +3804,6 @@ parameters:
 			message: "#^Constructor of class Drupal\\\\Tests\\\\Core\\\\Plugin\\\\TestPluginManager has an unused parameter \\$namespaces\\.$#"
 			count: 1
 			path: tests/Drupal/Tests/Core/Plugin/TestPluginManager.php
-
-		-
-			message: "#^\\#lazy_builder callback '\\\\\\\\Drupal\\\\\\\\Tests\\\\\\\\Core…' at key '0' is not trusted\\.$#"
-			count: 1
-			path: tests/Drupal/Tests/Core/Render/RendererCallbackTest.php
-
-		-
-			message: "#^\\#pre_render callback '\\\\\\\\Drupal\\\\\\\\Tests\\\\\\\\Core…' at key '0' is not trusted\\.$#"
-			count: 1
-			path: tests/Drupal/Tests/Core/Render/RendererCallbackTest.php
 
 		-
 			message: "#^Missing call to parent\\:\\:setUp\\(\\) method\\.$#"
