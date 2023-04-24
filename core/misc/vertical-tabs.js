@@ -203,7 +203,7 @@
       // Mark the active tab for screen readers.
       $('#active-vertical-tab').remove();
       this.link.append(
-        `<span id="active-vertical-tab" class="visually-hidden">${Drupal.t(
+        ` <span id="active-vertical-tab" class="visually-hidden">${Drupal.t(
           '(active tab)',
         )}</span>`,
       );

@@ -1892,7 +1892,7 @@ function template_preprocess_menu_local_task(&$variables) {
 
     // Add text to indicate active tab for non-visual users.
     $active = new FormattableMarkup('<span class="visually-hidden">@label</span>', ['@label' => t('(active tab)')]);
-    $link_text = t('@local-task-title@active', ['@local-task-title' => $link_text, '@active' => $active]);
+    $link_text = t('@local-task-title @active', ['@local-task-title' => $link_text, '@active' => $active]);
   }
 
   $link['localized_options']['set_active_class'] = TRUE;
