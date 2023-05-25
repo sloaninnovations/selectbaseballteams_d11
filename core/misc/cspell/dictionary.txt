@@ -1041,6 +1041,7 @@ sqlusername
 squaresmall
 squiz
 squizlabs
+srclang
 srcset
 ssess
 stardivision

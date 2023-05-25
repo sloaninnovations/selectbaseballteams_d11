@@ -14,6 +14,18 @@ class FileVideoFormatterTest extends FileMediaFormatterTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $modules = [
+    'entity_test',
+    'field',
+    'file',
+    'user',
+    'system',
+    'image',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
   protected $defaultTheme = 'stark';
 
   /**
