@@ -268,8 +268,10 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       $this->addAdditionalFields($fields);
     }
 
-    // Let the entity field renderer alter the query if needed.
-    $this->getEntityFieldRenderer()->query($this->query, $this->relationship);
+    if (!empty($fields)) {
+      // Let the entity field renderer alter the query if needed.
+      $this->getEntityFieldRenderer()->query($this->query, $this->relationship);
+    }
   }
 
   /**
