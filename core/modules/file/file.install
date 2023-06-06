@@ -140,13 +140,15 @@ function file_update_8001() {
     if ($form_displays = \Drupal::entityTypeManager()->getStorage('entity_form_display')->loadByProperties($properties)) {
       foreach ($form_displays as $form_display) {
         if ($component = $form_display->getComponent($fieldInstance->getName())) {
-          $form_display->setComponent($fieldInstance->getName(), [
+          $form_display->setComponent($fieldInstance->getName(), array_merge_recursive(
+            $component,
+            [
             'settings' => [
               'poster' => '',
               'poster_image_style' => '',
               'transcript' => '',
             ],
-          ] + $component)->save();
+          ]))->save();
         }
       }
     }
