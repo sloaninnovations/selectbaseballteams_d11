@@ -43,3 +43,33 @@ function file_post_update_add_default_filename_sanitization_configuration() {
   $config->set('filename_sanitization.replacement_character', '-');
   $config->save();
 }
+
+function file_post_update_add_poster_image_and_transcript() {
+  // Load all "file" field storage instances:
+  $fieldInstances = \Drupal::entityTypeManager()
+    ->getStorage('field_config')
+    ->loadByProperties(['field_type' => 'file']);
+
+  foreach ($fieldInstances as $fieldInstance) {
+    $properties = [
+      'targetEntityType' => $fieldInstance->getEntityTypeId(),
+      'bundle' => $fieldInstance->bundle(),
+    ];
+    // @todo Only get form displays, using the "file_video" formatter here:
+    if ($form_displays = \Drupal::entityTypeManager()->getStorage('entity_form_display')->loadByProperties($properties)) {
+      foreach ($form_displays as $form_display) {
+        if ($component = $form_display->getComponent($fieldInstance->getName())) {
+          $form_display->setComponent($fieldInstance->getName(), array_merge_recursive(
+            $component,
+            [
+              'settings' => [
+                'poster' => '',
+                'poster_image_style' => '',
+                'transcript' => '',
+              ],
+            ]))->save();
+        }
+      }
+    }
+  }
+}

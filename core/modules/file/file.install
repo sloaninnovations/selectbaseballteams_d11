@@ -121,36 +121,3 @@ function file_requirements($phase) {
 function file_update_last_removed() {
   return 8700;
 }
-
-/**
- * Add additional settings for the "file_video" formatter.
- */
-function file_update_8001() {
-  // Load all "file" field storage instances:
-  $fieldInstances = \Drupal::entityTypeManager()
-    ->getStorage('field_config')
-    ->loadByProperties(['field_type' => 'file']);
-
-  foreach ($fieldInstances as $fieldInstance) {
-    $properties = [
-      'targetEntityType' => $fieldInstance->getEntityTypeId(),
-      'bundle' => $fieldInstance->bundle(),
-    ];
-    // @todo Only get form displays, using the "file_video" formatter here:
-    if ($form_displays = \Drupal::entityTypeManager()->getStorage('entity_form_display')->loadByProperties($properties)) {
-      foreach ($form_displays as $form_display) {
-        if ($component = $form_display->getComponent($fieldInstance->getName())) {
-          $form_display->setComponent($fieldInstance->getName(), array_merge_recursive(
-            $component,
-            [
-            'settings' => [
-              'poster' => '',
-              'poster_image_style' => '',
-              'transcript' => '',
-            ],
-          ]))->save();
-        }
-      }
-    }
-  }
-}
