@@ -166,11 +166,11 @@ class UrlTest extends KernelTestBase {
   /**
    * Checks for class existence in link.
    *
-   * @param string $attribute
+   * @param $attribute
    *   Attribute to be checked.
-   * @param \Drupal\Core\Render\RenderableInterface|string $link
+   * @param $link
    *   URL to search.
-   * @param string $class
+   * @param $class
    *   Element class to search for.
    *
    * @return bool
@@ -213,12 +213,7 @@ class UrlTest extends KernelTestBase {
     // Multiple exclusions.
     $result = $original;
     unset($result['a'], $result['b']['e'], $result['c']);
-    $this->assertEquals(
-      UrlHelper::filterQueryParameters(
-        $original,
-        ['a', 'b[e]', 'c']
-      ), $result, "'a', 'b[e]', 'c' were removed."
-    );
+    $this->assertEquals(UrlHelper::filterQueryParameters($original, ['a', 'b[e]', 'c']), $result, "'a', 'b[e]', 'c' were removed.");
   }
 
   /**

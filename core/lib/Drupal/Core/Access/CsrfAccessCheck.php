@@ -4,6 +4,7 @@ namespace Drupal\Core\Access;
 
 use Drupal\Core\Routing\Access\AccessInterface as RoutingAccessInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\SessionConfigurationInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -32,13 +33,23 @@ class CsrfAccessCheck implements RoutingAccessInterface {
   protected $csrfToken;
 
   /**
+    * The session configuration.
+    *
+    * @var \Drupal\Core\Session\SessionConfigurationInterface
+    */
+  protected $sessionConfiguration;
+
+  /**
    * Constructs a CsrfAccessCheck object.
    *
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
    *   The CSRF token generator.
+   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
+   *   The session configuration.
    */
-  public function __construct(CsrfTokenGenerator $csrf_token) {
+  public function __construct(CsrfTokenGenerator $csrf_token, SessionConfigurationInterface $session_configuration) {
     $this->csrfToken = $csrf_token;
+    $this->sessionConfiguration = $session_configuration;
   }
 
   /**
@@ -62,7 +73,9 @@ class CsrfAccessCheck implements RoutingAccessInterface {
       $path = str_replace("{{$param}}", $value, $path);
     }
 
-    if ($this->csrfToken->validate($request->query->get('token', ''), $path)) {
+    // Per https://www.drupal.org/node/2319205 anonymous users do not need
+    // CSRF checking.
+    if (!$this->sessionConfiguration->hasSession($request) || $this->csrfToken->validate($request->query->get('token', ''), $path)) {
       $result = AccessResult::allowed();
     }
     else {
