@@ -64,6 +64,9 @@ class RouteProcessorCsrfTest extends UnitTestCase {
    * Tests the processOutbound() method with a _csrf_token route requirement.
    */
   public function testProcessOutbound() {
+    $this->sessionConfiguration->expects($this->once())
+      ->method('hasSession')
+      ->willReturn(TRUE);
     $route = new Route('/test-path', [], ['_csrf_token' => 'TRUE']);
     $parameters = [];
 
@@ -76,7 +79,10 @@ class RouteProcessorCsrfTest extends UnitTestCase {
     $path = 'test-path';
     $placeholder = Crypt::hashBase64($path);
     $placeholder_render_array = [
-      '#lazy_builder' => ['route_processor_csrf:renderPlaceholderCsrfToken', [$path]],
+      '#lazy_builder' => [
+        'route_processor_csrf:renderPlaceholderCsrfToken',
+        (array) $path,
+      ],
     ];
     $this->assertSame($parameters['token'], $placeholder);
     $this->assertEquals((new BubbleableMetadata())->setAttachments(['placeholders' => [$placeholder => $placeholder_render_array]]), $bubbleable_metadata);
@@ -96,7 +102,10 @@ class RouteProcessorCsrfTest extends UnitTestCase {
     $path = 'test-path/100';
     $placeholder = Crypt::hashBase64($path);
     $placeholder_render_array = [
-      '#lazy_builder' => ['route_processor_csrf:renderPlaceholderCsrfToken', [$path]],
+      '#lazy_builder' => [
+        'route_processor_csrf:renderPlaceholderCsrfToken',
+        (array) $path,
+      ],
     ];
     $this->assertEquals((new BubbleableMetadata())->setAttachments(['placeholders' => [$placeholder => $placeholder_render_array]]), $bubbleable_metadata);
   }
@@ -105,6 +114,9 @@ class RouteProcessorCsrfTest extends UnitTestCase {
    * Tests the processOutbound() method with two parameter replacements.
    */
   public function testProcessOutboundDynamicTwo() {
+    $this->sessionConfiguration->expects($this->once())
+      ->method('hasSession')
+      ->willReturn(TRUE);
     $route = new Route('{slug_1}/test-path/{slug_2}', [], ['_csrf_token' => 'TRUE']);
     $parameters = ['slug_1' => 100, 'slug_2' => 'test'];
 
@@ -115,7 +127,10 @@ class RouteProcessorCsrfTest extends UnitTestCase {
     $path = '100/test-path/test';
     $placeholder = Crypt::hashBase64($path);
     $placeholder_render_array = [
-      '#lazy_builder' => ['route_processor_csrf:renderPlaceholderCsrfToken', [$path]],
+      '#lazy_builder' => [
+        'route_processor_csrf:renderPlaceholderCsrfToken',
+        (array) $path,
+      ],
     ];
     $this->assertEquals((new BubbleableMetadata())->setAttachments(['placeholders' => [$placeholder => $placeholder_render_array]]), $bubbleable_metadata);
   }

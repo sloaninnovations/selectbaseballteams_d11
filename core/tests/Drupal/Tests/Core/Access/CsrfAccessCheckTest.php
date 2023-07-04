@@ -6,6 +6,9 @@ use Drupal\Core\Access\AccessResult;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 use Drupal\Core\Access\CsrfAccessCheck;
+use Drupal\Core\Access\CsrfTokenGenerator;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\SessionConfigurationInterface;
 use Drupal\Tests\UnitTestCase;
 
 /**

@@ -47,6 +47,8 @@ class UrlTest extends KernelTestBase {
    */
   public function testLinkBubbleableMetadata() {
     \Drupal::service('module_installer')->install(['user']);
+    // Fake a started session.
+    \Drupal::request()->cookies->add(['SESS' . substr(hash('sha256', $this->getDatabasePrefix()), 0, 32) => '']);
 
     $cases = [
       ['Regular link', 'internal:/user', [], ['contexts' => [], 'tags' => [], 'max-age' => Cache::PERMANENT], []],
@@ -164,11 +166,11 @@ class UrlTest extends KernelTestBase {
   /**
    * Checks for class existence in link.
    *
-   * @param $attribute
+   * @param string $attribute
    *   Attribute to be checked.
-   * @param $link
+   * @param \Drupal\Core\Render\RenderableInterface|string $link
    *   URL to search.
-   * @param $class
+   * @param string $class
    *   Element class to search for.
    *
    * @return bool
@@ -211,7 +213,12 @@ class UrlTest extends KernelTestBase {
     // Multiple exclusions.
     $result = $original;
     unset($result['a'], $result['b']['e'], $result['c']);
-    $this->assertEquals(UrlHelper::filterQueryParameters($original, ['a', 'b[e]', 'c']), $result, "'a', 'b[e]', 'c' were removed.");
+    $this->assertEquals(
+      UrlHelper::filterQueryParameters(
+        $original,
+        ['a', 'b[e]', 'c']
+      ), $result, "'a', 'b[e]', 'c' were removed."
+    );
   }
 
   /**

@@ -62,6 +62,8 @@ class MenuLinkContentCacheabilityBubblingTest extends KernelTestBase {
     $request = Request::create('/');
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, '<front>');
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('/'));
+    // Fake a started session.
+    $request->cookies->add(['SESS' . substr(hash('sha256', $this->getDatabasePrefix()), 0, 32) => '']);
     $request_stack->push($request);
     $request_context->fromRequest($request);
 
@@ -71,7 +73,11 @@ class MenuLinkContentCacheabilityBubblingTest extends KernelTestBase {
     $default_menu_cacheability = (new BubbleableMetadata())
       ->setCacheMaxAge(Cache::PERMANENT)
       ->setCacheTags(['config:system.menu.tools'])
-      ->setCacheContexts(['languages:' . LanguageInterface::TYPE_INTERFACE, 'theme', 'user.permissions']);
+      ->setCacheContexts([
+        'languages:' . LanguageInterface::TYPE_INTERFACE,
+        'theme',
+        'user.permissions',
+      ]);
 
     User::create(['uid' => 1, 'name' => $this->randomString()])->save();
     User::create(['uid' => 2, 'name' => $this->randomString()])->save();
@@ -86,7 +92,8 @@ class MenuLinkContentCacheabilityBubblingTest extends KernelTestBase {
     // cacheability metadata of the same type is working (two links with cache
     // tags).
     $test_cases = [
-      // \Drupal\Core\RouteProcessor\RouteProcessorCurrent: 'route' cache context.
+      // \Drupal\Core\RouteProcessor\RouteProcessorCurrent: 'route' cache
+      // context.
       [
         'uri' => 'route:<current>',
         'cacheability' => (new BubbleableMetadata())->setCacheContexts(['route']),
