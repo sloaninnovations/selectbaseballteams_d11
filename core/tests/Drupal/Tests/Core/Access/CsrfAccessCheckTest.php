@@ -43,7 +43,7 @@ class CsrfAccessCheckTest extends UnitTestCase {
    *
    * @var \Drupal\Core\Session\SessionConfigurationInterface|\PHPUnit_Framework_MockObject_MockObject
    */
-   protected $sessionConfiguration;
+  protected $sessionConfiguration;
 
   /**
    * {@inheritdoc}

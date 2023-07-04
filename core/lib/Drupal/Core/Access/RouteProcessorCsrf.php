@@ -26,7 +26,7 @@ class RouteProcessorCsrf implements OutboundRouteProcessorInterface, TrustedCall
    * The session configuration.
    *
    * @var \Drupal\Core\Session\SessionConfigurationInterface
-  */
+   */
   protected $sessionConfiguration;
 
   /**

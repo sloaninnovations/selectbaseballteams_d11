@@ -33,10 +33,10 @@ class CsrfAccessCheck implements RoutingAccessInterface {
   protected $csrfToken;
 
   /**
-    * The session configuration.
-    *
-    * @var \Drupal\Core\Session\SessionConfigurationInterface
-    */
+   * The session configuration.
+   *
+   * @var \Drupal\Core\Session\SessionConfigurationInterface
+   */
   protected $sessionConfiguration;
 
   /**
