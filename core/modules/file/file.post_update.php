@@ -44,7 +44,7 @@ function file_post_update_add_default_filename_sanitization_configuration() {
   $config->save();
 }
 
-function file_post_update_add_poster_image_and_transcript() {
+function file_post_update_add_poster_image() {
   // Load all "file" field storage instances:
   $fieldInstances = \Drupal::entityTypeManager()
     ->getStorage('field_config')
@@ -65,7 +65,6 @@ function file_post_update_add_poster_image_and_transcript() {
               'settings' => [
                 'poster' => '',
                 'poster_image_style' => '',
-                'transcript' => '',
               ],
             ]))->save();
         }

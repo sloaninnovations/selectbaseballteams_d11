@@ -132,9 +132,6 @@ field.formatter.settings.file_video:
     poster_image_style:
       type: string
       label: 'Poster image style'
-    transcript:
-      type: string
-      label: 'Transcript'
 
 field.formatter.settings.file_default:
   type: mapping

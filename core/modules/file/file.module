@@ -381,7 +381,7 @@ function file_theme() {
       'variables' => ['files' => [], 'attributes' => NULL],
     ],
     'file_video' => [
-      'variables' => ['files' => [], 'attributes' => NULL, 'transcript' => []],
+      'variables' => ['files' => [], 'attributes' => NULL],
     ],
     'file_widget_multiple' => [
       'render element' => 'element',

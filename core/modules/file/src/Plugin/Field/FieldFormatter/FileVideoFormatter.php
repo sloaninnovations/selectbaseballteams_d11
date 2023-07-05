@@ -118,7 +118,6 @@ class FileVideoFormatter extends FileMediaFormatterBase {
       'height' => 480,
       'poster' => '',
       'poster_image_style' => '',
-      'transcript' => '',
     ] + parent::defaultSettings();
   }
 
@@ -140,14 +139,6 @@ class FileVideoFormatter extends FileMediaFormatterBase {
       $this->t('Configure Image Styles'),
       Url::fromRoute('entity.image_style.collection')
     );
-
-    // Get all file fields for html5 transcript.
-    $file_fields = [];
-    foreach ($fields as $field) {
-      if ($field->getType() == 'file') {
-        $file_fields[$field->getName()] = $field->getLabel();
-      }
-    }
 
     return parent::settingsForm($form, $form_state) + [
       'muted' => [
@@ -198,14 +189,6 @@ class FileVideoFormatter extends FileMediaFormatterBase {
           ],
         ],
       ],
-      'transcript' => [
-        '#type' => 'select',
-        '#title' => $this->t('Transcript field'),
-        '#description' => empty($file_fields) ? $this->t('A file field to use as the source of the transcript attribute. Typically the file field contains a WebVTT (.vtt) file.') : NULL,
-        '#default_value' => $this->getSetting('transcript'),
-        '#options' => $file_fields,
-        '#empty_option' => $this->t('- None -'),
-      ],
     ];
   }
 
@@ -222,9 +205,6 @@ class FileVideoFormatter extends FileMediaFormatterBase {
     if (!empty($this->getSetting('poster'))) {
       $summary[] = $this->t('Poster field: %poster', ['%poster' => $this->getSetting('poster')]);
       $summary[] = $this->t('Poster image style: %poster_image_style', ['%poster_image_style' => $this->getSetting('poster_image_style') ?: $this->t('None (original image)')]);
-    }
-    if (!empty($this->getSetting('transcript'))) {
-      $summary[] = $this->t('Transcript field: %transcript', ['%transcript' => $this->getSetting('transcript')]);
     }
     return $summary;
   }
@@ -265,27 +245,6 @@ class FileVideoFormatter extends FileMediaFormatterBase {
       $poster_attributes->setAttribute('poster', $poster_url);
       $elements[0]['#attributes']->merge($poster_attributes);
       $elements[0]['#cache']['tags'] = $cache_tags;
-    }
-
-    if (!empty($this->getSetting('transcript')) && !$entity->get($this->getSetting('transcript'))->isEmpty()) {
-      $poster_file_item = $entity->get($this->getSetting('transcript'))[0];
-      $poster_file_entity = $poster_file_item->entity;
-
-      // Set the entity in the correct language for display.
-      if ($poster_file_entity instanceof TranslatableInterface && $poster_file_entity->hasTranslation($langcode)) {
-        $poster_file_entity = $poster_file_entity->getTranslation($langcode);
-      }
-
-      $transcript = $poster_file_entity->createFileUrl();
-      $languages = \Drupal::languageManager()->getNativeLanguages();
-
-      // Handle language object with and without language module enabled.
-      $label = ($languages[$langcode] instanceof Language) ? ($languages[$langcode]->getName()) : ($languages[$langcode]->label());
-      $elements[0]['#transcript'] = [
-        'file' => $transcript,
-        'srclang' => $langcode,
-        'label' => $label,
-      ];
     }
 
     return $elements;

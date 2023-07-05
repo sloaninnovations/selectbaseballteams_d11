@@ -11,7 +11,6 @@
 *   - file: The full file object.
 *   - source_attributes: An array of HTML attributes for to be added to the
 *     source tag.
-*   - transcript file: a vtt file to be added as a track
 *
 * @ingroup themeable
 */
@@ -20,7 +19,4 @@
   {% for file in files %}
     <source {{ file.source_attributes }} />
   {% endfor %}
-  {% if not transcript is empty %}
-     <track kind="subtitles" src="{{ transcript.file }}" srclang="{{ transcript.srclang }}" label="{{ transcript.label }}"></track>
-  {% endif %}
 </video>
