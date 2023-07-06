@@ -74,6 +74,7 @@ class NodeViewBuilderTest extends EntityKernelTestBase {
       'name' => $this->randomString(),
     ]);
     $account->save();
+    $this->container->get('current_user')->setAccount($account);
 
     $title = $this->randomMachineName();
     $node = Node::create([

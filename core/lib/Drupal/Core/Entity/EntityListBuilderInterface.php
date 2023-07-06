@@ -40,7 +40,6 @@ interface EntityListBuilderInterface {
    *   - title: The localized title of the operation.
    *   - url: An instance of \Drupal\Core\Url for the operation URL.
    *   - weight: The weight of this operation.
-   *   - access: Access result object with cache information.
    */
   public function getOperations(EntityInterface $entity);
 

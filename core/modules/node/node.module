@@ -869,15 +869,23 @@ function node_node_access(NodeInterface $node, $operation, AccountInterface $acc
   switch ($operation) {
     case 'update':
       $access = AccessResult::allowedIfHasPermission($account, 'edit any ' . $type . ' content');
-      if (!$access->isAllowed() && $account->hasPermission('edit own ' . $type . ' content')) {
-        $access = $access->orIf(AccessResult::allowedIf($account->id() == $node->getOwnerId())->cachePerUser()->addCacheableDependency($node));
+      $has_edit_own = $account->hasPermission('edit own ' . $type . ' content');
+      if ($has_edit_own) {
+        $access->cachePerUser()->addCacheableDependency($node);
+      }
+      if (!$access->isAllowed() && $has_edit_own) {
+        $access = $access->orIf(AccessResult::allowedIf($account->id() == $node->getOwnerId()));
       }
       break;
 
     case 'delete':
       $access = AccessResult::allowedIfHasPermission($account, 'delete any ' . $type . ' content');
-      if (!$access->isAllowed() && $account->hasPermission('delete own ' . $type . ' content')) {
-        $access = $access->orIf(AccessResult::allowedIf($account->id() == $node->getOwnerId()))->cachePerUser()->addCacheableDependency($node);
+      $has_delete_own = $account->hasPermission('delete own ' . $type . ' content');
+      if ($has_delete_own) {
+        $access->cachePerUser()->addCacheableDependency($node);
+      }
+      if (!$access->isAllowed() && $has_delete_own) {
+        $access = $access->orIf(AccessResult::allowedIf($account->id() == $node->getOwnerId()));
       }
       break;
 

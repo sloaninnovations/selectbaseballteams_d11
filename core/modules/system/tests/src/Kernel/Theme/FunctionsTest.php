@@ -6,6 +6,7 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Render\Element\Link;
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
@@ -223,6 +224,10 @@ class FunctionsTest extends KernelTestBase {
           'key' => 'value',
         ],
       ],
+      'cache-test' => [
+        'title' => 'Cache test route',
+        'url' => Url::fromRoute('router_test.28'),
+      ],
     ];
 
     $expected_links = '';
@@ -234,13 +239,16 @@ class FunctionsTest extends KernelTestBase {
     $expected_links .= '<li><a href="' . \Drupal::urlGenerator()->generate('router_test.1') . '">' . Html::escape('Test route') . '</a></li>';
     $query = ['key' => 'value'];
     $expected_links .= '<li><a href="' . \Drupal::urlGenerator()->generate('router_test.1', $query) . '">' . Html::escape('Query test route') . '</a></li>';
+    $expected_links .= '<li><a href="' . Url::fromRoute('router_test.28')->toString() . '">' . Html::escape('Cache test route') . '</a></li>';
     $expected_links .= '</ul>';
 
     // Verify that passing a string as heading works.
     $variables['heading'] = 'Links heading';
     $expected_heading = '<h2>Links heading</h2>';
     $expected = $expected_heading . $expected_links;
-    $this->assertThemeOutput('links', $variables, $expected);
+    $render_context = new RenderContext();
+    $this->assertThemeOutput('links', $variables, $expected, NULL, $render_context);
+    $this::assertEquals(['router-test-28'], $render_context->pop()->getCacheTags());
 
     // Restore the original request's query.
     \Drupal::request()->query->replace($original_query);
@@ -274,6 +282,7 @@ class FunctionsTest extends KernelTestBase {
     $expected_links .= '<li><a href="' . \Drupal::urlGenerator()->generate('router_test.1') . '">' . Html::escape('Test route') . '</a></li>';
     $query = ['key' => 'value'];
     $expected_links .= '<li><a href="' . \Drupal::urlGenerator()->generate('router_test.1', $query) . '">' . Html::escape('Query test route') . '</a></li>';
+    $expected_links .= '<li><a href="' . Url::fromRoute('router_test.28')->toString() . '">' . Html::escape('Cache test route') . '</a></li>';
     $expected_links .= '</ul>';
     $expected = $expected_heading . $expected_links;
     $this->assertThemeOutput('links', $variables, $expected);
@@ -291,6 +300,7 @@ class FunctionsTest extends KernelTestBase {
     $query = ['key' => 'value'];
     $encoded_query = Html::escape(Json::encode($query));
     $expected_links .= '<li data-drupal-link-query="' . $encoded_query . '" data-drupal-link-system-path="router_test/test1"><a href="' . \Drupal::urlGenerator()->generate('router_test.1', $query) . '" data-drupal-link-query="' . $encoded_query . '" data-drupal-link-system-path="router_test/test1">' . Html::escape('Query test route') . '</a></li>';
+    $expected_links .= '<li data-drupal-link-system-path="router_test/test28"><a href="' . Url::fromRoute('router_test.28')->toString() . '" data-drupal-link-system-path="router_test/test28">' . Html::escape('Cache test route') . '</a></li>';
     $expected_links .= '</ul>';
     $expected = $expected_heading . $expected_links;
     $this->assertThemeOutput('links', $variables, $expected);
@@ -447,7 +457,7 @@ class FunctionsTest extends KernelTestBase {
           // This should always be rendered.
           'first_child_link' => [
             'title' => 'First child link',
-            'url' => Url::fromRoute('router_test.7'),
+            'url' => Url::fromRoute('router_test.10'),
           ],
         ],
       ],
@@ -473,6 +483,12 @@ class FunctionsTest extends KernelTestBase {
         ],
         '#access' => FALSE,
       ],
+      // This should never be rendered, since the user does not have access to
+      // the route.
+      'fourth_child_link' => [
+        'title' => 'Fourth child link',
+        'url' => Url::fromRoute('router_test.7'),
+      ],
     ];
 
     // Start with a fresh copy of the base array, and try rendering the entire
@@ -490,6 +506,7 @@ class FunctionsTest extends KernelTestBase {
     $this->assertEquals('Second child link', $list_elements->item(2)->nodeValue, 'Third expected link found.');
     $this->assertStringNotContainsString('Parent link copy', $html, '"Parent link copy" link not found.');
     $this->assertStringNotContainsString('Third child link', $html, '"Third child link" link not found.');
+    $this->assertStringNotContainsString('Fourth child link', $html, '"Fourth child link" link not found.');
 
     // Now render 'first_child', followed by the rest of the links, and make
     // sure we get two separate <ul>'s with the appropriate links contained

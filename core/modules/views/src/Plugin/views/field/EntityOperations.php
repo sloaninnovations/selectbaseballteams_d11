@@ -2,8 +2,6 @@
 
 namespace Drupal\views\Plugin\views\field;
 
-use Drupal\Core\Access\AccessResultInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -138,16 +136,8 @@ class EntityOperations extends FieldPluginBase {
 
     $entity = $this->getEntityTranslationByRelationship($entity, $values);
     $operations = $this->entityTypeManager->getListBuilder($entity->getEntityTypeId())->getOperations($entity);
-    $cacheability = new CacheableMetadata();
-    foreach ($operations as $k => &$operation) {
-      if (isset($operation['access']) && $operation['access'] instanceof AccessResultInterface) {
-        $cacheability->addCacheableDependency($operation['access']);
-        if (!$operation['access']->isAllowed()) {
-          unset($operations[$k]);
-          continue;
-        }
-      }
-      if ($this->options['destination']) {
+    if ($this->options['destination']) {
+      foreach ($operations as &$operation) {
         if (!isset($operation['query'])) {
           $operation['query'] = [];
         }
@@ -158,7 +148,6 @@ class EntityOperations extends FieldPluginBase {
       '#type' => 'operations',
       '#links' => $operations,
     ];
-    $cacheability->applyTo($build);
 
     return $build;
   }

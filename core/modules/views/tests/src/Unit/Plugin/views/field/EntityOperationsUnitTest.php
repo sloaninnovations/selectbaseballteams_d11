@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\views\Unit\Plugin\views\field;
 
-use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\UnitTestCase;
@@ -110,11 +108,9 @@ class EntityOperationsUnitTest extends UnitTestCase {
       ->method('getEntityTypeId')
       ->willReturn($entity_type_id);
 
-    $cache = (new CacheableMetadata())->addCacheTags([$this->randomMachineName()]);
     $operations = [
       'foo' => [
         'title' => $this->randomMachineName(),
-        'access' => AccessResult::allowed()->addCacheableDependency($cache),
       ],
     ];
     $list_builder = $this->createMock('\Drupal\Core\Entity\EntityListBuilderInterface');
@@ -138,7 +134,6 @@ class EntityOperationsUnitTest extends UnitTestCase {
       '#links' => $operations,
     ];
     $expected_build['#links']['foo']['query'] = ['destination' => 'foobar'];
-    $cache->applyTo($expected_build);
     $build = $this->plugin->render($result);
     $this->assertSame($expected_build, $build);
   }
@@ -155,11 +150,9 @@ class EntityOperationsUnitTest extends UnitTestCase {
       ->method('getEntityTypeId')
       ->willReturn($entity_type_id);
 
-    $cache = (new CacheableMetadata())->addCacheTags([$this->randomMachineName()]);
     $operations = [
       'foo' => [
         'title' => $this->randomMachineName(),
-        'access' => AccessResult::allowed()->addCacheableDependency($cache),
       ],
     ];
     $list_builder = $this->createMock('\Drupal\Core\Entity\EntityListBuilderInterface');
@@ -182,7 +175,6 @@ class EntityOperationsUnitTest extends UnitTestCase {
       '#type' => 'operations',
       '#links' => $operations,
     ];
-    $cache->applyTo($expected_build);
     $build = $this->plugin->render($result);
     $this->assertSame($expected_build, $build);
   }

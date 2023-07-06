@@ -30,6 +30,7 @@ class UserRoleTest extends ViewsKernelTestBase {
       'roles' => 123,
     ]);
     $user->save();
+    $this->container->set('current_user', $user);
 
     $view = Views::getView('user_admin_people');
     $this->executeView($view);

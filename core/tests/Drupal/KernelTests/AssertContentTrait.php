@@ -736,15 +736,20 @@ trait AssertContentTrait {
    *   messages: use \Drupal\Component\Render\FormattableMarkup to embed
    *   variables in the message text, not t(). If left blank, a default message
    *   will be displayed.
+   * @param \Drupal\Core\Render\RenderContext $render_context
+   *   (optional) A specific render context to be used.
    */
-  protected function assertThemeOutput($callback, array $variables = [], $expected = '', $message = '') {
+  protected function assertThemeOutput($callback, array $variables = [], $expected = '', $message = '', $render_context = NULL) {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
+    if (!$render_context) {
+      $render_context = new RenderContext();
+    }
     // The string cast is necessary because theme functions return
     // MarkupInterface objects. This means we can assert that $expected
     // matches the theme output without having to worry about 0 == ''.
-    $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($callback, $variables) {
+    $output = (string) $renderer->executeInRenderContext($render_context, function () use ($callback, $variables) {
       return \Drupal::theme()->render($callback, $variables);
     });
     if (!$message) {

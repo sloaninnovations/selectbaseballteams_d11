@@ -115,10 +115,10 @@ class FieldEntityOperationsTest extends ViewTestBase {
     $role = $this->drupalCreateRole([
       'edit own article content',
     ]);
-    $user1 = $this->drupalCreateUser();
+    $user1 = $this->drupalCreateUser([], 'User 1');
     $user1->addRole($role);
     $user1->save();
-    $user2 = $this->drupalCreateUser();
+    $user2 = $this->drupalCreateUser([], 'User 2');
     $user2->addRole($role);
     $user2->save();
 
@@ -135,17 +135,18 @@ class FieldEntityOperationsTest extends ViewTestBase {
     ]);
     $article2->save();
 
-    $this->drupalLogin($user1);
-    $this->drupalGet('test-entity-operations');
-
-    $this->assertSession()->linkByHrefExists($article->toUrl('edit-form')->toString());
-    $this->assertSession()->linkByHrefNotExists($article2->toUrl('edit-form')->toString());
-
     $this->drupalLogin($user2);
     $this->drupalGet('test-entity-operations');
 
     $this->assertSession()->linkByHrefExists($article2->toUrl('edit-form')->toString());
     $this->assertSession()->linkByHrefNotExists($article->toUrl('edit-form')->toString());
+
+    $this->drupalLogin($user1);
+    $this->drupalGet('test-entity-operations');
+
+    $this->assertSession()->linkByHrefNotExists($article2->toUrl('edit-form')->toString());
+    $this->assertSession()->linkByHrefExists($article->toUrl('edit-form')->toString());
+
   }
 
 }

@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\Url;
@@ -127,12 +126,6 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
     $this->moduleHandler->alter('entity_operation', $operations, $entity);
     uasort($operations, '\Drupal\Component\Utility\SortArray::sortByWeightElement');
 
-    foreach ($operations as &$operation) {
-      if (!isset($operation['access'])) {
-        $operation['access'] = new AccessResultAllowed();
-      }
-    }
-
     return $operations;
   }
 
@@ -153,7 +146,6 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
         'title' => $this->t('Edit'),
         'weight' => 10,
         'url' => $this->ensureDestination($entity->toUrl('edit-form')),
-        'access' => $entity->access('update', NULL, TRUE),
       ];
     }
     if ($entity->hasLinkTemplate('delete-form')) {
@@ -168,7 +160,6 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
           ]),
         ],
         'url' => $this->ensureDestination($entity->toUrl('delete-form')),
-        'access' => $entity->access('delete', NULL, TRUE),
       ];
     }
 
