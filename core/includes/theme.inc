@@ -667,6 +667,7 @@ function template_preprocess_links(&$variables) {
       $heading['attributes'] = new Attribute($heading['attributes']);
     }
 
+    $cache = CacheableMetadata::createFromRenderArray($variables);
     $variables['links'] = [];
     foreach ($links as $key => $link) {
       $item = [];
@@ -702,7 +703,7 @@ function template_preprocess_links(&$variables) {
         // andIf, where neutral currently denies access, so to not show links to
         // entity routes we must deny unless the result is allow. See #2991698.
         $link_element['#access'] = $url->access(NULL, TRUE);
-        CacheableMetadata::createFromObject($link_element['#access'])->applyTo($variables);
+        $cache->addCacheableDependency($link_element['#access']);
         if (!$link_element['#access']->isAllowed()) {
           // Templates expect inaccessible links to not be included.
           continue;
@@ -754,6 +755,7 @@ function template_preprocess_links(&$variables) {
       // Add the item to the list of links.
       $variables['links'][$key] = $item;
     }
+    $cache->applyTo($variables);
   }
 }
 

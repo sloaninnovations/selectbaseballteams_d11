@@ -467,7 +467,7 @@ class FunctionsTest extends KernelTestBase {
         '#links' => [
           'second_child_link' => [
             'title' => 'Second child link',
-            'url' => Url::fromRoute('router_test.8'),
+            'url' => Url::fromRoute('router_test.2'),
           ],
         ],
       ],

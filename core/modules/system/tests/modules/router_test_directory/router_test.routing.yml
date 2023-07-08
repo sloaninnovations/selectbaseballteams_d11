@@ -45,8 +45,6 @@ router_test.8:
   path: '/router_test/test8'
   defaults:
     _controller: '\Drupal\router_test\TestControllers::test8'
-  requirements:
-    _access: 'TRUE'
 
 router_test.10:
   path: '/router_test/test10'
