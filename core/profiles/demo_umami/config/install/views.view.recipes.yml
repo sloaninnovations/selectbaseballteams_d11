@@ -148,6 +148,7 @@ display:
           entity_type: node
           entity_field: status
           plugin_id: boolean
+          accept_null: false
           value: '1'
           group: 1
           expose:
@@ -177,6 +178,7 @@ display:
           entity_type: node
           entity_field: default_langcode
           plugin_id: boolean
+          accept_null: false
           operator: '='
           value: '1'
           group: 1

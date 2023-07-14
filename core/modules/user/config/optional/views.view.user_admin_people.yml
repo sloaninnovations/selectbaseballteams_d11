@@ -575,6 +575,7 @@ display:
           entity_type: user
           entity_field: status
           plugin_id: boolean
+          accept_null: false
           operator: '='
           value: '1'
           group: 1
@@ -709,6 +710,7 @@ display:
           entity_type: user
           entity_field: default_langcode
           plugin_id: boolean
+          accept_null: false
           operator: '='
           value: '1'
           group: 1
