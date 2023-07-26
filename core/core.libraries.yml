@@ -421,7 +421,9 @@ loadjs:
 internal.jquery_ui:
   version: VERSION
   js:
-    # All weights are based on the requirements defined within each file.
+    # These JavaScript assets previously came from core/jquery.ui, a deprecated
+    # library.
+    # @todo replace with solution in https://drupal.org/node/3076171
     assets/vendor/jquery.ui/ui/version-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/data-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/disable-selection-min.js: { minified: true }
@@ -510,10 +512,6 @@ drupal.debounce:
 drupal.dialog:
   version: VERSION
   js:
-    misc/dialog/dialog-deprecation.js: {}
-    misc/dialog/dialog.js: {}
-    misc/dialog/dialog.position.js: {}
-    misc/dialog/dialog.jquery-ui.js: {}
     # The remaining JavaScript assets previously came from core/jquery.ui, a
     # deprecated library.
     # All weights are based on the requirements defined within each file.
@@ -528,6 +526,10 @@ drupal.dialog:
     assets/vendor/jquery.ui/ui/widgets/checkboxradio-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widgets/button-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widgets/dialog-min.js: { minified: true }
+    misc/dialog/dialog-deprecation.js: {}
+    misc/dialog/dialog.js: {}
+    misc/dialog/dialog.position.js: {}
+    misc/dialog/dialog.jquery-ui.js: {}
   # All CSS assets previously came from core/jquery.ui, a deprecated library.
   # @todo replace with solution found in https://drupal.org/node/2158943
   css:
