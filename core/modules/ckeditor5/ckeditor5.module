@@ -537,7 +537,7 @@ function ckeditor5_js_alter(&$javascript, AttachedAssetsInterface $assets, Langu
 
     // Remove all CKEditor 5 translations files that are not in the current
     // language.
-    $javascript = array_filter($javascript, function($item) use ($ckeditor5_language) {
+    $javascript = array_filter($javascript, function ($item) use ($ckeditor5_language) {
       // Skip not a CKEditor 5 translation files. Remove files that don't match
       // the language requested.
       return empty($item['ckeditor5_langcode']) || $item['ckeditor5_langcode'] === $ckeditor5_language;
