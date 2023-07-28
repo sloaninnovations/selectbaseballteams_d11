@@ -362,8 +362,6 @@ drupalSettings:
       isFront: null
       currentLanguage: null
     pluralDelimiter: null
-  before:
-    - core/drupal
 
 drupal.active-link:
   version: VERSION

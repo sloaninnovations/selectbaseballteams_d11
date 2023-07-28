@@ -122,15 +122,15 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
   public function getMinimalRepresentativeSubset(array $libraries) {
     assert(count($libraries) === count(array_unique($libraries)), '$libraries can\'t contain duplicate items.');
 
-    // Determine each library's dependencies.
-    $all_dependencies = [];
-    foreach ($libraries as $library) {
-      $with_deps = $this->getLibrariesWithDependencies([$library]);
-      // We don't need library itself listed in the dependencies.
-      $all_dependencies = array_unique(array_merge($all_dependencies, array_diff($with_deps, [$library])));
+    $this->librariesGraph = $this->doGetDependencies($libraries);
+    $this->doProcessBeforeAfter();
+
+    $libraries_to_exclude = [];
+    foreach ($this->librariesGraph as $vertex) {
+      $libraries_to_exclude += $vertex['edges'];
     }
 
-    return array_values(array_diff($libraries, array_intersect($all_dependencies, $libraries)));
+    return array_values(array_diff($libraries, $libraries_to_exclude));
   }
 
 }
