@@ -137,7 +137,7 @@ class IdentifierHandler {
       $original_name = substr($original_name, 1, -1);
     }
     if (!$this->hasIdentifier($original_name, static::ALIAS)) {
-      $this->setIdentifier($original_name, $this->resolvePlatformGenericIdentifier($original_name, $type), $type | static::ALIAS);
+      $this->setIdentifier($original_name, $this->resolvePlatformGenericIdentifier($original_name), $type | static::ALIAS);
     }
     [$start_quote, $end_quote] = $this->identifierQuotes;
     $alias = $this->identifiers['identifier'][$original_name][static::ALIAS][$type] ?? $this->identifiers['identifier'][$original_name][static::ALIAS][0];

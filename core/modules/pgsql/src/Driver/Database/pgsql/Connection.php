@@ -99,26 +99,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  protected function setPrefix($prefix) {
-    assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
-    $this->prefix = $prefix;
-
-    // Add the schema name if it is not set to public, otherwise it will use the
-    // default schema name.
-    $quoted_schema = '';
-    if (isset($this->connectionOptions['schema']) && ($this->connectionOptions['schema'] !== 'public')) {
-      $quoted_schema = $this->identifierQuotes[0] . $this->connectionOptions['schema'] . $this->identifierQuotes[1] . '.';
-    }
-
-    $this->tablePlaceholderReplacements = [
-      $quoted_schema . $this->identifierQuotes[0] . str_replace('.', $this->identifierQuotes[1] . '.' . $this->identifierQuotes[0], $prefix),
-      $this->identifierQuotes[1],
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function open(array &$connection_options = []) {
     // Default to TCP connection on port 5432.
     if (empty($connection_options['port'])) {

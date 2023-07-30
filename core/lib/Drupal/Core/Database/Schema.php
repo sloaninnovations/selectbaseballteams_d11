@@ -82,15 +82,16 @@ abstract class Schema implements PlaceholderInterface {
    *   A keyed array with information about the schema, table name and prefix.
    */
   protected function getPrefixInfo($table = 'default', $add_prefix = TRUE) {
+    $prefix = $this->connection->getPrefix();
     $info = [
       'schema' => $this->defaultSchema,
-      'prefix' => $this->connection->getPrefix(),
+      'prefix' => $prefix,
     ];
     if (strpos($table, '%') !== FALSE) {
       $table = ($add_prefix ? $prefix : '') . $table;
     }
     else {
-      $table = $this->connection->getIdentifierHandler()->getPlatformTableName($table ?? '', $add_prefix);
+      $table = $this->connection->getIdentifierHandler()->getPlatformTableName($table, $add_prefix);
     }
     // If the prefix contains a period in it, then that means the prefix also
     // contains a schema reference in which case we will change the schema key

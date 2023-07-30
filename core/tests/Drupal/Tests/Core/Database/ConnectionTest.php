@@ -3,6 +3,7 @@
 namespace Drupal\Tests\Core\Database;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\StatementPrefetch;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
