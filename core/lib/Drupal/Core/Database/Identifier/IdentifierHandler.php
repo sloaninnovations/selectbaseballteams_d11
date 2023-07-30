@@ -1,20 +1,13 @@
 <?php
 
-namespace Drupal\Core\Database;
+declare(strict_types=1);
+
+namespace Drupal\Core\Database\Identifier;
 
 /**
  * @todo
  */
 class IdentifierHandler {
-
-  const GENERIC = 0x0;
-  const DATABASE = 0x4;
-  const SEQUENCE = 0x5;
-  const TABLE = 0x7;
-  const PREFIXED_TABLE = 0x8;
-  const COLUMN = 0xC;
-  const INDEX = 0xD;
-  const ALIAS = 0x10;
 
   /**
    * @todo
@@ -48,35 +41,33 @@ class IdentifierHandler {
   /**
    * @todo
    */
-  protected function setIdentifier(string $identifier, string $platform_identifier, int $type): void {
-    $is_alias = (bool) ($type & static::ALIAS);
-    $type = $type & 0xF;
-    if (!$is_alias) {
-      $this->identifiers['identifier'][$identifier][$type] = $platform_identifier;
-      $this->identifiers['platform'][$platform_identifier][$type] = $identifier;
+  protected function setIdentifier(string $identifier, string $platform_identifier, IdentifierType $type, bool $isAlias): void {
+    if (!$isAlias) {
+      $this->identifiers['identifier'][$identifier][$type->value] = $platform_identifier;
+      $this->identifiers['platform'][$platform_identifier][$type->value] = $identifier;
     }
     else {
-      $this->identifiers['identifier'][$identifier][static::ALIAS][$type] = $platform_identifier;
-      $this->identifiers['platform'][$platform_identifier][static::ALIAS][$type] = $identifier;
+      $this->identifiers['identifier'][$identifier]['alias'][$type->value] = $platform_identifier;
+      $this->identifiers['platform'][$platform_identifier]['alias'][$type->value] = $identifier;
     }
   }
 
   /**
    * @todo
    */
-  protected function hasIdentifier(string $identifier, int $type = 0): bool {
-    return isset($this->identifiers['identifier'][$identifier][$type]);
+  protected function hasIdentifier(string $identifier, IdentifierType $type): bool {
+    return isset($this->identifiers['identifier'][$identifier][$type->value]);
   }
 
   /**
    * @todo
    */
   public function getPlatformIdentifierName(string $original_name, bool $quoted = TRUE): string {
-    if (!$this->hasIdentifier($original_name, static::GENERIC)) {
-      $this->setIdentifier($original_name, $this->resolvePlatformGenericIdentifier($original_name), static::GENERIC);
+    if (!$this->hasIdentifier($original_name, IdentifierType::Generic)) {
+      $this->setIdentifier($original_name, $this->resolvePlatformGenericIdentifier($original_name), IdentifierType::Generic, FALSE);
     }
     [$start_quote, $end_quote] = $this->identifierQuotes;
-    $identifier = $this->identifiers['identifier'][$original_name][static::GENERIC];
+    $identifier = $this->identifiers['identifier'][$original_name][IdentifierType::Generic->value];
     return $quoted ? $start_quote . $identifier . $end_quote : $identifier;
   }
 
@@ -85,13 +76,13 @@ class IdentifierHandler {
    */
   public function getPlatformDatabaseName(string $original_name, bool $quoted = TRUE): string {
     $original_name = preg_replace('/[^A-Za-z0-9_]+/', '', $original_name);
-    if (!$this->hasIdentifier($original_name, static::DATABASE)) {
-      $this->setIdentifier($original_name, $this->resolvePlatformDatabaseIdentifier($original_name), static::DATABASE);
+    if (!$this->hasIdentifier($original_name, IdentifierType::Database)) {
+      $this->setIdentifier($original_name, $this->resolvePlatformDatabaseIdentifier($original_name), IdentifierType::Database, FALSE);
     }
     [$start_quote, $end_quote] = $this->identifierQuotes;
     return $quoted ?
-      $start_quote . $this->identifiers['identifier'][$original_name][static::DATABASE] . $end_quote :
-      $this->identifiers['identifier'][$original_name][static::DATABASE];
+      $start_quote . $this->identifiers['identifier'][$original_name][IdentifierType::Database->value] . $end_quote :
+      $this->identifiers['identifier'][$original_name][IdentifierType::Database->value];
   }
 
   /**
@@ -99,13 +90,13 @@ class IdentifierHandler {
    */
   public function getPlatformTableName(string $original_name, bool $prefixed = FALSE, bool $quoted = FALSE): string {
     $original_name = preg_replace('/[^A-Za-z0-9_.]+/', '', $original_name);
-    if (!$this->hasIdentifier($original_name, static::TABLE)) {
+    if (!$this->hasIdentifier($original_name, IdentifierType::Table)) {
       $table_name = $this->resolvePlatformTableIdentifier($original_name);
-      $this->setIdentifier($original_name, $table_name, static::TABLE);
-      $this->setIdentifier($original_name, $this->getTablePrefix() . $table_name, static::PREFIXED_TABLE);
+      $this->setIdentifier($original_name, $table_name, IdentifierType::Table, FALSE);
+      $this->setIdentifier($original_name, $this->getTablePrefix() . $table_name, IdentifierType::PrefixedTable, FALSE);
     }
     [$start_quote, $end_quote] = $this->identifierQuotes;
-    $table = $prefixed ? $this->identifiers['identifier'][$original_name][static::PREFIXED_TABLE] : $this->identifiers['identifier'][$original_name][static::TABLE];
+    $table = $prefixed ? $this->identifiers['identifier'][$original_name][IdentifierType::PrefixedTable->value] : $this->identifiers['identifier'][$original_name][IdentifierType::Table->value];
     return $quoted ? $start_quote . str_replace(".", "$end_quote.$start_quote", $table) . $end_quote : $table;
   }
 
@@ -117,15 +108,15 @@ class IdentifierHandler {
       return '';
     }
     $original_name = preg_replace('/[^A-Za-z0-9_.]+/', '', $original_name);
-    if (!$this->hasIdentifier($original_name, static::COLUMN)) {
-      $this->setIdentifier($original_name, $this->resolvePlatformColumnIdentifier($original_name), static::COLUMN);
+    if (!$this->hasIdentifier($original_name, IdentifierType::Column)) {
+      $this->setIdentifier($original_name, $this->resolvePlatformColumnIdentifier($original_name), IdentifierType::Column, FALSE);
     }
     // Sometimes fields have the format table_alias.field. In such cases
     // both identifiers should be quoted, for example, "table_alias"."field".
     [$start_quote, $end_quote] = $this->identifierQuotes;
     return $quoted ?
-      $start_quote . str_replace(".", "$end_quote.$start_quote", $this->identifiers['identifier'][$original_name][static::COLUMN]) . $end_quote :
-      $this->identifiers['identifier'][$original_name][static::COLUMN];
+      $start_quote . str_replace(".", "$end_quote.$start_quote", $this->identifiers['identifier'][$original_name][IdentifierType::Column->value]) . $end_quote :
+      $this->identifiers['identifier'][$original_name][IdentifierType::Column->value];
   }
 
   /**
@@ -136,8 +127,8 @@ class IdentifierHandler {
     if ($original_name[0] === $this->identifierQuotes[0]) {
       $original_name = substr($original_name, 1, -1);
     }
-    if (!$this->hasIdentifier($original_name, static::ALIAS)) {
-      $this->setIdentifier($original_name, $this->resolvePlatformGenericIdentifier($original_name), $type | static::ALIAS);
+    if (!$this->hasIdentifier($original_name, IdentifierType::Alias)) {
+      $this->setIdentifier($original_name, $this->resolvePlatformGenericIdentifier($original_name), $type, TRUE);
     }
     [$start_quote, $end_quote] = $this->identifierQuotes;
     $alias = $this->identifiers['identifier'][$original_name][static::ALIAS][$type] ?? $this->identifiers['identifier'][$original_name][static::ALIAS][0];

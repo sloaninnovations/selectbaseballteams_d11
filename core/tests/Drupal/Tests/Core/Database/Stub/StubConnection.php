@@ -4,7 +4,7 @@ namespace Drupal\Tests\Core\Database\Stub;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ExceptionHandler;
-use Drupal\Core\Database\IdentifierHandler;
+use Drupal\Core\Database\Identifier\IdentifierHandler;
 use Drupal\Core\Database\Log;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Insert;

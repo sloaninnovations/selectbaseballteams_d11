@@ -4,6 +4,7 @@ namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\Core\Database\Exception\EventException;
+use Drupal\Core\Database\Identifier\IdentifierHandler;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Insert;
@@ -171,7 +172,7 @@ abstract class Connection {
   /**
    * @todo
    */
-  protected $identifierHandler;
+  protected IdentifierHandler $identifierHandler;
 
   /**
    * Post-root (non-nested) transaction commit callbacks.

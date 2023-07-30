@@ -9,7 +9,7 @@ use Drupal\Core\Database\DatabaseConnectionRefusedException;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\DatabaseNotFoundException;
-use Drupal\Core\Database\IdentifierHandler;
+use Drupal\Core\Database\Identifier\IdentifierHandler;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
