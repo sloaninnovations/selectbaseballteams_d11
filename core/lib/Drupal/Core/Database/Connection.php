@@ -221,7 +221,6 @@ abstract class Connection {
   public function __construct(object $connection, array $connection_options) {
     // Manage the table prefix.
     $connection_options['prefix'] = $connection_options['prefix'] ?? '';
-    $this->setPrefix($connection_options['prefix']);
 
     // Work out the database driver namespace if none is provided. This normally
     // written to setting.php by installer or set by
