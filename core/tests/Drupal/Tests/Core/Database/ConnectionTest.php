@@ -531,28 +531,6 @@ class ConnectionTest extends UnitTestCase {
   /**
    * @covers ::__construct
    */
-  public function testIdentifierQuotesAssertCount() {
-    $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
-    $mock_pdo = $this->createMock(StubPDO::class);
-    new StubConnection($mock_pdo, [], ['"']);
-  }
-
-  /**
-   * @covers ::__construct
-   */
-  public function testIdentifierQuotesAssertString() {
-    $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
-    $mock_pdo = $this->createMock(StubPDO::class);
-    $mock_connection = new StubConnection($mock_pdo, [], ['"', '"']);
-    $this->assertInstanceOf(Connection::class, $mock_connection);
-    $test_identifier_quotes = $mock_connection->identifierQuotes;
-  }
-
-  /**
-   * @covers ::__construct
-   */
   public function testNamespaceDefault() {
     $mock_pdo = $this->createMock(StubPDO::class);
     $connection = new StubConnection($mock_pdo, []);

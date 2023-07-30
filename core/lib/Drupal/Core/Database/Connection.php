@@ -111,13 +111,6 @@ abstract class Connection {
   protected $schema = NULL;
 
   /**
-   * The prefix used by this database connection.
-   *
-   * @var string
-   */
-  protected string $prefix;
-
-  /**
    * Replacements to fully qualify {table} placeholders in SQL strings.
    *
    * An array of two strings, the first being the replacement for opening curly
@@ -188,18 +181,6 @@ abstract class Connection {
   protected $rootTransactionEndCallbacks = [];
 
   /**
-   * Implements the magic __get() method.
-   *
-   * @todo Remove the method in Drupal 1x.
-   */
-  public function __get($name) {
-    if (in_array($name, ['escapedTables', 'escapedFields', 'escapedAliases', 'identifierQuotes'])) {
-      @trigger_error("Connection::\${$name} should not be accessed in drupal:9.x.0 and is removed from drupal:10.0.0. This is no longer used. See https://www.drupal.org/node/1234567", E_USER_DEPRECATED);
-      return [];
-    }
-  }
-
-  /**
    * Tracks the database API events to be dispatched.
    *
    * For performance reasons, database API events are not yielded by default.
@@ -231,6 +212,18 @@ abstract class Connection {
 
     $this->connection = $connection;
     $this->connectionOptions = $connection_options;
+  }
+
+  /**
+   * Implements the magic __get() method.
+   *
+   * @todo Remove the method in Drupal 1x.
+   */
+  public function __get($name) {
+    if (in_array($name, ['prefix', 'escapedTables', 'escapedFields', 'escapedAliases', 'identifierQuotes'])) {
+      @trigger_error("Connection::\${$name} should not be accessed in drupal:9.x.0 and is removed from drupal:10.0.0. This is no longer used. See https://www.drupal.org/node/1234567", E_USER_DEPRECATED);
+      return [];
+    }
   }
 
   /**
@@ -359,6 +352,7 @@ abstract class Connection {
    * @return string $prefix
    */
   public function getPrefix(): string {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:9.x.0 and is removed from drupal:10.0.0. @todo. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
     return $this->identifierHandler->getTablePrefix();
   }
 
@@ -442,7 +436,7 @@ abstract class Connection {
    */
   public function tablePrefix($table = 'default') {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Instead, you should just use Connection::getPrefix(). See https://www.drupal.org/node/3260849', E_USER_DEPRECATED);
-    return $this->prefix;
+    return $this->identifierHandler->getTablePrefix();
   }
 
   /**
