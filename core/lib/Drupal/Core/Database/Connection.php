@@ -352,7 +352,7 @@ abstract class Connection {
    * @return string $prefix
    */
   public function getPrefix(): string {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:9.x.0 and is removed from drupal:10.0.0. @todo. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
+    // @trigger_error(__METHOD__ . '() is deprecated in drupal:9.x.0 and is removed from drupal:10.0.0. @todo. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
     return $this->identifierHandler->getTablePrefix();
   }
 
