@@ -7,6 +7,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseAccessDeniedException;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
+use Drupal\Core\Database\IdentifierHandler;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\StatementWrapperIterator;
@@ -68,11 +69,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   protected $transactionalDDLSupport = TRUE;
 
   /**
-   * {@inheritdoc}
-   */
-  protected $identifierQuotes = ['"', '"'];
-
-  /**
    * Constructs a connection object.
    */
   public function __construct(\PDO $connection, array $connection_options) {
@@ -95,6 +91,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     if (isset($connection_options['init_commands'])) {
       $this->connection->exec(implode('; ', $connection_options['init_commands']));
     }
+
+    // Initialize the identifier handler.
+    $this->identifierHandler = new IdentifierHandler($connection_options['prefix']);
   }
 
   /**
@@ -346,7 +345,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
     // The fully qualified table name in PostgreSQL is in the form of
     // <database>.<schema>.<table>.
-    return $options['database'] . '.' . $schema . '.' . $this->getPrefix() . $table;
+    return $options['database'] . '.' . $schema . '.' . $this->identifierHandler->getPlatformTableName($table, TRUE, FALSE);
   }
 
   /**

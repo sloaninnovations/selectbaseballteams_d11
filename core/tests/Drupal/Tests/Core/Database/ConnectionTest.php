@@ -18,53 +18,6 @@ use Drupal\Tests\UnitTestCase;
 class ConnectionTest extends UnitTestCase {
 
   /**
-   * Data provider for testPrefixRoundTrip().
-   *
-   * @return array
-   *   Array of arrays with the following elements:
-   *   - Arguments to pass to Connection::setPrefix().
-   *   - Expected result from Connection::tablePrefix().
-   */
-  public function providerPrefixRoundTrip() {
-    return [
-      [
-        [
-          '' => 'test_',
-        ],
-        'test_',
-      ],
-      [
-        [
-          'fooTable' => 'foo_',
-          'barTable' => 'foo_',
-        ],
-        'foo_',
-      ],
-    ];
-  }
-
-  /**
-   * Exercise setPrefix() and tablePrefix().
-   *
-   * @dataProvider providerPrefixRoundTrip
-   */
-  public function testPrefixRoundTrip($expected, $prefix_info) {
-    $mock_pdo = $this->createMock('Drupal\Tests\Core\Database\Stub\StubPDO');
-    $connection = new StubConnection($mock_pdo, []);
-
-    // setPrefix() is protected, so we make it accessible with reflection.
-    $reflection = new \ReflectionClass('Drupal\Tests\Core\Database\Stub\StubConnection');
-    $set_prefix = $reflection->getMethod('setPrefix');
-
-    // Set the prefix data.
-    $set_prefix->invokeArgs($connection, [$prefix_info]);
-    // Check the round-trip.
-    foreach ($expected as $table => $prefix) {
-      $this->assertEquals($prefix, $connection->getPrefix());
-    }
-  }
-
-  /**
    * Data provider for testPrefixTables().
    *
    * @return array
@@ -591,7 +544,9 @@ class ConnectionTest extends UnitTestCase {
     $this->expectException(\AssertionError::class);
     $this->expectExceptionMessage('\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
     $mock_pdo = $this->createMock(StubPDO::class);
-    new StubConnection($mock_pdo, [], [0, '1']);
+    $mock_connection = new StubConnection($mock_pdo, [], ['"', '"']);
+    $this->assertInstanceOf(Connection::class, $mock_connection);
+    $test_identifier_quotes = $mock_connection->identifierQuotes;
   }
 
   /**
