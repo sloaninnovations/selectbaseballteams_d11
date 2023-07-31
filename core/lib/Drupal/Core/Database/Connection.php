@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Database;
 
-use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\Core\Database\Exception\EventException;
+use Drupal\Core\Database\Identifier\IdentifierHandler;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Insert;
@@ -112,13 +112,6 @@ abstract class Connection {
   protected $schema = NULL;
 
   /**
-   * The prefix used by this database connection.
-   *
-   * @var string
-   */
-  protected string $prefix;
-
-  /**
    * Replacements to fully qualify {table} placeholders in SQL strings.
    *
    * An array of two strings, the first being the replacement for opening curly
@@ -177,28 +170,9 @@ abstract class Connection {
   protected $unprefixedTablesMap = [];
 
   /**
-   * List of escaped table names, keyed by unescaped names.
-   *
-   * @var array
+   * @todo
    */
-  protected $escapedTables = [];
-
-  /**
-   * List of escaped field names, keyed by unescaped names.
-   *
-   * There are cases in which escapeField() is called on an empty string. In
-   * this case it should always return an empty string.
-   *
-   * @var array
-   */
-  protected $escapedFields = ["" => ""];
-
-  /**
-   * List of escaped aliases names, keyed by unescaped aliases.
-   *
-   * @var array
-   */
-  protected $escapedAliases = [];
+  protected IdentifierHandler $identifierHandler;
 
   /**
    * Post-root (non-nested) transaction commit callbacks.
@@ -206,17 +180,6 @@ abstract class Connection {
    * @var callable[]
    */
   protected $rootTransactionEndCallbacks = [];
-
-  /**
-   * The identifier quote characters for the database type.
-   *
-   * An array containing the start and end identifier quote characters for the
-   * database type. The ANSI SQL standard identifier quote character is a double
-   * quotation mark.
-   *
-   * @var string[]
-   */
-  protected $identifierQuotes;
 
   /**
    * Tracks the database API events to be dispatched.
@@ -238,11 +201,8 @@ abstract class Connection {
    *   - Other driver-specific options.
    */
   public function __construct(object $connection, array $connection_options) {
-    assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
-
     // Manage the table prefix.
     $connection_options['prefix'] = $connection_options['prefix'] ?? '';
-    $this->setPrefix($connection_options['prefix']);
 
     // Work out the database driver namespace if none is provided. This normally
     // written to setting.php by installer or set by
@@ -253,6 +213,18 @@ abstract class Connection {
 
     $this->connection = $connection;
     $this->connectionOptions = $connection_options;
+  }
+
+  /**
+   * Implements the magic __get() method.
+   *
+   * @todo Remove the method in Drupal 1x.
+   */
+  public function __get($name) {
+    if (in_array($name, ['prefix', 'escapedTables', 'escapedFields', 'escapedAliases', 'identifierQuotes'])) {
+      @trigger_error("Connection::\${$name} should not be accessed in drupal:9.x.0 and is removed from drupal:10.0.0. This is no longer used. See https://www.drupal.org/node/1234567", E_USER_DEPRECATED);
+      return [];
+    }
   }
 
   /**
@@ -381,7 +353,8 @@ abstract class Connection {
    * @return string $prefix
    */
   public function getPrefix(): string {
-    return $this->prefix;
+    // @trigger_error(__METHOD__ . '() is deprecated in drupal:9.x.0 and is removed from drupal:10.0.0. @todo. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
+    return $this->identifierHandler->getTablePrefix();
   }
 
   /**
@@ -391,12 +364,7 @@ abstract class Connection {
    *   A single prefix.
    */
   protected function setPrefix($prefix) {
-    assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
-    $this->prefix = $prefix;
-    $this->tablePlaceholderReplacements = [
-      $this->identifierQuotes[0] . str_replace('.', $this->identifierQuotes[1] . '.' . $this->identifierQuotes[0], $prefix),
-      $this->identifierQuotes[1],
-    ];
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:9.x.0 and is removed from drupal:10.0.0. @todo. See https://www.drupal.org/node/1234567', E_USER_DEPRECATED);
   }
 
   /**
@@ -414,7 +382,12 @@ abstract class Connection {
    *   The properly-prefixed string.
    */
   public function prefixTables($sql) {
-    return str_replace(['{', '}'], $this->tablePlaceholderReplacements, $sql);
+    $replacements = $tables = [];
+    preg_match_all('/(\{(\S*)\})/', $sql, $tables, PREG_SET_ORDER, 0);
+    foreach ($tables as $table) {
+      $replacements[$table[1]] = $this->identifierHandler->getPlatformTableName($table[2], TRUE, TRUE);
+    }
+    return str_replace(array_keys($replacements), array_values($replacements), $sql);
   }
 
   /**
@@ -438,7 +411,14 @@ abstract class Connection {
    *   This method should only be called by database API code.
    */
   public function quoteIdentifiers($sql) {
-    return str_replace(['[', ']'], $this->identifierQuotes, $sql);
+    preg_match_all('/(\[(.+?)\])/', $sql, $matches);
+    $identifiers = [];
+    $i = 0;
+    foreach ($matches[1] as $match) {
+      $identifiers[$match] = $this->identifierHandler->getPlatformIdentifierName($matches[2][$i]);
+      $i++;
+    }
+    return strtr($sql, $identifiers);
   }
 
   /**
@@ -457,7 +437,7 @@ abstract class Connection {
    */
   public function tablePrefix($table = 'default') {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Instead, you should just use Connection::getPrefix(). See https://www.drupal.org/node/3260849', E_USER_DEPRECATED);
-    return $this->prefix;
+    return $this->identifierHandler->getTablePrefix();
   }
 
   /**
@@ -486,9 +466,7 @@ abstract class Connection {
    * @return string
    */
   public function getFullQualifiedTableName($table) {
-    $options = $this->getConnectionOptions();
-    $prefix = $this->getPrefix();
-    return $options['database'] . '.' . $prefix . $table;
+    return $this->identifierHandler->getPlatformDatabaseName($this->getConnectionOptions()['database']) . '.' . $this->identifierHandler->getPlatformTableName($table, TRUE, TRUE);
   }
 
   /**
@@ -670,10 +648,7 @@ abstract class Connection {
    *   A table prefix-parsed string for the sequence name.
    */
   public function makeSequenceName($table, $field) {
-    $sequence_name = $this->prefixTables('{' . $table . '}_' . $field . '_seq');
-    // Remove identifier quotes as we are constructing a new name from a
-    // prefixed and quoted table name.
-    return str_replace($this->identifierQuotes, '', $sequence_name);
+    return $this->identifierHandler->getPlatformTableName($table, TRUE, FALSE) . "_{$field}_seq";
   }
 
   /**
@@ -987,6 +962,13 @@ abstract class Connection {
   }
 
   /**
+   * @todo
+   */
+  public function getIdentifierHandler(): IdentifierHandler {
+    return $this->identifierHandler;
+  }
+
+  /**
    * Prepares and returns a SELECT query object.
    *
    * @param string|\Drupal\Core\Database\Query\SelectInterface $table
@@ -1227,9 +1209,7 @@ abstract class Connection {
    *   The sanitized database name.
    */
   public function escapeDatabase($database) {
-    $database = preg_replace('/[^A-Za-z0-9_]+/', '', $database);
-    [$start_quote, $end_quote] = $this->identifierQuotes;
-    return $start_quote . $database . $end_quote;
+    return $this->identifierHandler->getPlatformDatabaseName($database);
   }
 
   /**
@@ -1250,10 +1230,7 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Connection::setPrefix()
    */
   public function escapeTable($table) {
-    if (!isset($this->escapedTables[$table])) {
-      $this->escapedTables[$table] = preg_replace('/[^A-Za-z0-9_.]+/', '', $table);
-    }
-    return $this->escapedTables[$table];
+    return $this->identifierHandler->getPlatformTableName($table);
   }
 
   /**
@@ -1270,14 +1247,7 @@ abstract class Connection {
    *   The sanitized field name.
    */
   public function escapeField($field) {
-    if (!isset($this->escapedFields[$field])) {
-      $escaped = preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
-      [$start_quote, $end_quote] = $this->identifierQuotes;
-      // Sometimes fields have the format table_alias.field. In such cases
-      // both identifiers should be quoted, for example, "table_alias"."field".
-      $this->escapedFields[$field] = $start_quote . str_replace('.', $end_quote . '.' . $start_quote, $escaped) . $end_quote;
-    }
-    return $this->escapedFields[$field];
+    return $this->identifierHandler->getPlatformColumnName($field);
   }
 
   /**
@@ -1295,11 +1265,7 @@ abstract class Connection {
    *   The sanitized alias name.
    */
   public function escapeAlias($field) {
-    if (!isset($this->escapedAliases[$field])) {
-      [$start_quote, $end_quote] = $this->identifierQuotes;
-      $this->escapedAliases[$field] = $start_quote . preg_replace('/[^A-Za-z0-9_]+/', '', $field) . $end_quote;
-    }
-    return $this->escapedAliases[$field];
+    return $this->identifierHandler->getPlatformAliasName($field);
   }
 
   /**

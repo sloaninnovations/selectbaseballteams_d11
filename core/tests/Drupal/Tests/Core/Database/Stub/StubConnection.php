@@ -4,6 +4,7 @@ namespace Drupal\Tests\Core\Database\Stub;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ExceptionHandler;
+use Drupal\Core\Database\Identifier\IdentifierHandler;
 use Drupal\Core\Database\Log;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Insert;
@@ -46,8 +47,9 @@ class StubConnection extends Connection {
    *   The identifier quote characters. Defaults to an empty strings.
    */
   public function __construct(\PDO $connection, array $connection_options, $identifier_quotes = ['', '']) {
-    $this->identifierQuotes = $identifier_quotes;
     parent::__construct($connection, $connection_options);
+    // Initialize the identifier handler.
+    $this->identifierHandler = new IdentifierHandler($connection_options['prefix'] ?? '', $identifier_quotes);
   }
 
   /**
