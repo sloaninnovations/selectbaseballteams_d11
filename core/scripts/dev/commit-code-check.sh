@@ -139,6 +139,9 @@ JAVASCRIPT_PACKAGES_CHANGED=0
 # it is used to make sure the compiled JS is valid.
 CKEDITOR5_PLUGINS_CHANGED=0
 
+# This variable will be set to when the dictionary has changed.
+CSPELL_DICTIONARY_FILE_CHANGED=0
+
 # Build up a list of absolute file names.
 ABS_FILES=
 for FILE in $FILES; do
@@ -172,6 +175,10 @@ for FILE in $FILES; do
   if [[ -f "$TOP_LEVEL/$FILE" ]] && [[ $FILE =~ \.js$ ]] && [[ $FILE =~ ^core/modules/ckeditor5/js/build || $FILE =~ ^core/modules/ckeditor5/js/ckeditor5_plugins ]]; then
     CKEDITOR5_PLUGINS_CHANGED=1;
   fi;
+
+  if [[ $FILE == "core/misc/cspell/dictionary.txt" ]]; then
+    CSPELL_DICTIONARY_FILE_CHANGED=1;
+  fi
 done
 
 # Exit early if there are no files.
@@ -208,8 +215,15 @@ if [ $DEPENDENCIES_NEED_INSTALLING -ne 0 ]; then
   exit 1;
 fi
 
+# Run spellcheck:core when cspell files are changed.
 # Check all files for spelling in one go for better performance.
-yarn run -s spellcheck --no-must-find-files --root $TOP_LEVEL $ABS_FILES
+if [[ $CSPELL_DICTIONARY_FILE_CHANGED == "1" ]] ; then
+  printf "\nRunning spellcheck on *all* files.\n"
+  yarn run -s spellcheck:core --no-must-find-files --root $TOP_LEVEL $ABS_FILES
+else
+  yarn run -s spellcheck --no-must-find-files --root $TOP_LEVEL $ABS_FILES
+fi
+
 if [ "$?" -ne "0" ]; then
   # If there are failures set the status to a number other than 0.
   FINAL_STATUS=1
@@ -352,13 +366,8 @@ for FILE in $FILES; do
   # Ensure the file still exists (i.e. is not being deleted).
   if [ -a $FILE ]; then
     if [ ${FILE: -3} != ".sh" ]; then
-      # Ensure the file has the correct mode.
-      STAT="$(stat -f "%A" $FILE 2>/dev/null)"
-      if [ $? -ne 0 ]; then
-        STAT="$(stat -c "%a" $FILE 2>/dev/null)"
-      fi
-      if [ "$STAT" -ne "644" ]; then
-        printf "${red}check failed:${reset} file $FILE should be 644 not $STAT\n"
+      if [ -x $FILE ]; then
+        printf "${red}check failed:${reset} file $FILE should not be executable\n"
         STATUS=1
       fi
     fi

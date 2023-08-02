@@ -20,6 +20,7 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
   protected static $modules = [
     'block',
     'system',
+    'user',
   ];
 
   /**
@@ -30,18 +31,19 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = $this->container->get('theme_installer');
     $default_theme = $this->config('system.theme')->get('default');
+    $theme_installer->install([$default_theme]);
 
     // Add two instances of the user login block.
     $this->placeBlock('user_login_block', [
-      'id' => $default_theme . '_' . strtolower($this->randomMachineName(8)),
+      'id' => $default_theme . '_' . $this->randomMachineName(8),
     ]);
     $this->placeBlock('user_login_block', [
-      'id' => $default_theme . '_' . strtolower($this->randomMachineName(8)),
+      'id' => $default_theme . '_' . $this->randomMachineName(8),
     ]);
 
     // Add an instance of a different block.
     $this->placeBlock('system_powered_by_block', [
-      'id' => $default_theme . '_' . strtolower($this->randomMachineName(8)),
+      'id' => $default_theme . '_' . $this->randomMachineName(8),
     ]);
 
     // Install a different theme that does not have blocks.

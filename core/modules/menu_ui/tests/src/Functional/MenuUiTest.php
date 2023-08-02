@@ -177,6 +177,48 @@ class MenuUiTest extends BrowserTestBase {
     $instance = $menu_link_manager->createInstance($instance->getPluginId());
     $this->assertEquals($edit['weight'], $instance->getWeight(), 'Saving an existing link updates the weight.');
     $this->resetMenuLink($instance, $old_weight);
+
+    // Tests the menus are listed alphabetically
+    // Delete all existing menus.
+    $existing = Menu::loadMultiple();
+    foreach ($existing as $existingMenu) {
+      $existingMenu->delete();
+    }
+
+    // Test alphabetical order without pager.
+    $menus = [];
+    for ($i = 1; $i < 6; $i++) {
+      $menus[] = strtolower($this->getRandomGenerator()->name());
+    }
+    sort($menus);
+    foreach ($menus as $menu) {
+      Menu::create(['id' => $menu, 'label' => $menu])->save();
+    }
+    $this->drupalGet('/admin/structure/menu');
+    $base_path = parse_url($this->baseUrl, PHP_URL_PATH) ?? '';
+    $first_link = $this->assertSession()->elementExists('css', 'tbody tr:nth-of-type(1) a');
+    $last_link = $this->assertSession()->elementExists('css', 'tbody tr:nth-of-type(5) a');
+    $this->assertEquals($first_link->getAttribute('href'), sprintf('%s/admin/structure/menu/manage/%s', $base_path, $menus[0]));
+    $this->assertEquals($last_link->getAttribute('href'), sprintf('%s/admin/structure/menu/manage/%s', $base_path, $menus[4]));
+    // Test alphabetical order with pager.
+    $new_menus = [];
+    for ($i = 1; $i < 61; $i++) {
+      $new_menus[] = strtolower($this->getRandomGenerator()->name());
+    }
+    foreach ($new_menus as $menu) {
+      Menu::create(['id' => $menu, 'label' => $menu])->save();
+    }
+    $menus = array_merge($menus, $new_menus);
+    sort($menus);
+    $this->drupalGet('/admin/structure/menu', [
+      'query' => [
+        'page' => 1,
+      ],
+    ]);
+    $first_link = $this->assertSession()->elementExists('css', 'tbody tr:nth-of-type(1) a');
+    $last_link = $this->assertSession()->elementExists('css', 'tbody tr:nth-of-type(15) a');
+    $this->assertEquals($first_link->getAttribute('href'), sprintf('%s/admin/structure/menu/manage/%s', $base_path, $menus[50]));
+    $this->assertEquals($last_link->getAttribute('href'), sprintf('%s/admin/structure/menu/manage/%s', $base_path, $menus[64]));
   }
 
   /**
@@ -184,7 +226,7 @@ class MenuUiTest extends BrowserTestBase {
    */
   public function addCustomMenuCRUD() {
     // Add a new custom menu.
-    $menu_name = strtolower($this->randomMachineName(MenuStorage::MAX_ID_LENGTH));
+    $menu_name = $this->randomMachineName(MenuStorage::MAX_ID_LENGTH);
     $label = $this->randomMachineName(16);
 
     $menu = Menu::create([
@@ -225,7 +267,7 @@ class MenuUiTest extends BrowserTestBase {
   public function addCustomMenu() {
     // Try adding a menu using a menu_name that is too long.
     $this->drupalGet('admin/structure/menu/add');
-    $menu_name = strtolower($this->randomMachineName(MenuStorage::MAX_ID_LENGTH + 1));
+    $menu_name = $this->randomMachineName(MenuStorage::MAX_ID_LENGTH + 1);
     $label = $this->randomMachineName(16);
     $edit = [
       'id' => $menu_name,
@@ -240,7 +282,7 @@ class MenuUiTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains("Menu name cannot be longer than " . MenuStorage::MAX_ID_LENGTH . " characters but is currently " . mb_strlen($menu_name) . " characters long.");
 
     // Change the menu_name so it no longer exceeds the maximum length.
-    $menu_name = strtolower($this->randomMachineName(MenuStorage::MAX_ID_LENGTH));
+    $menu_name = $this->randomMachineName(MenuStorage::MAX_ID_LENGTH);
     $edit['id'] = $menu_name;
     $this->drupalGet('admin/structure/menu/add');
     $this->submitForm($edit, 'Save');

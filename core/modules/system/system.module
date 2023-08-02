@@ -15,6 +15,8 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
+use Drupal\Core\Entity\EntityViewModeInterface;
+use Drupal\Core\Entity\EntityFormModeInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\TimestampFormatter;
@@ -25,7 +27,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Link;
-use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\Queue\QueueGarbageCollectionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -36,6 +37,7 @@ use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\Url;
 use GuzzleHttp\Exception\TransferException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
  * Disabled option on forms and settings.
@@ -305,15 +307,11 @@ function system_theme_suggestions_page(array $variables) {
   $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
   $suggestions = theme_get_suggestions($path_args, 'page');
 
-  $http_error_suggestions = [
-    'system.401' => 'page__401',
-    'system.403' => 'page__403',
-    'system.404' => 'page__404',
-  ];
-  $route_name = \Drupal::routeMatch()->getRouteName();
-  if (isset($http_error_suggestions[$route_name])) {
+  $supported_http_error_codes = [401, 403, 404];
+  $exception = \Drupal::requestStack()->getCurrentRequest()->attributes->get('exception');
+  if ($exception instanceof HttpExceptionInterface && in_array($exception->getStatusCode(), $supported_http_error_codes, TRUE)) {
     $suggestions[] = 'page__4xx';
-    $suggestions[] = $http_error_suggestions[$route_name];
+    $suggestions[] = 'page__' . $exception->getStatusCode();
   }
 
   return $suggestions;
@@ -980,67 +978,21 @@ function system_admin_compact_mode() {
  *
  * @return array
  *   An array of task links.
+ *
+ * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use the
+ *   'system.module_admin_links_helper' service with the getModuleAdminLinks() method
+ *   and 'user.module_permissions_link_helper' service with the
+ *   ::getModulePermissionsLink() method instead.
+ *
+ * @see https://www.drupal.org/node/3038972
  */
 function system_get_module_admin_tasks($module, string|array $module_name) {
-  if (!is_string($module_name)) {
-    @trigger_error('Calling ' . __FUNCTION__ . '() with $module_name argument as array is deprecated in drupal:10.2.0 and is required to be string from drupal:11.0.0. Pass only $info["name"] instead. See https://www.drupal.org/node/3357711', E_USER_DEPRECATED);
-    $module_name = $module_name['name'];
+  @trigger_error("system_get_module_admin_tasks() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use the 'system.module_admin_links_helper' service with the getModuleAdminLinks() method and 'user.module_permissions_link_helper' service with the ::getModulePermissionsLink() method instead. See https://www.drupal.org/node/3038972", E_USER_DEPRECATED);
+  $module_admin_links = \Drupal::service('system.module_admin_links_helper')->getModuleAdminLinks($module);
+  if ($module_permissions_link = \Drupal::service('user.module_permissions_link_helper')->getModulePermissionsLink($module, $module_name)) {
+    $module_admin_links["user.admin_permissions.{$module}"] = $module_permissions_link;
   }
-
-  $tree = &drupal_static(__FUNCTION__);
-
-  $menu_tree = \Drupal::menuTree();
-
-  if (!isset($tree)) {
-    $parameters = new MenuTreeParameters();
-    $parameters->setRoot('system.admin')->excludeRoot()->onlyEnabledLinks();
-    $tree = $menu_tree->load('system.admin', $parameters);
-    $manipulators = [
-      ['callable' => 'menu.default_tree_manipulators:checkAccess'],
-      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
-      ['callable' => 'menu.default_tree_manipulators:flatten'],
-    ];
-    $tree = $menu_tree->transform($tree, $manipulators);
-  }
-
-  $admin_tasks = [];
-  foreach ($tree as $element) {
-    if (!$element->access->isAllowed()) {
-      // @todo Bubble cacheability metadata of both accessible and inaccessible
-      //   links. Currently made impossible by the way admin tasks are rendered.
-      continue;
-    }
-
-    $link = $element->link;
-    if ($link->getProvider() != $module) {
-      continue;
-    }
-    $admin_tasks[] = [
-      'title' => $link->getTitle(),
-      'description' => $link->getDescription(),
-      'url' => $link->getUrlObject(),
-    ];
-  }
-
-  // Append link for permissions.
-  /** @var \Drupal\user\PermissionHandlerInterface $permission_handler */
-  $permission_handler = \Drupal::service('user.permissions');
-
-  if ($permission_handler->moduleProvidesPermissions($module)) {
-    /** @var \Drupal\Core\Access\AccessManagerInterface $access_manager */
-    $access_manager = \Drupal::service('access_manager');
-    if ($access_manager->checkNamedRoute('user.admin_permissions.module', ['modules' => $module], \Drupal::currentUser())) {
-      /** @var \Drupal\Core\Url $url */
-      $url = new Url('user.admin_permissions.module', ['modules' => $module]);
-      $admin_tasks["user.admin_permissions.$module"] = [
-        'title' => t('Configure @module permissions', ['@module' => $module_name]),
-        'description' => '',
-        'url' => $url,
-      ];
-    }
-  }
-
-  return $admin_tasks;
+  return $module_admin_links;
 }
 
 /**
@@ -1441,5 +1393,31 @@ function system_entity_view_display_presave(EntityViewDisplayInterface $entity_v
       @trigger_error("The 'timestamp' formatter plugin 'tooltip' and 'time_diff' settings were added in drupal:10.1.0 and will be mandatory in Drupal 11.0.0. See https://www.drupal.org/node/2993639", E_USER_DEPRECATED);
       $entity_view_display->setComponent($name, $component);
     }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for view mode entities.
+ *
+ * Sets the description property to an empty string.
+ *
+ * @todo Remove this BC layer in drupal:11.0.0.
+ */
+function system_entity_view_mode_presave(EntityViewModeInterface $entity_view_mode) {
+  if ($entity_view_mode->get('description') === NULL) {
+    $entity_view_mode->set('description', '');
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for form mode entities.
+ *
+ * Sets the description property to an empty string.
+ *
+ * @todo Remove this BC layer in drupal:11.0.0.
+ */
+function system_entity_form_mode_presave(EntityFormModeInterface $entity_form_mode) {
+  if ($entity_form_mode->get('description') === NULL) {
+    $entity_form_mode->set('description', '');
   }
 }

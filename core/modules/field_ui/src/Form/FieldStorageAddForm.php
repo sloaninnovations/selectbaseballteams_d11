@@ -8,7 +8,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Field\FieldTypePluginManager;
+use Drupal\Core\Field\FallbackFieldTypeCategory;
+use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -83,17 +84,23 @@ class FieldStorageAddForm extends FormBase {
    *   The field type plugin manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface|null $entity_field_manager
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   (optional) The entity field manager.
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
    *   (optional) The entity display repository.
+   * @param \Drupal\Core\Field\FieldTypeCategoryManagerInterface|null $fieldTypeCategoryManager
+   *   The field type category plugin manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_plugin_manager, ConfigFactoryInterface $config_factory, EntityFieldManagerInterface $entity_field_manager = NULL, EntityDisplayRepositoryInterface $entity_display_repository = NULL) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_plugin_manager, ConfigFactoryInterface $config_factory, EntityFieldManagerInterface $entity_field_manager, EntityDisplayRepositoryInterface $entity_display_repository, protected ?FieldTypeCategoryManagerInterface $fieldTypeCategoryManager = NULL) {
     $this->entityTypeManager = $entity_type_manager;
     $this->fieldTypePluginManager = $field_type_plugin_manager;
     $this->configFactory = $config_factory;
     $this->entityFieldManager = $entity_field_manager;
     $this->entityDisplayRepository = $entity_display_repository;
+    if ($this->fieldTypeCategoryManager === NULL) {
+      @trigger_error('Calling FieldStorageAddForm::__construct() without the $fieldTypeCategoryManager argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3375740', E_USER_DEPRECATED);
+      $this->fieldTypeCategoryManager = \Drupal::service('plugin.manager.field.field_type_category');
+    }
   }
 
   /**
@@ -112,7 +119,8 @@ class FieldStorageAddForm extends FormBase {
       $container->get('plugin.manager.field.field_type'),
       $container->get('config.factory'),
       $container->get('entity_field.manager'),
-      $container->get('entity_display.repository')
+      $container->get('entity_display.repository'),
+      $container->get('plugin.manager.field.field_type_category'),
     );
   }
 
@@ -150,16 +158,12 @@ class FieldStorageAddForm extends FormBase {
     $field_type_options = $unique_definitions = [];
     $grouped_definitions = $this->fieldTypePluginManager->getGroupedDefinitions($this->fieldTypePluginManager->getUiDefinitions());
     // Invoke a hook to get category properties.
-    $category_info = \Drupal::moduleHandler()->invokeAll('field_type_category_info');
     foreach ($grouped_definitions as $category => $field_types) {
       foreach ($field_types as $name => $field_type) {
         $unique_definitions[$category][$name] = ['unique_identifier' => $name] + $field_type;
-        if (isset($category_info[$category])) {
-          // Get the category label from the hook if it is defined in the hook.
-          $field_type_options[$category_info[$category]['label']->render()] = ['unique_identifier' => $name] + $field_type;
-        }
-        else {
-          $field_type_options[$field_type['label']->render()] = ['unique_identifier' => $name] + $field_type;
+        if ($this->fieldTypeCategoryManager->hasDefinition($category)) {
+          $category_plugin = $this->fieldTypeCategoryManager->createInstance($category, $unique_definitions[$category][$name]);
+          $field_type_options[$category_plugin->getPluginId()] = ['unique_identifier' => $name] + $field_type;
         }
       }
     }
@@ -176,21 +180,18 @@ class FieldStorageAddForm extends FormBase {
       ],
     ];
     $field_type_options_radios = [];
-    foreach ($field_type_options as $field_option => $val) {
-      // Boolean flag for whether a field option is to be displayed as a group.
-      // When an option should be displayed as a group, its category value
-      // is a string id instead of TranslatableMarkup. The string id maps
-      // to the values returned by the field_type_category_info hook.
-      $display_as_group = is_string($val['category']) && $val['category'] !== FieldTypePluginManager::DEFAULT_CATEGORY;
-      $option_info = $display_as_group ? $category_info[$val['category']] : $val;
-      $cleaned_class_name = Html::getClass($val['unique_identifier']);
-      $field_type_options_radios[$field_option] = [
+    foreach ($field_type_options as $id => $field_type) {
+      /** @var  \Drupal\Core\Field\FieldTypeCategoryInterface $category_info */
+      $category_info = $this->fieldTypeCategoryManager->createInstance($field_type['category'], $field_type);
+      $display_as_group = !($category_info instanceof FallbackFieldTypeCategory);
+      $cleaned_class_name = Html::getClass($field_type['unique_identifier']);
+      $field_type_options_radios[$id] = [
         '#type' => 'container',
         '#attributes' => [
           'class' => ['field-option', 'js-click-to-select'],
-          'checked' => $this->getRequest()->request->get('new_storage_type') !== NULL && $this->getRequest()->request->get('new_storage_type') == ($display_as_group ? $val['category'] : $val['unique_identifier']),
+          'checked' => $this->getRequest()->request->get('new_storage_type') !== NULL && $this->getRequest()->request->get('new_storage_type') == ($display_as_group ? $field_type['category'] : $field_type['unique_identifier']),
         ],
-        '#weight' => $option_info['weight'] ?? 1,
+        '#weight' => $category_info->getWeight(),
         'thumb' => [
           '#type' => 'container',
           '#attributes' => [
@@ -200,7 +201,7 @@ class FieldStorageAddForm extends FormBase {
             '#type' => 'container',
             '#attributes' => [
               'class' => ['field-option__icon', $display_as_group ?
-                "field-icon-$val[category]" : "field-icon-$cleaned_class_name",
+                "field-icon-$field_type[category]" : "field-icon-$cleaned_class_name",
               ],
             ],
           ],
@@ -211,14 +212,14 @@ class FieldStorageAddForm extends FormBase {
         ],
         'radio' => [
           '#type' => 'radio',
-          '#title' => $field_option,
+          '#title' => $category_info->getLabel(),
           '#parents' => ['new_storage_type'],
           '#title_display' => 'before',
           '#description_display' => 'before',
           '#theme_wrappers' => ['form_element__new_storage_type'],
           // If it is a category, set return value as the category label,
           // otherwise, set it as the field type id.
-          '#return_value' => $display_as_group ? $val['category'] : $val['unique_identifier'],
+          '#return_value' => $display_as_group ? $field_type['category'] : $field_type['unique_identifier'],
           '#attributes' => [
             'class' => ['field-option-radio'],
           ],
@@ -234,7 +235,7 @@ class FieldStorageAddForm extends FormBase {
             '#attributes' => [
               'class' => ['field-option__description'],
             ],
-            '#markup' => $option_info['description'] ?? NULL,
+            '#markup' => $category_info->getDescription(),
           ],
           '#variant' => 'field-option',
         ],
@@ -261,14 +262,13 @@ class FieldStorageAddForm extends FormBase {
     $selected_field_type = NULL;
     foreach ($field_type_options_radios as $field_type_options_radio) {
       if ($field_type_options_radio['#attributes']['checked']) {
-        $selected_field_label = $field_type_options_radio['radio']['#title'];
         $selected_field_type = $field_type_options_radio['radio']['#return_value'];
         $form_state->setValue('selected_field_type', $selected_field_type);
         break;
       }
     }
-    if (isset($selected_field_label)) {
-      $group_display = $field_type_options_radios[$selected_field_label]['#data']['#group_display'];
+    if (isset($selected_field_type)) {
+      $group_display = $field_type_options_radios[$selected_field_type]['#data']['#group_display'];
       if ($group_display) {
         $form['group_field_options_wrapper']['label'] = [
           '#type' => 'label',
@@ -286,12 +286,13 @@ class FieldStorageAddForm extends FormBase {
           $radio_element = [
             '#type' => 'radio',
             '#theme_wrappers' => ['form_element__new_storage_type'],
-            '#title' => $option['label']->render(),
+            '#title' => $option['label'],
             '#description' => [
               '#theme' => 'item_list',
               '#items' => $unique_definitions[$selected_field_type][$option_key]['description'],
             ],
             '#id' => $option['unique_identifier'],
+            '#weight' => $option['weight'],
             '#parents' => ['group_field_options_wrapper'],
             '#attributes' => [
               'class' => ['field-option-radio'],
@@ -307,8 +308,10 @@ class FieldStorageAddForm extends FormBase {
             $radio_element['#title'] = 'Other';
             $radio_element['#weight'] = 10;
           }
-          $form['group_field_options_wrapper']['fields'][$option['unique_identifier']] = $radio_element;
+          $group_field_options[$option['unique_identifier']] = $radio_element;
         }
+        uasort($group_field_options, [SortArray::class, 'sortByWeightProperty']);
+        $form['group_field_options_wrapper']['fields'] += $group_field_options;
       }
     }
     $field_prefix = $this->config('field_ui.settings')->get('field_prefix');

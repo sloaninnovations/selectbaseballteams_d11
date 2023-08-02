@@ -112,7 +112,7 @@ class DisplayPathTest extends UITestBase {
     $this->drupalGet($url);
     $this->submitForm(['path' => 'user/%1/example'], 'Apply');
     $this->assertSession()->addressEquals($url);
-    $this->assertSession()->pageTextContains("Numeric placeholders may not be used. Please use plain placeholders (%).");
+    $this->assertSession()->pageTextContains("Numeric placeholders may not be used. Use plain placeholders (%).");
   }
 
   /**
@@ -238,7 +238,7 @@ class DisplayPathTest extends UITestBase {
 
     $edit = [];
     $edit['label'] = $this->randomMachineName(16);
-    $view_id = $edit['id'] = strtolower($this->randomMachineName(16));
+    $view_id = $edit['id'] = $this->randomMachineName(16);
     $edit['description'] = $this->randomMachineName(16);
     $edit['page[create]'] = TRUE;
     $edit['page[path]'] = 'admin/foo';

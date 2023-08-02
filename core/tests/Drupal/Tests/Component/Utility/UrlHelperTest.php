@@ -54,6 +54,7 @@ class UrlHelperTest extends TestCase {
       'example.com',
       'www.example.com',
       'ex-ample.com',
+      // cspell:disable-next-line
       '3xampl3.com',
       'example.com/parenthesis',
       'example.com/index.html#pagetop',
@@ -188,6 +189,7 @@ class UrlHelperTest extends TestCase {
    */
   public function providerTestInvalidRelativeData() {
     $data = [
+      // cspell:disable-next-line
       'ex^mple',
       'example<>',
       'ex%ample',

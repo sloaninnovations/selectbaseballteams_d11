@@ -4,7 +4,11 @@ namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManager;
+use Drupal\Core\TypedData\Plugin\DataType\LanguageReference;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Base class for testing validation of config entities.
@@ -25,6 +29,20 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
    * @var \Drupal\Core\Config\Entity\ConfigEntityInterface
    */
   protected ConfigEntityInterface $entity;
+
+  /**
+   * Whether a config entity of this type has a label.
+   *
+   * Most config entity types ensure their entities have a label. But a few do
+   * not, typically highly abstract/very low level config entities without a
+   * strong UI presence. For example: REST resource configuration entities and
+   * entity view displays.
+   *
+   * @see \Drupal\Core\Entity\EntityInterface::label()
+   *
+   * @var bool
+   */
+  protected bool $hasLabel = TRUE;
 
   /**
    * {@inheritdoc}
@@ -102,14 +120,18 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
     $constraints = $this->getMachineNameConstraints();
 
     $this->assertNotEmpty($constraints['Regex']);
-    $this->assertIsString($constraints['Regex']);
+    $this->assertIsArray($constraints['Regex']);
+    $this->assertArrayHasKey('pattern', $constraints['Regex']);
+    $this->assertIsString($constraints['Regex']['pattern']);
+    $this->assertArrayHasKey('message', $constraints['Regex']);
+    $this->assertIsString($constraints['Regex']['message']);
 
     $id_key = $this->entity->getEntityType()->getKey('id');
     if ($is_expected_to_be_valid) {
       $expected_errors = [];
     }
     else {
-      $expected_errors = [$id_key => 'This value is not valid.'];
+      $expected_errors = [$id_key => sprintf('The <em class="placeholder">&quot;%s&quot;</em> machine name is not valid.', $machine_name)];
     }
 
     $this->entity->set(
@@ -132,7 +154,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
     $id_key = $this->entity->getEntityType()->getKey('id');
     $this->entity->set(
       $id_key,
-      mb_strtolower($this->randomMachineName($max_length + 2))
+      $this->randomMachineName($max_length + 2)
     );
     $this->assertValidationErrors([
       $id_key => 'This value is too long. It should have <em class="placeholder">' . $max_length . '</em> characters or less.',
@@ -281,6 +303,44 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
   }
 
   /**
+   * Tests validation of config entity's label.
+   *
+   * @see \Drupal\Core\Entity\EntityInterface::label()
+   * @see \Drupal\Core\Entity\EntityBase::label()
+   */
+  public function testLabelValidation(): void {
+    // Some entity types do not have a label.
+    if (!$this->hasLabel) {
+      $this->markTestSkipped();
+    }
+    if ($this->entity->getEntityType()->getKey('label') === $this->entity->getEntityType()->getKey('id')) {
+      $this->markTestSkipped('This entity type uses the ID as the label; an entity without a label is hence impossible.');
+    }
+
+    static::setLabel($this->entity, "Multi\nLine");
+    $this->assertValidationErrors([$this->entity->getEntityType()->getKey('label') => "Labels are not allowed to span multiple lines."]);
+  }
+
+  /**
+   * Sets the label of the given config entity.
+   *
+   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   *   The config entity to modify.
+   * @param string $label
+   *   The label to set.
+   *
+   * @see ::testLabelValidation()
+   */
+  protected static function setLabel(ConfigEntityInterface $entity, string $label): void {
+    $label_property = $entity->getEntityType()->getKey('label');
+    if ($label_property === FALSE) {
+      throw new \LogicException(sprintf('Override %s to allow testing a %s without a label.', __METHOD__, (string) $entity->getEntityType()->getSingularLabel()));
+    }
+
+    $entity->set($label_property, $label);
+  }
+
+  /**
    * Asserts a set of validation errors is raised when the entity is validated.
    *
    * @param array<string, string|string[]> $expected_messages
@@ -309,6 +369,55 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
       }
     }
     $this->assertSame($expected_messages, $actual_messages);
+  }
+
+  /**
+   * Tests that the config entity's langcode is validated.
+   */
+  public function testLangcode(): void {
+    $this->entity->set('langcode', NULL);
+    $this->assertValidationErrors([
+      'langcode' => 'This value should not be null.',
+    ]);
+
+    // A langcode from the standard list should always be acceptable.
+    $standard_languages = LanguageManager::getStandardLanguageList();
+    $this->assertNotEmpty($standard_languages);
+    $this->entity->set('langcode', key($standard_languages));
+    $this->assertValidationErrors([]);
+
+    // All special, internal langcodes should be acceptable.
+    $system_langcodes = [
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      LanguageInterface::LANGCODE_NOT_APPLICABLE,
+      LanguageInterface::LANGCODE_DEFAULT,
+      LanguageInterface::LANGCODE_SITE_DEFAULT,
+      LanguageInterface::LANGCODE_SYSTEM,
+    ];
+    foreach ($system_langcodes as $langcode) {
+      $this->entity->set('langcode', $langcode);
+      $this->assertValidationErrors([]);
+    }
+
+    // An invalid langcode should be unacceptable, even if it "looks" right.
+    $fake_langcode = 'definitely-not-a-language';
+    $this->assertArrayNotHasKey($fake_langcode, LanguageReference::getAllValidLangcodes());
+    $this->entity->set('langcode', $fake_langcode);
+    $this->assertValidationErrors([
+      'langcode' => 'The value you selected is not a valid choice.',
+    ]);
+
+    // If a new configurable language is created with a non-standard langcode,
+    // it should be acceptable.
+    $this->enableModules(['language']);
+    // The language doesn't exist yet, so it shouldn't be a valid choice.
+    $this->entity->set('langcode', 'kthxbai');
+    $this->assertValidationErrors([
+      'langcode' => 'The value you selected is not a valid choice.',
+    ]);
+    // Once we create the language, it should be a valid choice.
+    ConfigurableLanguage::createFromLangcode('kthxbai')->save();
+    $this->assertValidationErrors([]);
   }
 
 }

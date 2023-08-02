@@ -20,6 +20,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  *     @Translation("For example, 12.34 km or € when used for further detailed calculations (such as summing many of these)"),
  *   },
  *   category = "number",
+ *   weight = -30,
  *   default_widget = "number",
  *   default_formatter = "number_decimal"
  * )
@@ -40,7 +41,7 @@ class DecimalItem extends NumericItemBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
-    $properties['value'] = DataDefinition::create('string')
+    $properties['value'] = DataDefinition::create('decimal')
       ->setLabel(new TranslatableMarkup('Decimal value'))
       ->setRequired(TRUE);
 
@@ -90,24 +91,6 @@ class DecimalItem extends NumericItemBase {
     ];
 
     return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConstraints() {
-    $constraint_manager = \Drupal::typedDataManager()->getValidationConstraintManager();
-    $constraints = parent::getConstraints();
-
-    $constraints[] = $constraint_manager->create('ComplexData', [
-      'value' => [
-        'Regex' => [
-          'pattern' => '/^[+-]?((\d+(\.\d*)?)|(\.\d+))$/i',
-        ],
-      ],
-    ]);
-
-    return $constraints;
   }
 
   /**

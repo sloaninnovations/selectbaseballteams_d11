@@ -80,7 +80,7 @@ class OptionsFieldUITest extends FieldTestBase {
     $this->drupalLogin($admin_user);
 
     // Create content type, with underscores.
-    $this->typeName = 'test_' . strtolower($this->randomMachineName());
+    $this->typeName = 'test_' . $this->randomMachineName();
     $type = $this->drupalCreateContentType(['name' => $this->typeName, 'type' => $this->typeName]);
     $this->type = $type->id();
   }
@@ -141,7 +141,7 @@ class OptionsFieldUITest extends FieldTestBase {
     $node->delete();
     $this->drupalGet($this->adminPath);
     $delete_button_1->click();
-    $assert_session->pageTextNotContains('Please wait');
+    $assert_session->pageTextNotContains('Processing...');
     $page->findById('edit-submit')->click();
     $field_storage = FieldStorageConfig::loadByName('node', $this->fieldName);
     $this->assertSame($field_storage->getSetting('allowed_values'), [0 => 'Zero']);
@@ -221,7 +221,7 @@ class OptionsFieldUITest extends FieldTestBase {
     $node->delete();
     $this->drupalGet($this->adminPath);
     $delete_button_1->click();
-    $assert_session->pageTextNotContains('Please wait');
+    $assert_session->pageTextNotContains('Processing...');
     $page->findById('edit-submit')->click();
     $field_storage = FieldStorageConfig::loadByName('node', $this->fieldName);
     $this->assertSame($field_storage->getSetting('allowed_values'), [0 => 'Zero', 2 => 'Two']);
@@ -301,7 +301,7 @@ class OptionsFieldUITest extends FieldTestBase {
     $node->delete();
     $this->drupalGet($this->adminPath);
     $delete_button_1->click();
-    $assert_session->pageTextNotContains('Please wait');
+    $assert_session->pageTextNotContains('Processing...');
     $page->findById('edit-submit')->click();
     $field_storage = FieldStorageConfig::loadByName('node', $this->fieldName);
     $this->assertSame($field_storage->getSetting('allowed_values'), ['zero' => 'Zero']);
@@ -390,7 +390,7 @@ class OptionsFieldUITest extends FieldTestBase {
    * Tests normal and key formatter display on node display.
    */
   public function testNodeDisplay() {
-    $this->fieldName = strtolower($this->randomMachineName());
+    $this->fieldName = $this->randomMachineName();
     $this->createOptionsField('list_integer');
     $node = $this->drupalCreateNode(['type' => $this->type]);
 

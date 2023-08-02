@@ -127,10 +127,10 @@ function file_validate_name_length(FileInterface $file) {
   $errors = [];
 
   if (!$file->getFilename()) {
-    $errors[] = t("The file's name is empty. Please give a name to the file.");
+    $errors[] = t("The file's name is empty. Enter a name for the file.");
   }
   if (strlen($file->getFilename()) > 240) {
-    $errors[] = t("The file's name exceeds the 240 characters limit. Please rename the file and try again.");
+    $errors[] = t("The file's name exceeds the 240 characters limit. Rename the file and try again.");
   }
   return $errors;
 }
@@ -795,7 +795,7 @@ function file_tokens($type, $tokens, array $data, array $options, BubbleableMeta
 
         case 'url':
           // Ideally, this would use return a relative URL, but because tokens
-          // are also often used in e-mails, it's better to keep absolute file
+          // are also often used in emails, it's better to keep absolute file
           // URLs. The 'url.site' cache context is associated to ensure the
           // correct absolute URL is used in case of a multisite setup.
           $replacements[$original] = $file->createFileUrl(FALSE);
@@ -1080,7 +1080,7 @@ function template_preprocess_file_link(&$variables) {
   // Set file classes to the options array.
   $variables['attributes'] = new Attribute($variables['attributes']);
   $variables['attributes']->addClass($classes);
-  $variables['file_size'] = format_size($file->getSize() ?? 0);
+  $variables['file_size'] = $file->getSize() !== NULL ? format_size($file->getSize()) : '';
 
   $variables['link'] = Link::fromTextAndUrl($link_text, $url->mergeOptions($options))->toRenderable();
 }
@@ -1551,19 +1551,6 @@ function file_field_find_file_reference_column(FieldDefinitionInterface $field) 
     }
   }
   return FALSE;
-}
-
-/**
- * Implements hook_field_type_category_info().
- */
-function file_field_type_category_info() {
-  return [
-    'file_upload' => [
-      'label' => t('File upload'),
-      'description' => t('Field to upload any type of files.'),
-      'weight' => -15,
-    ],
-  ];
 }
 
 /**

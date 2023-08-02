@@ -39,7 +39,7 @@ system.site:
       type: integer
       label: 'Weight element maximum value'
     default_langcode:
-      type: string
+      type: langcode
       label: 'Site default language code'
     mail_notification:
       type: string
@@ -215,7 +215,9 @@ system.menu.*:
       # underscores.
       # @see \Drupal\menu_ui\MenuForm::form()
       constraints:
-        Regex: '/^[a-z0-9-]+$/'
+        Regex:
+          pattern: '/^[a-z0-9-]+$/'
+          message: "The %value machine name is not valid."
         Length:
           max: 32
     label:
@@ -235,6 +237,12 @@ system.action.*:
     id:
       type: machine_name
       label: 'ID'
+      constraints:
+        # Action IDs also allow periods.
+        # @see user_user_role_insert()
+        Regex:
+          pattern: '/^[a-z0-9_\.]+$/'
+          message: "The %value machine name is not valid."
     label:
       type: label
       label: 'Label'
@@ -354,6 +362,14 @@ condition.plugin.request_path:
   mapping:
     pages:
       type: string
+
+condition.plugin.response_status:
+  type: condition.plugin
+  mapping:
+    status_codes:
+      type: sequence
+      sequence:
+        type: integer
 
 system.feature_flags:
   type: config_object
