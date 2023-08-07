@@ -1,0 +1,5 @@
+name: 'Mailer capture transport'
+type: module
+description: 'A mailer transport capturing all mail in state.'
+package: Testing
+version: VERSION

@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Provides mailer with support for various protocols.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function mailer_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.mailer':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The Mailer module provides mail transports for various protocols. For more information, see the <a href=":mailer">online documentation for the Mailer module</a>.', [':mailer' => 'https://www.drupal.org/docs/core-modules-and-themes/core-modules/mailer-module']) . '</p>';
+      return $output;
+  }
+}

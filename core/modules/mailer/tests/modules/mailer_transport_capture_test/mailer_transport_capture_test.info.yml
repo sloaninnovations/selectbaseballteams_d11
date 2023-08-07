@@ -1,0 +1,5 @@
+name: 'Mailer transport capture test'
+type: module
+description: 'Support module for mailer transport capture testing.'
+package: Testing
+version: VERSION

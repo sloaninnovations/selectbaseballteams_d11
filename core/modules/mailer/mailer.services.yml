@@ -1,0 +1,45 @@
+services:
+  mailer.transport_factory.abstract:
+    abstract: true
+    class: Symfony\Component\Mailer\Transport\AbstractTransportFactory
+    arguments: ['@event_dispatcher', null, '@logger.channel.mail']
+  mailer.transport_factory.native:
+    parent: mailer.transport_factory.abstract
+    class: Symfony\Component\Mailer\Transport\NativeTransportFactory
+    tags:
+      - { name: mailer.transport_factory }
+  mailer.transport_factory.null:
+    parent: mailer.transport_factory.abstract
+    class: Symfony\Component\Mailer\Transport\NullTransportFactory
+    tags:
+      - { name: mailer.transport_factory }
+  mailer.transport_factory.sendmail:
+    parent: mailer.transport_factory.abstract
+    class: Symfony\Component\Mailer\Transport\SendmailTransportFactory
+    tags:
+      - { name: mailer.transport_factory }
+  mailer.transport_factory_decorator.sendmail_command_validation:
+    class: Drupal\mailer\Transport\SendmailCommandValidationTransportFactory
+    decorates: mailer.transport_factory.sendmail
+    arguments: ['@.inner']
+    public: false
+  mailer.transport_factory.smtp:
+    parent: mailer.transport_factory.abstract
+    class: Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory
+    tags:
+      - { name: mailer.transport_factory, priority: -100 }
+  mailer.transport_manager:
+    class: Drupal\mailer\TransportManager
+    arguments: ['@config.factory']
+    tags:
+      - { name: service_collector, tag: mailer.transport_factory, call: addTransportFactory }
+  Drupal\mailer\TransportManagerInterface: '@mailer.transport_manager'
+  mailer.transports:
+    class: Symfony\Component\Mailer\Transport\TransportInterface
+    factory: ['@mailer.transport_manager', 'getTransport']
+  Symfony\Component\Mailer\Transport\TransportInterface: '@mailer.transports'
+  mailer.originator_subscriber:
+    class: Drupal\mailer\EventSubscriber\OriginatorSubscriber
+    arguments: ['@config.factory']
+    tags:
+      - { name: event_subscriber }
