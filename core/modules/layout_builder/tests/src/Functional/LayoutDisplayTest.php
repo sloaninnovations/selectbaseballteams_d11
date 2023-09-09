@@ -90,4 +90,34 @@ class LayoutDisplayTest extends BrowserTestBase {
     $assert_session->pageTextContains('Powered by Drupal');
   }
 
+  /**
+   * Tests the placement of the page_title block in layout builder.
+   */
+  public function testPageBlock() {
+    $this->drupalPlaceBlock('page_title_block');
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+    $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field/display';
+
+    // Enable Layout Builder for the default view modes, and overrides.
+    $this->drupalGet("$field_ui_prefix/default");
+    $page->checkField('layout[enabled]');
+    $page->pressButton('Save');
+    $page->checkField('layout[allow_custom]');
+    $page->pressButton('Save');
+
+    $this->drupalGet('node/1/layout');
+    $assert_session->linkExists('Add block');
+    $this->clickLink('Add block');
+    $assert_session->linkExists('Page title');
+    $this->clickLink('Page title');
+    $page->pressButton('Add block');
+    $assert_session->pageTextContains('Title block');
+    $page->pressButton('Save layout');
+
+    $this->drupalGet('node/1');
+    $assert_session->elementsCount('xpath', '//h1', 2);
+
+  }
+
 }

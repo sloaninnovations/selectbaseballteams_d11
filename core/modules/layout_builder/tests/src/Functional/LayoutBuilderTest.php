@@ -993,12 +993,12 @@ class LayoutBuilderTest extends BrowserTestBase {
     // Verify that blocks not modified are present.
     $assert_session->linkExists('Powered by Drupal');
     $assert_session->linkExists('Default revision');
+    $assert_session->linkExists('Page title');
 
     // Verify that blocks explicitly removed are not present.
     $assert_session->linkNotExists('Help');
     $assert_session->linkNotExists('Sticky at top of lists');
     $assert_session->linkNotExists('Main page content');
-    $assert_session->linkNotExists('Page title');
     $assert_session->linkNotExists('Messages');
     $assert_session->linkNotExists('Help');
     $assert_session->linkNotExists('Tabs');
