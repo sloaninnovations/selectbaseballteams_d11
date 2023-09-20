@@ -538,6 +538,7 @@ idempotency
 iframes
 iframeupload
 ignoretag
+imageavif
 imagecache
 imagecreatefrom
 imagetest
