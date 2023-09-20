@@ -519,6 +519,9 @@ class GDToolkit extends ImageToolkitBase {
       IMG_AVIF => 'AVIF',
     ];
     $supported_formats = array_filter($check_formats, fn($type) => imagetypes() & $type, ARRAY_FILTER_USE_KEY);
+    if (!$this->checkAvifSupport()) {
+      unset($supported_formats[IMG_AVIF]);
+    }
     $unsupported_formats = array_diff_key($check_formats, $supported_formats);
 
     $descriptions = [];
@@ -615,6 +618,26 @@ class GDToolkit extends ImageToolkitBase {
       }
     }
     return IMAGETYPE_UNKNOWN;
+  }
+
+  /**
+   * Checks if AVIF is fully supported.
+   *
+   * @return bool
+   *   TRUE if AVIF is fully supported.
+   */
+  protected function checkAvifSupport(): bool {
+    $supported = TRUE;
+    $previous_error_handler = set_error_handler(function ($severity, $message, $file, $line) use (&$previous_error_handler, &$supported) {
+      if (str_starts_with($message, 'imageavif()')) {
+        $supported = FALSE;
+      }
+      if ($previous_error_handler) {
+        return $previous_error_handler($severity, $message, $file, $line);
+      }
+    });
+    imageavif(imagecreatetruecolor(1, 1), $this->fileSystem->tempnam('temporary://', 'avif'));
+    return $supported;
   }
 
   /**
