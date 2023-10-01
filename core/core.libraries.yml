@@ -393,6 +393,7 @@ drupal.ajax:
     - core/jquery
     - core/drupal
     - core/drupalSettings
+    - core/drupal.announce
     - core/drupal.progress
     - core/once
     - core/tabbable
