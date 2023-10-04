@@ -5,6 +5,7 @@ namespace Drupal\Tests\path\Functional;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
+use Drupal\Tests\WaitTerminateTestTrait;
 
 /**
  * Tests modifying path aliases from the UI.
@@ -12,6 +13,8 @@ use Drupal\Core\Url;
  * @group path
  */
 class PathAliasTest extends PathTestBase {
+
+  use WaitTerminateTestTrait;
 
   /**
    * Modules to enable.
@@ -40,6 +43,11 @@ class PathAliasTest extends PathTestBase {
       'access content overview',
     ]);
     $this->drupalLogin($web_user);
+
+    // The \Drupal\path_alias\AliasWhitelist service performs cache clears after
+    // Drupal has flushed the response to the client. We use
+    // WaitTerminateTestTrait to wait for Drupal to do this before continuing.
+    $this->setWaitForTerminate();
   }
 
   /**
@@ -66,9 +74,6 @@ class PathAliasTest extends PathTestBase {
     \Drupal::cache('data')->deleteAll();
     // Make sure the path is not converted to the alias.
     $this->drupalGet(trim($edit['path[0][value]'], '/'), ['alias' => TRUE]);
-    // The \Drupal\path_alias\AliasWhitelist service performs cache clears after
-    // Drupal has flushed the response to the client; wait for this to finish.
-    sleep(1);
     $this->assertNotEmpty(\Drupal::cache('data')->get('preload-paths:' . $edit['path[0][value]']), 'Cache entry was created.');
 
     // Visit the alias for the node and confirm a cache entry is created.
@@ -76,7 +81,6 @@ class PathAliasTest extends PathTestBase {
     // @todo Remove this once https://www.drupal.org/node/2480077 lands.
     Cache::invalidateTags(['rendered']);
     $this->drupalGet(trim($edit['alias[0][value]'], '/'));
-    sleep(1);
     $this->assertNotEmpty(\Drupal::cache('data')->get('preload-paths:' . $edit['path[0][value]']), 'Cache entry was created.');
   }
 

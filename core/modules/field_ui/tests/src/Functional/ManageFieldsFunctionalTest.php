@@ -3,153 +3,17 @@
 namespace Drupal\Tests\field_ui\Functional;
 
 use Behat\Mink\Exception\ElementNotFoundException;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
-use Drupal\Core\Entity\Entity\EntityFormMode;
-use Drupal\Core\Entity\Entity\EntityViewDisplay;
-use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\node\Entity\NodeType;
-use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
-use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 
 /**
  * Tests the Field UI "Manage fields" screen.
  *
  * @group field_ui
+ * @group #slow
  */
-class ManageFieldsFunctionalTest extends BrowserTestBase {
-
-  use FieldUiTestTrait;
-  use EntityReferenceTestTrait;
-
-  /**
-   * Modules to install.
-   *
-   * @var array
-   */
-  protected static $modules = [
-    'node',
-    'field_ui',
-    'field_test',
-    'taxonomy',
-    'image',
-    'block',
-    'node_access_test',
-  ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
-
-  /**
-   * The ID of the custom content type created for testing.
-   *
-   * @var string
-   */
-  protected $contentType;
-
-  /**
-   * The label for a random field to be created for testing.
-   *
-   * @var string
-   */
-  protected $fieldLabel;
-
-  /**
-   * The input name of a random field to be created for testing.
-   *
-   * @var string
-   */
-  protected $fieldNameInput;
-
-  /**
-   * The name of a random field to be created for testing.
-   *
-   * @var string
-   */
-  protected $fieldName;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->drupalPlaceBlock('system_breadcrumb_block');
-    $this->drupalPlaceBlock('local_actions_block');
-    $this->drupalPlaceBlock('local_tasks_block');
-    $this->drupalPlaceBlock('page_title_block');
-
-    // Create a test user.
-    $admin_user = $this->drupalCreateUser([
-      'access content',
-      'administer content types',
-      'bypass node access',
-      'administer node fields',
-      'administer node form display',
-      'administer node display',
-      'administer taxonomy',
-      'administer taxonomy_term fields',
-      'administer taxonomy_term display',
-      'administer users',
-      'administer account settings',
-      'administer user display',
-    ]);
-    $this->drupalLogin($admin_user);
-
-    // Create content type, with underscores.
-    $type_name = $this->randomMachineName(8) . '_test';
-    $type = $this->drupalCreateContentType(['name' => $type_name, 'type' => $type_name]);
-    $this->contentType = $type->id();
-
-    // Create random field name with markup to test escaping.
-    $this->fieldLabel = '<em>' . $this->randomMachineName(8) . '</em>';
-    $this->fieldNameInput = $this->randomMachineName(8);
-    $this->fieldName = 'field_' . $this->fieldNameInput;
-
-    // Create Basic page and Article node types.
-    $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
-    $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
-
-    // Create a vocabulary named "Tags".
-    $vocabulary = Vocabulary::create([
-      'name' => 'Tags',
-      'vid' => 'tags',
-      'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
-    ]);
-    $vocabulary->save();
-
-    // Create a vocabulary named "Kittens".
-    Vocabulary::create([
-      'name' => 'Kittens',
-      'vid' => 'kittens',
-      'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
-    ])->save();
-
-    $handler_settings = [
-      'target_bundles' => [
-        $vocabulary->id() => $vocabulary->id(),
-      ],
-    ];
-    $this->createEntityReferenceField('node', 'article', 'field_' . $vocabulary->id(), 'Tags', 'taxonomy_term', 'default', $handler_settings);
-
-    \Drupal::service('entity_display.repository')
-      ->getFormDisplay('node', 'article')
-      ->setComponent('field_' . $vocabulary->id())
-      ->save();
-
-    // Setup node access testing.
-    node_access_rebuild();
-    node_access_test_add_field(NodeType::load('article'));
-    \Drupal::state()->set('node_access_test.private', TRUE);
-
-  }
+class ManageFieldsFunctionalTest extends ManageFieldsFunctionalTestBase {
 
   /**
    * Runs the field CRUD tests.
@@ -174,7 +38,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
    * @param string $type
    *   (optional) The name of a content type.
    */
-  public function manageFieldsPage($type = '') {
+  protected function manageFieldsPage($type = '') {
     $type = empty($type) ? $this->contentType : $type;
     $this->drupalGet('admin/structure/types/manage/' . $type . '/fields');
     // Check all table columns.
@@ -221,7 +85,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
    * @todo Assert properties can be set in the form and read back in
    * $field_storage and $fields.
    */
-  public function createField() {
+  protected function createField() {
     // Create a test field.
     $this->fieldUIAddNewField('admin/structure/types/manage/' . $this->contentType, $this->fieldNameInput, $this->fieldLabel);
   }
@@ -229,7 +93,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
   /**
    * Tests editing an existing field.
    */
-  public function updateField() {
+  protected function updateField() {
     $field_id = 'node.' . $this->contentType . '.' . $this->fieldName;
     // Go to the field edit page.
     $this->drupalGet('admin/structure/types/manage/' . $this->contentType . '/fields/' . $field_id . '/storage');
@@ -240,7 +104,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
     $edit = [
       'settings[test_field_storage_setting]' => $string,
     ];
-    $this->submitForm($edit, 'Save field settings');
+    $this->submitForm($edit, 'Save');
 
     // Go to the field edit page.
     $this->drupalGet('admin/structure/types/manage/' . $this->contentType . '/fields/' . $field_id);
@@ -260,7 +124,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
   /**
    * Tests adding an existing field in another content type.
    */
-  public function addExistingField() {
+  protected function addExistingField() {
     // Check "Re-use existing field" appears.
     $this->drupalGet('admin/structure/types/manage/page/fields');
     $this->assertSession()->pageTextContains('Re-use an existing field');
@@ -281,7 +145,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
    * We do not test if the number can be submitted with anything else than a
    * numeric value. That is tested already in FormTest::testNumber().
    */
-  public function cardinalitySettings() {
+  protected function cardinalitySettings() {
     $field_edit_path = 'admin/structure/types/manage/article/fields/node.article.body/storage';
 
     // Assert the cardinality other field cannot be empty when cardinality is
@@ -291,7 +155,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
       'cardinality_number' => '',
     ];
     $this->drupalGet($field_edit_path);
-    $this->submitForm($edit, 'Save field settings');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('Number of values is required.');
 
     // Submit a custom number.
@@ -300,8 +164,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
       'cardinality_number' => 6,
     ];
     $this->drupalGet($field_edit_path);
-    $this->submitForm($edit, 'Save field settings');
-    $this->assertSession()->pageTextContains('Updated field Body field settings.');
+    $this->submitForm($edit, 'Save');
     $this->drupalGet($field_edit_path);
     $this->assertSession()->fieldValueEquals('cardinality', 'number');
     $this->assertSession()->fieldValueEquals('cardinality_number', 6);
@@ -324,7 +187,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
       'cardinality_number' => 1,
     ];
     $this->drupalGet($field_edit_path);
-    $this->submitForm($edit, 'Save field settings');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains("There is 1 entity with 2 or more values in this field");
 
     // Create a second entity with three values.
@@ -337,8 +200,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
     ];
     $this->drupalGet($field_edit_path);
-    $this->submitForm($edit, 'Save field settings');
-    $this->assertSession()->pageTextContains('Updated field Body field settings.');
+    $this->submitForm($edit, 'Save');
     $this->drupalGet($field_edit_path);
     $this->assertSession()->fieldValueEquals('cardinality', FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
     $this->assertSession()->fieldValueEquals('cardinality_number', 1);
@@ -350,7 +212,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
       'cardinality_number' => 1,
     ];
     $this->drupalGet($field_edit_path);
-    $this->submitForm($edit, 'Save field settings');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains("There are 2 entities with 2 or more values in this field");
 
     $edit = [
@@ -358,7 +220,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
       'cardinality_number' => 2,
     ];
     $this->drupalGet($field_edit_path);
-    $this->submitForm($edit, 'Save field settings');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains("There is 1 entity with 3 or more values in this field");
 
     $edit = [
@@ -366,7 +228,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
       'cardinality_number' => 3,
     ];
     $this->drupalGet($field_edit_path);
-    $this->submitForm($edit, 'Save field settings');
+    $this->submitForm($edit, 'Save');
 
     // Test the cardinality validation is not access sensitive.
 
@@ -375,7 +237,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
       'cardinality' => (string) FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
     ];
     $this->drupalGet($field_edit_path);
-    $this->submitForm($edit, 'Save field settings');
+    $this->submitForm($edit, 'Save');
     $node = $this->drupalCreateNode([
       'private' => TRUE,
       'uid' => 0,
@@ -396,21 +258,21 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
       'cardinality_number' => 2,
     ];
     $this->drupalGet($field_edit_path);
-    $this->submitForm($edit, 'Save field settings');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains("There are 2 entities with 3 or more values in this field");
     $edit = [
       'cardinality' => 'number',
       'cardinality_number' => 3,
     ];
     $this->drupalGet($field_edit_path);
-    $this->submitForm($edit, 'Save field settings');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains("There is 1 entity with 4 or more values in this field");
     $edit = [
       'cardinality' => 'number',
       'cardinality_number' => 4,
     ];
     $this->drupalGet($field_edit_path);
-    $this->submitForm($edit, 'Save field settings');
+    $this->submitForm($edit, 'Save');
   }
 
   /**
@@ -462,7 +324,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
    *
    * @internal
    */
-  public function assertFieldSettings(string $bundle, string $field_name, string $string = 'dummy test string', string $entity_type = 'node'): void {
+  protected function assertFieldSettings(string $bundle, string $field_name, string $string = 'dummy test string', string $entity_type = 'node'): void {
     // Assert field storage settings.
     $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
     $this->assertSame($string, $field_storage->getSetting('test_field_storage_setting'), 'Field storage settings were found.');
@@ -490,7 +352,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
       'field_name' => $field_exceed_max_length_input,
     ];
     $this->drupalGet('admin/structure/types/manage/' . $this->contentType . '/fields/add-field');
-    $this->submitForm($edit, 'Save and continue');
+    $this->submitForm($edit, 'Continue');
     $this->assertSession()->pageTextContains('Machine-readable name cannot be longer than 22 characters but is currently 23 characters long.');
 
     // Create a valid field.
@@ -642,14 +504,14 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
     $edit['field_name'] = 'title';
     $bundle_path = 'admin/structure/types/manage/' . $this->contentType;
     $this->drupalGet("{$bundle_path}/fields/add-field");
-    $this->submitForm($edit, 'Save and continue');
+    $this->submitForm($edit, 'Continue');
     $this->assertSession()->pageTextContains('The machine-readable name is already in use. It must be unique.');
 
     // Try with a base field.
     $edit['field_name'] = 'sticky';
     $bundle_path = 'admin/structure/types/manage/' . $this->contentType;
     $this->drupalGet("{$bundle_path}/fields/add-field");
-    $this->submitForm($edit, 'Save and continue');
+    $this->submitForm($edit, 'Continue');
     $this->assertSession()->pageTextContains('The machine-readable name is already in use. It must be unique.');
   }
 
@@ -755,11 +617,17 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
   public function testDuplicateFieldName() {
     // field_tags already exists, so we're expecting an error when trying to
     // create a new field with the same name.
-    $url = 'admin/structure/types/manage/' . $this->contentType;
-    $this->fieldUIAddNewField($url, 'tags', $this->randomMachineName(), 'entity_reference', [], [], FALSE);
+    $url = 'admin/structure/types/manage/' . $this->contentType . '/fields/add-field';
+    $this->drupalGet($url);
+    $edit = [
+      'label' => $this->randomMachineName(),
+      'field_name' => 'tags',
+      'new_storage_type' => 'boolean',
+    ];
+    $this->submitForm($edit, 'Continue');
 
     $this->assertSession()->pageTextContains('The machine-readable name is already in use. It must be unique.');
-    $this->assertSession()->addressEquals($url . '/fields/add-field');
+    $this->assertSession()->addressEquals($url);
   }
 
   /**
@@ -770,7 +638,7 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
       'query' => ['destinations' => ['http://example.com']],
     ];
     $this->drupalGet('admin/structure/types/manage/article/fields/node.article.body/storage', $options);
-    $this->submitForm([], 'Save field settings');
+    $this->submitForm([], 'Save');
     // The external redirect should not fire.
     $this->assertSession()->addressEquals('admin/structure/types/manage/article/fields/node.article.body/storage?destinations%5B0%5D=http%3A//example.com');
     $this->assertSession()->statusCodeEquals(200);
@@ -893,155 +761,6 @@ class ManageFieldsFunctionalTest extends BrowserTestBase {
 
     $this->drupalGet('admin/structure/types/manage/' . $this->contentType . '/fields/' . $field_id . '/storage');
     $this->assertSession()->statusCodeEquals(404);
-  }
-
-  /**
-   * Tests that options are copied over when reusing a field.
-   *
-   * @dataProvider entityTypesProvider
-   */
-  public function testReuseField($entity_type, $bundle1, $bundle2) {
-    $field_name = 'test_reuse';
-    $label = $this->randomMachineName();
-
-    // Create field with pre-configured options.
-    $this->drupalGet($bundle1['path'] . "/fields/add-field");
-    $this->fieldUIAddNewField(NULL, $field_name, $label, 'field_ui:test_field_with_preconfigured_options:custom_options');
-    $new_label = $this->randomMachineName();
-    $this->fieldUIAddExistingField($bundle2['path'], "field_{$field_name}", $new_label);
-    $field = FieldConfig::loadByName($entity_type, $bundle2['id'], "field_{$field_name}");
-    $this->assertTrue($field->isRequired());
-    $this->assertEquals($new_label, $field->label());
-    $this->assertEquals('preconfigured_field_setting', $field->getSetting('test_field_setting'));
-
-    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
-    $display_repository = \Drupal::service('entity_display.repository');
-
-    $form_display = $display_repository->getFormDisplay($entity_type, $bundle2['id']);
-    $this->assertEquals('test_field_widget_multiple', $form_display->getComponent("field_{$field_name}")['type']);
-    $view_display = $display_repository->getViewDisplay($entity_type, $bundle2['id']);
-    $this->assertEquals('field_test_multiple', $view_display->getComponent("field_{$field_name}")['type']);
-    $this->assertEquals('altered dummy test string', $view_display->getComponent("field_{$field_name}")['settings']['test_formatter_setting_multiple']);
-  }
-
-  /**
-   * Tests that options are copied over when reusing a field.
-   *
-   * @dataProvider entityTypesProvider
-   */
-  public function testReuseFieldMultipleDisplay($entity_type, $bundle1, $bundle2) {
-    // Create additional form mode and enable it on both bundles.
-    EntityFormMode::create([
-      'id' => "{$entity_type}.little",
-      'label' => 'Little Form',
-      'targetEntityType' => $entity_type,
-    ])->save();
-    $form_display = EntityFormDisplay::create([
-      'id' => "{$entity_type}.{$bundle1['id']}.little",
-      'targetEntityType' => $entity_type,
-      'status' => TRUE,
-      'bundle' => $bundle1['id'],
-      'mode' => 'little',
-    ]);
-    $form_display->save();
-    EntityFormDisplay::create([
-      'id' => "{$entity_type}.{$bundle2['id']}.little",
-      'targetEntityType' => $entity_type,
-      'status' => TRUE,
-      'bundle' => $bundle2['id'],
-      'mode' => 'little',
-    ])->save();
-
-    // Create additional view mode and enable it on both bundles.
-    EntityViewMode::create([
-      'id' => "{$entity_type}.little",
-      'targetEntityType' => $entity_type,
-      'status' => TRUE,
-      'enabled' => TRUE,
-      'label' => 'Little View Mode',
-    ])->save();
-    $view_display = EntityViewDisplay::create([
-      'id' => "{$entity_type}.{$bundle1['id']}.little",
-      'targetEntityType' => $entity_type,
-      'status' => TRUE,
-      'bundle' => $bundle1['id'],
-      'mode' => 'little',
-    ]);
-    $view_display->save();
-    EntityViewDisplay::create([
-      'id' => "{$entity_type}.{$bundle2['id']}.little",
-      'targetEntityType' => $entity_type,
-      'status' => TRUE,
-      'bundle' => $bundle2['id'],
-      'mode' => 'little',
-    ])->save();
-
-    $field_name = 'test_reuse';
-    $label = $this->randomMachineName();
-
-    // Create field with pre-configured options.
-    $this->drupalGet($bundle1['path'] . "/fields/add-field");
-    $this->fieldUIAddNewField(NULL, $field_name, $label, 'field_ui:test_field_with_preconfigured_options:custom_options');
-    $view_display->setComponent("field_{$field_name}", [
-      'type' => 'field_test_default',
-      'region' => 'content',
-    ])->save();
-    $form_display->setComponent("field_{$field_name}", [
-      'type' => 'test_field_widget',
-      'region' => 'content',
-    ])->save();
-
-    $new_label = $this->randomMachineName();
-    $this->fieldUIAddExistingField($bundle2['path'], "field_{$field_name}", $new_label);
-
-    $field = FieldConfig::loadByName($entity_type, $bundle2['id'], "field_{$field_name}");
-    $this->assertTrue($field->isRequired());
-    $this->assertEquals($new_label, $field->label());
-    $this->assertEquals('preconfigured_field_setting', $field->getSetting('test_field_setting'));
-
-    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
-    $display_repository = \Drupal::service('entity_display.repository');
-
-    // Ensure that the additional form display has correct settings.
-    $form_display = $display_repository->getFormDisplay($entity_type, $bundle2['id'], $form_display->getMode());
-    $this->assertEquals('test_field_widget', $form_display->getComponent("field_{$field_name}")['type']);
-
-    // Ensure that the additional view display has correct settings.
-    $view_display = $display_repository->getViewDisplay($entity_type, $bundle2['id'], $view_display->getMode());
-    $this->assertEquals('field_test_default', $view_display->getComponent("field_{$field_name}")['type']);
-  }
-
-  /**
-   * Data provider for testing Field UI with multiple entity types.
-   *
-   * @return array
-   *   Test cases.
-   */
-  public function entityTypesProvider() {
-    return [
-      'node' => [
-        'entity_type' => 'node',
-        'article' => [
-          'id' => 'article',
-          'path' => 'admin/structure/types/manage/article',
-        ],
-        'page' => [
-          'id' => 'page',
-          'path' => 'admin/structure/types/manage/page',
-        ],
-      ],
-      'taxonomy' => [
-        'entity_type' => 'taxonomy_term',
-        'tags' => [
-          'id' => 'tags',
-          'path' => 'admin/structure/taxonomy/manage/tags/overview',
-        ],
-        'kittens' => [
-          'id' => 'kittens',
-          'path' => 'admin/structure/taxonomy/manage/kittens/overview',
-        ],
-      ],
-    ];
   }
 
   /**

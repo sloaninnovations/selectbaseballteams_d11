@@ -18,7 +18,6 @@ ajaxing
 akiko
 allwords
 alphadecimal
-alterjs
 alternatif
 amet
 amphibius
@@ -122,6 +121,7 @@ blocknodebundle
 blockpromoted
 blockquotes
 blockrecipe
+blockrelated
 blocktest
 bloggy
 blub
@@ -131,8 +131,6 @@ bodyvalue
 boing
 bomofo
 bonacieux
-boskoop
-boskop
 bovigo
 breezer
 brion
@@ -306,6 +304,7 @@ desaturate
 desaturated
 desaturates
 desaturating
+descoping
 descripcion
 destructable
 deutsch
@@ -322,9 +321,11 @@ distro
 ditka
 divs
 dnumber
+dockerhub
 docroot
 docroots
 dolore
+dotenv
 downcasting
 doxygen
 dragtable
@@ -339,7 +340,6 @@ drivertext
 dropbutton
 dropbuttons
 drudbal
-drup
 drupalci
 drupaldatetime
 drupaldevdays
@@ -364,7 +364,6 @@ drush
 drépal
 détruire
 editables
-editunblock
 eerste
 egulias
 eins
@@ -433,7 +432,6 @@ fieldsets
 filelist
 filemime
 filesort
-filestorage
 filesystems
 filetransfer
 filevalidationerror
@@ -450,7 +448,6 @@ fooalert
 foobarbaz
 foobargorilla
 foofoo
-foos
 formattable
 formvalidation
 fouc
@@ -540,6 +537,7 @@ insidekeyword
 instaclick
 instantiator
 interactable
+interruptible
 introspectable
 invalidators
 invalididentifier
@@ -667,6 +665,7 @@ metatag
 metatags
 meφω
 mglaman
+micheh
 mikey
 milli
 mimetypes
@@ -737,7 +736,6 @@ negotiatiors
 newcol
 newfieldinitial
 newnode
-newstr
 newterm
 newwin
 nids
@@ -795,6 +793,7 @@ optin
 optionchecker
 orgchart
 ossp
+otel
 otlp
 otsikko
 outdent
@@ -885,8 +884,6 @@ presetname
 pretransaction
 preuninstall
 processlist
-projecta
-projectb
 proname
 prophesize
 prophesized
@@ -967,7 +964,6 @@ revlog
 revpub
 ribisi
 ritchie
-rolename
 roly
 routable
 routeable
@@ -1027,7 +1023,6 @@ somemodule
 someschema
 somethinggeneric
 sortablejs
-sourcedir
 sourceediting
 spacebar
 spagna
@@ -1130,7 +1125,6 @@ tagstack
 tagwords
 takeshita
 tappable
-targetdir
 tarz
 taskless
 tatou
@@ -1341,7 +1335,6 @@ wcprops
 webassert
 webcal
 webflo
-webheads
 webhosting
 webmention
 webmozart
@@ -1350,19 +1343,14 @@ webroot
 webservers
 webtest
 whitespaces
-whos
 widthx
-wimoids
 wmet
 wmlscript
 wordprocessingml
 wordsafe
 wordword
 workspaceswitcher
-writability
 writeln
-wrongparam
-wsod
 wwwrun
 xbap
 xbitmap

@@ -23,7 +23,8 @@
         "drupal/coder": "^8.3.10",
         "instaclick/php-webdriver": "^1.4.1",
         "justinrainbow/json-schema": "^5.2",
-        "mglaman/phpstan-drupal": "^1.1.36",
+        "mglaman/phpstan-drupal": "^1.2",
+        "micheh/phpcs-gitlab": "^1.1",
         "mikey179/vfsstream": "^1.6.11",
         "open-telemetry/exporter-otlp": "@beta",
         "open-telemetry/sdk": "@beta",
@@ -68,9 +69,6 @@
         }
     },
     "extra": {
-        "branch-alias": {
-          "dev-11.x": "10.2.x-dev"
-        },
         "_readme": [
             "By default Drupal loads the autoloader from ./vendor/autoload.php.",
             "To change the autoloader you can edit ./autoload.php.",

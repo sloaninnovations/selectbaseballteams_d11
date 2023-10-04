@@ -184,7 +184,7 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['mapping']['status']['label'] = 'Status';
     $expected['mapping']['dependencies']['type'] = 'config_dependencies';
     $expected['mapping']['dependencies']['label'] = 'Dependencies';
-    $expected['mapping']['label']['type'] = 'label';
+    $expected['mapping']['label']['type'] = 'required_label';
     $expected['mapping']['label']['label'] = 'Label';
     $expected['mapping']['effects']['type'] = 'sequence';
     $expected['mapping']['effects']['sequence']['type'] = 'mapping';
@@ -352,6 +352,8 @@ class ConfigSchemaTest extends KernelTestBase {
 
   /**
    * Tests configuration value data type enforcement using schemas.
+   *
+   * @group legacy
    */
   public function testConfigSaveWithSchema() {
     $untyped_values = [
@@ -399,6 +401,7 @@ class ConfigSchemaTest extends KernelTestBase {
     ];
 
     // Save config which has a schema that enforces types.
+    $this->expectDeprecation("The definition for the 'config_schema_test.schema_data_types.sequence_bc' sequence declares the type of its items in a way that is deprecated in drupal:8.0.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/2442603");
     $this->config('config_schema_test.schema_data_types')
       ->setData($untyped_to_typed)
       ->save();

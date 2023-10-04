@@ -11,7 +11,7 @@ use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
-use Drupal\Core\Database\Transaction;
+use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 
 // cSpell:ignore ilike nextval
 
@@ -71,6 +71,21 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   protected $identifierQuotes = ['"', '"'];
+
+  /**
+   * An array of transaction savepoints.
+   *
+   * The main use for this array is to store information about transaction
+   * savepoints opened to to mimic MySql's InnoDB functionality, which provides
+   * an inherent savepoint before any query in a transaction.
+   *
+   * @see ::addSavepoint()
+   * @see ::releaseSavepoint()
+   * @see ::rollbackSavepoint()
+   *
+   * @var array<string,Transaction>
+   */
+  protected array $savepoints = [];
 
   /**
    * Constructs a connection object.
@@ -198,7 +213,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // - A 'mimic_implicit_commit' does not exist already.
     // - The query is not a savepoint query.
     $wrap_with_savepoint = $this->inTransaction() &&
-      !isset($this->transactionLayers['mimic_implicit_commit']) &&
+      !$this->transactionManager()->has('mimic_implicit_commit') &&
       !(is_string($query) && (
         stripos($query, 'ROLLBACK TO SAVEPOINT ') === 0 ||
         stripos($query, 'RELEASE SAVEPOINT ') === 0 ||
@@ -271,27 +286,61 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   public function createDatabase($database) {
     // Escape the database name.
     $database = Database::getConnection()->escapeDatabase($database);
+    $db_created = FALSE;
 
-    // If the PECL intl extension is installed, use it to determine the proper
-    // locale.  Otherwise, fall back to en_US.
-    if (class_exists('Locale')) {
-      $locale = \Locale::getDefault();
-    }
-    else {
-      $locale = 'en_US';
+    // Try to determine the proper locales for character classification and
+    // collation. If we could determine locales other than 'en_US', try creating
+    // the database with these first.
+    $ctype = setlocale(LC_CTYPE, 0);
+    $collate = setlocale(LC_COLLATE, 0);
+    if ($ctype && $collate) {
+      try {
+        $this->connection->exec("CREATE DATABASE $database WITH TEMPLATE template0 ENCODING='UTF8' LC_CTYPE='$ctype.UTF-8' LC_COLLATE='$collate.UTF-8'");
+        $db_created = TRUE;
+      }
+      catch (\Exception $e) {
+        // It might be that the server is remote and does not support the
+        // locale and collation of the webserver, so we will try again.
+      }
     }
 
-    try {
-      // Create the database and set it as active.
-      $this->connection->exec("CREATE DATABASE $database WITH TEMPLATE template0 ENCODING='utf8' LC_CTYPE='$locale.utf8' LC_COLLATE='$locale.utf8'");
-    }
-    catch (\Exception $e) {
-      throw new DatabaseNotFoundException($e->getMessage());
+    // Otherwise fall back to creating the database using the 'en_US' locales.
+    if (!$db_created) {
+      try {
+        $this->connection->exec("CREATE DATABASE $database WITH TEMPLATE template0 ENCODING='UTF8' LC_CTYPE='en_US.UTF-8' LC_COLLATE='en_US.UTF-8'");
+      }
+      catch (\Exception $e) {
+        // If the database can't be created with the 'en_US' locale either,
+        // we're finally throwing an exception.
+        throw new DatabaseNotFoundException($e->getMessage());
+      }
     }
   }
 
   public function mapConditionOperator($operator) {
     return static::$postgresqlConditionOperatorMap[$operator] ?? NULL;
+  }
+
+  /**
+   * Creates the appropriate sequence name for a given table and serial field.
+   *
+   * This method should only be called by the driver's code.
+   *
+   * @param string $table
+   *   The table name to use for the sequence.
+   * @param string $field
+   *   The field name to use for the sequence.
+   *
+   * @return string
+   *   A table prefix-parsed string for the sequence name.
+   *
+   * @internal
+   */
+  public function makeSequenceName($table, $field) {
+    $sequence_name = $this->prefixTables('{' . $table . '}_' . $field . '_seq');
+    // Remove identifier quotes as we are constructing a new name from a
+    // prefixed and quoted table name.
+    return str_replace($this->identifierQuotes, '', $sequence_name);
   }
 
   /**
@@ -358,12 +407,10 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @param $savepoint_name
    *   A string representing the savepoint name. By default,
    *   "mimic_implicit_commit" is used.
-   *
-   * @see Drupal\Core\Database\Connection::pushTransaction()
    */
   public function addSavepoint($savepoint_name = 'mimic_implicit_commit') {
     if ($this->inTransaction()) {
-      $this->pushTransaction($savepoint_name);
+      $this->savepoints[$savepoint_name] = $this->startTransaction($savepoint_name);
     }
   }
 
@@ -373,12 +420,10 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @param $savepoint_name
    *   A string representing the savepoint name. By default,
    *   "mimic_implicit_commit" is used.
-   *
-   * @see Drupal\Core\Database\Connection::popTransaction()
    */
   public function releaseSavepoint($savepoint_name = 'mimic_implicit_commit') {
-    if (isset($this->transactionLayers[$savepoint_name])) {
-      $this->popTransaction($savepoint_name);
+    if ($this->inTransaction() && $this->transactionManager()->has($savepoint_name)) {
+      unset($this->savepoints[$savepoint_name]);
     }
   }
 
@@ -390,8 +435,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *   "mimic_implicit_commit" is used.
    */
   public function rollbackSavepoint($savepoint_name = 'mimic_implicit_commit') {
-    if (isset($this->transactionLayers[$savepoint_name])) {
-      $this->rollBack($savepoint_name);
+    if ($this->inTransaction() && $this->transactionManager()->has($savepoint_name)) {
+      $this->savepoints[$savepoint_name]->rollBack();
+      unset($this->savepoints[$savepoint_name]);
     }
   }
 
@@ -483,8 +529,15 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
+  protected function driverTransactionManager(): TransactionManagerInterface {
+    return new TransactionManager($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function startTransaction($name = '') {
-    return new Transaction($this, $name);
+    return $this->transactionManager()->push($name);
   }
 
 }

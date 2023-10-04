@@ -4,6 +4,9 @@ namespace Drupal\options\Plugin\Field\FieldType;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\FocusFirstCommand;
+use Drupal\Core\Ajax\InsertCommand;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -118,6 +121,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
       ],
       '#attributes' => [
         'id' => 'allowed-values-order',
+        'data-field-list-table' => TRUE,
       ],
       '#tabledrag' => [
         [
@@ -125,6 +129,9 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
           'relationship' => 'sibling',
           'group' => 'weight',
         ],
+      ],
+      '#attached' => [
+        'library' => ['core/drupal.fieldListKeyboardNavigation'],
       ],
     ];
 
@@ -178,6 +185,10 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
         '#default_value' => 0,
         '#attributes' => ['class' => ['weight']],
       ];
+      // Disable the remove button if there is only one row in the table.
+      if ($max === 0) {
+        $element['allowed_values']['table'][0]['delete']['#attributes']['disabled'] = 'disabled';
+      }
       if ($delta < count($allowed_values)) {
         $query = \Drupal::entityQuery($entity_type_id)
           ->accessCheck(FALSE)
@@ -196,12 +207,14 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
       }
     }
     $element['allowed_values']['table']['#max_delta'] = $max;
-
     $element['allowed_values']['add_more_allowed_values'] = [
       '#type' => 'submit',
       '#name' => 'add_more_allowed_values',
       '#value' => $this->t('Add another item'),
-      '#attributes' => ['class' => ['field-add-more-submit']],
+      '#attributes' => [
+        'class' => ['field-add-more-submit'],
+        'data-field-list-button' => TRUE,
+      ],
       // Allow users to add another row without requiring existing rows to have
       // values.
       '#limit_validation_errors' => [],
@@ -210,6 +223,10 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
         'callback' => [static::class, 'addMoreAjax'],
         'wrapper' => $wrapper_id,
         'effect' => 'fade',
+        'progress' => [
+          'type' => 'throbber',
+          'message' => $this->t('Adding a new item...'),
+        ],
       ],
     ];
 
@@ -246,10 +263,18 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     // Go one level up in the form.
     $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
     $delta = $element['table']['#max_delta'];
-    $element['table'][$delta]['item']['#prefix'] = '<div class="ajax-new-content">' . ($element['table'][$delta]['item']['#prefix'] ?? '');
+    $element['table'][$delta]['item']['#prefix'] = '<div class="ajax-new-content" data-drupal-selector="field-list-add-more-focus-target">' . ($element['table'][$delta]['item']['#prefix'] ?? '');
     $element['table'][$delta]['item']['#suffix'] = ($element['table'][$delta]['item']['#suffix'] ?? '') . '</div>';
+    // Enable the remove button for the first row if there are more rows.
+    if ($delta > 0 && isset($element['table'][0]['delete']['#attributes']['disabled']) && !isset($element['table'][0]['item']['key']['#attributes']['disabled'])) {
+      unset($element['table'][0]['delete']['#attributes']['disabled']);
+    }
 
-    return $element;
+    $response = new AjaxResponse();
+    $response->addCommand(new InsertCommand(NULL, $element));
+    $response->addCommand(new FocusFirstCommand('[data-drupal-selector="field-list-add-more-focus-target"]'));
+
+    return $response;
   }
 
   /**
@@ -367,7 +392,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     $values = [];
 
     if (is_string($list)) {
-      trigger_error('Passing a string to ' . __METHOD__ . '() is deprecated in drupal:10.2.0 and will be removed from drupal:11.0.0. Use an array instead.', E_USER_DEPRECATED);
+      trigger_error('Passing a string to ' . __METHOD__ . '() is deprecated in drupal:10.2.0 and will cause an error from drupal:11.0.0. Use an array instead. See https://www.drupal.org/node/3376368', E_USER_DEPRECATED);
       $list = explode("\n", $list);
       $list = array_map('trim', $list);
       $list = array_filter($list, 'strlen');

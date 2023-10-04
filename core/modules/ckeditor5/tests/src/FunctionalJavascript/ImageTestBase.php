@@ -9,7 +9,7 @@ use Drupal\node\Entity\Node;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 
-// cspell:ignore imageresize imageupload
+// cspell:ignore imageresize
 
 /**
  * @coversDefaultClass \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Image
@@ -55,7 +55,7 @@ abstract class ImageTestBase extends CKEditor5TestBase {
    * @return string[]
    */
   protected function imageAttributes() {
-    return ['src' => '/core/misc/druplicon.png'];
+    return ['src' => base_path() . 'core/misc/druplicon.png'];
   }
 
   /**

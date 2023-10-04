@@ -13,6 +13,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
  * Tests the Node Translation UI.
  *
  * @group node
+ * @group #slow
  */
 class NodeTranslationUITest extends ContentTranslationUITestBase {
 
@@ -560,7 +561,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     // details form element.
     $edit = ['cardinality_number' => 2];
     $this->drupalGet('admin/structure/types/manage/article/fields/node.article.field_image/storage');
-    $this->submitForm($edit, 'Save field settings');
+    $this->submitForm($edit, 'Save');
 
     // Make the image field non-translatable.
     $edit = ['settings[node][article][fields][field_image]' => FALSE];
