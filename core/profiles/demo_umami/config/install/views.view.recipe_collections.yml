@@ -134,6 +134,7 @@ display:
           entity_type: taxonomy_term
           entity_field: default_langcode
           plugin_id: boolean
+          accept_null: false
           operator: '='
           value: '1'
           group: 1
