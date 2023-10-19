@@ -909,7 +909,7 @@ class FormBuilderTest extends FormTestBase {
    *
    * @dataProvider providerTestFormTokenCacheability
    */
-  public function testFormTokenCacheability($token, $is_authenticated, $expected_form_cacheability, $expected_token_cacheability, $method): void {
+  public function testFormTokenCacheability($token, $is_authenticated, $method): void {
     $user = $this->prophesize(AccountProxyInterface::class);
     $user->isAuthenticated()
       ->willReturn($is_authenticated);
@@ -934,19 +934,36 @@ class FormBuilderTest extends FormTestBase {
 
     $form_state = new FormState();
     $built_form = $this->formBuilder->buildForm($form_arg, $form_state);
-    if (!isset($expected_form_cacheability) || ($method == 'get' && !is_string($token))) {
+
+    // FormBuilder does not even consider to set a form token when:
+    // - #token = FALSE (opting out explicitly)
+    // - #method = GET and #token is not set to a string (GET forms don't get a
+    //   form token by default, and this form did not explicitly opt in)
+    if ($token === FALSE || ($method == 'get' && !is_string($token))) {
       $this->assertEquals($built_form['#cache'], ['tags' => ['CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form']]);
-    }
-    else {
-      $this->assertTrue(isset($built_form['#cache']));
-      $this->assertEquals($expected_form_cacheability, $built_form['#cache']);
-    }
-    if (!isset($expected_token_cacheability)) {
       $this->assertFalse(isset($built_form['form_token']));
     }
+    // Otherwise, a form token is set, but only if the user is logged in. It is
+    // impossible (and unnecessary) to set a form token if the user is not
+    // logged in, because there is no session, and hence no CSRF token.
     else {
-      $this->assertTrue(isset($built_form['form_token']));
-      $this->assertEquals($expected_token_cacheability, $built_form['form_token']['#cache']);
+      // For forms that are eligible for form tokens, a cache context must be
+      // set that indicates the form token only exists for logged in users.
+      $this->assertTrue(isset($built_form['#cache']));
+      $expected_cacheability_metadata = [
+        'tags' => ['CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form'],
+        'contexts' => ['user.roles:authenticated'],
+      ];
+      $this->assertEquals($expected_cacheability_metadata, $built_form['#cache']);
+      // Finally, verify that a form token is generated when appropriate, with
+      // the expected cacheability metadata (or lack thereof).
+      if (!$is_authenticated) {
+        $this->assertFalse(isset($built_form['form_token']));
+      }
+      else {
+        $this->assertTrue(isset($built_form['form_token']));
+        $this->assertFalse(isset($built_form['form_token']['#cache']));
+      }
     }
   }
 
@@ -957,12 +974,12 @@ class FormBuilderTest extends FormTestBase {
    */
   public static function providerTestFormTokenCacheability() {
     return [
-      'token:none,authenticated:true' => [NULL, TRUE, ['contexts' => ['user.roles:authenticated'], 'tags' => ['CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form']], ['max-age' => 0], 'post'],
-      'token:none,authenticated:false' => [NULL, FALSE, ['contexts' => ['user.roles:authenticated'], 'tags' => ['CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form']], NULL, 'post'],
-      'token:false,authenticated:false' => [FALSE, FALSE, NULL, NULL, 'post'],
-      'token:false,authenticated:true' => [FALSE, TRUE, NULL, NULL, 'post'],
-      'token:none,authenticated:false,method:get' => [NULL, FALSE, ['contexts' => ['user.roles:authenticated'], 'tags' => ['CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form']], NULL, 'get'],
-      'token:test_form_id,authenticated:false,method:get' => ['test_form_id', TRUE, ['contexts' => ['user.roles:authenticated'], 'tags' => ['CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form']], ['max-age' => 0], 'get'],
+      'token:none,authenticated:true' => [NULL, TRUE, 'post'],
+      'token:none,authenticated:false' => [NULL, FALSE, 'post'],
+      'token:false,authenticated:false' => [FALSE, FALSE, 'post'],
+      'token:false,authenticated:true' => [FALSE, TRUE, 'post'],
+      'token:none,authenticated:false,method:get' => [NULL, FALSE, 'get'],
+      'token:test_form_id,authenticated:false,method:get' => ['test_form_id', TRUE, 'get'],
     ];
   }
 
