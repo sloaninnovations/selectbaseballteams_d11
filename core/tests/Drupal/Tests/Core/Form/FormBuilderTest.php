@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\Form;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Form\EnforcedResponseException;
@@ -909,7 +910,7 @@ class FormBuilderTest extends FormTestBase {
    *
    * @dataProvider providerTestFormTokenCacheability
    */
-  public function testFormTokenCacheability($token, $is_authenticated, $method): void {
+  public function testFormTokenCacheability($token, $is_authenticated, $method, $opted_in_for_cache): void {
     $user = $this->prophesize(AccountProxyInterface::class);
     $user->isAuthenticated()
       ->willReturn($is_authenticated);
@@ -922,6 +923,10 @@ class FormBuilderTest extends FormTestBase {
 
     if (isset($token)) {
       $form['#token'] = $token;
+    }
+
+    if ($opted_in_for_cache) {
+      $form['#cache']['max-age'] = Cache::PERMANENT;
     }
 
     $form_arg = $this->createMock('Drupal\Core\Form\FormInterface');
@@ -962,7 +967,12 @@ class FormBuilderTest extends FormTestBase {
       }
       else {
         $this->assertTrue(isset($built_form['form_token']));
-        $this->assertFalse(isset($built_form['form_token']['#cache']));
+        if ($opted_in_for_cache) {
+          $this->assertFalse(isset($built_form['form_token']['#cache']));
+        }
+        else {
+          $this->assertEquals(['max-age' => 0], $built_form['form_token']['#cache']);
+        }
       }
     }
   }
@@ -974,12 +984,13 @@ class FormBuilderTest extends FormTestBase {
    */
   public static function providerTestFormTokenCacheability() {
     return [
-      'token:none,authenticated:true' => [NULL, TRUE, 'post'],
-      'token:none,authenticated:false' => [NULL, FALSE, 'post'],
-      'token:false,authenticated:false' => [FALSE, FALSE, 'post'],
-      'token:false,authenticated:true' => [FALSE, TRUE, 'post'],
-      'token:none,authenticated:false,method:get' => [NULL, FALSE, 'get'],
-      'token:test_form_id,authenticated:false,method:get' => ['test_form_id', TRUE, 'get'],
+      'token:none,authenticated:true' => [NULL, TRUE, 'post', FALSE],
+      'token:none,authenticated:true,opted_in_for_cache' => [NULL, TRUE, 'post', TRUE],
+      'token:none,authenticated:false' => [NULL, FALSE, 'post', FALSE],
+      'token:false,authenticated:false' => [FALSE, FALSE, 'post', FALSE],
+      'token:false,authenticated:true' => [FALSE, TRUE, 'post', FALSE],
+      'token:none,authenticated:false,method:get' => [NULL, FALSE, 'get', FALSE],
+      'token:test_form_id,authenticated:false,method:get' => ['test_form_id', TRUE, 'get', FALSE],
     ];
   }
 
