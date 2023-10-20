@@ -92,6 +92,9 @@ class NodeForm extends ContentEntityForm {
     // parent::form().
     $store = $this->tempStoreFactory->get('node_preview');
 
+    // Because of the temp store integration, this is not cacheable.
+    $form['#cache']['max-age'] = 0;
+
     // Attempt to load from preview when the uuid is present unless we are
     // rebuilding the form.
     $request_uuid = \Drupal::request()->query->get('uuid');
