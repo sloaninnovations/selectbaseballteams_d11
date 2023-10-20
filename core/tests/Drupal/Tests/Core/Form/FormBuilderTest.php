@@ -959,6 +959,9 @@ class FormBuilderTest extends FormTestBase {
         'tags' => ['CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form'],
         'contexts' => ['user.roles:authenticated'],
       ];
+      if ($opted_in_for_cache) {
+        $expected_cacheability_metadata['max-age'] = Cache::PERMANENT;
+      }
       $this->assertEquals($expected_cacheability_metadata, $built_form['#cache']);
       // Finally, verify that a form token is generated when appropriate, with
       // the expected cacheability metadata (or lack thereof).
