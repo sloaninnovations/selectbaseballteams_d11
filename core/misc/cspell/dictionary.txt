@@ -477,6 +477,7 @@ sayre
 schemaapi
 schemeless
 scorewords
+screenreaders
 scriptable
 scrollbars
 seld
