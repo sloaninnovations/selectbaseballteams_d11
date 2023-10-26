@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\mailer\Kernel;
 
+use Drupal\Core\Site\Settings;
 use Drupal\mailer\TransportManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\mailer_transport_manager_test\Mailer\Transport\CanaryTransport;
@@ -58,7 +59,27 @@ class TransportManagerTest extends KernelTestBase {
   /**
    * @covers ::getTransport
    */
-  public function testMissingFactory() {
+  public function testSendmailCommandValidationFactory(): void {
+    $manager = $this->container->get('mailer.transport_manager');
+    assert($manager instanceof TransportManagerInterface);
+
+    // Test sendmail command allowlist.
+    $settings = Settings::getAll();
+    $settings['mailer_sendmail_commands'] = ['/usr/local/bin/sendmail -bs'];
+    new Settings($settings);
+
+    $actual = $manager->getTransport('sendmail://default?command=/usr/local/bin/sendmail%20-bs');
+    $this->assertInstanceOf(SendmailTransport::class, $actual);
+
+    // Test unlisted command.
+    $this->expectExceptionMessage("Unsafe sendmail command /usr/bin/bc");
+    $manager->getTransport('sendmail://default?command=/usr/bin/bc');
+  }
+
+  /**
+   * @covers ::getTransport
+   */
+  public function testMissingFactory(): void {
     $manager = $this->container->get('mailer.transport_manager');
     assert($manager instanceof TransportManagerInterface);
 
@@ -70,7 +91,7 @@ class TransportManagerTest extends KernelTestBase {
   /**
    * @covers ::addTransportFactory
    */
-  public function testThirdPartyFactory() {
+  public function testThirdPartyFactory(): void {
     $this->enableModules(['mailer_transport_manager_test']);
 
     $manager = $this->container->get('mailer.transport_manager');
