@@ -37,6 +37,7 @@ class TransportTest extends KernelTestBase {
    */
   protected function tearDown(): void {
     $GLOBALS['config']['system.mail']['mailer_dsn'] = 'null://null';
+    parent::tearDown();
   }
 
   /**
