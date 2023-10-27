@@ -1,7 +1,0 @@
-mailer_transport_capture_test.send-mail:
-  path: '/mailer-transport-capture-test/send-mail'
-  defaults:
-    _title: 'Send Mail'
-    _form: '\Drupal\mailer_transport_capture_test\Form\MailerTransportTestForm'
-  requirements:
-    _access: 'TRUE'

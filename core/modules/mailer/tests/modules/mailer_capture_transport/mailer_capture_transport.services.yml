@@ -1,6 +1,0 @@
-services:
-  mailer.transport_factory.drupal_test:
-    parent: mailer.transport_factory.abstract
-    class: Drupal\mailer_capture_transport\Transport\TestMailTransportFactory
-    tags:
-      - { name: mailer.transport_factory }

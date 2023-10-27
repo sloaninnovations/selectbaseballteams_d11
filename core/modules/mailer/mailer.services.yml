@@ -38,8 +38,3 @@ services:
     factory: ['@mailer.transport_factory', 'fromConfig']
     arguments: ['@config.factory']
   Symfony\Component\Mailer\Transport\TransportInterface: '@mailer.transports'
-  mailer.originator_subscriber:
-    class: Drupal\mailer\EventSubscriber\OriginatorSubscriber
-    arguments: ['@config.factory']
-    tags:
-      - { name: event_subscriber }
