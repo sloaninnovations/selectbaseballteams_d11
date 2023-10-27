@@ -28,15 +28,15 @@ services:
     class: Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory
     tags:
       - { name: mailer.transport_factory, priority: -100 }
-  mailer.transport_manager:
-    class: Drupal\mailer\TransportManager
-    arguments: ['@config.factory']
+  mailer.transport_factory:
+    class: Drupal\mailer\Transport
+    public: false
     tags:
       - { name: service_collector, tag: mailer.transport_factory, call: addTransportFactory }
-  Drupal\mailer\TransportManagerInterface: '@mailer.transport_manager'
   mailer.transports:
     class: Symfony\Component\Mailer\Transport\TransportInterface
-    factory: ['@mailer.transport_manager', 'getTransport']
+    factory: ['@mailer.transport_factory', 'fromConfig']
+    arguments: ['@config.factory']
   Symfony\Component\Mailer\Transport\TransportInterface: '@mailer.transports'
   mailer.originator_subscriber:
     class: Drupal\mailer\EventSubscriber\OriginatorSubscriber

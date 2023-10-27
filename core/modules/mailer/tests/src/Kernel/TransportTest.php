@@ -3,21 +3,19 @@
 namespace Drupal\Tests\mailer\Kernel;
 
 use Drupal\Core\Site\Settings;
-use Drupal\mailer\TransportManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\mailer_transport_manager_test\Mailer\Transport\CanaryTransport;
-use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 /**
- * Tests the transport manager.
+ * Tests the transport factory service.
  *
  * @group mailer
- * @coversDefaultClass \Drupal\mailer\TransportManager
+ * @coversDefaultClass \Drupal\mailer\Transport
  */
-class TransportManagerTest extends KernelTestBase {
+class TransportTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
@@ -25,25 +23,38 @@ class TransportManagerTest extends KernelTestBase {
   protected static $modules = ['mailer', 'system'];
 
   /**
-   * @covers ::getTransport
+   * Sets up a mailer dsn config override.
+   *
+   * @param string $dsn
+   *   The transport dsn string.
+   */
+  protected function setUpMailerDsnConfigOverride(string $dsn): void {
+    $GLOBALS['config']['system.mail']['mailer_dsn'] = $dsn;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function tearDown(): void {
+    $GLOBALS['config']['system.mail']['mailer_dsn'] = 'null://null';
+  }
+
+  /**
+   * @covers ::fromConfig
    */
   public function testDefaultTestMailFactory(): void {
-    $manager = $this->container->get('mailer.transport_manager');
-    assert($manager instanceof TransportManagerInterface);
-
-    $actual = $manager->getTransport();
+    $actual = $this->container->get('mailer.transports');
     $this->assertInstanceOf(NullTransport::class, $actual);
   }
 
   /**
    * @dataProvider providerTestBuiltinFactory
-   * @covers ::getTransport
+   * @covers ::fromConfig
    */
   public function testBuiltinFactory(string $dsn, string $expected): void {
-    $manager = $this->container->get('mailer.transport_manager');
-    assert($manager instanceof TransportManagerInterface);
+    $this->setUpMailerDsnConfigOverride($dsn);
 
-    $actual = $manager->getTransport($dsn);
+    $actual = $this->container->get('mailer.transports');
     $this->assertInstanceOf($expected, $actual);
   }
 
@@ -57,35 +68,43 @@ class TransportManagerTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getTransport
+   * @covers ::fromConfig
    */
-  public function testSendmailCommandValidationFactory(): void {
-    $manager = $this->container->get('mailer.transport_manager');
-    assert($manager instanceof TransportManagerInterface);
-
+  public function testSendmailFactoryAllowedCommand(): void {
     // Test sendmail command allowlist.
     $settings = Settings::getAll();
     $settings['mailer_sendmail_commands'] = ['/usr/local/bin/sendmail -bs'];
     new Settings($settings);
 
-    $actual = $manager->getTransport('sendmail://default?command=/usr/local/bin/sendmail%20-bs');
+    // Test allowlisted command.
+    $this->setUpMailerDsnConfigOverride('sendmail://default?command=/usr/local/bin/sendmail%20-bs');
+    $actual = $this->container->get('mailer.transports');
     $this->assertInstanceOf(SendmailTransport::class, $actual);
-
-    // Test unlisted command.
-    $this->expectExceptionMessage("Unsafe sendmail command /usr/bin/bc");
-    $manager->getTransport('sendmail://default?command=/usr/bin/bc');
   }
 
   /**
-   * @covers ::getTransport
+   * @covers ::fromConfig
+   */
+  public function testSendmailFactoryUnlistedCommand(): void {
+    // Test sendmail command allowlist.
+    $settings = Settings::getAll();
+    $settings['mailer_sendmail_commands'] = ['/usr/local/bin/sendmail -bs'];
+    new Settings($settings);
+
+    // Test unlisted command.
+    $this->setUpMailerDsnConfigOverride('sendmail://default?command=/usr/bin/bc');
+    $this->expectExceptionMessage("Unsafe sendmail command /usr/bin/bc");
+    $this->container->get('mailer.transports');
+  }
+
+  /**
+   * @covers ::fromConfig
    */
   public function testMissingFactory(): void {
-    $manager = $this->container->get('mailer.transport_manager');
-    assert($manager instanceof TransportManagerInterface);
+    $this->setUpMailerDsnConfigOverride('drupal.no-transport://default');
 
-    $this->expectException(UnsupportedSchemeException::class);
     $this->expectExceptionMessage('The "drupal.no-transport" scheme is not supported');
-    $manager->getTransport('drupal.no-transport://default');
+    $this->container->get('mailer.transports');
   }
 
   /**
@@ -94,10 +113,9 @@ class TransportManagerTest extends KernelTestBase {
   public function testThirdPartyFactory(): void {
     $this->enableModules(['mailer_transport_manager_test']);
 
-    $manager = $this->container->get('mailer.transport_manager');
-    assert($manager instanceof TransportManagerInterface);
+    $this->setUpMailerDsnConfigOverride('drupal.test-canary://default');
 
-    $actual = $manager->getTransport('drupal.test-canary://default');
+    $actual = $this->container->get('mailer.transports');
     $this->assertInstanceOf(CanaryTransport::class, $actual);
   }
 
