@@ -33,8 +33,8 @@ services:
     public: false
     tags:
       - { name: service_collector, tag: mailer.transport_factory, call: addTransportFactory }
-  mailer.transports:
+  mailer.transport:
     class: Symfony\Component\Mailer\Transport\TransportInterface
     factory: ['@mailer.transport_factory', 'fromConfig']
     arguments: ['@config.factory']
-  Symfony\Component\Mailer\Transport\TransportInterface: '@mailer.transports'
+  Symfony\Component\Mailer\Transport\TransportInterface: '@mailer.transport'

@@ -44,7 +44,7 @@ class TransportTest extends KernelTestBase {
    * @covers ::fromConfig
    */
   public function testDefaultTestMailFactory(): void {
-    $actual = $this->container->get('mailer.transports');
+    $actual = $this->container->get('mailer.transport');
     $this->assertInstanceOf(NullTransport::class, $actual);
   }
 
@@ -55,7 +55,7 @@ class TransportTest extends KernelTestBase {
   public function testBuiltinFactory(string $dsn, string $expected): void {
     $this->setUpMailerDsnConfigOverride($dsn);
 
-    $actual = $this->container->get('mailer.transports');
+    $actual = $this->container->get('mailer.transport');
     $this->assertInstanceOf($expected, $actual);
   }
 
@@ -79,7 +79,7 @@ class TransportTest extends KernelTestBase {
 
     // Test allowlisted command.
     $this->setUpMailerDsnConfigOverride('sendmail://default?command=/usr/local/bin/sendmail%20-bs');
-    $actual = $this->container->get('mailer.transports');
+    $actual = $this->container->get('mailer.transport');
     $this->assertInstanceOf(SendmailTransport::class, $actual);
   }
 
@@ -95,7 +95,7 @@ class TransportTest extends KernelTestBase {
     // Test unlisted command.
     $this->setUpMailerDsnConfigOverride('sendmail://default?command=/usr/bin/bc');
     $this->expectExceptionMessage("Unsafe sendmail command /usr/bin/bc");
-    $this->container->get('mailer.transports');
+    $this->container->get('mailer.transport');
   }
 
   /**
@@ -105,7 +105,7 @@ class TransportTest extends KernelTestBase {
     $this->setUpMailerDsnConfigOverride('drupal.no-transport://default');
 
     $this->expectExceptionMessage('The "drupal.no-transport" scheme is not supported');
-    $this->container->get('mailer.transports');
+    $this->container->get('mailer.transport');
   }
 
   /**
@@ -116,7 +116,7 @@ class TransportTest extends KernelTestBase {
 
     $this->setUpMailerDsnConfigOverride('drupal.test-canary://default');
 
-    $actual = $this->container->get('mailer.transports');
+    $actual = $this->container->get('mailer.transport');
     $this->assertInstanceOf(CanaryTransport::class, $actual);
   }
 
