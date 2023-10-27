@@ -96,7 +96,7 @@ class TransportTest extends KernelTestBase {
 
     // Test unlisted command.
     $this->setUpMailerDsnConfigOverride('sendmail://default?command=/usr/bin/bc');
-    $this->expectExceptionMessage("Unsafe sendmail command /usr/bin/bc");
+    $this->expectExceptionMessage('Unsafe sendmail command /usr/bin/bc');
     $this->container->get('mailer.transport');
   }
 
