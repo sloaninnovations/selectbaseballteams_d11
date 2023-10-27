@@ -1,6 +1,6 @@
 services:
   mailer.transport_factory.test_canary:
     parent: mailer.transport_factory.abstract
-    class: Drupal\mailer_transport_manager_test\Mailer\Transport\CanaryTransportFactory
+    class: Drupal\mailer_transport_factory_kernel_test\Transport\CanaryTransportFactory
     tags:
       - { name: mailer.transport_factory }

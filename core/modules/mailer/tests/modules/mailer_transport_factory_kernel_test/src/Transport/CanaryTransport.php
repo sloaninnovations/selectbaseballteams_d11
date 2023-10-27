@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\mailer_transport_manager_test\Mailer\Transport;
+namespace Drupal\mailer_transport_factory_kernel_test\Transport;
 
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
- * A transport only used to test the transport manager.
+ * A transport only used to test the transport factory adapter.
  */
 class CanaryTransport extends AbstractTransport implements TransportInterface {
 

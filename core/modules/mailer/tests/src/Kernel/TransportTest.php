@@ -4,7 +4,7 @@ namespace Drupal\Tests\mailer\Kernel;
 
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\mailer_transport_manager_test\Mailer\Transport\CanaryTransport;
+use Drupal\mailer_transport_factory_kernel_test\Transport\CanaryTransport;
 use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
@@ -114,7 +114,7 @@ class TransportTest extends KernelTestBase {
    * @covers ::addTransportFactory
    */
   public function testThirdPartyFactory(): void {
-    $this->enableModules(['mailer_transport_manager_test']);
+    $this->enableModules(['mailer_transport_factory_kernel_test']);
 
     $this->setUpMailerDsnConfigOverride('drupal.test-canary://default');
 

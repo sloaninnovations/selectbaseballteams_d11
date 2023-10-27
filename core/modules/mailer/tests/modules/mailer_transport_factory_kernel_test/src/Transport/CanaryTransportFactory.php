@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\mailer_transport_manager_test\Mailer\Transport;
+namespace Drupal\mailer_transport_factory_kernel_test\Transport;
 
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
@@ -9,7 +9,7 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
- * A transport factory only used to test the transport manager.
+ * A transport factory only used to test the transport factory adapter.
  */
 class CanaryTransportFactory extends AbstractTransportFactory implements TransportFactoryInterface {
 

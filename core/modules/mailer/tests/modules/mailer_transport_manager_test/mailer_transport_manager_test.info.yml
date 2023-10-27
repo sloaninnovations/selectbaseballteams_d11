@@ -1,5 +1,0 @@
-name: 'Mailer transport manager test'
-type: module
-description: 'Support module for mailer transport manager testing.'
-package: Testing
-version: VERSION
