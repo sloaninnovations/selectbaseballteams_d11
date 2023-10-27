@@ -70,6 +70,7 @@ class TransportTest extends KernelTestBase {
 
   /**
    * @covers ::fromConfig
+   * @covers \Drupal\mailer\Transport\SendmailCommandValidationTransportFactory::create
    */
   public function testSendmailFactoryAllowedCommand(): void {
     // Test sendmail command allowlist.
@@ -85,6 +86,7 @@ class TransportTest extends KernelTestBase {
 
   /**
    * @covers ::fromConfig
+   * @covers \Drupal\mailer\Transport\SendmailCommandValidationTransportFactory::create
    */
   public function testSendmailFactoryUnlistedCommand(): void {
     // Test sendmail command allowlist.
