@@ -33,6 +33,7 @@ services:
     public: false
     tags:
       - { name: service_collector, tag: mailer.transport_factory, call: addTransportFactory }
+  Drupal\mailer\Transport: '@mailer.transport_factory'
   mailer.transport:
     class: Symfony\Component\Mailer\Transport\TransportInterface
     factory: ['@mailer.transport_factory', 'fromConfig']
