@@ -135,7 +135,6 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('file');
     // Add the additional table schemas.
-    $this->installSchema('system', ['sequences']);
     $this->installSchema('node', ['node_access']);
     $this->installSchema('user', ['users_data']);
     $this->installSchema('file', ['file_usage']);
@@ -196,7 +195,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
       'uid' => $this->user,
       'body' => [
         'format' => 'plain_text',
-        'value' => $this->randomStringValidate(42),
+        'value' => $this->randomString(),
       ],
       'field_tags' => [
         ['target_id' => $this->term1->id()],
@@ -251,6 +250,8 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
     if ($this->user2) {
       $this->user2->delete();
     }
+
+    parent::tearDown();
   }
 
   /**
@@ -420,8 +421,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * Test the message and exceptions thrown when we are requesting additional
-   * field values for Label only resource.
+   * Tests the message and exceptions when requesting a Label only resource.
    */
   public function testAliasFieldRouteException() {
     $this->assertSame('uid', $this->resourceTypeRepository->getByTypeName('node--article')->getPublicName('uid'));
@@ -476,7 +476,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
     $this->assertNotEmpty($jsonapi_doc_object['meta']['omitted']);
     foreach ($jsonapi_doc_object['meta']['omitted']['links'] as $key => $link) {
       if (str_starts_with($key, 'item--')) {
-        // Ensure that resource link contains url with the alias field.
+        // Ensure that resource link contains URL with the alias field.
         $resource_link = Url::fromUri('internal:/jsonapi/user/user/' . $user->uuid() . '/user_roles')->setAbsolute()->toString(TRUE);
         $this->assertEquals($resource_link->getGeneratedUrl(), $link['href']);
         $this->assertEquals("The current user is not allowed to view this relationship. The user only has authorization for the 'view label' operation.", $link['meta']['detail']);

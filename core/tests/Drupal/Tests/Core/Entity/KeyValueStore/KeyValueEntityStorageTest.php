@@ -158,7 +158,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->exactly(2))
       ->method('invokeAll')
-      ->willReturnOnConsecutiveCalls(['test_entity_type_create'], ['entity_create']);
+      ->withConsecutive(['test_entity_type_create'], ['entity_create']);
     $this->uuidService->expects($this->never())
       ->method('generate');
 
@@ -181,7 +181,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->exactly(2))
       ->method('invokeAll')
-      ->willReturnOnConsecutiveCalls(['test_entity_type_create'], ['entity_create']);
+      ->withConsecutive(['test_entity_type_create'], ['entity_create']);
     $this->uuidService->expects($this->never())
       ->method('generate');
 
@@ -206,7 +206,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->exactly(2))
       ->method('invokeAll')
-      ->willReturnOnConsecutiveCalls(['test_entity_type_create'], ['entity_create']);
+      ->withConsecutive(['test_entity_type_create'], ['entity_create']);
     $this->uuidService->expects($this->once())
       ->method('generate')
       ->willReturn('bar');
@@ -248,7 +248,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->exactly(4))
       ->method('invokeAll')
-      ->willReturnOnConsecutiveCalls(
+      ->withConsecutive(
         ['test_entity_type_presave'],
         ['entity_presave'],
         ['test_entity_type_insert'],
@@ -292,7 +292,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
       ->method('delete');
     $this->moduleHandler->expects($this->exactly(4))
       ->method('invokeAll')
-      ->willReturnOnConsecutiveCalls(
+      ->withConsecutive(
         ['test_entity_type_presave'],
         ['entity_presave'],
         ['test_entity_type_update'],
@@ -549,7 +549,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->expectDeprecation('Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage::loadRevision() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Entity\RevisionableStorageInterface::loadRevision instead. See https://www.drupal.org/node/3294237');
     $this->setUpKeyValueEntityStorage();
 
-    $this->assertSame(NULL, $this->entityStorage->loadRevision(1));
+    $this->assertNull($this->entityStorage->loadRevision(1));
   }
 
   /**
@@ -560,7 +560,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->expectDeprecation('Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage::deleteRevision() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Entity\RevisionableStorageInterface::deleteRevision instead. See https://www.drupal.org/node/3294237');
     $this->setUpKeyValueEntityStorage();
 
-    $this->assertSame(NULL, $this->entityStorage->deleteRevision(1));
+    $this->assertNull($this->entityStorage->deleteRevision(1));
   }
 
   /**
@@ -574,7 +574,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->exactly(8))
       ->method('invokeAll')
-      ->willReturnOnConsecutiveCalls(
+      ->withConsecutive(
         ['test_entity_type_predelete'],
         ['entity_predelete'],
       );

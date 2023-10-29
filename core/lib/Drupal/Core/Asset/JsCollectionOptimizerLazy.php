@@ -8,7 +8,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\State\StateInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -42,8 +41,6 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
    *   The time service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state key/value store.
    */
   public function __construct(
     protected readonly AssetCollectionGrouperInterface $grouper,
@@ -55,8 +52,7 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
     protected readonly ConfigFactoryInterface $configFactory,
     protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
     protected readonly TimeInterface $time,
-    protected readonly LanguageManagerInterface $languageManager,
-    protected readonly StateInterface $state
+    protected readonly LanguageManagerInterface $languageManager
   ) {}
 
   /**
@@ -133,9 +129,11 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
             'scope' => $js_asset['scope'] === 'header' ? 'header' : 'footer',
             'delta' => "$order",
           ] + $query_args;
+          // Add a filename prefix to mitigate ad blockers which can block
+          // any script beginning with 'ad'.
           $filename = 'js_' . $this->generateHash($js_asset) . '.js';
-          $uri = 'public://js/' . $filename;
-          $js_assets[$order]['data'] = $this->fileUrlGenerator->generateAbsoluteString($uri) . '?' . UrlHelper::buildQuery($query);
+          $uri = 'assets://js/' . $filename;
+          $js_assets[$order]['data'] = $this->fileUrlGenerator->generateString($uri) . '?' . UrlHelper::buildQuery($query);
         }
         unset($js_assets[$order]['items']);
       }
@@ -148,26 +146,15 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
    * {@inheritdoc}
    */
   public function getAll() {
-    return $this->state->get('system.js_cache_files', []);
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.2.0 and will be removed in drupal:11.0.0, there is no replacement. See https:// www.drupal.org/node/3301744', E_USER_DEPRECATED);
+    return [];
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteAll() {
-    $this->state->delete('system.js_cache_files');
-    $delete_stale = function ($uri) {
-      $threshold = $this->configFactory
-        ->get('system.performance')
-        ->get('stale_file_threshold');
-      // Default stale file threshold is 30 days.
-      if ($this->time->getRequestTime() - filemtime($uri) > $threshold) {
-        $this->fileSystem->delete($uri);
-      }
-    };
-    if (is_dir('public://js')) {
-      $this->fileSystem->scanDirectory('public://js', '/.*/', ['callback' => $delete_stale]);
-    }
+    $this->fileSystem->deleteRecursive('assets://js');
   }
 
   /**

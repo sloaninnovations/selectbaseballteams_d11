@@ -240,8 +240,7 @@ class FileSystem implements FileSystemInterface {
   }
 
   /**
-   * Helper function. Ensures we don't pass a NULL as a context resource to
-   * mkdir().
+   * Ensures we don't pass a NULL as a context resource to mkdir().
    *
    * @see self::mkdir()
    */
@@ -353,6 +352,10 @@ class FileSystem implements FileSystemInterface {
   public function deleteRecursive($path, callable $callback = NULL) {
     if ($callback) {
       call_user_func($callback, $path);
+    }
+
+    if (!file_exists($path)) {
+      return TRUE;
     }
 
     if (is_dir($path)) {

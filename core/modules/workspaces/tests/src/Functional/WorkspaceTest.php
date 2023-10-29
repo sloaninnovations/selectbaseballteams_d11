@@ -3,6 +3,7 @@
 namespace Drupal\Tests\workspaces\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 
@@ -16,6 +17,7 @@ class WorkspaceTest extends BrowserTestBase {
   use WorkspaceTestUtilities;
   use ContentTypeCreationTrait;
   use TaxonomyTestTrait;
+  use FieldUiTestTrait;
 
   /**
    * {@inheritdoc}
@@ -172,6 +174,9 @@ class WorkspaceTest extends BrowserTestBase {
     $this->setupWorkspaceSwitcherBlock();
     $assert_session = $this->assertSession();
 
+    $this->drupalCreateContentType(['type' => 'test', 'label' => 'Test']);
+    $vocabulary = $this->createVocabulary();
+
     $test_1 = $this->createWorkspaceThroughUi('Test 1', 'test_1');
     $test_2 = $this->createWorkspaceThroughUi('Test 2', 'test_2');
 
@@ -188,10 +193,8 @@ class WorkspaceTest extends BrowserTestBase {
     $assert_session->linkExists('Switch to this workspace');
 
     // Create some test content.
-    $this->drupalCreateContentType(['type' => 'test', 'label' => 'Test']);
     $this->createNodeThroughUi('Node 1', 'test');
     $this->createNodeThroughUi('Node 2', 'test');
-    $vocabulary = $this->createVocabulary();
     $edit = [
       'name[0][value]' => 'Term 1',
     ];
@@ -225,16 +228,7 @@ class WorkspaceTest extends BrowserTestBase {
     // Create a new filed.
     $field_name = mb_strtolower($this->randomMachineName());
     $field_label = $this->randomMachineName();
-    $edit = [
-      'new_storage_type' => 'string',
-      'label' => $field_label,
-      'field_name' => $field_name,
-    ];
-    $this->drupalGet("admin/config/workflow/workspaces/fields/add-field");
-    $this->submitForm($edit, 'Save and continue');
-    $page = $this->getSession()->getPage();
-    $page->pressButton('Save field settings');
-    $page->pressButton('Save settings');
+    $this->fieldUIAddNewField('admin/config/workflow/workspaces', $field_name, $field_label, 'string');
 
     // Check that the field is displayed on the manage form display page.
     $this->drupalGet('admin/config/workflow/workspaces/form-display');

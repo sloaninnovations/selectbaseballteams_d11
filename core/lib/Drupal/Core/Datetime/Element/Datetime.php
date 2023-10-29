@@ -351,7 +351,7 @@ class Datetime extends DateElementBase {
     $input = NestedArray::getValue($form_state->getValues(), $element['#parents'], $input_exists);
     if ($input_exists) {
 
-      $title = !empty($element['#title']) ? $element['#title'] : '';
+      $title = static::getElementTitle($element, $complete_form);
       $date_format = $element['#date_date_element'] != 'none' ? static::getHtml5DateFormat($element) : '';
       $time_format = $element['#date_time_element'] != 'none' ? static::getHtml5TimeFormat($element) : '';
       $format = trim($date_format . ' ' . $time_format);
@@ -363,7 +363,7 @@ class Datetime extends DateElementBase {
       // If there's empty input and the field is required, set an error. A
       // reminder of the required format in the message provides a good UX.
       elseif (empty($input['date']) && empty($input['time']) && $element['#required']) {
-        $form_state->setError($element, t('The %field date is required. Please enter a date in the format %format.', ['%field' => $title, '%format' => static::formatExample($format)]));
+        $form_state->setError($element, t('The %field date is required. Enter a date in the format %format.', ['%field' => $title, '%format' => static::formatExample($format)]));
       }
       else {
         // If the date is valid, set it.
@@ -374,7 +374,7 @@ class Datetime extends DateElementBase {
         // If the date is invalid, set an error. A reminder of the required
         // format in the message provides a good UX.
         else {
-          $form_state->setError($element, t('The %field date is invalid. Please enter a date in the format %format.', ['%field' => $title, '%format' => static::formatExample($format)]));
+          $form_state->setError($element, t('The %field date is invalid. Enter a date in the format %format.', ['%field' => $title, '%format' => static::formatExample($format)]));
         }
       }
     }

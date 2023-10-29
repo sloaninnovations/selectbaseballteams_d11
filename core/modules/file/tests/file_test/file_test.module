@@ -42,8 +42,9 @@ function file_test_reset() {
 }
 
 /**
- * Get the arguments passed to invocation of a given hook since
- * file_test_reset() was last called.
+ * Gets the arguments passed to a given hook invocation.
+ *
+ * Arguments are gathered since file_test_reset() was last called.
  *
  * @param string $op
  *   One of the hook_file_* operations: 'load', 'validate', 'download',
@@ -136,14 +137,6 @@ function file_test_file_load($files) {
     // by reference.
     $file->file_test['loaded'] = TRUE;
   }
-}
-
-/**
- * Implements hook_file_validate().
- */
-function file_test_file_validate(File $file) {
-  _file_test_log_call('validate', [$file->id()]);
-  return _file_test_get_return('validate');
 }
 
 /**

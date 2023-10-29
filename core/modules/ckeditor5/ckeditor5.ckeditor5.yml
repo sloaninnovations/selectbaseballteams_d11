@@ -263,6 +263,7 @@ ckeditor5_codeBlock:
     label: Code Block
     library: ckeditor5/internal.drupal.ckeditor5.codeBlock
     admin_library: ckeditor5/internal.admin.codeBlock
+    class: Drupal\ckeditor5\Plugin\CKEditor5Plugin\CodeBlock
     toolbar_items:
       codeBlock:
         label: Code Block
@@ -440,6 +441,15 @@ ckeditor5_alignment:
     elements:
       - <$text-container class="text-align-left text-align-center text-align-right text-align-justify">
 
+ckeditor5_autoformat:
+  ckeditor5:
+    plugins:
+      - autoformat.Autoformat
+  drupal:
+    label: Autoformat
+    library: core/ckeditor5.autoformat
+    elements: false
+
 ckeditor5_removeFormat:
   ckeditor5:
     plugins: [removeFormat.RemoveFormat]
@@ -489,6 +499,45 @@ ckeditor5_table:
       - <tbody>
       - <tfoot>
       - <caption>
+
+ckeditor5_table_properties:
+  ckeditor5:
+    plugins:
+      - table.TableProperties
+    config:
+      table:
+        contentToolbar: [tableProperties]
+  drupal:
+    label: Table properties
+    library: ckeditor5/internal.drupal.ckeditor5.table
+    conditions:
+      plugins:
+        - ckeditor5_table
+        # When arbitrary HTML is already allowed, it's harmless to enable CKEditor 5's UI for table properties.
+        - ckeditor5_arbitraryHtmlSupport
+    elements:
+      - <table style>
+
+ckeditor5_table_cell_properties:
+  ckeditor5:
+    plugins:
+      - table.TableCellProperties
+    config:
+      table:
+        contentToolbar: [tableCellProperties]
+  drupal:
+    label: Table cell properties
+    library: ckeditor5/internal.drupal.ckeditor5.table
+    conditions:
+      plugins:
+        - ckeditor5_table
+        # When arbitrary HTML is already allowed, it's harmless to enable CKEditor 5's UI for table cell properties.
+        - ckeditor5_arbitraryHtmlSupport
+    elements:
+      - <td style>
+      - <td rowspan colspan style>
+      - <th style>
+      - <th rowspan colspan style>
 
 ckeditor5_image:
   ckeditor5:
@@ -548,7 +597,7 @@ ckeditor5_imageResize:
       - image.ImageResize
     config:
       image:
-        resizeUnit: '%'
+        resizeUnit: 'px'
         resizeOptions:
           -
             name: 'resizeImage:original'
@@ -742,7 +791,6 @@ media_library_mediaLibrary:
         dialogSettings:
           height: 75%
           dialogClass: media-library-widget-modal
-          title: Add or select media
   drupal:
     label: Media Library
     elements: false

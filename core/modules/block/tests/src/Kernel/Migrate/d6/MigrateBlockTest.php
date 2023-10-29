@@ -252,7 +252,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
     ];
     $this->assertEntity('statistics', [], 'sidebar', 'olivero', 0, $settings);
 
-    // Check custom blocks.
+    // Check content blocks.
     $visibility = [
       'request_path' => [
         'id' => 'request_path',
@@ -302,14 +302,14 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
     ];
     $this->assertEntity('block_2', [], 'right', 'test_theme', -7, $settings);
 
-    // Custom block with php code is not migrated.
+    // Content block with php code is not migrated.
     $block = Block::load('block_3');
     $this->assertNotInstanceOf(Block::class, $block);
 
     // Check migrate messages.
     $messages = iterator_to_array($this->getMigration('d6_block')->getIdMap()->getMessages());
     $this->assertCount(2, $messages);
-    $this->assertSame($messages[1]->message, 'Schema errors for block.block.aggregator with the following errors: block.block.aggregator:settings.block_count missing schema, block.block.aggregator:settings.feed missing schema');
+    $this->assertSame($messages[1]->message, 'Schema errors for block.block.aggregator with the following errors: block.block.aggregator:settings.block_count missing schema, block.block.aggregator:settings.feed missing schema, 0 [settings] &#039;block_count&#039; is not a supported key., 1 [settings] &#039;feed&#039; is not a supported key.');
   }
 
 }

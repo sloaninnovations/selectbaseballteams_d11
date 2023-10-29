@@ -66,6 +66,8 @@ class ContextualLinkManagerTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $language_manager = $this->createMock(LanguageManagerInterface::class);
     $language_manager->expects($this->any())
       ->method('getCurrentLanguage')
@@ -92,7 +94,6 @@ class ContextualLinkManagerTest extends UnitTestCase {
     );
 
     $property = new \ReflectionProperty('Drupal\Core\Menu\ContextualLinkManager', 'discovery');
-    $property->setAccessible(TRUE);
     $property->setValue($this->contextualLinkManager, $this->pluginDiscovery);
   }
 
@@ -246,7 +247,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->exactly(2))
       ->method('alter')
-      ->willReturnOnConsecutiveCalls(
+      ->withConsecutive(
         ['contextual_links_plugins'],
         ['contextual_links', new Count(2), 'group1', ['key' => 'value']],
       );

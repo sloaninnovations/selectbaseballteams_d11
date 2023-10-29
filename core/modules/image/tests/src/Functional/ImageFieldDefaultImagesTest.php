@@ -204,7 +204,7 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
 
     // Remove the field default from articles.
     $default_image_settings = $field->getSetting('default_image');
-    $default_image_settings['uuid'] = 0;
+    $default_image_settings['uuid'] = \Drupal::service('uuid')->generate();
     $field->setSetting('default_image', $default_image_settings);
     $field->save();
 
@@ -224,7 +224,7 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
     $non_image = $this->drupalGetTestFiles('text');
     $this->submitForm(['files[settings_default_image_uuid]' => \Drupal::service('file_system')->realpath($non_image[0]->uri)], 'Upload');
     $this->assertSession()->statusMessageContains('The specified file text-0.txt could not be uploaded.', 'error');
-    $this->assertSession()->statusMessageContains('Only files with the following extensions are allowed: png gif jpg jpeg.', 'error');
+    $this->assertSession()->statusMessageContains('Only files with the following extensions are allowed: png gif jpg jpeg webp.', 'error');
 
     // Confirm the default image is shown on the node form.
     $file = File::load($default_images['field_storage_new']->id());

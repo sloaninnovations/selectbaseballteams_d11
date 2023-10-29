@@ -7,8 +7,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 
 /**
- * Add, edit, delete, and change alias and verify its consistency in the
- * database.
+ * Tests modifying path aliases from the UI.
  *
  * @group path
  */
@@ -67,6 +66,9 @@ class PathAliasTest extends PathTestBase {
     \Drupal::cache('data')->deleteAll();
     // Make sure the path is not converted to the alias.
     $this->drupalGet(trim($edit['path[0][value]'], '/'), ['alias' => TRUE]);
+    // The \Drupal\path_alias\AliasWhitelist service performs cache clears after
+    // Drupal has flushed the response to the client; wait for this to finish.
+    sleep(1);
     $this->assertNotEmpty(\Drupal::cache('data')->get('preload-paths:' . $edit['path[0][value]']), 'Cache entry was created.');
 
     // Visit the alias for the node and confirm a cache entry is created.
@@ -74,6 +76,7 @@ class PathAliasTest extends PathTestBase {
     // @todo Remove this once https://www.drupal.org/node/2480077 lands.
     Cache::invalidateTags(['rendered']);
     $this->drupalGet(trim($edit['alias[0][value]'], '/'));
+    sleep(1);
     $this->assertNotEmpty(\Drupal::cache('data')->get('preload-paths:' . $edit['path[0][value]']), 'Cache entry was created.');
   }
 
@@ -175,14 +178,10 @@ class PathAliasTest extends PathTestBase {
     $edit['path[0][value]'] = '/node/' . $node1->id();
     $alias = '/' . $this->randomMachineName(128);
     $edit['alias[0][value]'] = $alias;
-    // The alias is shortened to 50 characters counting the ellipsis.
-    $truncated_alias = substr($alias, 0, 47);
     $this->drupalGet('admin/config/search/path/add');
     $this->submitForm($edit, 'Save');
-    // The untruncated alias should not be found.
-    $this->assertSession()->pageTextNotContains($alias);
-    // The 'truncated' alias will always be found.
-    $this->assertSession()->pageTextContains($truncated_alias);
+    // The alias will always be found.
+    $this->assertSession()->pageTextContains($alias);
 
     // Create third test node.
     $node3 = $this->drupalCreateNode();

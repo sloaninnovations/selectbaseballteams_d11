@@ -230,7 +230,7 @@ class ModuleHandler implements ModuleHandlerInterface {
         }
       }
     }
-    $graph_object = new Graph($graph);
+    $graph_object = new Graph($graph ?? []);
     $graph = $graph_object->searchAndSort();
     foreach ($graph as $module_name => $data) {
       $modules[$module_name]->required_by = $data['reverse_paths'] ?? [];
@@ -662,8 +662,10 @@ class ModuleHandler implements ModuleHandlerInterface {
   }
 
   /**
-   * Verifies an array of implementations loaded from the cache, by including
-   * the lazy-loaded $module.$group.inc, and checking function_exists().
+   * Verifies an array of implementations loaded from cache.
+   *
+   * Verification is done by including the lazy-loaded $module.$group.inc file,
+   * and checking function_exists().
    *
    * @param string[] $implementations
    *   Implementation "group" by module name.

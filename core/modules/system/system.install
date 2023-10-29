@@ -25,6 +25,7 @@ use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\Error;
 use GuzzleHttp\Exception\TransferException;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -196,8 +197,9 @@ function system_requirements($phase) {
       }
       $requirements['obsolete_extensions'] = [
         'title' => t('Obsolete extensions enabled'),
-        'value' => t('Obsolete extensions found: %extensions. Obsolete extensions are provided only so that they can be uninstalled cleanly. You should immediately uninstall these extensions since they may be removed in a future release.', [
+        'value' => t('Obsolete extensions found: %extensions. Obsolete extensions are provided only so that they can be uninstalled cleanly. You should immediately <a href=":uninstall_url">uninstall these extensions</a> since they may be removed in a future release.', [
           '%extensions' => Markup::create(implode(', ', $obsolete_extensions_link_list)),
+          ':uninstall_url' => Url::fromRoute('system.modules_uninstall')->toString(),
         ]),
         'severity' => REQUIREMENT_WARNING,
       ];
@@ -214,7 +216,7 @@ function system_requirements($phase) {
   ];
 
   // Tests clean URL support.
-  if ($phase == 'install' && $install_state['interactive'] && !$request_object->query->has('rewrite') && strpos($software, 'Apache') !== FALSE) {
+  if ($phase == 'install' && $install_state['interactive'] && !$request_object->query->has('rewrite') && str_contains($software, 'Apache')) {
     // If the Apache rewrite module is not enabled, Apache version must be >=
     // 2.2.16 because of the FallbackResource directive in the root .htaccess
     // file. Since the Apache version reported by the server is dependent on the
@@ -499,6 +501,17 @@ function system_requirements($phase) {
     }
   }
 
+  if ($phase === 'runtime') {
+    if (!function_exists('fastcgi_finish_request') && !function_exists('litespeed_finish_request') && !ob_get_status()) {
+      $requirements['output_buffering'] = [
+        'title' => t('Output Buffering'),
+        'error_value' => t('Not enabled'),
+        'severity' => REQUIREMENT_WARNING,
+        'description' => t('<a href="https://www.php.net/manual/en/function.ob-start.php">Output buffering</a> is not enabled. This may degrade Drupal\'s performance. You can enable output buffering by default <a href="https://www.php.net/manual/en/outcontrol.configuration.php#ini.output-buffering">in your PHP settings</a>.'),
+      ];
+    }
+  }
+
   if ($phase == 'install' || $phase == 'update') {
     // Test for PDO (database).
     $requirements['database_extensions'] = [
@@ -514,8 +527,7 @@ function system_requirements($phase) {
     }
     else {
       // Make sure at least one supported database driver exists.
-      $drivers = drupal_detect_database_types();
-      if (empty($drivers)) {
+      if (empty(Database::getDriverList()->getInstallableList())) {
         $database_ok = FALSE;
         $pdo_message = t('Your web server does not appear to support any common PDO database extensions. Check with your hosting provider to see if they support PDO (PHP Data Objects) and offer any databases that <a href=":drupal-databases">Drupal supports</a>.', [
           ':drupal-databases' => 'https://www.drupal.org/docs/system-requirements/database-server-requirements',
@@ -543,7 +555,7 @@ function system_requirements($phase) {
 
   if ($phase === 'runtime' || $phase === 'update') {
     // Database information.
-    $class = Database::getConnection()->getDriverClass('Install\\Tasks');
+    $class = Database::getConnection()->getConnectionOptions()['namespace'] . '\\Install\\Tasks';
     /** @var \Drupal\Core\Database\Install\Tasks $tasks */
     $tasks = new $class();
     $requirements['database_system'] = [
@@ -704,7 +716,7 @@ function system_requirements($phase) {
       $htaccess_file = $protected_dir->getPath() . '/.htaccess';
       // Check for the string which was added to the recommended .htaccess file
       // in the latest security update.
-      if (!file_exists($htaccess_file) || !($contents = @file_get_contents($htaccess_file)) || strpos($contents, 'Drupal_Security_Do_Not_Remove_See_SA_2013_003') === FALSE) {
+      if (!file_exists($htaccess_file) || !($contents = @file_get_contents($htaccess_file)) || !str_contains($contents, 'Drupal_Security_Do_Not_Remove_See_SA_2013_003')) {
         $url = 'https://www.drupal.org/SA-CORE-2013-003';
         $requirements[$htaccess_file] = [
           'title' => new TranslatableMarkup($protected_dir->getTitle()),
@@ -1052,7 +1064,8 @@ function system_requirements($phase) {
         // Check for an incompatible version.
         $required_file = $files[$required_module];
         $required_name = $required_file->info['name'];
-        $version = str_replace(\Drupal::CORE_COMPATIBILITY . '-', '', $required_file->info['version'] ?? '');
+        // Remove CORE_COMPATIBILITY- only from the start of the string.
+        $version = preg_replace('/^(' . \Drupal::CORE_COMPATIBILITY . '\-)/', '', $required_file->info['version'] ?? '');
         if (!$requirement->isCompatible($version)) {
           $requirements["$extension_name-$required_module"] = [
             'title' => t('Unresolved dependency'),
@@ -1276,7 +1289,7 @@ function system_requirements($phase) {
       break;
 
     case 'mbstring.encoding_translation':
-      $requirements['unicode']['description'] = t('Multibyte string input conversion in PHP is active and must be disabled. Check the php.ini <em>mbstring.encoding_translation</em> setting. Please refer to the <a href="http://php.net/mbstring">PHP mbstring documentation</a> for more information.');
+      $requirements['unicode']['description'] = t('Multibyte string input conversion in PHP is active and must be disabled. Check the php.ini <em>mbstring.encoding_translation</em> setting. Refer to the <a href="http://php.net/mbstring">PHP mbstring documentation</a> for more information.');
       break;
   }
 
@@ -1359,7 +1372,7 @@ function system_requirements($phase) {
     $provider = $connection->getProvider();
     if ($provider !== 'core' && !\Drupal::moduleHandler()->moduleExists($provider)) {
       $autoload = $connection->getConnectionOptions()['autoload'] ?? '';
-      if (strpos($autoload, 'src/Driver/Database/') !== FALSE) {
+      if (str_contains($autoload, 'src/Driver/Database/')) {
         $post_update_registry = \Drupal::service('update.post_update_registry');
         $pending_updates = $post_update_registry->getPendingUpdateInformation();
         if (!in_array('enable_provider_database_driver', array_keys($pending_updates['system']['pending'] ?? []), TRUE)) {
@@ -1529,6 +1542,37 @@ function system_requirements($phase) {
     }
   }
 
+  // Add warning when twig debug option is enabled.
+  if ($phase === 'runtime') {
+    $twig_debug = \Drupal::state()->get('twig_debug', FALSE);
+    $twig_cache_disable = \Drupal::state()->get('twig_cache_disable', FALSE);
+    if ($twig_debug || $twig_cache_disable) {
+      $requirements['twig_debug_enabled'] = [
+        'title' => t('Twig development mode'),
+        'value' => t('Twig development mode settings are turned on. Go to @link to disable them.', [
+          '@link' => Link::createFromRoute(
+            'development settings page',
+            'system.development_settings',
+          )->toString(),
+        ]),
+        'severity' => REQUIREMENT_WARNING,
+      ];
+    }
+    $render_cache_disabled = \Drupal::state()->get('disable_rendered_output_cache_bins', FALSE);
+    if ($render_cache_disabled) {
+      $requirements['render_cache_disabled'] = [
+        'title' => t('Markup caching disabled'),
+        'value' => t('Render cache, dynamic page cache, and page cache are bypassed. Go to @link to enable them.', [
+          '@link' => Link::createFromRoute(
+            'development settings page',
+            'system.development_settings',
+          )->toString(),
+        ]),
+        'severity' => REQUIREMENT_WARNING,
+      ];
+    }
+  }
+
   return $requirements;
 }
 
@@ -1549,13 +1593,16 @@ function system_install() {
   $site->save(TRUE);
 
   // Populate the dummy query string added to all CSS and JavaScript files.
-  _drupal_flush_css_js();
+  \Drupal::service('asset.query_string')->reset();
 }
 
 /**
  * Implements hook_schema().
  */
 function system_schema() {
+  // @deprecated The sequences table has been deprecated in drupal:10.2.0 and is
+  // removed from drupal:12.0.0. See https://www.drupal.org/node/3220378.
+  // @todo: Remove sequences table in Drupal 12. See https://www.drupal.org/i/3335756
   $schema['sequences'] = [
     'description' => 'Stores IDs.',
     'fields' => [
@@ -1650,7 +1697,7 @@ function _system_advisories_requirements(array &$requirements): void {
     $requirements['system_advisories']['title'] = t('Critical security announcements');
     $requirements['system_advisories']['severity'] = REQUIREMENT_WARNING;
     $requirements['system_advisories']['description'] = ['#theme' => 'system_security_advisories_fetch_error_message'];
-    watchdog_exception('system', $exception, 'Failed to retrieve security advisory data.');
+    Error::logException(\Drupal::logger('system'), $exception, 'Failed to retrieve security advisory data.');
     return;
   }
 
@@ -1776,6 +1823,25 @@ function system_update_10100(&$sandbox = NULL) {
       ];
       $schema->changeField($table, 'expire', 'expire', $new);
     }
+  }
+
+}
+
+/**
+ * Change the {batch} table [bid] field to serial.
+ */
+function system_update_10101(&$sandbox = NULL) {
+  $connection = \Drupal::database();
+  $schema = $connection->schema();
+
+  // Update batch table.
+  if ($schema->tableExists('batch')) {
+    $schema->changeField('batch', 'bid', 'bid', [
+      'description' => 'Primary Key: Unique batch ID.',
+      'type' => 'serial',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+    ]);
   }
 
 }

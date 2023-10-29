@@ -81,7 +81,7 @@
         .slice(1)
         .replace(/q=[^&]+&?|&?render=[^&]+/, '');
       if (queryString !== '') {
-        // If there is a '?' in ajaxPath, clean url are on and & should be
+        // If there is a '?' in ajaxPath, clean URL are on and & should be
         // used to add parameters.
         queryString = (/\?/.test(ajaxPath) ? '&' : '?') + queryString;
       }
@@ -90,6 +90,7 @@
     this.element_settings = {
       url: ajaxPath + queryString,
       submit: settings,
+      httpMethod: 'GET',
       setClick: true,
       event: 'click',
       selector,
@@ -106,7 +107,7 @@
       )}-${settings.view_display_id.replace(/_/g, '-')}`,
     );
     once('exposed-form', this.$exposed_form).forEach(
-      $.proxy(this.attachExposedFormAjax, this),
+      this.attachExposedFormAjax.bind(this),
     );
 
     // Add the ajax to pagers.
@@ -115,8 +116,8 @@
       this.$view
         // Don't attach to nested views. Doing so would attach multiple behaviors
         // to a given element.
-        .filter($.proxy(this.filterNestedViews, this)),
-    ).forEach($.proxy(this.attachPagerAjax, this));
+        .filter(this.filterNestedViews.bind(this)),
+    ).forEach(this.attachPagerAjax.bind(this));
 
     // Add a trigger to update this view specifically. In order to trigger a
     // refresh use the following code.
@@ -127,6 +128,7 @@
     const selfSettings = $.extend({}, this.element_settings, {
       event: 'RefreshView',
       base: this.selector,
+      httpMethod: 'GET',
       element: this.$view.get(0),
     });
     this.refreshViewAjax = Drupal.ajax(selfSettings);
@@ -172,7 +174,7 @@
       .find(
         '.js-pager__items a, th.views-field a, .attachment .views-summary a',
       )
-      .each($.proxy(this.attachPagerLinkAjax, this));
+      .each(this.attachPagerLinkAjax.bind(this));
   };
 
   /**
@@ -201,6 +203,7 @@
       submit: viewData,
       base: false,
       element: link,
+      httpMethod: 'GET',
     });
     this.pagerAjax = Drupal.ajax(selfSettings);
   };

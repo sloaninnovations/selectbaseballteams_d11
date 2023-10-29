@@ -310,7 +310,7 @@ class ContactSitewideTest extends BrowserTestBase {
     }
 
     $this->assertSession()->statusCodeEquals(200);
-    $this->clickLink('Add field');
+    $this->clickLink('Create a new field');
     $this->assertSession()->statusCodeEquals(200);
 
     // Create a simple textfield.
@@ -499,7 +499,7 @@ class ContactSitewideTest extends BrowserTestBase {
     $this->assertCount(0, $captured_emails);
     $this->drupalLogin($admin_user);
     $this->drupalGet('admin/reports/dblog');
-    $this->assertSession()->responseContains('Error sending auto-reply, missing sender e-mail address in foo');
+    $this->assertSession()->responseContains('Error sending auto-reply, missing sender email address in foo');
   }
 
   /**

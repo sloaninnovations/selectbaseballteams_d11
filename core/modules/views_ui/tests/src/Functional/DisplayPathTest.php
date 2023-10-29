@@ -93,7 +93,7 @@ class DisplayPathTest extends UITestBase {
     $this->assertSession()->assertEscaped('/<object>malformed_path</object>');
     $this->assertSession()->assertEscaped('/<script>alert("hello");</script>');
     $this->assertSession()->assertEscaped('/<script>alert("hello I have placeholders %");</script>');
-    // Links should be url-encoded.
+    // Links should be URL-encoded.
     $this->assertSession()->responseContains('/%3Cobject%3Emalformed_path%3C/object%3E');
     $this->assertSession()->responseContains('/%3Cscript%3Ealert%28%22hello%22%29%3B%3C/script%3E');
   }
@@ -112,7 +112,7 @@ class DisplayPathTest extends UITestBase {
     $this->drupalGet($url);
     $this->submitForm(['path' => 'user/%1/example'], 'Apply');
     $this->assertSession()->addressEquals($url);
-    $this->assertSession()->pageTextContains("Numeric placeholders may not be used. Please use plain placeholders (%).");
+    $this->assertSession()->pageTextContains("Numeric placeholders may not be used. Use plain placeholders (%).");
   }
 
   /**

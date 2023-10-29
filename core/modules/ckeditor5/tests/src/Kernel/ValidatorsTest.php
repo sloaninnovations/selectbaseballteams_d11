@@ -20,7 +20,7 @@ use Symfony\Component\Yaml\Yaml;
  * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\ToolbarItemConstraintValidator
  * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\ToolbarItemDependencyConstraintValidator
  * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\EnabledConfigurablePluginsConstraintValidator
- * @covers \Drupal\ckeditor5\Plugin\Editor\CKEditor5::validatePair()
+ * @covers \Drupal\ckeditor5\Plugin\Editor\CKEditor5::validatePair
  * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator
  * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\CKEditor5MediaAndFilterSettingsInSyncConstraintValidator
  * @group ckeditor5
@@ -60,9 +60,6 @@ class ValidatorsTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\ToolbarItemConstraintValidator
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\ToolbarItemDependencyConstraintValidator
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\EnabledConfigurablePluginsConstraintValidator
    * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\CKEditor5ElementConstraintValidator
    * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\StyleSensibleElementConstraintValidator
    * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\UniqueLabelInListConstraintValidator
@@ -549,11 +546,6 @@ class ValidatorsTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\ckeditor5\Plugin\Editor\CKEditor5::validatePair()
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\ToolbarItemConstraintValidator
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\ToolbarItemDependencyConstraintValidator
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\EnabledConfigurablePluginsConstraintValidator
    * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\SourceEditingPreventSelfXssConstraintValidator
    * @dataProvider providerPair
    *
@@ -588,15 +580,31 @@ class ValidatorsTest extends KernelTestBase {
       'label' => 'View Mode 2',
     ])->save();
     assert($text_editor instanceof EditorInterface);
-    $this->assertConfigSchema(
-      $this->typedConfig,
-      $text_editor->getConfigDependencyName(),
-      $text_editor->toArray()
-    );
     $text_format = FilterFormat::create([
       'filters' => $filters,
     ]);
     assert($text_format instanceof FilterFormatInterface);
+    // TRICKY: because we're validating using `editor.editor.*` as the config
+    // name, TextEditorObjectDependentValidatorTrait will load the stored
+    // filter format. That has not yet been updated at this point, so in order
+    // for validation to pass, it must first be saved.
+    // @see \Drupal\ckeditor5\Plugin\Validation\Constraint\TextEditorObjectDependentValidatorTrait::createTextEditorObjectFromContext()
+    // @todo Remove this work-around in https://www.drupal.org/project/drupal/issues/3231354
+    $text_format
+      ->set('format', $text_editor->id())
+      ->set('name', $this->randomString())
+      ->save();
+
+    // TRICKY: only assert config schema (and validation constraints) if we
+    // expect NO violations: when violations are expected, this would just find
+    // the very violations that the next assertion is checking.
+    if (empty($expected_violations)) {
+      $this->assertConfigSchema(
+        $this->typedConfig,
+        $text_editor->getConfigDependencyName(),
+        $text_editor->toArray()
+      );
+    }
 
     $this->assertSame($expected_violations, $this->validatePairToViolationsArray($text_editor, $text_format, TRUE));
   }
@@ -1070,7 +1078,7 @@ class ValidatorsTest extends KernelTestBase {
       'filters' => [],
       'violations' => [],
     ];
-    $data['INVALID: drupalMedia toolbar item condition NOT met: media filter enabled'] = [
+    $data['INVALID: drupalMedia toolbar item condition NOT met: media filter disabled'] = [
       'settings' => [
         'toolbar' => [
           'items' => [
@@ -1094,13 +1102,17 @@ class ValidatorsTest extends KernelTestBase {
             'drupalMedia',
           ],
         ],
-        'plugins' => [],
+        'plugins' => [
+          'media_media' => [
+            'allow_view_mode_override' => FALSE,
+          ],
+        ],
       ],
       'image_upload' => [
         'status' => FALSE,
       ],
       'filters' => [
-        'filter_html' => [
+        'media_embed' => [
           'id' => 'media_embed',
           'provider' => 'media',
           'status' => TRUE,
@@ -1112,9 +1124,7 @@ class ValidatorsTest extends KernelTestBase {
           ],
         ],
       ],
-      'violations' => [
-        'settings.toolbar.items.0' => 'The <em class="placeholder">Drupal media</em> toolbar item requires the <em class="placeholder">Embed media</em> filter to be enabled.',
-      ],
+      'violations' => [],
     ];
     $data['VALID: HTML format: very minimal toolbar + wildcard in source editing HTML'] = [
       'settings' => [
@@ -1469,7 +1479,7 @@ class ValidatorsTest extends KernelTestBase {
   /**
    * Tests that validation works with >1 enabled HTML restrictor filters.
    *
-   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator::checkHtmlRestrictionsMatch()
+   * @covers \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator::checkHtmlRestrictionsMatch
    */
   public function testMultipleHtmlRestrictingFilters(): void {
     $this->container->get('module_installer')->install(['filter_test']);

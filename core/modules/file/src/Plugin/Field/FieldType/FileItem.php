@@ -21,8 +21,11 @@ use Drupal\Core\TypedData\DataDefinition;
  * @FieldType(
  *   id = "file",
  *   label = @Translation("File"),
- *   description = @Translation("This field stores the ID of a file as an integer value."),
- *   category = @Translation("Reference"),
+ *   description = {
+ *     @Translation("For uploading files"),
+ *     @Translation("Can be configured with options such as allowed file extensions and maximum upload size"),
+ *   },
+ *   category = "file_upload",
  *   default_widget = "file_generic",
  *   default_formatter = "file_default",
  *   list_class = "\Drupal\file\Plugin\Field\FieldType\FileFieldItemList",
@@ -104,6 +107,14 @@ class FileItem extends EntityReferenceItem {
       ->setLabel(new TranslatableMarkup('Description'));
 
     return $properties;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function storageSettingsSummary(FieldStorageDefinitionInterface $storage_definition): array {
+    // Bypass the parent setting summary as it produces redundant information.
+    return [];
   }
 
   /**
@@ -323,11 +334,11 @@ class FileItem extends EntityReferenceItem {
     }
 
     // There is always a file size limit due to the PHP server limit.
-    $validators['file_validate_size'] = [$max_filesize];
+    $validators['FileSizeLimit'] = ['fileLimit' => $max_filesize];
 
     // Add the extension check if necessary.
     if (!empty($settings['file_extensions'])) {
-      $validators['file_validate_extensions'] = [$settings['file_extensions']];
+      $validators['FileExtension'] = ['extensions' => $settings['file_extensions']];
     }
 
     return $validators;

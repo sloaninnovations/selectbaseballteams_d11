@@ -19,6 +19,7 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'file',
     'field',
     'node',
     'serialization',
@@ -43,7 +44,6 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
     // Add the additional table schemas.
-    $this->installSchema('system', ['sequences']);
     $this->installSchema('node', ['node_access']);
     $this->installSchema('user', ['users_data']);
     NodeType::create([
@@ -114,8 +114,7 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
   }
 
   /**
-   * Ensures that a naming conflict in the mapping causes an exception to be
-   * thrown.
+   * Ensures that a naming conflict in mapping causes an exception to be thrown.
    *
    * @covers ::getFields
    * @dataProvider getFieldsProvider
@@ -125,10 +124,9 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
     $bundle = 'article';
     $reflection_class = new \ReflectionClass($this->resourceTypeRepository);
     $reflection_method = $reflection_class->getMethod('getFields');
-    $reflection_method->setAccessible(TRUE);
 
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage("The generated alias '{$field_name_list[1]}' for field name '{$field_name_list[0]}' conflicts with an existing field. Please report this in the JSON:API issue queue!");
+    $this->expectExceptionMessage("The generated alias '{$field_name_list[1]}' for field name '{$field_name_list[0]}' conflicts with an existing field. Report this in the JSON:API issue queue!");
     $reflection_method->invokeArgs($this->resourceTypeRepository, [$field_name_list, $entity_type, $bundle]);
   }
 

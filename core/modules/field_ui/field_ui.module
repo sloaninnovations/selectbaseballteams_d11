@@ -28,7 +28,7 @@ function field_ui_help($route_name, RouteMatchInterface $route_match) {
       $output .= '<dt>' . t('Creating a field') . '</dt>';
       $output .= '<dd>' . t('On the <em>Manage fields</em> page for your entity type or sub-type, you can add, configure, and delete fields for that entity type or sub-type. Each field has a <em>machine name</em>, which is used internally to identify the field and must be unique across an entity type; once a field is created, you cannot change the machine name. Most fields have two types of settings. The field-level settings depend on the field type, and affect how the data in the field is stored. Once they are set, they can no longer be changed; examples include how many data values are allowed for the field and where files are stored. The sub-type-level settings are specific to each entity sub-type the field is used on, and they can be changed later; examples include the field label, help text, default value, and whether the field is required or not. You can return to these settings by choosing the <em>Edit</em> link for the field from the <em>Manage fields</em> page.');
       $output .= '<dt>' . t('Re-using fields') . '</dt>';
-      $output .= '<dd>' . t('Once you have created a field, you can use it again in other sub-types of the same entity type. For instance, if you create a field for the article content type, you can also use it for the page content type, but you cannot use it for custom blocks or taxonomy terms. If there are fields available for re-use, after clicking <em>Add field</em> from the <em>Manage fields</em> page, you will see a list of available fields for re-use. After selecting a field for re-use, you can configure the sub-type-level settings.') . '</dd>';
+      $output .= '<dd>' . t('Once you have created a field, you can use it again in other sub-types of the same entity type. For instance, if you create a field for the article content type, you can also use it for the page content type, but you cannot use it for content blocks or taxonomy terms. If there are fields available for re-use, after clicking <em>Add field</em> from the <em>Manage fields</em> page, you will see a list of available fields for re-use. After selecting a field for re-use, you can configure the sub-type-level settings.') . '</dd>';
       $output .= '<dt>' . t('Configuring field editing') . '</dt>';
       $output .= '<dd>' . t('On the <em>Manage form display</em> page of your entity type or sub-type, you can configure how the field data is edited by default and in each form mode. If your entity type has multiple form modes (on most sites, most entities do not), you can toggle between the form modes at the top of the page, and you can toggle whether each form mode uses the default settings or custom settings in the <em>Custom display settings</em> section. For each field in each form mode, you can select the widget to use for editing; some widgets have additional configuration options, such as the size for a text field, and these can be edited using the Edit button (which looks like a wheel). You can also change the order of the fields on the form. You can exclude a field from a form by choosing <em>Hidden</em> from the widget drop-down list, or by dragging it into the <em>Disabled</em> section.') . '</dd>';
       $output .= '<dt>' . t('Configuring field display') . '</dt>';
@@ -62,6 +62,13 @@ function field_ui_theme() {
         'responsive' => TRUE,
         'empty' => '',
       ],
+    ],
+    // Provide a dedicated template for new storage options as their styling
+    // is quite different from a typical form element, so it works best to not
+    // include default form element classes.
+    'form_element__new_storage_type' => [
+      'base hook' => 'form_element',
+      'render element' => 'element',
     ],
   ];
 }
@@ -115,26 +122,6 @@ function field_ui_entity_bundle_create($entity_type, $bundle) {
 }
 
 /**
- * Implements hook_form_FORM_ID_alter().
- *
- * Adds a button 'Save and manage fields' to the 'Create content type' form.
- *
- * @see \Drupal\node\NodeTypeForm
- * @see field_ui_form_node_type_form_submit()
- */
-function field_ui_form_node_type_form_alter(&$form, FormStateInterface $form_state) {
-  // We want to display the button only on add page.
-  if ($form_state->getFormObject()->getEntity()->isNew()) {
-    $form['actions']['save_continue'] = $form['actions']['submit'];
-    $form['actions']['save_continue']['#value'] = t('Save and manage fields');
-    $form['actions']['save_continue']['#weight'] = $form['actions']['save_continue']['#weight'] + 5;
-    $form['actions']['save_continue']['#submit'][] = 'field_ui_form_node_type_form_submit';
-    // Hide the 'Save content type' button.
-    $form['actions']['submit']['#access'] = FALSE;
-  }
-}
-
-/**
  * Implements hook_entity_operation().
  */
 function field_ui_entity_operation(EntityInterface $entity) {
@@ -174,17 +161,6 @@ function field_ui_entity_operation(EntityInterface $entity) {
   }
 
   return $operations;
-}
-
-/**
- * Form submission handler for the 'Save and manage fields' button.
- *
- * @see field_ui_form_node_type_form_alter()
- */
-function field_ui_form_node_type_form_submit($form, FormStateInterface $form_state) {
-  if ($form_state->getTriggeringElement()['#parents'][0] === 'save_continue' && $route_info = FieldUI::getOverviewRouteInfo('node', $form_state->getValue('type'))) {
-    $form_state->setRedirectUrl($route_info);
-  }
 }
 
 /**
@@ -247,4 +223,57 @@ function field_ui_form_field_ui_field_storage_add_form_alter(array &$form) {
   // "Other".
   unset($form['add']['new_storage_type']['#options'][$optgroup]['entity_reference']);
   $form['add']['new_storage_type']['#options'][$optgroup]['entity_reference'] = t('Other…');
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function field_ui_preprocess_form_element__new_storage_type(&$variables) {
+  // Add support for a variant string so radios in the add field form can be
+  // programmatically distinguished.
+  $variables['variant'] = $variables['element']['#variant'] ?? NULL;
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Adds a button 'Save and manage fields' to forms.
+ *
+ * @see \Drupal\node\NodeTypeForm
+ * @see \Drupal\comment\CommentTypeForm
+ * @see \Drupal\media\MediaTypeForm
+ * @see \Drupal\block_content\BlockContentTypeForm
+ * @see field_ui_form_manage_field_form_submit()
+ */
+function field_ui_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $forms = [
+    'node_type_add_form',
+    'comment_type_add_form',
+    'media_type_add_form',
+    'block_content_type_add_form',
+  ];
+
+  if (!in_array($form_id, $forms)) {
+    return;
+  }
+  if ($form_state->getFormObject()->getEntity()->isNew()) {
+    $form['actions']['save_continue'] = $form['actions']['submit'];
+    unset($form['actions']['submit']['#button_type']);
+    $form['actions']['save_continue']['#value'] = t('Save and manage fields');
+    $form['actions']['save_continue']['#weight'] = $form['actions']['save_continue']['#weight'] - 5;
+    $form['actions']['save_continue']['#submit'][] = 'field_ui_form_manage_field_form_submit';
+  }
+}
+
+/**
+ * Form submission handler for the 'Save and manage fields' button.
+ *
+ * @see field_ui_form_alter()
+ */
+function field_ui_form_manage_field_form_submit($form, FormStateInterface $form_state) {
+  $provider = $form_state->getFormObject()->getEntity()->getEntityType()->getProvider();
+  $id = $form_state->getFormObject()->getEntity()->id();
+  if ($form_state->getTriggeringElement()['#parents'][0] === 'save_continue' && $route_info = FieldUI::getOverviewRouteInfo($provider, $id)) {
+    $form_state->setRedirectUrl($route_info);
+  }
 }

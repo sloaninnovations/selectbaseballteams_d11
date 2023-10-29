@@ -109,7 +109,6 @@ class UserLoginForm extends FormBase {
       '#title' => $this->t('Username'),
       '#size' => 60,
       '#maxlength' => UserInterface::USERNAME_MAX_LENGTH,
-      '#description' => $this->t('Enter your @s username.', ['@s' => $config->get('name')]),
       '#required' => TRUE,
       '#attributes' => [
         'autocorrect' => 'none',
@@ -123,7 +122,6 @@ class UserLoginForm extends FormBase {
       '#type' => 'password',
       '#title' => $this->t('Password'),
       '#size' => 60,
-      '#description' => $this->t('Enter the password that accompanies your username.'),
       '#required' => TRUE,
     ];
 
@@ -249,13 +247,7 @@ class UserLoginForm extends FormBase {
         $form_state->setResponse($response);
       }
       else {
-        // Use $form_state->getUserInput() in the error message to guarantee
-        // that we send exactly what the user typed in. The value from
-        // $form_state->getValue() may have been modified by validation
-        // handlers that ran earlier than this one.
-        $user_input = $form_state->getUserInput();
-        $query = isset($user_input['name']) ? ['name' => $user_input['name']] : [];
-        $form_state->setErrorByName('name', $this->t('Unrecognized username or password. <a href=":password">Forgot your password?</a>', [':password' => Url::fromRoute('user.pass', [], ['query' => $query])->toString()]));
+        $form_state->setErrorByName('name', $this->t('Unrecognized username or password. <a href=":password">Forgot your password?</a>', [':password' => Url::fromRoute('user.pass')->toString()]));
         $accounts = $this->userStorage->loadByProperties(['name' => $form_state->getValue('name')]);
         if (!empty($accounts)) {
           $this->logger('user')->notice('Login attempt failed for %user.', ['%user' => $form_state->getValue('name')]);

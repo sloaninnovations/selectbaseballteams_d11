@@ -84,6 +84,9 @@ class InstallUninstallTest extends ModuleTestBase {
     $this->assertSession()->pageTextContains('hook_modules_installed fired for help');
     $this->assertModuleSuccessfullyInstalled('help');
 
+    // Add new role to allow browsing help pages.
+    $this->adminUser->addRole($this->createRole(['access help pages']))->save();
+
     // Test help for the required modules.
     foreach ($required_modules as $name => $module) {
       $this->assertHelp($name, $module->info['name']);
@@ -174,6 +177,7 @@ class InstallUninstallTest extends ModuleTestBase {
 
       // Uninstall the original module, plus everything else that was installed
       // with it.
+      // @todo Remove in https://www.drupal.org/project/node/3261652
       if ($name == 'forum') {
         // Forum has an extra step to be able to uninstall it.
         $this->preUninstallForum();
@@ -415,6 +419,8 @@ class InstallUninstallTest extends ModuleTestBase {
 
   /**
    * Deletes forum taxonomy terms, so Forum can be uninstalled.
+   *
+   * @todo Remove in https://www.drupal.org/project/node/3261652
    */
   protected function preUninstallForum() {
     // There only should be a 'General discussion' term in the 'forums'

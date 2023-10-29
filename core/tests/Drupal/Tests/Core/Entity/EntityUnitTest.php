@@ -87,6 +87,8 @@ class EntityUnitTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->values = [
       'id' => 1,
       'langcode' => 'en',
@@ -399,7 +401,7 @@ class EntityUnitTest extends UnitTestCase {
   public function testPostSave() {
     $this->cacheTagsInvalidator->expects($this->exactly(2))
       ->method('invalidateTags')
-      ->willReturnOnConsecutiveCalls([
+      ->withConsecutive([
         [
           // List cache tag.
           $this->entityTypeId . '_list',
@@ -430,7 +432,7 @@ class EntityUnitTest extends UnitTestCase {
   public function testPostSaveBundle() {
     $this->cacheTagsInvalidator->expects($this->exactly(2))
       ->method('invalidateTags')
-      ->willReturnOnConsecutiveCalls([
+      ->withConsecutive([
         [
           // List cache tag.
           $this->entityTypeId . '_list',

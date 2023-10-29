@@ -23,6 +23,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\field\FieldLabelOptionsTrait;
 
 /**
  * Provides a block that renders a field from an entity.
@@ -37,6 +38,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class FieldBlock extends BlockBase implements ContextAwarePluginInterface, ContainerFactoryPluginInterface {
 
+  use FieldLabelOptionsTrait;
   /**
    * The entity field manager.
    *
@@ -159,7 +161,11 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
     $display_settings['third_party_settings']['layout_builder']['view_mode'] = $this->getContextValue('view_mode');
     $entity = $this->getEntity();
     try {
-      $build = $entity->get($this->fieldName)->view($display_settings);
+      $build = [];
+      $view = $entity->get($this->fieldName)->view($display_settings);
+      if ($view) {
+        $build = [$view];
+      }
     }
     // @todo Remove in https://www.drupal.org/project/drupal/issues/2367555.
     catch (EnforcedResponseException $e) {
@@ -247,15 +253,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
     $form['formatter']['label'] = [
       '#type' => 'select',
       '#title' => $this->t('Label'),
-      // @todo This is directly copied from
-      //   \Drupal\field_ui\Form\EntityViewDisplayEditForm::getFieldLabelOptions(),
-      //   resolve this in https://www.drupal.org/project/drupal/issues/2933924.
-      '#options' => [
-        'above' => $this->t('Above'),
-        'inline' => $this->t('Inline'),
-        'hidden' => '- ' . $this->t('Hidden') . ' -',
-        'visually_hidden' => '- ' . $this->t('Visually Hidden') . ' -',
-      ],
+      '#options' => $this->getFieldLabelOptions(),
       '#default_value' => $config['formatter']['label'],
     ];
 

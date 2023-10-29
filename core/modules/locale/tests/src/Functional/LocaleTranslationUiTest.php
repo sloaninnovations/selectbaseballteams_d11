@@ -9,8 +9,7 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Core\Language\LanguageInterface;
 
 /**
- * Adds a new locale and translates its name. Checks the validation of
- * translation strings and search results.
+ * Tests the validation of translation strings and search results.
  *
  * @group locale
  */
@@ -180,11 +179,11 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     // Test invalidation of 'rendered' cache tag after string translation.
     $this->drupalLogout();
     $this->drupalGet('xx/user/login');
-    $this->assertSession()->pageTextContains('Enter the password that accompanies your username.');
+    $this->assertSession()->pageTextContains('Password');
 
     $this->drupalLogin($translate_user);
     $search = [
-      'string' => 'accompanies your username',
+      'string' => 'Password',
       'langcode' => $langcode,
       'translation' => 'untranslated',
     ];
@@ -193,14 +192,14 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $textarea = $this->assertSession()->elementExists('xpath', '//textarea');
     $lid = $textarea->getAttribute('name');
     $edit = [
-      $lid => 'Please enter your Llama username.',
+      $lid => 'Llamas are larger than frogs.',
     ];
     $this->drupalGet('admin/config/regional/translate');
     $this->submitForm($edit, 'Save translations');
 
     $this->drupalLogout();
     $this->drupalGet('xx/user/login');
-    $this->assertSession()->pageTextContains('Please enter your Llama username.');
+    $this->assertSession()->pageTextContains('Llamas are larger than frogs.');
 
     // Delete the language.
     $this->drupalLogin($admin_user);
@@ -245,8 +244,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
   }
 
   /**
-   * Adds a language and checks that the JavaScript translation files are
-   * properly created and rebuilt on deletion.
+   * Tests the rebuilding of JavaScript translation files on deletion.
    */
   public function testJavaScriptTranslation() {
     $user = $this->drupalCreateUser([

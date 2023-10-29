@@ -64,9 +64,6 @@ class ResourceResponseSubscriberTest extends UnitTestCase {
       'associative array' => [['test' => 'foobar']],
       'boolean true' => [TRUE],
       'boolean false' => [FALSE],
-      // @todo Not supported. https://www.drupal.org/node/2427811
-      // [new \stdClass()],
-      // [(object) ['test' => 'foobar']],
     ];
   }
 
@@ -136,7 +133,7 @@ class ResourceResponseSubscriberTest extends UnitTestCase {
       $route_match = new RouteMatch('test', new Route('/rest/test', ['_rest_resource_config' => $this->randomMachineName()], $route_requirements));
 
       // The RequestHandler must return a ResourceResponseInterface object.
-      $handler_response = new ResourceResponse($method !== 'DELETE' ? ['REST' => 'Drupal'] : NULL);
+      $handler_response = new ResourceResponse(['REST' => 'Drupal']);
       $this->assertInstanceOf(ResourceResponseInterface::class, $handler_response);
       $this->assertInstanceOf(CacheableResponseInterface::class, $handler_response);
 
@@ -186,7 +183,7 @@ class ResourceResponseSubscriberTest extends UnitTestCase {
       $route_match = new RouteMatch('test', new Route('/rest/test', ['_rest_resource_config' => $this->randomMachineName()], $route_requirements));
 
       // The RequestHandler must return a ResourceResponseInterface object.
-      $handler_response = new ModifiedResourceResponse($method !== 'DELETE' ? ['REST' => 'Drupal'] : NULL);
+      $handler_response = new ModifiedResourceResponse(['REST' => 'Drupal']);
       $this->assertInstanceOf(ResourceResponseInterface::class, $handler_response);
       $this->assertNotInstanceOf(CacheableResponseInterface::class, $handler_response);
 
@@ -344,7 +341,7 @@ class ResourceResponseSubscriberTest extends UnitTestCase {
     ];
 
     $unsafe_method_bodyless_test_cases = [
-      'unsafe methods without response bodies (DELETE): client requested no format, response should have no format' => [
+      'unsafe methods without request bodies (DELETE): client requested no format, response should have the first acceptable format' => [
         ['DELETE'],
         ['xml', 'json'],
         ['xml', 'json'],
@@ -352,10 +349,10 @@ class ResourceResponseSubscriberTest extends UnitTestCase {
         ['Content-Type' => 'application/json'],
         NULL,
         'xml',
-        NULL,
-        '',
+        'text/xml',
+        $xml_encoded,
       ],
-      'unsafe methods without response bodies (DELETE): client requested format (XML), response should have no format' => [
+      'unsafe methods without request bodies (DELETE): client requested format (XML), response should have xml format' => [
         ['DELETE'],
         ['xml', 'json'],
         ['xml', 'json'],
@@ -363,10 +360,10 @@ class ResourceResponseSubscriberTest extends UnitTestCase {
         ['Content-Type' => 'application/json'],
         NULL,
         'xml',
-        NULL,
-        '',
+        'text/xml',
+        $xml_encoded,
       ],
-      'unsafe methods without response bodies (DELETE): client requested format (JSON), response should have no format' => [
+      'unsafe methods without request bodies (DELETE): client requested format (JSON), response should have json format' => [
         ['DELETE'],
         ['xml', 'json'],
         ['xml', 'json'],
@@ -374,8 +371,8 @@ class ResourceResponseSubscriberTest extends UnitTestCase {
         ['Content-Type' => 'application/json'],
         NULL,
         'json',
-        NULL,
-        '',
+        'application/json',
+        $json_encoded,
       ],
     ];
 

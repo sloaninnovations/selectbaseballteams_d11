@@ -188,6 +188,7 @@ class UrlHelperTest extends TestCase {
    */
   public function providerTestInvalidRelativeData() {
     $data = [
+      // cspell:disable-next-line
       'ex^mple',
       'example<>',
       'ex%ample',
@@ -430,14 +431,14 @@ class UrlHelperTest extends TestCase {
       ['https://example.com/external/path', TRUE],
       ['javascript://fake-external-path', FALSE],
       // External URL without an explicit protocol.
-      ['//www.drupal.org/foo/bar?foo=bar&bar=baz&baz#foo', TRUE],
+      ['//www.example.com/foo/bar?foo=bar&bar=baz&baz#foo', TRUE],
       // Internal URL starting with a slash.
-      ['/www.drupal.org', FALSE],
+      ['/www.example.com', FALSE],
       // Simple external URLs.
       ['http://example.com', TRUE],
       ['https://example.com', TRUE],
-      ['http://drupal.org/foo/bar?foo=bar&bar=baz&baz#foo', TRUE],
-      ['//drupal.org', TRUE],
+      ['http://example.com/foo/bar?foo=bar&bar=baz&baz#foo', TRUE],
+      ['//example.com', TRUE],
       // Some browsers ignore or strip leading control characters.
       ["\x00//www.example.com", TRUE],
       ["\x08//www.example.com", TRUE],
@@ -455,7 +456,7 @@ class UrlHelperTest extends TestCase {
       ['/system/ajax', FALSE],
       ['?q=foo:bar', FALSE],
       ['node/edit:me', FALSE],
-      ['/drupal.org', FALSE],
+      ['/example.com', FALSE],
       ['<front>', FALSE],
     ];
   }
@@ -541,10 +542,10 @@ class UrlHelperTest extends TestCase {
   }
 
   /**
-   * Enhances test urls with schemes.
+   * Enhances test URLs with schemes.
    *
    * @param array $urls
-   *   The list of urls.
+   *   The list of URLs.
    *
    * @return array
    *   A list of provider data with schemes.
@@ -561,10 +562,10 @@ class UrlHelperTest extends TestCase {
   }
 
   /**
-   * Enhances test urls with prefixes.
+   * Enhances test URLs with prefixes.
    *
    * @param array $urls
-   *   The list of urls.
+   *   The list of URLs.
    *
    * @return array
    *   A list of provider data with prefixes.
@@ -581,7 +582,7 @@ class UrlHelperTest extends TestCase {
   }
 
   /**
-   * Tests detecting external urls that point to local resources.
+   * Tests detecting external URLs that point to local resources.
    *
    * @param string $url
    *   The external URL to test.
@@ -661,7 +662,7 @@ class UrlHelperTest extends TestCase {
       ['http://example.com/foo', ''],
       ['http://example.com/foo', 'bar'],
       ['http://example.com/foo', 'http://'],
-      // Invalid destination urls.
+      // Invalid destination URLs.
       ['', 'http://example.com/foo'],
       ['bar', 'http://example.com/foo'],
       ['/bar', 'http://example.com/foo'],

@@ -15,8 +15,10 @@ use Drupal\Core\Render\AttachmentsResponseProcessorInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Tests\UnitTestCase;
+use Drupal\TestTools\Random;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use Prophecy\Prophet;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -38,10 +40,10 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
     $big_pipe_response_attachments_processor->processAttachments($non_html_response);
   }
 
-  public function nonHtmlResponseProvider() {
+  public static function nonHtmlResponseProvider() {
     return [
       'AjaxResponse, which implements AttachmentsInterface' => [AjaxResponse::class],
-      'A dummy that implements AttachmentsInterface' => [get_class($this->prophesize(AttachmentsInterface::class)->reveal())],
+      'A dummy that implements AttachmentsInterface' => [get_class((new Prophet())->prophesize(AttachmentsInterface::class)->reveal())],
     ];
   }
 
@@ -84,7 +86,7 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
     $this->assertEquals('processed', $processed_big_pipe_response->getContent(), 'Content of returned (processed) response object MUST be changed.');
   }
 
-  public function attachmentsProvider() {
+  public static function attachmentsProvider() {
     $typical_cases = [
       'no attachments' => [[]],
       'libraries' => [['library' => ['core/drupal']]],
@@ -94,16 +96,16 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
     $official_attachment_types = ['html_head', 'feed', 'html_head_link', 'http_header', 'library', 'placeholders', 'drupalSettings', 'html_response_attachment_placeholders'];
     $official_attachments_with_random_values = [];
     foreach ($official_attachment_types as $type) {
-      $official_attachments_with_random_values[$type] = $this->randomMachineName();
+      $official_attachments_with_random_values[$type] = Random::machineName();
     }
-    $random_attachments = ['random' . $this->randomMachineName() => $this->randomMachineName()];
+    $random_attachments = ['random' . Random::machineName() => Random::machineName()];
     $edge_cases = [
       'all official attachment types, with random assigned values, even if technically not valid, to prove BigPipeResponseAttachmentsProcessor is a perfect decorator' => [$official_attachments_with_random_values],
       'random attachment type (unofficial), with random assigned value, to prove BigPipeResponseAttachmentsProcessor is a perfect decorator' => [$random_attachments],
     ];
 
-    $big_pipe_placeholder_attachments = ['big_pipe_placeholders' => [$this->randomMachineName()]];
-    $big_pipe_nojs_placeholder_attachments = ['big_pipe_nojs_placeholders' => [$this->randomMachineName()]];
+    $big_pipe_placeholder_attachments = ['big_pipe_placeholders' => [Random::machineName()]];
+    $big_pipe_nojs_placeholder_attachments = ['big_pipe_nojs_placeholders' => [Random::machineName()]];
     $big_pipe_cases = [
       'only big_pipe_placeholders' => [$big_pipe_placeholder_attachments],
       'only big_pipe_nojs_placeholders' => [$big_pipe_nojs_placeholder_attachments],

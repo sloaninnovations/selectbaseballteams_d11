@@ -7,6 +7,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Queue\DatabaseQueue;
 use Drupal\Core\Queue\Memory;
+use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestDeriverQueue;
 use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestException;
 use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestRequeueException;
 use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestSuspendQueue;
@@ -132,7 +133,6 @@ class CronQueueTest extends KernelTestBase {
     // Ensure that the memory queue expiry time is unchanged after the
     // DelayedRequeueException has been thrown.
     $property = (new \ReflectionClass($memory))->getProperty('queue');
-    $property->setAccessible(TRUE);
     $memory_queue_internal = $property->getValue($memory);
     $this->assertEquals($this->currentTime + $memory_lease_time, reset($memory_queue_internal)->expire);
   }
@@ -328,6 +328,19 @@ class CronQueueTest extends KernelTestBase {
     $definition = ['cron' => ['time' => -1]];
     $queue_worker_manager->processDefinition($definition, $plugin_id);
     $this->assertEquals(QueueWorkerManagerInterface::DEFAULT_QUEUE_CRON_TIME, $definition['cron']['time']);
+  }
+
+  /**
+   * Tests that cron queues from derivers work.
+   */
+  public function testQueueWorkerDeriver(): void {
+    $this->assertEquals(0, \Drupal::state()->get(CronQueueTestDeriverQueue::PLUGIN_ID, 0));
+    $queue = \Drupal::queue(sprintf('%s:foo', CronQueueTestDeriverQueue::PLUGIN_ID));
+    $queue->createItem('foo');
+
+    $this->cron->run();
+
+    $this->assertEquals(1, \Drupal::state()->get(CronQueueTestDeriverQueue::PLUGIN_ID));
   }
 
   /**

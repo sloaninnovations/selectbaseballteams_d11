@@ -360,7 +360,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
    * {@inheritdoc}
    */
   public function tokenizeValue($value, $row_index = NULL) {
-    if (strpos($value, '{{') !== FALSE) {
+    if (str_contains($value, '{{')) {
       $fake_item = [
         'alter_text' => TRUE,
         'text' => $value,
@@ -420,12 +420,35 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
    */
   public function getEntity(ResultRow $values) {
     $relationship_id = $this->options['relationship'];
+    $entity = NULL;
     if ($relationship_id == 'none') {
-      return $values->_entity;
+      $entity = $values->_entity;
     }
     elseif (isset($values->_relationship_entities[$relationship_id])) {
-      return $values->_relationship_entities[$relationship_id];
+      $entity = $values->_relationship_entities[$relationship_id];
     }
+
+    if ($entity === NULL) {
+      // Don't log an error if we're getting an entity for an optional
+      // relationship.
+      if ($relationship_id !== 'none') {
+        $relationship = $this->view->relationship[$relationship_id] ?? NULL;
+        if ($relationship && !$relationship->options['required']) {
+          return NULL;
+        }
+      }
+      \Drupal::logger('views')->error(
+        'The view %id failed to load an entity of type %entity_type at row %index for field %field',
+        [
+          '%id' => $this->view->id(),
+          '%entity_type' => $this->configuration['entity_type'],
+          '%index' => $values->index,
+          '%field' => $this->label() ?: $this->realField,
+        ]
+      );
+      return NULL;
+    }
+    return $entity;
   }
 
   /**
@@ -533,8 +556,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
   }
 
   /**
-   * Default options form that provides the label widget that all fields
-   * should have.
+   * Default option form that provides label widget that all fields should have.
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
@@ -1399,8 +1421,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
   }
 
   /**
-   * Render this field as a link, with the info from a fieldset set by
-   * the user.
+   * Render this field as a link, with the info from a fieldset set by the user.
    */
   protected function renderAsLink($alter, $text, $tokens) {
     $options = [

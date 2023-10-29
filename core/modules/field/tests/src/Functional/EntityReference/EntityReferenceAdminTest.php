@@ -113,13 +113,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
 
     // Create a test entity reference field.
     $field_name = 'test_entity_ref_field';
-    $edit = [
-      'new_storage_type' => 'field_ui:entity_reference:node',
-      'label' => 'Test Entity Reference Field',
-      'field_name' => $field_name,
-    ];
-    $this->drupalGet($bundle_path . '/fields/add-field');
-    $this->submitForm($edit, 'Save and continue');
+    $this->fieldUIAddNewField($bundle_path, $field_name, 'Test Entity Reference Field', 'field_ui:entity_reference:node', [], [], FALSE);
 
     // Set to unlimited.
     $edit = [
@@ -227,6 +221,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save settings');
     $this->drupalGet($bundle_path . '/fields/' . $field_path);
     $edit = [
+      'set_default_value' => '1',
       // A term that doesn't yet exist.
       'default_value_input[field_' . $taxonomy_term_field_name . '][0][target_id]' => $term_name,
     ];
@@ -299,8 +294,10 @@ class EntityReferenceAdminTest extends BrowserTestBase {
   }
 
   /**
-   * Tests field settings for an entity reference field when the field has
-   * multiple target bundles and is set to auto-create the target entity.
+   * Tests field settings for an entity reference field.
+   *
+   * The tested entity reference field has multiple target bundles and is set
+   * to auto-create the target entity.
    */
   public function testMultipleTargetBundles() {
     /** @var \Drupal\taxonomy\Entity\Vocabulary[] $vocabularies */

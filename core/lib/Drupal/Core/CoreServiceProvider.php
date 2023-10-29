@@ -9,6 +9,7 @@ use Drupal\Core\DependencyInjection\Compiler\BackendCompilerPass;
 use Drupal\Core\DependencyInjection\Compiler\CorsCompilerPass;
 use Drupal\Core\DependencyInjection\Compiler\DeprecatedServicePass;
 use Drupal\Core\DependencyInjection\Compiler\ContextProvidersPass;
+use Drupal\Core\DependencyInjection\Compiler\DevelopmentSettingsPass;
 use Drupal\Core\DependencyInjection\Compiler\ProxyServicesPass;
 use Drupal\Core\DependencyInjection\Compiler\StackedKernelPass;
 use Drupal\Core\DependencyInjection\Compiler\StackedSessionHandlerPass;
@@ -26,6 +27,7 @@ use Drupal\Core\Plugin\PluginManagerPass;
 use Drupal\Core\Render\MainContent\MainContentRenderersPass;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * ServiceProvider class for mandatory core services.
@@ -57,6 +59,8 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
     // service definitions. This pass must come first so that later
     // list-building passes are operating on the post-alter services list.
     $container->addCompilerPass(new ModifyServiceDefinitionsPass());
+
+    $container->addCompilerPass(new DevelopmentSettingsPass());
 
     $container->addCompilerPass(new ProxyServicesPass());
 
@@ -93,6 +97,9 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
     $container->addCompilerPass(new PluginManagerPass());
 
     $container->addCompilerPass(new DeprecatedServicePass());
+
+    $container->registerForAutoconfiguration(EventSubscriberInterface::class)
+      ->addTag('event_subscriber');
   }
 
   /**

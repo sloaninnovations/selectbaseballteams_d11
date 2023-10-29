@@ -101,8 +101,18 @@ class AssetResolver implements AssetResolverInterface {
    *   loaded, excluding any libraries that have already been loaded.
    */
   protected function getLibrariesToLoad(AttachedAssetsInterface $assets) {
+    // The order of libraries passed in via assets can differ, so to reduce
+    // variation, first normalize the requested libraries to the minimal
+    // representative set before then expanding the list to include all
+    // dependencies.
+    // @see Drupal\FunctionalTests\Core\Asset\AssetOptimizationTestUmami
+    // @todo: https://www.drupal.org/project/drupal/issues/1945262
+    $libraries = $assets->getLibraries();
+    if ($libraries) {
+      $libraries = $this->libraryDependencyResolver->getMinimalRepresentativeSubset($libraries);
+    }
     return array_diff(
-      $this->libraryDependencyResolver->getLibrariesWithDependencies($assets->getLibraries()),
+      $this->libraryDependencyResolver->getLibrariesWithDependencies($libraries),
       $this->libraryDependencyResolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries())
     );
   }
@@ -142,13 +152,13 @@ class AssetResolver implements AssetResolverInterface {
           $options['license'] = $definition['license'];
 
           // Files with a query string cannot be preprocessed.
-          if ($options['type'] === 'file' && $options['preprocess'] && strpos($options['data'], '?') !== FALSE) {
+          if ($options['type'] === 'file' && $options['preprocess'] && str_contains($options['data'], '?')) {
             $options['preprocess'] = FALSE;
           }
 
           // Always add a tiny value to the weight, to conserve the insertion
           // order.
-          $options['weight'] += count($css) / 1000;
+          $options['weight'] += count($css) / 30000;
 
           // CSS files are being keyed by the full path.
           $css[$options['data']] = $options;
@@ -259,7 +269,7 @@ class AssetResolver implements AssetResolverInterface {
 
             // Always add a tiny value to the weight, to conserve the insertion
             // order.
-            $options['weight'] += count($javascript) / 1000;
+            $options['weight'] += count($javascript) / 30000;
 
             // Local and external files must keep their name as the associative
             // key so the same JavaScript file is not added twice.

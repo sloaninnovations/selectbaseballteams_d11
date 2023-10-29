@@ -1,5 +1,5 @@
 {
-    "version": "0.1",
+    "version": "0.2",
     "language": "en-US",
     "allowCompoundWords": false,
     "globRoot": ".",
@@ -47,8 +47,10 @@
       { "name": "drupal", "path": "./misc/cspell/dictionary.txt"}
     ],
     "flagWords": [
+      "e-mail",
       "grey",
-      "hte"
+      "hte",
+      "please"
     ],
     "overrides": [
       {

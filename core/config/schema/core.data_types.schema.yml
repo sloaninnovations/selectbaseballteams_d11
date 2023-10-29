@@ -46,6 +46,10 @@ mapping:
   label: Mapping
   class: '\Drupal\Core\Config\Schema\Mapping'
   definition_class: '\Drupal\Core\TypedData\MapDataDefinition'
+  mapping: {}
+  constraints:
+    # By default, only allow the explicitly listed mapping keys.
+    ValidKeys: '<infer>'
 sequence:
   label: Sequence
   class: '\Drupal\Core\Config\Schema\Sequence'
@@ -94,6 +98,27 @@ color_hex:
   type: string
   label: 'Color'
 
+# Machine-readable identifier that can only contain certain characters.
+machine_name:
+  type: string
+  label: 'Machine name'
+  constraints:
+    Regex:
+      pattern: '/^[a-z0-9_]+$/'
+      message: "The %value machine name is not valid."
+    Length:
+      # @see \Drupal\Core\Config\Entity\ConfigEntityStorage::MAX_ID_LENGTH
+      max: 166
+
+# A language identifier.
+langcode:
+  type: string
+  label: 'Language code'
+  constraints:
+    NotNull: []
+    Choice:
+      callback: 'Drupal\Core\TypedData\Plugin\DataType\LanguageReference::getAllValidLangcodes'
+
 # Complex extended data types:
 
 # Root of a configuration object.
@@ -104,6 +129,15 @@ _core_config_info:
     default_config_hash:
       type: string
       label: 'Default configuration hash'
+      constraints:
+        NotNull: []
+        Regex: '/^[a-zA-Z0-9\-_]+$/'
+        # The hash is a base64-encoded version of the config's SHA-256 hash. Given
+        # the deterministic length of a SHA-256 hash, and the way base64 encoding
+        # works, this is always going to be 43 characters long.
+        Length: 43
+  constraints:
+    ValidKeys: ['default_config_hash']
 
 config_object:
   type: mapping
@@ -111,8 +145,7 @@ config_object:
     _core:
       type: _core_config_info
     langcode:
-      type: string
-      label: 'Language code'
+      type: langcode
 
 # Mail text with subject and body parts.
 mail:
@@ -206,6 +239,7 @@ theme_settings:
           label: 'Logo path'
         url:
           type: uri
+          nullable: true
           label: 'URL'
         use_default:
           type: boolean
@@ -286,8 +320,7 @@ config_entity:
       type: uuid
       label: 'UUID'
     langcode:
-      type: string
-      label: 'Language code'
+      type: langcode
     status:
       type: boolean
       label: 'Status'

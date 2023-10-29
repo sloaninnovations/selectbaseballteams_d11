@@ -264,7 +264,7 @@ class Registry implements DestructableInterface {
   public function getRuntime() {
     $this->init($this->themeName);
     if (!isset($this->runtimeRegistry[$this->theme->getName()])) {
-      $this->runtimeRegistry[$this->theme->getName()] = new ThemeRegistry('theme_registry:runtime:' . $this->theme->getName(), $this->runtimeCache ?: $this->cache, $this->lock, ['theme_registry'], $this->moduleHandler->isLoaded());
+      $this->runtimeRegistry[$this->theme->getName()] = new ThemeRegistry('theme_registry:runtime:' . $this->theme->getName(), $this->runtimeCache ?: $this->cache, $this->lock, [], $this->moduleHandler->isLoaded());
     }
     return $this->runtimeRegistry[$this->theme->getName()];
   }
@@ -273,7 +273,7 @@ class Registry implements DestructableInterface {
    * Persists the theme registry in the cache backend.
    */
   protected function setCache() {
-    $this->cache->set('theme_registry:' . $this->theme->getName(), $this->registry[$this->theme->getName()], Cache::PERMANENT, ['theme_registry']);
+    $this->cache->set('theme_registry:' . $this->theme->getName(), $this->registry[$this->theme->getName()]);
   }
 
   /**
@@ -349,7 +349,7 @@ class Registry implements DestructableInterface {
       });
       // Only cache this registry if all modules are loaded.
       if ($this->moduleHandler->isLoaded()) {
-        $this->cache->set("theme_registry:build:modules", $cache, Cache::PERMANENT, ['theme_registry']);
+        $this->cache->set("theme_registry:build:modules", $cache);
       }
     }
 
@@ -764,7 +764,22 @@ class Registry implements DestructableInterface {
     $this->runtimeRegistry = [];
 
     $this->registry = [];
-    Cache::invalidateTags(['theme_registry']);
+    // Installing and uninstalling themes doesn't invalidate caches because
+    // rendered output varies by theme, however the tabs on the appearance page
+    // depend on the theme list, so invalidate those via the local tasks cache
+    // tag.
+    Cache::invalidateTags(['local_task']);
+
+    $cids = ['theme_registry:build:modules'];
+    foreach ($this->themeHandler->listInfo() as $theme_name => $info) {
+      $cids[] = 'theme_registry:' . $theme_name;
+      $cids[] = 'theme_registry:runtime:' . $theme_name;
+    }
+    $this->cache->deleteMultiple($cids);
+    if ($this->runtimeCache) {
+      $this->runtimeCache->deleteMultiple($cids);
+    }
+
     return $this;
   }
 

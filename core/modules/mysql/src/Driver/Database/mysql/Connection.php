@@ -2,14 +2,17 @@
 
 namespace Drupal\mysql\Driver\Database\mysql;
 
-use Drupal\Core\Database\DatabaseAccessDeniedException;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Database\StatementWrapper;
-use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseNotFoundException;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Connection as DatabaseConnection;
+use Drupal\Core\Database\Database;
+use Drupal\Core\Database\DatabaseAccessDeniedException;
+use Drupal\Core\Database\DatabaseConnectionRefusedException;
+use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\DatabaseNotFoundException;
+use Drupal\Core\Database\Query\Condition;
+use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
+use Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\TransactionNoActiveException;
 
 /**
@@ -33,6 +36,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   const ACCESS_DENIED = 1045;
 
   /**
+   * Error code for "Connection refused".
+   */
+  const CONNECTION_REFUSED = 2002;
+
+  /**
    * Error code for "Can't initialize character set" error.
    */
   const UNSUPPORTED_CHARSET = 2019;
@@ -50,12 +58,17 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  protected $statementWrapperClass = StatementWrapper::class;
+  protected $statementWrapperClass = StatementWrapperIterator::class;
 
   /**
    * Flag to indicate if the cleanup function in __destruct() should run.
    *
    * @var bool
+   *
+   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. There's no
+   *    replacement.
+   *
+   * @see https://www.drupal.org/node/3349345
    */
   protected $needsCleanup = FALSE;
 
@@ -168,13 +181,36 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       $pdo = new \PDO($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
     }
     catch (\PDOException $e) {
-      if ($e->getCode() == static::DATABASE_NOT_FOUND) {
-        throw new DatabaseNotFoundException($e->getMessage(), $e->getCode(), $e);
+      switch ($e->getCode()) {
+        case static::CONNECTION_REFUSED:
+          if (isset($connection_options['unix_socket'])) {
+            // Show message for socket connection via 'unix_socket' option.
+            $message = 'Drupal is configured to connect to the database server via a socket, but the socket file could not be found.';
+            $message .= ' This message normally means that there is no MySQL server running on the system or that you are using an incorrect Unix socket file name when trying to connect to the server.';
+            throw new DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
+          }
+          if (isset($connection_options['host']) && in_array(strtolower($connection_options['host']), ['', 'localhost'], TRUE)) {
+            // Show message for socket connection via 'host' option.
+            $message = 'Drupal was attempting to connect to the database server via a socket, but the socket file could not be found.';
+            $message .= ' A Unix socket file is used if you do not specify a host name or if you specify the special host name localhost.';
+            $message .= ' To connect via TPC/IP use an IP address (127.0.0.1 for IPv4) instead of "localhost".';
+            $message .= ' This message normally means that there is no MySQL server running on the system or that you are using an incorrect Unix socket file name when trying to connect to the server.';
+            throw new DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
+          }
+          // Show message for TCP/IP connection.
+          $message = 'This message normally means that there is no MySQL server running on the system or that you are using an incorrect host name or port number when trying to connect to the server.';
+          $message .= ' You should also check that the TCP/IP port you are using has not been blocked by a firewall or port blocking service.';
+          throw new DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
+
+        case static::DATABASE_NOT_FOUND:
+          throw new DatabaseNotFoundException($e->getMessage(), $e->getCode(), $e);
+
+        case static::ACCESS_DENIED:
+          throw new DatabaseAccessDeniedException($e->getMessage(), $e->getCode(), $e);
+
+        default:
+          throw $e;
       }
-      if ($e->getCode() == static::ACCESS_DENIED) {
-        throw new DatabaseAccessDeniedException($e->getMessage(), $e->getCode(), $e);
-      }
-      throw $e;
     }
 
     // Force MySQL to use the UTF-8 character set. Also set the collation, if a
@@ -203,6 +239,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     $connection_options['init_commands'] += [
       'sql_mode' => "SET sql_mode = 'ANSI,TRADITIONAL'",
     ];
+    if (!empty($connection_options['isolation_level'])) {
+      $connection_options['init_commands'] += [
+        'isolation_level' => 'SET SESSION TRANSACTION ISOLATION LEVEL ' . strtoupper($connection_options['isolation_level']),
+      ];
+    }
 
     // Execute initial commands.
     foreach ($connection_options['init_commands'] as $sql) {
@@ -320,7 +361,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function nextId($existing_id = 0) {
+    @trigger_error('Drupal\Core\Database\Connection::nextId() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Modules should use instead the keyvalue storage for the last used id. See https://www.drupal.org/node/3349345', E_USER_DEPRECATED);
     $this->query('INSERT INTO {sequences} () VALUES ()');
     $new_id = $this->lastInsertId();
     // This should only happen after an import or similar event.
@@ -341,6 +386,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   }
 
   public function nextIdDelete() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Modules should use instead the keyvalue storage for the last used id. See https://www.drupal.org/node/3349345', E_USER_DEPRECATED);
     // While we want to clean up the table to keep it up from occupying too
     // much storage and memory, we must keep the highest value in the table
     // because InnoDB uses an in-memory auto-increment counter as long as the
@@ -465,6 +511,86 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       }
     }
     return $success;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function exceptionHandler() {
+    return new ExceptionHandler();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function select($table, $alias = NULL, array $options = []) {
+    return new Select($this, $table, $alias, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function insert($table, array $options = []) {
+    return new Insert($this, $table, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function merge($table, array $options = []) {
+    return new Merge($this, $table, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function upsert($table, array $options = []) {
+    return new Upsert($this, $table, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function update($table, array $options = []) {
+    return new Update($this, $table, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function delete($table, array $options = []) {
+    return new Delete($this, $table, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function truncate($table, array $options = []) {
+    return new Truncate($this, $table, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function schema() {
+    if (empty($this->schema)) {
+      $this->schema = new Schema($this);
+    }
+    return $this->schema;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function condition($conjunction) {
+    return new Condition($conjunction);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function startTransaction($name = '') {
+    return new Transaction($this, $name);
   }
 
 }

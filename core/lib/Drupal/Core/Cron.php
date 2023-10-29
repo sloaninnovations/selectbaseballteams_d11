@@ -7,17 +7,18 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\Timer;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
-use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\DelayableQueueInterface;
+use Drupal\Core\Queue\DelayedRequeueException;
+use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Queue\QueueWorkerInterface;
 use Drupal\Core\Queue\QueueWorkerManagerInterface;
-use Drupal\Core\Queue\DelayedRequeueException;
 use Drupal\Core\Queue\RequeueException;
 use Drupal\Core\Queue\SuspendQueueException;
 use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\State\StateInterface;
+use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -191,23 +192,19 @@ class Cron implements CronInterface {
   protected function processQueues() {
     $max_wait = (float) $this->queueConfig['suspendMaximumWait'];
 
-    $queues = array_filter(
-      array_values($this->queueManager->getDefinitions()),
-      function (array $queueInfo) {
-        return isset($queueInfo['cron']);
-      }
-    );
-
     // Build a stack of queues to work on.
     /** @var array<array{process_from: int<0, max>, queue: \Drupal\Core\Queue\QueueInterface, worker: \Drupal\Core\Queue\QueueWorkerInterface}> $queues */
-    $queues = array_map(function (array $queue_info) {
-      $queue_name = $queue_info['id'];
+    $queues = [];
+    foreach ($this->queueManager->getDefinitions() as $queue_name => $queue_info) {
+      if (!isset($queue_info['cron'])) {
+        continue;
+      }
       $queue = $this->queueFactory->get($queue_name);
       // Make sure every queue exists. There is no harm in trying to recreate
       // an existing queue.
       $queue->createQueue();
       $worker = $this->queueManager->createInstance($queue_name);
-      return [
+      $queues[] = [
         // Set process_from to zero so each queue is always processed
         // immediately for the first time. This process_from timestamp will
         // change if a queue throws a delayable SuspendQueueException.
@@ -215,7 +212,7 @@ class Cron implements CronInterface {
         'queue' => $queue,
         'worker' => $worker,
       ];
-    }, $queues);
+    }
 
     // Work through stack of queues, re-adding to the stack when a delay is
     // necessary.
@@ -302,7 +299,7 @@ class Cron implements CronInterface {
       catch (\Exception $e) {
         // In case of any other kind of exception, log it and leave the item
         // in the queue to be processed again later.
-        watchdog_exception('cron', $e);
+        Error::logException($this->logger, $e);
       }
     }
   }
@@ -338,7 +335,7 @@ class Cron implements CronInterface {
         $hook();
       }
       catch (\Exception $e) {
-        watchdog_exception('cron', $e);
+        Error::logException($this->logger, $e);
       }
 
       Timer::stop('cron_' . $module);

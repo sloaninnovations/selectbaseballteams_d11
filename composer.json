@@ -18,25 +18,30 @@
         "behat/mink": "^1.10",
         "behat/mink-browserkit-driver": "^2.1",
         "behat/mink-selenium2-driver": "^1.4",
+        "colinodell/psr-testlogger": "^1.2",
         "composer/composer": "^2.4",
         "drupal/coder": "^8.3.10",
         "instaclick/php-webdriver": "^1.4.1",
         "justinrainbow/json-schema": "^5.2",
-        "mglaman/phpstan-drupal": "^1.1.29",
+        "mglaman/phpstan-drupal": "^1.1.36",
         "mikey179/vfsstream": "^1.6.11",
+        "open-telemetry/exporter-otlp": "@beta",
+        "open-telemetry/sdk": "@beta",
+        "php-http/guzzle7-adapter": "^1.0",
         "phpspec/prophecy-phpunit": "^2",
         "phpstan/extension-installer": "^1.1",
-        "phpstan/phpstan": "^1.10.1",
+        "phpstan/phpstan": "^1.10.24",
+        "phpstan/phpstan-phpunit": "^1.3.11",
         "phpunit/phpunit": "^9.5",
-        "symfony/browser-kit": "^6.2",
-        "symfony/css-selector": "^6.2",
-        "symfony/dom-crawler": "^6.2",
-        "symfony/error-handler": "^6.2",
-        "symfony/filesystem": "^6.2",
-        "symfony/finder": "^6.2",
-        "symfony/lock": "^6.2",
-        "symfony/phpunit-bridge": "^6.2",
-        "symfony/var-dumper": "^6.2"
+        "symfony/browser-kit": "^6.3",
+        "symfony/css-selector": "^6.3",
+        "symfony/dom-crawler": "^6.3",
+        "symfony/error-handler": "^6.3",
+        "symfony/filesystem": "^6.3",
+        "symfony/finder": "^6.3",
+        "symfony/lock": "^6.3",
+        "symfony/phpunit-bridge": "^6.3",
+        "symfony/var-dumper": "^6.3"
     },
     "replace": {
         "symfony/polyfill-php72": "*",
@@ -58,10 +63,14 @@
             "drupal/core-project-message": true,
             "drupal/core-vendor-hardening": true,
             "phpstan/extension-installer": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "php-http/discovery": true
         }
     },
     "extra": {
+        "branch-alias": {
+          "dev-11.x": "10.2.x-dev"
+        },
         "_readme": [
             "By default Drupal loads the autoloader from ./vendor/autoload.php.",
             "To change the autoloader you can edit ./autoload.php.",
@@ -94,11 +103,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Drupal\\Core\\Composer\\": "core/lib/Drupal/Core/Composer"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
+            "Drupal\\Core\\Composer\\": "core/lib/Drupal/Core/Composer",
             "Drupal\\Composer\\": "composer"
         }
     },

@@ -4,7 +4,11 @@ namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManager;
+use Drupal\Core\TypedData\Plugin\DataType\LanguageReference;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Base class for testing validation of config entities.
@@ -40,6 +44,110 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
   }
 
   /**
+   * Ensures that the entity created in ::setUp() has no validation errors.
+   */
+  public function testEntityIsValid(): void {
+    $this->assertInstanceOf(ConfigEntityInterface::class, $this->entity);
+    $this->assertValidationErrors([]);
+  }
+
+  /**
+   * Returns the validation constraints applied to the entity's ID.
+   *
+   * If the entity type does not define an ID key, the test will fail. If an ID
+   * key is defined but is not using the `machine_name` data type, the test will
+   * be skipped.
+   *
+   * @return array[]
+   *   The validation constraint configuration applied to the entity's ID.
+   */
+  protected function getMachineNameConstraints(): array {
+    $id_key = $this->entity->getEntityType()->getKey('id');
+    $this->assertNotEmpty($id_key, "The entity under test does not define an ID key.");
+
+    $data_definition = $this->entity->getTypedData()
+      ->get($id_key)
+      ->getDataDefinition();
+    if ($data_definition->getDataType() === 'machine_name') {
+      return $data_definition->getConstraints();
+    }
+    else {
+      $this->markTestSkipped("The entity's ID key does not use the machine_name data type.");
+    }
+  }
+
+  /**
+   * Data provider for ::testInvalidMachineNameCharacters().
+   *
+   * @return array[]
+   *   The test cases.
+   */
+  public function providerInvalidMachineNameCharacters(): array {
+    return [
+      'INVALID: space separated' => ['space separated', FALSE],
+      'INVALID: dash separated' => ['dash-separated', FALSE],
+      'INVALID: uppercase letters' => ['Uppercase_Letters', FALSE],
+      'INVALID: period separated' => ['period.separated', FALSE],
+      'VALID: underscore separated' => ['underscore_separated', TRUE],
+    ];
+  }
+
+  /**
+   * Tests that the entity's ID is tested for invalid characters.
+   *
+   * @param string $machine_name
+   *   A machine name to test.
+   * @param bool $is_expected_to_be_valid
+   *   Whether this machine name is expected to be considered valid.
+   *
+   * @dataProvider providerInvalidMachineNameCharacters
+   */
+  public function testInvalidMachineNameCharacters(string $machine_name, bool $is_expected_to_be_valid): void {
+    $constraints = $this->getMachineNameConstraints();
+
+    $this->assertNotEmpty($constraints['Regex']);
+    $this->assertIsArray($constraints['Regex']);
+    $this->assertArrayHasKey('pattern', $constraints['Regex']);
+    $this->assertIsString($constraints['Regex']['pattern']);
+    $this->assertArrayHasKey('message', $constraints['Regex']);
+    $this->assertIsString($constraints['Regex']['message']);
+
+    $id_key = $this->entity->getEntityType()->getKey('id');
+    if ($is_expected_to_be_valid) {
+      $expected_errors = [];
+    }
+    else {
+      $expected_errors = [$id_key => sprintf('The <em class="placeholder">&quot;%s&quot;</em> machine name is not valid.', $machine_name)];
+    }
+
+    $this->entity->set(
+      $id_key,
+      $machine_name
+    );
+    $this->assertValidationErrors($expected_errors);
+  }
+
+  /**
+   * Tests that the entity ID's length is validated if it is a machine name.
+   */
+  public function testMachineNameLength(): void {
+    $constraints = $this->getMachineNameConstraints();
+
+    $max_length = $constraints['Length']['max'];
+    $this->assertIsInt($max_length);
+    $this->assertGreaterThan(0, $max_length);
+
+    $id_key = $this->entity->getEntityType()->getKey('id');
+    $this->entity->set(
+      $id_key,
+      mb_strtolower($this->randomMachineName($max_length + 2))
+    );
+    $this->assertValidationErrors([
+      $id_key => 'This value is too long. It should have <em class="placeholder">' . $max_length . '</em> characters or less.',
+    ]);
+  }
+
+  /**
    * Data provider for ::testConfigDependenciesValidation().
    *
    * @return array[]
@@ -61,7 +169,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
           'fun_stuff' => ['star-trek.deep-space-nine'],
         ],
         [
-          "'fun_stuff' is not a supported key.",
+          'dependencies' => "'fun_stuff' is not a supported key.",
         ],
       ],
       'empty string in config dependencies' => [
@@ -69,8 +177,10 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
           'config' => [''],
         ],
         [
-          'This value should not be blank.',
-          "The '' config does not exist.",
+          'dependencies.config.0' => [
+            'This value should not be blank.',
+            "The '' config does not exist.",
+          ],
         ],
       ],
       'non-existent config dependency' => [
@@ -78,7 +188,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
           'config' => ['fake_settings'],
         ],
         [
-          "The 'fake_settings' config does not exist.",
+          'dependencies.config.0' => "The 'fake_settings' config does not exist.",
         ],
       ],
       'empty string in module dependencies' => [
@@ -86,8 +196,10 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
           'module' => [''],
         ],
         [
-          'This value should not be blank.',
-          "Module '' is not installed.",
+          'dependencies.module.0' => [
+            'This value should not be blank.',
+            "Module '' is not installed.",
+          ],
         ],
       ],
       'invalid module dependency' => [
@@ -95,8 +207,10 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
           'module' => ['invalid-module-name'],
         ],
         [
-          'This value is not valid.',
-          "Module 'invalid-module-name' is not installed.",
+          'dependencies.module.0' => [
+            'This value is not valid.',
+            "Module 'invalid-module-name' is not installed.",
+          ],
         ],
       ],
       'non-installed module dependency' => [
@@ -104,7 +218,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
           'module' => ['bad_judgment'],
         ],
         [
-          "Module 'bad_judgment' is not installed.",
+          'dependencies.module.0' => "Module 'bad_judgment' is not installed.",
         ],
       ],
       'empty string in theme dependencies' => [
@@ -112,8 +226,10 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
           'theme' => [''],
         ],
         [
-          'This value should not be blank.',
-          "Theme '' is not installed.",
+          'dependencies.theme.0' => [
+            'This value should not be blank.',
+            "Theme '' is not installed.",
+          ],
         ],
       ],
       'invalid theme dependency' => [
@@ -121,8 +237,10 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
           'theme' => ['invalid-theme-name'],
         ],
         [
-          'This value is not valid.',
-          "Theme 'invalid-theme-name' is not installed.",
+          'dependencies.theme.0' => [
+            'This value is not valid.',
+            "Theme 'invalid-theme-name' is not installed.",
+          ],
         ],
       ],
       'non-installed theme dependency' => [
@@ -130,7 +248,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
           'theme' => ['ugly_theme'],
         ],
         [
-          "Theme 'ugly_theme' is not installed.",
+          'dependencies.theme.0' => "Theme 'ugly_theme' is not installed.",
         ],
       ],
     ];
@@ -141,20 +259,17 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
    *
    * @param array[] $dependencies
    *   The dependencies that should be added to the config entity under test.
-   * @param string[] $expected_messages
-   *   The expected constraint violation messages.
+   * @param array<string, string|string[]> $expected_messages
+   *   The expected validation error messages. Keys are property paths, values
+   *   are the expected messages: a string if a single message is expected, an
+   *   array of strings if multiple are expected.
    *
    * @dataProvider providerConfigDependenciesValidation
    */
   public function testConfigDependenciesValidation(array $dependencies, array $expected_messages): void {
-    $this->assertInstanceOf(ConfigEntityInterface::class, $this->entity);
-
-    // The entity should have valid data to begin with.
-    $this->assertValidationErrors([]);
-
     // Add the dependencies we were given to the dependencies that may already
     // exist in the entity.
-    $dependencies = NestedArray::mergeDeep($this->entity->getDependencies(), $dependencies);
+    $dependencies = NestedArray::mergeDeep($dependencies, $this->entity->getDependencies());
 
     $this->entity->set('dependencies', $dependencies);
     $this->assertValidationErrors($expected_messages);
@@ -163,14 +278,23 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
     $this->entity->set('dependencies', [
       'enforced' => $dependencies,
     ]);
-    $this->assertValidationErrors($expected_messages);
+    // We now expect validation errors not at `dependencies.module.0`, but at
+    // `dependencies.enforced.module.0`. So reuse the same messages, but perform
+    // string replacement in the keys.
+    $expected_enforced_messages = array_combine(
+      str_replace('dependencies', 'dependencies.enforced', array_keys($expected_messages)),
+      array_values($expected_messages),
+    );
+    $this->assertValidationErrors($expected_enforced_messages);
   }
 
   /**
    * Asserts a set of validation errors is raised when the entity is validated.
    *
-   * @param string[] $expected_messages
-   *   The expected validation error messages.
+   * @param array<string, string|string[]> $expected_messages
+   *   The expected validation error messages. Keys are property paths, values
+   *   are the expected messages: a string if a single message is expected, an
+   *   array of strings if multiple are expected.
    */
   protected function assertValidationErrors(array $expected_messages): void {
     /** @var \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data */
@@ -180,9 +304,68 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
 
     $actual_messages = [];
     foreach ($violations as $violation) {
-      $actual_messages[] = (string) $violation->getMessage();
+      if (!isset($actual_messages[$violation->getPropertyPath()])) {
+        $actual_messages[$violation->getPropertyPath()] = (string) $violation->getMessage();
+      }
+      else {
+        // Transform value from string to array.
+        if (is_string($actual_messages[$violation->getPropertyPath()])) {
+          $actual_messages[$violation->getPropertyPath()] = (array) $actual_messages[$violation->getPropertyPath()];
+        }
+        // And append.
+        $actual_messages[$violation->getPropertyPath()][] = (string) $violation->getMessage();
+      }
     }
     $this->assertSame($expected_messages, $actual_messages);
+  }
+
+  /**
+   * Tests that the config entity's langcode is validated.
+   */
+  public function testLangcode(): void {
+    $this->entity->set('langcode', NULL);
+    $this->assertValidationErrors([
+      'langcode' => 'This value should not be null.',
+    ]);
+
+    // A langcode from the standard list should always be acceptable.
+    $standard_languages = LanguageManager::getStandardLanguageList();
+    $this->assertNotEmpty($standard_languages);
+    $this->entity->set('langcode', key($standard_languages));
+    $this->assertValidationErrors([]);
+
+    // All special, internal langcodes should be acceptable.
+    $system_langcodes = [
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      LanguageInterface::LANGCODE_NOT_APPLICABLE,
+      LanguageInterface::LANGCODE_DEFAULT,
+      LanguageInterface::LANGCODE_SITE_DEFAULT,
+      LanguageInterface::LANGCODE_SYSTEM,
+    ];
+    foreach ($system_langcodes as $langcode) {
+      $this->entity->set('langcode', $langcode);
+      $this->assertValidationErrors([]);
+    }
+
+    // An invalid langcode should be unacceptable, even if it "looks" right.
+    $fake_langcode = 'definitely-not-a-language';
+    $this->assertArrayNotHasKey($fake_langcode, LanguageReference::getAllValidLangcodes());
+    $this->entity->set('langcode', $fake_langcode);
+    $this->assertValidationErrors([
+      'langcode' => 'The value you selected is not a valid choice.',
+    ]);
+
+    // If a new configurable language is created with a non-standard langcode,
+    // it should be acceptable.
+    $this->enableModules(['language']);
+    // The language doesn't exist yet, so it shouldn't be a valid choice.
+    $this->entity->set('langcode', 'kthxbai');
+    $this->assertValidationErrors([
+      'langcode' => 'The value you selected is not a valid choice.',
+    ]);
+    // Once we create the language, it should be a valid choice.
+    ConfigurableLanguage::createFromLangcode('kthxbai')->save();
+    $this->assertValidationErrors([]);
   }
 
 }

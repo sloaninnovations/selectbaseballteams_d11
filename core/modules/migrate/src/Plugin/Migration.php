@@ -113,13 +113,6 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   protected $label;
 
   /**
-   * The plugin ID for the row.
-   *
-   * @var string
-   */
-  protected $row;
-
-  /**
    * The source configuration, with at least a 'plugin' key.
    *
    * Used to initialize the $sourcePlugin.
@@ -185,16 +178,6 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   protected $idMapPlugin;
 
   /**
-   * The source identifiers.
-   *
-   * An array of source identifiers: the keys are the name of the properties,
-   * the values are dependent on the ID map plugin.
-   *
-   * @var array
-   */
-  protected $sourceIds = [];
-
-  /**
    * The destination identifiers.
    *
    * An array of destination identifiers: the keys are the name of the
@@ -205,8 +188,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   protected $destinationIds = [];
 
   /**
-   * Specify value of source_row_status for current map row. Usually set by
-   * MigrateFieldHandler implementations.
+   * The source_row_status for the current map row.
    *
    * @var int
    */

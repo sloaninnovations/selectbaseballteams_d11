@@ -79,6 +79,8 @@ class UrlGeneratorTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
       ->disableOriginalConstructor()
       ->getMock();
@@ -175,8 +177,7 @@ class UrlGeneratorTest extends UnitTestCase {
   }
 
   /**
-   * Return value callback for the getAliasByPath() method on the mock alias
-   * manager.
+   * Return value callback for getAliasByPath() on the mock alias manager.
    *
    * Ensures that by default the call to getAliasByPath() will return the first
    * argument that was passed in. We special-case the paths for which we wish it
@@ -478,8 +479,7 @@ class UrlGeneratorTest extends UnitTestCase {
   }
 
   /**
-   * Tests that the 'scheme' route requirement is respected during URL
-   * generation.
+   * Tests the 'scheme' route requirement during URL generation.
    */
   public function testUrlGenerationWithHttpsRequirement() {
     $url = $this->generator->generate('test_4', [], TRUE);

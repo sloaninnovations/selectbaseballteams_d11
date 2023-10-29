@@ -56,6 +56,7 @@ class TermTest extends TaxonomyTestBase {
 
     $this->drupalLogin($this->drupalCreateUser([
       'administer taxonomy',
+      'access taxonomy overview',
       'bypass node access',
     ]));
     $this->vocabulary = $this->createVocabulary();
@@ -188,53 +189,6 @@ class TermTest extends TaxonomyTestBase {
     for ($x = 18; $x <= 25; $x++) {
       $this->assertSession()->pageTextContains($terms_array[$x]->getName());
     }
-  }
-
-  /**
-   * Tests that hook_node_$op implementations work correctly.
-   *
-   * Save & edit a node and assert that taxonomy terms are saved/loaded properly.
-   */
-  public function testTaxonomyNode() {
-    // Create two taxonomy terms.
-    $term1 = $this->createTerm($this->vocabulary);
-    $term2 = $this->createTerm($this->vocabulary);
-
-    // Post an article.
-    $edit = [];
-    $edit['title[0][value]'] = $this->randomMachineName();
-    $edit['body[0][value]'] = $this->randomMachineName();
-    $edit[$this->field->getName() . '[]'] = $term1->id();
-    $this->drupalGet('node/add/article');
-    $this->submitForm($edit, 'Save');
-
-    // Check that the term is displayed when the node is viewed.
-    $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
-    $this->drupalGet('node/' . $node->id());
-    $this->assertSession()->pageTextContains($term1->getName());
-
-    $this->clickLink('Edit');
-    $this->assertSession()->pageTextContains($term1->getName());
-    $this->submitForm([], 'Save');
-    $this->assertSession()->pageTextContains($term1->getName());
-
-    // Edit the node with a different term.
-    $edit[$this->field->getName() . '[]'] = $term2->id();
-    $this->drupalGet('node/' . $node->id() . '/edit');
-    $this->submitForm($edit, 'Save');
-
-    $this->drupalGet('node/' . $node->id());
-    $this->assertSession()->pageTextContains($term2->getName());
-
-    // Preview the node.
-    $this->drupalGet('node/' . $node->id() . '/edit');
-    $this->submitForm($edit, 'Preview');
-    // Ensure that term is displayed when previewing the node.
-    $this->assertSession()->pageTextContainsOnce($term2->getName());
-    $this->drupalGet('node/' . $node->id() . '/edit');
-    $this->submitForm([], 'Preview');
-    // Ensure that term is displayed when previewing the node again.
-    $this->assertSession()->pageTextContainsOnce($term2->getName());
   }
 
   /**
@@ -384,6 +338,13 @@ class TermTest extends TaxonomyTestBase {
     $this->assertSession()->pageTextContains($edit['name[0][value]']);
     $this->assertSession()->linkExists('Edit');
 
+    // Unpublish the term.
+    $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');
+    $this->submitForm(["status[value]" => 0], 'Save');
+    // Check that the term is now unpublished in the list.
+    $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
+    $this->assertSession()->elementTextContains('css', "#edit-terms-tid{$term->id()}0-status", 'Unpublished');
+
     // Check the term link can be clicked through to the term page.
     $this->clickLink($edit['name[0][value]']);
     $this->assertSession()->statusCodeEquals(200);
@@ -436,6 +397,15 @@ class TermTest extends TaxonomyTestBase {
     // Validate that "Save and go to list" doesn't exist when destination
     // parameter is present.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add', ['query' => ['destination' => 'node/add']]);
+    $this->assertSession()->pageTextNotContains('Save and go to list');
+
+    // Validate that "Save and go to list" doesn't exist when missing permission
+    // 'access taxonomy overview'.
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer taxonomy',
+      'bypass node access',
+    ]));
+    $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
     $this->assertSession()->pageTextNotContains('Save and go to list');
   }
 

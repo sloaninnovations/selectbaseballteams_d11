@@ -13,6 +13,8 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\filter\FilterFormatInterface;
+use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
 
 /**
  * Implements hook_help().
@@ -149,11 +151,16 @@ function filter_formats_reset() {
 function filter_get_roles_by_format(FilterFormatInterface $format) {
   // Handle the fallback format upfront (all roles have access to this format).
   if ($format->isFallbackFormat()) {
-    return user_role_names();
+    return array_map(fn(RoleInterface $role) => $role->label(), Role::loadMultiple());
   }
   // Do not list any roles if the permission does not exist.
   $permission = $format->getPermissionName();
-  return !empty($permission) ? user_role_names(FALSE, $permission) : [];
+  if (empty($permission)) {
+    return [];
+  }
+
+  $roles = array_filter(Role::loadMultiple(), fn(RoleInterface $role) => $role->hasPermission($permission));
+  return array_map(fn(RoleInterface $role) => $role->label(), $roles);
 }
 
 /**
@@ -488,7 +495,7 @@ function _filter_url($text, $filter) {
   $valid_url_query_ending_chars = '[a-zA-Z0-9_&=#\/]';
 
   // full path
-  // and allow @ in a url, but only in the middle. Catch things like http://example.com/@user/
+  // and allow @ in a URL, but only in the middle. Catch things like http://example.com/@user/
   $valid_url_path = '(?:(?:' . $valid_url_path_characters . '*(?:' . $valid_url_balanced_parens . $valid_url_path_characters . '*)*' . $valid_url_ending_characters . ')|(?:@' . $valid_url_path_characters . '+\/))';
 
   // Prepare domain name pattern.

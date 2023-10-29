@@ -60,7 +60,7 @@ function user_help($route_name, RouteMatchInterface $route_match) {
       return '<p>' . t("This web page allows administrators to register new users. Users' email addresses and usernames must be unique.") . '</p>';
 
     case 'user.admin_permissions':
-      return '<p>' . t('Permissions let you control what users can do and see on your site. You can define a specific set of permissions for each role. (See the <a href=":role">Roles</a> page to create a role.) Any permissions granted to the Authenticated user role will be given to any user who is logged in to your site. From the <a href=":settings">Account settings</a> page, you can make any role into an Administrator role for the site, meaning that role will be granted all new permissions automatically. You should be careful to ensure that only trusted users are given this access and level of control of your site.', [':role' => Url::fromRoute('entity.user_role.collection')->toString(), ':settings' => Url::fromRoute('entity.user.admin_form')->toString()]) . '</p>';
+      return '<p>' . t('Permissions let you control what users can do and see on your site. You can define a specific set of permissions for each role. (See the <a href=":role">Roles</a> page to create a role.) Any permissions granted to the Authenticated user role will be given to any user who is logged in to your site. On the <a href=":settings">Role settings</a> page, you can make any role into an Administrator role for the site, meaning that role will be granted all permissions. You should be careful to ensure that only trusted users are given this access and level of control of your site.', [':role' => Url::fromRoute('entity.user_role.collection')->toString(), ':settings' => Url::fromRoute('user.role.settings')->toString()]) . '</p>';
 
     case 'entity.user_role.collection':
       return '<p>' . t('A role defines a group of users that have certain privileges. These privileges are defined on the <a href=":permissions">Permissions page</a>. Here, you can define the names and the display sort order of the roles on your site. It is recommended to order roles from least permissive (for example, Anonymous user) to most permissive (for example, Administrator user). Users who are not logged in have the Anonymous user role. Users who are logged in have the Authenticated user role, plus any other roles granted to their user account.', [':permissions' => Url::fromRoute('user.admin_permissions')->toString()]) . '</p>';
@@ -227,8 +227,15 @@ function user_validate_name($name) {
  * @return array
  *   An array indexed by role ID. Each value is an array of permission strings
  *   for the given role.
+ *
+ * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. There is no
+ *   replacement beyond loading the roles and calling
+ *   \Drupal\user\Entity\Role::getPermissions().
+ *
+ * @see https://www.drupal.org/node/3348138
  */
 function user_role_permissions(array $roles) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. There is no replacement beyond loading the roles and calling \Drupal\user\Entity\Role::getPermissions(). See https://www.drupal.org/node/3348138', E_USER_DEPRECATED);
   if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'update') {
     return _user_role_permissions_update($roles);
   }
@@ -253,8 +260,14 @@ function user_role_permissions(array $roles) {
  * @return array
  *   An array indexed by role ID. Each value is an array of permission strings
  *   for the given role.
+ *
+ * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. There is no
+ *   replacement.
+ *
+ * @see https://www.drupal.org/node/3348138
  */
 function _user_role_permissions_update($roles) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3348138', E_USER_DEPRECATED);
   $role_permissions = [];
   foreach ($roles as $rid) {
     $role_permissions[$rid] = \Drupal::config("user.role.$rid")->get('permissions') ?: [];
@@ -816,8 +829,15 @@ function user_mail_tokens(&$replacements, $data, $options) {
  * @return array
  *   An associative array with the role id as the key and the role name as
  *   value.
+ *
+ * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
+ *   \Drupal\user\Entity\Role::loadMultiple() and, if necessary, an inline
+ *   implementation instead.
+ *
+ * @see https://www.drupal.org/node/3349759
  */
 function user_role_names($membersonly = FALSE, $permission = NULL) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\user\Entity\Role::loadMultiple() and, if necessary, an inline implementation instead. See https://www.drupal.org/node/3349759', E_USER_DEPRECATED);
   return array_map(function ($item) {
     return $item->label();
   }, user_roles($membersonly, $permission));
@@ -898,8 +918,15 @@ function user_user_role_delete(RoleInterface $role) {
  * @return \Drupal\user\RoleInterface[]
  *   An associative array with the role id as the key and the role object as
  *   value.
+ *
+ * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
+ *   \Drupal\user\Entity\Role::loadMultiple() and, if necessary, an inline
+ *   implementation instead.
+ *
+ * @see https://www.drupal.org/node/3349759
  */
 function user_roles($membersonly = FALSE, $permission = NULL) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\user\Entity\Role::loadMultiple() and, if necessary, an inline implementation instead. See https://www.drupal.org/node/3349759', E_USER_DEPRECATED);
   $roles = Role::loadMultiple();
   if ($membersonly) {
     unset($roles[RoleInterface::ANONYMOUS_ID]);
@@ -999,8 +1026,7 @@ function user_role_revoke_permissions($rid, array $permissions = []) {
 }
 
 /**
- * Conditionally create and send a notification email when a certain
- * operation happens on the given user account.
+ * Creates and sends a notification email following a change to a user account.
  *
  * @param string $op
  *   The operation being performed on the account. Possible values:
@@ -1191,6 +1217,9 @@ function user_toolbar() {
     $items['user']['tray']['user_links'] = [
       '#lazy_builder' => ['user.toolbar_link_builder:renderToolbarLinks', []],
       '#create_placeholder' => TRUE,
+      '#lazy_builder_preview' => [
+        '#markup' => '<a href="#" class="toolbar-tray-lazy-placeholder-link">&nbsp;</a>',
+      ],
     ];
   }
 

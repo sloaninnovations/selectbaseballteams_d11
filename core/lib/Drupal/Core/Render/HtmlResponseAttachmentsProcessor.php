@@ -10,7 +10,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Component\Utility\Html;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -312,17 +311,19 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   protected function processAssetLibraries(AttachedAssetsInterface $assets, array $placeholders) {
     $variables = [];
 
+    $maintenance_mode = defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
+
     // Print styles - if present.
     if (isset($placeholders['styles'])) {
       // Optimize CSS if necessary, but only during normal site operation.
-      $optimize_css = !defined('MAINTENANCE_MODE') && $this->config->get('css.preprocess');
+      $optimize_css = !$maintenance_mode && $this->config->get('css.preprocess');
       $variables['styles'] = $this->cssCollectionRenderer->render($this->assetResolver->getCssAssets($assets, $optimize_css, $this->languageManager->getCurrentLanguage()));
     }
 
     // Print scripts - if any are present.
     if (isset($placeholders['scripts']) || isset($placeholders['scripts_bottom'])) {
       // Optimize JS if necessary, but only during normal site operation.
-      $optimize_js = !defined('MAINTENANCE_MODE') && !\Drupal::state()->get('system.maintenance_mode') && $this->config->get('js.preprocess');
+      $optimize_js = !$maintenance_mode && $this->config->get('js.preprocess');
       [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($assets, $optimize_js, $this->languageManager->getCurrentLanguage());
       $variables['scripts'] = $this->jsCollectionRenderer->render($js_assets_header);
       $variables['scripts_bottom'] = $this->jsCollectionRenderer->render($js_assets_footer);
@@ -420,7 +421,10 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    * @param array $html_head_link
    *   The 'html_head_link' value of a render array. Each head link is specified
    *   by a two-element array:
-   *   - An array specifying the attributes of the link.
+   *   - An array specifying the attributes of the link. The 'href' and 'rel'
+   *     attributes are required, and the 'href' attribute is expected to be a
+   *     percent-encoded URI for proper serialization in the Link: HTTP header,
+   *     as specified by RFC 8288.
    *   - A boolean specifying whether the link should also be a Link: HTTP
    *     header.
    *
@@ -455,7 +459,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
 
       if ($should_add_header) {
         // Also add a HTTP header "Link:".
-        $href = '<' . Html::escape($attributes['href']) . '>';
+        $href = '<' . $attributes['href'] . '>';
         unset($attributes['href']);
         if ($param = static::formatHttpHeaderAttributes($attributes)) {
           $href .= ';' . $param;
