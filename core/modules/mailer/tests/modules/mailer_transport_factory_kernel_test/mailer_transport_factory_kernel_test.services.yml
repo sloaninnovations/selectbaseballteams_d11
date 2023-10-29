@@ -1,6 +1,11 @@
 services:
+  mailer.transport_factory.test_failing:
+    parent: mailer.transport_factory.abstract
+    class: Drupal\mailer_transport_factory_kernel_test\Transport\FailingTransportFactory
+    tags:
+      - { name: mailer.transport_factory, priority: -1 }
   mailer.transport_factory.test_canary:
     parent: mailer.transport_factory.abstract
     class: Drupal\mailer_transport_factory_kernel_test\Transport\CanaryTransportFactory
     tags:
-      - { name: mailer.transport_factory }
+      - { name: mailer.transport_factory, priority: 1 }
