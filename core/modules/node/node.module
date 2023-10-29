@@ -399,8 +399,8 @@ function node_revision_delete($revision_id) {
  * @param \Drupal\node\NodeInterface $node
  *   A node entity.
  *
- * @return int|false
- *   The ID of the node if this is a full page view, otherwise FALSE.
+ * @return bool
+ *   TRUE if this is a full page view, otherwise FALSE.
  */
 function node_is_page(NodeInterface $node) {
   $route_match = \Drupal::routeMatch();
@@ -1144,7 +1144,7 @@ function node_access_rebuild($batch_mode = FALSE) {
     $access_control_handler->writeDefaultGrant();
   }
 
-  if (!isset($batch)) {
+  if (!isset($batch_builder)) {
     \Drupal::messenger()->addStatus(t('Content permissions have been rebuilt.'));
     node_access_needs_rebuild(FALSE);
   }
@@ -1185,10 +1185,11 @@ function _node_access_rebuild_batch_operation(&$context) {
     ->execute();
   $node_storage->resetCache($nids);
   $nodes = Node::loadMultiple($nids);
-  foreach ($nodes as $nid => $node) {
+  foreach ($nids as $nid) {
     // To preserve database integrity, only write grants if the node
     // loads successfully.
-    if (!empty($node)) {
+    if (!empty($nodes[$nid])) {
+      $node = $nodes[$nid];
       /** @var \Drupal\node\NodeAccessControlHandlerInterface $access_control_handler */
       $access_control_handler = \Drupal::entityTypeManager()->getAccessControlHandler('node');
       $grants = $access_control_handler->acquireGrants($node);

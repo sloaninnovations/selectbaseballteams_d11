@@ -19,6 +19,7 @@ use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Link;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -801,7 +802,7 @@ function locale_translation_get_file_history() {
  */
 function locale_translation_update_file_history($file) {
   $status = \Drupal::database()->merge('locale_file')
-    ->key([
+    ->keys([
       'project' => $file->project,
       'langcode' => $file->langcode,
     ])
@@ -1184,8 +1185,8 @@ function _locale_invalidate_js($langcode = NULL) {
   if (empty($langcode)) {
     // Invalidate all languages.
     $languages = locale_translatable_language_list();
-    foreach ($languages as $lcode => $data) {
-      $parsed['refresh:' . $lcode] = 'waiting';
+    foreach ($languages as $language_code => $data) {
+      $parsed['refresh:' . $language_code] = 'waiting';
     }
   }
   else {
@@ -1228,6 +1229,14 @@ function _locale_rebuild_js($langcode = NULL) {
   $translations = [];
   foreach (\Drupal::service('locale.storage')->getTranslations($conditions) as $data) {
     $translations[$data->context][$data->source] = $data->translation;
+  }
+
+  // Include custom string overrides.
+  $custom_strings = Settings::get('locale_custom_strings_' . $language->getId(), []);
+  foreach ($custom_strings as $context => $strings) {
+    foreach ($strings as $source => $translation) {
+      $translations[$context][$source] = $translation;
+    }
   }
 
   // Construct the JavaScript file, if there are translations.

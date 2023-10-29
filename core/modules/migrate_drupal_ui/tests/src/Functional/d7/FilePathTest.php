@@ -7,8 +7,6 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Tests\ExtensionListTestTrait;
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeTestBase;
 
-// cspell:ignore terok
-
 /**
  * Tests the Drupal 7 public and private file migrations.
  *
@@ -280,8 +278,8 @@ class FilePathTest extends MigrateUpgradeTestBase {
         'uri' => 'private://Babylon5.txt',
       ],
       [
-        'filename' => 'TerokNor.txt',
-        'uri' => 'temporary://TerokNor.txt',
+        'filename' => 'DeepSpaceNine.txt',
+        'uri' => 'temporary://DeepSpaceNine.txt',
       ],
     ];
   }

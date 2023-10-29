@@ -12,6 +12,7 @@ use Drupal\KernelTests\KernelTestBase;
  *
  * @coversDefaultClass \Drupal\system\Plugin\ImageToolkit\GDToolkit
  * @group Image
+ * @group #slow
  * @requires extension gd
  */
 class ToolkitGdTest extends KernelTestBase {
@@ -61,7 +62,7 @@ class ToolkitGdTest extends KernelTestBase {
     $this->assertEquals('gd', $this->imageFactory->getToolkitId(), 'The image factory is set to use the \'gd\' image toolkit.');
 
     // Prepare a directory for test file results.
-    $this->directory = 'public://imagetest';
+    $this->directory = 'public://image_test';
     \Drupal::service('file_system')->prepareDirectory($this->directory, FileSystemInterface::CREATE_DIRECTORY);
   }
 
@@ -557,16 +558,16 @@ class ToolkitGdTest extends KernelTestBase {
     $image = imagecreate(10, 10);
     $this->expectDeprecation('Drupal\system\Plugin\ImageToolkit\GDToolkit::setResource() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::setImage() instead. See https://www.drupal.org/node/3265963');
     $toolkit->setResource($image);
-    $this->expectDeprecation('Checking the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead.');
+    $this->expectDeprecation('Checking the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead. See https://www.drupal.org/node/3265963');
     $this->assertTrue(isset($toolkit->resource));
     $this->expectDeprecation('Drupal\system\Plugin\ImageToolkit\GDToolkit::getResource() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::getImage() instead. See https://www.drupal.org/node/3265963');
     $this->assertSame($image, $toolkit->getResource());
-    $this->expectDeprecation('Accessing the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead.');
+    $this->expectDeprecation('Accessing the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead. See https://www.drupal.org/node/3265963');
     $this->assertSame($image, $toolkit->resource);
-    $this->expectDeprecation('Setting the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead.');
+    $this->expectDeprecation('Setting the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead. See https://www.drupal.org/node/3265963');
     $toolkit->resource = NULL;
     $this->assertNull($toolkit->getImage());
-    $this->expectDeprecation('Unsetting the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead.');
+    $this->expectDeprecation('Unsetting the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead. See https://www.drupal.org/node/3265963');
     $toolkit->setImage($image);
     unset($toolkit->resource);
     $this->assertNull($toolkit->getImage());

@@ -4,10 +4,12 @@ namespace Drupal\user\Plugin\Block;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Block\BlockBase;
@@ -16,13 +18,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a 'User login' block.
- *
- * @Block(
- *   id = "user_login_block",
- *   admin_label = @Translation("User login"),
- *   category = @Translation("Forms")
- * )
  */
+#[Block(
+  id: "user_login_block",
+  admin_label: new TranslatableMarkup("User login"),
+  category: new TranslatableMarkup("Forms")
+)]
 class UserLoginBlock extends BlockBase implements ContainerFactoryPluginInterface, TrustedCallbackInterface {
 
   use RedirectDestinationTrait;
@@ -98,6 +99,7 @@ class UserLoginBlock extends BlockBase implements ContainerFactoryPluginInterfac
     // This is based on the implementation in
     // \Drupal\Core\Form\FormBuilder::prepareForm(), but the user login block
     // requires different behavior for the destination query argument.
+    // cspell:disable-next-line
     $placeholder = 'form_action_p_4r8ITd22yaUvXM6SzwrSe9rnQWe48hz9k1Sxto3pBvE';
 
     $form['#attached']['placeholders'][$placeholder] = [

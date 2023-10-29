@@ -42,11 +42,11 @@ trait FieldUiTestTrait {
     // page before calling this method.
     if ($bundle_path !== NULL) {
       $bundle_path = "$bundle_path/fields/add-field";
-    }
-
-    // First step: 'Add field' page.
-    if ($bundle_path !== NULL) {
+      // First step: 'Add field' page.
       $this->drupalGet($bundle_path);
+    }
+    else {
+      $bundle_path = $this->getUrl();
     }
 
     try {
@@ -76,27 +76,38 @@ trait FieldUiTestTrait {
         ];
       }
     }
-    $this->submitForm($initial_edit, 'Save and continue');
+    $this->submitForm($initial_edit, 'Continue');
+    // Assert that the field is not created.
+    $this->assertFieldDoesNotExist($bundle_path, $label);
     if ($save_settings) {
       $this->assertSession()->pageTextContains("These settings apply to the $label field everywhere it is used.");
       // Test Breadcrumbs.
       $this->getSession()->getPage()->findLink($label);
 
+      // Ensure that each array key in $storage_edit is prefixed with field_storage.
+      $prefixed_storage_edit = [];
+      foreach ($storage_edit as $key => $value) {
+        if (str_starts_with($key, 'field_storage')) {
+          $prefixed_storage_edit[$key] = $value;
+          continue;
+        }
+        // If the key starts with settings, it needs to be prefixed differently.
+        if (str_starts_with($key, 'settings[')) {
+          $prefixed_storage_edit[str_replace('settings[', 'field_storage[subform][settings][', $key)] = $value;
+          continue;
+        }
+        $prefixed_storage_edit['field_storage[subform][' . $key . ']'] = $value;
+      }
+
       // Second step: 'Storage settings' form.
-      $this->submitForm($storage_edit, 'Save field settings');
-      $this->assertSession()
-        ->pageTextContains("Updated field $label field settings.");
+      $this->submitForm($prefixed_storage_edit, 'Update settings');
 
       // Third step: 'Field settings' form.
       $this->submitForm($field_edit, 'Save settings');
       $this->assertSession()->pageTextContains("Saved $label configuration.");
 
       // Check that the field appears in the overview form.
-      $xpath = $this->assertSession()
-        ->buildXPathQuery("//table[@id=\"field-overview\"]//tr/td[1 and text() = :label]", [
-          ':label' => $label,
-        ]);
-      $this->assertSession()->elementExists('xpath', $xpath);
+      $this->assertFieldExistsOnOverview($label);
     }
   }
 
@@ -154,8 +165,10 @@ trait FieldUiTestTrait {
    *   The label of the field.
    * @param string $bundle_label
    *   The label of the bundle.
+   * @param string $source_label
+   *   (optional) The label of the source entity type bundle.
    */
-  public function fieldUIDeleteField($bundle_path, $field_name, $label, $bundle_label) {
+  public function fieldUIDeleteField($bundle_path, $field_name, $label, $bundle_label, string $source_label = '') {
     // Display confirmation form.
     $this->drupalGet("$bundle_path/fields/$field_name/delete");
     $this->assertSession()->pageTextContains("Are you sure you want to delete the field $label");
@@ -165,7 +178,7 @@ trait FieldUiTestTrait {
 
     // Submit confirmation form.
     $this->submitForm([], 'Delete');
-    $this->assertSession()->pageTextContains("The field $label has been deleted from the $bundle_label content type.");
+    $this->assertSession()->pageTextContains("The field $label has been deleted from the $bundle_label $source_label");
 
     // Check that the field does not appear in the overview form.
     $xpath = $this->assertSession()->buildXPathQuery('//table[@id="field-overview"]//span[@class="label-field" and text()= :label]', [
@@ -180,8 +193,8 @@ trait FieldUiTestTrait {
    * @param string $field_type
    *   The name of the field type.
    *
-   * @returns string
-   *  Group name
+   * @return string
+   *   Group name
    */
   public function getFieldFromGroup($field_type) {
     $group_elements = $this->getSession()->getPage()->findAll('css', '.field-option-radio');
@@ -203,6 +216,55 @@ trait FieldUiTestTrait {
       }
     }
     return NULL;
+  }
+
+  /**
+   * Asserts that the field doesn't exist in the overview form.
+   *
+   * @param string $bundle_path
+   *   The bundle path.
+   * @param string $label
+   *   The field label.
+   */
+  protected function assertFieldDoesNotExist(string $bundle_path, string $label) {
+    $original_url = $this->getUrl();
+    $this->drupalGet(explode('/fields', $bundle_path)[0] . '/fields');
+    $this->assertFieldDoesNotExistOnOverview($label);
+    $this->drupalGet($original_url);
+  }
+
+  /**
+   * Asserts that the field appears on the overview form.
+   *
+   * @param string $label
+   *   The field label.
+   *
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   */
+  protected function assertFieldExistsOnOverview(string $label) {
+    $xpath = $this->assertSession()
+      ->buildXPathQuery("//table[@id=\"field-overview\"]//tr/td[1 and text() = :label]", [
+        ':label' => $label,
+      ]);
+    $element = $this->getSession()->getPage()->find('xpath', $xpath);
+    if ($element === NULL) {
+      throw new ElementNotFoundException($this->getSession()->getDriver(), 'form field', 'label', $label);
+    }
+  }
+
+  /**
+   * Asserts that the field does not appear on the overview form.
+   *
+   * @param string $label
+   *   The field label.
+   */
+  protected function assertFieldDoesNotExistOnOverview(string $label) {
+    $xpath = $this->assertSession()
+      ->buildXPathQuery("//table[@id=\"field-overview\"]//tr/td[1 and text() = :label]", [
+        ':label' => $label,
+      ]);
+    $element = $this->getSession()->getPage()->find('xpath', $xpath);
+    $this->assertSession()->assert($element === NULL, sprintf('A field "%s" appears on this page, but it should not.', $label));
   }
 
 }

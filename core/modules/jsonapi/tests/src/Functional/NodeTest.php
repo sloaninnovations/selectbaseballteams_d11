@@ -5,12 +5,14 @@ namespace Drupal\Tests\jsonapi\Functional;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Url;
 use Drupal\jsonapi\Normalizer\HttpExceptionNormalizer;
 use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
+use Drupal\Tests\WaitTerminateTestTrait;
 use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
 
@@ -18,10 +20,12 @@ use GuzzleHttp\RequestOptions;
  * JSON:API integration test for the "Node" content entity type.
  *
  * @group jsonapi
+ * @group #slow
  */
 class NodeTest extends ResourceTestBase {
 
   use CommonCollectionFilterAccessTestPatternsTrait;
+  use WaitTerminateTestTrait;
 
   /**
    * {@inheritdoc}
@@ -248,7 +252,7 @@ class NodeTest extends ResourceTestBase {
       'data' => [
         'type' => 'node--camelids',
         'attributes' => [
-          'title' => 'Dramallama',
+          'title' => 'Drama llama',
         ],
       ],
     ];
@@ -315,6 +319,11 @@ class NodeTest extends ResourceTestBase {
    * {@inheritdoc}
    */
   public function testGetIndividual() {
+    // Cacheable normalizations are written after the response is flushed to
+    // the client. We use WaitTerminateTestTrait to wait for Drupal to perform
+    // its termination work before continuing.
+    $this->setWaitForTerminate();
+
     parent::testGetIndividual();
 
     $this->assertCacheableNormalizations();
@@ -379,12 +388,7 @@ class NodeTest extends ResourceTestBase {
     $this->entity->save();
     $uuid = $this->entity->uuid();
     $language = $this->entity->language()->getId();
-    $cache = \Drupal::service('render_cache')->get([
-      '#cache' => [
-        'keys' => ['node--camelids', $uuid, $language],
-        'bin' => 'jsonapi_normalizations',
-      ],
-    ]);
+    $cache = \Drupal::service('variation_cache.jsonapi_normalizations')->get(['node--camelids', $uuid, $language], new CacheableMetadata());
     // After saving the entity the normalization should not be cached.
     $this->assertFalse($cache);
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/drupal/issues/2878463.
@@ -393,15 +397,11 @@ class NodeTest extends ResourceTestBase {
     $request_options = $this->getAuthenticationRequestOptions();
     $request_options[RequestOptions::QUERY] = ['fields' => ['node--camelids' => 'title']];
     $this->request('GET', $url, $request_options);
-    // Cacheable normalizations are written after the response is flushed to
-    // the client; give the server a chance to complete this work.
-    sleep(1);
     // Ensure the normalization cache is being incrementally built. After
     // requesting the title, only the title is in the cache.
     $this->assertNormalizedFieldsAreCached(['title']);
     $request_options[RequestOptions::QUERY] = ['fields' => ['node--camelids' => 'field_rest_test']];
     $this->request('GET', $url, $request_options);
-    sleep(1);
     // After requesting an additional field, then that field is in the cache and
     // the old one is still there.
     $this->assertNormalizedFieldsAreCached(['title', 'field_rest_test']);
@@ -419,13 +419,8 @@ class NodeTest extends ResourceTestBase {
    * @internal
    */
   protected function assertNormalizedFieldsAreCached(array $field_names): void {
-    $cache = \Drupal::service('render_cache')->get([
-      '#cache' => [
-        'keys' => ['node--camelids', $this->entity->uuid(), $this->entity->language()->getId()],
-        'bin' => 'jsonapi_normalizations',
-      ],
-    ]);
-    $cached_fields = $cache['#data']['fields'];
+    $cache = \Drupal::service('variation_cache.jsonapi_normalizations')->get(['node--camelids', $this->entity->uuid(), $this->entity->language()->getId()], new CacheableMetadata());
+    $cached_fields = $cache->data['fields'];
     $this->assertSameSize($field_names, $cached_fields);
     array_walk($field_names, function ($field_name) use ($cached_fields) {
       $this->assertInstanceOf(

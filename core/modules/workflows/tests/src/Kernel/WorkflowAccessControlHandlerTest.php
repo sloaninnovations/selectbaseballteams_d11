@@ -13,6 +13,7 @@ use Prophecy\Prophet;
 /**
  * @coversDefaultClass \Drupal\workflows\WorkflowAccessControlHandler
  * @group workflows
+ * @group #slow
  */
 class WorkflowAccessControlHandlerTest extends KernelTestBase {
 
@@ -102,6 +103,7 @@ class WorkflowAccessControlHandlerTest extends KernelTestBase {
     $workflow = Workflow::create([
       'type' => 'workflow_type_test',
       'id' => 'test_workflow',
+      'label' => 'Test workflow',
     ]);
     $workflow->save();
     $workflow_type = $workflow->getTypePlugin();

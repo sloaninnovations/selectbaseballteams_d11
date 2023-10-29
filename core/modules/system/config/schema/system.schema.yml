@@ -221,7 +221,7 @@ system.menu.*:
         Length:
           max: 32
     label:
-      type: label
+      type: required_label
       label: 'Label'
     description:
       type: label
@@ -237,8 +237,14 @@ system.action.*:
     id:
       type: machine_name
       label: 'ID'
+      constraints:
+        # Action IDs also allow periods.
+        # @see user_user_role_insert()
+        Regex:
+          pattern: '/^[a-z0-9_\.]+$/'
+          message: "The %value machine name is not valid."
     label:
-      type: label
+      type: required_label
       label: 'Label'
     type:
       type: string
@@ -296,6 +302,9 @@ system.mail:
       sequence:
         type: string
         label: 'Interface'
+    mailer_dsn:
+      type: string
+      label: 'Symfony mailer transport DSN'
 
 system.theme.global:
   type: theme_settings
@@ -356,6 +365,14 @@ condition.plugin.request_path:
   mapping:
     pages:
       type: string
+
+condition.plugin.response_status:
+  type: condition.plugin
+  mapping:
+    status_codes:
+      type: sequence
+      sequence:
+        type: integer
 
 system.feature_flags:
   type: config_object

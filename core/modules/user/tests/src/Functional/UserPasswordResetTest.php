@@ -339,6 +339,13 @@ class UserPasswordResetTest extends BrowserTestBase {
     $this->assertSession()->linkExists('Log out');
     $this->assertSession()->linkByHrefExists(Url::fromRoute('user.logout')->toString());
 
+    // Verify that the invalid password reset page does not show the user name.
+    $attack_reset_url = "user/reset/" . $another_account->id() . "/1/1";
+    $this->drupalGet($attack_reset_url);
+    $this->assertSession()->pageTextNotContains($another_account->getAccountName());
+    $this->assertSession()->addressEquals('user/' . $this->account->id());
+    $this->assertSession()->pageTextContains('The one-time login link you clicked is invalid.');
+
     $another_account->delete();
     $this->drupalGet($resetURL);
     $this->assertSession()->pageTextContains('The one-time login link you clicked is invalid.');
@@ -633,6 +640,15 @@ class UserPasswordResetTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains($user2->getAccountName());
     $this->assertSession()->addressEquals('user/password');
     $this->assertSession()->pageTextContains('You have tried to use a one-time login link that has either been used or is no longer valid. Request a new one using the form below.');
+  }
+
+  /**
+   * Test the autocomplete attribute is present.
+   */
+  public function testResetFormHasAutocompleteAttribute() {
+    $this->drupalGet('user/password');
+    $field = $this->getSession()->getPage()->findField('name');
+    $this->assertEquals('username', $field->getAttribute('autocomplete'));
   }
 
 }

@@ -27,6 +27,8 @@ class UrlConversionTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->root = dirname(__FILE__, 7);
+    // This unit test relies on reading files relative to Drupal root.
+    chdir($this->root);
   }
 
   /**
@@ -402,7 +404,7 @@ class UrlConversionTest extends UnitTestCase {
       'port' => '5432',
       'driver' => 'DrivertestPgsql',
       'namespace' => 'Drupal\\driver_test\\Driver\\Database\\DrivertestPgsql',
-      'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/drivertestpqsql/',
+      'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DrivertestPgsql/',
     ];
     $expected_url7 = 'DrivertestPgsql://test_user:test_pass@test_host:5432/test_database?module=driver_test';
 
@@ -415,7 +417,7 @@ class UrlConversionTest extends UnitTestCase {
       'port' => '5432',
       'driver' => 'DrivertestPgsql',
       'namespace' => 'Drupal\\driver_test\\Driver\\Database\\DrivertestPgsql',
-      'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/drivertestpqsql/',
+      'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DrivertestPgsql/',
     ];
     $expected_url8 = 'DrivertestPgsql://test_user:test_pass@test_host:5432/test_database?module=driver_test#pre';
 
