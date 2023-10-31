@@ -28,14 +28,22 @@ services:
     class: Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory
     tags:
       - { name: mailer.transport_factory, priority: -100 }
-  mailer.transport_factory:
-    class: Drupal\mailer\Transport
+  mailer.transport_factory_collection:
+    class: Drupal\mailer\TransportFactoryCollection
     public: false
     tags:
       - { name: service_collector, tag: mailer.transport_factory, call: addTransportFactory }
-  Drupal\mailer\Transport: '@mailer.transport_factory'
+  Drupal\mailer\TransportFactoryCollection: '@mailer.transport_factory_collection'
+  mailer.transport_factory:
+    class: Symfony\Component\Mailer\Transport
+    factory: ['@mailer.transport_factory_collection', 'createTransportFactory']
+  Symfony\Component\Mailer\Transport: '@mailer.transport_factory'
+  mailer.transport_factory_adapter:
+    arguments: ['@config.factory', '@mailer.transport_factory']
+    class: Drupal\mailer\DefaultFactoryAdapter
+    public: false
+  Drupal\mailer\DefaultFactoryAdapter: '@mailer.transport_factory_adapter'
   mailer.transport:
     class: Symfony\Component\Mailer\Transport\TransportInterface
-    factory: ['@mailer.transport_factory', 'fromConfig']
-    arguments: ['@config.factory']
+    factory: ['@mailer.transport_factory_adapter', 'fromDefaultDsn']
   Symfony\Component\Mailer\Transport\TransportInterface: '@mailer.transport'

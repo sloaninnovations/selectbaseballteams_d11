@@ -2,22 +2,20 @@
 
 namespace Drupal\mailer;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Symfony\Component\Mailer\Transport as SymfonyTransport;
+use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
-use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
- * The mailer transport factory.
+ * The mailer transport factory collection.
  *
- * Adapts the symfony mailer Transport factory class to better suit the Drupal
- * config system.
+ * Collects transport factories from the container and constructs the symfony
+ * transport factory.
  *
  * @see \Symfony\Component\Mailer\Transport
  *
  * @internal
  */
-class Transport {
+final class TransportFactoryCollection {
 
   /**
    * An unsorted array of arrays of transport factories.
@@ -42,19 +40,14 @@ class Transport {
   }
 
   /**
-   * Return configured transport.
+   * Returns the Symfony mailer transport factory.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory service.
-   *
-   * @return \Symfony\Component\Mailer\Transport\TransportInterface
+   * @return \Symfony\Component\Mailer\Transport
    */
-  public function fromConfig(ConfigFactoryInterface $configFactory): TransportInterface {
+  public function createTransportFactory(): Transport {
     krsort($this->transportFactories);
     $sortedFactories = array_merge(...$this->transportFactories);
-    $symfonyTransport = new SymfonyTransport($sortedFactories);
-    $dsn = $configFactory->get('system.mail')->get('mailer_dsn');
-    return $symfonyTransport->fromString($dsn);
+    return new Transport($sortedFactories);
   }
 
 }
