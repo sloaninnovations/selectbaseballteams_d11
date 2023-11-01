@@ -42,7 +42,7 @@ services:
     arguments: ['@config.factory', '@mailer.transport_factory']
     class: Drupal\mailer\DefaultFactoryAdapter
     public: false
-  Drupal\mailer\DefaultFactoryAdapter: '@mailer.transport_factory_adapter'
+  Drupal\mailer\Transport\ConfiguredTransportFactoryInterface: '@mailer.transport_factory_adapter'
   mailer.transport:
     class: Symfony\Component\Mailer\Transport\TransportInterface
     factory: ['@mailer.transport_factory_adapter', 'createTransport']
