@@ -8,8 +8,8 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 /**
  * The mailer transport factory collection.
  *
- * Collects transport factories from the container and constructs the symfony
- * transport factory.
+ * Collects transport factories from the container and constructs the Symfony
+ * mailer transport factory.
  *
  * @see \Symfony\Component\Mailer\Transport
  *

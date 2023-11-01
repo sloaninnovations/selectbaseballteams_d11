@@ -3,6 +3,7 @@
 namespace Drupal\mailer;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\mailer\Transport\ConfiguredTransportFactoryInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
@@ -13,10 +14,8 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
  * config system.
  *
  * @see \Symfony\Component\Mailer\Transport
- *
- * @internal
  */
-final class DefaultFactoryAdapter {
+class DefaultFactoryAdapter implements ConfiguredTransportFactoryInterface {
 
   /**
    * Constructs new transport factory adapter.
@@ -33,11 +32,9 @@ final class DefaultFactoryAdapter {
   }
 
   /**
-   * Returns a transport constructed using the default DSN.
-   *
-   * @return \Symfony\Component\Mailer\Transport\TransportInterface
+   * {@inheritdoc}
    */
-  public function fromDefaultDsn(): TransportInterface {
+  public function createTransport(): TransportInterface {
     $dsn = $this->configFactory->get('system.mail')->get('mailer_dsn');
     return $this->transport->fromString($dsn);
   }

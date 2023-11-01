@@ -45,5 +45,5 @@ services:
   Drupal\mailer\DefaultFactoryAdapter: '@mailer.transport_factory_adapter'
   mailer.transport:
     class: Symfony\Component\Mailer\Transport\TransportInterface
-    factory: ['@mailer.transport_factory_adapter', 'fromDefaultDsn']
+    factory: ['@mailer.transport_factory_adapter', 'createTransport']
   Symfony\Component\Mailer\Transport\TransportInterface: '@mailer.transport'
