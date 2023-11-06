@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\mailer;
+namespace Drupal\Core\Mailer;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\mailer\Transport\ConfiguredTransportFactoryInterface;
+use Drupal\Core\Mailer\Transport\ConfiguredTransportFactoryInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
@@ -15,7 +15,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
  *
  * @see \Symfony\Component\Mailer\Transport
  */
-class DefaultFactoryAdapter implements ConfiguredTransportFactoryInterface {
+class TransportFactoryAdapter implements ConfiguredTransportFactoryInterface {
 
   /**
    * Constructs new transport factory adapter.

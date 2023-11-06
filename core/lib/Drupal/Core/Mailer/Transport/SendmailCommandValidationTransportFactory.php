@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\mailer\Transport;
+namespace Drupal\Core\Mailer\Transport;
 
 use Drupal\Core\Site\Settings;
 use Symfony\Component\Mailer\Transport\Dsn;

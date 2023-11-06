@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\mailer;
+namespace Drupal\Core\Mailer;
 
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;

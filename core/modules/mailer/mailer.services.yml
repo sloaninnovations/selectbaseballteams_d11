@@ -19,7 +19,7 @@ services:
     tags:
       - { name: mailer.transport_factory }
   mailer.transport_factory_decorator.sendmail_command_validation:
-    class: Drupal\mailer\Transport\SendmailCommandValidationTransportFactory
+    class: Drupal\Core\Mailer\Transport\SendmailCommandValidationTransportFactory
     decorates: mailer.transport_factory.sendmail
     arguments: ['@.inner']
     public: false
@@ -29,20 +29,20 @@ services:
     tags:
       - { name: mailer.transport_factory, priority: -100 }
   mailer.transport_factory_collection:
-    class: Drupal\mailer\TransportFactoryCollection
+    class: Drupal\Core\Mailer\TransportFactoryCollection
     public: false
     tags:
       - { name: service_collector, tag: mailer.transport_factory, call: addTransportFactory }
-  Drupal\mailer\TransportFactoryCollection: '@mailer.transport_factory_collection'
+  Drupal\Core\Mailer\TransportFactoryCollection: '@mailer.transport_factory_collection'
   mailer.transport_factory:
     class: Symfony\Component\Mailer\Transport
     factory: ['@mailer.transport_factory_collection', 'createTransportFactory']
   Symfony\Component\Mailer\Transport: '@mailer.transport_factory'
   mailer.transport_factory_adapter:
     arguments: ['@config.factory', '@mailer.transport_factory']
-    class: Drupal\mailer\DefaultFactoryAdapter
+    class: Drupal\Core\Mailer\TransportFactoryAdapter
     public: false
-  Drupal\mailer\Transport\ConfiguredTransportFactoryInterface: '@mailer.transport_factory_adapter'
+  Drupal\Core\Mailer\Transport\ConfiguredTransportFactoryInterface: '@mailer.transport_factory_adapter'
   mailer.transport:
     class: Symfony\Component\Mailer\Transport\TransportInterface
     factory: ['@mailer.transport_factory_adapter', 'createTransport']

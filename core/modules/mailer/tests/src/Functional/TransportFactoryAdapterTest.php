@@ -10,7 +10,7 @@ use Symfony\Component\Mailer\Transport\NullTransport;
  *
  * @group mailer
  */
-class DefaultTransportTest extends BrowserTestBase {
+class TransportFactoryAdapterTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}

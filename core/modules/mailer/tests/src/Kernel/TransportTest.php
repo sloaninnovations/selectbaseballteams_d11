@@ -13,7 +13,7 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
  * Tests the transport factory service.
  *
  * @group mailer
- * @coversDefaultClass \Drupal\mailer\Transport
+ * @coversDefaultClass \Drupal\Core\Mailer\TransportFactoryAdapter
  */
 class TransportTest extends KernelTestBase {
 
@@ -41,7 +41,7 @@ class TransportTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::fromConfig
+   * @covers ::createTransport
    */
   public function testDefaultTestMailFactory(): void {
     $actual = $this->container->get('mailer.transport');
@@ -50,7 +50,7 @@ class TransportTest extends KernelTestBase {
 
   /**
    * @dataProvider providerTestBuiltinFactory
-   * @covers ::fromConfig
+   * @covers ::createTransport
    */
   public function testBuiltinFactory(string $dsn, string $expected): void {
     $this->setUpMailerDsnConfigOverride($dsn);
@@ -69,8 +69,8 @@ class TransportTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::fromConfig
-   * @covers \Drupal\mailer\Transport\SendmailCommandValidationTransportFactory::create
+   * @covers ::createTransport
+   * @covers \Drupal\Core\Mailer\Transport\SendmailCommandValidationTransportFactory::create
    */
   public function testSendmailFactoryAllowedCommand(): void {
     // Test sendmail command allowlist.
@@ -85,8 +85,8 @@ class TransportTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::fromConfig
-   * @covers \Drupal\mailer\Transport\SendmailCommandValidationTransportFactory::create
+   * @covers ::createTransport
+   * @covers \Drupal\Core\Mailer\Transport\SendmailCommandValidationTransportFactory::create
    */
   public function testSendmailFactoryUnlistedCommand(): void {
     // Test sendmail command allowlist.
@@ -101,7 +101,7 @@ class TransportTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::fromConfig
+   * @covers ::createTransport
    */
   public function testMissingFactory(): void {
     $this->setUpMailerDsnConfigOverride('drupal.no-transport://default');
@@ -111,7 +111,7 @@ class TransportTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::addTransportFactory
+   * @covers \Drupal\Core\Mailer\TransportFactoryCollection::addTransportFactory
    */
   public function testThirdPartyFactory(): void {
     $this->enableModules(['mailer_transport_factory_kernel_test']);
