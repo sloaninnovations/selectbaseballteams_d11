@@ -2,7 +2,10 @@ services:
   mailer.transport_factory.abstract:
     abstract: true
     class: Symfony\Component\Mailer\Transport\AbstractTransportFactory
-    arguments: ['@event_dispatcher', null, '@logger.channel.mail']
+    arguments:
+      - '@Symfony\Contracts\EventDispatcher\EventDispatcherInterface'
+      - '@?Symfony\Contracts\HttpClient\HttpClientInterface'
+      - '@logger.channel.mail'
   mailer.transport_factory.native:
     parent: mailer.transport_factory.abstract
     class: Symfony\Component\Mailer\Transport\NativeTransportFactory
@@ -36,14 +39,27 @@ services:
   Drupal\Core\Mailer\TransportFactoryCollection: '@mailer.transport_factory_collection'
   mailer.transport_factory:
     class: Symfony\Component\Mailer\Transport
-    factory: ['@mailer.transport_factory_collection', 'createTransportFactory']
+    factory: ['@Drupal\Core\Mailer\TransportFactoryCollection', 'createTransportFactory']
   Symfony\Component\Mailer\Transport: '@mailer.transport_factory'
   mailer.transport_factory_adapter:
-    arguments: ['@config.factory', '@mailer.transport_factory']
     class: Drupal\Core\Mailer\TransportFactoryAdapter
+    autowire: true
     public: false
   Drupal\Core\Mailer\Transport\ConfiguredTransportFactoryInterface: '@mailer.transport_factory_adapter'
   mailer.transport:
     class: Symfony\Component\Mailer\Transport\TransportInterface
-    factory: ['@mailer.transport_factory_adapter', 'createTransport']
+    factory: ['@Drupal\Core\Mailer\Transport\ConfiguredTransportFactoryInterface', 'createTransport']
   Symfony\Component\Mailer\Transport\TransportInterface: '@mailer.transport'
+  mailer.messenger.message_handler:
+    class: Symfony\Component\Mailer\Messenger\MessageHandler
+    autowire: true
+    public: false
+    tags:
+      - { name: messenger.message_handler }
+  mailer.mailer:
+    class: Symfony\Component\Mailer\Mailer
+    arguments:
+      - '@Symfony\Component\Mailer\Transport\TransportInterface'
+      - '@?Symfony\Component\Messenger\MessageBusInterface'
+      - '@Symfony\Contracts\EventDispatcher\EventDispatcherInterface'
+  Symfony\Component\Mailer\MailerInterface: '@mailer.mailer'

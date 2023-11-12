@@ -33,8 +33,8 @@ class TransportInfoController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('config.factory'),
-      $container->get('mailer.transport')
+      $container->get(ConfigFactoryInterface::class),
+      $container->get(TransportInterface::class)
     );
   }
 
