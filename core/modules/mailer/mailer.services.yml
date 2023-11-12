@@ -56,6 +56,7 @@ services:
     public: false
     tags:
       - { name: messenger.message_handler }
+  Symfony\Component\Mailer\Messenger\MessageHandler: '@mailer.messenger.message_handler'
   mailer.mailer:
     class: Symfony\Component\Mailer\Mailer
     arguments:
