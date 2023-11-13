@@ -1,6 +1,6 @@
 name: Mailer
 type: module
-description: 'Provides mailer with support for various protocols.'
+description: 'Provides an experimental API to build and deliver email messages.'
 package: Core (Experimental)
 lifecycle: experimental
 version: VERSION
