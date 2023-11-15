@@ -2,14 +2,21 @@
 
 namespace Drupal\Core\Config;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\Schema\ArrayElement;
 use Drupal\Core\Config\Schema\ConfigSchemaAlterException;
 use Drupal\Core\Config\Schema\ConfigSchemaDiscovery;
+use Drupal\Core\Config\Schema\Ignore;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Config\Schema\Undefined;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
+use Drupal\Core\TypedData\DataDefinitionInterface;
+use Drupal\Core\TypedData\ListDataDefinitionInterface;
+use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\TypedDataManager;
 
 /**
@@ -147,6 +154,86 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       $type = 'undefined';
     }
     return $type;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinitions() {
+    $definitions = parent::getDefinitions();
+    foreach ($definitions as $plugin_id => &$definition) {
+      static::validateType($definition, $plugin_id);
+    }
+    return $definitions;
+  }
+
+  /**
+   * Validates the "type" key of a config schema definition.
+   */
+  protected function validateType(array $definition, string $id): void {
+    if (isset($definition['type'])) {
+      return;
+    }
+
+    // This type claims to be a primitive scalar, primitive list or primitive
+    // complex type, so its class must prove it.
+    if (!isset($definition['class'])) {
+      throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive config schema type, but it does not provide a class.', $id));
+    }
+
+    // There are two special cases: special cases: "Ignore" and "Undefined".
+    if (in_array($definition['class'], [Undefined::class, Ignore::class])) {
+      return;
+    }
+
+    switch (static::getShape($definition)) {
+      case 'special':
+        // Nothing to do.
+        break;
+
+      // All primitive scalar types' classes must implement PrimitiveInterface.
+      case 'scalar':
+        if (!is_subclass_of($definition['class'], PrimitiveInterface::class)) {
+          throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive scalar config schema type, but its class %s does not implement PrimitiveInterface.', $id, $definition['class']));
+        }
+        break;
+
+      // All primitive list and complex types' classes must extend ArrayElement.
+      case 'list':
+      case 'complex':
+        if (!is_subclass_of($definition['class'], ArrayElement::class)) {
+          throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive complex config schema type, but its class %s does not extend ArrayElement.', $id, $definition['class']));
+        }
+        break;
+    }
+  }
+
+  /**
+   * Gets the shape of a config schema type definition.
+   *
+   * @param array $definition
+   *   A config schema definition.
+   *
+   * @return string
+   *   One of:
+   *   - "special": for the special "ignore" and "undefined" types.
+   *   - "list": for any list type (in core only "sequence")
+   *   - "complex": for any complex type (in core only "mapping")
+   *   - "scalar": for any other type (in core f.e. "string", "boolean", etc.)
+   */
+  private function getShape(array $definition): string {
+    // @todo Convert the string return type to an enum.
+    return match (TRUE) {
+      // Optional: default is set later, in ::getDefinitionWithReplacements().
+      !isset($definition['definition_class']) => 'scalar',
+      // Two special cases: "ignore" and "undefined".
+      in_array($definition['class'], [Undefined::class, Ignore::class]) => 'special',
+      // The three normal shapes.
+      is_subclass_of($definition['definition_class'], ListDataDefinitionInterface::class) => 'list',
+      is_subclass_of($definition['definition_class'], ComplexDataDefinitionInterface::class) => 'complex',
+      is_subclass_of($definition['definition_class'], DataDefinitionInterface::class) => 'scalar',
+      // No default case, because at minimum DataDefinitionInterface must be implemented.
+    };
   }
 
   /**
