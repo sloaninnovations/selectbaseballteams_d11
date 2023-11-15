@@ -163,6 +163,10 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     $definitions = parent::getDefinitions();
     foreach ($definitions as $plugin_id => &$definition) {
       static::validateType($definition, $plugin_id);
+      // @todo Generalize
+      if ($plugin_id === 'filter_settings.filter_html') {
+        $this->validateNoCircularTypeReference($definition, $plugin_id, $definitions);
+      }
     }
     return $definitions;
   }
@@ -236,6 +240,57 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     };
   }
 
+  // phpcs:disable
+  protected function validateNoCircularTypeReference(array $definition, string $id, array $all_definitions): void {
+    $all_types_in_subtree = static::getInDirectlyReferencedTypes($definition, $all_definitions);
+    // Resolve types with variable values to all possible types they may match.
+    // @see \Drupal\Core\Config\TypedConfigManager::replaceVariable
+    // @see \Drupal\Core\Config\TypedConfigManager::getPossibleTypes
+    foreach ($all_types_in_subtree as $used_type) {
+      $possible_types = $this->findPossibleTypes($used_type);
+      if (in_array($id, $possible_types, TRUE)) {
+        throw new \LogicException(sprintf('Config schema type "%s" has a circular type reference, where it uses the type "%s".', $id, $used_type));
+      }
+    }
+  }
+
+  protected static function getDirectlyReferencedTypes(array $definition): array {
+    // Primitive types do not specify the "type" key.
+    if (!isset($definition['type'])) {
+      return [];
+    }
+    $types = [$definition['type']];
+    // Find types further down.
+    foreach ($definition['mapping'] ?? $definition['sequence'] ?? [] as $array_element_definition) {
+      $types = array_merge($types, static::getDirectlyReferencedTypes($array_element_definition));
+    }
+    return array_unique($types);
+  }
+
+  protected static function getInDirectlyReferencedTypes(array $definition, array $all_definitions): array {
+    // The indirect ones include the direct ones too.
+    $direct = static::getDirectlyReferencedTypes($definition);
+    // For each of the directly used types, figure out recursively which types
+    // they use. If $directly contains only primitive types, a single iteration
+    // of the loop below will be sufficient.
+    $result = $direct;
+    do {
+      // For all types seen so far, find the next ones.
+      $next_level = array_map(
+        fn(array $d): array => static::getDirectlyReferencedTypes($d),
+        // Use $new from the previous iteration, to not repeat the same work.
+        array_intersect_key($all_definitions, array_flip($new ?? $direct))
+      );
+      // Determine the newly discovered types.
+      $new = array_merge(...array_values($next_level));
+      // Remember them.
+      $result = array_merge($result, $new);
+    } while (!empty($new));
+    return array_unique($result);
+  }
+
+  // phpcs:enable
+
   /**
    * Gets a schema definition with replacements for dynamic names.
    *
@@ -304,7 +359,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   }
 
   /**
-   * Gets fallback configuration schema name.
+   * Finds fallback configuration schema name.
    *
    * @param string $name
    *   Configuration name or key.
@@ -329,6 +384,21 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    *     block.settings.*
    *     block.*.*:*
    *     block.*
+   */
+  public function findFallback(string $name): ?string {
+    $fallback = $this->getFallbackName($name);
+    assert($fallback === NULL || str_ends_with($fallback, '.*'));
+    return $fallback;
+  }
+
+  /**
+   * Gets fallback configuration schema name.
+   *
+   * @param string $name
+   *   Configuration name or key.
+   *
+   * @return null|string
+   *   The resolved schema name for the given configuration name or key.
    */
   protected function getFallbackName($name) {
     // Check for definition of $name with filesystem marker.
@@ -488,6 +558,56 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     $definition = $this->getDefinition($config_name);
     $data_definition = $this->buildDataDefinition($definition, $config_data);
     return $this->create($data_definition, $config_data, $config_name);
+  }
+
+  /**
+   * Returns all possible types for the type with the given name.
+   *
+   * @param string $name
+   *   Configuration name or key.
+   *
+   * @return string[]
+   *   All possible types for a given type. For example,
+   *   `core_date_format_pattern.[%parent.locked]` will return:
+   *   - `core_date_format_pattern.0`
+   *   - `core_date_format_pattern.1`
+   *   If a fallback name is available, that will be returned too. In this
+   *   example, that would be `core_date_format_pattern.*`.
+   */
+  private function findPossibleTypes(string $name): array {
+    // First, parse from e.g.
+    // `module.something.foo_[%parent.locked]`
+    // this:
+    // `[%parent.locked]`
+    // or from
+    // `[%parent.%parent.%type].third_party.[%key]`
+    // this:
+    // `[%parent.%parent.%type]` and `[%key]`.
+    // And collapse all these to just `[]`.
+    // @see \Drupal\Core\Config\TypedConfigManager::replaceVariable()
+    $matches = [];
+    if (preg_match_all('/(\[[^\]]+\])/', $name, $matches) >= 1) {
+      $name = str_replace($matches[0], '[]', $name);
+    }
+    // Then, replace all `[]` occurrences with `.*` and escape all periods for
+    // use in a regex. So:
+    // `module\.something\.foo_.*`
+    // or
+    // `.*\.third_party\..*`
+    $regex = str_replace(['.', '[]'], ['\.', '.*'], $name);
+    // Now find all possible types:
+    // 1. `module.something.foo_foo`, `module.something.foo_bar`, etc.
+    $possible_types = array_filter(
+      array_keys($this->definitions),
+      fn (string $type) => preg_match("/^$regex$/", $type) === 1
+    );
+    // 2. The fallback: `module.something.*` — if no concrete definition for it
+    // exists.
+    $fallback_type = $this->findFallback($name);
+    if ($fallback_type && !in_array($fallback_type, $possible_types, TRUE)) {
+      $possible_types[] = $fallback_type;
+    }
+    return $possible_types;
   }
 
 }
