@@ -53,7 +53,7 @@ filter_settings.*:
     label: 'Value'
 
 filter_settings.filter_html:
-  type: filter
+  type: mapping
   label: 'Filter HTML'
   mapping:
     allowed_html:
