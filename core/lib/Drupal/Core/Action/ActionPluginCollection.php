@@ -9,13 +9,4 @@ use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
  */
 class ActionPluginCollection extends DefaultSingleLazyPluginCollection {
 
-  /**
-   * {@inheritdoc}
-   *
-   * @return \Drupal\Core\Action\ActionInterface
-   */
-  public function &get($instance_id) {
-    return parent::get($instance_id);
-  }
-
 }
