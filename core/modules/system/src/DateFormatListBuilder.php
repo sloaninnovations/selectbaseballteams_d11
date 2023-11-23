@@ -37,6 +37,7 @@ class DateFormatListBuilder extends ConfigEntityListBuilder {
     parent::__construct($entity_type, $storage);
 
     $this->dateFormatter = $date_formatter;
+    $this->loadOverrideFree = TRUE;
   }
 
   /**
