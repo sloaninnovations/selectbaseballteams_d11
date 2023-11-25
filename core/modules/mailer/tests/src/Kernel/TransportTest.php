@@ -23,20 +23,44 @@ class TransportTest extends KernelTestBase {
   protected static $modules = ['mailer', 'system'];
 
   /**
-   * Sets up a mailer dsn config override.
+   * Sets up a mailer DSN config override.
    *
-   * @param string $dsn
-   *   The transport dsn string.
+   * @param string $scheme
+   *   The mailer DSN scheme.
+   * @param string $host
+   *   The mailer DSN host.
+   * @param string|null $user
+   *   The mailer DSN username.
+   * @param string|null $password
+   *   The mailer DSN password.
+   * @param int|null $port
+   *   The mailer DSN port.
+   * @param <string, mixed>[] $options
+   *   Options for the mailer transport.
    */
-  protected function setUpMailerDsnConfigOverride(string $dsn): void {
-    $GLOBALS['config']['system.mail']['mailer_dsn'] = $dsn;
+  protected function setUpMailerDsnConfigOverride(
+    string $scheme,
+    string $host,
+    ?string $user = NULL,
+    #[\SensitiveParameter] ?string $password = NULL,
+    ?int $port = NULL,
+    array $options = []
+  ): void {
+    $GLOBALS['config']['system.mail']['mailer_dsn'] = [
+      'scheme' => $scheme,
+      'host' => $host,
+      'user' => $user,
+      'password' => $password,
+      'port' => $port,
+      'options' => $options,
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    $GLOBALS['config']['system.mail']['mailer_dsn'] = 'null://null';
+    $this->setUpMailerDsnConfigOverride('null', 'null');
     parent::tearDown();
   }
 
@@ -52,8 +76,8 @@ class TransportTest extends KernelTestBase {
    * @dataProvider providerTestBuiltinFactory
    * @covers ::createTransport
    */
-  public function testBuiltinFactory(string $dsn, string $expected): void {
-    $this->setUpMailerDsnConfigOverride($dsn);
+  public function testBuiltinFactory(string $schema, string $host, string $expected): void {
+    $this->setUpMailerDsnConfigOverride($schema, $host);
 
     $actual = $this->container->get('mailer.transport');
     $this->assertInstanceOf($expected, $actual);
@@ -63,9 +87,9 @@ class TransportTest extends KernelTestBase {
    * Provides test data for testBuiltinFactory().
    */
   public function providerTestBuiltinFactory(): iterable {
-    yield ['null://null', NullTransport::class];
-    yield ['sendmail://default', SendmailTransport::class];
-    yield ['smtp://default', EsmtpTransport::class];
+    yield ['null', 'null', NullTransport::class];
+    yield ['sendmail', 'default', SendmailTransport::class];
+    yield ['smtp', 'default', EsmtpTransport::class];
   }
 
   /**
@@ -79,7 +103,9 @@ class TransportTest extends KernelTestBase {
     new Settings($settings);
 
     // Test allowlisted command.
-    $this->setUpMailerDsnConfigOverride('sendmail://default?command=/usr/local/bin/sendmail%20-bs');
+    $this->setUpMailerDsnConfigOverride('sendmail', 'default', options: [
+      'command' => '/usr/local/bin/sendmail -bs',
+    ]);
     $actual = $this->container->get('mailer.transport');
     $this->assertInstanceOf(SendmailTransport::class, $actual);
   }
@@ -95,7 +121,9 @@ class TransportTest extends KernelTestBase {
     new Settings($settings);
 
     // Test unlisted command.
-    $this->setUpMailerDsnConfigOverride('sendmail://default?command=/usr/bin/bc');
+    $this->setUpMailerDsnConfigOverride('sendmail', 'default', options: [
+      'command' => '/usr/bin/bc',
+    ]);
     $this->expectExceptionMessage('Unsafe sendmail command /usr/bin/bc');
     $this->container->get('mailer.transport');
   }
@@ -104,7 +132,7 @@ class TransportTest extends KernelTestBase {
    * @covers ::createTransport
    */
   public function testMissingFactory(): void {
-    $this->setUpMailerDsnConfigOverride('drupal.no-transport://default');
+    $this->setUpMailerDsnConfigOverride('drupal.no-transport', 'default');
 
     $this->expectExceptionMessage('The "drupal.no-transport" scheme is not supported');
     $this->container->get('mailer.transport');
@@ -116,7 +144,7 @@ class TransportTest extends KernelTestBase {
   public function testThirdPartyFactory(): void {
     $this->enableModules(['mailer_transport_factory_kernel_test']);
 
-    $this->setUpMailerDsnConfigOverride('drupal.test-canary://default');
+    $this->setUpMailerDsnConfigOverride('drupal.test-canary', 'default');
 
     $actual = $this->container->get('mailer.transport');
     $this->assertInstanceOf(CanaryTransport::class, $actual);

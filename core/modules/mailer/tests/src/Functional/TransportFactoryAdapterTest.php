@@ -34,7 +34,14 @@ class TransportFactoryAdapterTest extends BrowserTestBase {
     $actual = json_decode($response, TRUE);
 
     $expected = [
-      'mailerDsn' => 'null://null',
+      'mailerDsn' => [
+        'scheme' => 'null',
+        'host' => 'null',
+        'user' => NULL,
+        'password' => NULL,
+        'port' => NULL,
+        'options' => [],
+      ],
       'mailerTransportClass' => NullTransport::class,
     ];
     $this->assertEquals($expected, $actual);

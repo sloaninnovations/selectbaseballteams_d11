@@ -5,6 +5,7 @@ namespace Drupal\Core\Mailer;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Mailer\Transport\ConfiguredTransportFactoryInterface;
 use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
@@ -36,7 +37,8 @@ class TransportFactoryAdapter implements ConfiguredTransportFactoryInterface {
    */
   public function createTransport(): TransportInterface {
     $dsn = $this->configFactory->get('system.mail')->get('mailer_dsn');
-    return $this->transport->fromString($dsn);
+    $dsnObject = new Dsn(...$dsn);
+    return $this->transport->fromDsnObject($dsnObject);
   }
 
 }
