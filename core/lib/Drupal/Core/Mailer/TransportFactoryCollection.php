@@ -2,20 +2,23 @@
 
 namespace Drupal\Core\Mailer;
 
-use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 /**
  * The mailer transport factory collection.
  *
- * Collects transport factories from the container and constructs the Symfony
- * mailer transport factory.
+ * Collects transport factories from the container. Pass an instance of this
+ * class to the constructor of the Symfony mailer Transport facade.
  *
+ * @todo Deprecate this class and replace mailer.transport_factory constructor
+ *   argument with !tagged_iterator as soon as Drupal dependency injection
+ *   caugth up with the upstream component (#3228629).
+ * @see https://www.drupal.org/project/drupal/issues/3228629
  * @see \Symfony\Component\Mailer\Transport
  *
  * @internal
  */
-final class TransportFactoryCollection {
+final class TransportFactoryCollection implements \IteratorAggregate {
 
   /**
    * An unsorted array of arrays of transport factories.
@@ -40,14 +43,12 @@ final class TransportFactoryCollection {
   }
 
   /**
-   * Returns the Symfony mailer transport factory.
-   *
-   * @return \Symfony\Component\Mailer\Transport
+   * {@inheritdoc}
    */
-  public function createTransportFactory(): Transport {
+  public function getIterator(): \Traversable {
     krsort($this->transportFactories);
     $sortedFactories = array_merge(...$this->transportFactories);
-    return new Transport($sortedFactories);
+    yield from $sortedFactories;
   }
 
 }

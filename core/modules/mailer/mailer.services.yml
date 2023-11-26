@@ -39,7 +39,7 @@ services:
   Drupal\Core\Mailer\TransportFactoryCollection: '@mailer.transport_factory_collection'
   mailer.transport_factory:
     class: Symfony\Component\Mailer\Transport
-    factory: ['@Drupal\Core\Mailer\TransportFactoryCollection', 'createTransportFactory']
+    arguments: ['@Drupal\Core\Mailer\TransportFactoryCollection']
   Symfony\Component\Mailer\Transport: '@mailer.transport_factory'
   mailer.transport_factory_adapter:
     class: Drupal\Core\Mailer\TransportFactoryAdapter
