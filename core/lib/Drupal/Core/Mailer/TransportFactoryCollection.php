@@ -12,7 +12,7 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
  *
  * @todo Deprecate this class and replace mailer.transport_factory constructor
  *   argument with !tagged_iterator as soon as Drupal dependency injection
- *   caugth up with the upstream component (#3228629).
+ *   caught up with the upstream component (#3228629).
  * @see https://www.drupal.org/project/drupal/issues/3228629
  * @see \Symfony\Component\Mailer\Transport
  *
