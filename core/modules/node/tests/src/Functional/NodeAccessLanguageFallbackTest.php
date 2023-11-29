@@ -71,6 +71,7 @@ class NodeAccessLanguageFallbackTest extends NodeTestBase {
       'bypass node access',
       'administer nodes',
       'translate any entity',
+      'create content translations',
       'administer content translation',
     ]);
     $this->drupalLogin($admin);
