@@ -3,6 +3,7 @@
 namespace Drupal\system\Plugin\ImageToolkit;
 
 use Drupal\Component\Utility\Color;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
@@ -629,7 +630,7 @@ class GDToolkit extends ImageToolkitBase {
    *   TRUE if AVIF is fully supported.
    */
   protected function checkAvifSupport(): bool {
-    if ($cache = $this->cacheDefault->get('gdtoolkit_avif_support')) {
+    if ($cache = $this->cacheDefault->get('gd_toolkit_avif_support')) {
       return $cache->data;
     }
 
@@ -647,7 +648,7 @@ class GDToolkit extends ImageToolkitBase {
     imageavif(imagecreatetruecolor(1, 1), $this->fileSystem->tempnam($tempFile));
     $this->fileSystem->unlink($tempFile);
 
-    $this->cacheDefault->set('gdtoolkit_avif_support', $supported);
+    $this->cacheDefault->set('gd_toolkit_avif_support', $supported);
 
     return $supported;
   }
