@@ -645,7 +645,7 @@ class GDToolkit extends ImageToolkitBase {
     });
 
     $tempFile = $this->fileSystem->tempnam('temporary://', 'avif');
-    imageavif(imagecreatetruecolor(1, 1), $this->fileSystem->tempnam($tempFile));
+    imageavif(imagecreatetruecolor(1, 1), $tempFile);
     $this->fileSystem->unlink($tempFile);
 
     $this->cacheDefault->set('gd_toolkit_avif_support', $supported);
