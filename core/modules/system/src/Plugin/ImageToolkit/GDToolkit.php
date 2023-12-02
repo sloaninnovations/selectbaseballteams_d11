@@ -626,6 +626,11 @@ class GDToolkit extends ImageToolkitBase {
   /**
    * Checks if AVIF is fully supported.
    *
+   * This method tries to create an AVIF image and save it to disk via
+   * imageavif(). If that fails, it's likely a codec missing, or the function
+   * was disabled. This is an expensive operation to run, so we cache its
+   * result.
+   *
    * @return bool
    *   TRUE if AVIF is fully supported.
    */
@@ -647,6 +652,8 @@ class GDToolkit extends ImageToolkitBase {
     $tempFile = $this->fileSystem->tempnam('temporary://', 'avif');
     imageavif(imagecreatetruecolor(1, 1), $tempFile);
     $this->fileSystem->unlink($tempFile);
+
+    restore_error_handler();
 
     $this->cacheDefault->set('gd_toolkit_avif_support', $supported);
 
