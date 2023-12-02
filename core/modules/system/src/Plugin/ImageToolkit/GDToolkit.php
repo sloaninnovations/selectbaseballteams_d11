@@ -84,9 +84,9 @@ class GDToolkit extends ImageToolkitBase {
     ImageToolkitOperationManagerInterface $operation_manager,
     LoggerInterface $logger,
     ConfigFactoryInterface $config_factory,
-    protected readonly StreamWrapperManagerInterface $streamWrapperManager,
-    protected readonly FileSystemInterface $fileSystem,
-    protected readonly CacheBackendInterface $cacheDefault,
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+    protected FileSystemInterface $fileSystem,
+    protected CacheBackendInterface $cacheDefault,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $operation_manager, $logger, $config_factory);
   }
