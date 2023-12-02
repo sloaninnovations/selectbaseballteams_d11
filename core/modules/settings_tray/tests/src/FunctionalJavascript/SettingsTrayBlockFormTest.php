@@ -122,7 +122,7 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
       $page->pressButton($button_text);
       // Make sure the changes are present.
       $new_page_text_locator = "$block_selector $label_selector:contains($new_page_text)";
-      $this->assertElementVisibleAfterWait('css', $new_page_text_locator);
+      $this->assertNotEmpty($web_assert->waitForElementVisible('css', $new_page_text_locator));
       // The page is loaded with the new change but make sure page is
       // completely loaded.
       $this->assertPageLoadComplete();
@@ -230,6 +230,7 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
    * Tests enabling and disabling Edit Mode.
    */
   public function testEditModeEnableDisable() {
+    $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3317520");
     foreach ($this->getTestThemes() as $theme) {
       $this->enableTheme($theme);
       $block = $this->placeBlock('system_powered_by_block');

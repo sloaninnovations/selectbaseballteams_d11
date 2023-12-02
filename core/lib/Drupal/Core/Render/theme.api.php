@@ -685,6 +685,7 @@ function hook_theme_suggestions_HOOK(array $variables) {
  *
  * In the following example, we provide an alternative template suggestion to
  * node and taxonomy term templates based on the user being logged in.
+ *
  * @code
  * function MYMODULE_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
  *   if (\Drupal::currentUser()->isAuthenticated() && in_array($hook, array('node', 'taxonomy_term'))) {
@@ -694,8 +695,9 @@ function hook_theme_suggestions_HOOK(array $variables) {
  *
  * @endcode
  *
- * @param array $suggestions
- *   An array of alternate, more specific names for template files.
+ * @param array &$suggestions
+ *   An array of alternate, more specific names for template files, passed by
+ *   reference.
  * @param array $variables
  *   An array of variables passed to the theme hook. Note that this hook is
  *   invoked before any variable preprocessing.
@@ -1246,6 +1248,8 @@ function hook_page_bottom(array &$page_bottom) {
  *     'module', 'theme_engine', or 'theme'.
  *   - theme path: The directory path of the theme or module. If not defined,
  *     it is determined during the registry process.
+ *   - deprecated: The deprecated key marks a twig template as deprecated with
+ *     a custom message.
  *
  * @see themeable
  * @see hook_theme_registry_alter()

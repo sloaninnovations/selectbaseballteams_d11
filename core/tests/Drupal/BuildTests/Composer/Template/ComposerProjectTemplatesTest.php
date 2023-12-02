@@ -30,7 +30,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
    *
    * @see https://getcomposer.org/doc/04-schema.md#minimum-stability
    */
-  protected const MINIMUM_STABILITY = 'beta';
+  protected const MINIMUM_STABILITY = 'stable';
 
   /**
    * The order of stability strings from least stable to most stable.
@@ -119,7 +119,12 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
         continue;
       }
 
-      $project_stability = VersionParser::parseStability($project['version']);
+      // VersionParser::parseStability doesn't play nice with (mostly dev-)
+      // versions ending with the first seven characters of the commit ID as
+      // returned by "composer info". Let's strip those suffixes here.
+      $version = preg_replace('/ [0-9a-f]{7}$/i', '', $project['version']);
+
+      $project_stability = VersionParser::parseStability($version);
       $project_stability_order_index = $stability_order_indexes[$project_stability];
 
       $project_stabilities[$project['name']] = $project_stability;

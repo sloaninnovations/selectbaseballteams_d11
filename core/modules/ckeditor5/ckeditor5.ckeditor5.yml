@@ -83,6 +83,17 @@ ckeditor5_style:
     elements:
       - <$any-html5-element class>
 
+ckeditor5_htmlComments:
+  ckeditor5:
+    plugins:
+      - htmlSupport.HtmlComment
+  drupal:
+    label: HTML Comment support
+    elements: false
+    library: core/ckeditor5.htmlSupport
+    # @see \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface::getEnabledDefinitions()
+    conditions: []
+
 ckeditor5_arbitraryHtmlSupport:
   ckeditor5:
     plugins: [htmlSupport.GeneralHtmlSupport]
@@ -382,8 +393,6 @@ ckeditor5_list:
     config:
       list:
         properties:
-          reversed: true
-          startIndex: true
           # @todo Make this configurable in https://www.drupal.org/project/drupal/issues/3274635
           styles: false
   drupal:
@@ -549,6 +558,9 @@ ckeditor5_image:
     config:
       image:
         toolbar: [drupalImageAlternativeText]
+        insert:
+          # Determine image type (inline or block) by insertion context.
+          type: auto
   drupal:
     label: Image
     class: \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Image
