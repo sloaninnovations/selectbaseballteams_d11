@@ -110,7 +110,17 @@ function options_field_storage_config_update_forbid(FieldStorageConfigInterface 
   if ($field_storage->getTypeProvider() == 'options' && $field_storage->hasData()) {
     // Forbid any update that removes allowed values with actual data.
     $allowed_values = $field_storage->getSetting('allowed_values');
+    $allowed_values_func = $field_storage->getSetting('allowed_values_function');
     $prior_allowed_values = $prior_field_storage->getSetting('allowed_values');
+    $prior_allowed_values_func = $prior_field_storage->getSetting('allowed_values_function');
+
+    // If values from current or previous config are dynamically generated, then
+    // don't attempt to compare values. Assume dev knows what they are doing
+    // and allow the change.
+    if (!empty($allowed_values_func) || !empty($prior_allowed_values_func)) {
+      return;
+    }
+
     $lost_keys = array_keys(array_diff_key($prior_allowed_values, $allowed_values));
     if (_options_values_in_use($field_storage->getTargetEntityTypeId(), $field_storage->getName(), $lost_keys)) {
       throw new FieldStorageDefinitionUpdateForbiddenException("A list field '{$field_storage->getName()}' with existing data cannot have its keys changed.");
