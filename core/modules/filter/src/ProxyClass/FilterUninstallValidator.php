@@ -10,7 +10,7 @@ namespace Drupal\filter\ProxyClass {
     /**
      * Provides a proxy class for \Drupal\filter\FilterUninstallValidator.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class FilterUninstallValidator implements \Drupal\Core\Extension\ModuleUninstallValidatorInterface
     {

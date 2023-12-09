@@ -10,7 +10,7 @@ namespace Drupal\language\ProxyClass {
     /**
      * Provides a proxy class for \Drupal\language\LanguageConverter.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class LanguageConverter implements \Drupal\Core\ParamConverter\ParamConverterInterface
     {

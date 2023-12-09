@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\Plugin {
     /**
      * Provides a proxy class for \Drupal\Core\Plugin\CachedDiscoveryClearer.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class CachedDiscoveryClearer implements \Drupal\Core\Plugin\CachedDiscoveryClearerInterface
     {

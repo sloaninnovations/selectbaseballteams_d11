@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\Extension {
     /**
      * Provides a proxy class for \Drupal\Core\Extension\RequiredModuleUninstallValidator.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class RequiredModuleUninstallValidator implements \Drupal\Core\Extension\ModuleUninstallValidatorInterface
     {

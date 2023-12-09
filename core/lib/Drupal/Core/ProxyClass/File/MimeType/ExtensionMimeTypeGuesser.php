@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\File\MimeType {
     /**
      * Provides a proxy class for \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class ExtensionMimeTypeGuesser implements \Symfony\Component\Mime\MimeTypeGuesserInterface
     {

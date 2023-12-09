@@ -10,7 +10,7 @@ namespace Drupal\forum\ProxyClass {
     /**
      * Provides a proxy class for \Drupal\forum\ForumUninstallValidator.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class ForumUninstallValidator implements \Drupal\Core\Extension\ModuleUninstallValidatorInterface
     {

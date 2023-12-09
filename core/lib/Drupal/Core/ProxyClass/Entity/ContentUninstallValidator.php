@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\Entity {
     /**
      * Provides a proxy class for \Drupal\Core\Entity\ContentUninstallValidator.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class ContentUninstallValidator implements \Drupal\Core\Extension\ModuleUninstallValidatorInterface
     {
