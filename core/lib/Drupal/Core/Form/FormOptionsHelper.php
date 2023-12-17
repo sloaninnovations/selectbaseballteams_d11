@@ -13,8 +13,7 @@ class FormOptionsHelper {
   const OPTIONS_EMPTY_OPTION = '_none';
 
   /**
-   * Converts an array of options into HTML, for use in select list form
-   * elements.
+   * Converts an array of options into HTML, for use in select list form elements.
    *
    * This function calls itself recursively to obtain the values for each
    * optgroup within the list of options and when the function encounters an
