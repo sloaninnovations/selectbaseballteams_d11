@@ -142,7 +142,7 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupal6TestBase {
     $this->assertSame($expected, $component);
     $display = EntityViewDisplay::load('node.story.default');
     $expected['type'] = 'file_url_plain';
-    $expected['settings'] = [];
+    $expected['settings'] = ['absolute_url' => FALSE];
     $component = $display->getComponent('field_test_filefield');
     $this->assertSame($expected, $component);
 

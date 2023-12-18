@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
@@ -41,6 +42,13 @@ class ImageUrlFormatter extends ImageFormatterBase {
   protected $currentUser;
 
   /**
+   * The file URL generator.
+   *
+   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   */
+  protected $fileUrlGenerator;
+
+  /**
    * Constructs an ImageFormatter object.
    *
    * @param string $plugin_id
@@ -61,11 +69,14 @@ class ImageUrlFormatter extends ImageFormatterBase {
    *   The image style storage.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
+   * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
+   *   The file URL generator.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityStorageInterface $image_style_storage, AccountInterface $current_user) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityStorageInterface $image_style_storage, AccountInterface $current_user, FileUrlGeneratorInterface $file_url_generator) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->imageStyleStorage = $image_style_storage;
     $this->currentUser = $current_user;
+    $this->fileUrlGenerator = $file_url_generator;
   }
 
   /**
@@ -82,6 +93,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $configuration['third_party_settings'],
       $container->get('entity_type.manager')->getStorage('image_style'),
       $container->get('current_user'),
+      $container->get('file_url_generator')
     );
   }
 
@@ -90,6 +102,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
    */
   public static function defaultSettings() {
     return [
+      'absolute_url' => FALSE,
       'image_style' => '',
     ];
   }
@@ -99,6 +112,13 @@ class ImageUrlFormatter extends ImageFormatterBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::settingsForm($form, $form_state);
+
+    $element['absolute_url'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Render as absolute url'),
+      '#description' => $this->t('If checked, links will be rendered as absolute urls.'),
+      '#default_value' => $this->getSetting('absolute_url'),
+    ];
 
     unset($element['image_link'], $element['image_loading']);
 
@@ -140,7 +160,9 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $summary[] = $this->t('Original image');
     }
 
-    return array_merge($summary, parent::settingsSummary());
+    $summary[] = $this->getSetting('absolute_url') ? $this->t('Rendered as absolute url') : $this->t('Rendered as relative url');
+
+    return $summary;
   }
 
   /**
@@ -162,7 +184,15 @@ class ImageUrlFormatter extends ImageFormatterBase {
     /** @var \Drupal\file\FileInterface[] $images */
     foreach ($images as $delta => $image) {
       $image_uri = $image->getFileUri();
-      $url = $image_style ? $file_url_generator->transformRelative($image_style->buildUrl($image_uri)) : $file_url_generator->generateString($image_uri);
+      if ($image_style) {
+        $image_uri = $file_url_generator->transformRelative($image_style->buildUri($image_uri));
+      }
+      $url = $file_url_generator->generateAbsoluteString($image_uri);
+
+      // Generate absolute url for the image.
+      if (!$this->getSetting('absolute_url')) {
+        $url = $this->fileUrlGenerator->generateString($url);
+      }
 
       // Add cacheability metadata from the image and image style.
       $cacheability = CacheableMetadata::createFromObject($image);
@@ -172,6 +202,11 @@ class ImageUrlFormatter extends ImageFormatterBase {
 
       $elements[$delta] = ['#markup' => $url];
       $cacheability->applyTo($elements[$delta]);
+
+      // Add url.site cache context if url is absolute URL.
+      if ($this->getSetting('absolute_url')) {
+        array_push($elements[$delta]['#cache']['contexts'], 'url.site');
+      }
     }
     return $elements;
   }
