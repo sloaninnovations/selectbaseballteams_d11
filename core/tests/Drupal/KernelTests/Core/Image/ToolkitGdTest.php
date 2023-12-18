@@ -597,7 +597,7 @@ class ToolkitGdTest extends KernelTestBase {
    * @return \Generator
    *   The test data.
    */
-  protected function pngImageProvider(): \Generator {
+  public function pngImageProvider(): \Generator {
     yield 'valid image 1' => ['core/tests/fixtures/files/image-1.png'];
     yield 'valid image 2' => ['core/tests/fixtures/files/image-test.png'];
     yield 'PNG with iCCP profile' => [
