@@ -72,7 +72,7 @@ class BlockContentRevisionsTest extends BlockContentTestBase {
     $blocks = $this->blocks;
     $logs = $this->revisionLogs;
     $storage = $this->container->get('entity_type.manager')->getStorage('block_content');
-    // Default to last block.
+    // Start off with last revision.
     $loaded = $storage->loadRevision(end($blocks));
 
     foreach ($blocks as $delta => $revision_id) {
