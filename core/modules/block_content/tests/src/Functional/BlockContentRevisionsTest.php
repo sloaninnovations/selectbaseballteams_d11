@@ -36,6 +36,9 @@ class BlockContentRevisionsTest extends BlockContentTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    // Login admin user.
+    $this->drupalLogin($this->adminUser);
+
     // Create initial block.
     $block = $this->createBlockContent('initial');
 
@@ -68,13 +71,14 @@ class BlockContentRevisionsTest extends BlockContentTestBase {
   public function testRevisions() {
     $blocks = $this->blocks;
     $logs = $this->revisionLogs;
+    $storage = $this->container->get('entity_type.manager')->getStorage('block_content');
+    // Default to last block.
+    $loaded = $storage->loadRevision(end($blocks));
 
     foreach ($blocks as $delta => $revision_id) {
       // Confirm the correct revision text appears.
       /** @var \Drupal\block_content\BlockContentInterface  $loaded */
-      $loaded = $this->container->get('entity_type.manager')
-        ->getStorage('block_content')
-        ->loadRevision($revision_id);
+      $loaded = $storage->loadRevision($revision_id);
       // Verify revision log is the same.
       $this->assertEquals($logs[$delta], $loaded->getRevisionLogMessage(), new FormattableMarkup('Correct log message found for revision @revision', ['@revision' => $loaded->getRevisionId()]));
       if ($delta > 0) {
@@ -87,17 +91,25 @@ class BlockContentRevisionsTest extends BlockContentTestBase {
     // Confirm that this is the default revision.
     $this->assertTrue($loaded->isDefaultRevision(), 'Third block revision is the default one.');
 
+    // Place the bloc for testing later.
+    $this->drupalPlaceBlock('block_content:' . $loaded->uuid());
+
     // Make a new revision and set it to not be default.
     // This will create a new revision that is not "front facing".
     // Save this as a non-default revision.
     $loaded->setNewRevision();
     $loaded->isDefaultRevision(FALSE);
-    $loaded->body = $this->randomMachineName(8);
+    $loaded->body = 'Create a new revision for block_content.';
     $loaded->save();
+
+    // Verify body text from latest revision isn't appearing.
+    $this->drupalGet('<front>');
+    $this->assertSession()->pageTextNotContains($loaded->body->value);
 
     // Confirm that revision body text is not present on default version of
     // block.
     $this->drupalGet('admin/content/block/' . $loaded->id());
+    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextNotContains($loaded->body->value);
 
     // Verify that the non-default revision id is greater than the default
@@ -105,6 +117,13 @@ class BlockContentRevisionsTest extends BlockContentTestBase {
     $default_revision = BlockContent::load($loaded->id());
     // Verify that the revision ID is greater than the default revision ID.
     $this->assertGreaterThan($default_revision->getRevisionId(), $loaded->getRevisionId());
+
+    // Make last revision default.
+    $loaded->isDefaultRevision(TRUE);
+    $loaded->save();
+
+    $this->drupalGet('<front>');
+    $this->assertSession()->pageTextContains($loaded->body->value);
   }
 
 }

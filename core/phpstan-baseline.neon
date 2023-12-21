@@ -1122,11 +1122,6 @@ parameters:
 			path: modules/block_content/tests/src/Functional/BlockContentRevisionsTest.php
 
 		-
-			message: "#^Variable \\$loaded might not be defined\\.$#"
-			count: 9
-			path: modules/block_content/tests/src/Functional/BlockContentRevisionsTest.php
-
-		-
 			message: "#^Call to deprecated constant REQUEST_TIME\\: Deprecated in drupal\\:8\\.3\\.0 and is removed from drupal\\:11\\.0\\.0\\. Use \\\\Drupal\\:\\:time\\(\\)\\-\\>getRequestTime\\(\\); $#"
 			count: 1
 			path: modules/block_content/tests/src/Functional/BlockContentSaveTest.php
