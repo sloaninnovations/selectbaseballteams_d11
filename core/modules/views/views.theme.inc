@@ -351,6 +351,7 @@ function template_preprocess_views_view_summary_unformatted(&$variables) {
 
   $count = 0;
   $active_urls = [
+    \Drupal::service('path.current')->getPath(),
     // Force system path.
     Url::fromRoute('<current>', [], ['alias' => TRUE])->toString(),
     // Could be an alias.
