@@ -46,6 +46,8 @@ class UrlTest extends KernelTestBase {
    */
   public function testLinkBubbleableMetadata() {
     \Drupal::service('module_installer')->install(['user']);
+    // Fake a started session.
+    \Drupal::request()->cookies->add(['SESS' . substr(hash('sha256', $this->getDatabasePrefix()), 0, 32) => '']);
 
     $cases = [
       ['Regular link', 'internal:/user', [], ['contexts' => [], 'tags' => [], 'max-age' => Cache::PERMANENT], []],
