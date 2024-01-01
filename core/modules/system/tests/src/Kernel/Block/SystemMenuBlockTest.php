@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\system\Kernel\Block;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Entity\Menu;
 use Drupal\block\Entity\Block;
@@ -12,6 +11,8 @@ use Drupal\Tests\Core\Menu\MenuLinkMock;
 use Drupal\user\Entity\User;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -155,7 +156,7 @@ class SystemMenuBlockTest extends KernelTestBase {
     $block = Block::create([
       'plugin' => 'system_menu_block:' . $this->menu->id(),
       'region' => 'footer',
-      'id' => 'machinename',
+      'id' => 'machine_name',
       'theme' => 'stark',
     ]);
 
@@ -182,7 +183,7 @@ class SystemMenuBlockTest extends KernelTestBase {
     $place_block = function ($level, $depth) {
       return $this->blockManager->createInstance('system_menu_block:' . $this->menu->id(), [
         'region' => 'footer',
-        'id' => 'machinename',
+        'id' => 'machine_name',
         'theme' => 'stark',
         'level' => $level,
         'depth' => $depth,
@@ -226,7 +227,7 @@ class SystemMenuBlockTest extends KernelTestBase {
     foreach ($blocks as $id => $block) {
       $block_build = $block->build();
       $items = $block_build['#items'] ?? [];
-      $this->assertSame($no_active_trail_expectations[$id], $this->convertBuiltMenuToIdTree($items), new FormattableMarkup('Menu block %id with no active trail renders the expected tree.', ['%id' => $id]));
+      $this->assertSame($no_active_trail_expectations[$id], $this->convertBuiltMenuToIdTree($items), "Menu block $id with no active trail renders the expected tree.");
     }
 
     // Scenario 2: test all block instances when there's an active trail.
@@ -234,6 +235,7 @@ class SystemMenuBlockTest extends KernelTestBase {
     $request = new Request();
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'example3');
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, $route);
+    $request->setSession(new Session(new MockArraySessionStorage()));
     $this->container->get('request_stack')->push($request);
     // \Drupal\Core\Menu\MenuActiveTrail uses the cache collector pattern, which
     // includes static caching. Since this second scenario simulates a second
@@ -278,7 +280,7 @@ class SystemMenuBlockTest extends KernelTestBase {
     foreach ($blocks as $id => $block) {
       $block_build = $block->build();
       $items = $block_build['#items'] ?? [];
-      $this->assertSame($active_trail_expectations[$id], $this->convertBuiltMenuToIdTree($items), new FormattableMarkup('Menu block %id with an active trail renders the expected tree.', ['%id' => $id]));
+      $this->assertSame($active_trail_expectations[$id], $this->convertBuiltMenuToIdTree($items), "Menu block $id with an active trail renders the expected tree.");
     }
   }
 
@@ -290,7 +292,7 @@ class SystemMenuBlockTest extends KernelTestBase {
   public function testConfigExpanded($active_route, $menu_block_level, $expected_items) {
     $block = $this->blockManager->createInstance('system_menu_block:' . $this->menu->id(), [
       'region' => 'footer',
-      'id' => 'machinename',
+      'id' => 'machine_name',
       'theme' => 'stark',
       'level' => $menu_block_level,
       'depth' => 0,
@@ -301,6 +303,7 @@ class SystemMenuBlockTest extends KernelTestBase {
     $request = new Request();
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, $active_route);
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, $route);
+    $request->setSession(new Session(new MockArraySessionStorage()));
     $this->container->get('request_stack')->push($request);
 
     $block_build = $block->build();

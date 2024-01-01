@@ -7,6 +7,7 @@ parameters:
   # \Drupal\Core\Cache\ListCacheBinsPass::process() will override this but defining this allows the cache system to
   # function properly before that runs.
   cache_default_bin_backends: []
+  memory_cache_default_bin_backends: []
   session.storage.options:
     gc_probability: 1
     gc_divisor: 100
@@ -150,8 +151,7 @@ services:
       - { name: cache.context }
   cache_context.route.menu_active_trails:
     class: Drupal\Core\Cache\Context\MenuActiveTrailsCacheContext
-    calls:
-      - [setContainer, ['@service_container']]
+    arguments: ['@menu.active_trail']
     tags:
       - { name: cache.context }
 
@@ -195,7 +195,7 @@ services:
 
   cache_factory:
     class: Drupal\Core\Cache\CacheFactory
-    arguments: ['@settings', '%cache_default_bin_backends%']
+    arguments: ['@settings', '%cache_default_bin_backends%', '%memory_cache_default_bin_backends%']
     calls:
       - [setContainer, ['@service_container']]
   Drupal\Core\Cache\CacheFactoryInterface: '@cache_factory'
@@ -240,6 +240,8 @@ services:
     arguments: ['@cache_tags.invalidator.checksum']
   cache.backend.memory:
     class: Drupal\Core\Cache\MemoryBackendFactory
+  cache.backend.memory.memory:
+    class: Drupal\Core\Cache\MemoryCache\MemoryCacheFactory
   # A special cache bin that does not persist beyond the length of the request.
   cache.static:
     class: Drupal\Core\Cache\CacheBackendInterface
@@ -283,6 +285,18 @@ services:
       - { name: cache.bin }
     factory: ['@cache_factory', 'get']
     arguments: [render]
+  cache.access_policy:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: ['@cache_factory', 'get']
+    arguments: [access_policy]
+  cache.access_policy_memory:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
+    factory: ['@cache_factory', 'get']
+    arguments: [access_policy_memory]
   cache.data:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
@@ -295,6 +309,14 @@ services:
       - { name: cache.bin, default_backend: cache.backend.chainedfast }
     factory: ['@cache_factory', 'get']
     arguments: [discovery]
+  variation_cache.access_policy:
+    class: Drupal\Core\Cache\VariationCacheInterface
+    factory: ['@variation_cache_factory', 'get']
+    arguments: [access_policy]
+  variation_cache.access_policy_memory:
+    class: Drupal\Core\Cache\VariationCacheInterface
+    factory: ['@variation_cache_factory', 'get']
+    arguments: [access_policy_memory]
   Drupal\Core\Asset\AssetQueryStringInterface: '@asset.query_string'
   asset.query_string:
     class: Drupal\Core\Asset\AssetQueryString
@@ -398,6 +420,8 @@ services:
   context.repository:
     class: Drupal\Core\Plugin\Context\LazyContextRepository
     arguments: ['@service_container']
+    tags:
+      - { name: service_id_collector, tag: context_provider }
   Drupal\Core\Plugin\Context\ContextRepositoryInterface: '@context.repository'
   Drupal\Component\DependencyInjection\ReverseContainer:
     arguments: [ '@service_container' ]
@@ -500,6 +524,9 @@ services:
   logger.channel.security:
     parent: logger.channel_base
     arguments: ['security']
+  logger.channel.mail:
+    parent: logger.channel_base
+    arguments: ['mail']
   logger.channel.menu:
     parent: logger.channel_base
     arguments: ['menu']
@@ -769,7 +796,7 @@ services:
   Drupal\Core\Menu\MenuLinkManagerInterface: '@plugin.manager.menu.link'
   menu.link_tree:
     class: Drupal\Core\Menu\MenuLinkTree
-    arguments: ['@menu.tree_storage', '@plugin.manager.menu.link', '@router.route_provider', '@menu.active_trail', '@controller_resolver']
+    arguments: ['@menu.tree_storage', '@plugin.manager.menu.link', '@router.route_provider', '@menu.active_trail', '@callable_resolver']
   Drupal\Core\Menu\MenuLinkTreeInterface: '@menu.link_tree'
   menu.default_tree_manipulators:
     class: Drupal\Core\Menu\DefaultMenuLinkTreeManipulators
@@ -780,6 +807,7 @@ services:
     arguments: ['@plugin.manager.menu.link', '@current_route_match', '@cache.menu', '@lock']
     tags:
       - { name: needs_destruction }
+    lazy: true
   Drupal\Core\Menu\MenuActiveTrailInterface: '@menu.active_trail'
   menu.parent_form_selector:
     class: Drupal\Core\Menu\MenuParentFormSelector
@@ -886,6 +914,10 @@ services:
   argument_resolver.default:
     class: Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver
     public: false
+  http_middleware.ajax_page_state:
+    class: Drupal\Core\StackMiddleware\AjaxPageState
+    tags:
+      - { name: http_middleware, priority: 500 }
   http_middleware.negotiation:
     class: Drupal\Core\StackMiddleware\NegotiationMiddleware
     tags:
@@ -971,6 +1003,10 @@ services:
     parent: default_plugin_manager
     tags:
       - { name: plugin_manager_cache_clear }
+  validation.basic_recursive_validator_factory:
+    class: Drupal\Core\Validation\BasicRecursiveValidatorFactory
+    arguments: ['@class_resolver']
+  Drupal\Core\Validation\BasicRecursiveValidatorFactory: '@validation.basic_recursive_validator_factory'
   lock:
     class: Drupal\Core\Lock\DatabaseLockBackend
     arguments: ['@database']
@@ -1300,7 +1336,7 @@ services:
       - { name: access_check, applies_to: _access_theme }
   access_check.custom:
     class: Drupal\Core\Access\CustomAccessCheck
-    arguments: ['@controller_resolver', '@access_arguments_resolver_factory']
+    arguments: ['@callable_resolver', '@access_arguments_resolver_factory']
     tags:
       - { name: access_check, applies_to: _custom_access }
   access_check.csrf:
@@ -1533,6 +1569,12 @@ services:
     class: Drupal\Core\Session\AccountSwitcher
     arguments: ['@current_user', '@session_handler.write_safe']
   Drupal\Core\Session\AccountSwitcherInterface: '@account_switcher'
+  access_policy_processor:
+    class: Drupal\Core\Session\AccessPolicyProcessor
+    arguments: ['@variation_cache.access_policy', '@variation_cache.access_policy_memory', '@cache.access_policy_memory', '@current_user', '@account_switcher']
+    tags:
+      - { name: service_collector, call: addAccessPolicy, tag: access_policy }
+  Drupal\Core\Session\AccessPolicyChainInterface: '@access_policy_processor'
   permission_checker:
     class: Drupal\Core\Session\PermissionChecker
     arguments: ['@entity_type.manager']
@@ -1726,7 +1768,7 @@ services:
   Drupal\Core\Render\RenderCacheInterface: '@render_cache'
   renderer:
     class: Drupal\Core\Render\Renderer
-    arguments: ['@controller_resolver', '@theme.manager', '@plugin.manager.element_info', '@render_placeholder_generator', '@render_cache', '@request_stack', '%renderer.config%']
+    arguments: ['@callable_resolver', '@theme.manager', '@plugin.manager.element_info', '@render_placeholder_generator', '@render_cache', '@request_stack', '%renderer.config%']
   Drupal\Core\Render\RendererInterface: '@renderer'
   early_rendering_controller_wrapper_subscriber:
     class: Drupal\Core\EventSubscriber\EarlyRenderingControllerWrapperSubscriber

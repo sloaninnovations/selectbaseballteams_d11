@@ -47,7 +47,8 @@ variables:
   COMPOSER_ROOT_VERSION: "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}${CI_COMMIT_BRANCH}-dev"
   CONCURRENCY: 24
   GIT_DEPTH: "3"
-
+  PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+  _TARGET_PHP: "8.2"
 
 #############
 # Stages    #
@@ -58,12 +59,11 @@ stages:
   - 🗜️ Test
 
 #############
-# Templates #
+# Defaults  #
 #############
 
-.default-job-settings: &default-job-settings-lint
+default:
   interruptible: true
-  allow_failure: false
   retry:
     max: 2
     when:
@@ -72,53 +72,24 @@ stages:
       - stuck_or_timeout_failure
       - runner_system_failure
       - scheduler_failure
-  variables:
-    _TARGET_PHP: "8.2"
-    _TARGET_DB: "sqlite-3"
   image:
     name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:production
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
-.composer-cache: &composer-cache
-  key:
-    files:
-      - ./composer.json
-      - ./composer.lock
-  paths:
-    - ./vendor
+#############
+# Templates #
+#############
 
-.yarn-cache: &yarn-cache
-  key:
-    files:
-      - ./core/package.json
-      - ./core/yarn.lock
-  paths:
-    - ./core/node_modules
-
-.with-composer-cache: &with-composer-cache
-  cache:
-    policy: pull
-    <<: *composer-cache
+.with-composer: &with-composer
   needs:
     - '📦️ Composer'
 
-.with-yarn-cache: &with-yarn-cache
+.with-yarn: &with-yarn
   needs:
     - '📦️ Yarn'
-  cache:
-    policy: pull
-    <<: *yarn-cache
 
-.junit-artifacts: &junit-artifacts
-  artifacts:
-    expose_as: junit
-    expire_in: 6 mos
-    paths:
-      - junit.xml
-    reports:
-      junit: junit.xml
+.default-job-settings-lint: &default-job-settings-lint
+  rules:
+    - if: $PERFORMANCE_TEST != "1"
 
 
 ################
@@ -142,93 +113,195 @@ stages:
 .run-on-commit: &run-on-commit
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: manual
       allow_failure: true
 
 .run-daily: &run-daily
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
+      allow_failure: true
+
+.run-on-mr: &run-on-mr
+  rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: manual
       allow_failure: true
 
 # Default configuration.
-'PHP 8.2 MySQL 8':
+'DEFAULT: PHP 8.2 MySQL 8':
   <<: *default-stage
   variables:
     _TARGET_PHP: "8.2"
     _TARGET_DB: "mysql-8"
+    PERFORMANCE_TEST: $PERFORMANCE_TEST
+    OTEL_COLLECTOR: $OTEL_COLLECTOR
+  # Run on MR, schedule, push and performance test.
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
+      allow_failure: true
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $PERFORMANCE_TEST == "1"
 
-# Run on commit, or manually.
+# Special job for MRs for test-only checks.
+'DEFAULT: Test-only (PHP 8.2 MySQL 8)':
+  <<: [ *default-stage, *with-composer ]
+  when: manual
+  allow_failure: true
+  variables:
+    _TARGET_PHP: "8.2"
+    _TARGET_DB: "mysql-8"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  trigger:
+    # Rely on the status of the child pipeline.
+    strategy: depend
+    include:
+      - local: .gitlab-ci/pipeline-test-only.yml
+
+# Main listing of jobs.
+# All of these are available on Merge Requests and also work as base jobs for
+# on-commit and daily jobs to extend from.
 'PHP 8.1 MySQL 5.7':
-  <<: [ *default-stage, *run-on-commit ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.1"
     _TARGET_DB: "mysql-5.7"
 
 'PHP 8.2 PostgreSQL 14.1':
-  <<: [ *default-stage, *run-daily ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.2"
     _TARGET_DB: "pgsql-14.1"
 
 'PHP 8.2 PostgreSQL 15':
-  <<: [ *default-stage, *run-daily ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.2"
     _TARGET_DB: "pgsql-15"
 
 'PHP 8.2 PostgreSQL 16':
-  <<: [ *default-stage, *run-on-commit ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.2"
     _TARGET_DB: "pgsql-16"
 
 'PHP 8.2 SQLite 3':
-  <<: [ *default-stage, *run-on-commit ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.2"
     _TARGET_DB: "sqlite-3"
 
-# Run daily, or manually.
-# 'PHP 8.1 MariaDB 10.3.22':
-#   <<: [ *default-stage, *run-daily ]
-#   variables:
-#     _TARGET_PHP: "8.1"
-#     _TARGET_DB: "mariadb-10.3.22"
+'PHP 8.3 MySQL 8':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.3"
+    _TARGET_DB: "mysql-8"
 
-# 'PHP 8.1 MySQL 5.7 with updated deps':
-#   <<: [ *default-stage, *run-daily ]
-#   variables:
-#     _TARGET_PHP: "8.1"
-#     _TARGET_DB: "mysql-5.7"
+'PHP 8.3 PostgreSQL 16':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.3"
+    _TARGET_DB: "pgsql-16"
+
+'PHP 8.3 SQLite 3':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.3"
+    _TARGET_DB: "sqlite-3"
+
+'PHP 8.1 MariaDB 10.3.22':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.1"
+    _TARGET_DB: "mariadb-10.3.22"
 
 'PHP 8.1 PostgreSQL 14.1':
-  <<: [ *default-stage, *run-daily ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.1"
     _TARGET_DB: "pgsql-14.1"
 
 'PHP 8.1 SQLite 3':
-  <<: [ *default-stage, *run-daily ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.1"
     _TARGET_DB: "sqlite-3"
 
+# Jobs running on commits.
+# The value set in the "needs" property will determine the order in the sequence.
+'[Commit] PHP 8.1 MySQL 5.7':
+  extends: 'PHP 8.1 MySQL 5.7'
+  needs: [ 'DEFAULT: PHP 8.2 MySQL 8' ]
+  <<: [ *run-on-commit ]
+
+'[Commit] PHP 8.2 PostgreSQL 16':
+  extends: 'PHP 8.2 PostgreSQL 16'
+  needs: [ '[Commit] PHP 8.1 MySQL 5.7' ]
+  <<: [ *run-on-commit ]
+
+'[Commit] PHP 8.2 SQLite 3':
+  extends: 'PHP 8.2 SQLite 3'
+  needs: [ '[Commit] PHP 8.2 PostgreSQL 16' ]
+  <<: [ *run-on-commit ]
+
+# Jobs running daily.
+# The value set in the "needs" property will determine the order in the sequence.
+'[Daily] PHP 8.2 PostgreSQL 14.1':
+  extends: 'PHP 8.2 PostgreSQL 14.1'
+  needs: [ 'DEFAULT: PHP 8.2 MySQL 8' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.2 PostgreSQL 15':
+  extends: 'PHP 8.2 PostgreSQL 15'
+  needs: [ '[Daily] PHP 8.2 PostgreSQL 14.1' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.3 MySQL 8':
+  extends: 'PHP 8.3 MySQL 8'
+  needs: [ '[Daily] PHP 8.2 PostgreSQL 15' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.3 PostgreSQL 16':
+  extends: 'PHP 8.3 PostgreSQL 16'
+  needs: [ '[Daily] PHP 8.3 MySQL 8' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.3 SQLite 3':
+  extends: 'PHP 8.3 SQLite 3'
+  needs: [ '[Daily] PHP 8.3 PostgreSQL 16' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.1 MariaDB 10.3.22':
+  extends: 'PHP 8.1 MariaDB 10.3.22'
+  needs: [ '[Daily] PHP 8.3 SQLite 3' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.1 PostgreSQL 14.1':
+  extends: 'PHP 8.1 PostgreSQL 14.1'
+  needs: [ '[Daily] PHP 8.1 MariaDB 10.3.22' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.1 SQLite 3':
+  extends: 'PHP 8.1 SQLite 3'
+  needs: [ '[Daily] PHP 8.1 PostgreSQL 14.1' ]
+  <<: [ *run-daily ]
 
 ################
 # Build Jobs for linting
 ################
 
 '📦️ Composer':
-  <<: *default-job-settings-lint
+  variables:
+    KUBERNETES_CPU_REQUEST: "1"
   stage: 🏗️ Build
   cache:
-    <<: *composer-cache
+    key:
+      files:
+        - ./composer.json
+        - ./composer.lock
+    paths:
+      - ./vendor
   artifacts:
     expire_in: 1 week
     expose_as: 'web-vendor'
@@ -239,10 +312,16 @@ stages:
       - composer install
 
 '📦️ Yarn':
-  <<: *default-job-settings-lint
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
   stage: 🏗️ Build
   cache:
-    <<: *yarn-cache
+    key:
+      files:
+        - ./core/package.json
+        - ./core/yarn.lock
+    paths:
+      - ./core/node_modules
   artifacts:
     expire_in: 1 week
     expose_as: 'yarn-vendor'
@@ -256,17 +335,39 @@ stages:
 ################
 
 '🧹 PHP Static Analysis (phpstan)':
-  <<: [ *with-composer-cache, *junit-artifacts, *default-job-settings-lint ]
+  <<: [ *with-composer, *default-job-settings-lint ]
   stage: 🪄 Lint
+  variables:
+    KUBERNETES_CPU_REQUEST: "16"
   script:
-    - php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --error-format=gitlab > phpstan-quality-report.json
+    # Rely on PHPStan caching to execute analysis multiple times without performance drawback.
+    # Output a copy in junit.
+    - php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --error-format=gitlab > phpstan-quality-report.json || EXIT_CODE=$?
+    - php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress --error-format=junit > phpstan-junit.xml || true
+    - |
+      if [ -n "$EXIT_CODE" ]; then
+        # Output a copy in plain text for human logs.
+        php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress || true
+        # Generate a new baseline.
+        echo "Generating an PHPStan baseline file (available as job artifact)."
+        php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress --generate-baseline=./core/phpstan-baseline.neon || true
+        exit $EXIT_CODE
+      fi
+
   artifacts:
     reports:
       codequality: phpstan-quality-report.json
+      junit: phpstan-junit.xml
+    # Only store the baseline if the job fails.
+    when: on_failure
+    paths:
+      - core/phpstan-baseline.neon
 
 '🧹 PHP Coding standards (PHPCS)':
-  <<: [ *with-composer-cache, *junit-artifacts, *default-job-settings-lint ]
+  <<: [ *with-composer, *default-job-settings-lint ]
   stage: 🪄 Lint
+  variables:
+    KUBERNETES_CPU_REQUEST: "16"
   script:
     - composer phpcs -- --report-full --report-summary --report-\\Micheh\\PhpCodeSniffer\\Report\\Gitlab=phpcs-quality-report.json
   artifacts:
@@ -274,8 +375,10 @@ stages:
       codequality: phpcs-quality-report.json
 
 '🧹 JavaScript linting (eslint)':
-  <<: [ *with-yarn-cache, *junit-artifacts, *default-job-settings-lint ]
+  <<: [ *with-yarn, *default-job-settings-lint ]
   stage: 🪄 Lint
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
   script:
     - yarn --cwd=./core run -s lint:core-js-passing --format gitlab
   artifacts:
@@ -283,8 +386,10 @@ stages:
       codequality: eslint-quality-report.json
 
 '🧹 CSS linting (stylelint)':
-  <<: [ *with-yarn-cache, *junit-artifacts, *default-job-settings-lint ]
+  <<: [ *with-yarn, *default-job-settings-lint ]
   stage: 🪄 Lint
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
   script:
     - yarn run --cwd=./core lint:css --color --custom-formatter=node_modules/stylelint-formatter-gitlab
   artifacts:
@@ -292,15 +397,19 @@ stages:
       codequality: stylelint-quality-report.json
 
 '🧹 Compilation check':
-  <<: [ *with-yarn-cache, *default-job-settings-lint ]
+  <<: [ *with-yarn, *default-job-settings-lint ]
   stage: 🪄 Lint
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
   script:
     - yarn run --cwd=./core build:css --check
     - cd core && yarn run -s check:ckeditor5
 
 '📔 Spell-checking':
-  <<: [ *with-yarn-cache, *default-job-settings-lint ]
+  <<: [ *with-yarn, *default-job-settings-lint ]
   stage: 🪄 Lint
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
   script:
     - export TARGET_BRANCH=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}${CI_COMMIT_BRANCH}
     - git fetch -vn --depth=$GIT_DEPTH "${CI_MERGE_REQUEST_PROJECT_URL:-origin}" "+refs/heads/$TARGET_BRANCH:refs/heads/$TARGET_BRANCH"

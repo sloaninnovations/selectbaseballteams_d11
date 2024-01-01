@@ -340,7 +340,7 @@ function system_requirements($phase) {
     // errors, so warn about that when running Drupal on those versions.
     // @todo Remove this when \Drupal::MINIMUM_PHP is at least 8.1.6 in
     //   https://www.drupal.org/i/3305726.
-    if (version_compare(\Drupal::MINIMUM_PHP, '8.1.6') < 0) {
+    if (version_compare($phpversion, '8.1.6') < 0) {
       $requirements['php']['description'] = t('PHP %version has <a href=":bug_url">an OPcache bug that can cause fatal errors with class autoloading</a>. This can be fixed by upgrading to PHP 8.1.6 or later. See <a href="http://php.net/supported-versions.php">PHP\'s version support documentation</a> and the <a href=":php_requirements">Drupal PHP requirements</a> page for more information.', [
         '%version' => $phpversion,
         ':bug_url' => 'https://github.com/php/php-src/issues/8164',
@@ -975,6 +975,17 @@ function system_requirements($phase) {
       $requirements['entity_update']['severity'] = REQUIREMENT_ERROR;
       $requirements['entity_update']['value'] = t('Mismatched entity and/or field definitions');
       $requirements['entity_update']['description'] = t('The following changes were detected in the entity type and field definitions. @updates', ['@updates' => $entity_update_issues]);
+    }
+  }
+
+  // Display the deployment identifier if set.
+  if ($phase == 'runtime') {
+    if ($deployment_identifier = Settings::get('deployment_identifier')) {
+      $requirements['deployment identifier'] = [
+        'title' => t('Deployment identifier'),
+        'value' => $deployment_identifier,
+        'severity' => REQUIREMENT_INFO,
+      ];
     }
   }
 
@@ -1812,6 +1823,12 @@ function system_update_10100(&$sandbox = NULL) {
   });
   if ($connection->databaseType() != 'sqlite') {
     foreach (array_keys($cache_tables) as $table) {
+      // If the table has no expire column there is nothing to do. This can
+      // happen if a site has tables starting with cache_ that are not cache
+      // bins.
+      if (!$schema->fieldExists($table, 'expire')) {
+        continue;
+      }
       // Truncate cache tables. They will be flushed anyway at the end of
       // database updates, but emptying the tables now will boost the schema
       // changes.

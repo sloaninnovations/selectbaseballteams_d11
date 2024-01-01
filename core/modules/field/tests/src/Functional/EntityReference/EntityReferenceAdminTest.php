@@ -118,9 +118,9 @@ class EntityReferenceAdminTest extends BrowserTestBase {
 
     // Set to unlimited.
     $edit = [
-      'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
+      'field_storage[subform][cardinality]' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
     ];
-    $this->submitForm($edit, 'Continue');
+    $this->submitForm($edit, 'Update settings');
 
     // Add the view to the test field.
     $edit = [
@@ -204,12 +204,26 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     Vocabulary::create(['vid' => 'tags', 'name' => 'tags'])->save();
     $taxonomy_term_field_name = $this->createEntityReferenceField('taxonomy_term', ['tags']);
     $field_path = 'node.' . $this->type . '.field_' . $taxonomy_term_field_name;
-    $this->drupalGet($bundle_path . '/fields/' . $field_path . '/storage');
-    $edit = [
-      'cardinality' => -1,
-    ];
-    $this->submitForm($edit, 'Save');
     $this->drupalGet($bundle_path . '/fields/' . $field_path);
+    $edit = [
+      'field_storage[subform][cardinality]' => -1,
+    ];
+    $this->submitForm($edit, 'Update settings');
+
+    // Assert that the target bundle handler setting is initially set.
+    $this->assertSession()->checkboxChecked('settings[handler_settings][target_bundles][tags]');
+    // Change the handler to 'views'.
+    $this->submitForm([
+      'settings[handler]' => 'views',
+    ], 'Change handler');
+    $this->assertSession()->fieldValueEquals('settings[handler]', 'views');
+    // Change handler back to 'default'.
+    $this->submitForm([
+      'settings[handler]' => 'default:taxonomy_term',
+    ], 'Change handler');
+    // Assert that changing the handler resets the handler settings.
+    $this->assertSession()->checkboxNotChecked('settings[handler_settings][target_bundles][tags]');
+
     $term_name = $this->randomString();
     $result = \Drupal::entityQuery('taxonomy_term')
       ->condition('name', $term_name)
@@ -218,6 +232,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
       ->execute();
     $this->assertCount(0, $result, "No taxonomy terms exist with the name '$term_name'.");
     $edit = [
+      'settings[handler_settings][target_bundles][tags]' => TRUE,
       // This must be set before new entities will be auto-created.
       'settings[handler_settings][auto_create]' => 1,
     ];

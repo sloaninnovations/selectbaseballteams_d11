@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\BuildTests\Composer\Template;
 
 use Composer\Json\JsonFile;
@@ -119,7 +121,12 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
         continue;
       }
 
-      $project_stability = VersionParser::parseStability($project['version']);
+      // VersionParser::parseStability doesn't play nice with (mostly dev-)
+      // versions ending with the first seven characters of the commit ID as
+      // returned by "composer info". Let's strip those suffixes here.
+      $version = preg_replace('/ [0-9a-f]{7}$/i', '', $project['version']);
+
+      $project_stability = VersionParser::parseStability($version);
       $project_stability_order_index = $stability_order_indexes[$project_stability];
 
       $project_stabilities[$project['name']] = $project_stability;

@@ -2,6 +2,7 @@
 
 namespace Drupal\KernelTests\Core\Config;
 
+use Drupal\Core\Config\ConfigCollectionEvents;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
@@ -18,7 +19,7 @@ class ConfigInstallTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
+  protected static $modules = ['system', 'config_events_test'];
 
   /**
    * {@inheritdoc}
@@ -46,7 +47,7 @@ class ConfigInstallTest extends KernelTestBase {
 
     // Ensure that schema provided by modules that are not installed is not
     // available.
-    $this->assertFalse(\Drupal::service('config.typed')->hasConfigSchema('config_schema_test.someschema'), 'Configuration schema for config_schema_test.someschema does not exist.');
+    $this->assertFalse(\Drupal::service('config.typed')->hasConfigSchema('config_schema_test.some_schema'), 'Configuration schema for config_schema_test.some_schema does not exist.');
 
     // Install the test module.
     $this->installModules(['config_test']);
@@ -73,12 +74,12 @@ class ConfigInstallTest extends KernelTestBase {
     $this->installConfig(['config_schema_test']);
 
     // After module installation the new schema should exist.
-    $this->assertTrue(\Drupal::service('config.typed')->hasConfigSchema('config_schema_test.someschema'), 'Configuration schema for config_schema_test.someschema exists.');
+    $this->assertTrue(\Drupal::service('config.typed')->hasConfigSchema('config_schema_test.some_schema'), 'Configuration schema for config_schema_test.some_schema exists.');
 
     // Test that uninstalling configuration removes configuration schema.
     $this->config('core.extension')->set('module', [])->save();
     \Drupal::service('config.manager')->uninstall('module', 'config_test');
-    $this->assertFalse(\Drupal::service('config.typed')->hasConfigSchema('config_schema_test.someschema'), 'Configuration schema for config_schema_test.someschema does not exist.');
+    $this->assertFalse(\Drupal::service('config.typed')->hasConfigSchema('config_schema_test.some_schema'), 'Configuration schema for config_schema_test.some_schema does not exist.');
   }
 
   /**
@@ -146,10 +147,25 @@ class ConfigInstallTest extends KernelTestBase {
 
     // Test that the config manager uninstalls configuration from collections
     // as expected.
-    \Drupal::service('config.manager')->uninstall('module', 'config_collection_install_test');
+    \Drupal::state()->set('config_events_test.all_events', []);
+    $this->container->get('config.manager')->uninstall('module', 'config_collection_install_test');
+    $all_events = \Drupal::state()->get('config_events_test.all_events');
+    $this->assertArrayHasKey(ConfigCollectionEvents::DELETE_IN_COLLECTION, $all_events);
+    // The delete-in-collection event has been triggered 3 times.
+    $this->assertCount(3, $all_events[ConfigCollectionEvents::DELETE_IN_COLLECTION]['config_collection_install_test.test']);
+    $event_collections = [];
+    foreach ($all_events[ConfigCollectionEvents::DELETE_IN_COLLECTION]['config_collection_install_test.test'] as $event) {
+      $event_collections[] = $event['original_config_data']['collection'];
+    }
+    $this->assertSame(['another_collection', 'collection.test1', 'collection.test2'], $event_collections);
     $this->assertEquals(['entity'], $active_storage->getAllCollectionNames());
-    \Drupal::service('config.manager')->uninstall('module', 'config_test');
+
+    \Drupal::state()->set('config_events_test.all_events', []);
+    $this->container->get('config.manager')->uninstall('module', 'config_test');
     $this->assertEquals([], $active_storage->getAllCollectionNames());
+    $all_events = \Drupal::state()->get('config_events_test.all_events');
+    $this->assertArrayHasKey(ConfigCollectionEvents::DELETE_IN_COLLECTION, $all_events);
+    $this->assertCount(1, $all_events[ConfigCollectionEvents::DELETE_IN_COLLECTION]['config_test.dynamic.dotted.default']);
   }
 
   /**

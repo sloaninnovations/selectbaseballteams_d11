@@ -91,7 +91,8 @@
   *
   * Add the same margin for action-link inside form-actions as button has.
   */
-  @nest .form-actions & {
+  .form-actions &,
+  .field-actions & {
     margin-inline: 0 var(--space-s);
   }
 }
@@ -490,6 +491,22 @@
 
     &:active::before {
       background-image: url("../../images/icons/ab1b1b/questionmark.svg");
+    }
+  }
+}
+
+.action-link--icon-chevron-left {
+  &::before {
+    display: block;
+    content: "";
+    background-image: url("../../images/icons/545560/pager-prev.svg");
+  }
+}
+
+@media (min-width: 30em) {
+  .action-link--icon-chevron-left {
+    &::before {
+      display: inline-block;
     }
   }
 }

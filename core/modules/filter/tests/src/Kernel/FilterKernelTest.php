@@ -475,7 +475,7 @@ class FilterKernelTest extends KernelTestBase {
     $this->assertFilteredString($filter, $tests);
 
     // Very long string hitting PCRE limits.
-    $limit = max(ini_get('pcre.backtrack_limit'), ini_get('pcre.recursion_limit'));
+    $limit = max((int) ini_get('pcre.backtrack_limit'), (int) ini_get('pcre.recursion_limit'));
     $source = $this->randomMachineName($limit);
     $result = _filter_autop($source);
     $this->assertEquals($result, '<p>' . $source . "</p>\n", 'Line break filter can process very long strings.');
@@ -1024,10 +1024,10 @@ class FilterKernelTest extends KernelTestBase {
     $this->assertEquals('<hr><br>', $f, 'HTML corrector -- void element.');
 
     $f = Html::normalize('<P>test</P>');
-    $this->assertEquals('<p>test</p>', $f, 'HTML corrector -- Convert uppercased tags to proper lowercased ones.');
+    $this->assertEquals('<p>test</p>', $f, 'HTML corrector -- Convert upper cased tags to proper lowercased ones.');
 
     $f = Html::normalize('<P>test</p>');
-    $this->assertEquals('<p>test</p>', $f, 'HTML corrector -- Convert uppercased tags to proper lowercased ones.');
+    $this->assertEquals('<p>test</p>', $f, 'HTML corrector -- Convert upper cased tags to proper lowercased ones.');
 
     $f = Html::normalize('test<hr />');
     $this->assertEquals('test<hr>', $f, 'HTML corrector -- convert self-closing element to HTML5 void element.');

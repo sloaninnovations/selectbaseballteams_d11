@@ -23,8 +23,6 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
     'block_content',
     'taxonomy',
     'node',
-    'book',
-    'forum',
     'path_alias',
     'statistics',
   ];
@@ -34,6 +32,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installEntitySchema('path_alias');
 
     // Install the themes used for this test.
     $this->installEntitySchema('block_content');
@@ -207,9 +206,9 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
 
     // Check book block.
     $settings = [
-      'id' => 'book_navigation',
+      'id' => 'broken',
       'label' => '',
-      'provider' => 'book',
+      'provider' => 'core',
       'label_display' => '0',
       'block_mode' => 'book pages',
     ];
@@ -217,26 +216,20 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
 
     // Check forum block settings.
     $settings = [
-      'id' => 'forum_active_block',
+      'id' => 'broken',
       'label' => '',
-      'provider' => 'forum',
+      'provider' => 'core',
       'label_display' => '0',
       'block_count' => 3,
-      'properties' => [
-        'administrative' => '1',
-      ],
     ];
     $this->assertEntity('forum', [], 'sidebar', 'olivero', -8, $settings);
 
     $settings = [
-      'id' => 'forum_new_block',
+      'id' => 'broken',
       'label' => '',
-      'provider' => 'forum',
+      'provider' => 'core',
       'label_display' => '0',
       'block_count' => 4,
-      'properties' => [
-        'administrative' => '1',
-      ],
     ];
     $this->assertEntity('forum_1', [], 'sidebar', 'olivero', -9, $settings);
 
@@ -308,10 +301,13 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
 
     // Check migrate messages.
     $messages = iterator_to_array($this->getMigration('d6_block')->getIdMap()->getMessages());
-    $this->assertCount(3, $messages);
+    $this->assertCount(6, $messages);
     $this->assertSame($messages[0]->message, 'Schema errors for block.block.block_1 with the following errors: 0 [dependencies.theme.0] Theme &#039;bluemarine&#039; is not installed.');
     $this->assertSame($messages[1]->message, "d6_block:visibility: The block with bid '13' from module 'block' will have no PHP or request_path visibility configuration.");
-    $this->assertSame($messages[2]->message, 'Schema errors for block.block.aggregator with the following errors: block.block.aggregator:settings.block_count missing schema, block.block.aggregator:settings.feed missing schema, 0 [settings] &#039;block_count&#039; is not a supported key., 1 [settings] &#039;feed&#039; is not a supported key.');
+    $this->assertSame($messages[2]->message, 'Schema errors for block.block.aggregator with the following errors: block.block.aggregator:settings.block_count missing schema, block.block.aggregator:settings.feed missing schema, 0 [settings.feed] &#039;feed&#039; is not a supported key., 1 [settings] &#039;block_count&#039; is an unknown key because plugin is aggregator_feed_block (see config schema type block.settings.*).');
+    $this->assertSame($messages[3]->message, 'Schema errors for block.block.book with the following errors: block.block.book:settings.block_mode missing schema, 0 [settings.block_mode] &#039;block_mode&#039; is not a supported key.');
+    $this->assertSame('Schema errors for block.block.forum with the following errors: block.block.forum:settings.block_count missing schema, 0 [settings] &#039;block_count&#039; is an unknown key because plugin is forum_active_block (see config schema type block.settings.*).', $messages[4]->message);
+    $this->assertSame('Schema errors for block.block.forum_1 with the following errors: block.block.forum_1:settings.block_count missing schema, 0 [settings] &#039;block_count&#039; is an unknown key because plugin is forum_new_block (see config schema type block.settings.*).', $messages[5]->message);
   }
 
 }

@@ -143,36 +143,40 @@ class ManageFieldsTest extends BrowserTestBase {
 
     $this->drupalGet('/admin/structure/types/manage/' . $type->id() . '/fields/add-field');
     $edit = [
+      'new_storage_type' => 'test_field',
+    ];
+    $this->submitForm($edit, 'Continue');
+    $edit = [
       'label' => 'Test field',
       'field_name' => 'test_field',
-      'new_storage_type' => 'test_field',
     ];
     $this->submitForm($edit, 'Continue');
     $this->assertSession()->statusMessageNotContains('Saved');
 
     // Change the storage form values.
-    $edit = ['cardinality_number' => 5];
-    $this->submitForm($edit, 'Continue');
+    $edit = ['field_storage[subform][cardinality_number]' => 5];
+    $this->submitForm($edit, 'Update settings');
     $this->assertSession()->statusMessageNotContains('Saved');
 
-    // Go back to the field storage form.
-    $this->drupalGet('/admin/structure/types/manage/' . $type->id() . '/add-storage/node/field_test_field');
     // Assert that the form values persist.
-    $this->assertEquals(5, $page->findField('cardinality_number')->getValue());
+    $this->assertEquals(5, $page->findField('field_storage[subform][cardinality_number]')->getValue());
 
     // Try creating a field with the same machine name.
     $this->drupalGet('/admin/structure/types/manage/' . $type->id() . '/fields/add-field');
     $edit = [
-      'label' => 'Test field',
-      'field_name' => 'test_field',
       'new_storage_type' => 'test_field',
     ];
     $this->submitForm($edit, 'Continue');
+    $edit = [
+      'label' => 'Test field',
+      'field_name' => 'test_field',
+    ];
+    $this->submitForm($edit, 'Continue');
     // Assert that the values in the field storage form are reset.
-    $this->assertEquals(1, $page->findField('cardinality_number')->getValue());
+    $this->assertEquals(1, $page->findField('field_storage[subform][cardinality_number]')->getValue());
 
     // Assert that the field is created with the new settings.
-    $this->submitForm([], 'Continue');
+    $this->submitForm([], 'Update settings');
     $this->assertSession()->statusMessageNotContains('Saved');
     $this->submitForm([], 'Save settings');
     $this->assertSession()->statusMessageContains('Saved');
@@ -196,31 +200,37 @@ class ManageFieldsTest extends BrowserTestBase {
     $this->drupalLogin($user1);
     $this->drupalGet($bundle_path . '/fields/add-field');
     $edit = [
-      'label' => 'Test field',
-      'field_name' => 'test_field',
       'new_storage_type' => 'test_field',
     ];
     $this->submitForm($edit, 'Continue');
-    // Make changes to the storage form.
-    $edit = ['cardinality_number' => 5];
-    $storage_form_url = $this->getUrl();
+    $edit = [
+      'label' => 'Test field',
+      'field_name' => 'test_field',
+    ];
     $this->submitForm($edit, 'Continue');
+    // Make changes to the storage form.
+    $edit = ['field_storage[subform][cardinality_number]' => 5];
+    $storage_form_url = $this->getUrl();
+    $this->submitForm($edit, 'Update settings');
     $this->drupalLogout();
 
     // Actually add a field as user 2.
     $this->drupalLogin($user2);
     $this->drupalGet($bundle_path . '/fields/add-field');
     $edit = [
-      'label' => 'Test field',
-      'field_name' => 'test_field',
       'new_storage_type' => 'test_field',
     ];
     $this->submitForm($edit, 'Continue');
-    $allowed_no_of_values = $page->findField('cardinality_number')->getValue();
+    $edit = [
+      'label' => 'Test field',
+      'field_name' => 'test_field',
+    ];
+    $this->submitForm($edit, 'Continue');
+    $allowed_no_of_values = $page->findField('field_storage[subform][cardinality_number]')->getValue();
     // Assert that the changes made by any user do not affect other users until
     // the field is saved.
     $this->assertEquals(1, $allowed_no_of_values);
-    $this->submitForm(['cardinality_number' => 2], 'Continue');
+    $this->submitForm(['field_storage[subform][cardinality_number]' => 2], 'Update settings');
     $this->submitForm([], 'Save settings');
     $this->assertSession()->pageTextContains("Saved Test field configuration.");
     $this->drupalLogout();
@@ -228,7 +238,6 @@ class ManageFieldsTest extends BrowserTestBase {
     // Continue adding a field as user 1, using the URL saved previously.
     $this->drupalLogin($user1);
     $this->drupalGet($storage_form_url);
-    $this->submitForm([], 'Continue');
     // Assert that the user can go on with configuring a field with a machine
     // that is already taken.
     $this->assertSession()->pageTextNotContains('error');
@@ -250,9 +259,12 @@ class ManageFieldsTest extends BrowserTestBase {
     $this->drupalLogin($user);
     $this->drupalGet($bundle_path . '/fields/add-field');
     $edit = [
+      'new_storage_type' => 'test_field',
+    ];
+    $this->submitForm($edit, 'Continue');
+    $edit = [
       'label' => 'Test field',
       'field_name' => 'test_field',
-      'new_storage_type' => 'test_field',
     ];
     $this->submitForm($edit, 'Continue');
 
@@ -274,10 +286,6 @@ class ManageFieldsTest extends BrowserTestBase {
         'entity_type' => 'node',
       ])
       ->save();
-
-    $this->drupalGet("$bundle_path/fields/node.{$node_type->id()}.test_field/storage");
-    $this->submitForm([], 'Save');
-    $this->assertSession()->statusMessageContains('Your settings have been saved.', 'status');
 
     $this->drupalGet("$bundle_path/fields/node.{$node_type->id()}.test_field");
     $this->submitForm([], 'Save settings');
@@ -302,6 +310,79 @@ class ManageFieldsTest extends BrowserTestBase {
     $this->fieldUIAddNewField($bundle_path, 'user_reference', NULL, 'field_ui:entity_reference:user', [], $field_edit);
     $field = FieldConfig::loadByName('node', 'kittens', $field_name);
     $this->assertEquals([['target_id' => $this->adminUser->id()]], $field->getDefaultValue(User::create(['name' => '1337'])));
+  }
+
+  /**
+   * Tests hook_form_field_storage_config_form_edit_alter().
+   *
+   * @group legacy
+   */
+  public function testFieldStorageFormAlter() {
+    $this->container->get('module_installer')->install(['field_ui_test_deprecated']);
+    $this->rebuildContainer();
+
+    $node_type = $this->drupalCreateContentType();
+    $bundle = $node_type->id();
+    $this->expectDeprecation('The deprecated alter hook hook_form_field_storage_config_edit_form_alter() is implemented in these functions: field_ui_test_deprecated_form_field_storage_config_edit_form_alter. Use hook_form_field_config_edit_form_alter() instead. See https://www.drupal.org/node/3386675.');
+    $this->drupalGet("/admin/structure/types/manage/$bundle/fields/node.$bundle.body");
+    $this->assertSession()->elementTextContains('css', '#edit-field-storage', 'Greetings from the field_storage_config_edit_form() alter.');
+  }
+
+  /**
+   * Tests hook_form_field_storage_config_form_edit_alter().
+   *
+   * @group legacy
+   */
+  public function testFieldTypeCardinalityAlter() {
+    $node_type = $this->drupalCreateContentType();
+    $bundle = $node_type->id();
+
+    /** @var \Drupal\field\FieldStorageConfigInterface $storage */
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage('field_storage_config')
+      ->create([
+        'type' => 'test_field',
+        'field_name' => 'field_test_field',
+        'entity_type' => 'node',
+      ]);
+    $storage->save();
+
+    $this->container->get('entity_type.manager')
+      ->getStorage('field_config')
+      ->create([
+        'field_storage' => $storage,
+        'bundle' => $bundle,
+        'entity_type' => 'node',
+      ])
+      ->save();
+
+    $this->drupalGet("/admin/structure/types/manage/$bundle/fields/node.$bundle.field_test_field");
+    $this->assertSession()->elementTextContains('css', '#edit-field-storage', 'Greetings from Drupal\field_test\Plugin\Field\FieldType\TestItem::storageSettingsForm');
+  }
+
+  /**
+   * Tests hook_field_info_entity_type_ui_definitions_alter().
+   */
+  public function testFieldUiDefinitionsAlter() {
+    $user = $this->drupalCreateUser(['administer node fields']);
+    $node_type = $this->drupalCreateContentType();
+    $this->drupalLogin($user);
+    $this->drupalGet('/admin/structure/types/manage/' . $node_type->id() . '/fields/add-field');
+    $this->assertSession()->pageTextContains('Boolean (overridden by alter)');
+  }
+
+  /**
+   * Ensure field category fallback works for field types without a description.
+   */
+  public function testFieldCategoryFallbackWithoutDescription() {
+    $user = $this->drupalCreateUser(['administer node fields']);
+    $node_type = $this->drupalCreateContentType();
+    $this->drupalLogin($user);
+    $this->drupalGet('/admin/structure/types/manage/' . $node_type->id() . '/fields/add-field');
+    $field_type = $this->assertSession()->elementExists('xpath', '//label[text()="Test field"]');
+    $description_container = $field_type->getParent()->find('css', '.field-option__description');
+    $this->assertNotNull($description_container);
+    $this->assertEquals('', $description_container->getText());
   }
 
 }

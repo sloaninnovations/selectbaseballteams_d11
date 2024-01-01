@@ -458,7 +458,7 @@ function claro_form_alter(array &$form, FormStateInterface $form_state, $form_id
 
         // Group the bulk actions select and submit elements, and add a label
         // that makes the purpose of these elements more clear to
-        // screenreaders.
+        // screen readers.
         $form['bulk_actions_container']['#attributes']['role'] = 'group';
         $form['bulk_actions_container']['#attributes']['aria-labelledby'] = $label_id;
         $form['bulk_actions_container']['group_label'] = [
@@ -664,7 +664,7 @@ function _claro_convert_link_to_action_link(array $link, $icon_name = NULL, $siz
  */
 function claro_form_node_form_alter(&$form, FormStateInterface $form_state) {
   $form['#theme'] = ['node_edit_form'];
-  $form['#attached']['library'][] = 'claro/node-form';
+  $form['#attached']['library'][] = 'claro/form-two-columns';
 
   $form['advanced']['#type'] = 'container';
   $form['advanced']['#accordion'] = TRUE;
@@ -674,6 +674,66 @@ function claro_form_node_form_alter(&$form, FormStateInterface $form_state) {
   $form['revision_information']['#type'] = 'container';
   $form['revision_information']['#group'] = 'meta';
   $form['revision_information']['#attributes']['class'][] = 'entity-meta__revision';
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for MenuLinkContentForm.
+ *
+ * Alters the menu_link_content_form by organizing form elements into different
+ * 'details' sections.
+ */
+function claro_form_menu_link_content_form_alter(&$form, FormStateInterface $form_state) {
+  $form['#theme'] = ['menu_link_form'];
+  $form['#attached']['library'][] = 'claro/form-two-columns';
+  $form['advanced'] = [
+    '#type' => 'container',
+    '#weight' => 10,
+    '#accordion' => TRUE,
+  ];
+  $form['menu_parent']['#wrapper_attributes'] = ['class' => ['accordion__item', 'entity-meta__header']];
+  $form['menu_parent']['#prefix'] = '<div class="accordion">';
+  $form['menu_parent']['#suffix'] = '</div>';
+  $form['menu_parent']['#group'] = 'advanced';
+
+  $form['menu_link_display_settings'] = [
+    '#type' => 'details',
+    '#group' => 'advanced',
+    '#title' => t('Display settings'),
+    '#attributes' => ['class' => ['entity-meta__options']],
+    '#tree' => TRUE,
+    '#accordion' => TRUE,
+  ];
+  if (!empty($form['weight'])) {
+    $form['menu_link_display_settings']['weight'] = $form['weight'];
+    unset($form['weight'], $form['menu_link_display_settings']['weight']['#weight']);
+  }
+  if (!empty($form['expanded'])) {
+    $form['menu_link_display_settings']['expanded'] = $form['expanded'];
+    unset($form['expanded']);
+  }
+
+  if (isset($form['description'])) {
+    $form['menu_link_description'] = [
+      '#type' => 'details',
+      '#group' => 'advanced',
+      '#title' => t('Description'),
+      '#attributes' => ['class' => ['entity-meta__description']],
+      '#tree' => TRUE,
+      '#accordion' => TRUE,
+      'description' => $form['description'],
+    ];
+    unset($form['description']);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for MenuLinkEditForm.
+ *
+ * Alters the menu_link_edit form by organizing form elements into different
+ * 'details' sections.
+ */
+function claro_form_menu_link_edit_alter(&$form, FormStateInterface $form_state) {
+  claro_form_menu_link_content_form_alter($form, $form_state);
 }
 
 /**
@@ -835,7 +895,7 @@ function claro_form_views_exposed_form_alter(&$form, FormStateInterface $form_st
   $view = $form_state->getStorage()['view'];
   $view_title = $view->getTitle();
 
-  // Add a label so screenreaders can identify the purpose of the exposed form
+  // Add a label so screen readers can identify the purpose of the exposed form
   // without having to scan content that appears further down the page.
   $form['#attributes']['aria-label'] = t('Filter the contents of the %view_title view', ['%view_title' => $view_title]);
 }
@@ -1382,6 +1442,11 @@ function _claro_preprocess_file_and_image_widget(array &$variables) {
   $variables['has_meta'] = $alt_is_visible || $title_is_visible || $display_is_visible || $description_is_visible;
   $variables['display'] = $display_is_visible;
 
+  // Handle the default checkbox display after the file is uploaded.
+  if (array_key_exists('display', $element)) {
+    $variables['data']['display']['#checked'] = $element['display']['#value'];
+  }
+
   // Render file upload input and upload button (or file name and remove button,
   // if the field is not empty) in an emphasized div.
   foreach ($variables['data'] as $key => $item) {
@@ -1781,5 +1846,15 @@ function claro_form_user_admin_permissions_alter(&$form, FormStateInterface $for
       unset($form['filters']['text']['#title_display']);
       $form['filters']['text']['#title'] = t('Filter');
     }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function claro_form_node_preview_form_select_alter(array &$form, FormStateInterface $form_state) {
+  if (isset($form['backlink'])) {
+    $form['backlink']['#options']['attributes']['class'][] = 'action-link';
+    $form['backlink']['#options']['attributes']['class'][] = 'action-link--icon-chevron-left';
   }
 }

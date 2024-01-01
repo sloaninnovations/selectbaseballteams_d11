@@ -11,6 +11,7 @@ use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Config\Schema\Undefined;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\TypedData\TypedDataManager;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstraint;
 
 /**
  * Manages config schema type plugins.
@@ -104,7 +105,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       if (isset($name)) {
         $replace['%key'] = $name;
       }
-      $type = $this->replaceName($type, $replace);
+      $type = $this->resolveDynamicTypeName($type, $replace);
       // Remove the type from the definition so that it is replaced with the
       // concrete type from schema definitions.
       unset($definition['type']);
@@ -120,6 +121,35 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
         $data_definition[$key] = $value;
       }
     }
+
+    // All values are optional by default (meaning they can be NULL), except for
+    // mappings and sequences. A sequence can only be NULL when `nullable: true`
+    // is set on the config schema type definition. This is unintuitive and
+    // contradicts Drupal core's documentation.
+    // @see https://www.drupal.org/node/2264179
+    // @see https://www.drupal.org/node/1978714
+    // To gradually evolve configuration schemas in the Drupal ecosystem to be
+    // validatable, this needs to be clarified in a non-disruptive way. Any
+    // config schema type definition — that is, a top-level entry in a
+    // *.schema.yml file — can opt into stricter behavior, whereby a property
+    // cannot be NULL unless it specifies `nullable: true`, by adding
+    // `FullyValidatable` as a top-level validation constraint.
+    // @see https://www.drupal.org/node/3364108
+    // @see https://www.drupal.org/node/3364109
+    // @see \Drupal\Core\TypedData\TypedDataManager::getDefaultConstraints()
+    if ($parent) {
+      $root_type_has_opted_in = FALSE;
+      foreach ($parent->getRoot()->getConstraints() as $constraint) {
+        if ($constraint instanceof FullyValidatableConstraint) {
+          $root_type_has_opted_in = TRUE;
+          break;
+        }
+      }
+      if ($root_type_has_opted_in) {
+        $data_definition->setRequired(!isset($data_definition['nullable']) || $data_definition['nullable'] === FALSE);
+      }
+    }
+
     return $data_definition;
   }
 
@@ -150,7 +180,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   }
 
   /**
-   * Gets a schema definition with replacements for dynamic names.
+   * Gets a schema definition with replacements for dynamic type names.
    *
    * @param string $base_plugin_id
    *   A plugin ID.
@@ -177,7 +207,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
 
       // Replace dynamic portions of the definition type.
       if (!empty($replacements) && strpos($definition['type'], ']')) {
-        $sub_type = $this->determineType($this->replaceName($definition['type'], $replacements), $definitions);
+        $sub_type = $this->determineType($this->resolveDynamicTypeName($definition['type'], $replacements), $definitions);
         $sub_definition = $definitions[$sub_type];
         if (isset($definitions[$sub_type]['type'])) {
           $sub_merge = $this->getDefinition($definitions[$sub_type]['type'], $exception_on_invalid);
@@ -217,7 +247,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   }
 
   /**
-   * Gets fallback configuration schema name.
+   * Finds fallback configuration schema name.
    *
    * @param string $name
    *   Configuration name or key.
@@ -243,6 +273,21 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    *     block.*.*:*
    *     block.*
    */
+  public function findFallback(string $name): ?string {
+    $fallback = $this->getFallbackName($name);
+    assert($fallback === NULL || str_ends_with($fallback, '.*'));
+    return $fallback;
+  }
+
+  /**
+   * Gets fallback configuration schema name.
+   *
+   * @param string $name
+   *   Configuration name or key.
+   *
+   * @return null|string
+   *   The resolved schema name for the given configuration name or key.
+   */
   protected function getFallbackName($name) {
     // Check for definition of $name with filesystem marker.
     $replaced = preg_replace('/([^\.:]+)([\.:\*]*)$/', '*\2', $name);
@@ -267,39 +312,69 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   }
 
   /**
-   * Replaces variables in configuration name.
+   * Replaces dynamic type expressions in configuration type.
    *
-   * The configuration name may contain one or more variables to be replaced,
-   * enclosed in square brackets like '[name]' and will follow the replacement
-   * rules defined by the replaceVariable() method.
+   * The configuration type name may contain one or more expressions to be
+   * replaced, enclosed in square brackets like '[name]' or '[%parent.id]' and
+   * will follow the replacement rules defined by the resolveExpression()
+   * method.
    *
-   * @param string $name
-   *   Configuration name with variables in square brackets.
-   * @param mixed $data
+   * @param string $type
+   *   Configuration type, potentially with expressions in square brackets.
+   * @param array $data
    *   Configuration data for the element.
    *
    * @return string
-   *   Configuration name with variables replaced.
+   *   Configuration type name with all expressions resolved.
    */
-  protected function replaceName($name, $data) {
-    if (preg_match_all("/\[(.*)\]/U", $name, $matches)) {
+  protected function resolveDynamicTypeName(string $type, array $data): string {
+    // Parse the expressions in the dynamic type, if any.
+    if (preg_match_all("/\[(.*)\]/U", $type, $matches)) {
       // Build our list of '[value]' => replacement.
       $replace = [];
       foreach (array_combine($matches[0], $matches[1]) as $key => $value) {
-        $replace[$key] = $this->replaceVariable($value, $data);
+        $replace[$key] = $this->resolveExpression($value, $data);
       }
-      return strtr($name, $replace);
+      return strtr($type, $replace);
     }
     else {
-      return $name;
+      // No expressions: nothing to resolve.
+      return $type;
     }
   }
 
   /**
-   * Replaces variable values in included names with configuration data.
+   * Replaces dynamic type expressions in configuration type.
    *
-   * Variable values are nested configuration keys that will be replaced by
-   * their value or some of these special strings:
+   * The configuration type name may contain one or more expressions to be
+   * replaced, enclosed in square brackets like '[name]' or '[%parent.id]' and
+   * will follow the replacement rules defined by the resolveExpression()
+   * method.
+   *
+   * @param string $name
+   *   Configuration type, potentially with expressions in square brackets.
+   * @param array $data
+   *   Configuration data for the element.
+   *
+   * @return string
+   *   Configuration type name with all expressions resolved.
+   *
+   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
+   *   ::resolveDynamicTypeName() instead.
+   *
+   * @see https://www.drupal.org/node/3408266
+   */
+  protected function replaceName($name, $data) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use ::resolveDynamicTypeName() instead. See https://www.drupal.org/node/3408266', E_USER_DEPRECATED);
+    return $this->resolveDynamicTypeName($name, $data);
+  }
+
+  /**
+   * Resolves a dynamic type expression using configuration data.
+   *
+   * Dynamic type names are nested configuration keys containing expressions to
+   * be replaced by the value at the property path that the expression is
+   * pointing at. The expression may contain the following special strings:
    * - '%key', will be replaced by the element's key.
    * - '%parent', to reference the parent element.
    * - '%type', to reference the schema definition type. Can only be used in
@@ -309,7 +384,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    * patterns like '%parent.name' which references the 'name' value of the
    * parent element.
    *
-   * Example patterns:
+   * Example expressions:
    * - 'name.subkey', indicates a nested value of the current element.
    * - '%parent.name', will be replaced by the 'name' value of the parent.
    * - '%parent.%key', will be replaced by the parent element's key.
@@ -317,29 +392,33 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    * - '%parent.%parent.%type', will be replaced by the schema type of the
    *   parent's parent.
    *
-   * @param string $value
-   *   Variable value to be replaced.
-   * @param mixed $data
+   * @param string $expression
+   *   Expression to be resolved.
+   * @param array $data
    *   Configuration data for the element.
    *
    * @return string
-   *   The replaced value if a replacement found or the original value if not.
+   *   The value the expression resolves to, or the given expression if it
+   *   cannot be resolved.
+   *
+   * @todo Validate the expression in https://www.drupal.org/project/drupal/issues/3392903
    */
-  protected function replaceVariable($value, $data) {
-    $parts = explode('.', $value);
+  protected function resolveExpression(string $expression, array $data): string {
+    assert(!str_contains($expression, '[') && !str_contains($expression, ']'));
+    $parts = explode('.', $expression);
     // Process each value part, one at a time.
     while ($name = array_shift($parts)) {
       if (!is_array($data) || !isset($data[$name])) {
         // Key not found, return original value
-        return $value;
+        return $expression;
       }
       elseif (!$parts) {
-        $value = $data[$name];
-        if (is_bool($value)) {
-          $value = (int) $value;
+        $expression = $data[$name];
+        if (is_bool($expression)) {
+          $expression = (int) $expression;
         }
         // If no more parts left, this is the final property.
-        return (string) $value;
+        return (string) $expression;
       }
       else {
         // Get nested value and continue processing.
@@ -360,6 +439,51 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
         }
       }
     }
+
+    // Satisfy PHPStan, which cannot interpret the loop.
+    return $expression;
+  }
+
+  /**
+   * Resolves a dynamic type expression using configuration data.
+   *
+   * Dynamic type names are nested configuration keys containing expressions to
+   * be replaced by the value at the property path that the expression is
+   * pointing at. The expression may contain the following special strings:
+   * - '%key', will be replaced by the element's key.
+   * - '%parent', to reference the parent element.
+   * - '%type', to reference the schema definition type. Can only be used in
+   *   combination with %parent.
+   *
+   * There may be nested configuration keys separated by dots or more complex
+   * patterns like '%parent.name' which references the 'name' value of the
+   * parent element.
+   *
+   * Example expressions:
+   * - 'name.subkey', indicates a nested value of the current element.
+   * - '%parent.name', will be replaced by the 'name' value of the parent.
+   * - '%parent.%key', will be replaced by the parent element's key.
+   * - '%parent.%type', will be replaced by the schema type of the parent.
+   * - '%parent.%parent.%type', will be replaced by the schema type of the
+   *   parent's parent.
+   *
+   * @param string $value
+   *   Expression to be resolved.
+   * @param array $data
+   *   Configuration data for the element.
+   *
+   * @return string
+   *   The value the expression resolves to, or the given expression if it
+   *   cannot be resolved.
+   *
+   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
+   *   ::resolveExpression() instead.
+   *
+   * @see https://www.drupal.org/node/3408266
+   */
+  protected function replaceVariable($value, $data) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use ::resolveExpression() instead. See https://www.drupal.org/node/3408266', E_USER_DEPRECATED);
+    return $this->resolveExpression($value, $data);
   }
 
   /**

@@ -171,7 +171,7 @@ class ConfigCRUDTest extends KernelTestBase {
     $new_config = $this->config($new_name);
     $expected_values = [
       'value' => 'herp',
-      '404' => 'derp',
+      '404' => 'foo',
     ];
     $new_config->merge($expected_values);
     $new_config->save();
@@ -200,7 +200,7 @@ class ConfigCRUDTest extends KernelTestBase {
     }
 
     // Verify that a name longer than the maximum length causes an exception.
-    $name = 'config_test.herman_melville.moby_dick_or_the_whale.harper_1851.now_small_fowls_flew_screaming_over_the_yet_yawning_gulf_a_sullen_white_surf_beat_against_its_steep_sides_then_all_collapsed_and_the_great_shroud_of_the_sea_rolled_on_as_it_rolled_five_thousand_years_ago';
+    $name = 'config_test.herman_melville.dick_or_the_whale.harper_1851.now_small_fowls_flew_screaming_over_the_yet_yawning_gulf_a_sullen_white_surf_beat_against_its_steep_sides_then_all_collapsed_and_the_great_shroud_of_the_sea_rolled_on_as_it_rolled_five_thousand_years_ago';
     try {
       $this->config($name)->save();
       $this->fail('Expected ConfigNameException was thrown for a name longer than Config::MAX_NAME_LENGTH.');
@@ -284,6 +284,16 @@ class ConfigCRUDTest extends KernelTestBase {
       // 'octal' => 0775,
       'string' => 'string',
       'string_int' => '1',
+      'nullable_array' => NULL,
+      'nullable_boolean' => NULL,
+      'nullable_exp' => NULL,
+      'nullable_float' => NULL,
+      'nullable_float_as_integer' => NULL,
+      'nullable_hex' => NULL,
+      'nullable_int' => NULL,
+      'nullable_octal' => NULL,
+      'nullable_string' => NULL,
+      'nullable_string_int' => NULL,
     ];
     $data = ['_core' => ['default_config_hash' => Crypt::hashBase64(serialize($data))]] + $data;
     $this->assertSame($data, $config->get());

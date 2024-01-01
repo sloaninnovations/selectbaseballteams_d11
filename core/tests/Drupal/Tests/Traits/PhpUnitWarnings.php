@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Traits;
 
 /**
@@ -37,8 +39,8 @@ trait PhpUnitWarnings {
     // PHPUnit 9.6.
     'Expecting E_WARNING and E_USER_WARNING is deprecated and will no longer be possible in PHPUnit 10.',
     'Expecting E_ERROR and E_USER_ERROR is deprecated and will no longer be possible in PHPUnit 10.',
-    'assertObjectHasAttribute() is deprecated and will be removed in PHPUnit 10. Refactor your test to use assertObjectHasProperty() (PHPUnit 10.1.0+) instead.',
-    'assertObjectNotHasAttribute() is deprecated and will be removed in PHPUnit 10. Refactor your test to use assertObjectNotHasProperty() (PHPUnit 10.1.0+) instead.',
+    'assertObjectHasAttribute() is deprecated and will be removed in PHPUnit 10. Refactor your test to use assertObjectHasProperty() instead.',
+    'assertObjectNotHasAttribute() is deprecated and will be removed in PHPUnit 10. Refactor your test to use assertObjectNotHasProperty() instead.',
   ];
 
   /**

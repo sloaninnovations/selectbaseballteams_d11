@@ -173,14 +173,13 @@ mb_language('uni');
 // reduce the fragility of the testing system in general.
 date_default_timezone_set('Australia/Sydney');
 
-// Runtime assertions. PHPUnit follows the php.ini assert.active setting for
-// runtime assertions. By default this setting is on. Ensure exceptions are
-// thrown if an assert fails.
-assert_options(ASSERT_EXCEPTION, TRUE);
-
 // Ensure ignored deprecation patterns listed in .deprecation-ignore.txt are
 // considered in testing.
 if (getenv('SYMFONY_DEPRECATIONS_HELPER') === FALSE) {
   $deprecation_ignore_filename = realpath(__DIR__ . "/../.deprecation-ignore.txt");
   putenv("SYMFONY_DEPRECATIONS_HELPER=ignoreFile=$deprecation_ignore_filename");
 }
+
+// Drupal expects to be run from its root directory. This ensures all test types
+// are consistent.
+chdir(dirname(__DIR__, 2));

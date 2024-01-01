@@ -15,6 +15,7 @@ use Drupal\user\RoleInterface;
  * Tests the display of image fields.
  *
  * @group image
+ * @group #slow
  */
 class ImageFieldDisplayTest extends ImageFieldTestBase {
 
@@ -260,7 +261,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     ];
     $field = $this->createImageField($field_name, 'article', [], $field_settings, $widget_settings);
 
-    // Verify that the min/max resolution set on the field are properly
+    // Verify that the min/max dimensions set on the field are properly
     // extracted, and displayed, on the image field's configuration form.
     $this->drupalGet('admin/structure/types/manage/article/fields/' . $field->id());
     $this->assertSession()->fieldValueEquals('settings[max_resolution][x]', '100');
@@ -334,9 +335,9 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     // 1, so we need to make sure the file widget prevents these notices by
     // providing all settings, even if they are not used.
     // @see FileWidget::formMultipleElements().
-    $this->drupalGet('admin/structure/types/manage/article/fields/node.article.' . $field_name . '/storage');
+    $this->drupalGet('admin/structure/types/manage/article/fields/node.article.' . $field_name);
     $this->submitForm([
-      'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
+      'field_storage[subform][cardinality]' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
     ], 'Save');
     $edit = [
       'files[' . $field_name . '_1][]' => \Drupal::service('file_system')->realpath($test_image->uri),
@@ -499,11 +500,11 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $title = $this->randomString(1024);
     $edit = [
       // Get the path of the 'image-test.png' file.
-      'files[settings_default_image_uuid]' => \Drupal::service('file_system')->realpath($images[0]->uri),
-      'settings[default_image][alt]' => $alt,
-      'settings[default_image][title]' => $title,
+      'files[field_storage_subform_settings_default_image_uuid]' => \Drupal::service('file_system')->realpath($images[0]->uri),
+      'field_storage[subform][settings][default_image][alt]' => $alt,
+      'field_storage[subform][settings][default_image][title]' => $title,
     ];
-    $this->drupalGet("admin/structure/types/manage/article/fields/node.article.{$field_name}/storage");
+    $this->drupalGet("admin/structure/types/manage/article/fields/node.article.{$field_name}");
     $this->submitForm($edit, 'Save');
     // Clear field definition cache so the new default image is detected.
     \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
@@ -558,8 +559,8 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Remove default image from the field and make sure it is no longer used.
     // Can't use fillField cause Mink can't fill hidden fields.
-    $this->drupalGet("admin/structure/types/manage/article/fields/node.article.$field_name/storage");
-    $this->getSession()->getPage()->find('css', 'input[name="settings[default_image][uuid][fids]"]')->setValue(0);
+    $this->drupalGet("admin/structure/types/manage/article/fields/node.article.$field_name");
+    $this->getSession()->getPage()->find('css', 'input[name="field_storage[subform][settings][default_image][uuid][fids]"]')->setValue(0);
     $this->getSession()->getPage()->pressButton('Save');
 
     // Clear field definition cache so the new default image is detected.
@@ -574,11 +575,11 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     // Add a default image to the new field.
     $edit = [
       // Get the path of the 'image-test.gif' file.
-      'files[settings_default_image_uuid]' => \Drupal::service('file_system')->realpath($images[2]->uri),
-      'settings[default_image][alt]' => $alt,
-      'settings[default_image][title]' => $title,
+      'files[field_storage_subform_settings_default_image_uuid]' => \Drupal::service('file_system')->realpath($images[2]->uri),
+      'field_storage[subform][settings][default_image][alt]' => $alt,
+      'field_storage[subform][settings][default_image][title]' => $title,
     ];
-    $this->drupalGet('admin/structure/types/manage/article/fields/node.article.' . $private_field_name . '/storage');
+    $this->drupalGet('admin/structure/types/manage/article/fields/node.article.' . $private_field_name);
     $this->submitForm($edit, 'Save');
     // Clear field definition cache so the new default image is detected.
     \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();

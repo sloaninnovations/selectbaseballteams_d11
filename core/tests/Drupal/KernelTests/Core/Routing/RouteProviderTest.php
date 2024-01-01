@@ -1,16 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\KernelTests\Core\Routing\RouteProviderTest.
- */
-
 namespace Drupal\KernelTests\Core\Routing;
 
 use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Database\Database;
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Routing\MatcherDumper;
@@ -109,19 +103,6 @@ class RouteProviderTest extends KernelTestBase {
     $this->installEntitySchema('path_alias');
 
     $this->logger = new TestLogger();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function register(ContainerBuilder $container) {
-    parent::register($container);
-
-    // Read the incoming path alias for these tests.
-    if ($container->hasDefinition('path_alias.path_processor')) {
-      $definition = $container->getDefinition('path_alias.path_processor');
-      $definition->addTag('path_processor_inbound');
-    }
   }
 
   /**
@@ -415,7 +396,7 @@ class RouteProviderTest extends KernelTestBase {
     $collection->add('poink', new Route('/some/path/{value}', [
       'value' => 'poink',
     ]));
-    $collection->add('narf', new Route('/some/path/here'));
+    $collection->add('Lassie', new Route('/some/path/here'));
 
     $dumper = new MatcherDumper($connection, $this->state, $this->logger, 'test_routes');
     $dumper->addRoutes($collection);
@@ -454,7 +435,7 @@ class RouteProviderTest extends KernelTestBase {
     $collection->add('poink', new Route('/some/path/{value}', [
       'value' => 'poink',
     ]));
-    $collection->add('narf', new Route('/some/path/here'));
+    $collection->add('Lassie', new Route('/some/path/here'));
     $collection->add('eep', new Route('/something/completely/different'));
 
     $dumper = new MatcherDumper($connection, $this->state, $this->logger, 'test_routes');
@@ -470,8 +451,8 @@ class RouteProviderTest extends KernelTestBase {
       $routes_array = $routes->all();
 
       $this->assertCount(2, $routes, 'The correct number of routes was found.');
-      $this->assertEquals(['narf', 'poink'], array_keys($routes_array), 'Ensure the fitness was taken into account.');
-      $this->assertNotNull($routes->get('narf'), 'The first matching route was found.');
+      $this->assertEquals(['Lassie', 'poink'], array_keys($routes_array), 'Ensure the fitness was taken into account.');
+      $this->assertNotNull($routes->get('Lassie'), 'The first matching route was found.');
       $this->assertNotNull($routes->get('poink'), 'The second matching route was found.');
       $this->assertNull($routes->get('eep'), 'Non-matching route was not found.');
     }
@@ -493,7 +474,7 @@ class RouteProviderTest extends KernelTestBase {
     $collection->add('poink', new Route('/some/{value}/path'));
     // Add a second route matching the same path pattern.
     $collection->add('poink2', new Route('/some/{object}/path'));
-    $collection->add('narf', new Route('/some/here/path'));
+    $collection->add('Lassie', new Route('/some/here/path'));
     $collection->add('eep', new Route('/something/completely/different'));
 
     $dumper = new MatcherDumper($connection, $this->state, $this->logger, 'test_routes');

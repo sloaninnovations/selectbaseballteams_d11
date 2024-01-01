@@ -72,7 +72,7 @@ class FileWidget extends WidgetBase {
       '#default_value' => $this->getSetting('progress_indicator'),
       '#description' => $this->t('The throbber display does not show the status of uploads but takes up less space. The progress bar is helpful for monitoring progress on large uploads.'),
       '#weight' => 16,
-      '#access' => file_progress_implementation(),
+      '#access' => extension_loaded('uploadprogress'),
     ];
     return $element;
   }
@@ -318,10 +318,18 @@ class FileWidget extends WidgetBase {
    */
   public static function value($element, $input, FormStateInterface $form_state) {
     if ($input) {
-      // Checkboxes lose their value when empty.
-      // If the display field is present make sure its unchecked value is saved.
       if (empty($input['display'])) {
-        $input['display'] = $element['#display_field'] ? 0 : 1;
+        // Updates the display field with the default value because
+        // #display_field is invisible.
+        if (empty($input['fids'])) {
+          $input['display'] = $element['#display_default'];
+        }
+        // Checkboxes lose their value when empty.
+        // If the display field is present, make sure its unchecked value is
+        // saved.
+        else {
+          $input['display'] = $element['#display_field'] ? 0 : 1;
+        }
       }
     }
 

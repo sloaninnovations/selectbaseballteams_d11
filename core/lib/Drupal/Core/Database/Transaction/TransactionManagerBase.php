@@ -8,7 +8,6 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\TransactionCommitFailedException;
 use Drupal\Core\Database\TransactionNameNonUniqueException;
-use Drupal\Core\Database\TransactionNoActiveException;
 use Drupal\Core\Database\TransactionOutOfOrderException;
 
 /**
@@ -47,11 +46,22 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * The array key is the transaction's unique id, its value a StackItem.
    *
    * @var array<string,StackItem>
-   *
-   * @todo in https://www.drupal.org/project/drupal/issues/3384995, complete
-   *   the LIFO logic extending it to the root transaction too.
    */
   private array $stack = [];
+
+  /**
+   * A list of voided stack items.
+   *
+   * In some cases the active transaction can be automatically committed by the
+   * database server (for example, MySql when a DDL statement is executed
+   * during a transaction). In such cases we need to void the remaining items
+   * on the stack, and we track them here.
+   *
+   * The array key is the transaction's unique id, its value a StackItem.
+   *
+   * @var array<string,StackItem>
+   */
+  private array $voidedItems = [];
 
   /**
    * A list of post-transaction callbacks.
@@ -78,6 +88,15 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   public function __construct(
     protected readonly Connection $connection,
   ) {
+  }
+
+  /**
+   * Destructor.
+   *
+   * When destructing, $stack must have been already emptied.
+   */
+  public function __destruct() {
+    assert($this->stack === [], "Transaction \$stack was not empty. Active stack: " . $this->dumpStackItemsAsString());
   }
 
   /**
@@ -109,16 +128,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   }
 
   /**
-   * Resets the transaction stack.
-   *
-   * Drivers should not override this method unless they also override the
-   * $stack property.
-   */
-  protected function resetStack(): void {
-    $this->stack = [];
-  }
-
-  /**
    * Adds an item to the transaction stack.
    *
    * Drivers should not override this method unless they also override the
@@ -147,6 +156,45 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   }
 
   /**
+   * Voids an item from the transaction stack.
+   *
+   * Drivers should not override this method unless they also override the
+   * $stack property.
+   *
+   * @param string $id
+   *   The id of the transaction.
+   */
+  protected function voidStackItem(string $id): void {
+    // The item should be removed from $stack and added to $voidedItems for
+    // later processing.
+    $this->voidedItems[$id] = $this->stack[$id];
+    $this->removeStackItem($id);
+  }
+
+  /**
+   * Produces a string representation of the stack items.
+   *
+   * A helper method for exception messages.
+   *
+   * Drivers should not override this method unless they also override the
+   * $stack property.
+   *
+   * @return string
+   *   The string representation of the stack items.
+   */
+  protected function dumpStackItemsAsString(): string {
+    if ($this->stack() === []) {
+      return '*** empty ***';
+    }
+
+    $temp = [];
+    foreach ($this->stack() as $id => $item) {
+      $temp[] = $id . '\\' . $item->name;
+    }
+    return implode(' > ', $temp);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function inTransaction(): bool {
@@ -169,7 +217,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     }
 
     if ($this->has($name)) {
-      throw new TransactionNameNonUniqueException($name . " is already in use.");
+      throw new TransactionNameNonUniqueException("A transaction named {$name} is already in use. Active stack: " . $this->dumpStackItemsAsString());
     }
 
     // Do the client-level processing.
@@ -202,45 +250,45 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   public function unpile(string $name, string $id): void {
     // If the $id does not correspond to the one in the stack for that $name,
     // we are facing an orphaned Transaction object (for example in case of a
-    // DDL statement breaking an active transaction), so there is nothing more
-    // to do.
+    // DDL statement breaking an active transaction). That should be listed in
+    // $voidedItems, so we can remove it from there.
     if (!isset($this->stack()[$id]) || $this->stack()[$id]->name !== $name) {
+      assert(isset($this->voidedItems[$id]), "Transaction {$id}/{$name} is out of sequence. Active stack: " . $this->dumpStackItemsAsString());
+      unset($this->voidedItems[$id]);
       return;
     }
 
-    // If unpiling a savepoint, but that does not exist on the stack, the stack
-    // got corrupted.
-    if ($name !== 'drupal_transaction' && !$this->has($name)) {
-      throw new TransactionOutOfOrderException();
+    // If we are not releasing the last savepoint but an earlier one, or
+    // committing a root transaction while savepoints are active, all
+    // subsequent savepoints will be released as well. The stack must be
+    // diminished accordingly.
+    while (($i = array_key_last($this->stack())) != $id) {
+      $this->voidStackItem((string) $i);
     }
 
-    // Release the client transaction savepoint in case the Drupal transaction
-    // is not a root one.
-    if (
-      $this->has($name)
-      && $this->stack()[$id]->type === StackItemType::Savepoint
-      && $this->getConnectionTransactionState() === ClientConnectionTransactionState::Active
-    ) {
-      // If we are not releasing the last savepoint but an earlier one, all
-      // subsequent savepoints will have been released as well. The stack must
-      // be diminished accordingly.
-      while (($i = array_key_last($this->stack())) != $id) {
-        $this->removeStackItem((string) $i);
+    if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Active) {
+      if ($this->stackDepth() > 1 && $this->stack()[$id]->type === StackItemType::Savepoint) {
+        // Release the client transaction savepoint in case the Drupal
+        // transaction is not a root one.
+        $this->releaseClientSavepoint($name);
       }
-      $this->releaseClientSavepoint($name);
+      elseif ($this->stackDepth() === 1 && $this->stack()[$id]->type === StackItemType::Root) {
+        // If this was the root Drupal transaction, we can commit the client
+        // transaction.
+        $this->processRootCommit();
+      }
+      else {
+        // The stack got corrupted.
+        throw new TransactionOutOfOrderException("Transaction {$id}/{$name} is out of order. Active stack: " . $this->dumpStackItemsAsString());
+      }
+
+      // Remove the transaction from the stack.
+      $this->removeStackItem($id);
+      return;
     }
 
-    // Remove the transaction from the stack.
-    $this->removeStackItem($id);
-
-    // If this was the last Drupal transaction open, we can commit the client
-    // transaction.
-    if (
-      $this->stackDepth() === 0
-      && $this->getConnectionTransactionState() === ClientConnectionTransactionState::Active
-    ) {
-      $this->processRootCommit();
-    }
+    // The stack got corrupted.
+    throw new TransactionOutOfOrderException("Transaction {$id}/{$name} is out of order. Active stack: " . $this->dumpStackItemsAsString());
   }
 
   /**
@@ -262,37 +310,39 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     }
     // End of BC layer.
 
-    // If the $id does not correspond to the one in the stack for that $name,
-    // we are facing an orphaned Transaction object (for example in case of a
-    // DDL statement breaking an active transaction), so there is nothing more
-    // to do.
-    if (!isset($this->stack()[$id]) || $this->stack()[$id]->name !== $name) {
+    // Rolled back item should match the last one in stack.
+    if ($id != array_key_last($this->stack()) || $name !== $this->stack()[$id]->name) {
+      throw new TransactionOutOfOrderException("Error attempting rollback of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
+    }
+
+    if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Active) {
+      if ($this->stackDepth() > 1 && $this->stack()[$id]->type === StackItemType::Savepoint) {
+        // Rollback the client transaction to the savepoint when the Drupal
+        // transaction is not a root one. Then, release the savepoint too. The
+        // client connection remains active.
+        $this->rollbackClientSavepoint($name);
+        $this->releaseClientSavepoint($name);
+        // The Transaction object remains open, and when it will get destructed
+        // no commit should happen. Void the stack item.
+        $this->voidStackItem($id);
+      }
+      elseif ($this->stackDepth() === 1 && $this->stack()[$id]->type === StackItemType::Root) {
+        // If this was the root Drupal transaction, we can rollback the client
+        // transaction. The transaction is closed.
+        $this->processRootRollback();
+        // The Transaction object remains open, and when it will get destructed
+        // no commit should happen. Void the stack item.
+        $this->voidStackItem($id);
+      }
+      else {
+        // The stack got corrupted.
+        throw new TransactionOutOfOrderException("Error attempting rollback of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
+      }
       return;
     }
 
-    if (!$this->inTransaction()) {
-      throw new TransactionNoActiveException();
-    }
-
-    // Do the client-level processing.
-    match ($this->stack()[$id]->type) {
-      StackItemType::Root => $this->processRootRollback(),
-      StackItemType::Savepoint => $this->rollbackClientSavepoint($name),
-    };
-
-    // Rolled back item should match the last one in stack.
-    if ($id != array_key_last($this->stack())) {
-      throw new TransactionOutOfOrderException();
-    }
-
-    // Remove the transaction from the stack.
-    $this->removeStackItem($id);
-
-    // If this was the last Drupal transaction open, we can commit the client
-    // transaction.
-    if ($this->stackDepth() === 0 && $this->getConnectionTransactionState() === ClientConnectionTransactionState::Active) {
-      $this->processRootCommit();
-    }
+    // The stack got corrupted.
+    throw new TransactionOutOfOrderException("Error attempting rollback of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
   }
 
   /**
@@ -460,5 +510,16 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *   Returns TRUE on success or FALSE on failure.
    */
   abstract protected function commitClientTransaction(): bool;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function voidClientTransaction(): void {
+    while ($i = array_key_last($this->stack())) {
+      $this->voidStackItem((string) $i);
+    }
+    $this->setConnectionTransactionState(ClientConnectionTransactionState::Voided);
+    $this->processPostTransactionCallbacks();
+  }
 
 }

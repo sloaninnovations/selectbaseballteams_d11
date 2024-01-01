@@ -41,8 +41,6 @@ abstract class MigrateUpgradeExecuteTestBase extends MigrateUpgradeTestBase {
     $this->submitForm([], 'Perform upgrade');
     $this->assertUpgrade($this->getEntityCounts());
 
-    \Drupal::service('module_installer')->install(['book']);
-
     // Test incremental migration.
     $this->createContentPostUpgrade();
 
@@ -65,6 +63,14 @@ abstract class MigrateUpgradeExecuteTestBase extends MigrateUpgradeTestBase {
     // Set up an override.
     $settings['config']['system.mail']['interface']['default'] = (object) [
       'value' => 'test_mail_collector',
+      'required' => TRUE,
+    ];
+    $settings['config']['system.mail']['mailer_dsn']['scheme'] = (object) [
+      'value' => 'null',
+      'required' => TRUE,
+    ];
+    $settings['config']['system.mail']['mailer_dsn']['host'] = (object) [
+      'value' => 'null',
       'required' => TRUE,
     ];
     $this->writeSettings($settings);

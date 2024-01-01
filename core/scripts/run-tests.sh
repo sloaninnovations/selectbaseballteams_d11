@@ -335,6 +335,14 @@ All arguments are long options.
               will be used. The default is that any unexpected silenced
               deprecation error will fail tests.
 
+  --ci-parallel-node-total
+
+              The total number of instances of this job running in parallel.
+
+  --ci-parallel-node-index
+
+              The index of the job in the job set.
+
   <test1>[,<test2>[,<test3> ...]]
 
               One or more tests to be run. By default, these are interpreted
@@ -352,7 +360,7 @@ Drupal installation as the webserver user (differs per configuration), or root:
 sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$args['script']}
   --url http://example.com/ --all
 sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$args['script']}
-  --url http://example.com/ --class "Drupal\block\Tests\BlockTest"
+  --url http://example.com/ --class Drupal\block\Tests\BlockTest
 
 Without a preinstalled Drupal site, specify a SQLite database pathname to create
 and the default database connection info to use in tests:

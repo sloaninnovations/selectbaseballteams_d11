@@ -1,0 +1,13 @@
+bartik
+dblog
+drupalci
+druplicon
+drush
+langcode
+langcodes
+olivero
+olivero's
+simpletest
+tempstore
+umami
+validatable

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Render\RendererTestBase.
- */
-
 namespace Drupal\Tests\Core\Render;
 
 use Drupal\Core\Cache\Cache;
@@ -16,6 +11,7 @@ use Drupal\Core\Render\PlaceholderGenerator;
 use Drupal\Core\Render\PlaceholderingRenderCache;
 use Drupal\Core\Render\Renderer;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,9 +61,9 @@ abstract class RendererTestBase extends UnitTestCase {
   /**
    * The mocked controller resolver.
    *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Utility\CallableResolver|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $controllerResolver;
+  protected $callableResolver;
 
   /**
    * The mocked theme manager.
@@ -119,7 +115,10 @@ abstract class RendererTestBase extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->controllerResolver = $this->createMock('Drupal\Core\Controller\ControllerResolverInterface');
+    $this->callableResolver = $this->createMock(CallableResolver::class);
+    $this->callableResolver->expects($this->any())
+      ->method('getCallableFromDefinition')
+      ->willReturnArgument(0);
     $this->themeManager = $this->createMock('Drupal\Core\Theme\ThemeManagerInterface');
     $this->elementInfo = $this->createMock('Drupal\Core\Render\ElementInfoManagerInterface');
     $this->elementInfo->expects($this->any())
@@ -181,7 +180,7 @@ abstract class RendererTestBase extends UnitTestCase {
       });
     $this->placeholderGenerator = new PlaceholderGenerator($this->cacheContextsManager, $this->rendererConfig);
     $this->renderCache = new PlaceholderingRenderCache($this->requestStack, $this->cacheFactory, $this->cacheContextsManager, $this->placeholderGenerator);
-    $this->renderer = new Renderer($this->controllerResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig);
+    $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig);
 
     $container = new ContainerBuilder();
     $container->set('cache_contexts_manager', $this->cacheContextsManager);
@@ -314,6 +313,11 @@ class PlaceholdersTest implements TrustedCallbackInterface {
    *   A renderable array.
    */
   public static function callbackPerUser($animal) {
+    // As well as adding the user cache context, additionally suspend the
+    // current Fiber if there is one.
+    if ($fiber = \Fiber::getCurrent()) {
+      $fiber->suspend();
+    }
     $build = static::callback($animal);
     $build['#cache']['contexts'][] = 'user';
     return $build;

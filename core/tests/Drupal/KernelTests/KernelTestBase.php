@@ -37,6 +37,7 @@ use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 
 /**
  * Base class for functional integration tests.
@@ -227,8 +228,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected static $configSchemaCheckerExclusions = [
     // Following are used to test lack of or partial schema. Where partial
     // schema is provided, that is explicitly tested in specific tests.
-    'config_schema_test.noschema',
-    'config_schema_test.someschema',
+    'config_schema_test.no_schema',
+    'config_schema_test.some_schema',
     'config_schema_test.schema_data_types',
     'config_schema_test.no_schema_data_types',
     // Used to test application of schema to filtering of configuration.
@@ -241,9 +242,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
     VarDumper::setHandler(TestVarDumper::class . '::cliHandler');
-
-    // Change the current dir to DRUPAL_ROOT.
-    chdir(static::getDrupalRoot());
   }
 
   /**
@@ -430,7 +428,14 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // While this should be enforced via settings.php prior to installation,
     // some tests expect to be able to test mail system implementations.
     $GLOBALS['config']['system.mail']['interface']['default'] = 'test_mail_collector';
-
+    $GLOBALS['config']['system.mail']['mailer_dsn'] = [
+      'scheme' => 'null',
+      'host' => 'null',
+      'user' => NULL,
+      'password' => NULL,
+      'port' => NULL,
+      'options' => [],
+    ];
     // Manually configure the default file scheme so that modules that use file
     // functions don't have to install system and its configuration.
     // @see file_default_scheme()
@@ -576,21 +581,15 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $container->setParameter('language.default_values', Language::$defaultValues);
 
     if ($this->strictConfigSchema) {
+      $test_file_name = (new \ReflectionClass($this))->getFileName();
+      // @todo Decide in https://www.drupal.org/project/drupal/issues/3395099 when/how to trigger deprecation errors or even failures for contrib modules.
+      $is_core_test = str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
       $container
         ->register('testing.config_schema_checker', ConfigSchemaChecker::class)
         ->addArgument(new Reference('config.typed'))
         ->addArgument($this->getConfigSchemaExclusions())
+        ->addArgument($is_core_test)
         ->addTag('event_subscriber');
-    }
-
-    if ($container->hasDefinition('path_alias.path_processor')) {
-      // The alias-based processor requires the path_alias entity schema to be
-      // installed, so we prevent it from being registered to the path processor
-      // manager. We do this by removing the tags that the compiler pass looks
-      // for. This means that the URL generator can safely be used within tests.
-      $container->getDefinition('path_alias.path_processor')
-        ->clearTag('path_processor_inbound')
-        ->clearTag('path_processor_outbound');
     }
 
     // Relax the password hashing cost in tests to avoid performance issues.
@@ -659,6 +658,19 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * {@inheritdoc}
    */
   protected function tearDown(): void {
+    if ($this->container) {
+      // Clean up mock session started in DrupalKernel::preHandle().
+      try {
+        /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
+        $session = $this->container->get('request_stack')->getSession();
+        $session->clear();
+        $session->save();
+      }
+      catch (SessionNotFoundException) {
+        @trigger_error('Pushing requests without a session onto the request_stack is deprecated in drupal:10.3.0 and an error will be thrown from drupal:11.0.0. See https://www.drupal.org/node/3337193', E_USER_DEPRECATED);
+      }
+    }
+
     // Destroy the testing kernel.
     if (isset($this->kernel)) {
       $this->kernel->shutdown();

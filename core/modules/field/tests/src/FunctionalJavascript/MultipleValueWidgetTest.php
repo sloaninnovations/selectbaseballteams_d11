@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\FunctionalJavascript;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -150,6 +152,21 @@ class MultipleValueWidgetTest extends WebDriverTestBase {
 
     // Assert that the wrapper exists and isn't nested.
     $this->assertSession()->elementsCount('css', '[data-drupal-selector="edit-field-unlimited-wrapper"]', 1);
+
+    // Test removing items/values on saved entities resets to initial value.
+    $this->submitForm([], 'Save');
+    $field_2_remove_button->click();
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $field_1_remove_button->click();
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $field_0_remove_button->click();
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $add_more_button->click();
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSame('', $field_0->getValue());
+    $add_more_button->click();
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSame('', $field_1->getValue());
   }
 
 }
