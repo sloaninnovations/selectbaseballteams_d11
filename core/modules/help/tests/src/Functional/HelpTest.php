@@ -158,12 +158,15 @@ class HelpTest extends BrowserTestBase {
           else {
             $this->assertSession()->linkNotExists($task['title']);
           }
+          // Ensure there are no double escaped '&' or '<' characters.
+          $this->assertSession()->assertNoEscaped('&amp;');
+          $this->assertSession()->assertNoEscaped('&lt;');
+          // Ensure there are no escaped '<' characters.
+          $this->assertSession()->assertNoEscaped('<');
         }
         // Ensure there are no double escaped '&' or '<' characters.
         $this->assertSession()->assertNoEscaped('&amp;');
         $this->assertSession()->assertNoEscaped('&lt;');
-        // Ensure there are no escaped '<' characters.
-        $this->assertSession()->assertNoEscaped('<');
 
         // The help for CKEditor 5 intentionally has escaped '<' so leave this
         // iteration before the assertion below.
