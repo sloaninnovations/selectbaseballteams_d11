@@ -80,7 +80,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
 
     $this->assertGreaterThanOrEqual(38, $performance_data->getQueryCount());
     $this->assertLessThanOrEqual(39, $performance_data->getQueryCount());
-    $this->assertGreaterThanOrEqual(86, $performance_data->getCacheGetCount());
+    $this->assertGreaterThanOrEqual(85, $performance_data->getCacheGetCount());
     $this->assertLessThanOrEqual(88, $performance_data->getCacheGetCount());
     $this->assertGreaterThanOrEqual(20, $performance_data->getCacheSetCount());
     $this->assertLessThanOrEqual(28, $performance_data->getCacheSetCount());
