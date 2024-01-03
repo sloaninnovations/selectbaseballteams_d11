@@ -91,26 +91,28 @@ class BlockContentRevisionsTest extends BlockContentTestBase {
     // Confirm that this is the default revision.
     $this->assertTrue($loaded->isDefaultRevision(), 'Third block revision is the default one.');
 
-    // Place the bloc for testing later.
+    // Place the block for testing later.
     $this->drupalPlaceBlock('block_content:' . $loaded->uuid());
+
+    $loaded_body_text = 'Create a new revision for block_content.';
 
     // Make a new revision and set it to not be default.
     // This will create a new revision that is not "front facing".
     // Save this as a non-default revision.
     $loaded->setNewRevision();
     $loaded->isDefaultRevision(FALSE);
-    $loaded->body = 'Create a new revision for block_content.';
+    $loaded->body = $loaded_body_text;
     $loaded->save();
 
     // Verify body text from latest revision isn't appearing.
     $this->drupalGet('<front>');
-    $this->assertSession()->pageTextNotContains($loaded->body->value);
+    $this->assertSession()->pageTextNotContains($loaded_body_text);
 
     // Confirm that revision body text is not present on default version of
     // block.
     $this->drupalGet('admin/content/block/' . $loaded->id());
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextNotContains($loaded->body->value);
+    $this->assertSession()->pageTextNotContains($loaded_body_text);
 
     // Verify that the non-default revision id is greater than the default
     // revision id.
@@ -123,7 +125,7 @@ class BlockContentRevisionsTest extends BlockContentTestBase {
     $loaded->save();
 
     $this->drupalGet('<front>');
-    $this->assertSession()->pageTextContains($loaded->body->value);
+    $this->assertSession()->pageTextContains($loaded_body_text);
   }
 
 }
