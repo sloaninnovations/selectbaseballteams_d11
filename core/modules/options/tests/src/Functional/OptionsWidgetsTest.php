@@ -404,11 +404,11 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
     // A required field without any value has a "none" option.
-    $option = $this->assertSession()->optionExists('edit-card-1', '_none');
+    $option = $this->assertSession()->optionExists('edit-card-1', FormOptionsHelper::OPTIONS_EMPTY_OPTION);
     $this->assertSame('- Select a value -', $option->getText());
 
     // Submit form: select invalid 'none' option.
-    $edit = ['card_1' => '_none'];
+    $edit = ['card_1' => FormOptionsHelper::OPTIONS_EMPTY_OPTION];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->responseContains('This is custom message for required field.');
   }
