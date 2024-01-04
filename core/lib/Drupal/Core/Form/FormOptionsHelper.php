@@ -50,7 +50,7 @@ class FormOptionsHelper {
    *   internally and is not intended to be passed in to the initial function
    *   call.
    *
-   * @return string
+   * @return array
    *   An HTML string of options and optgroups for use in a select form element.
    */
   public static function formSelectOptions(array $element, $choices = NULL) {
@@ -59,7 +59,17 @@ class FormOptionsHelper {
         return [];
       }
       $choices = $element['#options'];
+      $sort_options = isset($element['#sort_options']) && $element['#sort_options'];
+      $sort_start = $element['#sort_start'] ?? 0;
     }
+    else {
+      // We are within an option group.
+      $sort_options = isset($choices['#sort_options']) && $choices['#sort_options'];
+      $sort_start = $choices['#sort_start'] ?? 0;
+      unset($choices['#sort_options']);
+      unset($choices['#sort_start']);
+    }
+
     // array_key_exists() accommodates the rare event where $element['#value']
     // is NULL. isset() fails in this situation.
     $value_valid = isset($element['#value']) || array_key_exists('#value', $element);
@@ -81,7 +91,7 @@ class FormOptionsHelper {
       else {
         $option = [];
         $key = (string) $key;
-        $empty_choice = $empty_value && $key == static::OPTIONS_EMPTY_OPTION;
+        $empty_choice = $empty_value && $key === static::OPTIONS_EMPTY_OPTION;
         if ($value_valid && ((!$value_is_array && (string) $element['#value'] === $key || ($value_is_array && in_array($key, $element['#value']))) || $empty_choice)) {
           $option['selected'] = TRUE;
         }
@@ -93,6 +103,15 @@ class FormOptionsHelper {
         $option['label'] = $choice;
         $options[] = $option;
       }
+    }
+
+    if ($sort_options) {
+      $unsorted = array_slice($options, 0, $sort_start);
+      $sorted = array_slice($options, $sort_start);
+      uasort($sorted, function ($a, $b) {
+        return strcmp((string) $a['label'], (string) $b['label']);
+      });
+      $options = array_merge($unsorted, $sorted);
     }
 
     return $options;
