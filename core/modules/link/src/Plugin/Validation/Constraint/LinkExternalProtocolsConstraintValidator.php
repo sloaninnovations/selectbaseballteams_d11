@@ -24,11 +24,29 @@ class LinkExternalProtocolsConstraintValidator extends ConstraintValidator {
       catch (\InvalidArgumentException) {
         return;
       }
+
       // Disallow external URLs using untrusted protocols.
-      if ($url->isExternal() && !in_array(parse_url($url->getUri(), PHP_URL_SCHEME), UrlHelper::getAllowedProtocols())) {
+      $trusted_protocols = array_merge(UrlHelper::getAllowedProtocols(), $this->getAllowedProtocols($value));
+      if ($url->isExternal() && !in_array(parse_url($url->getUri(), PHP_URL_SCHEME), $trusted_protocols)) {
         $this->context->addViolation($constraint->message, ['@uri' => $value->uri]);
       }
     }
+  }
+
+  /**
+   * Fetch the list of allowed protocols.
+   *
+   * @param mixed $value
+   *   The value that is being validated.
+   *
+   * @return array
+   *   The list of protocols.
+   */
+  protected function getAllowedProtocols($value) {
+    if (!is_null($value->getFieldDefinition()) && !empty($value->getFieldDefinition()->getSettings()['allowed_protocols'])) {
+      return $value->getFieldDefinition()->getSettings()['allowed_protocols'];
+    }
+    return [];
   }
 
 }
