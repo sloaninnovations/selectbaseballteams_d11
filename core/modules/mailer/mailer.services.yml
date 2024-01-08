@@ -3,7 +3,7 @@ services:
     abstract: true
     class: Symfony\Component\Mailer\Transport\AbstractTransportFactory
     arguments:
-      - '@Symfony\Contracts\EventDispatcher\EventDispatcherInterface'
+      - '@Psr\EventDispatcher\EventDispatcherInterface'
       - '@?Symfony\Contracts\HttpClient\HttpClientInterface'
       - '@logger.channel.mail'
   mailer.transport_factory.native:
