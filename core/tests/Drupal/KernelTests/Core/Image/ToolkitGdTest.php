@@ -577,9 +577,9 @@ class ToolkitGdTest extends KernelTestBase {
       restore_error_handler();
       $warning_detected = TRUE;
     };
-    // $error_level is intentionally set to 0. In that case native PHP handler
-    // will be called and our will serve like a notification. It's required for
-    // PHP '@' suppression not trigger ours handler.
+    // $error_level is intentionally set to 0. It's required for PHP '@'
+    // suppression not to trigger Drupal error handler. In that case native
+    // PHP handler will be called and Drupal's will serve like a notification.
     set_error_handler($error_handler, 0);
 
     $image_factory = $this->container->get('image.factory');
