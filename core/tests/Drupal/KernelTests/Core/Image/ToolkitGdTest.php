@@ -566,8 +566,7 @@ class ToolkitGdTest extends KernelTestBase {
    * Tests that GD doesn't trigger warnings for iCCP sRGB profiles.
    *
    * If image is saved with 'sRGB IEC61966-2.1' sRGB profile, GD will trigger
-   * warning: 'imagecreatefrompng(): gd-png: libpng warning: iCCP: known
-   * incorrect sRGB profile'.
+   * a warning about an incorrect sRGB profile'.
    *
    * @dataProvider pngImageProvider
    */
