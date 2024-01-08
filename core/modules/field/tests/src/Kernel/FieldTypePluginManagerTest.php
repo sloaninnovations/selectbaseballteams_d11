@@ -111,6 +111,18 @@ class FieldTypePluginManagerTest extends FieldKernelTestBase {
   }
 
   /**
+   * Tests UI definitions per entity type.
+   */
+  public function testUiDefinitionsPerEntityType() {
+    /** @var \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager */
+    $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
+    $definitions = $field_type_manager->getEntityTypeUiDefinitions('node');
+    $this->assertEquals('Boolean (overridden by alter)', (string) $definitions['boolean']['label']);
+    $definitions = $field_type_manager->getEntityTypeUiDefinitions('entity_test');
+    $this->assertEquals('Boolean', (string) $definitions['boolean']['label']);
+  }
+
+  /**
    * Enable all core modules.
    */
   protected function enableAllCoreModules() {
@@ -119,7 +131,7 @@ class FieldTypePluginManagerTest extends FieldKernelTestBase {
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
     $module_list = array_filter(array_keys($module_list), function ($module) use ($module_handler, $module_list) {
-      return !$module_handler->moduleExists($module) && substr($module_list[$module]->getPath(), 0, 4) === 'core';
+      return !$module_handler->moduleExists($module) && str_starts_with($module_list[$module]->getPath(), 'core');
     });
     $this->enableModules($module_list);
   }

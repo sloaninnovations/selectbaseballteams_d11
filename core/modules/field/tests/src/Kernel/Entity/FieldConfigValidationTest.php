@@ -98,4 +98,30 @@ class FieldConfigValidationTest extends FieldStorageConfigValidationTest {
     parent::testImmutableProperties($valid_values);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function testRequiredPropertyKeysMissing(?array $additional_expected_validation_errors_when_missing = NULL): void {
+    parent::testRequiredPropertyKeysMissing([
+      'dependencies' => [
+        // @see ::testInvalidDependencies()
+        // @see \Drupal\Core\Config\Plugin\Validation\Constraint\RequiredConfigDependenciesConstraintValidator
+        '' => 'This field requires a field storage.',
+      ],
+    ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testRequiredPropertyValuesMissing(?array $additional_expected_validation_errors_when_missing = NULL): void {
+    parent::testRequiredPropertyValuesMissing([
+      'dependencies' => [
+        // @see ::testInvalidDependencies()
+        // @see \Drupal\Core\Config\Plugin\Validation\Constraint\RequiredConfigDependenciesConstraintValidator
+        '' => 'This field requires a field storage.',
+      ],
+    ]);
+  }
+
 }
