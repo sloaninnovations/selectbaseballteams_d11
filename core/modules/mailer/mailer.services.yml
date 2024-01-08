@@ -59,8 +59,5 @@ services:
   Symfony\Component\Mailer\Messenger\MessageHandler: '@mailer.messenger.message_handler'
   mailer.mailer:
     class: Symfony\Component\Mailer\Mailer
-    arguments:
-      - '@Symfony\Component\Mailer\Transport\TransportInterface'
-      - '@?Symfony\Component\Messenger\MessageBusInterface'
-      - '@Symfony\Contracts\EventDispatcher\EventDispatcherInterface'
+    autowire: true
   Symfony\Component\Mailer\MailerInterface: '@mailer.mailer'
