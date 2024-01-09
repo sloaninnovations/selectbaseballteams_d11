@@ -58,7 +58,7 @@ class PagerModalTest extends WebDriverTestBase {
 
     $this->assertTrue($this->assertSession()->waitForText('Current page 2'));
     // Ensure we're still in the modal.
-    $this->assertTrue($this->assertSession()->elementExists('css', '.pager-test-modal')->isVisible());
+    $this->assertTrue($this->assertSession()->elementExists('css', '#drupal-modal')->isVisible());
   }
 
 }
