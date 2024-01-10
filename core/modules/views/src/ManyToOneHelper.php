@@ -194,15 +194,16 @@ class ManyToOneHelper {
           $join = $this->getJoin();
           $join->type = 'LEFT';
           if (!empty($this->handler->view->many_to_one_tables[$field])) {
+            $selected_value = $this->handler->value[0];
             foreach ($this->handler->view->many_to_one_tables[$field] as $value) {
-              $join->extra = [
-                [
+              if ($value == $selected_value) {
+                $join->extra[] = [
                   'field' => $this->handler->realField,
-                  'operator' => '!=',
-                  'value' => $value,
+                  'operator' => '=',
+                  'value' => $selected_value,
                   'numeric' => !empty($this->handler->definition['numeric']),
-                ],
-              ];
+                ];
+              }
             }
           }
 
