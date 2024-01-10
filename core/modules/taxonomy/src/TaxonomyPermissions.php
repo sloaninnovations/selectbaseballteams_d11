@@ -49,7 +49,7 @@ class TaxonomyPermissions implements ContainerInjectionInterface {
    *   Permissions array.
    */
   public function permissions() {
-    return $this->generatePermissions(Vocabulary::loadMultiple(), [$this, 'buildPermissions']);
+    return $this->generatePermissions($this->entityTypeManager->getStorage('taxonomy_vocabulary')->loadMultiple(), [$this, 'buildPermissions']);
   }
 
   /**

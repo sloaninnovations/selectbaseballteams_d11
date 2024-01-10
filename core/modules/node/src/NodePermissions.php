@@ -2,26 +2,61 @@
 
 namespace Drupal\node;
 
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\BundlePermissionHandlerTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\node\Entity\NodeType;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides dynamic permissions for nodes of different types.
  */
-class NodePermissions {
+class NodePermissions implements ContainerInjectionInterface {
   use BundlePermissionHandlerTrait;
   use StringTranslationTrait;
+
+  /**
+   * The node type storage.
+   *
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
+   */
+  protected $nodeTypeStorage;
+
+  /**
+   * Constructs a new NodePermissions object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface|null $entity_type_manager
+   *   The entity type manager.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager = NULL) {
+    if ($entity_type_manager == NULL) {
+      $entity_type_manager = \Drupal::entityTypeManager();
+    }
+    $this->nodeTypeStorage = $entity_type_manager->getStorage('node_type');
+
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static($container->get('entity_type.manager'));
+  }
 
   /**
    * Returns an array of node type permissions.
    *
    * @return array
    *   The node type permissions.
-   *   @see \Drupal\user\PermissionHandlerInterface::getPermissions()
+   *
+   * @see \Drupal\user\PermissionHandlerInterface::getPermissions()
    */
   public function nodeTypePermissions() {
-    return $this->generatePermissions(NodeType::loadMultiple(), [$this, 'buildPermissions']);
+    return $this->generatePermissions(
+      $this->nodeTypeStorage->loadMultiple(),
+      [$this, 'buildPermissions']
+    );
   }
 
   /**
