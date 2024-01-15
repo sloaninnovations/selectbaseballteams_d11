@@ -53,7 +53,7 @@ class FormOptionsHelper {
    * @return array
    *   An HTML string of options and optgroups for use in a select form element.
    */
-  public static function formSelectOptions(array $element, $choices = NULL) {
+  public static function formSelectOptions(array $element, $choices = NULL): array {
     if (!isset($choices)) {
       if (empty($element['#options'])) {
         return [];
@@ -145,11 +145,11 @@ class FormOptionsHelper {
    * @param $key
    *   The key to look for.
    *
-   * @return array
+   * @return array|false
    *   An array of indexes that match the given $key. Array will be empty if no
    *   elements were found. FALSE if optgroups were found.
    */
-  public static function formGetOptions($element, $key) {
+  public static function formGetOptions($element, $key): array|false {
     $keys = [];
     foreach ($element['#options'] as $index => $choice) {
       if (is_array($choice)) {
