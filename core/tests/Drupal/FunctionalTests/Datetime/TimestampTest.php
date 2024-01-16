@@ -154,4 +154,28 @@ class TimestampTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($date->format($medium));
   }
 
+  /**
+   * Tests the "datetime_timestamp" widget default value handling.
+   */
+  public function testWidgetDefaultValue(): void {
+    // Build up a date in the UTC timezone.
+    $value = '2024-01-16 00:00:00';
+    $date = new DrupalDateTime($value, 'UTC');
+
+    // Set a default value for the field.
+    $this->field->setDefaultValue($date->getTimestamp())->save();
+
+    // Update the timezone to the system default.
+    $date->setTimezone(timezone_open(date_default_timezone_get()));
+
+    $this->drupalGet('entity_test/add');
+    $date_format = DateFormat::load('html_date')->getPattern();
+    $time_format = DateFormat::load('html_time')->getPattern();
+    // Make sure the default field value is set as the default value in the widget.
+    $this->assertSession()->fieldExists('field_timestamp[0][value][date]');
+    $this->assertSession()->fieldValueEquals('field_timestamp[0][value][date]', $date->format($date_format));
+    $this->assertSession()->fieldExists('field_timestamp[0][value][time]');
+    $this->assertSession()->fieldValueEquals('field_timestamp[0][value][time]', $date->format($time_format));
+  }
+
 }
