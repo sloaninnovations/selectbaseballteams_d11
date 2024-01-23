@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Unit\Plugin\display;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
+use Drupal\views\Plugin\ViewsPluginManager;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -44,6 +45,20 @@ class PathPluginBaseTest extends UnitTestCase {
   protected $state;
 
   /**
+   * The mocked views data.
+   *
+   * @var \Drupal\views\ViewsData|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $viewsData;
+
+  /**
+   * The display plugin manager.
+   *
+   * @var \Drupal\Component\Plugin\PluginManagerInterface;
+   */
+  protected $displayPluginManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -51,8 +66,51 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
     $this->state = $this->createMock('\Drupal\Core\State\StateInterface');
+    $this->viewsData = $this->getMockBuilder('Drupal\views\ViewsData')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $this->displayPluginManager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $this->displayPluginManager1 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->displayPluginManager2 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->displayPluginManager3 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->displayPluginManager4 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->displayPluginManager5 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->displayPluginManager6 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $this->accessPluginManager = $this->createMock(ViewsPluginManager::class);
+
     $this->pathPlugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\PathPluginBase')
-      ->setConstructorArgs([[], 'path_base', [], $this->routeProvider, $this->state])
+      ->setConstructorArgs([
+        [],
+        'path_base',
+        [],
+        $this->routeProvider,
+        $this->state,
+        $this->viewsData,
+        $this->accessPluginManager,
+        $this->displayPluginManager,
+        $this->displayPluginManager,
+        $this->displayPluginManager,
+        $this->displayPluginManager,
+        $this->displayPluginManager,
+        $this->displayPluginManager,
+      ])
       ->onlyMethods([])
       ->getMock();
     $this->setupContainer();
@@ -96,6 +154,43 @@ class PathPluginBaseTest extends UnitTestCase {
       ->method('get')
       ->willReturn([]);
     $container->set('cache.data', $cache);
+
+    $container->set('plugin.manager.views.access', $this->accessPluginManager);
+
+    $cache_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.cache', $cache_plugin_manager);
+
+    $display_extender_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.display_extender', $display_extender_plugin_manager);
+
+    $exposed_form_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.exposed_form', $exposed_form_plugin_manager);
+
+    $pager_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.pager', $pager_plugin_manager);
+
+    $row_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.row', $row_plugin_manager);
+
+    $style_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.style', $style_plugin_manager);
+
+    $views_data = $this->getMockBuilder('\Drupal\views\ViewsData')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('views.views_data', $views_data);
 
     \Drupal::setContainer($container);
   }
@@ -143,7 +238,21 @@ class PathPluginBaseTest extends UnitTestCase {
       'path' => 'test_route',
     ];
     $this->pathPlugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\PathPluginBase')
-      ->setConstructorArgs([[], 'path_base', ['returns_response' => TRUE], $this->routeProvider, $this->state])
+      ->setConstructorArgs([
+        [],
+        'path_base',
+        ['returns_response' => TRUE],
+        $this->routeProvider,
+        $this->state,
+        $this->viewsData,
+        $this->displayPluginManager,
+        $this->displayPluginManager,
+        $this->displayPluginManager,
+        $this->displayPluginManager,
+        $this->displayPluginManager,
+        $this->displayPluginManager,
+        $this->displayPluginManager,
+      ])
       ->onlyMethods([])
       ->getMock();
     $this->pathPlugin->initDisplay($view, $display);
@@ -359,7 +468,10 @@ class PathPluginBaseTest extends UnitTestCase {
    */
   public function testAlterRouteWithAlterCallback(): void {
     $collection = new RouteCollection();
-    $collection->add('test_route', new Route('test_route', ['_controller' => 'Drupal\Tests\Core\Controller\TestController::content', '_title_callback' => '\Drupal\Tests\views\Unit\Plugin\display\TestController::testTitle']));
+    $collection->add('test_route', new Route('test_route', [
+      '_controller' => 'Drupal\Tests\Core\Controller\TestController::content',
+      '_title_callback' => '\Drupal\Tests\views\Unit\Plugin\display\TestController::testTitle',
+    ]));
     $route_2 = new Route('test_route/example', ['_controller' => 'Drupal\Tests\Core\Controller\TestController::content']);
     $collection->add('test_route_2', $route_2);
 
