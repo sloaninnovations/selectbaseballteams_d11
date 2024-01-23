@@ -12,6 +12,7 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\views\Entity\View;
 use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\ViewExecutableFactory;
+use Drupal\views\ViewsData;
 use Drupal\views_ui\ViewListBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -21,6 +22,20 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @group views_ui
  */
 class ViewListBuilderTest extends UnitTestCase {
+
+  /**
+   * The views data.
+   *
+   * @var \Drupal\views\ViewsData
+   */
+  protected ViewsData $viewsData;
+
+  /**
+   * The plugin manager for views plugins.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager
+   */
+  protected ViewsPluginManager $viewPluginManager;
 
   /**
    * Tests the listing of displays on a views list builder.
@@ -40,30 +55,9 @@ class ViewListBuilderTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->displayPluginManager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+    $this->viewPluginManager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
       ->disableOriginalConstructor()
       ->getMock();
-
-    $this->displayPluginManager1 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->displayPluginManager2 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->displayPluginManager3 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->displayPluginManager4 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->displayPluginManager5 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->displayPluginManager6 = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $this->accessPluginManager = $this->createMock(ViewsPluginManager::class);
 
     $display_manager->expects($this->any())
       ->method('getDefinition')
@@ -111,13 +105,13 @@ class ViewListBuilderTest extends UnitTestCase {
         'default',
         $display_manager->getDefinition('default'),
         $this->viewsData,
-        $this->accessPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
       ])
       ->getMock();
     $route_provider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
@@ -135,13 +129,13 @@ class ViewListBuilderTest extends UnitTestCase {
         $menu_storage,
         $parent_form_selector,
         $this->viewsData,
-        $this->accessPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
       ])
       ->getMock();
     $page_display->expects($this->any())
@@ -159,13 +153,13 @@ class ViewListBuilderTest extends UnitTestCase {
         'default',
         $display_manager->getDefinition('embed'),
         $this->viewsData,
-        $this->accessPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
-        $this->displayPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
       ])
       ->getMock();
 
