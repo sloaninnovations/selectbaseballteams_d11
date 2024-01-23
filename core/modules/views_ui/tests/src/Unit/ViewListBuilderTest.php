@@ -65,7 +65,6 @@ class ViewListBuilderTest extends UnitTestCase {
 
     $this->accessPluginManager = $this->createMock(ViewsPluginManager::class);
 
-
     $display_manager->expects($this->any())
       ->method('getDefinition')
       ->willReturnMap([
