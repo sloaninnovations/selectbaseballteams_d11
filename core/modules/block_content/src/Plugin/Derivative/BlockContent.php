@@ -43,6 +43,12 @@ class BlockContent extends DeriverBase implements ContainerDeriverInterface {
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
+    // We use an aggregate query here because we need access to UUID, info and
+    // type. An entity query would only return the ID, and then we would need
+    // to use ::loadMultiple to load every reusable block content entity. This
+    // has a performance impact. Using an aggregate query allows us to fetch
+    // the information we need to calculate the derivatives without the expense
+    // of loading the entities.
     $block_contents = $this->blockContentStorage->getAggregateQuery()
       ->condition('reusable', TRUE)
       ->groupBy('uuid')
