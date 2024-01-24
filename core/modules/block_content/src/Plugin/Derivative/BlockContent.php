@@ -47,6 +47,7 @@ class BlockContent extends DeriverBase implements ContainerDeriverInterface {
       ->condition('reusable', TRUE)
       ->groupBy('uuid')
       ->groupBy('info')
+      ->accessCheck(FALSE)
       ->groupBy('type')
       ->execute();
     // Reset the discovered definitions.
