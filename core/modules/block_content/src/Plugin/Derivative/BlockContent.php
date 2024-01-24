@@ -55,7 +55,7 @@ class BlockContent extends DeriverBase implements ContainerDeriverInterface {
     foreach ($block_contents as $block_content) {
       $uuid = $block_content['uuid'];
       $this->derivatives[$uuid] = $base_plugin_definition;
-      $this->derivatives[$uuid]['admin_label'] = $block_content['label'];
+      $this->derivatives[$uuid]['admin_label'] = $block_content['info'];
       $this->derivatives[$uuid]['config_dependencies']['content'] = [
         sprintf('block_content:%s:%s', $block_content['type'], $block_content['uuid']),
       ];
