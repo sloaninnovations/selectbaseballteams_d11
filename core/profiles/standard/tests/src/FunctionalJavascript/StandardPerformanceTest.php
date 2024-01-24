@@ -55,8 +55,8 @@ class StandardPerformanceTest extends PerformanceTestBase {
       $this->drupalGet('');
     }, 'standardFrontPage');
     $this->assertNoJavaScript($performance_data);
-    $this->assertSame(66, $performance_data->getQueryCount());
-    $this->assertSame(135, $performance_data->getCacheGetCount());
+    $this->assertSame(58, $performance_data->getQueryCount());
+    $this->assertSame(124, $performance_data->getCacheGetCount());
     $this->assertSame(47, $performance_data->getCacheSetCount());
     $this->assertSame(0, $performance_data->getCacheDeleteCount());
 
