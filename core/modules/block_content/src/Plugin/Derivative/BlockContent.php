@@ -43,15 +43,20 @@ class BlockContent extends DeriverBase implements ContainerDeriverInterface {
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
-    $block_contents = $this->blockContentStorage->loadByProperties(['reusable' => TRUE]);
+    $block_contents = $this->blockContentStorage->getAggregateQuery()
+      ->condition('reusable', TRUE)
+      ->groupBy('uuid')
+      ->groupBy('info')
+      ->groupBy('type')
+      ->execute();
     // Reset the discovered definitions.
     $this->derivatives = [];
-    /** @var \Drupal\block_content\Entity\BlockContent $block_content */
     foreach ($block_contents as $block_content) {
-      $this->derivatives[$block_content->uuid()] = $base_plugin_definition;
-      $this->derivatives[$block_content->uuid()]['admin_label'] = $block_content->label() ?? ($block_content->type->entity->label() . ': ' . $block_content->id());
-      $this->derivatives[$block_content->uuid()]['config_dependencies']['content'] = [
-        $block_content->getConfigDependencyName(),
+      $uuid = $block_content['uuid'];
+      $this->derivatives[$uuid] = $base_plugin_definition;
+      $this->derivatives[$uuid]['admin_label'] = $block_content['label'];
+      $this->derivatives[$uuid]['config_dependencies']['content'] = [
+        sprintf('block_content:%s:%s', $block_content['type'], $block_content['uuid']),
       ];
     }
     return parent::getDerivativeDefinitions($base_plugin_definition);
