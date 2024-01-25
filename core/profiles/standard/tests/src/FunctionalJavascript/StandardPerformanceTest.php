@@ -67,7 +67,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertNoJavaScript($performance_data);
 
     $this->assertSame(38, $performance_data->getQueryCount());
-    $this->assertSame(94, $performance_data->getCacheGetCount());
+    $this->assertSame(93, $performance_data->getCacheGetCount());
     $this->assertSame(16, $performance_data->getCacheSetCount());
     $this->assertSame(0, $performance_data->getCacheDeleteCount());
 
