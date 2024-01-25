@@ -1635,7 +1635,7 @@ function template_preprocess_field_multiple_value_form(&$variables) {
         'colspan' => 2,
         'class' => ['field-label'],
       ],
-      [],
+      '',
       t('Order', [], ['context' => 'Sort order']),
     ];
     $rows = [];
