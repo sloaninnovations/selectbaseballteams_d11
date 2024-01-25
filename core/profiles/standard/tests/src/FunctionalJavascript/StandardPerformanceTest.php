@@ -68,7 +68,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
 
     $this->assertSame(38, $performance_data->getQueryCount());
     $this->assertSame(93, $performance_data->getCacheGetCount());
-    $this->assertSame(16, $performance_data->getCacheSetCount());
+    $this->assertSame(15, $performance_data->getCacheSetCount());
     $this->assertSame(0, $performance_data->getCacheDeleteCount());
 
     // Test user profile page.
