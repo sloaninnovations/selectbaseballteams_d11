@@ -3,6 +3,14 @@
 namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Config\Schema\Ignore;
+use Drupal\Core\Config\Schema\Mapping;
+use Drupal\Core\Config\Schema\Sequence;
+use Drupal\Core\Config\Schema\SequenceDataDefinition;
+use Drupal\Core\TypedData\PrimitiveInterface;
+use Drupal\Core\TypedData\Type\FloatInterface;
+use Drupal\Core\TypedData\Type\IntegerInterface;
+use Drupal\Core\Config\Schema\Undefined;
 
 /**
  * Provides a base class for configuration objects with storage support.
@@ -192,6 +200,105 @@ abstract class StorableConfigBase extends ConfigBase {
     elseif ($value !== NULL && !is_scalar($value)) {
       throw new UnsupportedDataTypeConfigException("Invalid data type for config element {$this->getName()}:$key");
     }
+  }
+
+  /**
+   * Casts the value to correct data type using the configuration schema.
+   *
+   * @param string|null $key
+   *   A string that maps to a key within the configuration data. If NULL the
+   *   top level mapping will be processed.
+   * @param mixed $value
+   *   Value to associate with the key.
+   *
+   * @return mixed
+   *   The value cast to the type indicated in the schema.
+   *
+   * @throws \Drupal\Core\Config\UnsupportedDataTypeConfigException
+   *   If the value is unsupported in configuration.
+   *
+   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
+   *   Element::getCanonicalRepresentation() instead.
+   * @see https://www.drupal.org/node/1337
+   */
+  protected function castValue($key, $value) {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Call ::getCanonicalRepresentation() on the typed config instead. See https://www.drupal.org/node/1337', E_USER_DEPRECATED);
+
+    $element = $this->getSchemaWrapper();
+    if ($key !== NULL) {
+      $element = $element->get($key);
+    }
+
+    // Do not cast value if it is unknown or defined to be ignored.
+    if ($element && ($element instanceof Undefined || $element instanceof Ignore)) {
+      // Do validate the value (may throw UnsupportedDataTypeConfigException)
+      // to ensure unsupported types are not supported in this case either.
+      $this->validateValue($key, $value);
+      return $value;
+    }
+    if (is_scalar($value) || $value === NULL) {
+      if ($element && $element instanceof PrimitiveInterface) {
+        // Special handling for integers and floats since the configuration
+        // system is primarily concerned with saving values from the Form API
+        // we have to special case the meaning of an empty string for numeric
+        // types. In PHP this would be casted to a 0 but for the purposes of
+        // configuration we need to treat this as a NULL.
+        $empty_value = $value === '' && ($element instanceof IntegerInterface || $element instanceof FloatInterface);
+
+        if ($value === NULL || $empty_value) {
+          $value = NULL;
+        }
+        else {
+          $value = $element->getCastedValue();
+        }
+      }
+    }
+    else {
+      // Throw exception on any non-scalar or non-array value.
+      if (!is_array($value)) {
+        throw new UnsupportedDataTypeConfigException("Invalid data type for config element {$this->getName()}:$key");
+      }
+      // Recurse into any nested keys.
+      foreach ($value as $nested_value_key => $nested_value) {
+        $lookup_key = $key ? $key . '.' . $nested_value_key : $nested_value_key;
+        $value[$nested_value_key] = $this->castValue($lookup_key, $nested_value);
+      }
+
+      // Only sort maps when we have more than 1 element to sort.
+      if ($element instanceof Mapping && count($value) > 1) {
+        $mapping = $element->getDataDefinition()['mapping'];
+        if (is_array($mapping)) {
+          // Only sort the keys in $value.
+          $mapping = array_intersect_key($mapping, $value);
+          // Sort the array in $value using the mapping definition.
+          $value = array_replace($mapping, $value);
+        }
+      }
+
+      if ($element instanceof Sequence) {
+        $data_definition = $element->getDataDefinition();
+        if ($data_definition instanceof SequenceDataDefinition) {
+          // Apply any sorting defined on the schema.
+          switch ($data_definition->getOrderBy()) {
+            case 'key':
+              ksort($value);
+              break;
+
+            case 'value':
+              // The PHP documentation notes that "Be careful when sorting
+              // arrays with mixed types values because sort() can produce
+              // unpredictable results". There is no risk here because
+              // \Drupal\Core\Config\StorableConfigBase::castValue() has
+              // already cast all values to the same type using the
+              // configuration schema.
+              sort($value);
+              break;
+
+          }
+        }
+      }
+    }
+    return $value;
   }
 
 }
