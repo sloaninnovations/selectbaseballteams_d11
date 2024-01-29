@@ -4,6 +4,7 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Config\Schema\Mapping;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -208,7 +209,9 @@ class Config extends StorableConfigBase {
       if ($this->typedConfigManager->hasConfigSchema($this->name)) {
         // Ensure that the schema wrapper has the latest data.
         $this->schemaWrapper = NULL;
-        $this->data = $this->castValue(NULL, $this->data);
+        $this->data = $this->getSchemaWrapper()->getCanonicalRepresentation();
+        // All config is of `type: config_object`, which is always a mapping.
+        assert($this->schemaWrapper instanceof Mapping);
       }
       else {
         foreach ($this->data as $key => $value) {
