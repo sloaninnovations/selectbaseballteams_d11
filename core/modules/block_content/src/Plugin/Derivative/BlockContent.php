@@ -14,22 +14,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BlockContent extends DeriverBase implements ContainerDeriverInterface {
 
   /**
-   * The content block storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $blockContentStorage;
-
-  /**
    * Constructs a BlockContent object.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $block_content_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $blockContentStorage
    *   The content block storage.
    * @param \Drupal\Core\Language\LanguageManagerInterface|null $languageManager
    *   Language manager.
    */
   public function __construct(
-    protected EntityStorageInterface $block_content_storage,
+    protected EntityStorageInterface $blockContentStorage,
     protected ?LanguageManagerInterface $languageManager = NULL) {
     if (!$this->languageManager) {
       @trigger_error('Calling ' . __METHOD__ . ' without the $languageManager argument is deprecated in drupal:10.2.3 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3417692', E_USER_DEPRECATED);
