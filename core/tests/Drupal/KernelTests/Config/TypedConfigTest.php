@@ -77,16 +77,17 @@ class TypedConfigTest extends KernelTestBase {
     $this->assertArrayHasKey('count', $mapping->getProperties());
 
     // Test accessing sequences.
-    $sequence = $typed_config->get('giraffe');
+    $sequence = $typed_config->get('giraffes.unsorted');
     /** @var \Drupal\Core\TypedData\ListInterface $sequence */
     $this->assertInstanceOf(SequenceDataDefinition::class, $sequence->getDataDefinition());
     $this->assertSame(Sequence::class, $sequence->getDataDefinition()->getClass());
-    $this->assertSame('sequence', $sequence->getDataDefinition()->getDataType());
+    $this->assertSame('config_test.validation.giraffes', $sequence->getDataDefinition()->getDataType());
     $this->assertInstanceOf(ComplexDataInterface::class, $sequence);
     $this->assertInstanceOf(StringInterface::class, $sequence->get('hum1'));
-    $this->assertEquals('hum1', $sequence->get('hum1')->getValue());
-    $this->assertEquals('hum2', $sequence->get('hum2')->getValue());
-    $this->assertCount(2, $sequence->getIterator());
+    $this->assertSame('humZ', $sequence->get('hum1')->getValue());
+    $this->assertSame('humX', $sequence->get('hum2')->getValue());
+    $this->assertSame('humY', $sequence->get('hum3')->getValue());
+    $this->assertCount(3, $sequence->getIterator());
     // Verify the item metadata is available.
     $this->assertInstanceOf(SequenceDataDefinition::class, $sequence->getDataDefinition());
 
@@ -95,7 +96,7 @@ class TypedConfigTest extends KernelTestBase {
     $typed_config_manager = \Drupal::service('config.typed');
     $typed_config = $typed_config_manager->createFromNameAndData('config_test.validation', \Drupal::configFactory()->get('config_test.validation')->get());
     $this->assertInstanceOf(TypedConfigInterface::class, $typed_config);
-    $this->assertEquals(['_core', 'llama', 'cat', 'giraffe', 'uuid', 'langcode', 'string__not_blank'], array_keys($typed_config->getElements()));
+    $this->assertEquals(['_core', 'llama', 'cat', 'giraffes', 'uuid', 'langcode', 'string__not_blank'], array_keys($typed_config->getElements()));
     $this->assertSame('config_test.validation', $typed_config->getName());
     $this->assertSame('config_test.validation', $typed_config->getPropertyPath());
     $this->assertSame('config_test.validation.llama', $typed_config->get('llama')->getPropertyPath());
@@ -184,7 +185,7 @@ class TypedConfigTest extends KernelTestBase {
 
     // Test constrains on sequences elements.
     $config->set('cat.type', 'nyans');
-    $config->set('giraffe', ['muh', 'hum2']);
+    $config->set('giraffes.unsorted', ['muh', 'hum2']);
     $config->save();
     $typed_config = $typed_config_manager->get('config_test.validation');
     $result = $typed_config->validate();
@@ -192,19 +193,19 @@ class TypedConfigTest extends KernelTestBase {
     $this->assertEquals('Giraffes just hum', $result->get(0)->getMessage());
 
     // Test constrains on the sequence itself.
-    $config->set('giraffe', ['hum', 'hum2', 'invalid-key' => 'hum']);
+    $config->set('giraffes.unsorted', ['hum', 'hum2', 'invalid-key' => 'hum']);
     $config->save();
 
     $typed_config = $typed_config_manager->get('config_test.validation');
     $result = $typed_config->validate();
     $this->assertCount(1, $result);
-    $this->assertEquals('giraffe', $result->get(0)->getPropertyPath());
+    $this->assertEquals('giraffes.unsorted', $result->get(0)->getPropertyPath());
     $this->assertEquals('Invalid giraffe key.', $result->get(0)->getMessage());
 
     // Validates mapping.
     $typed_config = $typed_config_manager->get('config_test.validation');
     $value = $typed_config->getValue();
-    unset($value['giraffe']);
+    unset($value['giraffes']);
     $value['elephant'] = 'foo';
     $value['zebra'] = 'foo';
     $typed_config->setValue($value);
