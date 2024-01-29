@@ -199,7 +199,7 @@ class ManyToOneHelper {
             // Check all filters for exposed data.
             foreach ($this->handler->view->filter as $value) {
               // Check current filter field in filter list.
-              if ($value->realField == $this->handler->realField){
+              if ($value->realField == $this->handler->realField) {
                 if (!empty($this->handler->view->exposed_data[$value->options['id']])) {
                   $exposed_field_data[] = $this->handler->view->exposed_data[$value->options['id']];
                 }
