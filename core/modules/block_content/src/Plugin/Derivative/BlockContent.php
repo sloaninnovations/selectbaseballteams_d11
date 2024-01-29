@@ -4,6 +4,7 @@ namespace Drupal\block_content\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -24,9 +25,16 @@ class BlockContent extends DeriverBase implements ContainerDeriverInterface {
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $block_content_storage
    *   The content block storage.
+   * @param \Drupal\Core\Language\LanguageManagerInterface|null $languageManager
+   *   Language manager.
    */
-  public function __construct(EntityStorageInterface $block_content_storage) {
-    $this->blockContentStorage = $block_content_storage;
+  public function __construct(
+    protected EntityStorageInterface $block_content_storage,
+    protected ?LanguageManagerInterface $languageManager = NULL) {
+    if (!$this->languageManager) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $languageManager argument is deprecated in drupal:10.2.3 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3417692', E_USER_DEPRECATED);
+      $this->languageManager = \Drupal::service('language_manager');
+    }
   }
 
   /**
@@ -35,7 +43,8 @@ class BlockContent extends DeriverBase implements ContainerDeriverInterface {
   public static function create(ContainerInterface $container, $base_plugin_id) {
     $entity_type_manager = $container->get('entity_type.manager');
     return new static(
-      $entity_type_manager->getStorage('block_content')
+      $entity_type_manager->getStorage('block_content'),
+      $container->get('language_manager'),
     );
   }
 
@@ -51,6 +60,7 @@ class BlockContent extends DeriverBase implements ContainerDeriverInterface {
     // of loading the entities.
     $block_contents = $this->blockContentStorage->getAggregateQuery()
       ->condition('reusable', TRUE)
+      ->condition('langcode', $this->languageManager->getDefaultLanguage())
       ->groupBy('uuid')
       ->groupBy('info')
       ->accessCheck(FALSE)
