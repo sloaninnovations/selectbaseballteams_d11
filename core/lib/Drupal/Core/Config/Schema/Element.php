@@ -55,4 +55,12 @@ abstract class Element extends TypedData {
     return $this;
   }
 
+  /**
+   * Generates the canonical representation for schema-defined configuration.
+   *
+   * @return mixed
+   *   The value cast to the type indicated in the schema.
+   */
+  abstract public function getCanonicalRepresentation() : mixed;
+
 }

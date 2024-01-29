@@ -22,6 +22,10 @@ class BooleanData extends PrimitiveBase implements BooleanInterface {
    * {@inheritdoc}
    */
   public function getCastedValue() {
+    if ($this->value === NULL) {
+      return NULL;
+    }
+
     return (bool) $this->value;
   }
 

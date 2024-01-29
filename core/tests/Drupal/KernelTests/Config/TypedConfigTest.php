@@ -58,6 +58,40 @@ class TypedConfigTest extends KernelTestBase {
     /** @var \Drupal\Core\Config\Schema\TypedConfigInterface $typed_config */
     $typed_config = $typed_config_manager->get('config_test.validation');
 
+    // Note how this ordering matches that in the schema.
+    // @see core/modules/config/tests/config_test/config/schema/config_test.schema.yml
+    $this->assertSame([
+      '_core' => [
+        // cspell:disable-next-line
+        'default_config_hash' => 'f9T-mGn3hq-0cVuKdZKMmodjaqoPeGLHSaUEqIiKHko',
+      ],
+      'langcode' => 'en',
+      'llama' => 'llama',
+      'cat' => [
+        'type' => 'kitten',
+        'count' => 2,
+      ],
+      'giraffes' => [
+        'unsorted' => [
+          'hum1' => 'humZ',
+          'hum3' => 'humY',
+          'hum2' => 'humX',
+        ],
+        'sorted_by_key' => [
+          'hum1' => 'humZ',
+          'hum2' => 'humX',
+          'hum3' => 'humY',
+        ],
+        'sorted_by_value' => [
+          0 => 'humX',
+          1 => 'humY',
+          2 => 'humZ',
+        ],
+      ],
+      'uuid' => '7C30C50E-641A-4E34-A7F1-46BCFB9BE5A3',
+      'string__not_blank' => 'this is a label',
+    ], $typed_config->getCanonicalRepresentation());
+
     // Test a primitive.
     $string_data = $typed_config->get('llama');
     $this->assertInstanceOf(StringInterface::class, $string_data);
@@ -111,6 +145,19 @@ class TypedConfigTest extends KernelTestBase {
     $typed_config = $typed_config_manager->createFromNameAndData($config_test_entity->getConfigDependencyName(), $config_test_entity->toArray());
     $this->assertInstanceOf(TypedConfigInterface::class, $typed_config);
     $this->assertEquals(['uuid', 'langcode', 'status', 'dependencies', 'id', 'label', 'weight', 'style', 'size', 'size_value', 'protected_property'], array_keys($typed_config->getElements()));
+    $this->assertSame([
+      'uuid' => $config_test_entity->uuid(),
+      'langcode' => 'en',
+      'status' => TRUE,
+      'dependencies' => [],
+      'id' => 'test',
+      'label' => 'Test',
+      'weight' => 11,
+      'style' => 'test_style',
+      'size' => NULL,
+      'size_value' => NULL,
+      'protected_property' => NULL,
+    ], $typed_config->getCanonicalRepresentation());
   }
 
   /**

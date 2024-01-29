@@ -5,6 +5,7 @@ namespace Drupal\Core\Config\Schema;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\MapDataDefinition;
+use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
@@ -289,6 +290,41 @@ class Mapping extends ArrayElement {
       $possible_types[] = $fallback_type;
     }
     return $possible_types;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCanonicalRepresentation(): array {
+    $representation = [];
+
+    // Mapping keys should be ordered however the data definition says.
+    // Note: this specifically does NOT use required/optional keys, because this
+    // MUST work even on invalid data (i.e. when required keys are missing).
+    $ordered_mapping_keys = $this->getValidKeys();
+
+    // Generate a representation of this mapping:
+    // 1. defer to each value's own canonical representation
+    // (::getElements() respects the stored order in $this->value, not the
+    // schema order)
+    // 2. respect the schema-defined order of mapping keys
+    $elements = $this->getElements();
+    foreach ($ordered_mapping_keys as $key) {
+      if (array_key_exists($key, $elements)) {
+        $representation[$key] = $elements[$key] instanceof PrimitiveInterface
+          ? $elements[$key]->getCastedValue()
+          : $elements[$key]->getCanonicalRepresentation();
+      }
+    }
+    // 3. include even key-value pairs absent from schema.
+    // @see \Drupal\KernelTests\Core\Config\ConfigSchemaTest::testConfigSaveWithSchema()
+    $schemaless_keys = array_diff_key($elements, array_fill_keys($ordered_mapping_keys, NULL));
+    foreach ($schemaless_keys as $key => $definition) {
+      assert($definition instanceof Undefined);
+      $representation[$key] = $definition->getCanonicalRepresentation();
+    }
+
+    return $representation;
   }
 
 }

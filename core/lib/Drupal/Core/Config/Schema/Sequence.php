@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Config\Schema;
 
+use Drupal\Core\TypedData\PrimitiveInterface;
+
 /**
  * Defines a configuration element of type Sequence.
  *
@@ -35,6 +37,48 @@ class Sequence extends ArrayElement {
       $definition = $this->definition['sequence'];
     }
     return $this->buildDataDefinition($definition, $value, $key);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCanonicalRepresentation(): mixed {
+    $representation = [];
+
+    // Sequence keys should be ordered however the data definition says.
+    $data_definition = $this->getDataDefinition();
+    assert($data_definition instanceof SequenceDataDefinition);
+    $orderby = $data_definition->getOrderBy();
+
+    // Generate a representation of this sequence:
+    // 1. defer to each value's own canonical representation
+    // (::getElements() respects the stored order in $this->value, not the
+    // schema order)
+    // 2. respect the `orderby` instruction in the schema
+    // @see \Drupal\Core\Config\Schema\SequenceDataDefinition::getOrderBy()
+    $elements = $this->getElements();
+    foreach ($elements as $key => $definition) {
+      $representation[$key] = $elements[$key] instanceof PrimitiveInterface
+        ? $elements[$key]->getCastedValue()
+        : $elements[$key]->getCanonicalRepresentation();
+    }
+    switch ($orderby) {
+      case 'key':
+        ksort($representation);
+        break;
+
+      case 'value':
+        // The PHP documentation notes that "Be careful when sorting
+        // arrays with mixed types values because sort() can produce
+        // unpredictable results". There is no risk here because
+        // \Drupal\Core\Config\StorableConfigBase::castValue() has
+        // already cast all values to the same type using the
+        // configuration schema.
+        sort($representation);
+        break;
+    }
+
+    return $representation;
   }
 
 }
