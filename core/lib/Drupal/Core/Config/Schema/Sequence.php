@@ -43,6 +43,11 @@ class Sequence extends ArrayElement {
    * {@inheritdoc}
    */
   public function getCanonicalRepresentation(): mixed {
+    // Sequences are nullable.
+    if ($this->value === NULL) {
+      return NULL;
+    }
+
     $representation = [];
 
     // Sequence keys should be ordered however the data definition says.
