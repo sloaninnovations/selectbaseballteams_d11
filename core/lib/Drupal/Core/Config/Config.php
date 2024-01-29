@@ -212,6 +212,8 @@ class Config extends StorableConfigBase {
         $this->data = $this->getSchemaWrapper()->getCanonicalRepresentation();
         // All config is of `type: config_object`, which is always a mapping.
         assert($this->schemaWrapper instanceof Mapping);
+        // Ensure that for example resources are never attempted to be saved.
+        $this->validateValue(NULL, $this->data);
       }
       else {
         foreach ($this->data as $key => $value) {
