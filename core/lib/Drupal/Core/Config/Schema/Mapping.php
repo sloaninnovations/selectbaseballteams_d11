@@ -3,6 +3,7 @@
 namespace Drupal\Core\Config\Schema;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\Core\TypedData\PrimitiveInterface;
@@ -295,7 +296,14 @@ class Mapping extends ArrayElement {
   /**
    * {@inheritdoc}
    */
-  public function getCanonicalRepresentation(): array {
+  public function getCanonicalRepresentation(bool $suppress_exceptions = FALSE): array {
+    if (!is_array($this->value)) {
+      if ($suppress_exceptions) {
+        return $this->value;
+      }
+      throw new UnsupportedDataTypeConfigException(sprintf("variable type is %s but applied schema class is %s", gettype($this->value), $this->getDataDefinition()->getClass()));
+    }
+
     $representation = [];
 
     // Mapping keys should be ordered however the data definition says.
@@ -313,7 +321,7 @@ class Mapping extends ArrayElement {
       if (array_key_exists($key, $elements)) {
         $representation[$key] = $elements[$key] instanceof PrimitiveInterface
           ? $elements[$key]->getCastedValue()
-          : $elements[$key]->getCanonicalRepresentation();
+          : $elements[$key]->getCanonicalRepresentation($suppress_exceptions);
       }
     }
     // 3. include even key-value pairs absent from schema.

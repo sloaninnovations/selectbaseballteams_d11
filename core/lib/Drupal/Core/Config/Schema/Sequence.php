@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config\Schema;
 
+use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 use Drupal\Core\TypedData\PrimitiveInterface;
 
 /**
@@ -42,10 +43,16 @@ class Sequence extends ArrayElement {
   /**
    * {@inheritdoc}
    */
-  public function getCanonicalRepresentation(): mixed {
+  public function getCanonicalRepresentation(bool $suppress_exceptions = FALSE): mixed {
     // Sequences are nullable.
     if ($this->value === NULL) {
       return NULL;
+    }
+    if (!is_array($this->value)) {
+      if ($suppress_exceptions) {
+        return $this->value;
+      }
+      throw new UnsupportedDataTypeConfigException(sprintf("variable type is %s but applied schema class is %s", gettype($this->value), $this->getDataDefinition()->getClass()));
     }
 
     $representation = [];
@@ -65,7 +72,7 @@ class Sequence extends ArrayElement {
     foreach ($elements as $key => $definition) {
       $representation[$key] = $elements[$key] instanceof PrimitiveInterface
         ? $elements[$key]->getCastedValue()
-        : $elements[$key]->getCanonicalRepresentation();
+        : $elements[$key]->getCanonicalRepresentation($suppress_exceptions);
     }
     match ($orderby) {
       'key' => ksort($representation),

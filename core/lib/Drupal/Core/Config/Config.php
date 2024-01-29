@@ -209,7 +209,7 @@ class Config extends StorableConfigBase {
       if ($this->typedConfigManager->hasConfigSchema($this->name)) {
         // Ensure that the schema wrapper has the latest data.
         $this->schemaWrapper = NULL;
-        $this->data = $this->getSchemaWrapper()->getCanonicalRepresentation();
+        $this->data = $this->getSchemaWrapper()->getCanonicalRepresentation(TRUE);
         // All config is of `type: config_object`, which is always a mapping.
         assert($this->schemaWrapper instanceof Mapping);
         // Ensure that for example resources are never attempted to be saved.
