@@ -318,7 +318,7 @@ class Mapping extends ArrayElement {
     }
     // 3. include even key-value pairs absent from schema.
     // @see \Drupal\KernelTests\Core\Config\ConfigSchemaTest::testConfigSaveWithSchema()
-    $schemaless_keys = array_diff_key($elements, array_fill_keys($ordered_mapping_keys, NULL));
+    $schemaless_keys = array_diff_key($elements, array_flip($ordered_mapping_keys));
     foreach ($schemaless_keys as $key => $definition) {
       assert($definition instanceof Undefined);
       $representation[$key] = $definition->getCanonicalRepresentation();

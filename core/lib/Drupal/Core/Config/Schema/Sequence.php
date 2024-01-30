@@ -67,21 +67,16 @@ class Sequence extends ArrayElement {
         ? $elements[$key]->getCastedValue()
         : $elements[$key]->getCanonicalRepresentation();
     }
-    switch ($orderby) {
-      case 'key':
-        ksort($representation);
-        break;
-
-      case 'value':
-        // The PHP documentation notes that "Be careful when sorting
-        // arrays with mixed types values because sort() can produce
-        // unpredictable results". There is no risk here because
-        // \Drupal\Core\Config\StorableConfigBase::castValue() has
-        // already cast all values to the same type using the
-        // configuration schema.
-        sort($representation);
-        break;
-    }
+    match ($orderby) {
+      'key' => ksort($representation),
+      // The PHP documentation notes that "Be careful when sorting
+      // arrays with mixed types values because sort() can produce
+      // unpredictable results". There is no risk here because
+      // \Drupal\Core\Config\StorableConfigBase::castValue() has
+      // already cast all values to the same type using the
+      // configuration schema.
+      'value' => sort($representation),
+    };
 
     return $representation;
   }

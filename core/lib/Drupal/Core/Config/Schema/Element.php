@@ -61,6 +61,6 @@ abstract class Element extends TypedData {
    * @return mixed
    *   The value cast to the type indicated in the schema.
    */
-  abstract public function getCanonicalRepresentation() : mixed;
+  abstract public function getCanonicalRepresentation(): mixed;
 
 }
