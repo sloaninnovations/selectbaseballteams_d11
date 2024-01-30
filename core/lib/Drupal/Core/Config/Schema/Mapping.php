@@ -58,7 +58,8 @@ class Mapping extends ArrayElement {
    * Gets all keys allowed in this mapping.
    *
    * @return string[]
-   *   A list of keys allowed in this mapping.
+   *   A list of keys allowed in this mapping, in the order defined by the
+   *   config schema type.
    */
   public function getValidKeys(): array {
     $all_keys = $this->getDefinedKeys();
@@ -311,8 +312,9 @@ class Mapping extends ArrayElement {
     $representation = [];
 
     // Mapping keys should be ordered however the data definition says.
-    // Note: this specifically does NOT use required/optional keys, because this
-    // MUST work even on invalid data (i.e. when required keys are missing).
+    // Note: this specifically does NOT use ::getRequiredKeys() nor
+    // ::getOptionalKeys()`, because this MUST work even on invalid data (i.e.
+    // when required keys are missing).
     $ordered_mapping_keys = $this->getValidKeys();
 
     // Generate a representation of this mapping:
