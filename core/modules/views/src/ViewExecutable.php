@@ -507,13 +507,12 @@ class ViewExecutable {
     // @see \Drupal\views\DisplayPluginCollection::initializePlugin()
     // @see \Drupal\Core\Config\Config::save()
     // @see ::initDisplay()
+    // @see ::setDisplay()
     $current_display_to_restore = $this->current_display;
     $this->current_display = NULL;
     $this->display_handler = NULL;
     $this->displayHandlers->clear();
-    if ($current_display_to_restore) {
-      $this->setDisplay($current_display_to_restore);
-    }
+    $this->setDisplay($current_display_to_restore);
   }
 
   /**
