@@ -296,7 +296,11 @@ class Mapping extends ArrayElement {
   /**
    * {@inheritdoc}
    */
-  public function getCanonicalRepresentation(bool $suppress_exceptions = FALSE): array {
+  public function getCanonicalRepresentation(bool $suppress_exceptions = FALSE): ?array {
+    if ($this->value === NULL) {
+      return NULL;
+    }
+
     if (!is_array($this->value)) {
       if ($suppress_exceptions) {
         return $this->value;
