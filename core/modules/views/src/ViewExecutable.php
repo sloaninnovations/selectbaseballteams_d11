@@ -497,6 +497,22 @@ class ViewExecutable {
    */
   public function save() {
     $this->storage->save();
+    // A ViewExecutable with display plugins initialized contains references to
+    // subsets of in-memory array structures in the associated View
+    // entity (i.e. to the settings for each display plugin). Upon saving, those
+    // arrays are overwritten with a normalized/canonical representation. Hence
+    // the instantiated display plugins reference the old rather than the new
+    // arrays. Force a reinitialization, to keep them in sync.
+    // @see \Drupal\views\DisplayPluginCollection::initializePlugin()
+    // @see \Drupal\Core\Config\Config::save()
+    // @see ::initDisplay()
+    $current_display_to_restore = $this->current_display;
+    $this->current_display = NULL;
+    $this->display_handler = NULL;
+    $this->displayHandlers->clear();
+    if ($current_display_to_restore) {
+      $this->setDisplay($current_display_to_restore);
+    }
   }
 
   /**
