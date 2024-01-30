@@ -502,7 +502,8 @@ class ViewExecutable {
     // entity (i.e. to the settings for each display plugin). Upon saving, those
     // arrays are overwritten with a normalized/canonical representation. Hence
     // the instantiated display plugins reference the old rather than the new
-    // arrays. Force a reinitialization, to keep them in sync.
+    // arrays. Force a reinitialization, to keep them in sync. This only matters
+    // when overriding options at runtime.
     // @see \Drupal\views\DisplayPluginCollection::initializePlugin()
     // @see \Drupal\Core\Config\Config::save()
     // @see ::initDisplay()
