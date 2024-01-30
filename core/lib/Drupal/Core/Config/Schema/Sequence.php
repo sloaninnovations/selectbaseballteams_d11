@@ -76,6 +76,8 @@ class Sequence extends ArrayElement {
       // already cast all values to the same type using the
       // configuration schema.
       'value' => sort($representation),
+      // Nothing to do when `orderby === NULL`.
+      NULL => 'no-op',
     };
 
     return $representation;
