@@ -27,7 +27,7 @@ class UserRoleTest extends ViewsKernelTestBase {
       ->save();
 
     $this->setupCurrentUser([
-      'uid' => 2,
+      'uid' => 1,
       'name' => 'foo',
       'roles' => 123,
     ]);
@@ -35,8 +35,8 @@ class UserRoleTest extends ViewsKernelTestBase {
     $view = Views::getView('user_admin_people');
     $this->executeView($view);
     $view->render('user_admin_people');
-    $output = $view->field['roles_target_id']->render($view->result[1]);
-    $this->assertEquals(2, $output);
+    $output = $view->field['roles_target_id']->render($view->result[0]);
+    $this->assertEquals(1, $output);
   }
 
 }
