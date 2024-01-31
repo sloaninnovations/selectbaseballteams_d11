@@ -119,7 +119,7 @@ class DisplayTest extends ViewTestBase {
     $view->display_handler->overrideOption('test_option', 'Test option title');
     $view->save();
 
-    // The `style_test` style plugin has a method to disable the use of the row
+    // TRICKY: The `style_test` style plugin has a method to disable the use of the row
     // plugin at runtime only. Because it's not an option, it was not saved by
     // the ::save() above. That's why this step must be repeated. This is not
     // representative of real-world use.
