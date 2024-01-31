@@ -472,6 +472,16 @@ abstract class Connection {
   }
 
   /**
+   * Returns the default placeholder type for SQL statements.
+   *
+   * @return \Drupal\Core\Database\PlaceholderType
+   *   The default placeholder type for SQL statements.
+   */
+  public function placeholderFormat(): PlaceholderType {
+    return PlaceholderType::Named;
+  }
+
+  /**
    * Find the prefix for a table.
    *
    * This function is for when you want to know the prefix of a table. This

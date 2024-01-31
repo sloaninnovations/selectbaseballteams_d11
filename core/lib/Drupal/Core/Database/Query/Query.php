@@ -78,6 +78,7 @@ abstract class Query implements PlaceholderInterface {
     $this->connectionTarget = $this->connection->getTarget();
 
     $this->queryOptions = $options;
+    $this->queryOptions['placeholder_format'] ??= $this->connection->placeholderFormat();
   }
 
   /**

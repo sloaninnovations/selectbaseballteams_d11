@@ -2,6 +2,7 @@
 
 namespace Drupal\mysql\Driver\Database\mysql;
 
+use Drupal\Core\Database\PlaceholderType;
 use Drupal\Core\Database\Query\Insert as QueryInsert;
 
 /**
@@ -17,6 +18,8 @@ class Insert extends QueryInsert {
     // @see https://www.drupal.org/project/drupal/issues/3256524
     parent::__construct($connection, $table, $options);
     unset($this->queryOptions['return']);
+    // @todo For testing, remove later.
+    $this->queryOptions['placeholder_format'] = PlaceholderType::Positional;
   }
 
   public function execute() {
@@ -31,7 +34,12 @@ class Insert extends QueryInsert {
       $values = [];
       foreach ($this->insertValues as $insert_values) {
         foreach ($insert_values as $value) {
-          $values[':db_insert_placeholder_' . $max_placeholder++] = $value;
+          if ($this->queryOptions['placeholder_format'] === PlaceholderType::Named) {
+            $values[':db_insert_placeholder_' . $max_placeholder++] = $value;
+          }
+          else {
+            $values[$max_placeholder++] = $value;
+          }
         }
       }
     }
