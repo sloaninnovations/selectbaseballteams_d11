@@ -6,8 +6,8 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\NodeType;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
-use Drupal\user\Entity\User;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
 
@@ -18,6 +18,8 @@ use Drupal\views\Views;
  * @see \Drupal\views\Entity\Render\RendererBase
  */
 class RowEntityRenderersTest extends ViewsKernelTestBase {
+
+  use UserCreationTrait;
 
   /**
    * Modules to enable.
@@ -100,11 +102,9 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
       ConfigurableLanguage::createFromLangcode($langcode)->save();
     }
 
-    $this->testAuthor = User::create([
+    $this->testAuthor = $this->setupCurrentUser([
       'name' => 'foo',
     ]);
-    $this->testAuthor->save();
-    $this->container->set('current_user', $this->testAuthor);
 
     // Make sure we do not try to render non-existing user data.
     $node_type = NodeType::create([

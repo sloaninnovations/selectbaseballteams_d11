@@ -154,10 +154,10 @@ class HelpTest extends BrowserTestBase {
           // links available and therefore access is denied based on the
           // _access_admin_menu_block_page access check.
           if ($url->access()) {
-            $this->assertSession()->linkExists($task['title']);
+            $this->assertSession()->linkExistsExact($task['title']);
           }
           else {
-            $this->assertSession()->linkNotExists($task['title']);
+            $this->assertSession()->linkNotExistsExact($task['title']);
           }
           // Ensure there are no double escaped '&' or '<' characters.
           $this->assertSession()->assertNoEscaped('&amp;');

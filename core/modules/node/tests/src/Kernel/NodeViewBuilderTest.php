@@ -5,7 +5,6 @@ namespace Drupal\Tests\node\Kernel;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use Drupal\user\Entity\User;
 
 /**
  * Tests the node view builder.
@@ -70,11 +69,10 @@ class NodeViewBuilderTest extends EntityKernelTestBase {
    * @covers ::buildLinks
    */
   public function testPendingRevisionLinks() {
-    $account = User::create([
-      'name' => $this->randomString(),
+    $account = $this->drupalSetUpCurrentUser(permissions: [
+      'access content',
+      'view own unpublished content',
     ]);
-    $account->save();
-    $this->container->get('current_user')->setAccount($account);
 
     $title = $this->randomMachineName();
     $node = Node::create([

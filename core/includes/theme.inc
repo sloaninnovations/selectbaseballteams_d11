@@ -686,6 +686,7 @@ function template_preprocess_links(&$variables) {
         '#url' => $link['url'],
         '#ajax' => $link['ajax'],
       ];
+
       // Handle links and ensure that the active class is added on the LIs, but
       // only if the 'set_active_class' option is not empty. Links templates
       // duplicate the "is-active" class handling of l() and
@@ -703,7 +704,7 @@ function template_preprocess_links(&$variables) {
         // Entity access uses orIf to sum access results, but routing uses
         // andIf, where neutral currently denies access, so to not show links to
         // entity routes we must deny unless the result is allow. See #2991698.
-        $link_element['#access'] = $url->access(NULL, TRUE);
+        $link_element['#access'] = $url->access(return_as_object: TRUE);
         $cache->addCacheableDependency($link_element['#access']);
         if (!$link_element['#access']->isAllowed()) {
           // Templates expect inaccessible links to not be included.
