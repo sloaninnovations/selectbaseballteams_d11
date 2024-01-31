@@ -4,6 +4,8 @@ namespace Drupal\Core\TypedData;
 
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\Schema\Element;
+use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -293,7 +295,31 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     }
     // Get the plugin definition of the used data type.
     $type_definition = $this->getDefinition($data_definition->getDataType());
+
     if (!empty($type_definition['unwrap_for_canonical_representation'])) {
+      // @todo Move to TypedConfigManager::getCanonicalRepresentation(), which should override this.
+      // Typed Data that is Config schema element may optionally provide a
+      // canonical representation. This is how each config schema type is able
+      // to do its own casting to robustly transform stored data to schema
+      // compliant data.
+      //if ($data instanceof ElementWithCanonicalRepresentation) {
+      $value = $data->getValue();
+      if ($data instanceof Element) {
+        $value = $data->getValue();
+        // All config property paths can be marked nullable. There is no point
+        // in requiring each implementation to handle this.
+        if ($value === NULL) {
+          return NULL;
+        }
+        // @todo Move this method to an abstract subclass of Element.
+        try {
+          return $data->getCanonicalRepresentation();
+        }
+        catch (UnsupportedDataTypeConfigException $e) {
+          // When not compliant, fall back.
+          return $value;
+        }
+      }
       return $data->getValue();
     }
     return $data;

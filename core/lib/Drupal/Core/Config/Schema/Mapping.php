@@ -6,7 +6,6 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\UnsupportedDataTypeConfigException;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\MapDataDefinition;
-use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
@@ -297,48 +296,30 @@ class Mapping extends ArrayElement {
   /**
    * {@inheritdoc}
    */
-  public function getCanonicalRepresentation(bool $suppress_exceptions = FALSE): mixed {
-    if ($this->value === NULL) {
-      return NULL;
-    }
-
+  public function getProperties($include_computed = FALSE) {
     if (!is_array($this->value)) {
-      if ($suppress_exceptions) {
-        return $this->value;
-      }
       throw new UnsupportedDataTypeConfigException(sprintf("variable type is %s but applied schema class is %s", gettype($this->value), $this->getDataDefinition()->getClass()));
     }
-
-    $representation = [];
 
     // Mapping keys should be ordered however the data definition says.
     // Note: this specifically does NOT use ::getRequiredKeys() nor
     // ::getOptionalKeys()`, because this MUST work even on invalid data (i.e.
     // when required keys are missing).
-    $ordered_mapping_keys = $this->getValidKeys();
 
-    // Generate a representation of this mapping:
-    // 1. defer to each value's own canonical representation
-    // (::getElements() respects the stored order in $this->value, not the
-    // schema order)
-    // 2. respect the schema-defined order of mapping keys
+    // Note: ::getElements() respects the stored order in $this->value, not the
+    // schema order.
     $elements = $this->getElements();
-    foreach ($ordered_mapping_keys as $key) {
-      if (array_key_exists($key, $elements)) {
-        $representation[$key] = $elements[$key] instanceof PrimitiveInterface
-          ? $elements[$key]->getCastedValue()
-          : $elements[$key]->getCanonicalRepresentation($suppress_exceptions);
-      }
-    }
+
+    // 1. respect the schema-defined order of mapping keys
+    $ordered_mapping_keys = array_flip($this->getValidKeys());
+    // 2. keep only the keys that have a value (but do not change the order).
+    $elements_in_schema = array_intersect_key($ordered_mapping_keys, $elements);
+    $properties_in_schema = array_replace($elements_in_schema, $elements);
     // 3. include even key-value pairs absent from schema.
     // @see \Drupal\KernelTests\Core\Config\ConfigSchemaTest::testConfigSaveWithSchema()
-    $schemaless_keys = array_diff_key($elements, array_flip($ordered_mapping_keys));
-    foreach ($schemaless_keys as $key => $definition) {
-      assert($definition instanceof Undefined);
-      $representation[$key] = $definition->getCanonicalRepresentation();
-    }
+    $properties_unknown = array_diff_key($elements, $ordered_mapping_keys);
 
-    return $representation;
+    return $properties_in_schema + $properties_unknown;
   }
 
 }

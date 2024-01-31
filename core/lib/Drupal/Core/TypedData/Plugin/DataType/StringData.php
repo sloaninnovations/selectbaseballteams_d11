@@ -22,10 +22,6 @@ class StringData extends PrimitiveBase implements StringInterface {
    * {@inheritdoc}
    */
   public function getCastedValue() {
-    if ($this->value === NULL) {
-      return NULL;
-    }
-
     return $this->getString();
   }
 

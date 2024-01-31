@@ -55,18 +55,4 @@ abstract class Element extends TypedData {
     return $this;
   }
 
-  /**
-   * Generates the canonical representation for schema-defined configuration.
-   *
-   * @param bool $suppress_exceptions
-   *   Whether to suppress UnsupportedDataTypeConfigExceptions when the value in
-   *   an element is invalid (for example when a scalar value is assigned to a
-   *   sequence or a mapping). This is necessary for allowing saving of invalid
-   *   config and then surfacing those problems to the user afterwards.
-   *
-   * @return mixed
-   *   The value cast to the type indicated in the schema.
-   */
-  abstract public function getCanonicalRepresentation(bool $suppress_exceptions = FALSE): mixed;
-
 }

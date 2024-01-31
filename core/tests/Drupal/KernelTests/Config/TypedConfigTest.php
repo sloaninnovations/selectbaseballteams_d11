@@ -90,7 +90,7 @@ class TypedConfigTest extends KernelTestBase {
       ],
       'uuid' => '7C30C50E-641A-4E34-A7F1-46BCFB9BE5A3',
       'string__not_blank' => 'this is a label',
-    ], $typed_config->getCanonicalRepresentation());
+    ], $typed_config_manager->getCanonicalRepresentation($typed_config));
 
     // Test a primitive.
     $string_data = $typed_config->get('llama');
@@ -157,7 +157,7 @@ class TypedConfigTest extends KernelTestBase {
       'size' => NULL,
       'size_value' => NULL,
       'protected_property' => NULL,
-    ], $typed_config->getCanonicalRepresentation());
+    ], $typed_config_manager->getCanonicalRepresentation($typed_config));
   }
 
   /**

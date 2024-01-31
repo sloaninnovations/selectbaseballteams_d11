@@ -3,7 +3,6 @@
 namespace Drupal\Core\Config\Schema;
 
 use Drupal\Core\Config\UnsupportedDataTypeConfigException;
-use Drupal\Core\TypedData\PrimitiveInterface;
 
 /**
  * Defines a configuration element of type Sequence.
@@ -43,19 +42,10 @@ class Sequence extends ArrayElement {
   /**
    * {@inheritdoc}
    */
-  public function getCanonicalRepresentation(bool $suppress_exceptions = FALSE): mixed {
-    if ($this->value === NULL) {
-      return NULL;
-    }
-
+  public function getProperties($include_computed = FALSE) {
     if (!is_array($this->value)) {
-      if ($suppress_exceptions) {
-        return $this->value;
-      }
       throw new UnsupportedDataTypeConfigException(sprintf("variable type is %s but applied schema class is %s", gettype($this->value), $this->getDataDefinition()->getClass()));
     }
-
-    $representation = [];
 
     // Sequence keys should be ordered however the data definition says.
     $data_definition = $this->getDataDefinition();
@@ -68,21 +58,13 @@ class Sequence extends ArrayElement {
     // schema order)
     // 2. respect the `orderby` instruction in the schema
     // @see \Drupal\Core\Config\Schema\SequenceDataDefinition::getOrderBy()
-    $elements = $this->getElements();
-    foreach ($elements as $key => $definition) {
-      $representation[$key] = $elements[$key] instanceof PrimitiveInterface
-        ? $elements[$key]->getCastedValue()
-        : $elements[$key]->getCanonicalRepresentation($suppress_exceptions);
-    }
+    $representation = $this->getElements();
     match ($orderby) {
       'key' => ksort($representation),
-      // The PHP documentation notes that "Be careful when sorting
-      // arrays with mixed types values because sort() can produce
-      // unpredictable results". There is no risk here because
-      // \Drupal\Core\Config\StorableConfigBase::castValue() has
-      // already cast all values to the same type using the
-      // configuration schema.
-      'value' => sort($representation),
+      // `orderby: value` cannot be handled here because the canonical
+      // representation of each property is needed.
+      // @see \Drupal\Core\Config\TypedConfigManager::getCanonicalRepresentation()
+      'value' => '@see \Drupal\Core\Config\TypedConfigManager::getCanonicalRepresentation',
       // Nothing to do when `orderby` is NULL or some other unknown value.
       default => 'no-op',
     };

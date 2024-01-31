@@ -5,15 +5,19 @@ namespace Drupal\Core\Config;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\Schema\ArrayElement;
 use Drupal\Core\Config\Schema\ConfigSchemaAlterException;
 use Drupal\Core\Config\Schema\ConfigSchemaDiscovery;
+use Drupal\Core\Config\Schema\Element;
 use Drupal\Core\Config\Schema\TypeResolver;
 use Drupal\Core\Config\Schema\SequenceDataDefinition;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Config\Schema\Undefined;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\TypedData\MapDataDefinition;
+use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstraint;
 
@@ -477,6 +481,59 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     $definition = $this->getDefinition($config_name);
     $data_definition = $this->buildDataDefinition($definition, $config_data);
     return $this->create($data_definition, $config_data, $config_name);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCanonicalRepresentation(TypedDataInterface $data) {
+    // Anything in config schema can be marked `nullable: true`.
+    if ($data->getValue() === NULL) {
+      return NULL;
+    }
+
+    if ($data instanceof PrimitiveInterface) {
+      return $data->getCastedValue();
+    }
+
+    // Everything that is not a primitive must be a config schema element.
+    assert($data instanceof Element);
+
+    // Treat config schema elements containing multiple properties differently:
+    // each could be either NULL, a PrimitiveInterface or an Element instance.
+    // @see \Drupal\Core\Config\Schema\Sequence
+    // @see \Drupal\Core\Config\Schema\Mapping
+    if ($data instanceof ArrayElement) {
+      try {
+        $properties = $data->getProperties();
+      }
+      catch (UnsupportedDataTypeConfigException) {
+        // Prefer schema non-compliance over data loss: when it is impossible to
+        // enumerate the properties in this config schema element in compliance
+        // with the config schema, fall back to the actual value encountered.
+        // (These violations will be surfaced by ConfigSchemaChecker during
+        // development.)
+        // @see \Drupal\Core\Config\Development\ConfigSchemaChecker
+        return $data->getValue();
+      }
+      $representation = array_map(fn (TypedDataInterface $d) => $this->getCanonicalRepresentation($d), $properties);
+      // Special case: `orderby: value` for `type: sequence` (this one is
+      // special because the canonical representation is needed.)
+      // @see \Drupal\Core\Config\Schema\Sequence::getProperties()
+      $data_definition = $data->getDataDefinition();
+      if ($data_definition instanceof SequenceDataDefinition && $data_definition->getOrderBy() === 'value') {
+        // The PHP documentation notes that "Be careful when sorting
+        // arrays with mixed types values because sort() can produce
+        // unpredictable results". There is no risk here because
+        // \Drupal\Core\Config\StorableConfigBase::castValue() has
+        // already cast all values to the same type using the
+        // configuration schema.
+        sort($representation);
+      }
+      return $representation;
+    }
+
+    return $data->getValue();
   }
 
   /**
