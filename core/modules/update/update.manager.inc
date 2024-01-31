@@ -40,7 +40,7 @@ use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Url;
-use GuzzleHttp\Exception\TransferException;
+use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -193,7 +193,7 @@ function update_manager_archive_extract($file, $directory) {
  * @param string $project
  *   The short name of the project to download.
  * @param string $archive_file
- *   The filename of the unextracted archive.
+ *   The filename of the un-extracted archive.
  * @param string $directory
  *   The directory that the archive was extracted into.
  *
@@ -233,7 +233,7 @@ function update_manager_file_get($url) {
       $data = (string) \Drupal::httpClient()->get($url)->getBody();
       return \Drupal::service('file_system')->saveData($data, $local, FileSystemInterface::EXISTS_REPLACE);
     }
-    catch (TransferException $exception) {
+    catch (ClientExceptionInterface $exception) {
       \Drupal::messenger()->addError(t('Failed to fetch file due to error "%error"', ['%error' => $exception->getMessage()]));
     }
     catch (FileException | InvalidStreamWrapperException $e) {

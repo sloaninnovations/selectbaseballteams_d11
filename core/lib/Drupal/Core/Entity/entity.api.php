@@ -523,7 +523,6 @@ use Drupal\node\Entity\NodeType;
  * general information about configuration.)
  *
  * There are several good examples of this in Drupal Core:
- * - The Book module defines a content type in node.type.book.yml
  * - The Standard install profile defines Page and Article content types in
  *   node.type.page.yml and node.type.article.yml, a Tags vocabulary in
  *   taxonomy.vocabulary.tags.yml, and a Node comment type in
@@ -1692,6 +1691,23 @@ function hook_entity_view_mode_alter(&$view_mode, \Drupal\Core\Entity\EntityInte
   // For nodes, change the view mode when it is teaser.
   if ($entity->getEntityTypeId() == 'node' && $view_mode == 'teaser') {
     $view_mode = 'my_custom_view_mode';
+  }
+}
+
+/**
+ * Change the view mode of a specific entity type currently being displayed.
+ *
+ * @param string $view_mode
+ *   The view_mode currently displaying the entity.
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity that is being viewed.
+ *
+ * @ingroup entity_crud
+ */
+function hook_ENTITY_TYPE_view_mode_alter(string &$view_mode, \Drupal\Core\Entity\EntityInterface $entity): void {
+  // Change the view mode to teaser.
+  if ($view_mode == 'full') {
+    $view_mode = 'teaser';
   }
 }
 
