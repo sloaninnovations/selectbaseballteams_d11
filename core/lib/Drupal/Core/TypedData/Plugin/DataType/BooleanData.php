@@ -24,11 +24,13 @@ class BooleanData extends PrimitiveBase implements BooleanInterface {
   public function getCastedValue() {
     // Special handling for `TRUE` as a string: "TRUE", "True", "true". Same for
     // `FALSE`.
-    if (strtoupper($this->value) === 'TRUE') {
-      return TRUE;
-    }
-    if ($this->value === '' || strtoupper($this->value) === 'FALSE') {
-      return FALSE;
+    if (is_string($this->value)) {
+      if (strtoupper($this->value) === 'TRUE') {
+        return TRUE;
+      }
+      if (strtoupper($this->value) === 'FALSE') {
+        return FALSE;
+      }
     }
 
     return (bool) $this->value;
