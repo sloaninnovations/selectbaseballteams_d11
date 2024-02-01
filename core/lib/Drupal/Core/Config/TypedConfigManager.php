@@ -13,6 +13,7 @@ use Drupal\Core\Config\Schema\TypeResolver;
 use Drupal\Core\Config\Schema\SequenceDataDefinition;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Config\Schema\Undefined;
+use Drupal\Core\Entity\Plugin\DataType\ConfigEntityAdapter;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\Core\TypedData\PrimitiveInterface;
@@ -487,6 +488,12 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    * {@inheritdoc}
    */
   public function getCanonicalRepresentation(TypedDataInterface $data) {
+    // If a config entity is being validated, an EntityInterface object must be
+    // validated. That is handled by TypedDataManager.
+    if ($data instanceof ConfigEntityAdapter) {
+      return parent::getCanonicalRepresentation($data);
+    }
+
     // Anything in config schema can be marked `nullable: true`.
     if ($data->getValue() === NULL) {
       return NULL;
