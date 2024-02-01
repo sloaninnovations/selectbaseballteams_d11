@@ -46,9 +46,10 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
     if ($typed_data instanceof BooleanInterface && !(is_bool($value) || $value === 0 || $value === '0' || $value === 1 || $value == '1')) {
       $valid = FALSE;
     }
-    // Special handling for `TRUE` as a string: "TRUE", "True", "true". Same for
-    // `FALSE`. Also: treat the empty string as `FALSE`.
-    if ($typed_data instanceof BooleanInterface && is_string($value) && in_array(strtoupper($value), ['TRUE', 'FALSE', ''], TRUE)) {
+    // Special handling for booleans: any string is allowed, from "TRUE", to "",
+    // to arbitrary strings such as "test".
+    // @see
+    if ($typed_data instanceof BooleanInterface && is_string($value)) {
       $valid = TRUE;
     }
     if ($typed_data instanceof FloatInterface && filter_var($value, FILTER_VALIDATE_FLOAT) === FALSE) {
