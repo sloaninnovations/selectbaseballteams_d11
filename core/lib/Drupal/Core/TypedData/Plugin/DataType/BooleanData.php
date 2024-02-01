@@ -27,7 +27,7 @@ class BooleanData extends PrimitiveBase implements BooleanInterface {
     if (strtoupper($this->value) === 'TRUE') {
       return TRUE;
     }
-    if (strtoupper($this->value) === 'FALSE') {
+    if ($this->value === '' || strtoupper($this->value) === 'FALSE') {
       return FALSE;
     }
 
