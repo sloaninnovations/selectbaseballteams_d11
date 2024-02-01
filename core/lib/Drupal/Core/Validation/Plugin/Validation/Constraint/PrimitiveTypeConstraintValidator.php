@@ -52,6 +52,16 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
     if ($typed_data instanceof IntegerInterface && filter_var($value, FILTER_VALIDATE_INT) === FALSE) {
       $valid = FALSE;
     }
+    // Special handling for integers and floats since the configuration
+    // system is primarily concerned with saving values from the Form API
+    // we have to special case the meaning of an empty string for numeric
+    // types. In PHP this would be casted to a 0 but for the purposes of
+    // configuration we need to treat this as a NULL.
+    // @see \Drupal\Core\TypedData\Plugin\DataType\FloatData::getCastedValue()
+    // @see \Drupal\Core\TypedData\Plugin\DataType\IntegerData::getCastedValue()
+    if (($typed_data instanceof IntegerInterface || $typed_data instanceof FloatInterface) && $value === '') {
+      $valid = TRUE;
+    }
     if ($typed_data instanceof DecimalInterface && !preg_match('/^[+-]?((\d+(\.\d*)?)|(\.\d+))$/i', $value)) {
       $valid = FALSE;
     }
