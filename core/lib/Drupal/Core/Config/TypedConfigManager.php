@@ -493,6 +493,19 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     }
 
     if ($data instanceof PrimitiveInterface) {
+      // If this is an array, this is definitely not a primitive. In other
+      // words: do the opposite here of what Mapping::getProperties() and
+      // Sequence::getProperties() do — those are the only ones where arrays are
+      // accepted.
+      if (is_array($data->getValue())) {
+        // Prefer schema non-compliance over data loss: when it is impossible to
+        // safely cast the value of a primitive, fall back to the actual value
+        // encountered.
+        // (These violations will be surfaced by ConfigSchemaChecker during
+        // development.)
+        // @see \Drupal\Core\Config\Development\ConfigSchemaChecker
+        return $data->getValue();
+      }
       return $data->getCastedValue();
     }
 
