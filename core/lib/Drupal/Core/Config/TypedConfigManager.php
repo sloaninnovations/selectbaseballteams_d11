@@ -21,6 +21,7 @@ use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstraint;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\PrimitiveTypeConstraintValidator;
 
 /**
  * Manages config schema type plugins.
@@ -500,11 +501,12 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     }
 
     if ($data instanceof PrimitiveInterface) {
-      // If this is an array, this is definitely not a primitive. In other
+      // If this is an array, this is definitely not a primitive. If a string
+      // is assigned to BooleanData, then this is an invalid primitive. In other
       // words: do the opposite here of what Mapping::getProperties() and
       // Sequence::getProperties() do — those are the only ones where arrays are
       // accepted.
-      if (is_array($data->getValue())) {
+      if (!PrimitiveTypeConstraintValidator::isValidPrimitiveTypedData($data)) {
         // Prefer schema non-compliance over data loss: when it is impossible to
         // safely cast the value of a primitive, fall back to the actual value
         // encountered.

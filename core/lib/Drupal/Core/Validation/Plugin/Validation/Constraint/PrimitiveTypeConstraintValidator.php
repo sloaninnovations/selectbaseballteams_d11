@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
+use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\Type\BinaryInterface;
 use Drupal\Core\TypedData\Type\BooleanInterface;
 use Drupal\Core\TypedData\Type\DateTimeInterface;
@@ -24,18 +25,20 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
   use TypedDataAwareValidatorTrait;
 
   /**
-   * {@inheritdoc}
+   * Checks if the given value is a valid Primitive Typed Data instance.
    *
-   * phpcs:ignore Drupal.Commenting.FunctionComment.VoidReturn
-   * @return void
+   * @param \Drupal\Core\TypedData\PrimitiveInterface $typed_data
+   *   A Primitive Typed Data instance.
+   *
+   * @return bool
+   *   TRUE if it is valid, FALSE otherwise.
+   *
+   * @internal
+   * @see \Drupal\Core\Config\TypedConfigManager::getCanonicalRepresentation()
    */
-  public function validate($value, Constraint $constraint) {
+  public static function isValidPrimitiveTypedData(PrimitiveInterface $typed_data): bool {
+    $value = $typed_data->getValue();
 
-    if (!isset($value)) {
-      return;
-    }
-
-    $typed_data = $this->getTypedData();
     $valid = TRUE;
     if ($typed_data instanceof BinaryInterface && !is_resource($value)) {
       $valid = FALSE;
@@ -77,7 +80,21 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
       $valid = FALSE;
     }
 
-    if (!$valid) {
+    return $valid;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.VoidReturn
+   * @return void
+   */
+  public function validate($value, Constraint $constraint) {
+    if (!isset($value)) {
+      return;
+    }
+
+    if (!$this->isValidPrimitiveTypedData($this->getTypedData())) {
       // @todo: Provide a good violation message for each problem.
       $this->context->addViolation($constraint->message, [
         '%value' => is_object($value) ? get_class($value) : (is_array($value) ? 'Array' : (string) $value),
