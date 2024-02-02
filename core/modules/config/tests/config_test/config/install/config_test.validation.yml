@@ -1,7 +1,7 @@
 llama: llama
 cat:
   type: kitten
-  count: 2
+  count: '2'
 giraffes:
   unsorted:
     # Note: hum1, hum3, hum2. `orderby: null` SHOULD NOT change this.

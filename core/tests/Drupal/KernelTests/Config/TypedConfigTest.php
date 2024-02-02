@@ -63,7 +63,7 @@ class TypedConfigTest extends KernelTestBase {
     $this->assertSame([
       '_core' => [
         // cspell:disable-next-line
-        'default_config_hash' => 'f9T-mGn3hq-0cVuKdZKMmodjaqoPeGLHSaUEqIiKHko',
+        'default_config_hash' => 'wcxWP7T8RquowvhOW6x44Hrz6wU4NgkWVzucy4AuLtc',
       ],
       'langcode' => 'en',
       'llama' => 'llama',
