@@ -535,18 +535,16 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
         // @see \Drupal\Core\Config\Development\ConfigSchemaChecker
         return $raw_value;
       }
-      $representation = array_map(fn (TypedDataInterface $d) => $this->getCanonicalRepresentation($d), $properties);
+      $representation = array_map($this->getCanonicalRepresentation(...), $properties);
       // Special case: `orderby: value` for `type: sequence` (this one is
       // special because the canonical representation is needed.)
       // @see \Drupal\Core\Config\Schema\Sequence::getProperties()
       $data_definition = $data->getDataDefinition();
       if ($data_definition instanceof SequenceDataDefinition && $data_definition->getOrderBy() === 'value') {
-        // The PHP documentation notes that "Be careful when sorting
-        // arrays with mixed types values because sort() can produce
-        // unpredictable results". There is no risk here because
-        // \Drupal\Core\Config\StorableConfigBase::castValue() has
-        // already cast all values to the same type using the
-        // configuration schema.
+        // The PHP documentation notes that "Be careful when sorting arrays with
+        // mixed types values because sort() can produce unpredictable results".
+        // There is no risk here because this method as already cast all values
+        // to the same type using the configuration schema.
         sort($representation);
       }
       return $representation;
