@@ -73,6 +73,10 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
     if (($typed_data instanceof IntegerInterface || $typed_data instanceof FloatInterface) && is_string($value) && str_contains($value, (string) (int) $value)) {
       $valid = TRUE;
     }
+    // Special handling for integers: booleans are allowed (cast to 0/1).
+    if ($typed_data instanceof IntegerInterface && is_bool($value)) {
+      $valid = TRUE;
+    }
     if ($typed_data instanceof DecimalInterface && !preg_match('/^[+-]?((\d+(\.\d*)?)|(\.\d+))$/i', $value)) {
       $valid = FALSE;
     }
