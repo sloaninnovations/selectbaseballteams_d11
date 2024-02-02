@@ -495,25 +495,22 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       return parent::getCanonicalRepresentation($data);
     }
 
+    $raw_value = $data->getValue();
+
     // Anything in config schema can be marked `nullable: true`.
-    if ($data->getValue() === NULL) {
+    if ($raw_value === NULL) {
       return NULL;
     }
 
     if ($data instanceof PrimitiveInterface) {
-      // If this is an array, this is definitely not a primitive. If a string
-      // is assigned to BooleanData, then this is an invalid primitive. In other
-      // words: do the opposite here of what Mapping::getProperties() and
-      // Sequence::getProperties() do — those are the only ones where arrays are
-      // accepted.
+      // Prefer schema non-compliance over data loss: when it is impossible to
+      // safely cast the value of a primitive, fall back to the actual value
+      // encountered.
+      // (These violations will be surfaced by ConfigSchemaChecker during
+      // development.)
+      // @see \Drupal\Core\Config\Development\ConfigSchemaChecker
       if (!PrimitiveTypeConstraintValidator::isValidPrimitiveTypedData($data)) {
-        // Prefer schema non-compliance over data loss: when it is impossible to
-        // safely cast the value of a primitive, fall back to the actual value
-        // encountered.
-        // (These violations will be surfaced by ConfigSchemaChecker during
-        // development.)
-        // @see \Drupal\Core\Config\Development\ConfigSchemaChecker
-        return $data->getValue();
+        return $raw_value;
       }
       return $data->getCastedValue();
     }
@@ -536,7 +533,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
         // (These violations will be surfaced by ConfigSchemaChecker during
         // development.)
         // @see \Drupal\Core\Config\Development\ConfigSchemaChecker
-        return $data->getValue();
+        return $raw_value;
       }
       $representation = array_map(fn (TypedDataInterface $d) => $this->getCanonicalRepresentation($d), $properties);
       // Special case: `orderby: value` for `type: sequence` (this one is
@@ -555,7 +552,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       return $representation;
     }
 
-    return $data->getValue();
+    return $raw_value;
   }
 
   /**

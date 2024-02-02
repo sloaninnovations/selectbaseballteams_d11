@@ -48,7 +48,6 @@ class PrimitiveTypeConstraintValidator extends ConstraintValidator {
     }
     // Special handling for booleans: any string is allowed, from "TRUE", to "",
     // to arbitrary strings such as "test".
-    // @see
     if ($typed_data instanceof BooleanInterface && is_string($value)) {
       $valid = TRUE;
     }
