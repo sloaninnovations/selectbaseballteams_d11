@@ -307,6 +307,7 @@ config_dependencies_base:
       # All dependency keys are optional: this might not depend on any other config.
       requiredKey: false
       type: sequence
+      orderby: value
       label: 'Configuration entity dependencies'
       sequence:
         type: string
@@ -317,6 +318,7 @@ config_dependencies_base:
       # All dependency keys are optional: this might not depend on any content entities.
       requiredKey: false
       type: sequence
+      orderby: value
       label: 'Content entity dependencies'
       sequence:
         type: string
@@ -324,6 +326,7 @@ config_dependencies_base:
       # All dependency keys are optional: this might not depend on any modules.
       requiredKey: false
       type: sequence
+      orderby: value
       label: 'Module dependencies'
       sequence:
         type: string
@@ -335,6 +338,7 @@ config_dependencies_base:
       # All dependency keys are optional: this might not depend on any themes.
       requiredKey: false
       type: sequence
+      orderby: value
       label: 'Theme dependencies'
       sequence:
         type: string
