@@ -82,7 +82,7 @@ class TypedDataTest extends KernelTestBase {
     $this->assertNull($typed_data->getValue(), 'Boolean wrapper is null-able.');
     $this->assertEquals(0, $typed_data->validate()->count());
     $typed_data->setValue('invalid');
-    $this->assertEquals(1, $typed_data->validate()->count(), 'Validation detected invalid value.');
+    $this->assertEquals(0, $typed_data->validate()->count(), 'String values are cast to booleans for backwards compatibility.');
 
     // String type.
     $value = $this->randomString();
