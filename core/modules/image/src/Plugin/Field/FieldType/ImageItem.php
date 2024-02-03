@@ -326,8 +326,8 @@ class ImageItem extends FileItem {
   public function preSave() {
     parent::preSave();
 
-    $width = $this->get('width');
-    $height = $this->get('height');
+    $width = $this->get('width')->getValue();
+    $height = $this->get('height')->getValue();
 
     // Determine the dimensions if necessary.
     if ($this->entity && $this->entity instanceof EntityInterface) {
