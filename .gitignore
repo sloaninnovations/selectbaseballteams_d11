@@ -1,0 +1,6 @@
+.idea/
+sites/default/files/
+sites/default/settings.php
+vendor/
+sites/simpletest/
+.ddev/config.yaml
