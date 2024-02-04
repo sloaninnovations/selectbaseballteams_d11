@@ -2103,11 +2103,6 @@ parameters:
 			path: modules/system/tests/modules/service_provider_test/src/TestClass.php
 
 		-
-			message: "#^Access to an undefined property Drupal\\\\Tests\\\\system\\\\Functional\\\\FileTransfer\\\\TestFileTransfer\\:\\:\\$connection\\.$#"
-			count: 5
-			path: modules/system/tests/src/Functional/FileTransfer/TestFileTransfer.php
-
-		-
 			message: "#^Variable \\$form_output in empty\\(\\) always exists and is not falsy\\.$#"
 			count: 2
 			path: modules/system/tests/src/Functional/Form/FormTest.php
