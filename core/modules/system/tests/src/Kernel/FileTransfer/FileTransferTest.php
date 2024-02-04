@@ -59,10 +59,10 @@ class FileTransferTest extends KernelTestBase {
     ];
 
     foreach ($file_names as $file_name) {
-      $filepath = \Drupal::service('file_system')->createFilename($file_name, 'fake');
+      $filepath = $this->fileSystem->createFilename($file_name, 'fake');
       $file_uri = 'temporary://' . $filepath;
       $directory_uri = 'temporary://' . dirname($filepath);
-      \Drupal::service('file_system')->prepareDirectory($directory_uri, FileSystemInterface::CREATE_DIRECTORY);
+      $this->fileSystem->prepareDirectory($directory_uri, FileSystemInterface::CREATE_DIRECTORY);
 
       file_put_contents($file_uri, str_repeat('t', 10));
       $file = File::create(['uri' => $file_uri, 'filename' => $file_name]);
