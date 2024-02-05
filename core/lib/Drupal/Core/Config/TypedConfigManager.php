@@ -279,15 +279,22 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   /**
    * {@inheritdoc}
    */
-  public function findDefinitions() {
-    $definitions = parent::findDefinitions();
-    foreach ($definitions as $plugin_id => &$definition) {
+  public function setCachedDefinitions($definitions) {
+    assert($this->definitions === NULL);
+    parent::setCachedDefinitions($definitions);
+    assert($this->definitions !== NULL);
+
+    // Before this method, not all config schema types were known. After calling
+    // the parent method, all config schema types are known and stored in
+    // $this->definitions.
+    // Because caching this happens only once, it is appropriate to ensure the
+    // combination of these config schema types together makes sense.
+    foreach ($this->definitions as $plugin_id => &$definition) {
       // TRICKY: Validating the absence of circular type references requires
       // knowing all config schema type definitions. Hence this cannot happen in
       // ::processDefinition().
       $this->validateNoCircularTypeReference($definition, $plugin_id);
     }
-    return $definitions;
   }
 
   /**
@@ -369,8 +376,10 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   }
 
   // phpcs:disable
-  protected function validateNoCircularTypeReference(array $definition, string $id, array $all_definitions): void {
-    $all_types_in_subtree = static::getIndirectlyReferencedTypes($definition, $all_definitions);
+  protected function validateNoCircularTypeReference(array $definition, string $id): void {
+    // This validation requires all config schema types to be known.
+    assert(isset($this->definitions));
+    $all_types_in_subtree = static::getIndirectlyReferencedTypes($definition, $this->definitions);
     // Resolve types with variable values to all possible types they may match.
     // @see \Drupal\Core\Config\Schema\TypeResolver::resolveExpression()
     // @see \Drupal\Core\Config\TypedConfigManager::getPossibleTypes()
@@ -383,16 +392,25 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   }
 
   protected static function getDirectlyReferencedTypes(array $definition): array {
-    // Primitive types do not specify the "type" key.
+    // Primitive types do not specify the "type" key. They cannot reference
+    // other types, so return early.
     if (!isset($definition['type'])) {
       return [];
     }
-    $types = [$definition['type']];
-    // `type: mapping` and `type: sequence` contain values of certain types.
-    foreach ($definition['mapping'] ?? $definition['sequence'] ?? [] as $array_element_definition) {
-      $types = array_merge($types, static::getDirectlyReferencedTypes($array_element_definition));
-    }
-    return array_unique($types);
+
+    $used_types = match (TRUE) {
+      // Sequence: many keys using values of the same type.
+      isset($definition['sequence']) => static::getDirectlyReferencedTypes($definition['sequence']),
+
+      // Mapping: each key may be using a different type.
+      isset($definition['mapping']) => array_reduce(
+        $definition['mapping'],
+        fn (array $carry, array $array_element_definition) => array_merge($carry, static::getDirectlyReferencedTypes($array_element_definition)),
+        [],
+      ),
+      default => [],
+    };
+    return array_unique(array_merge([$definition['type']], $used_types));
   }
 
   protected static function getIndirectlyReferencedTypes(array $definition, array $all_definitions): array {
