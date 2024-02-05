@@ -351,9 +351,9 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    *   One of:
    *   - "arbitrary": for the "ignore" and "undefined" types that allow
    *     arbitrary values.
-   *   - "list": for any list type (in core only "sequence")
-   *   - "complex": for any complex type (in core only "mapping")
-   *   - "scalar": for any other type (in core f.e. "string", "boolean", etc.)
+   *   - "list": for any list type (in core, only "sequence")
+   *   - "complex": for any complex type (in core, only "mapping")
+   *   - "scalar": for any other type (in core, primitives like "string", "boolean", etc.)
    */
   private static function getShape(array $definition): string {
     return match (TRUE) {
