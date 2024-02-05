@@ -333,14 +333,24 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    *   - "complex": for any complex type (in core only "mapping")
    *   - "scalar": for any other type (in core f.e. "string", "boolean", etc.)
    */
-  private function getShape(array $definition): string {
+  private static function getShape(array $definition): string {
     // @todo Convert the string return type to an enum.
     return match (TRUE) {
       // Two cases that allow arbitrary values: "ignore" and "undefined".
       in_array($definition['class'], [Undefined::class, Ignore::class], TRUE) => 'arbitrary',
       // Optional: default is set later, in ::getDefinitionWithReplacements().
       !isset($definition['definition_class']) => 'scalar',
-      // The three normal shapes.
+      // The three normal shapes:
+      // - (for ALL data, a data definition must exist to describe its structure)
+      // - for data containing more than a single value, the Typed Data objects
+      //   must implement TraversableTypedDataInterface, and two kinds of
+      //   traversable data are supported:
+      //   1. data shaped like "a list of values": ListDataDefinitionInterface
+      //   must be used — in core this is only SequenceDataDefinition
+      //   2. data shaped like "a bunch of key-value pairs",
+      //   ComplexDataDefinitionInterface must be used — in core this is only
+      //   MapDataDefinition
+      // - hence everything else must contain a single value.
       is_subclass_of($definition['definition_class'], ListDataDefinitionInterface::class) => 'list',
       is_subclass_of($definition['definition_class'], ComplexDataDefinitionInterface::class) => 'complex',
       is_subclass_of($definition['definition_class'], DataDefinitionInterface::class) => 'scalar',
