@@ -686,6 +686,12 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    *   example, that would be `core_date_format_pattern.*`.
    */
   public function getPossibleTypes(string $name): array {
+    // If this name isn't dynamic, there's nothing to do.
+    // @see \Drupal\Core\Config\Schema\TypeResolver::resolveDynamicTypeName()
+    if (!str_contains($name, ']')) {
+      return [$name];
+    }
+
     // First, parse from e.g.
     // `module.something.foo_[%parent.locked]`
     // this:
