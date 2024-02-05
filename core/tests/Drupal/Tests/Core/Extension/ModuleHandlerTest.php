@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Extension;
 
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -113,15 +115,18 @@ class ModuleHandlerTest extends UnitTestCase {
       ])
       ->onlyMethods(['load'])
       ->getMock();
-    $module_handler->expects($this->exactly(3))
+    $calls = [
+      // First reload.
+      'module_handler_test',
+      // Second reload.
+      'module_handler_test',
+      'module_handler_test_added',
+    ];
+    $module_handler->expects($this->exactly(count($calls)))
       ->method('load')
-      ->withConsecutive(
-        // First reload.
-        ['module_handler_test'],
-        // Second reload.
-        ['module_handler_test'],
-        ['module_handler_test_added'],
-      );
+      ->with($this->callback(function (string $module) use (&$calls): bool {
+        return $module === array_shift($calls);
+      }));
     $module_handler->reload();
     $module_handler->addModule('module_handler_test_added', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_added');
     $module_handler->reload();
@@ -335,7 +340,7 @@ class ModuleHandlerTest extends UnitTestCase {
       ->with('hook')
       ->willReturnOnConsecutiveCalls(
         [],
-        ['mymodule' => FALSE],
+        ['my_module' => FALSE],
       );
 
     // ModuleHandler::buildImplementationInfo mock returns no implementations.

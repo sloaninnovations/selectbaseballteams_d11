@@ -46,7 +46,7 @@ variables:
   # Let composer know what self.version means.
   COMPOSER_ROOT_VERSION: "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}${CI_COMMIT_BRANCH}-dev"
   CONCURRENCY: 24
-  GIT_DEPTH: "3"
+  GIT_DEPTH: "50"
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   _TARGET_PHP: "8.2"
 
@@ -113,104 +113,179 @@ default:
 .run-on-commit: &run-on-commit
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: manual
       allow_failure: true
 
 .run-daily: &run-daily
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
+      allow_failure: true
+
+.run-on-mr: &run-on-mr
+  rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: manual
       allow_failure: true
 
 # Default configuration.
-'PHP 8.2 MySQL 8':
+'DEFAULT: PHP 8.2 MySQL 8':
   <<: *default-stage
   variables:
     _TARGET_PHP: "8.2"
     _TARGET_DB: "mysql-8"
     PERFORMANCE_TEST: $PERFORMANCE_TEST
     OTEL_COLLECTOR: $OTEL_COLLECTOR
+  # Run on MR, schedule, push and performance test.
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
+      allow_failure: true
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $PERFORMANCE_TEST == "1"
 
-# Run on commit, or manually.
+# Special job for MRs for test-only checks.
+'DEFAULT: Test-only (PHP 8.2 MySQL 8)':
+  <<: [ *default-stage, *with-composer ]
+  when: manual
+  allow_failure: true
+  variables:
+    _TARGET_PHP: "8.2"
+    _TARGET_DB: "mysql-8"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  trigger:
+    # Rely on the status of the child pipeline.
+    strategy: depend
+    include:
+      - local: .gitlab-ci/pipeline-test-only.yml
+
+# Main listing of jobs.
+# All of these are available on Merge Requests and also work as base jobs for
+# on-commit and daily jobs to extend from.
 'PHP 8.1 MySQL 5.7':
-  <<: [ *default-stage, *run-on-commit ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.1"
     _TARGET_DB: "mysql-5.7"
 
 'PHP 8.2 PostgreSQL 14.1':
-  <<: [ *default-stage, *run-daily ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.2"
     _TARGET_DB: "pgsql-14.1"
 
 'PHP 8.2 PostgreSQL 15':
-  <<: [ *default-stage, *run-daily ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.2"
     _TARGET_DB: "pgsql-15"
 
 'PHP 8.2 PostgreSQL 16':
-  <<: [ *default-stage, *run-on-commit ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.2"
     _TARGET_DB: "pgsql-16"
 
 'PHP 8.2 SQLite 3':
-  <<: [ *default-stage, *run-on-commit ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.2"
     _TARGET_DB: "sqlite-3"
 
 'PHP 8.3 MySQL 8':
-  <<: [ *default-stage, *run-daily ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.3"
     _TARGET_DB: "mysql-8"
 
 'PHP 8.3 PostgreSQL 16':
-  <<: [ *default-stage, *run-daily ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.3"
     _TARGET_DB: "pgsql-16"
 
 'PHP 8.3 SQLite 3':
-  <<: [ *default-stage, *run-daily ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.3"
     _TARGET_DB: "sqlite-3"
 
-# Run daily, or manually.
-# 'PHP 8.1 MariaDB 10.3.22':
-#   <<: [ *default-stage, *run-daily ]
-#   variables:
-#     _TARGET_PHP: "8.1"
-#     _TARGET_DB: "mariadb-10.3.22"
-
-# 'PHP 8.1 MySQL 5.7 with updated deps':
-#   <<: [ *default-stage, *run-daily ]
-#   variables:
-#     _TARGET_PHP: "8.1"
-#     _TARGET_DB: "mysql-5.7"
+'PHP 8.1 MariaDB 10.3.22':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.1"
+    _TARGET_DB: "mariadb-10.3.22"
 
 'PHP 8.1 PostgreSQL 14.1':
-  <<: [ *default-stage, *run-daily ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.1"
     _TARGET_DB: "pgsql-14.1"
 
 'PHP 8.1 SQLite 3':
-  <<: [ *default-stage, *run-daily ]
+  <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.1"
     _TARGET_DB: "sqlite-3"
 
+# Jobs running on commits.
+# The value set in the "needs" property will determine the order in the sequence.
+'[Commit] PHP 8.1 MySQL 5.7':
+  extends: 'PHP 8.1 MySQL 5.7'
+  needs: [ 'DEFAULT: PHP 8.2 MySQL 8' ]
+  <<: [ *run-on-commit ]
+
+'[Commit] PHP 8.2 PostgreSQL 16':
+  extends: 'PHP 8.2 PostgreSQL 16'
+  needs: [ '[Commit] PHP 8.1 MySQL 5.7' ]
+  <<: [ *run-on-commit ]
+
+'[Commit] PHP 8.2 SQLite 3':
+  extends: 'PHP 8.2 SQLite 3'
+  needs: [ '[Commit] PHP 8.2 PostgreSQL 16' ]
+  <<: [ *run-on-commit ]
+
+# Jobs running daily.
+# The value set in the "needs" property will determine the order in the sequence.
+'[Daily] PHP 8.2 PostgreSQL 14.1':
+  extends: 'PHP 8.2 PostgreSQL 14.1'
+  needs: [ 'DEFAULT: PHP 8.2 MySQL 8' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.2 PostgreSQL 15':
+  extends: 'PHP 8.2 PostgreSQL 15'
+  needs: [ '[Daily] PHP 8.2 PostgreSQL 14.1' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.3 MySQL 8':
+  extends: 'PHP 8.3 MySQL 8'
+  needs: [ '[Daily] PHP 8.2 PostgreSQL 15' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.3 PostgreSQL 16':
+  extends: 'PHP 8.3 PostgreSQL 16'
+  needs: [ '[Daily] PHP 8.3 MySQL 8' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.3 SQLite 3':
+  extends: 'PHP 8.3 SQLite 3'
+  needs: [ '[Daily] PHP 8.3 PostgreSQL 16' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.1 MariaDB 10.3.22':
+  extends: 'PHP 8.1 MariaDB 10.3.22'
+  needs: [ '[Daily] PHP 8.3 SQLite 3' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.1 PostgreSQL 14.1':
+  extends: 'PHP 8.1 PostgreSQL 14.1'
+  needs: [ '[Daily] PHP 8.1 MariaDB 10.3.22' ]
+  <<: [ *run-daily ]
+
+'[Daily] PHP 8.1 SQLite 3':
+  extends: 'PHP 8.1 SQLite 3'
+  needs: [ '[Daily] PHP 8.1 PostgreSQL 14.1' ]
+  <<: [ *run-daily ]
 
 ################
 # Build Jobs for linting
@@ -265,10 +340,28 @@ default:
   variables:
     KUBERNETES_CPU_REQUEST: "16"
   script:
-    - php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --error-format=gitlab > phpstan-quality-report.json
+    # Rely on PHPStan caching to execute analysis multiple times without performance drawback.
+    # Output a copy in junit.
+    - php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --error-format=gitlab > phpstan-quality-report.json || EXIT_CODE=$?
+    - php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress --error-format=junit > phpstan-junit.xml || true
+    - |
+      if [ -n "$EXIT_CODE" ]; then
+        # Output a copy in plain text for human logs.
+        php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress || true
+        # Generate a new baseline.
+        echo "Generating an PHPStan baseline file (available as job artifact)."
+        php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress --generate-baseline=./core/phpstan-baseline.neon || true
+        exit $EXIT_CODE
+      fi
+
   artifacts:
     reports:
       codequality: phpstan-quality-report.json
+      junit: phpstan-junit.xml
+    # Only store the baseline if the job fails.
+    when: on_failure
+    paths:
+      - core/phpstan-baseline.neon
 
 '🧹 PHP Coding standards (PHPCS)':
   <<: [ *with-composer, *default-job-settings-lint ]
@@ -318,7 +411,9 @@ default:
   variables:
     KUBERNETES_CPU_REQUEST: "2"
   script:
-    - export TARGET_BRANCH=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}${CI_COMMIT_BRANCH}
-    - git fetch -vn --depth=$GIT_DEPTH "${CI_MERGE_REQUEST_PROJECT_URL:-origin}" "+refs/heads/$TARGET_BRANCH:refs/heads/$TARGET_BRANCH"
-    - export MODIFIED=`git diff --name-only refs/heads/$TARGET_BRANCH|while read r;do echo "$CI_PROJECT_DIR/$r";done|tr "\n" " "`
-    - echo $MODIFIED | tr ' ' '\n' | yarn --cwd=./core run -s spellcheck:core --no-must-find-files --file-list stdin
+    - if [ -n "$CI_MERGE_REQUEST_TARGET_BRANCH_SHA" ]; then
+        echo "HEAD is $(git rev-parse HEAD). \$CI_MERGE_REQUEST_TARGET_BRANCH_SHA is ${CI_MERGE_REQUEST_TARGET_BRANCH_SHA}";
+      else
+        echo "HEAD is $(git rev-parse HEAD). \$CI_MERGE_REQUEST_DIFF_BASE_SHA is ${CI_MERGE_REQUEST_DIFF_BASE_SHA}";
+      fi;
+    - git diff ${CI_MERGE_REQUEST_TARGET_BRANCH_SHA:-$CI_MERGE_REQUEST_DIFF_BASE_SHA} --name-only | sed "s_^_../_" | yarn --cwd=./core run -s spellcheck:core --no-must-find-files --file-list stdin

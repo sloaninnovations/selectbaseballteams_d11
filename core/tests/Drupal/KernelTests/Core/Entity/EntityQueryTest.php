@@ -11,8 +11,12 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+
+// cspell:ignore merhaba siema xsiemax
 
 /**
  * Tests Entity Query functionality.
@@ -21,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class EntityQueryTest extends EntityKernelTestBase {
 
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
 
   /**
    * Modules to enable.
@@ -92,7 +96,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       do {
         $bundle = $this->randomMachineName();
       } while ($bundles && strtolower($bundles[0]) >= strtolower($bundle));
-      entity_test_create_bundle($bundle);
+      entity_test_create_bundle($bundle, entity_type: $field_storage->getTargetEntityTypeId());
       foreach ($field_storages as $field_storage) {
         FieldConfig::create([
           'field_storage' => $field_storage,
@@ -462,6 +466,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     $request->query->replace([
       'page' => '0,2',
     ]);
+    $request->setSession(new Session(new MockArraySessionStorage()));
     \Drupal::getContainer()->get('request_stack')->push($request);
     $this->queryResults = $this->storage
       ->getQuery()
@@ -498,6 +503,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       'sort' => 'asc',
       'order' => 'Type',
     ]);
+    $request->setSession(new Session(new MockArraySessionStorage()));
     \Drupal::getContainer()->get('request_stack')->push($request);
 
     $header = [
@@ -556,6 +562,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     ]);
     $field_storage->save();
     $bundle = $this->randomMachineName();
+    entity_test_create_bundle($bundle);
     FieldConfig::create([
       'field_storage' => $field_storage,
       'bundle' => $bundle,
@@ -807,6 +814,7 @@ class EntityQueryTest extends EntityKernelTestBase {
    */
   public function testCaseSensitivity() {
     $bundle = $this->randomMachineName();
+    entity_test_create_bundle($bundle, entity_type: 'entity_test_mulrev');
 
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_ci',

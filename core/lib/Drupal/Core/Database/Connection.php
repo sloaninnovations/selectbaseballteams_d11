@@ -886,7 +886,7 @@ abstract class Connection {
     // If the placeholder indicated the value to use is an array,  we need to
     // expand it out into a comma-delimited set of placeholders.
     foreach ($args as $key => $data) {
-      $is_bracket_placeholder = substr($key, -2) === '[]';
+      $is_bracket_placeholder = str_ends_with($key, '[]');
       $is_array_data = is_array($data);
       if ($is_bracket_placeholder && !$is_array_data) {
         throw new \InvalidArgumentException('Placeholders with a trailing [] can only be expanded with an array of values.');
@@ -2205,7 +2205,9 @@ abstract class Connection {
    *   The debug backtrace.
    */
   protected function getDebugBacktrace(): array {
-    return debug_backtrace();
+    // @todo: allow a backtrace including all arguments as an option.
+    // See https://www.drupal.org/project/drupal/issues/3401906
+    return debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
   }
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Render\MarkupInterface;
@@ -8,6 +10,8 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Random;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+
+// cspell:ignore répét répété
 
 /**
  * Tests \Drupal\Component\Utility\Html.
@@ -75,14 +79,14 @@ class HtmlTest extends TestCase {
       // stripped from the identifier.
       ['invalididentifier', 'invalid !"#$%&\'()*+,./:;<=>?@[\\]^`{|}~ identifier', []],
       // Verify that an identifier starting with a digit is replaced.
-      ['_cssidentifier', '1cssidentifier', []],
+      ['_css_identifier', '1css_identifier', []],
       // Verify that an identifier starting with a hyphen followed by a digit is
       // replaced.
-      ['__cssidentifier', '-1cssidentifier', []],
+      ['__css_identifier', '-1css_identifier', []],
       // Verify that an identifier starting with two hyphens is replaced.
-      ['__cssidentifier', '--cssidentifier', []],
+      ['__css_identifier', '--css_identifier', []],
       // Verify that passing double underscores as a filter is processed.
-      ['_cssidentifier', '__cssidentifier', ['__' => '_']],
+      ['_css_identifier', '__css_identifier', ['__' => '_']],
     ];
   }
 

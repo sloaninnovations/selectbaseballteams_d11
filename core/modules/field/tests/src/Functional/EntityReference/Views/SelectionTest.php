@@ -7,7 +7,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\views\Views;
 
 /**
@@ -17,7 +17,7 @@ use Drupal\views\Views;
  */
 class SelectionTest extends BrowserTestBase {
 
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -65,6 +65,10 @@ class SelectionTest extends BrowserTestBase {
     foreach ([$node1, $node2, $node3] as $node) {
       $this->nodes[$node->id()] = $node;
     }
+
+    // Ensure the bundle to which the field is attached actually exists, or we
+    // will get config validation errors.
+    entity_test_create_bundle('test_bundle');
 
     // Create an entity reference field.
     $handler_settings = [

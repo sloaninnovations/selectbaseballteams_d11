@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\DependencyInjection\Dumper {
 
   use Drupal\Component\Utility\Crypt;
@@ -7,6 +9,7 @@ namespace Drupal\Tests\Component\DependencyInjection\Dumper {
   use Prophecy\PhpUnit\ProphecyTrait;
   use Prophecy\Prophet;
   use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+  use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
   use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
   use Symfony\Component\DependencyInjection\Definition;
   use Symfony\Component\DependencyInjection\Reference;
@@ -347,6 +350,13 @@ namespace Drupal\Tests\Component\DependencyInjection\Dumper {
         'arguments_expected' => static::getCollection([static::getCollection([static::getServiceCall('bar')])]),
       ] + $base_service_definition;
 
+      // Test an IteratorArgument collection with a reference to resolve.
+      $service_definitions[] = [
+        'arguments' => [new IteratorArgument([new Reference('bar')])],
+        'arguments_count' => 1,
+        'arguments_expected' => static::getCollection([static::getCollection([static::getServiceCall('bar')])]),
+      ] + $base_service_definition;
+
       // Test a collection with a variable to resolve.
       $service_definitions[] = [
         'arguments' => [new Parameter('llama_parameter')],
@@ -554,7 +564,7 @@ namespace Drupal\Tests\Component\DependencyInjection\Dumper {
     public function testGetServiceDefinitionForDecoratedService() {
       $bar_definition = new Definition('\stdClass');
       $bar_definition->setPublic(TRUE);
-      $bar_definition->setDecoratedService(new Reference('foo'));
+      $bar_definition->setDecoratedService((string) new Reference('foo'));
       $services['bar'] = $bar_definition;
 
       $this->containerBuilder->getDefinitions()->willReturn($services);

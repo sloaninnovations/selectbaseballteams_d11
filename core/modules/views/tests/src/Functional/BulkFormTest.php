@@ -2,8 +2,8 @@
 
 namespace Drupal\Tests\views\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\views\Views;
 
 /**
@@ -13,6 +13,8 @@ use Drupal\views\Views;
  * @see \Drupal\views\Plugin\views\field\BulkForm
  */
 class BulkFormTest extends BrowserTestBase {
+
+  use NodeCreationTrait;
 
   /**
    * Modules to install.
@@ -82,7 +84,7 @@ class BulkFormTest extends BrowserTestBase {
 
     foreach ($nodes as $node) {
       $changed_node = $node_storage->load($node->id());
-      $this->assertTrue($changed_node->isSticky(), new FormattableMarkup('Node @nid got marked as sticky.', ['@nid' => $node->id()]));
+      $this->assertTrue($changed_node->isSticky(), "Node {$node->id()} got marked as sticky.");
     }
 
     $this->assertSession()->pageTextContains('Make content sticky was applied to 10 items.');
@@ -217,6 +219,29 @@ class BulkFormTest extends BrowserTestBase {
     ];
     $this->submitForm($edit, 'Apply to selected items');
     $this->assertSession()->pageTextContains('No content selected.');
+  }
+
+  /**
+   * Tests that route parameters are passed to the confirmation form route.
+   */
+  public function testConfirmRouteWithParameters(): void {
+    $session = $this->getSession();
+    $page = $session->getPage();
+    $assert = $this->assertSession();
+
+    $node = $this->createNode();
+    // Access the view page.
+    $this->drupalGet('/node/' . $node->id() . '/test_bulk_form');
+
+    // Select a node and perform the 'Test action'.
+    $page->checkField('node_bulk_form[0]');
+    $page->selectFieldOption('Action', 'Test action');
+    $page->pressButton('Apply to selected items');
+
+    // Check that we've been landed on the confirmation form.
+    $assert->pageTextContains('Do you agree?');
+    // Check that route parameters were passed to the confirmation from route.
+    $assert->addressEquals('/node/' . $node->id() . '/confirm');
   }
 
 }

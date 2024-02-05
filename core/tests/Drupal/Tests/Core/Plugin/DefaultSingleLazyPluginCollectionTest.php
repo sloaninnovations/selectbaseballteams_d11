@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Plugin;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
@@ -68,6 +70,39 @@ class DefaultSingleLazyPluginCollectionTest extends LazyPluginCollectionTestBase
 
     $this->defaultPluginCollection->addInstanceId('banana', ['id' => 'banana', 'key' => 'other_value']);
     $this->assertEquals(['banana' => 'banana'], $this->defaultPluginCollection->getInstanceIds());
+  }
+
+  /**
+   * @covers ::setConfiguration
+   */
+  public function testConfigurableSetConfiguration() {
+    $this->setupPluginCollection($this->any());
+
+    $this->defaultPluginCollection->setConfiguration(['apple' => ['value' => 'pineapple', 'id' => 'apple']]);
+    $config = $this->defaultPluginCollection->getConfiguration();
+    $this->assertSame(['apple' => ['value' => 'pineapple', 'id' => 'apple']], $config);
+    $plugin = $this->pluginInstances['apple'];
+    $this->assertSame(['apple' => ['value' => 'pineapple', 'id' => 'apple']], $plugin->getConfiguration());
+
+    $this->defaultPluginCollection->setConfiguration([]);
+    $this->assertSame([], $this->defaultPluginCollection->getConfiguration());
+
+    $this->defaultPluginCollection->setConfiguration(['cherry' => ['value' => 'kiwi', 'id' => 'cherry']]);
+    $expected['cherry'] = ['value' => 'kiwi', 'id' => 'cherry'];
+    $config = $this->defaultPluginCollection->getConfiguration();
+    $this->assertSame($expected, $config);
+  }
+
+  /**
+   * @covers ::setConfiguration
+   * @group legacy
+   */
+  public function testConfigurableSetConfigurationToNull(): void {
+    $this->setupPluginCollection($this->any());
+
+    $this->expectDeprecation('Calling Drupal\Core\Plugin\DefaultSingleLazyPluginCollection::setConfiguration() with a non-array argument is deprecated in drupal:10.3.0 and will fail in drupal:11.0.0. See https://www.drupal.org/node/3406191');
+    $this->defaultPluginCollection->setConfiguration(NULL);
+    $this->assertSame([], $this->defaultPluginCollection->getConfiguration());
   }
 
 }

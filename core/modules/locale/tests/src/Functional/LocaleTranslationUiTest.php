@@ -13,6 +13,7 @@ use Drupal\Core\Language\LanguageInterface;
  * Tests the validation of translation strings and search results.
  *
  * @group locale
+ * @group #slow
  */
 class LocaleTranslationUiTest extends BrowserTestBase {
 
@@ -60,7 +61,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     // Code for the language.
     $langcode = 'xx';
     // The English name for the language. This will be translated.
-    $name = 'cucurbitaceae';
+    $name = 'Foo';
     // This will be the translation of $name.
     $translation = $this->randomMachineName(16);
     $translation_to_en = $this->randomMachineName(16);

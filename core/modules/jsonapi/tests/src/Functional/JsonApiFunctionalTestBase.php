@@ -10,7 +10,7 @@ use Drupal\file\Entity\File;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
@@ -24,7 +24,7 @@ use GuzzleHttp\Exception\ServerException;
  */
 abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
 
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
   use ImageFieldCreationTrait;
 
   const IS_MULTILINGUAL = TRUE;
@@ -210,7 +210,7 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   The request response.
    *
-   * @throws \GuzzleHttp\Exception\GuzzleException
+   * @throws \Psr\Http\Client\ClientExceptionInterface
    *
    * @see \GuzzleHttp\ClientInterface::request
    */

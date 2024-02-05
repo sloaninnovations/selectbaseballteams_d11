@@ -59,7 +59,14 @@ class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
       'interface' => [
         'default' => 'php_mail',
       ],
-      'mailer_dsn' => 'sendmail://default',
+      'mailer_dsn' => [
+        'scheme' => 'sendmail',
+        'host' => 'default',
+        'user' => NULL,
+        'password' => NULL,
+        'port' => NULL,
+        'options' => [],
+      ],
     ],
     'system.maintenance' => [
       // langcode is not handled by the migration.
@@ -111,6 +118,7 @@ class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
       'admin_compact_mode' => TRUE,
       'weight_select_max' => 100,
       'default_langcode' => 'en',
+      'mail_notification' => NULL,
     ],
   ];
 
