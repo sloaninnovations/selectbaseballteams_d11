@@ -372,8 +372,8 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   protected function validateNoCircularTypeReference(array $definition, string $id, array $all_definitions): void {
     $all_types_in_subtree = static::getIndirectlyReferencedTypes($definition, $all_definitions);
     // Resolve types with variable values to all possible types they may match.
-    // @see \Drupal\Core\Config\TypedConfigManager::replaceVariable
-    // @see \Drupal\Core\Config\TypedConfigManager::getPossibleTypes
+    // @see \Drupal\Core\Config\Schema\TypeResolver::resolveExpression()
+    // @see \Drupal\Core\Config\TypedConfigManager::getPossibleTypes()
     foreach ($all_types_in_subtree as $used_type) {
       $possible_types = $this->getPossibleTypes($used_type);
       if (in_array($id, $possible_types, TRUE)) {
@@ -711,7 +711,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     // this:
     // `[%parent.%parent.%type]` and `[%key]`.
     // And collapse all these to just `[]`.
-    // @see \Drupal\Core\Config\TypedConfigManager::replaceVariable()
+    // @see \Drupal\Core\Config\Schema\TypeResolver::resolveExpression()
     $matches = [];
     if (preg_match_all('/(\[[^\]]+\])/', $name, $matches) >= 1) {
       $name = str_replace($matches[0], '[]', $name);
