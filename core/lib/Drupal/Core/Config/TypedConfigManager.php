@@ -327,7 +327,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       // All primitive scalar types' classes must implement PrimitiveInterface.
       case 'scalar':
         if (!is_subclass_of($definition['class'], PrimitiveInterface::class)) {
-          throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive scalar config schema type, but its class %s does not implement PrimitiveInterface.', $id, $definition['class']));
+          throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive scalar config schema type, but its class %s does not implement %s.', $id, $definition['class'], PrimitiveInterface::class));
         }
         break;
 
@@ -335,7 +335,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       case 'list':
       case 'complex':
         if (!is_subclass_of($definition['class'], ArrayElement::class)) {
-          throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive complex config schema type, but its class %s does not extend ArrayElement.', $id, $definition['class']));
+          throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive complex config schema type, but its class %s does not extend %s.', $id, $definition['class'], ArrayElement::class));
         }
         break;
     }
@@ -356,7 +356,6 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    *   - "scalar": for any other type (in core f.e. "string", "boolean", etc.)
    */
   private static function getShape(array $definition): string {
-    // @todo Convert the string return type to an enum.
     return match (TRUE) {
       // Two cases that allow arbitrary values: "ignore" and "undefined".
       in_array($definition['class'], [Undefined::class, Ignore::class], TRUE) => 'arbitrary',
@@ -390,9 +389,9 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    */
   private function validateNoCircularTypeReference(array $definition, string $plugin_id): void {
     // This validation requires all config schema types to be known.
-    assert(isset($this->definitions));
+    assert($this->definitions !== NULL);
     $all_types_in_subtree = static::getImplicitlyReferencedTypes($definition, $this->definitions);
-    // Resolve types with variable values to all possible types they may match.
+    // Resolve types with dynamic names to all possible types they may match.
     // @see \Drupal\Core\Config\Schema\TypeResolver::resolveExpression()
     // @see \Drupal\Core\Config\TypedConfigManager::getPossibleTypes()
     foreach ($all_types_in_subtree as $used_type) {
