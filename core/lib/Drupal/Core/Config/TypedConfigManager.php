@@ -297,16 +297,19 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    * Validates the "type" key of a config schema definition.
    */
   protected function validateType(array $definition, string $id): void {
+    // If a config schema does not define a new type, but uses an existing one,
+    // there's nothing left to validate.
     if (isset($definition['type'])) {
       return;
     }
 
-    // This type claims to be a primitive scalar, primitive list or primitive
-    // complex type, so its class must prove it.
+    // This type does not narrow an existing type (for example: `type: string` +
+    // validation constraints to only allow license plates), and is hence a new
+    // "low level type". So its `class` and `definition_class` must meet basic
+    // expectations of the configuration (schema) system.
     if (!isset($definition['class'])) {
       throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive config schema type, but it does not provide a class.', $id));
     }
-
     switch (static::getShape($definition)) {
       case 'arbitrary':
         // When arbitrary data can be stored, there is nothing to validate.
@@ -388,7 +391,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       return [];
     }
     $types = [$definition['type']];
-    // Find types further down.
+    // `type: mapping` and `type: sequence` contain values of certain types.
     foreach ($definition['mapping'] ?? $definition['sequence'] ?? [] as $array_element_definition) {
       $types = array_merge($types, static::getDirectlyReferencedTypes($array_element_definition));
     }
