@@ -297,14 +297,9 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive config schema type, but it does not provide a class.', $id));
     }
 
-    // There are two special cases: special cases: "Ignore" and "Undefined".
-    if (in_array($definition['class'], [Undefined::class, Ignore::class])) {
-      return;
-    }
-
     switch (static::getShape($definition)) {
-      case 'special':
-        // Nothing to do.
+      case 'arbitrary':
+        // When arbitrary data can be stored, there is nothing to validate.
         break;
 
       // All primitive scalar types' classes must implement PrimitiveInterface.
@@ -332,7 +327,8 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    *
    * @return string
    *   One of:
-   *   - "special": for the special "ignore" and "undefined" types.
+   *   - "arbitrary": for the "ignore" and "undefined" types that allow
+   *     arbitrary values.
    *   - "list": for any list type (in core only "sequence")
    *   - "complex": for any complex type (in core only "mapping")
    *   - "scalar": for any other type (in core f.e. "string", "boolean", etc.)
@@ -340,10 +336,10 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   private function getShape(array $definition): string {
     // @todo Convert the string return type to an enum.
     return match (TRUE) {
+      // Two cases that allow arbitrary values: "ignore" and "undefined".
+      in_array($definition['class'], [Undefined::class, Ignore::class], TRUE) => 'arbitrary',
       // Optional: default is set later, in ::getDefinitionWithReplacements().
       !isset($definition['definition_class']) => 'scalar',
-      // Two special cases: "ignore" and "undefined".
-      in_array($definition['class'], [Undefined::class, Ignore::class]) => 'special',
       // The three normal shapes.
       is_subclass_of($definition['definition_class'], ListDataDefinitionInterface::class) => 'list',
       is_subclass_of($definition['definition_class'], ComplexDataDefinitionInterface::class) => 'complex',
