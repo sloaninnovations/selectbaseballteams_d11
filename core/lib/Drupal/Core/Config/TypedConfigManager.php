@@ -420,18 +420,28 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       return [];
     }
 
-    $used_types = match (TRUE) {
-      // Sequence: many keys using values of the same type.
-      isset($definition['sequence']) => static::getExplicitlyReferencedTypes($definition['sequence']),
-      // Mapping: each key may be using a different type.
-      isset($definition['mapping']) => array_reduce(
-        $definition['mapping'],
-        fn (array $carry, array $array_element_definition) => array_merge($carry, static::getExplicitlyReferencedTypes($array_element_definition)),
-        [],
-      ),
-      default => [],
-    };
-    return array_unique(array_merge([$definition['type']], $used_types));
+    // TRICKY: checking if `$definition['type']` is `sequence` or `mapping` is
+    // insufficient here, because it may be a subtype of a sequence or mapping.
+    // For example:
+    // - `type: views.filter_value.in_operator` is a specialized subtype of
+    //   `type: sequence`
+    // - `type: config_entity` is a specialized subtype of `type: config_object`
+    //   which itself is a specialized subtype of `type: mapping`, and both
+    //   specializations define additional keys in `mapping: …`.
+    $used_types = [$definition['type']];
+
+    // Add the type that all values in this sequence use.
+    if (isset($definition['sequence'])) {
+      $used_types = array_merge($used_types, static::getExplicitlyReferencedTypes($definition['sequence']));
+    }
+    // Add the types that the various keys in this mapping use.
+    elseif (isset($definition['mapping'])) {
+      foreach (array_keys($definition['mapping']) as $key) {
+        $used_types = array_merge($used_types, static::getExplicitlyReferencedTypes($definition['mapping'][$key]));
+      }
+    }
+
+    return array_unique($used_types);
   }
 
   /**
