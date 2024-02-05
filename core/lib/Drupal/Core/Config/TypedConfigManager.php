@@ -404,10 +404,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   // phpcs:enable
 
   /**
-   * Gets a schema definition with replacements for dynamic names.
-=======
    * Gets a schema definition with replacements for dynamic type names.
->>>>>>> origin/11.x
    *
    * @param string $base_plugin_id
    *   A plugin ID.
@@ -667,7 +664,6 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Config\Schema\TypeResolver::' . __FUNCTION__ . '() instead. See https://www.drupal.org/node/3413264', E_USER_DEPRECATED);
     return TypeResolver::resolveExpression($expression, $data);
   }
-
 
   /**
    * Returns all possible types for the type with the given name.
