@@ -285,10 +285,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       // TRICKY: Validating the absence of circular type references requires
       // knowing all config schema type definitions. Hence this cannot happen in
       // ::processDefinition().
-      // @todo Generalize
-      if ($plugin_id === 'filter_settings.filter_html') {
-        $this->validateNoCircularTypeReference($definition, $plugin_id, $definitions);
-      }
+      $this->validateNoCircularTypeReference($definition, $plugin_id);
     }
     return $definitions;
   }
