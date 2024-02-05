@@ -360,7 +360,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
 
   // phpcs:disable
   protected function validateNoCircularTypeReference(array $definition, string $id, array $all_definitions): void {
-    $all_types_in_subtree = static::getInDirectlyReferencedTypes($definition, $all_definitions);
+    $all_types_in_subtree = static::getIndirectlyReferencedTypes($definition, $all_definitions);
     // Resolve types with variable values to all possible types they may match.
     // @see \Drupal\Core\Config\TypedConfigManager::replaceVariable
     // @see \Drupal\Core\Config\TypedConfigManager::getPossibleTypes
@@ -385,17 +385,17 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     return array_unique($types);
   }
 
-  protected static function getInDirectlyReferencedTypes(array $definition, array $all_definitions): array {
+  protected static function getIndirectlyReferencedTypes(array $definition, array $all_definitions): array {
     // The indirect ones include the direct ones too.
     $direct = static::getDirectlyReferencedTypes($definition);
     // For each of the directly used types, figure out recursively which types
-    // they use. If $directly contains only primitive types, a single iteration
-    // of the loop below will be sufficient.
+    // they use. If $direct contains only primitive types, a single iteration of
+    // the loop below will be sufficient.
     $result = $direct;
     do {
       // For all types seen so far, find the next ones.
       $next_level = array_map(
-        fn(array $d): array => static::getDirectlyReferencedTypes($d),
+        static::getDirectlyReferencedTypes(...),
         // Use $new from the previous iteration, to not repeat the same work.
         array_intersect_key($all_definitions, array_flip($new ?? $direct))
       );
