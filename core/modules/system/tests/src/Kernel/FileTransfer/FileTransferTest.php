@@ -82,7 +82,7 @@ class FileTransferTest extends KernelTestBase {
     // Copying to a directory inside the jail shouldn't throw an exception.
     $destination = $this->root . '/' . PublicStream::basePath();
     $this->connection->copyDirectory('temporary://fake', $destination);
-    
+
     // Copying to a directory outside the jail is not allowed.
     $this->expectException(FileTransferException::class);
     $this->expectExceptionMessage('@directory is outside of the @jail');
