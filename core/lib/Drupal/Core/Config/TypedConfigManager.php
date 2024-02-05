@@ -299,6 +299,11 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
 
   /**
    * Validates the "type" key of a config schema definition.
+   *
+   * @param array $definition
+   *   A config schema type definition.
+   * @param string $id
+   *   A config schema type ID.
    */
   protected function validateType(array $definition, string $id): void {
     // If a config schema does not define a new type, but uses an existing one,
@@ -340,7 +345,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    * Gets the shape of a config schema type definition.
    *
    * @param array $definition
-   *   A config schema definition.
+   *   A config schema type definition.
    *
    * @return string
    *   One of:
@@ -375,23 +380,41 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     };
   }
 
-  // phpcs:disable
-  protected function validateNoCircularTypeReference(array $definition, string $id): void {
+  /**
+   * Validates the absence of circular config schema type references.
+   *
+   * @param array $definition
+   *   A config schema type definition
+   * @param string $plugin_id
+   *   A config schema type ID.
+   */
+  private function validateNoCircularTypeReference(array $definition, string $plugin_id): void {
     // This validation requires all config schema types to be known.
     assert(isset($this->definitions));
-    $all_types_in_subtree = static::getIndirectlyReferencedTypes($definition, $this->definitions);
+    $all_types_in_subtree = static::getImplicitlyReferencedTypes($definition, $this->definitions);
     // Resolve types with variable values to all possible types they may match.
     // @see \Drupal\Core\Config\Schema\TypeResolver::resolveExpression()
     // @see \Drupal\Core\Config\TypedConfigManager::getPossibleTypes()
     foreach ($all_types_in_subtree as $used_type) {
       $possible_types = $this->getPossibleTypes($used_type);
-      if (in_array($id, $possible_types, TRUE)) {
-        throw new \LogicException(sprintf('Config schema type "%s" has a circular type reference, where it uses the type "%s".', $id, $used_type));
+      if (in_array($plugin_id, $possible_types, TRUE)) {
+        throw new InvalidPluginDefinitionException($plugin_id, sprintf('Config schema type "%s" has a circular type reference, where it uses the type "%s".', $plugin_id, $used_type));
       }
     }
   }
 
-  protected static function getDirectlyReferencedTypes(array $definition): array {
+  /**
+   * Gets explicitly referenced types for a config schema type definition.
+   *
+   * @param array $definition
+   *   A config schema type definition.
+   *
+   * @return string[]
+   *   All config schema types that are explicitly referenced by this config
+   *   schema type definition. In other words: this collects all `type: …`
+   *   strings in the given $definition.
+   */
+  private static function getExplicitlyReferencedTypes(array $definition): array {
     // Primitive types do not specify the "type" key. They cannot reference
     // other types, so return early.
     if (!isset($definition['type'])) {
@@ -400,12 +423,11 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
 
     $used_types = match (TRUE) {
       // Sequence: many keys using values of the same type.
-      isset($definition['sequence']) => static::getDirectlyReferencedTypes($definition['sequence']),
-
+      isset($definition['sequence']) => static::getExplicitlyReferencedTypes($definition['sequence']),
       // Mapping: each key may be using a different type.
       isset($definition['mapping']) => array_reduce(
         $definition['mapping'],
-        fn (array $carry, array $array_element_definition) => array_merge($carry, static::getDirectlyReferencedTypes($array_element_definition)),
+        fn (array $carry, array $array_element_definition) => array_merge($carry, static::getExplicitlyReferencedTypes($array_element_definition)),
         [],
       ),
       default => [],
@@ -413,19 +435,34 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     return array_unique(array_merge([$definition['type']], $used_types));
   }
 
-  protected static function getIndirectlyReferencedTypes(array $definition, array $all_definitions): array {
-    // The indirect ones include the direct ones too.
-    $direct = static::getDirectlyReferencedTypes($definition);
-    // For each of the directly used types, figure out recursively which types
-    // they use. If $direct contains only primitive types, a single iteration of
-    // the loop below will be sufficient.
-    $result = $direct;
+  /**
+   * Gets implicitly referenced types for a config schema type definition.
+   *
+   * @param array $definition
+   *   A config schema type definition.
+   * @param array $all_definitions
+   *   All config schema type definitions.
+   *
+   * @return string[]
+   *   All config schema types that are implicitly referenced by this config
+   *   schema type definition, by looking up the types used by the explicitly
+   *   referenced types in their respective type definitions. In other words:
+   *   this looks at the config schema type plugin definitions for all the
+   *   explicit `type: …` strings (plugin IDs) found in $definition.
+   */
+  private static function getImplicitlyReferencedTypes(array $definition, array $all_definitions): array {
+    // The implicit ones include the explicit ones too.
+    $explicit = static::getExplicitlyReferencedTypes($definition);
+    // For each of the implicitly used types, figure out recursively which types
+    // they use. If $explicit contains only primitive types, a single iteration
+    // of the loop below will be sufficient.
+    $result = $explicit;
     do {
       // For all types seen so far, find the next ones.
       $next_level = array_map(
-        static::getDirectlyReferencedTypes(...),
+        static::getExplicitlyReferencedTypes(...),
         // Use $new from the previous iteration, to not repeat the same work.
-        array_intersect_key($all_definitions, array_flip($new ?? $direct))
+        array_intersect_key($all_definitions, array_flip($new ?? $explicit))
       );
       // Determine the newly discovered types.
       $new = array_merge(...array_values($next_level));
@@ -434,8 +471,6 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     } while (!empty($new));
     return array_unique($result);
   }
-
-  // phpcs:enable
 
   /**
    * Gets a schema definition with replacements for dynamic type names.
