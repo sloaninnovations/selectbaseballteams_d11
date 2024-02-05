@@ -271,10 +271,20 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   /**
    * {@inheritdoc}
    */
-  public function getDefinitions() {
-    $definitions = parent::getDefinitions();
+  public function processDefinition(&$definition, $plugin_id) {
+    parent::processDefinition($definition, $plugin_id);
+    static::validateType($definition, $plugin_id);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function findDefinitions() {
+    $definitions = parent::findDefinitions();
     foreach ($definitions as $plugin_id => &$definition) {
-      static::validateType($definition, $plugin_id);
+      // TRICKY: Validating the absence of circular type references requires
+      // knowing all config schema type definitions. Hence this cannot happen in
+      // ::processDefinition().
       // @todo Generalize
       if ($plugin_id === 'filter_settings.filter_html') {
         $this->validateNoCircularTypeReference($definition, $plugin_id, $definitions);
