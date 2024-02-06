@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\Extension {
     /**
      * Provides a proxy class for \Drupal\Core\Extension\ModuleInstaller.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class ModuleInstaller implements \Drupal\Core\Extension\ModuleInstallerInterface
     {

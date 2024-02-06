@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass {
     /**
      * Provides a proxy class for \Drupal\Core\Cron.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class Cron implements \Drupal\Core\CronInterface
     {

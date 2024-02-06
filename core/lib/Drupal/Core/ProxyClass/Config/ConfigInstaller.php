@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\Config {
     /**
      * Provides a proxy class for \Drupal\Core\Config\ConfigInstaller.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class ConfigInstaller implements \Drupal\Core\Config\ConfigInstallerInterface
     {

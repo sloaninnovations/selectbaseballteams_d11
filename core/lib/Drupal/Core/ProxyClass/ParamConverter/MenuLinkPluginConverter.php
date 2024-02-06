@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\ParamConverter {
     /**
      * Provides a proxy class for \Drupal\Core\ParamConverter\MenuLinkPluginConverter.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class MenuLinkPluginConverter implements \Drupal\Core\ParamConverter\ParamConverterInterface
     {

@@ -10,7 +10,7 @@ namespace Drupal\book\ProxyClass {
     /**
      * Provides a proxy class for \Drupal\book\BookUninstallValidator.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class BookUninstallValidator implements \Drupal\Core\Extension\ModuleUninstallValidatorInterface
     {

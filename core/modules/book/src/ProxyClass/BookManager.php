@@ -10,7 +10,7 @@ namespace Drupal\book\ProxyClass {
     /**
      * Provides a proxy class for \Drupal\book\BookManager.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class BookManager implements \Drupal\book\BookManagerInterface
     {

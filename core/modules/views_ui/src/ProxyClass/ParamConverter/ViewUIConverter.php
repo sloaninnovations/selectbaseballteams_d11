@@ -10,7 +10,7 @@ namespace Drupal\views_ui\ProxyClass\ParamConverter {
     /**
      * Provides a proxy class for \Drupal\views_ui\ParamConverter\ViewUIConverter.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class ViewUIConverter implements \Drupal\Core\ParamConverter\ParamConverterInterface
     {
