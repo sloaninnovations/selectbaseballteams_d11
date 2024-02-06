@@ -338,6 +338,9 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
           throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive complex config schema type, but its class %s does not extend %s.', $id, $definition['class'], ArrayElement::class));
         }
         break;
+
+      case 'no-data-definition':
+        throw new InvalidPluginDefinitionException($id, sprintf('The definition class for "%s" must implement %s.', $id, DataDefinitionInterface::class));
     }
   }
 
@@ -354,6 +357,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    *   - "list": for any list type (in core, only "sequence")
    *   - "complex": for any complex type (in core, only "mapping")
    *   - "scalar": for any other type (in core, primitives like "string", "boolean", etc.)
+   *   - "no-data-definition": for an invalid definition class.
    */
   private static function getShape(array $definition): string {
     return match (TRUE) {
@@ -375,7 +379,8 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       is_subclass_of($definition['definition_class'], ListDataDefinitionInterface::class) => 'list',
       is_subclass_of($definition['definition_class'], ComplexDataDefinitionInterface::class) => 'complex',
       is_subclass_of($definition['definition_class'], DataDefinitionInterface::class) => 'scalar',
-      // No default case, because at minimum DataDefinitionInterface must be implemented.
+      // A default case only to provide precise guidance.
+      default => 'no-data-definition',
     };
   }
 
