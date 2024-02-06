@@ -3,17 +3,16 @@
 namespace Drupal\Core\Database;
 
 use Composer\Autoload\ClassLoader;
-use Drupal\Core\Database\Event\StatementExecutionEndEvent;
-use Drupal\Core\Database\Event\StatementExecutionStartEvent;
+use Drupal\Core\Database\Event\StatementEvent;
 use Drupal\Core\Extension\DatabaseDriverList;
 use Drupal\Core\Cache\NullBackend;
 
 /**
  * Primary front-controller for the database system.
  *
- * This class is uninstantiatable and un-extendable. It acts to encapsulate
- * all control and shepherding of database connections into a single location
- * without the use of globals.
+ * This class is un-extendable. It acts to encapsulate all control and
+ * shepherding of database connections into a single location without the use of
+ * globals.
  */
 abstract class Database {
 
@@ -125,10 +124,7 @@ abstract class Database {
       // logging object associated with it.
       if (!empty(self::$connections[$key])) {
         foreach (self::$connections[$key] as $connection) {
-          $connection->enableEvents([
-            StatementExecutionStartEvent::class,
-            StatementExecutionEndEvent::class,
-          ]);
+          $connection->enableEvents(StatementEvent::all());
           $connection->setLogger(self::$logs[$key]);
         }
       }
@@ -469,10 +465,7 @@ abstract class Database {
     // If we have any active logging objects for this connection key, we need
     // to associate them with the connection we just opened.
     if (!empty(self::$logs[$key])) {
-      $new_connection->enableEvents([
-        StatementExecutionStartEvent::class,
-        StatementExecutionEndEvent::class,
-      ]);
+      $new_connection->enableEvents(StatementEvent::all());
       $new_connection->setLogger(self::$logs[$key]);
     }
 

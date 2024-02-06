@@ -12,6 +12,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
  * Tests the pluggable pager system.
  *
  * @group views
+ * @group #slow
  */
 class PagerTest extends ViewTestBase {
 
@@ -424,7 +425,7 @@ class PagerTest extends ViewTestBase {
     $view->setAjaxEnabled(TRUE);
     $view->pager = NULL;
     $output = $view->render();
-    $output = \Drupal::service('renderer')->renderRoot($output);
+    $output = (string) \Drupal::service('renderer')->renderRoot($output);
     $this->assertEquals(0, preg_match('/<ul class="pager">/', $output), 'The pager is not rendered.');
   }
 

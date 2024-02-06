@@ -539,7 +539,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $list = $discovery->scan('module');
     foreach ($modules as $name) {
       if (!isset($list[$name])) {
-        throw new Exception("Unavailable module: '$name'. If this module needs to be downloaded separately, annotate the test class with '@requires module $name'.");
+        throw new Exception("Unavailable module: '$name'. If this module needs to be downloaded for testing, include it in the 'require-dev' section of your composer.json file.");
       }
       $extensions[$name] = $list[$name];
     }
@@ -613,6 +613,10 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $route_provider_definition = new Definition(RouteProvider::class);
     $route_provider_definition->setPublic(TRUE);
     $container->setDefinition($id, $route_provider_definition);
+
+    // Remove the stored configuration importer so if used again it will be
+    // built with up-to-date services.
+    $this->configImporter = NULL;
   }
 
   /**

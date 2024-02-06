@@ -24,18 +24,18 @@
  * 'sites/default' will be used.
  *
  * For example, for a fictitious site installed at
- * https://www.drupal.org:8080/mysite/test/, the 'settings.php' file is searched
+ * https://www.drupal.org:8080/my-site/test/, the 'settings.php' file is searched
  * for in the following directories:
  *
- * - sites/8080.www.drupal.org.mysite.test
- * - sites/www.drupal.org.mysite.test
- * - sites/drupal.org.mysite.test
- * - sites/org.mysite.test
+ * - sites/8080.www.drupal.org.my-site.test
+ * - sites/www.drupal.org.my-site.test
+ * - sites/drupal.org.my-site.test
+ * - sites/org.my-site.test
  *
- * - sites/8080.www.drupal.org.mysite
- * - sites/www.drupal.org.mysite
- * - sites/drupal.org.mysite
- * - sites/org.mysite
+ * - sites/8080.www.drupal.org.my-site
+ * - sites/www.drupal.org.my-site
+ * - sites/drupal.org.my-site
+ * - sites/org.my-site
  *
  * - sites/8080.www.drupal.org
  * - sites/www.drupal.org
@@ -46,8 +46,8 @@
  *
  * Note that if you are installing on a non-standard port number, prefix the
  * hostname with that number. For example,
- * https://www.drupal.org:8080/mysite/test/ could be loaded from
- * sites/8080.www.drupal.org.mysite.test/.
+ * https://www.drupal.org:8080/my-site/test/ could be loaded from
+ * sites/8080.www.drupal.org.my-site.test/.
  *
  * @see example.sites.php
  * @see \Drupal\Core\DrupalKernel::getSitePath()
@@ -355,14 +355,13 @@ $settings['update_free_access'] = FALSE;
  * security, or encryption benefits. In an environment where Drupal
  * is behind a reverse proxy, the real IP address of the client should
  * be determined such that the correct client IP address is available
- * to Drupal's logging, statistics, and access management systems. In
- * the most simple scenario, the proxy server will add an
- * X-Forwarded-For header to the request that contains the client IP
- * address. However, HTTP headers are vulnerable to spoofing, where a
- * malicious client could bypass restrictions by setting the
- * X-Forwarded-For header directly. Therefore, Drupal's proxy
- * configuration requires the IP addresses of all remote proxies to be
- * specified in $settings['reverse_proxy_addresses'] to work correctly.
+ * to Drupal's logging and access management systems. In the most simple
+ * scenario, the proxy server will add an X-Forwarded-For header to the request
+ * that contains the client IP address. However, HTTP headers are vulnerable to
+ * spoofing, where a malicious client could bypass restrictions by setting the
+ * X-Forwarded-For header directly. Therefore, Drupal's proxy configuration
+ * requires the IP addresses of all remote proxies to be specified in
+ * $settings['reverse_proxy_addresses'] to work correctly.
  *
  * Enable this setting to get Drupal to determine the client IP from the
  * X-Forwarded-For header. If you are unsure about this setting, do not have a

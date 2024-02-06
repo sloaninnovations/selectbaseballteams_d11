@@ -128,6 +128,29 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
   }
 
   /**
+   * Tests libraries overrides with multiple parent themes.
+   */
+  public function testLibrariesOverridesMultiple() {
+    /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
+    $theme_installer = $this->container->get('theme_installer');
+    $theme_installer->install(['test_basetheme']);
+    $theme_installer->install(['test_subtheme']);
+    $theme_installer->install(['test_subsubtheme']);
+
+    /** @var \Drupal\Core\Theme\ThemeInitializationInterface $theme_initializer */
+    $theme_initializer = $this->container->get('theme.initialization');
+    $active_theme = $theme_initializer->initTheme('test_subsubtheme');
+
+    $libraries_override = $active_theme->getLibrariesOverride();
+    $expected_order = [
+      'core/modules/system/tests/themes/test_basetheme',
+      'core/modules/system/tests/themes/test_subtheme',
+      'core/modules/system/tests/themes/test_subsubtheme',
+    ];
+    $this->assertEquals($expected_order, array_keys($libraries_override));
+  }
+
+  /**
    * Tests library assets with other ways for specifying paths.
    */
   public function testLibrariesOverrideOtherAssetLibraryNames() {
@@ -165,14 +188,14 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
    * Tests libraries-extend.
    */
   public function testLibrariesExtend() {
-    // Simulate starterkit_theme defining the book-navigation library.
+    // Simulate starterkit_theme defining the test-navigation library.
     // @see theme_test_library_info_alter()
     $this->container->get('state')
       ->set('theme_test_library_info_alter starterkit_theme', [
-        'book-navigation' => [
+        'test-navigation' => [
           'css' => [
             'component' => [
-              'css/components/book-navigation.css' => [],
+              'css/components/test-navigation.css' => [],
             ],
           ],
         ],
@@ -180,16 +203,16 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
 
     // Activate starterkit_theme and verify the libraries are not extended.
     $this->activateTheme('starterkit_theme');
-    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_theme_libraries_extend/css/extend_1.css', 'starterkit_theme', 'book-navigation', 'css');
-    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_theme_libraries_extend/js/extend_1.js', 'starterkit_theme', 'book-navigation', 'js');
-    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_theme_libraries_extend/css/extend_2.css', 'starterkit_theme', 'book-navigation', 'css');
+    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_theme_libraries_extend/css/extend_1.css', 'starterkit_theme', 'test-navigation', 'css');
+    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_theme_libraries_extend/js/extend_1.js', 'starterkit_theme', 'test-navigation', 'js');
+    $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_theme_libraries_extend/css/extend_2.css', 'starterkit_theme', 'test-navigation', 'css');
 
-    // Activate the theme that extends the book-navigation library in
+    // Activate the theme that extends the test-navigation library in
     // starterkit_theme.
     $this->activateTheme('test_theme_libraries_extend');
-    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_theme_libraries_extend/css/extend_1.css', 'starterkit_theme', 'book-navigation', 'css');
-    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_theme_libraries_extend/js/extend_1.js', 'starterkit_theme', 'book-navigation', 'js');
-    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_theme_libraries_extend/css/extend_2.css', 'starterkit_theme', 'book-navigation', 'css');
+    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_theme_libraries_extend/css/extend_1.css', 'starterkit_theme', 'test-navigation', 'css');
+    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_theme_libraries_extend/js/extend_1.js', 'starterkit_theme', 'test-navigation', 'js');
+    $this->assertAssetInLibrary('core/modules/system/tests/themes/test_theme_libraries_extend/css/extend_2.css', 'starterkit_theme', 'test-navigation', 'css');
 
     // Activate a sub theme and confirm that it inherits the library assets
     // extended in the base theme as well as its own.

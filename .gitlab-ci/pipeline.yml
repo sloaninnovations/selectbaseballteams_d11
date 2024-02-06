@@ -67,7 +67,7 @@ variables:
   POSTGRES_DB: drupaltestbot
   POSTGRES_USER: drupaltestbot
   POSTGRES_PASSWORD: drupaltestbotpw
-  MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-dev-shm-usage","--disable-gpu","--headless"]}}, "http://localhost:9515"]'
+  MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-dev-shm-usage","--disable-gpu","--headless","--dns-prefetch-disable"]}}, "http://localhost:9515"]'
   CI_PARALLEL_NODE_INDEX: $CI_NODE_INDEX
   CI_PARALLEL_NODE_TOTAL: $CI_NODE_TOTAL
 
@@ -83,6 +83,7 @@ variables:
     - "--no-sandbox"
     - "--log-path=/builds/chromedriver.log"
     - "--whitelisted-ips="
+    - "--allowed-origins=*"
 
 .run-tests: &run-tests
   script:
@@ -147,7 +148,7 @@ variables:
 
 '⚙️️ PHPUnit Kernel':
   <<: [ *with-composer, *run-tests, *default-job-settings ]
-  parallel: 2
+  parallel: 3
   variables:
     TESTSUITE: PHPUnit-Kernel
     KUBERNETES_CPU_REQUEST: "16"
@@ -189,9 +190,10 @@ variables:
     - echo "DRUPAL_TEST_CHROMEDRIVER_AUTOSTART=false" >> ./core/.env
     - echo "DRUPAL_TEST_DB_URL='${DRUPAL_TEST_DB_URL}'" >> ./core/.env
     - echo "DRUPAL_TEST_WEBDRIVER_HOSTNAME='localhost'" >> ./core/.env
-    - echo "DRUPAL_TEST_WEBDRIVER_CHROME_ARGS='--disable-dev-shm-usage --disable-gpu --headless'" >> ./core/.env
+    - echo "DRUPAL_TEST_WEBDRIVER_CHROME_ARGS='--disable-dev-shm-usage --disable-gpu --headless --dns-prefetch-disable'" >> ./core/.env
     - echo "DRUPAL_TEST_WEBDRIVER_PORT='9515'" >> ./core/.env
     - echo "DRUPAL_NIGHTWATCH_OUTPUT='"../nightwatch_output"'" >> ./core/.env
+    - echo "COLUMNS=1000" >> ./core/.env
     - chown -R www-data:www-data ./sites /var/www
     - sudo -u www-data yarn run --cwd=./core test:nightwatch --workers=4
   after_script:
@@ -220,6 +222,9 @@ variables:
     - if: $PERFORMANCE_TEST == "1"
   variables:
     KUBERNETES_CPU_REQUEST: "24"
+    MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-dev-shm-usage","--disable-gpu","--headless","--no-sandbox"]}}, "http://chrome:9515"]'
+  tags:
+    - performance-test-runner
   services:
     - <<: *with-database
     - <<: *with-chrome
@@ -234,4 +239,4 @@ variables:
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
     - sudo -u www-data git config --global --add safe.directory $CI_PROJECT_DIR
-    - for run in {1..3}; do sudo SIMPLETEST_BASE_URL="$SIMPLETEST_BASE_URL" SIMPLETEST_DB="$SIMPLETEST_DB" MINK_DRIVER_ARGS_WEBDRIVER="$MINK_DRIVER_ARGS_WEBDRIVER" OTEL_COLLECTOR="$OTEL_COLLECTOR" -u www-data ./vendor/bin/phpunit -c core --group OpenTelemetry --log-junit=./sites/default/files/simpletest/phpunit-performance.xml; done
+    - sudo SIMPLETEST_BASE_URL="http://$HOSTNAME/subdirectory" SIMPLETEST_DB="$SIMPLETEST_DB" MINK_DRIVER_ARGS_WEBDRIVER="$MINK_DRIVER_ARGS_WEBDRIVER" OTEL_COLLECTOR="$OTEL_COLLECTOR" -u www-data ./vendor/bin/phpunit --verbose -c core --group OpenTelemetry --log-junit=./sites/default/files/simpletest/phpunit-performance.xml

@@ -687,7 +687,7 @@ function hook_theme_suggestions_HOOK(array $variables) {
  * node and taxonomy term templates based on the user being logged in.
  *
  * @code
- * function MYMODULE_theme_suggestions_alter(array &$suggestions, array &$variables, $hook) {
+ * function MY_MODULE_theme_suggestions_alter(array &$suggestions, array &$variables, $hook) {
  *   if (\Drupal::currentUser()->isAuthenticated() && in_array($hook, array('node', 'taxonomy_term'))) {
  *     $suggestions[] = $hook . '__' . 'logged_in';
  *   }
@@ -741,7 +741,7 @@ function hook_theme_suggestions_alter(array &$suggestions, array &$variables, $h
  * In the following example, we provide an alternative template suggestion to
  * node templates based on the user being logged in.
  * @code
- * function MYMODULE_theme_suggestions_node_alter(array &$suggestions, array $variables) {
+ * function MY_MODULE_theme_suggestions_node_alter(array &$suggestions, array $variables) {
  *   if (\Drupal::currentUser()->isAuthenticated()) {
  *     $suggestions[] = 'node__logged_in';
  *   }
@@ -869,7 +869,7 @@ function hook_element_info_alter(array &$info) {
  */
 function hook_element_plugin_alter(array &$definitions) {
   // Use a custom class for the LayoutBuilder element.
-  $definitions['layout_builder']['class'] = '\Drupal\mymodule\Element\MyLayoutBuilderElement';
+  $definitions['layout_builder']['class'] = '\Drupal\my_module\Element\MyLayoutBuilderElement';
 }
 
 /**
@@ -1133,7 +1133,7 @@ function hook_page_attachments_alter(array &$attachments) {
  *   A renderable array representing the top of the page.
  */
 function hook_page_top(array &$page_top) {
-  $page_top['mymodule'] = ['#markup' => 'This is the top.'];
+  $page_top['my_module'] = ['#markup' => 'This is the top.'];
 }
 
 /**
@@ -1143,7 +1143,7 @@ function hook_page_top(array &$page_top) {
  *   A renderable array representing the bottom of the page.
  */
 function hook_page_bottom(array &$page_bottom) {
-  $page_bottom['mymodule'] = ['#markup' => 'This is the bottom.'];
+  $page_bottom['my_module'] = ['#markup' => 'This is the bottom.'];
 }
 
 /**
@@ -1221,16 +1221,9 @@ function hook_page_bottom(array &$page_bottom) {
  *     suggestion, then this suggestion's template will be used to generate the
  *     rendered output.
  *   - pattern: A regular expression pattern to be used to allow this theme
- *     implementation to have a dynamic name. The convention is to use __ to
- *     differentiate the dynamic portion of the theme. For example, to allow
- *     forums to be themed individually, the pattern might be: 'forum__'. Then,
- *     when the forum is rendered, following render array can be used:
- *     @code
- *     $render_array = array(
- *       '#theme' => array('forum__' . $tid, 'forum'),
- *       '#forum' => $forum,
- *     );
- *     @endcode
+ *     implementation to have a dynamic name. The default is to use __ to
+ *     differentiate the dynamic portion of the theme. Implementations
+ *     can specify a different pattern if required.
  *   - preprocess functions: A list of functions used to preprocess this data.
  *     Ordinarily this won't be used; it's automatically filled in. By default,
  *     for a module this will be filled in as template_preprocess_HOOK. For
@@ -1256,13 +1249,13 @@ function hook_page_bottom(array &$page_bottom) {
  */
 function hook_theme($existing, $type, $theme, $path) {
   return [
-    'forum_display' => [
-      'variables' => ['forums' => NULL, 'topics' => NULL, 'parents' => NULL, 'tid' => NULL, 'sortby' => NULL, 'forum_per_page' => NULL],
+    'my_module_display' => [
+      'variables' => ['my_modules' => NULL, 'topics' => NULL, 'parents' => NULL, 'tid' => NULL, 'sortby' => NULL, 'my_module_per_page' => NULL],
     ],
-    'forum_list' => [
-      'variables' => ['forums' => NULL, 'parents' => NULL, 'tid' => NULL],
+    'my_module_list' => [
+      'variables' => ['my_modules' => NULL, 'parents' => NULL, 'tid' => NULL],
     ],
-    'forum_icon' => [
+    'my_module_icon' => [
       'variables' => ['new_posts' => NULL, 'num_posts' => 0, 'comment_mode' => 0, 'sticky' => 0],
     ],
     'status_report' => [
@@ -1315,10 +1308,10 @@ function hook_theme($existing, $type, $theme, $path) {
  * @see \Drupal\Core\Theme\Registry::processExtension()
  */
 function hook_theme_registry_alter(&$theme_registry) {
-  // Kill the next/previous forum topic navigation links.
-  foreach ($theme_registry['forum_topic_navigation']['preprocess functions'] as $key => $value) {
-    if ($value == 'template_preprocess_forum_topic_navigation') {
-      unset($theme_registry['forum_topic_navigation']['preprocess functions'][$key]);
+  // Kill the next/previous my_module topic navigation links.
+  foreach ($theme_registry['my_module_topic_navigation']['preprocess functions'] as $key => $value) {
+    if ($value == 'template_preprocess_my_module_topic_navigation') {
+      unset($theme_registry['my_module_topic_navigation']['preprocess functions'][$key]);
     }
   }
 }

@@ -24,7 +24,6 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
     'datetime_range',
     'language',
     'migrate_drupal_ui',
-    'statistics',
     'telephone',
     'update',
   ];
@@ -52,6 +51,11 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
     $this->nodeStorage->delete($this->nodeStorage->loadMultiple());
 
     $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal6.php');
+
+    // Enable saving the logs and set the post migration admin user name.
+    $this->outputLogs = TRUE;
+    $this->migratedAdminUserName = 'root';
+    $this->expectedLoggedErrors = 39;
   }
 
   /**
@@ -153,7 +157,6 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'Path',
       'Profile translation',
       'Search',
-      'Statistics',
       'String translation',
       'Synchronize translations',
       'System',
@@ -185,6 +188,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'Aggregator',
       'Book',
       'Forum',
+      'Statistics',
     ];
   }
 

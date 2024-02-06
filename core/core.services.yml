@@ -229,7 +229,7 @@ services:
       - [setContainer, ['@service_container']]
   cache.backend.database:
     class: Drupal\Core\Cache\DatabaseBackendFactory
-    arguments: ['@database', '@cache_tags.invalidator.checksum', '@settings']
+    arguments: ['@database', '@cache_tags.invalidator.checksum', '@settings', '@serialization.phpserialize']
     tags:
       - { name: backend_overridable }
   cache.backend.apcu:
@@ -541,6 +541,7 @@ services:
     class: Drupal\Component\Serialization\Json
   serialization.phpserialize:
     class: Drupal\Component\Serialization\PhpSerialize
+  Drupal\Component\Serialization\ObjectAwareSerializationInterface: '@serialization.phpserialize'
   serialization.yaml:
     class: Drupal\Component\Serialization\Yaml
 
@@ -1478,8 +1479,6 @@ services:
   Drupal\Core\Render\ElementInfoManagerInterface: '@plugin.manager.element_info'
   stream_wrapper_manager:
     class: Drupal\Core\StreamWrapper\StreamWrapperManager
-    calls:
-      - [setContainer, ['@service_container']]
   Drupal\Core\StreamWrapper\StreamWrapperManagerInterface: '@stream_wrapper_manager'
   stream_wrapper.assets:
     class: Drupal\Core\StreamWrapper\AssetsStream
@@ -1494,10 +1493,6 @@ services:
     class: Drupal\Core\StreamWrapper\TemporaryStream
     tags:
       - { name: stream_wrapper, scheme: temporary }
-  kernel_destruct_subscriber:
-    class: Drupal\Core\EventSubscriber\KernelDestructionSubscriber
-    calls:
-      - [setContainer, ['@service_container']]
   image.toolkit.manager:
     class: Drupal\Core\ImageToolkit\ImageToolkitManager
     arguments: ['@config.factory']

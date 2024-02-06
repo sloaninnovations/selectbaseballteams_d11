@@ -11,7 +11,6 @@ use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\toolbar\Ajax\SetSubtreesCommand;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Defines a controller for the toolbar module.
@@ -25,11 +24,10 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
    *   The time service.
    */
   public function __construct(
-    #[Autowire(service: 'datetime.time')]
     protected ?TimeInterface $time = NULL
   ) {
     if ($this->time === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $time argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3301971', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $time argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3112298', E_USER_DEPRECATED);
       $this->time = \Drupal::service('datetime.time');
     }
   }

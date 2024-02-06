@@ -7,8 +7,11 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\rest\Functional\AnonResourceTestTrait;
 
+// cspell:ignore cádiz
+
 /**
  * @group rest
+ * @group #slow
  */
 class EntityTestTextItemNormalizerTest extends EntityTestResourceTestBase {
 

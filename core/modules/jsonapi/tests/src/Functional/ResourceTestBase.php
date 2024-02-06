@@ -1965,7 +1965,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     }
 
     // Try with all of the following request bodies.
-    $unparseable_request_body = '!{>}<';
+    $not_parseable_request_body = '!{>}<';
     $parseable_valid_request_body = Json::encode($this->getPostDocument());
     $parseable_invalid_request_body_missing_type = Json::encode($this->removeResourceTypeFromDocument($this->getPostDocument()));
     if ($this->entity->getEntityType()->hasKey('label')) {
@@ -2014,9 +2014,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $response = $this->request('POST', $url, $request_options);
     $this->assertResourceErrorResponse(400, 'Empty request body.', $url, $response, FALSE);
 
-    $request_options[RequestOptions::BODY] = $unparseable_request_body;
+    $request_options[RequestOptions::BODY] = $not_parseable_request_body;
 
-    // DX: 400 when unparseable request body.
+    // DX: 400 when un-parseable request body.
     $response = $this->request('POST', $url, $request_options);
     $this->assertResourceErrorResponse(400, 'Syntax error', $url, $response, FALSE);
 
@@ -2185,7 +2185,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->anotherEntity = $this->createAnotherEntity('dupe');
 
     // Try with all of the following request bodies.
-    $unparseable_request_body = '!{>}<';
+    $not_parseable_request_body = '!{>}<';
     $parseable_valid_request_body = Json::encode($this->getPatchDocument());
     if ($this->entity->getEntityType()->hasKey('label')) {
       $parseable_invalid_request_body = Json::encode($this->makeNormalizationInvalid($this->getPatchDocument(), 'label'));
@@ -2237,9 +2237,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $response = $this->request('PATCH', $url, $request_options);
     $this->assertResourceErrorResponse(400, 'Empty request body.', $url, $response, FALSE);
 
-    $request_options[RequestOptions::BODY] = $unparseable_request_body;
+    $request_options[RequestOptions::BODY] = $not_parseable_request_body;
 
-    // DX: 400 when unparseable request body.
+    // DX: 400 when un-parseable request body.
     $response = $this->request('PATCH', $url, $request_options);
     $this->assertResourceErrorResponse(400, 'Syntax error', $url, $response, FALSE);
 
@@ -2731,7 +2731,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'all' => $relationship_field_names,
     ];
     if (count($relationship_field_names) > 1) {
-      $about_half_the_fields = floor(count($relationship_field_names) / 2);
+      $about_half_the_fields = (int) floor(count($relationship_field_names) / 2);
       $field_sets['some'] = array_slice($relationship_field_names, $about_half_the_fields);
 
       $nested_includes = $this->getNestedIncludePaths();
@@ -3324,7 +3324,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $field_names = array_keys($this->entity->toArray());
     $field_sets = [
       'empty' => [],
-      'some' => array_slice($field_names, floor(count($field_names) / 2)),
+      'some' => array_slice($field_names, (int) floor(count($field_names) / 2)),
       'all' => $field_names,
     ];
     if ($this->entity instanceof EntityOwnerInterface) {
