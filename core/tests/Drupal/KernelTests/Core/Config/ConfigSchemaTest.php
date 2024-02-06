@@ -628,7 +628,7 @@ class ConfigSchemaTest extends KernelTestBase {
 vector:
   label: 'Vector, which is a specialized `type: sequence`'
 YAML,
-      '"vector" claims to be a primitive config schema type, but it does not provide a class.',
+      '"vector" claims to be a new config schema type, but it does not provide a class.',
     ];
 
     // @see \Drupal\Core\Config\TypedConfigManager::validateType()
@@ -638,7 +638,7 @@ vector:
   label: 'Vector, which is a specialized `type: sequence`'
   class: '\Drupal'
 YAML,
-      '"vector" claims to be a primitive scalar config schema type, but its class Drupal does not implement Drupal\Core\TypedData\PrimitiveInterface.',
+      '"vector" appears to be a primitive config schema type (for representing scalar values), but its class Drupal does not implement Drupal\Core\TypedData\PrimitiveInterface. Its class must either implement that interface or specify a definition class.',
     ];
 
     yield 'INVALID: `type: vector` with nonsensical `class` and nonsensical `definition_class`' => [
@@ -658,7 +658,7 @@ vector:
   class: '\Drupal'
   definition_class: '\Drupal\Core\Config\Schema\SequenceDataDefinition'
 YAML,
-      '"vector" claims to be a primitive complex config schema type, but its class Drupal does not extend Drupal\Core\Config\Schema\ArrayElement.',
+      '"vector" claims to be a complex config schema type (for representing array-like values), but its class Drupal does not extend Drupal\Core\Config\Schema\ArrayElement.',
     ];
 
     yield 'VALID: `type: vector` with sensible `class` and sensible `definition_class`' => [

@@ -304,6 +304,12 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    *   A config schema type definition.
    * @param string $id
    *   A config schema type ID.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   *   Thrown if the config schema type definition is:
+   *   - incomplete
+   *   - its `class` does not subclass PrimitiveInterface nor ArrayElement
+   *   - its `definition_class` does not implement DataDefinitionInterface.
    */
   protected function validateType(array $definition, string $id): void {
     // If a config schema does not define a new type, but uses an existing one,
@@ -317,25 +323,28 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     // "low level type". So its `class` and `definition_class` must meet basic
     // expectations of the configuration (schema) system.
     if (!isset($definition['class'])) {
-      throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive config schema type, but it does not provide a class.', $id));
+      throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a new config schema type, but it does not provide a class.', $id));
     }
     switch (static::getShape($definition)) {
       case 'arbitrary':
         // When arbitrary data can be stored, there is nothing to validate.
         break;
 
-      // All primitive scalar types' classes must implement PrimitiveInterface.
+      // All scalar types' classes must implement PrimitiveInterface.
       case 'scalar':
         if (!is_subclass_of($definition['class'], PrimitiveInterface::class)) {
-          throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive scalar config schema type, but its class %s does not implement %s.', $id, $definition['class'], PrimitiveInterface::class));
+          throw new InvalidPluginDefinitionException($id, sprintf('"%s" appears to be a primitive config schema type (for representing scalar values), but its class %s does not implement %s. Its class must either implement that interface or specify a definition class.', $id, $definition['class'], PrimitiveInterface::class));
         }
         break;
 
-      // All primitive list and complex types' classes must extend ArrayElement.
+      // All other types must be arrays and can be either:
+      // - list (`type: sequence`)
+      // - complex (`type: mapping`).
+      // They must all extend ArrayElement.
       case 'list':
       case 'complex':
         if (!is_subclass_of($definition['class'], ArrayElement::class)) {
-          throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a primitive complex config schema type, but its class %s does not extend %s.', $id, $definition['class'], ArrayElement::class));
+          throw new InvalidPluginDefinitionException($id, sprintf('"%s" claims to be a complex config schema type (for representing array-like values), but its class %s does not extend %s.', $id, $definition['class'], ArrayElement::class));
         }
         break;
 
@@ -391,6 +400,10 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    *   A config schema type definition
    * @param string $plugin_id
    *   A config schema type ID.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   *   Thrown if the config schema type definition contains a circular type
+   *   reference.
    */
   private function validateNoCircularTypeReference(array $definition, string $plugin_id): void {
     // This validation requires all config schema types to be known.
