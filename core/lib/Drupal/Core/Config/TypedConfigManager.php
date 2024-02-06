@@ -375,7 +375,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       //   2. data shaped like "a bunch of key-value pairs",
       //   ComplexDataDefinitionInterface must be used — in core this is only
       //   MapDataDefinition
-      // - hence everything else must contain a single value.
+      // - hence everything else must contain a single scalar value.
       is_subclass_of($definition['definition_class'], ListDataDefinitionInterface::class) => 'list',
       is_subclass_of($definition['definition_class'], ComplexDataDefinitionInterface::class) => 'complex',
       is_subclass_of($definition['definition_class'], DataDefinitionInterface::class) => 'scalar',
@@ -399,6 +399,8 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     // Resolve types with dynamic names to all possible types they may match.
     // @see \Drupal\Core\Config\Schema\TypeResolver::resolveExpression()
     // @see \Drupal\Core\Config\TypedConfigManager::getPossibleTypes()
+    // If this type's name appears anywhere in its definition tree, it has a
+    // circular reference.
     foreach ($all_types_in_subtree as $used_type) {
       $possible_types = $this->getPossibleTypes($used_type);
       if (in_array($plugin_id, $possible_types, TRUE)) {
@@ -417,6 +419,10 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    *   All config schema types that are explicitly referenced by this config
    *   schema type definition. In other words: this collects all `type: …`
    *   strings in the given $definition.
+   *   For example, for `type: config_object` this would return:
+   *   - `mapping`
+   *   - `_core_config_info`
+   *   - `langcode`
    */
   private static function getExplicitlyReferencedTypes(array $definition): array {
     // Primitive types do not specify the "type" key. They cannot reference
@@ -463,6 +469,11 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    *   referenced types in their respective type definitions. In other words:
    *   this looks at the config schema type plugin definitions for all the
    *   explicit `type: …` strings (plugin IDs) found in $definition.
+   *   For example, for `type: config_object` this would return:
+   *   - `mapping` (explicit)
+   *   - `_core_config_info` (explicit)
+   *   - `langcode` (explicit)
+   *   - `string` (implicit, via both `_core_config_info` and `langcode`)
    */
   private static function getImplicitlyReferencedTypes(array $definition, array $all_definitions): array {
     // The implicit ones include the explicit ones too.
