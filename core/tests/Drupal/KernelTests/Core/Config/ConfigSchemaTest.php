@@ -604,14 +604,14 @@ class ConfigSchemaTest extends KernelTestBase {
    * @covers \Drupal\Core\Config\TypedConfigManager::validateNoCircularTypeReference
    * @dataProvider providerTestInvalidConfigSchemaDefinitions
    */
-  public function testInvalidConfigSchemaDefinition(string $yaml, ?string $expected_message, array $additional_files = []): void {
+  public function testInvalidConfigSchemaDefinition(string $yaml, ?string $expected_exception_message, array $additional_files = []): void {
     $container = $this->mockModuleInVfs('config_schema_invalid_type', $yaml, $additional_files);
     // Bypass \Drupal\Core\Config\ExtensionInstallStorage::getAllFolders() relying on \Drupal::root(), which references the unmodified container
     \Drupal::setContainer($container);
 
-    if ($expected_message) {
+    if ($expected_exception_message) {
       $this->expectException(InvalidPluginDefinitionException::class);
-      $this->expectExceptionMessage($expected_message);
+      $this->expectExceptionMessage($expected_exception_message);
     }
     $container->get('config.typed')->getDefinitions();
   }
