@@ -408,16 +408,16 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   private function validateNoCircularTypeReference(array $definition, string $plugin_id): void {
     // This validation requires all config schema types to be known.
     assert($this->definitions !== NULL);
-    $all_types_in_subtree = static::getImplicitlyReferencedTypes($definition, $this->definitions);
+    $referenced_types = static::getImplicitlyReferencedTypes($definition, $this->definitions);
     // Resolve types with dynamic names to all possible types they may match.
     // @see \Drupal\Core\Config\Schema\TypeResolver::resolveExpression()
     // @see \Drupal\Core\Config\TypedConfigManager::getPossibleTypes()
     // If this type's name appears anywhere in its definition tree, it has a
     // circular reference.
-    foreach ($all_types_in_subtree as $used_type) {
-      $possible_types = $this->getPossibleTypes($used_type);
+    foreach ($referenced_types as $referenced_type) {
+      $possible_types = $this->getPossibleTypes($referenced_type);
       if (in_array($plugin_id, $possible_types, TRUE)) {
-        throw new InvalidPluginDefinitionException($plugin_id, sprintf('Config schema type "%s" has a circular type reference, where it uses the type "%s".', $plugin_id, $used_type));
+        throw new InvalidPluginDefinitionException($plugin_id, sprintf('Config schema type "%s" has a circular type reference, where it uses the type "%s".', $plugin_id, $referenced_type));
       }
     }
   }
