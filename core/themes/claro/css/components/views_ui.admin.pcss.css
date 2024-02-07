@@ -49,7 +49,7 @@
       margin-inline-start: 0;
     }
 
-    @nest [dir="rtl"] & {
+    [dir="rtl"] & {
       & > * {
         float: right;
       }
