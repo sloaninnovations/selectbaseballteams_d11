@@ -11,7 +11,7 @@ ajaxing
 allwords
 alphadecimal
 ampm
-anyall
+applix
 archiver
 archivers
 arrowrefresh
