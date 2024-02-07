@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\FileTransfer;
 
 use Drupal\Core\File\FileSystemInterface;
@@ -24,13 +25,17 @@ class FileTransferTest extends KernelTestBase {
     'user',
   ];
 
-  /**
+ /**
    * The file system service.
+   *
+   * @var \Drupal\Core\File\FileSystemInterface
    */
   protected FileSystemInterface $fileSystem;
 
   /**
    * The connection.
+   *
+   * @var \Drupal\Tests\system\Kernel\FileTransfer\TestFileTransfer
    */
   protected TestFileTransfer $connection;
 

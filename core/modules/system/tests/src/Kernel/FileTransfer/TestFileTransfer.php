@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\FileTransfer;
 
 use Drupal\Core\FileTransfer\ChmodInterface;
@@ -32,6 +33,8 @@ class TestFileTransfer extends FileTransfer implements ChmodInterface {
 
   /**
    * The connection.
+   *
+   * @var \Drupal\Tests\system\Kernel\FileTransfer\MockTestConnection
    */
   protected MockTestConnection $connection;
 
