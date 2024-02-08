@@ -248,8 +248,7 @@ class InstallStorage extends FileStorage {
    *   The configuration folder name for this component.
    */
   protected function getComponentFolder(Extension $extension) {
-    // Prefix with the root to allow a VFS-based root in kernel tests.
-    return \Drupal::root() . '/' . $extension->getPath() . '/' . $this->getCollectionDirectory();
+    return $extension->getAbsolutePath() . '/' . $this->getCollectionDirectory();
   }
 
   /**
