@@ -12,6 +12,8 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\TestFileCreationTrait;
 
+// cspell:ignore itok
+
 /**
  * Tests the functions for generating paths and URLs for image styles.
  *
