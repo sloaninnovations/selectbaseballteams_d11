@@ -1,5 +1,5 @@
 # Schema for the views argument plugins.
-
+# cspell:ignore fulldate
 views.argument.*:
   type: views_argument
   label: 'Default argument'

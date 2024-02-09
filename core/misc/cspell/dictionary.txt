@@ -207,7 +207,7 @@ français
 fraîche
 frontpage
 fudgy
-fulldate
+fulldata
 fulltext
 gabilondo
 gids
