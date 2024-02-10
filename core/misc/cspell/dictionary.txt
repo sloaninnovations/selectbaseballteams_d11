@@ -186,7 +186,7 @@ favstar
 fcgi
 fdiv
 fieldapi
-fieldblock
+fieldbody
 fieldgroup
 fieldgroups
 fieldnames
