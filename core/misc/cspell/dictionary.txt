@@ -31,7 +31,6 @@ autoloaders
 autoloading
 autop
 autoplace
-autoplay
 autoreply
 autosubmit
 backlink
