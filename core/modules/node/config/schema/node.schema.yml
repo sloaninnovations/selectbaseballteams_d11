@@ -1,4 +1,5 @@
 # Schema for the configuration files of the node module.
+# cspell:ignore unsticky
 
 node.settings:
   type: config_object

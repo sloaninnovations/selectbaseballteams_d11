@@ -7,6 +7,8 @@ use Drupal\Core\Field\FieldUpdateActionBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\node\NodeInterface;
 
+// cspell:ignore unsticky
+
 /**
  * Makes a node not sticky.
  */
