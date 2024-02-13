@@ -68,6 +68,10 @@ trait UiHelperTrait {
   protected function submitForm(array $edit, $submit, $form_html_id = NULL) {
     $assert_session = $this->assertSession();
 
+    if (!is_string($submit)) {
+      // @todo trigger deprecation.
+      $submit = (string) $submit;
+    }
     // Get the form.
     if (isset($form_html_id)) {
       $form = $assert_session->elementExists('xpath', "//form[@id='$form_html_id']");

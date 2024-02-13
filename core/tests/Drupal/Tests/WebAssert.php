@@ -937,4 +937,15 @@ class WebAssert extends MinkWebAssert {
     parent::responseHeaderEquals($name, $value);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function pageTextContains($text) {
+    if (!is_string($text)) {
+      // @todo trigger deprecation.
+      $text = (string) $text;
+    }
+    parent::pageTextContains($text);
+  }
+
 }
