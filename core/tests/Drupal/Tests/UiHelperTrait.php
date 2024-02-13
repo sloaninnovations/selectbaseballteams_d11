@@ -235,11 +235,13 @@ trait UiHelperTrait {
     $this->prepareRequest();
     foreach ($headers as $header_name => $header_value) {
       if (is_int($header_name)) {
-        // @todo consider issuing a deprecation here.
+        // @todo Trigger deprecation in
+        //   https://www.drupal.org/project/drupal/issues/3421105.
         [$header_name, $header_value] = explode(':', $header_value);
       }
       if (is_null($header_value)) {
-        // @todo consider issuing a deprecation here.
+        // @todo Trigger deprecation in
+        //   https://www.drupal.org/project/drupal/issues/3421105.
         $header_value = '';
       }
       $session->setRequestHeader($header_name, $header_value);
