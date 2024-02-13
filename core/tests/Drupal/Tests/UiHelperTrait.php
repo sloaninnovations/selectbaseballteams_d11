@@ -84,14 +84,16 @@ trait UiHelperTrait {
     foreach ($edit as $name => $value) {
       $field = $assert_session->fieldExists($name, $form);
 
-      // Provide support for the values '1' and '0' for checkboxes instead of
-      // TRUE and FALSE.
-      // @todo Get rid of supporting 1/0 by converting all tests cases using
-      // this to boolean values.
-      $field_type = $field->getAttribute('type');
-      if ($field_type === 'checkbox') {
-        $value = (bool) $value;
-      }
+      $value = match ($field->getAttribute('type')) {
+        // Provide support for the values '1' and '0' for checkboxes instead of
+        // TRUE and FALSE.
+        // @todo Get rid of supporting 1/0 by converting all tests cases using
+        // this to boolean values.
+        'checkbox' => (bool) $value,
+        // Mink only allows strings for text, number and radio button values.
+        'text', 'number', 'radio' => (string) $value,
+        default => $value,
+      };
 
       $field->setValue($value);
     }
@@ -232,6 +234,14 @@ trait UiHelperTrait {
 
     $this->prepareRequest();
     foreach ($headers as $header_name => $header_value) {
+      if (is_int($header_name)) {
+        // @todo consider issuing a deprecation here.
+        [$header_name, $header_value] = explode(':', $header_value);
+      }
+      if (is_null($header_value)) {
+        // @todo consider issuing a deprecation here.
+        $header_value = '';
+      }
       $session->setRequestHeader($header_name, $header_value);
     }
 

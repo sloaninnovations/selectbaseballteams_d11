@@ -918,4 +918,20 @@ class WebAssert extends MinkWebAssert {
     return $selector;
   }
 
+  public function responseHeaderEquals($name, $value) {
+    if (!is_string($name)) {
+      // @todo trigger deprecation
+      $name = (string) $name;
+    }
+    if ($value === NULL) {
+      // @todo trigger deprecation.
+      $this->responseHeaderDoesNotExist($name);
+      return;
+    }
+    if (!is_string($value)) {
+      $value = (string) $value;
+    }
+    parent::responseHeaderEquals($name, $value);
+  }
+
 }

@@ -57,7 +57,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     foreach ($style->getEffects() as $uuid => $effect) {
       $effect_path = $admin_path . '/manage/' . $style_name . '/effects/' . $uuid;
       $this->drupalGet($effect_path);
-      $page->findField('data[test_parameter]')->setValue(111);
+      $page->findField('data[test_parameter]')->setValue('111');
       $ajax_value = $page->find('css', '#ajax-value')->getText();
       $this->assertSame('Ajax value bar', $ajax_value);
       $this->getSession()->getPage()->pressButton('Ajax refresh');
