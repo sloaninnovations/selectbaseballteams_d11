@@ -68,10 +68,6 @@ trait UiHelperTrait {
   protected function submitForm(array $edit, $submit, $form_html_id = NULL) {
     $assert_session = $this->assertSession();
 
-    if (!is_string($submit)) {
-      // @todo trigger deprecation.
-      $submit = (string) $submit;
-    }
     // Get the form.
     if (isset($form_html_id)) {
       $form = $assert_session->elementExists('xpath', "//form[@id='$form_html_id']");
@@ -88,16 +84,14 @@ trait UiHelperTrait {
     foreach ($edit as $name => $value) {
       $field = $assert_session->fieldExists($name, $form);
 
-      $value = match ($field->getAttribute('type')) {
-        // Provide support for the values '1' and '0' for checkboxes instead of
-        // TRUE and FALSE.
-        // @todo Get rid of supporting 1/0 by converting all tests cases using
-        // this to boolean values.
-        'checkbox' => (bool) $value,
-        // Mink only allows strings for text, number and radio button values.
-        'text', 'number', 'radio' => (string) $value,
-        default => $value,
-      };
+      // Provide support for the values '1' and '0' for checkboxes instead of
+      // TRUE and FALSE.
+      // @todo Get rid of supporting 1/0 by converting all tests cases using
+      // this to boolean values.
+      $field_type = $field->getAttribute('type');
+      if ($field_type === 'checkbox') {
+        $value = (bool) $value;
+      }
 
       $field->setValue($value);
     }

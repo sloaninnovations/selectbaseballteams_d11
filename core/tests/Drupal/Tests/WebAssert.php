@@ -139,6 +139,10 @@ class WebAssert extends MinkWebAssert {
    *   When the element doesn't exist.
    */
   public function buttonExists($button, TraversableElement $container = NULL) {
+    if (!is_string($button)) {
+      // @todo trigger deprecation.
+      $button = (string) $button;
+    }
     $container = $container ?: $this->session->getPage();
     $node = $container->findButton($button);
 
@@ -946,6 +950,17 @@ class WebAssert extends MinkWebAssert {
       $text = (string) $text;
     }
     parent::pageTextContains($text);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldValueEquals(string $field, $value, TraversableElement $container = NULL) {
+    if (!is_string($value)) {
+      // @todo trigger deprecation.
+      $value = (string) $value;
+    }
+    parent::fieldValueEquals($field, $value, $container);
   }
 
 }

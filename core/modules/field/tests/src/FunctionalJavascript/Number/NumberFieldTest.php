@@ -139,7 +139,7 @@ class NumberFieldTest extends WebDriverTestBase {
     $assert_session->waitForElement('css', '.ajax-new-content');
     $edit = [
       "fields[{$float_field}][settings_edit_form][settings][prefix_suffix]" => TRUE,
-      "fields[{$float_field}][settings_edit_form][settings][scale]" => (string) $scale,
+      "fields[{$float_field}][settings_edit_form][settings][scale]" => $scale,
       "fields[{$float_field}][settings_edit_form][settings][decimal_separator]" => $decimal_separator,
       "fields[{$float_field}][settings_edit_form][settings][thousand_separator]" => $thousand_separator,
     ];
