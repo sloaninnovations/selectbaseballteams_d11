@@ -140,7 +140,8 @@ class WebAssert extends MinkWebAssert {
    */
   public function buttonExists($button, TraversableElement $container = NULL) {
     if (!is_string($button)) {
-      // @todo trigger deprecation.
+      // @todo Trigger deprecation in
+      //   https://www.drupal.org/project/drupal/issues/3421105.
       $button = (string) $button;
     }
     $container = $container ?: $this->session->getPage();
@@ -927,11 +928,13 @@ class WebAssert extends MinkWebAssert {
    */
   public function responseHeaderEquals($name, $value) {
     if (!is_string($name)) {
-      // @todo trigger deprecation
+      // @todo Trigger deprecation in
+      //   https://www.drupal.org/project/drupal/issues/3421105.
       $name = (string) $name;
     }
     if ($value === NULL) {
-      // @todo trigger deprecation.
+      // @todo Trigger deprecation in
+      //   https://www.drupal.org/project/drupal/issues/3421105.
       $this->responseHeaderDoesNotExist($name);
       return;
     }
@@ -946,7 +949,8 @@ class WebAssert extends MinkWebAssert {
    */
   public function pageTextContains($text) {
     if (!is_string($text)) {
-      // @todo trigger deprecation.
+      // @todo Trigger deprecation in
+      //   https://www.drupal.org/project/drupal/issues/3421105.
       $text = (string) $text;
     }
     parent::pageTextContains($text);
@@ -957,7 +961,8 @@ class WebAssert extends MinkWebAssert {
    */
   public function fieldValueEquals(string $field, $value, TraversableElement $container = NULL) {
     if (!is_string($value)) {
-      // @todo trigger deprecation.
+      // @todo Trigger deprecation in
+      //   https://www.drupal.org/project/drupal/issues/3421105.
       $value = (string) $value;
     }
     parent::fieldValueEquals($field, $value, $container);

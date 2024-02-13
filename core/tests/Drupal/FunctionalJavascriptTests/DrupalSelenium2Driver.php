@@ -168,7 +168,8 @@ if (typeof Drupal !== 'undefined') {
 }
 JS);
         if (!is_string($value) && strtolower($element->name()) === 'input' && in_array(strtolower($element->attribute('type')), ['text', 'number', 'radio'], TRUE)) {
-          // @todo trigger deprecation.
+          // @todo Trigger deprecation in
+          //   https://www.drupal.org/project/drupal/issues/3421105.
           $value = (string) $value;
         }
 
