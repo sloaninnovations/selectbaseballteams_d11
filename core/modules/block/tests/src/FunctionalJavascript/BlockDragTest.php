@@ -21,7 +21,7 @@ class BlockDragTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'stark';
+  protected $defaultTheme = 'olivero';
 
   /**
    * {@inheritdoc}
@@ -32,56 +32,58 @@ class BlockDragTest extends WebDriverTestBase {
       'administer blocks',
     ]);
     $this->drupalLogin($admin_user);
-    $this->drupalPlaceBlock('system_branding_block', ['region' => 'header', 'id' => 'site_branding']);
-    $this->drupalPlaceBlock('system_menu_block:main', ['region' => 'primary_menu', 'id' => 'main_menu']);
-    $this->drupalPlaceBlock('system_powered_by_block', ['region' => 'footer', 'id' => 'powered_by']);
-    $this->drupalPlaceBlock('system_breadcrumb_block', ['region' => 'breadcrumb', 'id' => 'breadcrumb']);
   }
 
   /**
    * Tests drag and drop blocks.
    */
   public function testDragAndDropBlocks() {
+    // Resize window to work around https://github.com/bitovi/syn/issues/164.
+    $this->getSession()->resizeWindow(1024, 2048);
     $this->drupalGet('admin/structure/block');
     $assertSession = $this->assertSession();
     $session = $this->getSession();
     $page = $session->getPage();
 
-    // Drag main-menu and powered-by blocks to header region.
-    $siteBranding = $this->getDragRow($page, 'edit-blocks-site-branding');
-    $mainMenuRow = $this->getDragRow($page, 'edit-blocks-main-menu');
+    // Dragging main-menu and status messages to header region.
+    $siteBranding = $this->getDragRow($page, 'edit-blocks-olivero-site-branding');
+    $mainMenuRow = $this->getDragRow($page, 'edit-blocks-olivero-main-menu');
     $mainMenuRow->dragTo($siteBranding);
-    $poweredBy = $this->getDragRow($page, 'edit-blocks-powered-by');
-    $poweredBy->dragTo($siteBranding);
+    $messages = $this->getDragRow($page, 'edit-blocks-olivero-messages');
+    $messages->dragTo($siteBranding);
 
-    // Test if both blocks were positioned in the header region.
+    // Test if both blocks above was positioned on the header region.
     $this->assertEquals(
       'header',
-      $page->findField('edit-blocks-main-menu-region')->getValue()
+      $page->findField('edit-blocks-olivero-main-menu-region')->getValue(),
+      'Main menu should be positioned on header region'
     );
     $this->assertEquals(
       'header',
-      $page->findField('edit-blocks-powered-by-region')->getValue()
+      $page->findField('edit-blocks-olivero-messages-region')->getValue(),
+      'Status messages should be positioned on header region'
     );
 
-    // Check if the message about unsaved changed appears.
+    // Check if the message unsaved changed appears.
     $assertSession->pageTextContains('You have unsaved changes.');
 
-    // Test if the message for empty regions appears on the primary-menu region,
-    // which should now be empty after dragging the only block out of there.
+    // Test if the message for empty regions appear after drag the unique block on the region.
     $noBlockMessage = $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-primary-menu-message"] td')->getText();
+    $this->assertSession()->assert($noBlockMessage === 'No blocks in this region', 'Region primary menu should be empty.');
 
-    $this->assertEquals('No blocks in this region', $noBlockMessage);
+    // Testing drag row to an empty region.
+    $pageTitle = $this->getDragRow($page, 'edit-blocks-olivero-page-title');
+    $heroRegion = $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-hero-message"]');
+    $pageTitle->dragTo($heroRegion);
+    $this->assertSession()->assert(
+      $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-hero-message"] td')->getText() !== 'No blocks in this region',
+      "Region here shouldn't be empty"
+    );
 
-    // Test if dragging a row to an empty region removes empty region message.
-    $breadcrumbs = $this->getDragRow($page, 'edit-blocks-breadcrumb');
-    $heroRegion = $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-highlighted-message"]');
-    $breadcrumbs->dragTo($heroRegion);
-    $this->assertNotEquals('No blocks in this region', $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-highlighted-message"] td')->getText());
   }
 
   /**
-   * Helper function to find the tabledrag handle on a table-row element.
+   * Helper function to find block tr element on the page.
    */
   private function getDragRow($page, $blockId) {
     return $page->find('css', '#blocks tbody tr[data-drupal-selector="' . $blockId . '"] a.tabledrag-handle');
