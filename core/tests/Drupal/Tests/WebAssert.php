@@ -918,6 +918,9 @@ class WebAssert extends MinkWebAssert {
     return $selector;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function responseHeaderEquals($name, $value) {
     if (!is_string($name)) {
       // @todo trigger deprecation
