@@ -112,6 +112,7 @@ class ViewListBuilderTest extends UnitTestCase {
         $this->viewPluginManager,
         $this->viewPluginManager,
         $this->viewPluginManager,
+        $this->viewPluginManager,
       ])
       ->getMock();
     $route_provider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
@@ -136,6 +137,7 @@ class ViewListBuilderTest extends UnitTestCase {
         $this->viewPluginManager,
         $this->viewPluginManager,
         $this->viewPluginManager,
+        $this->viewPluginManager,
       ])
       ->getMock();
     $page_display->expects($this->any())
@@ -153,6 +155,7 @@ class ViewListBuilderTest extends UnitTestCase {
         'default',
         $display_manager->getDefinition('embed'),
         $this->viewsData,
+        $this->viewPluginManager,
         $this->viewPluginManager,
         $this->viewPluginManager,
         $this->viewPluginManager,
