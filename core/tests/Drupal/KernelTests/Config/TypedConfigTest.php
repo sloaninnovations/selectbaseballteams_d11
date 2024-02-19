@@ -175,8 +175,8 @@ class TypedConfigTest extends KernelTestBase {
     $key = 'boolean';
 
     // No magic: values 2–4 are identical; no validation errors (value 5).
-    yield "$key: NO MAGIC: `true`" => ['boolean', TRUE, TRUE, TRUE, []];
-    yield "$key: NO MAGIC: `false`" => ['boolean', FALSE, FALSE, FALSE, []];
+    yield "$key: NO MAGIC: `true`" => [$key, TRUE, TRUE, TRUE, []];
+    yield "$key: NO MAGIC: `false`" => [$key, FALSE, FALSE, FALSE, []];
     // Every key can be marked optional: the validator should not complain.
     yield "$key: NO MAGIC: `null`" => [$key, NULL, NULL, NULL, []];
 
@@ -212,7 +212,7 @@ class TypedConfigTest extends KernelTestBase {
     // @see core/modules/config/tests/config_test/config/install/config_test.types.yml
     $key = 'int';
 
-    // No magic: values 2–4 are identical; no validation errors (value 5).
+    // No magic: array items 2–4 are identical; no validation errors (item 5).
     yield "$key: NO MAGIC: `0`" => [$key, 0, 0, 0, []];
     yield "$key: NO MAGIC: `1`" => [$key, 1, 1, 1, []];
     yield "$key: NO MAGIC: `-1`" => [$key, -1, -1, -1, []];
@@ -220,7 +220,7 @@ class TypedConfigTest extends KernelTestBase {
     // Every key can be marked optional: the validator should not complain.
     yield "$key: NO MAGIC: `null`" => [$key, NULL, NULL, NULL, []];
 
-    // Magic: values 2–4 are not identical.
+    // Magic: array items 2–4 are not identical.
     // First: intentional magic — no validation errors triggered.
     yield "$key: 🪄 `'55'` → `55`" => [$key, '55', '55', 55, [], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData'];
     yield "$key: 🪄 `true` → `1`" => [$key, TRUE, TRUE, 1, [], 'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData'];
@@ -248,7 +248,7 @@ class TypedConfigTest extends KernelTestBase {
     // @see core/modules/config/tests/config_test/config/install/config_test.types.yml
     $key = 'float';
 
-    // No magic: values 2–4 are identical; no validation errors (value 5).
+    // No magic: array items 2–4 are identical; no validation errors (item 5).
     yield "$key: NO MAGIC: `0.0`" => [$key, 0.0, 0.0, 0.0, []];
     yield "$key: NO MAGIC: `1.0`" => [$key, 1.0, 1.0, 1.0, []];
     yield "$key: NO MAGIC: `-1.0`" => [$key, -1.0, -1.0, -1.0, []];
@@ -257,14 +257,14 @@ class TypedConfigTest extends KernelTestBase {
     // Every key can be marked optional: the validator should not complain.
     yield "$key: NO MAGIC: `null`" => [$key, NULL, NULL, NULL, []];
 
-    // Rational magic: integers can be represented as floats; values 2 and 3 are
-    // identical, value 4 is a float.
-    yield "$key: RATIONAL MAGIC: `0`" => [$key, 0, 0, 0.0, []];
-    yield "$key: RATIONAL MAGIC: `1`" => [$key, 1, 1, 1.0, []];
-    yield "$key: RATIONAL MAGIC: `-1`" => [$key, -1, -1, -1.0, []];
-    yield "$key: RATIONAL MAGIC: `-2147483648`" => [$key, -2147483648, -2147483648, -2147483648.0, []];
+    // Reasonable magical conversions: integers can be represented as floats;
+    // array items 2 and 3 are identical, array item 4 is a float.
+    yield "$key: REASONABLE MAGIC: `0`" => [$key, 0, 0, 0.0, []];
+    yield "$key: REASONABLE MAGIC: `1`" => [$key, 1, 1, 1.0, []];
+    yield "$key: REASONABLE MAGIC: `-1`" => [$key, -1, -1, -1.0, []];
+    yield "$key: REASONABLE MAGIC: `-2147483648`" => [$key, -2147483648, -2147483648, -2147483648.0, []];
 
-    // Magic: values 2–4 are not identical.
+    // Magic: array items 2–4 are not identical.
     // First: intentional magic — no validation errors triggered.
     yield "$key: 🪄 `'3.14159'` → `3.14159`" => [$key, '3.14159', '3.14159', 3.14159, [], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\FloatData'];
     yield "$key: 🪄 `true` → `1.0`" => [$key, TRUE, TRUE, 1.0, [], 'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\FloatData'];
@@ -292,13 +292,13 @@ class TypedConfigTest extends KernelTestBase {
     // @see core/modules/config/tests/config_test/config/install/config_test.types.yml
     $key = 'string';
 
-    // No magic: values 2–4 are identical.
+    // No magic: array items 2–4 are identical.
     yield "$key: NO MAGIC: `''`" => [$key, '', '', '', []];
     yield "$key: NO MAGIC: `'55%'`" => [$key, '55%', '55%', '55%', []];
     // Every key can be marked optional: the validator should not complain.
     yield "$key: NO MAGIC: `null`" => [$key, NULL, NULL, NULL, []];
 
-    // Magic: values 2–4 are not identical.
+    // Magic: array items 2–4 are not identical.
     // First: intentional magic — no validation errors triggered.
     // Booleans.
     yield "$key: 🪄 `true` → `'1'`" => [$key, TRUE, TRUE, '1', [], 'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData'];
