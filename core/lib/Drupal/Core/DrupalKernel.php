@@ -75,6 +75,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         'factory' => 'Drupal\Core\Database\Database::getConnection',
         'arguments' => ['default'],
       ],
+      'request_stack' => [
+        'class' => 'Symfony\Component\HttpFoundation\RequestStack',
+      ],
+      'datetime.time' => [
+        'class' => 'Drupal\Component\Datetime\Time',
+        'arguments' => ['@request_stack'],
+      ],
       'cache.container' => [
         'class' => 'Drupal\Core\Cache\DatabaseBackend',
         'arguments' => [
@@ -82,6 +89,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           '@cache_tags_provider.container',
           'container',
           '@serialization.phpserialize',
+          '@datetime.time',
           DatabaseBackend::MAXIMUM_NONE,
         ],
       ],
@@ -189,7 +197,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $containerNeedsDumping;
 
   /**
-   * List of discovered services.yml pathnames.
+   * List of discovered services.yml path names.
    *
    * This is a nested array whose top-level keys are 'app' and 'site', denoting
    * the origin of a service provider. Site-specific providers have to be

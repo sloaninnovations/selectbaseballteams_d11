@@ -9,7 +9,6 @@ adminforms
 afterclose
 aftercreate
 ahah
-ajaxcallback
 ajaxing
 allwords
 alphadecimal
@@ -20,7 +19,6 @@ applix
 archiver
 archivers
 arrakis
-arrayx
 arrowrefresh
 arrowreturn
 arrowreturnthick
@@ -163,7 +161,6 @@ controlgroup
 conv
 corge
 cpio
-createkey
 createrole
 createuser
 crema
@@ -178,13 +175,11 @@ customevent
 customrequest
 cweagans
 dailymotion
-databasename
 datelist
 daterange
 datestamp
 datetimeiso
 datetimeplus
-daycount
 dbtng
 dburl
 dealerdirect
@@ -204,7 +199,6 @@ desaturate
 desaturated
 desaturates
 desaturating
-descoping
 destructable
 devel
 deviantart
@@ -257,7 +251,6 @@ endmacro
 endset
 endtrans
 enoki
-entitytype
 entityviewedit
 errmode
 etag
@@ -277,7 +270,6 @@ falsey
 falsish
 fapi
 fastcgi
-fatals
 favourite
 favstar
 fcgi
@@ -293,7 +285,6 @@ fieldlinks
 fieldnames
 fieldsets
 filemime
-filesort
 filesystems
 filetransfer
 findwith
@@ -339,9 +330,7 @@ hmac
 hoglet
 hookname
 hosters
-hostnames
 hrefs
-htkey
 htmlcorrector
 httpheader
 httplug
@@ -350,12 +339,10 @@ hustlin
 hwldf
 icann
 iconwrap
-idconflict
 idekey
 iframes
 iframeupload
 imagecache
-imagecreatefrom
 imagetextalternative
 indexname
 inited
@@ -379,7 +366,6 @@ johansson
 jqueryui
 jsonlint
 jssdk
-jumplinks
 justinrainbow
 kangarookitten
 kernighan
@@ -397,7 +383,6 @@ kword
 lamoids
 languageswitcher
 libc
-libmysqlclient
 licious
 lified
 lightninggreen
@@ -433,7 +418,6 @@ mank
 maryjane
 matchout
 mathematica
-maxage
 maximumred
 maxlifetime
 maynot
@@ -452,12 +436,10 @@ metatags
 mglaman
 micheh
 mikey
-milli
 mimetypes
 minifyzombies
 minusthick
 mlfr
-mlid
 mocktail
 mocktails
 mocky
@@ -476,9 +458,7 @@ mulrevpub
 multibuys
 multibyte
 multicardinality
-multifield
 multilanguage
-multipage
 multipass
 multisite
 multistar
@@ -494,10 +474,8 @@ namespacing
 navs
 ndocs
 necolas
-negotiatiors
 newcol
 newfieldinitial
-newnode
 newwin
 nids
 nightwatch
@@ -535,7 +513,6 @@ onecol
 oneplusfourgrid
 onetwo
 onewidgetfield
-onoff
 opendocument
 openxmlformats
 optgroups
@@ -544,7 +521,6 @@ orgchart
 ossp
 otel
 otlp
-otsikko
 outdent
 outro
 overridable
@@ -559,7 +535,6 @@ parseable
 parsererror
 pastafazoul
 pathauto
-pathnames
 pcre
 pcss
 peast
@@ -580,7 +555,6 @@ pingback
 pjpeg
 placeholdered
 placeholdering
-plid
 plusthick
 porterstemmer
 postcondition
@@ -718,7 +692,6 @@ smalldatetime
 somecompany
 sortablejs
 sourceediting
-spacebar
 specialchars
 spiffiness
 splitbutton
@@ -771,7 +744,6 @@ subrequest's
 subrequests
 subresults
 subselect
-subshell
 substrategies
 subsubtheme
 subtheme
@@ -811,9 +783,6 @@ testcase
 testcontent
 testcontextawareblock
 testdialog
-testfilter
-testfunc
-testfunction
 testgroups
 testkey
 testlogger
@@ -824,7 +793,6 @@ textboxes
 texte
 textfields
 textformat
-textgroup
 textwithsummary
 themename
 themer
@@ -852,7 +820,6 @@ toolkits
 toolongdomainexampledomainexampledomainexampledomainexampledomain
 toplevel
 torder
-totalcount
 touchevents
 trackback
 trailingslash
@@ -863,12 +830,8 @@ trgm
 trid
 troopal
 truecolor
-turbolinks
 twistie
 twocol
-typehint
-typehinted
-typehints
 tzid
 uids
 ulwa
@@ -903,12 +866,10 @@ untabbable
 upcasted
 upcasting
 updateprogress
-updatetype
 uploaders
 uploadprogress
 upscaling
 urandom
-usecase
 userid
 userinfo
 userref
@@ -918,7 +879,6 @@ versionable
 versionless
 verygreatdrupalmodule
 vfsstream
-viewmode
 viewports
 vocabs
 wcag

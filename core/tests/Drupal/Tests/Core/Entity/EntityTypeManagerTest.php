@@ -20,6 +20,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -81,8 +82,9 @@ class EntityTypeManagerTest extends UnitTestCase {
     $this->cacheBackend = $this->prophesize(CacheBackendInterface::class);
     $this->translationManager = $this->prophesize(TranslationInterface::class);
     $this->entityLastInstalledSchemaRepository = $this->prophesize(EntityLastInstalledSchemaRepositoryInterface::class);
+    $container = $this->prophesize(Container::class);
 
-    $this->entityTypeManager = new TestEntityTypeManager(new \ArrayObject(), $this->moduleHandler->reveal(), $this->cacheBackend->reveal(), $this->translationManager->reveal(), $this->getClassResolverStub(), $this->entityLastInstalledSchemaRepository->reveal());
+    $this->entityTypeManager = new TestEntityTypeManager(new \ArrayObject(), $this->moduleHandler->reveal(), $this->cacheBackend->reveal(), $this->translationManager->reveal(), $this->getClassResolverStub(), $this->entityLastInstalledSchemaRepository->reveal(), $container->reveal());
     $this->discovery = $this->prophesize(DiscoveryInterface::class);
     $this->entityTypeManager->setDiscovery($this->discovery->reveal());
   }
@@ -155,7 +157,7 @@ class EntityTypeManagerTest extends UnitTestCase {
    * @return array
    *   Test data.
    */
-  public function providerTestHasHandler() {
+  public static function providerTestHasHandler() {
     return [
       ['apple', TRUE],
       ['banana', FALSE],
@@ -247,17 +249,51 @@ class EntityTypeManagerTest extends UnitTestCase {
   }
 
   /**
+   * Provides test data for testGetFormObjectInvalidOperation().
+   *
+   * @return array
+   *   Test data.
+   */
+  public function provideFormObjectInvalidOperationData(): array {
+    return [
+      'missing_form_handler' => [
+        'test_entity_type',
+        'edit',
+        '',
+        'The "test_entity_type" entity type did not specify a "edit" form class.',
+      ],
+      'missing_form_handler_class' => [
+        'test_entity_type',
+        'edit',
+        'Drupal\test_entity_type\Form\NonExistingClass',
+        'The "edit" form handler of the "test_entity_type" entity type specifies a non-existent class "Drupal\test_entity_type\Form\NonExistingClass".',
+      ],
+    ];
+  }
+
+  /**
    * Tests the getFormObject() method with an invalid operation.
    *
    * @covers ::getFormObject
+   *
+   * @dataProvider provideFormObjectInvalidOperationData
    */
-  public function testGetFormObjectInvalidOperation() {
+  public function testGetFormObjectInvalidOperation(string $entity_type_id, string $operation, string $form_class, string $exception_message): void {
     $entity = $this->prophesize(EntityTypeInterface::class);
-    $entity->getFormClass('edit')->willReturn('');
-    $this->setUpEntityTypeDefinitions(['test_entity_type' => $entity]);
+    $entity->getFormClass($operation)->willReturn(NULL);
+    if (!$form_class) {
+      $entity->getHandlerClasses()->willReturn([]);
+    }
+    else {
+      $entity->getHandlerClasses()->willReturn([
+        'form' => [$operation => $form_class],
+      ]);
+    }
+    $this->setUpEntityTypeDefinitions([$entity_type_id => $entity]);
 
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->entityTypeManager->getFormObject('test_entity_type', 'edit');
+    $this->expectExceptionMessage($exception_message);
+    $this->entityTypeManager->getFormObject($entity_type_id, $operation);
   }
 
   /**
@@ -286,7 +322,7 @@ class EntityTypeManagerTest extends UnitTestCase {
    * @return array
    *   Test data.
    */
-  public function provideMissingHandlerData() : array {
+  public static function provideMissingHandlerData() : array {
     return [
       'missing_handler' => [
         'test_entity_type',
@@ -389,7 +425,7 @@ class EntityTypeManagerTest extends UnitTestCase {
    * @return array
    *   Test data.
    */
-  public function providerTestGetDefinition() {
+  public static function providerTestGetDefinition() {
     return [
       ['apple', TRUE],
       ['banana', TRUE],
