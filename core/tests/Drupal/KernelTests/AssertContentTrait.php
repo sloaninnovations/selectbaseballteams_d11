@@ -282,7 +282,7 @@ trait AssertContentTrait {
     // Cast MarkupInterface objects to string.
     $label = (string) $label;
     $links = $this->xpath('//a[normalize-space(text())=:label]', [':label' => $label]);
-    $message = ($message ? $message : strtr('Link with label %label found.', ['%label' => $label]));
+    $message = ($message ?: strtr('Link with label %label found.', ['%label' => $label]));
     $this->assertArrayHasKey($index, $links, $message);
     return TRUE;
   }
@@ -305,7 +305,7 @@ trait AssertContentTrait {
     // Cast MarkupInterface objects to string.
     $label = (string) $label;
     $links = $this->xpath('//a[normalize-space(text())=:label]', [':label' => $label]);
-    $message = ($message ? $message : new FormattableMarkup('Link with label %label not found.', ['%label' => $label]));
+    $message = ($message ?: new FormattableMarkup('Link with label %label not found.', ['%label' => $label]));
     $this->assertEmpty($links, $message);
     return TRUE;
   }
@@ -328,7 +328,7 @@ trait AssertContentTrait {
    */
   protected function assertLinkByHref($href, $index = 0, $message = '') {
     $links = $this->xpath('//a[contains(@href, :href)]', [':href' => $href]);
-    $message = ($message ? $message : new FormattableMarkup('Link containing href %href found.', ['%href' => $href]));
+    $message = ($message ?: new FormattableMarkup('Link containing href %href found.', ['%href' => $href]));
     $this->assertArrayHasKey($index, $links, $message);
     return TRUE;
   }
@@ -349,7 +349,7 @@ trait AssertContentTrait {
    */
   protected function assertNoLinkByHref($href, $message = '') {
     $links = $this->xpath('//a[contains(@href, :href)]', [':href' => $href]);
-    $message = ($message ? $message : new FormattableMarkup('No link containing href %href found.', ['%href' => $href]));
+    $message = ($message ?: new FormattableMarkup('No link containing href %href found.', ['%href' => $href]));
     $this->assertEmpty($links, $message);
     return TRUE;
   }
@@ -370,7 +370,7 @@ trait AssertContentTrait {
    */
   protected function assertNoLinkByHrefInMainRegion($href, $message = '') {
     $links = $this->xpath('//main//a[contains(@href, :href)]', [':href' => $href]);
-    $message = ($message ? $message : new FormattableMarkup('No link containing href %href found.', ['%href' => $href]));
+    $message = ($message ?: new FormattableMarkup('No link containing href %href found.', ['%href' => $href]));
     $this->assertEmpty($links, $message);
     return TRUE;
   }
@@ -945,7 +945,7 @@ trait AssertContentTrait {
    *   TRUE on pass, FALSE on fail.
    */
   protected function assertNoFieldByName($name, $value = '', $message = '') {
-    return $this->assertNoFieldByXPath($this->constructFieldXpath('name', $name), $value, $message ? $message : new FormattableMarkup('Did not find field by name @name', ['@name' => $name]));
+    return $this->assertNoFieldByXPath($this->constructFieldXpath('name', $name), $value, $message ?: new FormattableMarkup('Did not find field by name @name', ['@name' => $name]));
   }
 
   /**
@@ -973,7 +973,7 @@ trait AssertContentTrait {
       $value = (string) $value;
     }
     $message = (string) $message;
-    return $this->assertFieldByXPath($this->constructFieldXpath('id', $id), $value, $message ? $message : new FormattableMarkup('Found field by id @id', ['@id' => $id]));
+    return $this->assertFieldByXPath($this->constructFieldXpath('id', $id), $value, $message ?: new FormattableMarkup('Found field by id @id', ['@id' => $id]));
   }
 
   /**
@@ -996,7 +996,7 @@ trait AssertContentTrait {
    *   TRUE on pass, FALSE on fail.
    */
   protected function assertNoFieldById($id, $value = '', $message = '') {
-    return $this->assertNoFieldByXPath($this->constructFieldXpath('id', $id), $value, $message ? $message : new FormattableMarkup('Did not find field by id @id', ['@id' => $id]));
+    return $this->assertNoFieldByXPath($this->constructFieldXpath('id', $id), $value, $message ?: new FormattableMarkup('Did not find field by id @id', ['@id' => $id]));
   }
 
   /**
@@ -1014,7 +1014,7 @@ trait AssertContentTrait {
    *   TRUE on pass.
    */
   protected function assertFieldChecked($id, $message = '') {
-    $message = $message ? $message : new FormattableMarkup('Checkbox field @id is checked.', ['@id' => $id]);
+    $message = $message ?: new FormattableMarkup('Checkbox field @id is checked.', ['@id' => $id]);
     $elements = $this->xpath('//input[@id=:id]', [':id' => $id]);
     $this->assertNotEmpty($elements, $message);
     $this->assertNotEmpty($elements[0]['checked'], $message);
@@ -1036,7 +1036,7 @@ trait AssertContentTrait {
    *   TRUE on pass.
    */
   protected function assertNoFieldChecked($id, $message = '') {
-    $message = $message ? $message : new FormattableMarkup('Checkbox field @id is not checked.', ['@id' => $id]);
+    $message = $message ?: new FormattableMarkup('Checkbox field @id is not checked.', ['@id' => $id]);
     $elements = $this->xpath('//input[@id=:id]', [':id' => $id]);
     $this->assertNotEmpty($elements, $message);
     $this->assertEmpty($elements[0]['checked'], $message);
@@ -1058,7 +1058,7 @@ trait AssertContentTrait {
    */
   protected function assertOption($id, $option, $message = '') {
     $options = $this->xpath('//select[@id=:id]//option[@value=:option]', [':id' => $id, ':option' => $option]);
-    $this->assertTrue(isset($options[0]), $message ? $message : new FormattableMarkup('Option @option for field @id exists.', ['@option' => $option, '@id' => $id]));
+    $this->assertTrue(isset($options[0]), $message ?: new FormattableMarkup('Option @option for field @id exists.', ['@option' => $option, '@id' => $id]));
   }
 
   /**
@@ -1091,7 +1091,7 @@ trait AssertContentTrait {
    */
   protected function assertOptionWithDrupalSelector($drupal_selector, $option, $message = '') {
     $options = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [':data_drupal_selector' => $drupal_selector, ':option' => $option]);
-    $this->assertTrue(isset($options[0]), $message ? $message : new FormattableMarkup('Option @option for field @data_drupal_selector exists.', ['@option' => $option, '@data_drupal_selector' => $drupal_selector]));
+    $this->assertTrue(isset($options[0]), $message ?: new FormattableMarkup('Option @option for field @data_drupal_selector exists.', ['@option' => $option, '@data_drupal_selector' => $drupal_selector]));
   }
 
   /**
@@ -1111,7 +1111,7 @@ trait AssertContentTrait {
    *   TRUE on pass.
    */
   protected function assertNoOption($id, $option, $message = '') {
-    $message = $message ? $message : new FormattableMarkup('Option @option for field @id does not exist.', ['@option' => $option, '@id' => $id]);
+    $message = $message ?: new FormattableMarkup('Option @option for field @id does not exist.', ['@option' => $option, '@id' => $id]);
     $selects = $this->xpath('//select[@id=:id]', [':id' => $id]);
     $options = $this->xpath('//select[@id=:id]//option[@value=:option]', [':id' => $id, ':option' => $option]);
     $this->assertArrayHasKey(0, $selects, $message);
@@ -1138,7 +1138,7 @@ trait AssertContentTrait {
    * @todo $id is unusable. Replace with $name.
    */
   protected function assertOptionSelected($id, $option, $message = '') {
-    $message = $message ? $message : new FormattableMarkup('Option @option for field @id is selected.', ['@option' => $option, '@id' => $id]);
+    $message = $message ?: new FormattableMarkup('Option @option for field @id is selected.', ['@option' => $option, '@id' => $id]);
     $elements = $this->xpath('//select[@id=:id]//option[@value=:option]', [':id' => $id, ':option' => $option]);
     $this->assertNotEmpty($elements, $message);
     $this->assertNotEmpty($elements[0]['selected'], $message);
@@ -1164,7 +1164,7 @@ trait AssertContentTrait {
    * @todo $id is unusable. Replace with $name.
    */
   protected function assertOptionSelectedWithDrupalSelector($drupal_selector, $option, $message = '') {
-    $message = $message ? $message : new FormattableMarkup('Option @option for field @data_drupal_selector is selected.', ['@option' => $option, '@data_drupal_selector' => $drupal_selector]);
+    $message = $message ?: new FormattableMarkup('Option @option for field @data_drupal_selector is selected.', ['@option' => $option, '@data_drupal_selector' => $drupal_selector]);
     $elements = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [':data_drupal_selector' => $drupal_selector, ':option' => $option]);
     $this->assertNotEmpty($elements, $message);
     $this->assertNotEmpty($elements[0]['selected'], $message);
@@ -1188,7 +1188,7 @@ trait AssertContentTrait {
    *   TRUE on pass.
    */
   protected function assertNoOptionSelected($id, $option, $message = '') {
-    $message = $message ? $message : new FormattableMarkup('Option @option for field @id is not selected.', ['@option' => $option, '@id' => $id]);
+    $message = $message ?: new FormattableMarkup('Option @option for field @id is not selected.', ['@option' => $option, '@id' => $id]);
     $elements = $this->xpath('//select[@id=:id]//option[@value=:option]', [':id' => $id, ':option' => $option]);
     $this->assertNotEmpty($elements, $message);
     $this->assertEmpty($elements[0]['selected'], $message);

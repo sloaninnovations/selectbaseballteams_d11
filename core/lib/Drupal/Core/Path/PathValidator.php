@@ -153,7 +153,7 @@ class PathValidator implements PathValidatorInterface {
       $router = $this->accessAwareRouter;
     }
 
-    $initial_request_context = $router->getContext() ? $router->getContext() : new RequestContext();
+    $initial_request_context = $router->getContext() ?: new RequestContext();
     $path = $this->pathProcessor->processInbound('/' . $path, $request);
 
     try {

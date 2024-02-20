@@ -199,7 +199,7 @@ function entity_test_entity_base_field_info_alter(&$fields, EntityTypeInterface 
  */
 function entity_test_create_bundle($bundle, $text = NULL, $entity_type = 'entity_test') {
   $bundles = \Drupal::state()->get($entity_type . '.bundles', [$entity_type => ['label' => 'Entity Test Bundle']]);
-  $bundles += [$bundle => ['label' => $text ? $text : $bundle]];
+  $bundles += [$bundle => ['label' => $text ?: $bundle]];
   \Drupal::state()->set($entity_type . '.bundles', $bundles);
 
   \Drupal::service('entity_bundle.listener')->onBundleCreate($bundle, $entity_type);
