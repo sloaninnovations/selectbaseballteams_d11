@@ -1959,11 +1959,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Tests POSTing an individual resource, plus edge cases to ensure good DX.
    */
   public function testPostIndividual() {
-    // @todo Remove this in https://www.drupal.org/node/2300677.
-    if ($this->entity instanceof ConfigEntityInterface) {
-      $this->markTestSkipped('POSTing config entities is not yet supported.');
-    }
-
     // Try with all of the following request bodies.
     $not_parseable_request_body = '!{>}<';
     $parseable_valid_request_body = Json::encode($this->getPostDocument());
