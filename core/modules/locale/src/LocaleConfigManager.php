@@ -288,8 +288,8 @@ class LocaleConfigManager {
    * Gets configuration names associated with components.
    *
    * @param array $components
-   *   (optional) Array of component lists indexed by type. If not present or it
-   *   is an empty array, it will update all components.
+   *   (optional) An array of arrays of component (theme and/or module) names to import
+   *   translations for, indexed by type.
    *
    * @return array
    *   Array of configuration object names.
