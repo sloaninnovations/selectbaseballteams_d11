@@ -34,6 +34,7 @@ class DrupalDevDependenciesBuilder extends DrupalPackageBuilder {
    * Returns the initial package metadata that describes the metapackage.
    *
    * @return array
+   *   An Array of metapackage data which have dependencies with core.
    */
   protected function initialPackageMetadata() {
     return [

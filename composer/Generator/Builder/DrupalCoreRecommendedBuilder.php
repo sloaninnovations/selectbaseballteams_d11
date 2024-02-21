@@ -59,6 +59,7 @@ class DrupalCoreRecommendedBuilder extends DrupalPackageBuilder {
    * Returns the initial package metadata that describes the metapackage.
    *
    * @return array
+   *   Intial metapackage which are dependencies with core.
    */
   protected function initialPackageMetadata() {
     return [
