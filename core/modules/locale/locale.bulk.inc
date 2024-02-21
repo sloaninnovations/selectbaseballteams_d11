@@ -536,8 +536,8 @@ function locale_translate_delete_translation_files(array $projects = [], array $
  * @param array $langcodes
  *   (optional) Array of language codes. Defaults to all translatable languages.
  * @param array $components
- *   (optional) An array of arrays of component (theme and/or module) names to import
- *   translations for, indexed by type.
+ *   An associative array containing component types as keys and lists of
+ *   components as values.
  * @param bool $update_default_config_langcodes
  *   Determines whether default configuration langcodes should be updated. This
  *   Should only happen during site and extension install.
