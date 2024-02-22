@@ -112,7 +112,7 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
               if ($this->moduleHandler->moduleExists('history')) {
                 $links['comment-new-comments'] = [
                   'title' => '',
-                  'url' => Url::fromRoute('<current>'),
+                  'url' => $entity->toUrl(),
                   'attributes' => [
                     'class' => 'hidden',
                     'title' => $this->t('Jump to the first new comment.'),

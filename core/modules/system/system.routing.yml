@@ -432,8 +432,6 @@ system.theme_settings_theme:
 
 '<current>':
   path: '<current>'
-  requirements:
-    _access: 'TRUE'
 
 system.modules_uninstall:
   path: '/admin/modules/uninstall'
