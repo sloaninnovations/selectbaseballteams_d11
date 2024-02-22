@@ -7,6 +7,7 @@ namespace Drupal\KernelTests;
 use Drupal\Core\Routing\PreloadableRouteProviderInterface;
 use Drupal\Core\Routing\RouteProvider as RouteProviderBase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Rebuilds the router when the provider is instantiated.
@@ -97,6 +98,13 @@ class RouteProvider implements PreloadableRouteProviderInterface {
    */
   public function reset() {
     return $this->lazyLoadItself()->reset();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRouteAliases(string $route_name): RouteCollection {
+    return $this->lazyLoadItself()->getRouteAliases($route_name);
   }
 
 }

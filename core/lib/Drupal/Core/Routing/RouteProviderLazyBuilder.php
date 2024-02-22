@@ -4,6 +4,7 @@ namespace Drupal\Core\Routing;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * A Route Provider front-end for all Drupal-stored routes.
@@ -151,6 +152,13 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   public function routerRebuildFinished() {
     $this->rebuilding = FALSE;
     $this->rebuilt = TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRouteAliases(string $route_name): RouteCollection {
+    return $this->getRouteProvider()->getRouteAliases($route_name);
   }
 
 }

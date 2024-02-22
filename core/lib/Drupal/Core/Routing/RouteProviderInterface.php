@@ -3,6 +3,7 @@
 namespace Drupal\Core\Routing;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Defines the route provider interface.
@@ -103,5 +104,19 @@ interface RouteProviderInterface {
    * Resets the route provider object.
    */
   public function reset();
+
+  /**
+   * Gets aliases for a route name.
+   *
+   * The aliases can be found using the ::getAliases() method of the returned
+   * route collection.
+   *
+   * @param string $route_name
+   *   The route name.
+   *
+   * @return \Symfony\Component\Routing\RouteCollection
+   *   Collection of routes that are an alias for a given route name.
+   */
+  public function getRouteAliases(string $route_name): RouteCollection;
 
 }

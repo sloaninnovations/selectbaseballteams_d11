@@ -1760,3 +1760,26 @@ function system_update_11102(): TranslatableMarkup|null {
   }
   return NULL;
 }
+
+/**
+ * Add the [alias] field to the {router} table.
+ */
+function system_update_10301() {
+  $schema = \Drupal::database()->schema();
+
+  if ($schema->tableExists('router')) {
+    $spec = [
+      'description' => 'The alias of the route, if applicable.',
+      'type' => 'varchar_ascii',
+      'length' => 255,
+    ];
+    if (!$schema->fieldExists('router', 'alias')) {
+      $schema->addField('router', 'alias', $spec, [
+        'fields' => [
+          'alias' => $spec
+        ],
+        'indexes' => ['alias' => ['alias']],
+      ]);
+    }
+  }
+}
