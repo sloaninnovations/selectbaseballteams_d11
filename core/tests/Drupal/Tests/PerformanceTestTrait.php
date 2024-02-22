@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
+use Drupal\Core\Database\Event\DatabaseEvent;
+use Drupal\performance_test\Cache\CacheTagOperation;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
@@ -123,10 +125,13 @@ trait PerformanceTestTrait {
       $cache_get_count = 0;
       $cache_set_count = 0;
       $cache_delete_count = 0;
+      $cache_tag_is_valid_count = 0;
+      $cache_tag_invalidation_count = 0;
+      $cache_tag_checksum_count = 0;
       foreach ($performance_test_data['database_events'] as $event) {
         // Don't log queries from the database cache backend because they're
         // logged separately as cache operations.
-        if (!(isset($event->caller['class']) && is_a(str_replace('\\\\', '\\', $event->caller['class']), '\Drupal\Core\Cache\DatabaseBackend', TRUE))) {
+        if (!static::isDatabaseCache($event)) {
           $query_count++;
         }
       }
@@ -141,10 +146,20 @@ trait PerformanceTestTrait {
           $cache_delete_count++;
         }
       }
+      foreach ($performance_test_data['cache_tag_operations'] as $operation) {
+        match($operation['operation']) {
+          CacheTagOperation::getCurrentChecksum => $cache_tag_checksum_count++,
+          CacheTagOperation::isValid => $cache_tag_is_valid_count++,
+          CacheTagOperation::invalidateTags => $cache_tag_invalidation_count++,
+        };
+      }
       $performance_data->setQueryCount($query_count);
       $performance_data->setCacheGetCount($cache_get_count);
       $performance_data->setCacheSetCount($cache_set_count);
       $performance_data->setCacheDeleteCount($cache_delete_count);
+      $performance_data->setCacheTagChecksumCount($cache_tag_checksum_count);
+      $performance_data->setCacheTagIsValidCount($cache_tag_is_valid_count);
+      $performance_data->setCacheTagInvalidationCount($cache_tag_invalidation_count);
     }
 
     return $performance_data;
@@ -313,7 +328,11 @@ trait PerformanceTestTrait {
       ResourceAttributes::DEPLOYMENT_ENVIRONMENT => 'local',
     ])));
 
-    $transport = (new OtlpHttpTransportFactory())->create($collector, 'application/x-protobuf');
+    $otel_collector_headers = getenv('OTEL_COLLECTOR_HEADERS') ?: [];
+    if ($otel_collector_headers) {
+      $otel_collector_headers = json_decode($otel_collector_headers, TRUE);
+    }
+    $transport = (new OtlpHttpTransportFactory())->create($collector, 'application/x-protobuf', $otel_collector_headers);
     $exporter = new SpanExporter($transport);
     $tracerProvider = new TracerProvider(new SimpleSpanProcessor($exporter), NULL, $resource);
     $tracer = $tracerProvider->getTracer('Drupal');
@@ -339,7 +358,7 @@ trait PerformanceTestTrait {
       $performance_test_data = $collection->get('performance_test_data');
       $query_events = $performance_test_data['database_events'] ?? [];
       foreach ($query_events as $key => $event) {
-        if (isset($event->caller['class']) && is_a(str_replace('\\\\', '\\', $event->caller['class']), '\Drupal\Core\Cache\DatabaseBackend', TRUE)) {
+        if (static::isDatabaseCache($event)) {
           continue;
         }
         // Use the first part of the database query for the span name.
@@ -353,13 +372,22 @@ trait PerformanceTestTrait {
       }
       $cache_operations = $performance_test_data['cache_operations'] ?? [];
       foreach ($cache_operations as $operation) {
-        $cache_span = $tracer->spanBuilder($operation['operation'] . ' ' . $operation['bin'])
+        $cache_span = $tracer->spanBuilder('cache ' . $operation['operation'] . ' ' . $operation['bin'])
           ->setStartTimestamp((int) ($operation['start'] * $nanoseconds_per_second))
           ->setAttribute('cache.operation', $operation['operation'])
           ->setAttribute('cache.cids', $operation['cids'])
           ->setAttribute('cache.bin', $operation['bin'])
           ->startSpan();
         $cache_span->end((int) ($operation['stop'] * $nanoseconds_per_second));
+      }
+      $cache_tag_operations = $performance_test_data['cache_tag_operations'] ?? [];
+      foreach ($cache_tag_operations as $operation) {
+        $cache_tag_span = $tracer->spanBuilder('cache_tag ' . $operation['operation']->name . ' ' . $operation['tags'])
+          ->setStartTimestamp((int) ($operation['start'] * $nanoseconds_per_second))
+          ->setAttribute('cache_tag.operation', $operation['operation']->name)
+          ->setAttribute('cache_tag.tags', $operation['tags'])
+          ->startSpan();
+        $cache_tag_span->end((int) ($operation['stop'] * $nanoseconds_per_second));
       }
 
       $lcp_timestamp = NULL;
@@ -405,6 +433,42 @@ trait PerformanceTestTrait {
       $span->end($last_timestamp);
       $tracerProvider->shutdown();
     }
+  }
+
+  /**
+   * Asserts that a count is between a min and max inclusively.
+   *
+   * @param int $min
+   *   Minimum value.
+   * @param int $max
+   *   Maximum value.
+   * @param int $actual
+   *   The number to assert against.
+   *
+   * @return void
+   *
+   * @throws \PHPUnit\Framework\ExpectationFailedException
+   */
+  protected function assertCountBetween(int $min, int $max, int $actual) {
+    static::assertThat(
+      $actual,
+      static::logicalAnd(static::greaterThanOrEqual($min), static::lessThanOrEqual($max)),
+      "$actual is greater or equal to $min and is smaller or equal to $max",
+    );
+  }
+
+  /**
+   * Checks whether a database event is from the database cache implementation.
+   *
+   * @param Drupal\Core\Database\Event\DatabaseEvent $event
+   *   The database event.
+   *
+   * @return bool
+   *   Whether the event was triggered by the database cache implementation.
+   */
+  protected static function isDatabaseCache(DatabaseEvent $event): bool {
+    $class = str_replace('\\\\', '\\', $event->caller['class']);
+    return is_a($class, '\Drupal\Core\Cache\DatabaseBackend', TRUE) || is_a($class, '\Drupal\Core\Cache\DatabaseCacheTagsChecksum', TRUE);
   }
 
 }
