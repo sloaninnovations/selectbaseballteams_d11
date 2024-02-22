@@ -107,9 +107,21 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'special';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getPostDocument() {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => 'date_format--date_format',
+        'attributes' => [
+          'drupal_internal__id' => 'special',
+          'label' => 'My special date format',
+        ],
+      ],
+    ];
   }
 
 }
