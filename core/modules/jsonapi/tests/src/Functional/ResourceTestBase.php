@@ -12,6 +12,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheRedirect;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityNullStorage;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -33,6 +34,7 @@ use Drupal\Core\TypedData\Plugin\DataType\StringData;
 use Drupal\Core\TypedData\Plugin\DataType\Timestamp;
 use Drupal\Core\TypedData\TypedDataInternalPropertiesHelper;
 use Drupal\Core\Url;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstraint;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\jsonapi\CacheableResourceResponse;
@@ -276,7 +278,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       }
       static::$patchProtectedFieldNames = array_flip($this->entity->getEntityType()->getConstraints()['ImmutableProperties']);
       // Abort ASAP to prevent unnecessary use of resources.
-      if ($this instanceof ConfigEntityResourceTestBase && !$this->isFullyValidatable()) {
+      if ($this instanceof ConfigEntityResourceTestBase && !$this->isFullyValidatableConfigEntityType()) {
         $this->markTestSkipped("Not yet supported for config entities.");
         return;
       }
@@ -3706,6 +3708,32 @@ abstract class ResourceTestBase extends BrowserTestBase {
       unset($expected_document['data']['attributes'][$field_name]);
     }
     return $expected_document;
+  }
+
+  /**
+   * Whether the tested config entity type is fully validatable.
+   *
+   * @return bool
+   *   Whether the tested config entity type is fully validatable.
+   *
+   * @see \Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase::isFullyValidatable()
+   */
+  protected function isFullyValidatableConfigEntityType(): bool {
+    $typed_config = $this->container->get('config.typed');
+    assert($typed_config instanceof TypedConfigManagerInterface);
+    // @see \Drupal\Core\Entity\Plugin\DataType\ConfigEntityAdapter::getConfigTypedData()
+    $config_entity_type_schema_constraints = $typed_config
+      ->createFromNameAndData(
+        $this->entity->getConfigDependencyName(),
+        $this->entity->toArray()
+      )->getConstraints();
+
+    foreach ($config_entity_type_schema_constraints as $constraint) {
+      if ($constraint instanceof FullyValidatableConstraint) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }
