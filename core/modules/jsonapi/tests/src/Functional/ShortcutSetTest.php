@@ -50,10 +50,10 @@ class ShortcutSetTest extends ConfigEntityResourceTestBase {
         break;
 
       case 'POST':
-      case 'PATCH':
         $this->grantPermissionsToTestedRole(['access shortcuts', 'customize shortcut links']);
         break;
 
+      case 'PATCH':
       case 'DELETE':
         $this->grantPermissionsToTestedRole(['administer shortcuts']);
         break;
@@ -141,5 +141,12 @@ class ShortcutSetTest extends ConfigEntityResourceTestBase {
       ],
     ];
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $patchProtectedFieldNames = [
+    // @todo expand this, but first fix ::getModifiedEntityForPatchTesting()
+  ];
 
 }
