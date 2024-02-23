@@ -1776,7 +1776,7 @@ function system_update_10301() {
     if (!$schema->fieldExists('router', 'alias')) {
       $schema->addField('router', 'alias', $spec, [
         'fields' => [
-          'alias' => $spec
+          'alias' => $spec,
         ],
         'indexes' => ['alias' => ['alias']],
       ]);
