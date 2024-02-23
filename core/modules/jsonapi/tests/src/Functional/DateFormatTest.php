@@ -163,11 +163,4 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
     $this->assertResourceResponse(422, $expected_document, $response);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected static $patchProtectedFieldNames = [
-    // @todo expand this, but first fix ::getModifiedEntityForPatchTesting()
-  ];
-
 }
