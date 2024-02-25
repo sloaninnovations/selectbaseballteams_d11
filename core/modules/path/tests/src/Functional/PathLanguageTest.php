@@ -205,4 +205,65 @@ class PathLanguageTest extends PathTestBase {
     $this->assertSession()->pageTextContains($english_node->body->value);
   }
 
+  /**
+   * Tests alias generation when the field is marked as non-translatable.
+   */
+  public function testNonTranslatableAlias() {
+    // Disable translation for path field.
+    // Enable translation for page node.
+    $edit = [
+      'entity_types[node]' => 1,
+      'settings[node][page][translatable]' => 1,
+      'settings[node][page][fields][path]' => 0,
+      'settings[node][page][fields][body]' => 1,
+      'settings[node][page][settings][language][language_alterable]' => 1,
+    ];
+    $this->drupalGet('admin/config/regional/content-language');
+    $this->submitForm($edit, 'Save configuration');
+    \Drupal::entityTypeManager()->clearCachedDefinitions();
+
+    // Create node in default language.
+    $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
+    $english_node = $this->drupalCreateNode(['type' => 'page', 'langcode' => 'en']);
+    $english_alias = $this->randomMachineName();
+
+    // Edit the node to set language and path.
+    $edit = [];
+    $edit['path[0][alias]'] = '/' . $english_alias;
+    $this->drupalGet('node/' . $english_node->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+
+    // Confirm that the alias works.
+    $this->drupalGet($english_alias);
+    $this->assertSession()->pageTextContains($english_node->body->value);
+
+    // Translate the node into French.
+    $this->drupalGet('node/' . $english_node->id() . '/translations');
+    $this->clickLink(t('Add'));
+
+    $edit = [];
+    $edit['title[0][value]'] = $this->randomMachineName();
+    $edit['body[0][value]'] = $this->randomMachineName();
+    $french_alias = $this->randomMachineName();
+    $edit['path[0][alias]'] = '/' . $french_alias;
+    $this->submitForm($edit, 'Save (this translation)');
+
+    // Clear the path lookup cache.
+    $this->container->get('path_alias.manager')->cacheClear();
+
+    // Languages are cached on many levels, and we need to clear those caches.
+    $this->container->get('language_manager')->reset();
+    $this->rebuildContainer();
+
+    // Ensure the node was created.
+    $node_storage->resetCache([$english_node->id()]);
+    $english_node = $node_storage->load($english_node->id());
+    $english_node_french_translation = $english_node->getTranslation('fr');
+    $this->assertTrue($english_node->hasTranslation('fr'), 'Node found in database.');
+
+    // Confirm that the alias works.
+    $this->drupalGet('fr' . $edit['path[0][alias]']);
+    $this->assertSession()->pageTextContains($english_node_french_translation->body->value);
+  }
+
 }
