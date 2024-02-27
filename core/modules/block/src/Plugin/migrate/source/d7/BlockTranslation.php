@@ -4,6 +4,7 @@ namespace Drupal\block\Plugin\migrate\source\d7;
 
 use Drupal\block\Plugin\migrate\source\Block;
 
+// cspell:ignore objectid objectindex plid textgroup
 
 /**
  * Drupal 7 i18n block data from database.
@@ -15,8 +16,6 @@ use Drupal\block\Plugin\migrate\source\Block;
  */
 #[\Drupal\migrate\Attribute\MigrateSource(id: 'd7_block_translation', source_module: 'i18n_block')]
 class BlockTranslation extends Block {
-
-  // cspell:ignore objectid objectindex plid textgroup
 
   /**
    * {@inheritdoc}
