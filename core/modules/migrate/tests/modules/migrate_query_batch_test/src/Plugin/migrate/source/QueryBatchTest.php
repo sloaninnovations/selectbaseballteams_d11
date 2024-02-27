@@ -8,11 +8,8 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 
 /**
  * Source plugin for migration high water tests.
- *
- * @MigrateSource(
- *   id = "query_batch_test"
- * )
  */
+#[\Drupal\migrate\Attribute\MigrateSource(id: 'query_batch_test')]
 class QueryBatchTest extends SqlBase {
 
   /**

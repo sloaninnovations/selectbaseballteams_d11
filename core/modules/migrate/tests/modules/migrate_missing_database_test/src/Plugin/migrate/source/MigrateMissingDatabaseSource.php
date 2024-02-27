@@ -9,13 +9,8 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 
 /**
  * A simple migrate source for the missing database tests.
- *
- * @MigrateSource(
- *   id = "migrate_missing_database_test",
- *   source_module = "migrate_missing_database_test",
- *   requirements_met = true
- * )
  */
+#[\Drupal\migrate\Attribute\MigrateSource(id: 'migrate_missing_database_test', source_module: 'migrate_missing_database_test', requirements_met: '@todo')]
 class MigrateMissingDatabaseSource extends SqlBase {
 
   /**

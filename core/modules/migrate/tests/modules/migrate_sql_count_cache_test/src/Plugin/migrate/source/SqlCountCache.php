@@ -8,11 +8,8 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 
 /**
  * Source plugin for Sql count cache test.
- *
- * @MigrateSource(
- *   id = "sql_count_cache"
- * )
  */
+#[\Drupal\migrate\Attribute\MigrateSource(id: 'sql_count_cache')]
 class SqlCountCache extends SqlBase {
 
   /**
