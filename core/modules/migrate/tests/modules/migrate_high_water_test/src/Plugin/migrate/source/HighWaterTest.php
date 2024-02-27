@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\migrate_high_water_test\Plugin\migrate\source;
 
+use Drupal\migrate\Attribute\MigrateSource;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
 
 /**
  * Source plugin for migration high water tests.
  */
-#[\Drupal\migrate\Attribute\MigrateSource(id: 'high_water_test')]
+#[MigrateSource(
+  id: 'high_water_test',
+)]
 class HighWaterTest extends SqlBase {
 
   /**

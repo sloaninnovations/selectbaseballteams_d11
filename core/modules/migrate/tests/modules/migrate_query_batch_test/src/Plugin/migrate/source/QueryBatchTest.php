@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\migrate_query_batch_test\Plugin\migrate\source;
 
+use Drupal\migrate\Attribute\MigrateSource;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
 
 /**
  * Source plugin for migration high water tests.
  */
-#[\Drupal\migrate\Attribute\MigrateSource(id: 'query_batch_test')]
+#[MigrateSource(
+  id: 'query_batch_test',
+)]
 class QueryBatchTest extends SqlBase {
 
   /**
