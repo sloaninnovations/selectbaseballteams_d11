@@ -16,6 +16,8 @@ use Drupal\block\Plugin\migrate\source\Block;
 #[\Drupal\migrate\Attribute\MigrateSource(id: 'd7_block_translation', source_module: 'i18n_block')]
 class BlockTranslation extends Block {
 
+  // cspell:ignore objectid objectindex plid textgroup
+
   /**
    * {@inheritdoc}
    */
