@@ -206,7 +206,7 @@ class NodeRevisionsTest extends NodeTestBase {
     $old_revision_date = \Drupal::time()->getRequestTime() - 86400;
     node_revision_load($nodes[2]->getRevisionId())
       ->setRevisionCreationTime($old_revision_date)
-      ->save();    
+      ->save();
     $this->drupalGet("node/" . $node->id() . "/revisions/" . $nodes[2]->getRevisionId() . "/revert");
     $this->submitForm([], 'Revert');
     $this->assertSession()->pageTextContains("Basic page {$nodes[2]->label()} has been reverted to the revision from {$this->container->get('date.formatter')->format($old_revision_date)}.");

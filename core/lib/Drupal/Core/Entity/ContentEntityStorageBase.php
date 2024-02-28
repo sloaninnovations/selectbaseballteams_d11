@@ -688,7 +688,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
             ->condition($this->entityType->getKey('id'), array_keys($entities), 'NOT IN')
             ->execute();
           $ids = array_values($result);
-        }     
+        }
       }
     }
 
@@ -1349,9 +1349,9 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   Cache ID that can be passed to the cache backend.
    */
   protected function buildCacheId($id, $revision = FALSE) {
-      return $revision ? "values:{$this->entityTypeId}:revision:$id" : parent::buildCacheId($id);
-    }
-  
+    return $revision ? "values:{$this->entityTypeId}:revision:$id" : parent::buildCacheId($id);
+  }
+
   /**
    * Gets entities from the static cache.
    *
@@ -1511,10 +1511,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
           // this case.
           $revision_cache_tags[] = $this->invalidateAllRevisions ?
             "revision_of:{$this->entityTypeId}:{$id}" :
-            "default_revision_of:{$this->entityTypeId}:{$id}";      
+            "default_revision_of:{$this->entityTypeId}:{$id}";
         }
       }
-      
+
       if ($this->entityType->isPersistentlyCacheable()) {
         $this->cacheBackend->deleteMultiple($cids);
         if ($revisionable) {

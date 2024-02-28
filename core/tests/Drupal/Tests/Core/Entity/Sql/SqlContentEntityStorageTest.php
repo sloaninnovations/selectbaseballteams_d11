@@ -1282,9 +1282,9 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       ->method('id')
       ->willReturn($id);
 
-      $entity->expects($this->any())
-        ->method('isDefaultRevision')
-        ->willReturn(TRUE);
+    $entity->expects($this->any())
+      ->method('isDefaultRevision')
+      ->willReturn(TRUE);
 
     $this->entityType->expects($this->any())
       ->method('isPersistentlyCacheable')
