@@ -53,6 +53,7 @@ class UpdateSettingsForm extends ConfigFormBase {
     $form['update_notify_emails'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Email addresses to notify when updates are available'),
+      '#default_value' => isset($notification_emails) ? implode("\n", $notification_emails) : NULL,
       '#rows' => 4,
       '#config_target' => new ConfigTarget(
         'update.settings',
