@@ -182,7 +182,7 @@ class NodeRevisionsAllTest extends NodeTestBase {
     // Set the revision timestamp to an older date to make sure that the
     // confirmation message correctly displays the stored revision date.
     $old_revision_date = \Drupal::time()->getRequestTime() - 86400;
-    node_revision_load($nodes[2]->getRevisionId())
+    $node_storage->loadRevision($nodes[2]->getRevisionId())
       ->setRevisionCreationTime($old_revision_date)
       ->save();
 
