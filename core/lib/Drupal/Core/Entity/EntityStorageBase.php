@@ -90,6 +90,13 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   protected $memoryCacheTag;
 
   /**
+   * The suffix for preload cache id.
+   *
+   * @var string
+   */
+  protected $preLoadCacheIdSuffix = '-preLoaded';
+
+  /**
    * Constructs an EntityStorageBase instance.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -157,6 +164,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     if ($this->entityType->isStaticallyCacheable() && isset($ids)) {
       foreach ($ids as $id) {
         $this->memoryCache->delete($this->buildCacheId($id));
+        $this->memoryCache->delete($this->buildCacheId($id) . $this->preLoadCacheIdSuffix);
       }
     }
     else {
@@ -275,22 +283,9 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     // were passed. The $ids array is reduced as items are loaded from cache,
     // and we need to know if it is empty for this reason to avoid querying the
     // database when all requested entities are loaded from cache.
-    $flipped_ids = $ids ? array_flip($ids) : FALSE;
-    // Try to load entities from the static cache, if the entity type supports
-    // static caching.
-    if ($ids) {
-      $entities += $this->getFromStaticCache($ids);
-      // If any entities were loaded, remove them from the IDs still to load.
-      $ids = array_keys(array_diff_key($flipped_ids, $entities));
-    }
-
-    // Try to gather any remaining entities from a 'preload' method. This method
-    // can invoke a hook to be used by modules that need, for example, to swap
-    // the default revision of an entity with a different one. Even though the
-    // base entity storage class does not actually invoke any preload hooks, we
-    // need to call the method here so we can add the pre-loaded entity objects
-    // to the static cache below. If all the entities were fetched from the
-    // static cache, skip this step.
+    $flipped_ids = $ids ? array_flip($ids) : FALSE;    
+    // Preload entities before loading them in order to prevent retrieving them
+    // from the regular static cache.
     if ($ids === NULL || $ids) {
       $preloaded_entities = $this->preLoad($ids);
     }
@@ -300,9 +295,17 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
       // If any entities were pre-loaded, remove them from the IDs still to
       // load.
       $ids = array_keys(array_diff_key($flipped_ids, $entities));
+      // We don't want preloaded entities to get into entity cache. There is a
+      // dedicated preload cache, which is taken care of by preLoad() method
+      // itself.
+    }
 
-      // Add pre-loaded entities to the cache.
-      $this->setStaticCache($preloaded_entities);
+    // Try to load entities from the static cache, if the entity type supports
+    // static caching.
+    if ($this->entityType->isStaticallyCacheable() && $ids) {
+      $entities += $this->getFromStaticCache($ids);
+      // If any entities were loaded, remove them from the IDs still to load.
+      $ids = array_keys(array_diff_key($flipped_ids, $entities));
     }
 
     // Load any remaining entities from the database. This is the case if $ids
@@ -319,16 +322,21 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
       $this->postLoad($queried_entities);
       $entities += $queried_entities;
 
-      // Add queried entities to the cache.
-      $this->setStaticCache($queried_entities);
+      if ($this->entityType->isStaticallyCacheable()) {
+        // Add queried entities to the cache.
+        $this->setStaticCache($queried_entities);
+      }
     }
 
     // Ensure that the returned array is ordered the same as the original
     // $ids array if this was passed in and remove any invalid IDs.
     if ($flipped_ids) {
-      // Remove any invalid IDs from the array and preserve the order passed in.
+      // Remove any invalid IDs from the array.
       $flipped_ids = array_intersect_key($flipped_ids, $entities);
-      $entities = array_replace($flipped_ids, $entities);
+      foreach ($entities as $id => $entity) {
+        $flipped_ids[$id] = $entity;
+      }
+      $entities = $flipped_ids;
     }
 
     return $entities;
@@ -484,6 +492,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
 
     // Perform the save and reset the static cache for the changed entity.
     $return = $this->doSave($id, $entity);
+    $this->doResetCacheOnSave($entity);
 
     // Execute post save logic and invoke the related hooks.
     $this->doPostSave($entity, !$is_new);
@@ -546,6 +555,19 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   abstract protected function doSave($id, EntityInterface $entity);
 
   /**
+   * Resets the entity cache after saving the entity.
+   *
+   * This should call ::resetCache() but may contain other logic that is
+   * specific to saving an entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The saved entity.
+   */
+  protected function doResetCacheOnSave(EntityInterface $entity) {
+    $this->resetCache([$entity->id()]);
+  }
+
+  /**
    * Performs post save entity processing.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
@@ -554,8 +576,6 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    *   Specifies whether the entity is being updated or created.
    */
   protected function doPostSave(EntityInterface $entity, $update) {
-    $this->resetCache([$entity->id()]);
-
     // The entity is no longer new.
     $entity->enforceIsNew(FALSE);
 

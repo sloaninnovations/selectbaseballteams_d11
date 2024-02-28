@@ -8,7 +8,7 @@ use Drupal\Component\Datetime\Time;
 use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityFieldManager;
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManager;
@@ -1108,7 +1108,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       ->method('id')
       ->willReturn('foo');
 
-    $this->assertInstanceOf('Drupal\Core\Entity\EntityInterface', $entity);
+    $this->assertInstanceOf(ContentEntityInterface::class, $entity);
     $this->assertSame('foo', $entity->id());
     $this->assertTrue($entity->isNew());
   }
@@ -1281,6 +1281,10 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $entity->expects($this->any())
       ->method('id')
       ->willReturn($id);
+
+      $entity->expects($this->any())
+        ->method('isDefaultRevision')
+        ->willReturn(TRUE);
 
     $this->entityType->expects($this->any())
       ->method('isPersistentlyCacheable')
@@ -1463,7 +1467,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 /**
  * Provides an entity with dummy implementations of static methods.
  */
-abstract class SqlContentEntityStorageTestEntityInterface implements EntityInterface {
+abstract class SqlContentEntityStorageTestEntityInterface implements \IteratorAggregate, ContentEntityInterface {
 
   /**
    * {@inheritdoc}

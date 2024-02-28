@@ -613,11 +613,14 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * {@inheritdoc}
    */
   protected function doLoadMultipleRevisionsFieldItems($revision_ids) {
-    $revisions = [];
 
     // Sanitize IDs. Before feeding ID array into buildQuery, check whether
     // it is empty as this would load all entity revisions.
     $revision_ids = $this->cleanIds($revision_ids, 'revision');
+
+    // Attempt to load entities from the persistent cache. This will remove IDs
+    // that were loaded from $ids.
+    $revisions = $this->getFromPersistentCache($revision_ids, TRUE);
 
     if (!empty($revision_ids)) {
       // Build and execute the query.
@@ -626,7 +629,28 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
       // Map the loaded records into entity objects and according fields.
       if ($records) {
-        $revisions = $this->mapFromStorageRecords($records, TRUE);
+        $revisions_from_storage = $this->mapFromStorageRecords($records, TRUE);
+
+        // The hooks are executed with an array of entities keyed by the entity
+        // ID. As we could load multiple revisions for the same entity ID at
+        // once we have to build groups of entities where the same entity ID is
+        // present only once.
+        $entity_groups = [];
+        $entity_group_mapping = [];
+        foreach ($revisions_from_storage as $revision) {
+          $entity_id = $revision->id();
+          $entity_group_key = isset($entity_group_mapping[$entity_id]) ? $entity_group_mapping[$entity_id] + 1 : 0;
+          $entity_group_mapping[$entity_id] = $entity_group_key;
+          $entity_groups[$entity_group_key][$entity_id] = $revision;
+        }
+
+        // Invoke the entity hooks for each group.
+        foreach ($entity_groups as $entities) {
+          $this->invokeStorageLoadHook($entities);
+        }
+        $this->setPersistentCache($revisions_from_storage);
+
+        $revisions += $revisions_from_storage;
       }
     }
 

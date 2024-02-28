@@ -819,3 +819,23 @@ function entity_test_query_entity_test_access_alter(AlterableInterface $query) {
     $query->condition('entity_test_query_access.name', 'published entity');
   }
 }
+
+/**
+ * Implements hook_entity_preload().
+ *
+ * Loads non-default revision when loading an entity.
+ */
+function entity_test_entity_preload(array $ids, $entity_type_id) {
+  $entities = [];
+  if ($revisions_load = \Drupal::state()
+    ->get($entity_type_id . '.preload_entities')
+  ) {
+    foreach ($revisions_load as $id => $revision_id) {
+      $revisions = \Drupal::entityTypeManager()
+        ->getStorage($entity_type_id)
+        ->loadMultipleRevisions([$revision_id]);
+      $entities[$id] = $revisions[$revision_id];
+    }
+  }
+  return $entities;
+}
