@@ -283,6 +283,7 @@ class ContentEntityStaticCacheTest extends KernelTestBase {
    */
   public function testNonDefaultRevision() {
     \Drupal::state()->set('enable_hook', TRUE);
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage($this->revEntityTypeId);
     $revision_ids = [];
     // Create a revisionable entity and save it. We now have entity with ID 1
