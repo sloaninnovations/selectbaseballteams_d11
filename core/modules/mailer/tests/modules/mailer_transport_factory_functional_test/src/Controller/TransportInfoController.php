@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\mailer_transport_factory_functional_test\Controller;
 
 use Drupal\Core\Config\ConfigFactoryInterface;

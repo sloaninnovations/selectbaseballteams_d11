@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Mailer\Transport;
 
 use Symfony\Component\Mailer\Transport\TransportInterface;

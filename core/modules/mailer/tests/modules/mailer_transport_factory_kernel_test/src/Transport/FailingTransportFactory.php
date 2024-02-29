@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\mailer_transport_factory_kernel_test\Transport;
 
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
