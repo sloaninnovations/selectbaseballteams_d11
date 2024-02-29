@@ -161,32 +161,40 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
         }
 
         // Ask for an absolute URL with our modified base URL.
-        $options['absolute'] = TRUE;
-        $options['base_url'] = $url_scheme . '://' . $config['domains'][$options['language']->getId()];
+        $new_base_url = $url_scheme . '://' . $config['domains'][$options['language']->getId()];
 
         // In case either the original base URL or the HTTP host contains a
         // port, retain it.
         if (isset($normalized_base_url) && str_contains($normalized_base_url, ':')) {
           [, $port] = explode(':', $normalized_base_url);
-          $options['base_url'] .= ':' . $port;
+          $new_base_url .= ':' . $port;
         }
         elseif (($url_scheme == 'http' && $port != 80) || ($url_scheme == 'https' && $port != 443)) {
-          $options['base_url'] .= ':' . $port;
+          $new_base_url .= ':' . $port;
         }
 
         if (isset($options['https'])) {
           if ($options['https'] === TRUE) {
-            $options['base_url'] = str_replace('http://', 'https://', $options['base_url']);
+            $new_base_url = str_replace('http://', 'https://', $new_base_url);
           }
           elseif ($options['https'] === FALSE) {
-            $options['base_url'] = str_replace('https://', 'http://', $options['base_url']);
+            $new_base_url = str_replace('https://', 'http://', $new_base_url);
           }
         }
 
         // Add Drupal's subfolder from the base_path if there is one.
-        $options['base_url'] .= rtrim(base_path(), '/');
-        if ($bubbleable_metadata) {
-          $bubbleable_metadata->addCacheContexts(['languages:' . LanguageInterface::TYPE_URL, 'url.site']);
+        $new_base_url .= rtrim(base_path(), '/');
+
+        // Update the options base_url if it differs from the global base_url.
+        global $base_url;
+        if ($new_base_url != $base_url) {
+          // Ask for an absolute URL with our modified base URL.
+          $options['absolute'] = TRUE;
+          $options['base_url'] = $new_base_url;
+
+          if ($bubbleable_metadata) {
+            $bubbleable_metadata->addCacheContexts(['languages:' . LanguageInterface::TYPE_URL, 'url.site']);
+          }
         }
       }
     }
