@@ -68,7 +68,7 @@ class LayoutBuilderEntityViewDisplayValidationTest extends ConfigEntityValidatio
   /**
    * {@inheritdoc}
    */
-  public function testImmutableProperties(array $valid_values = []): void {
+  public function testImmutableProperties(array $valid_values = [], ?array $additional_expected_validation_errors_when_modified = NULL): void {
     parent::testImmutableProperties([
       'targetEntityType' => 'entity_test_with_bundle',
       'bundle' => 'two',

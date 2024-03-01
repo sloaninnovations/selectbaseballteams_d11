@@ -61,13 +61,17 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
 
     switch ($constraint->type) {
       case 'module':
-        if (!$this->moduleHandler->moduleExists($extension_name)) {
+        // Special case: `core` — for core-provided plugins.
+        if ($extension_name === 'core') {
+          break;
+        }
+        if ($extension_name !== NULL && !$this->moduleHandler->moduleExists($extension_name)) {
           $this->context->addViolation($constraint->moduleMessage, $variables);
         }
         break;
 
       case 'theme':
-        if (!$this->themeHandler->themeExists($extension_name)) {
+        if ($extension_name !== NULL && !$this->themeHandler->themeExists($extension_name)) {
           $this->context->addViolation($constraint->themeMessage, $variables);
         }
         break;

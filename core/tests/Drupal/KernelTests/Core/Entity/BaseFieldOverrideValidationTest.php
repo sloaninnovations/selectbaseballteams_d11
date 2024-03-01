@@ -4,6 +4,8 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\entity_test\Entity\EntityTestBundle;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 
@@ -16,6 +18,14 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 class BaseFieldOverrideValidationTest extends ConfigEntityValidationTestBase {
 
   use ContentTypeCreationTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static array $propertiesWithOptionalValues = [
+    'default_value',
+    'description',
+  ];
 
   /**
    * {@inheritdoc}
@@ -43,6 +53,25 @@ class BaseFieldOverrideValidationTest extends ConfigEntityValidationTestBase {
   }
 
   /**
+   * Tests that the bundle is validated.
+   */
+  public function testBundle(): void {
+    $fields = $this->container->get('entity_field.manager')
+      ->getBaseFieldDefinitions('user');
+
+    // Try to create an instance of this base field override on a bundle that
+    // does not exist.
+    $this->entity = BaseFieldOverride::createFromBaseFieldDefinition($fields['uuid'], 'non_existent');
+    $this->assertValidationErrors([
+      'bundle' => "The 'non_existent' bundle does not exist on the 'user' entity type.",
+    ]);
+
+    // Next, try to create it on a bundle that does exist.
+    $this->entity = BaseFieldOverride::createFromBaseFieldDefinition($fields['uuid'], 'user');
+    $this->assertValidationErrors([]);
+  }
+
+  /**
    * Tests that the target bundle of the field is checked.
    */
   public function testTargetBundleMustExist(): void {
@@ -56,7 +85,7 @@ class BaseFieldOverrideValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testImmutableProperties(array $valid_values = []): void {
+  public function testImmutableProperties(array $valid_values = [], ?array $additional_expected_validation_errors_when_modified = NULL): void {
     // If we don't clear the previous settings here, we will get unrelated
     // validation errors (in addition to the one we're expecting), because the
     // settings from the *old* field_type won't match the config schema for the
@@ -65,7 +94,8 @@ class BaseFieldOverrideValidationTest extends ConfigEntityValidationTestBase {
     parent::testImmutableProperties([
       'entity_type' => 'entity_test_with_bundle',
       'bundle' => 'another',
-      'field_type' => 'string',
+      'field_type' => 'email',
+      'field_name' => 'title',
     ]);
   }
 
@@ -79,6 +109,32 @@ class BaseFieldOverrideValidationTest extends ConfigEntityValidationTestBase {
       ->set('field_type', 'invalid');
     $this->assertValidationErrors([
       'field_type' => "The 'invalid' plugin does not exist.",
+    ]);
+  }
+
+  /**
+   * Tests that base field overrides must be overriding, well, base fields.
+   */
+  public function testOverriddenFieldMustBeABaseField(): void {
+    $storage = FieldStorageConfig::create([
+      'entity_type' => 'node',
+      'field_name' => 'field_mail',
+      'type' => 'email',
+    ]);
+    $storage->save();
+
+    $field = FieldConfig::create([
+      'field_storage' => $storage,
+      'bundle' => 'one',
+    ]);
+    $field->save();
+
+    // The `field_name` property is immutable, so we need to clone the entity
+    // in order to change it.
+    $this->entity = $this->entity->createDuplicate()
+      ->set('field_name', 'field_mail');
+    $this->assertValidationErrors([
+      '' => "'field_mail' is not a base field of the node entity type.",
     ]);
   }
 

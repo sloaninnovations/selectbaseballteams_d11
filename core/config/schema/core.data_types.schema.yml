@@ -514,16 +514,29 @@ base_entity_reference_field_settings:
 
 field_config_base:
   type: config_entity
+  constraints:
+    UniqueFieldCombination: [entity_type, bundle, field_name]
   mapping:
     id:
       type: string
       label: 'ID'
+      constraints:
+        StringParts:
+          separator: .
+          parts:
+            - '%parent.entity_type'
+            - '%parent.bundle'
+            - '%parent.field_name'
     field_name:
       type: string
       label: 'Field name'
     entity_type:
       type: string
       label: 'Entity type'
+      constraints:
+        PluginExists:
+          manager: entity_type.manager
+          interface: \Drupal\Core\Entity\FieldableEntityInterface
     bundle:
       type: string
       label: 'Bundle'
@@ -535,6 +548,7 @@ field_config_base:
     description:
       type: text
       label: 'Help text'
+      nullable: true
     required:
       type: boolean
       label: 'Required field'
@@ -544,14 +558,20 @@ field_config_base:
     default_value:
       type: sequence
       label: 'Default values'
+      nullable: true
       sequence:
         type: field.value.[%parent.%parent.field_type]
         label: 'Default value'
+        constraint:
+          # TBD, looks like \Symfony\Component\Validator\Constraints\ValidValidator *could* work here…
+          Valid: []
     default_value_callback:
       type: string
       label: 'Default value callback'
+      # @todo Constraints — validate that this callback A) returns an entity, B) a *valid* entity?
     settings:
       type: field.field_settings.[%parent.field_type]
+      # @todo Constraints on each of the field type-specific settings config schemas BUT extra special challenge: until Drupal 11, at best only core field types will have validation constraints set!
     field_type:
       type: string
       label: 'Field type'
@@ -563,6 +583,8 @@ field_config_base:
 core.base_field_override.*.*.*:
   type: field_config_base
   label: 'Base field bundle override'
+  constraints:
+    FullyValidatable: ~
 
 core.date_format.*:
   type: config_entity
@@ -633,6 +655,8 @@ field.storage_settings.string:
 field.field_settings.string:
   type: mapping
   label: 'String settings'
+  constraints:
+    FullyValidatable: ~
 
 field.value.string:
   type: mapping
@@ -651,10 +675,14 @@ field.storage_settings.string_long:
     case_sensitive:
       type: boolean
       label: 'Case sensitive'
+  constraints:
+    FullyValidatable: ~
 
 field.field_settings.string_long:
   type: mapping
   label: 'String (long) settings'
+  constraints:
+    FullyValidatable: ~
 
 field.value.string_long:
   type: mapping
@@ -669,10 +697,14 @@ field.value.string_long:
 field.storage_settings.password:
   type: field.storage_settings.string
   label: 'Password settings'
+  constraints:
+    FullyValidatable: ~
 
 field.field_settings.password:
   type: mapping
   label: 'Password settings'
+  constraints:
+    FullyValidatable: ~
 
 # Schema for the configuration of the URI field type.
 
@@ -690,6 +722,8 @@ field.storage_settings.uri:
 field.field_settings.uri:
   type: mapping
   label: 'URI settings'
+  constraints:
+    FullyValidatable: ~
 
 field.value.uri:
   type: mapping
@@ -704,10 +738,14 @@ field.value.uri:
 field.storage_settings.created:
   type: mapping
   label: 'Created timestamp settings'
+  constraints:
+    FullyValidatable: ~
 
 field.field_settings.created:
   type: mapping
   label: 'Created timestamp settings'
+  constraints:
+    FullyValidatable: ~
 
 field.value.created:
   type: mapping
@@ -722,10 +760,14 @@ field.value.created:
 field.storage_settings.changed:
   type: mapping
   label: 'Changed timestamp settings'
+  constraints:
+    FullyValidatable: ~
 
 field.field_settings.changed:
   type: mapping
   label: 'Changed timestamp settings'
+  constraints:
+    FullyValidatable: ~
 
 field.value.changed:
   type: mapping
@@ -744,6 +786,9 @@ field.storage_settings.entity_reference:
     target_type:
       type: string
       label: 'Type of item to reference'
+      constraints:
+        PluginExists:
+          manager: entity_type.manager
 
 field.field_settings.entity_reference:
   type: mapping
@@ -785,6 +830,8 @@ field.field_settings.boolean:
     off_label:
       type: required_label
       label: 'Off label'
+  constraints:
+    FullyValidatable: ~
 
 field.value.boolean:
   type: mapping
@@ -798,6 +845,8 @@ field.value.boolean:
 field.storage_settings.email:
   type: mapping
   label: 'Email settings'
+  constraints:
+    FullyValidatable: ~
 
 field.field_settings.email:
   type: mapping
@@ -895,6 +944,8 @@ field.value.decimal:
 field.storage_settings.float:
   type: mapping
   label: 'Float settings'
+  constraints:
+    FullyValidatable: ~
 
 field.field_settings.float:
   type: mapping

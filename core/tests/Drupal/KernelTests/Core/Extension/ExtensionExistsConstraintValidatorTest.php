@@ -40,6 +40,15 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $this->enableModules(['user']);
     $this->assertCount(0, $data->validate());
 
+    // Special case: the `core` module — this is not a real module but is the
+    // official module-like extension that provides many plugins.
+    $data = $typed_data->create($definition, 'core');
+    $this->assertCount(0, $data->validate());
+    // Special case: `NULL` — validation constraints should be compatible with
+    // optional values.
+    $data = $typed_data->create($definition, NULL);
+    $this->assertCount(0, $data->validate());
+
     $definition->setConstraints(['ExtensionExists' => 'theme']);
     $data = $typed_data->create($definition, 'stark');
 
@@ -54,6 +63,11 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
       ->getContainer()
       ->get('typed_data_manager')
       ->create($definition, 'stark');
+    $this->assertCount(0, $data->validate());
+
+    // Special case: `NULL` — validation constraints should be compatible with
+    // optional values.
+    $data = $typed_data->create($definition, NULL);
     $this->assertCount(0, $data->validate());
 
     // Anything but a module or theme should raise an exception.

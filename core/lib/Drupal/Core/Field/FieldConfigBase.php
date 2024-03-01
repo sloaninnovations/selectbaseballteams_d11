@@ -79,9 +79,9 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
    * For example, the description will be the help text of Form API elements for
    * this field in entity edit forms.
    *
-   * @var string
+   * @var string|null
    */
-  protected $description = '';
+  protected $description = NULL;
 
   /**
    * Field-type specific settings.
@@ -336,7 +336,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
    * {@inheritdoc}
    */
   public function getDescription() {
-    return $this->description;
+    return $this->description ?? '';
   }
 
   /**
