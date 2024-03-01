@@ -152,12 +152,7 @@ class TimestampTest extends BrowserTestBase {
     $medium = DateFormat::load('medium')->getPattern();
     $this->drupalGet('entity_test/' . $id);
     $this->assertSession()->pageTextContains($date->format($medium));
-  }
 
-  /**
-   * Tests the "datetime_timestamp" widget default value handling.
-   */
-  public function testWidgetDefaultValue(): void {
     // Build up a date in the UTC timezone.
     $value = '2024-01-16 00:00:00';
     $date = new DrupalDateTime($value, 'UTC');
