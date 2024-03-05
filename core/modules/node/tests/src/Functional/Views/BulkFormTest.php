@@ -7,8 +7,6 @@ namespace Drupal\Tests\node\Functional\Views;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\views\Views;
 
-// cspell:ignore unsticky
-
 /**
  * Tests a node bulk form.
  *

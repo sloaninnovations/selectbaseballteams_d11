@@ -121,7 +121,6 @@ csslintrc
 csstools
 cweagans
 datelist
-daterange
 datestamp
 datetimeiso
 dburl
@@ -385,7 +384,6 @@ prepopulate
 prepopulates
 prepopulating
 prepopulation
-prerender
 prerendered
 presave
 pretransaction
@@ -561,7 +559,6 @@ unindexed
 uninstallations
 unminified
 unmoderated
-unpromote
 unpublishing
 unrouted
 unsanitized

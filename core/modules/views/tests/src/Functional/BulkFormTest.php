@@ -8,8 +8,6 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\views\Views;
 
-// cspell:ignore unsticky
-
 /**
  * Tests the views bulk form test.
  *
