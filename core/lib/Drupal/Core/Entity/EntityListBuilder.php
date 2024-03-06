@@ -141,7 +141,7 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
    */
   protected function getDefaultOperations(EntityInterface $entity) {
     $operations = [];
-    if ($entity->access('update') && $entity->hasLinkTemplate('edit-form')) {
+    if ($entity->hasLinkTemplate('edit-form')) {
       $edit_url = $this->ensureDestination($entity->toUrl('edit-form'));
       if (!empty($entity->label())) {
         $label = $this->t('Edit @entity_label', ['@entity_label' => $entity->label()]);
@@ -159,7 +159,7 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
         'url' => $edit_url,
       ];
     }
-    if ($entity->access('delete') && $entity->hasLinkTemplate('delete-form')) {
+    if ($entity->hasLinkTemplate('delete-form')) {
       $delete_url = $this->ensureDestination($entity->toUrl('delete-form'));
       if (!empty($entity->label())) {
         $label = $this->t('Delete @entity_label', ['@entity_label' => $entity->label()]);

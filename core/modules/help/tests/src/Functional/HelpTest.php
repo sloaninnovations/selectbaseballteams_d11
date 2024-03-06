@@ -150,7 +150,18 @@ class HelpTest extends BrowserTestBase {
           $this->assertSession()->pageTextContains($name . ' administration pages');
         }
         foreach ($admin_tasks as $task) {
-          $this->assertSession()->linkExists($task['title']);
+          /** @var \Drupal\Core\Url $url */
+          $url = $task['url'];
+          // Links should only be rendered if we have access. Some links such as
+          // the Workflow task will not be rendered as there are no child menu
+          // links available and therefore access is denied based on the
+          // _access_admin_menu_block_page access check.
+          if ($url->access()) {
+            $this->assertSession()->linkExistsExact($task['title']);
+          }
+          else {
+            $this->assertSession()->linkNotExistsExact($task['title']);
+          }
           // Ensure there are no double escaped '&' or '<' characters.
           $this->assertSession()->assertNoEscaped('&amp;');
           $this->assertSession()->assertNoEscaped('&lt;');
