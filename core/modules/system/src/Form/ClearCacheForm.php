@@ -42,7 +42,9 @@ class ClearCacheForm extends FormBase {
    * Clears the caches.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    drupal_flush_all_caches();
+    /** @var \Drupal\Core\Cache\CacheClearerInterface $cacheClearer */
+    $cacheClearer = \Drupal::service('cache.chain_cache_clearer');
+    $cacheClearer->clearCache();
     $this->messenger()->addStatus($this->t('Caches cleared.'));
   }
 

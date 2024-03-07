@@ -3,6 +3,7 @@
 namespace Drupal\Core\Routing;
 
 use Drupal\Core\Access\CheckProviderInterface;
+use Drupal\Core\Cache\CacheClearerInterface;
 use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\Discovery\YamlDiscovery;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Route;
 /**
  * Managing class for rebuilding the router table.
  */
-class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
+class RouteBuilder implements RouteBuilderInterface, DestructableInterface, CacheClearerInterface {
 
   /**
    * The dumper to which we should send collected routes.
@@ -233,6 +234,13 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
     // the up-to-date list of modules.
     $discovery = new YamlDiscovery('routing', $this->moduleHandler->getModuleDirectories());
     return $discovery->findAll();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function clearCache(): void {
+    $this->rebuild();
   }
 
 }

@@ -319,11 +319,33 @@ services:
     factory: ['@variation_cache_factory', 'get']
     arguments: [access_policy_memory]
   Drupal\Core\Asset\AssetQueryStringInterface: '@asset.query_string'
+  cache.chain_cache_clearer:
+    class: Drupal\Core\Cache\ChainCacheClearer
+    tags:
+      - { name: service_collector, tag: cache_clearer, call: add }
+  Drupal\Core\Cache\ChainCacheClearer: '@cache.chain_cache_clearer'
+  cache.cache_flush_cache_clearer:
+    class: Drupal\Core\Extension\HookCacheFlushClearer
+    arguments: ['@module_handler']
+    tags:
+      - { name: cache_clearer, priority: 100 }
+  Drupal\Core\Extension\HookCacheFlushClearer: '@cache.cache_flush_cache_clearer'
+  cache.cache_bins_cache_clearer:
+    class: Drupal\Core\Cache\CacheBinsClearer
+    tags:
+      - { name: cache_clearer, priority: 90 }
+  Drupal\Core\Cache\CacheBinsClearer: '@cache.cache_bins_cache_clearer'
   asset.query_string:
     class: Drupal\Core\Asset\AssetQueryString
     arguments:
       - '@state'
       - '@datetime.time'
+    tags:
+      - { name: cache_clearer, priority: 80 }
+  cache.drupal_static_cache_clearer:
+    class: Drupal\Core\Cache\DrupalStaticCacheClearer
+    tags:
+      - { name: cache_clearer, priority: 70 }
   cache_router_rebuild_subscriber:
     class: Drupal\Core\EventSubscriber\CacheRouterRebuildSubscriber
   page_cache_request_policy:
@@ -634,9 +656,17 @@ services:
     class: Drupal\Core\Extension\ModuleExtensionList
     arguments: ['%app.root%', 'module', '@cache.default', '@info_parser', '@module_handler', '@state', '@config.factory', '@extension.list.profile', '%install_profile%', '%container.modules%']
   Drupal\Core\Extension\ModuleExtensionList: '@extension.list.module'
+  cache.module_cache_clearer:
+    class: Drupal\Core\Extension\ModuleCacheClearer
+    arguments: ['@extension.list.module', '@module_handler']
+    tags:
+      - { name: cache_clearer, priority: 40 }
+  Drupal\Core\Extension\ModuleCacheClearer: '@cache.module_cache_clearer'
   extension.list.profile:
     class: Drupal\Core\Extension\ProfileExtensionList
     arguments: ['%app.root%', 'profile', '@cache.default', '@info_parser', '@module_handler', '@state', '%install_profile%']
+    tags:
+      - { name: cache_clearer, priority: 50 }
   Drupal\Core\Extension\ProfileExtensionList: '@extension.list.profile'
   extension.list.theme:
     class: Drupal\Core\Extension\ThemeExtensionList
@@ -682,6 +712,11 @@ services:
     class: Drupal\Core\Extension\ThemeHandler
     arguments: ['%app.root%', '@config.factory', '@extension.list.theme']
   Drupal\Core\Extension\ThemeHandlerInterface: '@theme_handler'
+  cache.theme_cache_clearer:
+    class: Drupal\Core\Extension\ThemeCacheClearer
+    arguments: ['@extension.list.theme', '@theme_handler', '@theme.manager']
+    tags:
+      - { name: cache_clearer, priority: 50 }
   theme_installer:
     class: Drupal\Core\Extension\ThemeInstaller
     arguments: ['@theme_handler', '@config.factory', '@config.installer', '@module_handler', '@config.manager', '@asset.css.collection_optimizer', '@router.builder', '@logger.channel.default', '@state', '@extension.list.module', '@theme.registry', '@extension.list.theme']
@@ -837,6 +872,8 @@ services:
   plugin.cache_clearer:
     class: Drupal\Core\Plugin\CachedDiscoveryClearer
     lazy: true
+    tags:
+      - { name: cache_clearer, priority: 30 }
   Drupal\Core\Plugin\CachedDiscoveryClearerInterface: '@plugin.cache_clearer'
   paramconverter.menu_link:
     class: Drupal\Core\ParamConverter\MenuLinkPluginConverter
@@ -1117,6 +1154,7 @@ services:
     lazy: true
     tags:
       - { name: needs_destruction }
+      - {name: cache_clearer, priority: 30}
   Drupal\Core\Routing\RouteBuilderInterface: '@router.builder'
   menu.rebuild_subscriber:
     class: Drupal\Core\EventSubscriber\MenuRouterRebuildSubscriber
@@ -1538,6 +1576,11 @@ services:
     calls:
       - [setThemeRegistry, ['@theme.registry']]
   Drupal\Core\Theme\ThemeManagerInterface: '@theme.manager'
+  cache.maintenance_theme_cache_clearer:
+    class: Drupal\Core\Theme\MaintenanceThemeCacheClearer
+    arguments: ['@theme.manager']
+    tags:
+      - { name: cache_clearer, priority: 10 }
   theme.initialization:
     class: Drupal\Core\Theme\ThemeInitialization
     arguments: ['%app.root%', '@theme_handler', '@cache.bootstrap', '@module_handler']
@@ -1636,6 +1679,8 @@ services:
   asset.css.collection_optimizer:
     class: Drupal\Core\Asset\CssCollectionOptimizerLazy
     arguments: [ '@asset.css.collection_grouper', '@asset.css.optimizer', '@theme.manager', '@library.dependency_resolver', '@request_stack', '@file_system', '@config.factory', '@file_url_generator', '@datetime.time', '@language_manager']
+    tags:
+      - { name: cache_clearer, priority: 80 }
   asset.css.optimizer:
     class: Drupal\Core\Asset\CssOptimizer
     arguments: ['@file_url_generator']
@@ -1650,6 +1695,8 @@ services:
   asset.js.collection_optimizer:
     class: Drupal\Core\Asset\JsCollectionOptimizerLazy
     arguments: [ '@asset.js.collection_grouper', '@asset.js.optimizer', '@theme.manager', '@library.dependency_resolver', '@request_stack', '@file_system', '@config.factory', '@file_url_generator', '@datetime.time', '@language_manager']
+    tags:
+      - { name: cache_clearer, priority: 80 }
   asset.js.optimizer:
     class: Drupal\Core\Asset\JsOptimizer
     arguments: ['@logger.channel.default']
@@ -1692,6 +1739,7 @@ services:
     arguments: ['%app.root%', '@cache.default', '%twig_extension_hash%', '@state', '@twig.loader', '%twig.config%']
     tags:
       - { name: service_collector, tag: 'twig.extension', call: addExtension }
+      - { name: cache_clearer, priority: 60 }
   Drupal\Core\Template\TwigEnvironment: '@twig'
   twig.extension:
     class: Drupal\Core\Template\TwigExtension

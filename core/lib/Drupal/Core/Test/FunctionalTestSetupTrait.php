@@ -229,7 +229,9 @@ trait FunctionalTestSetupTrait {
    */
   protected function resetAll() {
     // Clear all database and static caches and rebuild data structures.
-    drupal_flush_all_caches();
+    /** @var \Drupal\Core\Cache\CacheClearerInterface $cacheClearer */
+    $cacheClearer = \Drupal::service('cache.chain_cache_clearer');
+    $cacheClearer->clearCache();
     $this->container = \Drupal::getContainer();
 
     // Reset static variables and reload permissions.

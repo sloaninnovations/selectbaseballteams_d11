@@ -270,7 +270,9 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $assert_session->pageTextContains('The text format ckeditor5 has been updated.');
 
     // Flush caches so the updated config can be checked.
-    drupal_flush_all_caches();
+    /** @var \Drupal\Core\Cache\CacheClearerInterface $cacheClearer */
+    $cacheClearer = \Drupal::service('cache.chain_cache_clearer');
+    $cacheClearer->clearCache();
 
     // Confirm that the tags required by the newly-added plugins were correctly
     // saved.

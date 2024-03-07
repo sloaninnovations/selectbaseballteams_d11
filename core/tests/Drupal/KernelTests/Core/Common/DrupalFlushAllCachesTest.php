@@ -33,7 +33,9 @@ class DrupalFlushAllCachesTest extends KernelTestBase {
     $module['system_test'] = -10;
     $core_extension->set('module', module_config_sort($module))->save();
     $this->containerBuilds = 0;
-    drupal_flush_all_caches();
+    /** @var \Drupal\Core\Cache\CacheClearerInterface $cacheClearer */
+    $cacheClearer = \Drupal::service('cache.chain_cache_clearer');
+    $cacheClearer->clearCache();
     $module_list = ['system_test', 'system'];
     $database_module = \Drupal::database()->getProvider();
     if ($database_module !== 'core') {
@@ -48,7 +50,9 @@ class DrupalFlushAllCachesTest extends KernelTestBase {
 
     $core_extension->clear('module.system_test')->save();
     $this->containerBuilds = 0;
-    drupal_flush_all_caches();
+    /** @var \Drupal\Core\Cache\CacheClearerInterface $cacheClearer */
+    $cacheClearer = \Drupal::service('cache.chain_cache_clearer');
+    $cacheClearer->clearCache();
     $module_list = ['system'];
     if ($database_module !== 'core') {
       $module_list[] = $database_module;

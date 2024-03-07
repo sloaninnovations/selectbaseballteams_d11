@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Asset;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\CacheClearerInterface;
 use Drupal\Core\State\StateInterface;
 
 /**
@@ -13,7 +14,7 @@ use Drupal\Core\State\StateInterface;
  * The string changes on every update or full cache flush, forcing browsers to
  * load a new copy of the files, as the URL changed.
  */
-class AssetQueryString implements AssetQueryStringInterface {
+class AssetQueryString implements AssetQueryStringInterface, CacheClearerInterface {
 
   /**
    * The key used for state.
@@ -46,6 +47,13 @@ class AssetQueryString implements AssetQueryStringInterface {
    */
   public function get(): string {
     return $this->state->get(self::STATE_KEY, '0');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function clearCache(): void {
+    $this->reset();
   }
 
 }

@@ -38,7 +38,9 @@ function drupal_rebuild($class_loader, Request $request) {
     $request->setSession($kernel->getContainer()->get('session'));
   }
 
-  drupal_flush_all_caches($kernel);
+  /** @var \Drupal\Core\Cache\CacheClearerInterface $cacheClearer */
+  $cacheClearer = \Drupal::service('cache.chain_cache_clearer');
+  $cacheClearer->clearCache();
 
   // Disable recording of cached pages.
   \Drupal::service('page_cache_kill_switch')->trigger();

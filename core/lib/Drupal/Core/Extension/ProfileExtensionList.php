@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Extension;
 
+use Drupal\Core\Cache\CacheClearerInterface;
+
 /**
  * Provides a list of installation profiles.
  *
@@ -11,7 +13,7 @@ namespace Drupal\Core\Extension;
  *   properties / methods will not change over time. This will be reviewed after
  *   https://www.drupal.org/project/drupal/issues/2940481
  */
-class ProfileExtensionList extends ExtensionList {
+class ProfileExtensionList extends ExtensionList implements CacheClearerInterface {
 
   /**
    * {@inheritdoc}
@@ -30,6 +32,13 @@ class ProfileExtensionList extends ExtensionList {
    */
   protected function getInstalledExtensionNames() {
     return [$this->installProfile];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function clearCache(): void {
+    $this->reset();
   }
 
 }

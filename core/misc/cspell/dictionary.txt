@@ -133,6 +133,8 @@ classmaps
 classname
 classtype
 cldr
+clearer
+clearers
 clearfix
 closethick
 codesniffer

@@ -9,8 +9,6 @@
  */
 
 use Drupal\Component\Utility\SortArray;
-use Drupal\Core\Cache\Cache;
-use Drupal\Core\DrupalKernel;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 
 /**
@@ -433,64 +431,18 @@ function show(&$element) {
  *   the container if this is passed in. Sometimes drupal_flush_all_caches is
  *   used as a batch operation so $kernel will be an array, in this instance it
  *   will be treated as if it is NULL.
+ *
+ * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
+ * \Drupal\Core\Cache\Rebuilder::rebuildAll() instead.
+ *
+ * @see https://www.drupal.org/node/3014783
+ * @see \Drupal\Core\Cache\Rebuilder::rebuildAll()
  */
 function drupal_flush_all_caches($kernel = NULL) {
-  // This is executed based on old/previously known information if $kernel is
-  // not passed in, which is sufficient, since new extensions cannot have any
-  // primed caches yet.
-  $module_handler = \Drupal::moduleHandler();
-  // Flush all persistent caches.
-  $module_handler->invokeAll('cache_flush');
-  foreach (Cache::getBins() as $cache_backend) {
-    $cache_backend->deleteAll();
-  }
-
-  // Flush asset file caches.
-  \Drupal::service('asset.css.collection_optimizer')->deleteAll();
-  \Drupal::service('asset.js.collection_optimizer')->deleteAll();
-  \Drupal::service('asset.query_string')->reset();
-
-  // Reset all static caches.
-  drupal_static_reset();
-
-  // Wipe the Twig PHP Storage cache.
-  \Drupal::service('twig')->invalidate();
-
-  // Rebuild profile, profile, theme_engine and theme data.
-  \Drupal::service('extension.list.profile')->reset();
-  \Drupal::service('extension.list.theme_engine')->reset();
-  \Drupal::service('theme_handler')->refreshInfo();
-  // In case the active theme gets requested later in the same request we need
-  // to reset the theme manager.
-  \Drupal::theme()->resetActiveTheme();
-
-  if (!$kernel instanceof DrupalKernel) {
-    $kernel = \Drupal::service('kernel');
-    $kernel->invalidateContainer();
-    $kernel->rebuildContainer();
-  }
-
-  // Rebuild module data that is stored in state.
-  \Drupal::service('extension.list.module')->reset();
-
-  // Rebuild all information based on new module data.
-  \Drupal::moduleHandler()->invokeAll('rebuild');
-
-  // Clear all plugin caches.
-  \Drupal::service('plugin.cache_clearer')->clearCachedDefinitions();
-
-  // Rebuild the menu router based on all rebuilt data.
-  // Important: This rebuild must happen last, so the menu router is guaranteed
-  // to be based on up to date information.
-  \Drupal::service('router.builder')->rebuild();
-
-  // Re-initialize the maintenance theme, if the current request attempted to
-  // use it. Unlike regular usages of this function, the installer and update
-  // scripts need to flush all caches during GET requests/page building.
-  if (function_exists('_drupal_maintenance_theme')) {
-    \Drupal::theme()->resetActiveTheme();
-    drupal_maintenance_theme();
-  }
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Cache\Rebuilder::rebuildAll() instead. See https://www.drupal.org/node/3014783', E_USER_DEPRECATED);
+  /** @var \Drupal\Core\Cache\CacheClearerInterface $cacheClearer */
+  $cacheClearer = \Drupal::service('cache.chain_cache_clearer');
+  $cacheClearer->clearCache();
 }
 
 /**

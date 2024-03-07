@@ -364,7 +364,9 @@ class DbUpdateController extends ControllerBase {
       ];
 
       // No updates to run, so caches won't get flushed later.  Clear them now.
-      drupal_flush_all_caches();
+      /** @var \Drupal\Core\Cache\CacheClearerInterface $cacheClearer */
+      $cacheClearer = \Drupal::service('cache.chain_cache_clearer');
+      $cacheClearer->clearCache();
     }
     else {
       $build['help'] = [
@@ -644,7 +646,8 @@ class DbUpdateController extends ControllerBase {
     if ($post_updates) {
       // Now we rebuild all caches and after that execute the hook_post_update()
       // functions.
-      $batch_builder->addOperation('drupal_flush_all_caches', []);
+      $callable = \Drupal::service('callable_resolver')->getCallableFromDefinition('cache.chain_cache_clearer:clearCache');
+      $batch_builder->addOperation($callable, []);
       foreach ($post_updates as $function) {
         $batch_builder->addOperation('update_invoke_post_update', [$function]);
       }
@@ -673,7 +676,9 @@ class DbUpdateController extends ControllerBase {
    */
   public static function batchFinished($success, $results, $operations) {
     // No updates to run, so caches won't get flushed later.  Clear them now.
-    drupal_flush_all_caches();
+    /** @var \Drupal\Core\Cache\CacheClearerInterface $cacheClearer */
+    $cacheClearer = \Drupal::service('cache.chain_cache_clearer');
+    $cacheClearer->clearCache();
 
     $session = \Drupal::request()->getSession();
     $session->set('update_results', $results);

@@ -5,6 +5,7 @@ namespace Drupal\Core\Template;
 use Drupal\Component\FrontMatter\Exception\FrontMatterParseException;
 use Drupal\Component\FrontMatter\FrontMatter;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\CacheClearerInterface;
 use Drupal\Core\PhpStorage\PhpStorageFactory;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Serialization\Yaml;
@@ -21,7 +22,7 @@ use Twig\Source;
  * Instances of this class are used to store the configuration and extensions,
  * and are used to load templates from the file system or other locations.
  */
-class TwigEnvironment extends Environment {
+class TwigEnvironment extends Environment implements CacheClearerInterface {
 
   /**
    * Key name of the Twig cache prefix metadata key-value pair in State.
@@ -232,6 +233,13 @@ class TwigEnvironment extends Environment {
     // Prefix all inline templates with a special comment.
     $template_string = '{# inline_template_start #}' . $template_string;
     return Markup::create($this->createTemplate($template_string)->render($context));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function clearCache(): void {
+    $this->invalidate();
   }
 
 }
