@@ -165,7 +165,7 @@ class DateFormatter implements DateFormatterInterface {
         break;
       }
     }
-    return $output ? $output : $this->t('0 sec', [], ['langcode' => $langcode]);
+    return $output ?: $this->t('0 sec', [], ['langcode' => $langcode]);
   }
 
   /**

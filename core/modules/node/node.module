@@ -755,7 +755,7 @@ function node_get_recent($number = 10) {
 
   $nodes = Node::loadMultiple($nids);
 
-  return $nodes ? $nodes : [];
+  return $nodes ?: [];
 }
 
 /**
