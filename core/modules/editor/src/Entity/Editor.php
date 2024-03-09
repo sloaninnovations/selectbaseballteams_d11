@@ -52,6 +52,7 @@ class Editor extends ConfigEntityBase implements EditorInterface {
    * @var string
    *
    * @see getFilterFormat()
+   * @see hasAssociatedFilterFormat()
    */
   protected $format;
 
@@ -144,6 +145,9 @@ class Editor extends ConfigEntityBase implements EditorInterface {
    * {@inheritdoc}
    */
   public function getFilterFormat() {
+    if (empty($this->format)) {
+      throw new \DomainException(sprintf('You cannot call %s on the editor "%s" since it does not have an assigned text format.', __METHOD__, $this->getEditor()));
+    }
     if (!$this->filterFormat) {
       $this->filterFormat = \Drupal::entityTypeManager()->getStorage('filter_format')->load($this->format);
     }
