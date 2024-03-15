@@ -246,6 +246,9 @@
    *   URL to be set.
    */
   Drupal.AjaxCommands.prototype.setBrowserUrl = (ajax, response) => {
-    window.history.replaceState(null, '', response.url);
+    // Do not change browser URL if we are in a dialog wrapper.
+    if (!ajax.element.closest('.ui-dialog-content')) {
+      window.history.replaceState(null, '', response.url);
+    }
   };
 })(jQuery, Drupal, drupalSettings);

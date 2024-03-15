@@ -225,10 +225,10 @@ class ViewAjaxController implements ContainerInjectionInterface {
         }
         $preview = $view->preview($display_id, $args);
         $request->attributes->remove('ajax_page_state');
+        $response->addCommand(new SetBrowserUrl($target_url->toString()));
         $response->addCommand(new ReplaceCommand(".js-view-dom-id-$dom_id", $preview));
         $response->addCommand(new PrependCommand(".js-view-dom-id-$dom_id", ['#type' => 'status_messages']));
         $request->query->set('ajax_page_state', $existing_page_state);
-        $response->addCommand(new SetBrowserUrl($target_url->toString()));
 
         return $response;
       }
