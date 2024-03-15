@@ -63,6 +63,12 @@
   Drupal.views.ajaxView = function (settings) {
     const selector = `.js-view-dom-id-${settings.view_dom_id}`;
     this.$view = $(selector);
+    this.$exposed_form = $(
+      `form#views-exposed-form-${settings.view_name.replace(
+        /_/g,
+        '-',
+      )}-${settings.view_display_id.replace(/_/g, '-')}`,
+    )
 
     // Retrieve the path to use for views' ajax.
     let ajaxPath = drupalSettings.views.ajax_path;
@@ -80,9 +86,17 @@
       queryString = queryString
         .slice(1)
         .replace(/q=[^&]+&?|&?render=[^&]+/, '');
+
+      // Remove current exposed filters.
+      const params = decodeURI(queryString).split('&').filter(param => {
+        let [name, value] = param.split('=');
+        return this.$exposed_form.find(`input[name="${name}"]`).length === 0 && name !== 'page';
+      });
+      queryString = encodeURI(params.join('&'));
+
+      // If there is a '?' in ajaxPath, clean URL are on and & should be
+      // used to add parameters.
       if (queryString !== '') {
-        // If there is a '?' in ajaxPath, clean URL are on and & should be
-        // used to add parameters.
         queryString = (/\?/.test(ajaxPath) ? '&' : '?') + queryString;
       }
     }
@@ -99,13 +113,7 @@
 
     this.settings = settings;
 
-    // Add the ajax to exposed forms.
-    this.$exposed_form = $(
-      `form#views-exposed-form-${settings.view_name.replace(
-        /_/g,
-        '-',
-      )}-${settings.view_display_id.replace(/_/g, '-')}`,
-    );
+    // Add the ajax to exposed forms.;
     once('exposed-form', this.$exposed_form).forEach(
       this.attachExposedFormAjax.bind(this),
     );
@@ -225,5 +233,19 @@
    */
   Drupal.AjaxCommands.prototype.viewsScrollTop = function (ajax, response) {
     Drupal.AjaxCommands.prototype.scrollTop(ajax, response);
+  };
+
+  /**
+   * Sets the browser URL ajax command.
+   *
+   * @param {Drupal.Ajax} [ajax]
+   *   A {@link Drupal.ajax} object.
+   * @param {object} response
+   *   Ajax response.
+   * @param {string} response.url
+   *   URL to be set.
+   */
+  Drupal.AjaxCommands.prototype.setBrowserUrl = (ajax, response) => {
+    window.history.replaceState(null, '', response.url);
   };
 })(jQuery, Drupal, drupalSettings);
