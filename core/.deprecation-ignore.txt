@@ -42,3 +42,10 @@
 %The ".*" class uses "Symfony\\Component\\DependencyInjection\\ContainerAwareTrait" that is deprecated since Symfony 6.4, use dependency injection instead.%
 %The ".*" class implements "Symfony\\Component\\DependencyInjection\\ContainerAwareInterface" that is deprecated since Symfony 6.4, use dependency injection instead.%
 %The ".*" interface extends "Symfony\\Component\\DependencyInjection\\ContainerAwareInterface" that is deprecated since Symfony 6.4, use dependency injection instead.%
+
+# Temporarily while updating PrimitiveTypeConstraintValidator and ConfigSchemaChecker to agree with each other.
+# @todo Remove in https://www.drupal.org/project/drupal/issues/3230826.
+%The `type: (string|boolean|float|int)` config schema type uses magical casting when saving.%
+%⚠️ The `type: boolean` config schema type uses magical casting for the string value `(no|test|false|)` that is inconsistent with the validation logic in Drupal\\Core\\Validation\\Plugin\\Validation\\Constraint\\PrimitiveTypeConstraintValidator.%
+%⚠️ The `type: (int|float)` config schema type uses magical casting for the string value `(55\%|)` that is inconsistent with the validation logic in Drupal\\Core\\Validation\\Plugin\\Validation\\Constraint\\PrimitiveTypeConstraintValidator.%
+%⚠️ The `type: (int|float)` config schema type uses magical casting for the boolean value `` that is inconsistent with the validation logic in Drupal\\Core\\Validation\\Plugin\\Validation\\Constraint\\PrimitiveTypeConstraintValidator.%

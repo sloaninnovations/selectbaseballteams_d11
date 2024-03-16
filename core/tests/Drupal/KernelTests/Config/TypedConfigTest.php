@@ -2,6 +2,7 @@
 
 namespace Drupal\KernelTests\Config;
 
+use Drupal\Core\Config\Schema\SchemaCheckTrait;
 use Drupal\Core\Config\Schema\Sequence;
 use Drupal\Core\Config\Schema\SequenceDataDefinition;
 use Drupal\Core\Config\Schema\TypedConfigInterface;
@@ -9,9 +10,17 @@ use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\Type\IntegerInterface;
 use Drupal\Core\TypedData\Type\StringInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\Core\TypedData\Validation\ExecutionContextFactory;
+use Drupal\Core\TypedData\Validation\RecursiveContextualValidator;
+use Drupal\Core\TypedData\Validation\RecursiveValidator;
+use Drupal\Core\Validation\ConstraintValidatorFactory;
+use Drupal\Core\Validation\DrupalTranslator;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\PrimitiveTypeConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Error\Error;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 
 /**
  * Tests config validation mechanism.
@@ -19,6 +28,8 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  * @group Config
  */
 class TypedConfigTest extends KernelTestBase {
+
+  use SchemaCheckTrait;
 
   /**
    * {@inheritdoc}
@@ -28,7 +39,12 @@ class TypedConfigTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $configSchemaCheckerExclusions = ['config_test.validation'];
+  protected static $configSchemaCheckerExclusions = [
+    'config_test.validation',
+    // @see ::testPrimitiveDataTypesConsistency()
+    // @see ::testPrimitiveDataTypesConsistencyWhenTrustingData()
+    'config_test.types',
+  ];
 
   /**
    * {@inheritdoc}
@@ -138,6 +154,379 @@ class TypedConfigTest extends KernelTestBase {
     $this->assertCount(1, $result);
     $this->assertSame('string__not_blank', $result->get(0)->getPropertyPath());
     $this->assertEquals($expected_message, $result->get(0)->getMessage());
+  }
+
+  /**
+   * Provides test cases for testing the `type: boolean` primitive type.
+   *
+   * @return \Generator
+   *   Each returned value is an array with at least 4 values, potentially 6, to
+   *   pass into ::assertPrimitiveDataTypesConsistency():
+   *   1. the config key whose value to set
+   *   2. the value to set
+   *   3. the value we expect to be validated
+   *   4. the value we expect to be saved
+   *   5. the expected validation errors
+   *   6. whether we expect a complaint from the ConfigSchemaChecker when saving
+   *      as trusted data (and hence bypassing the magic-cast-during-save logic).
+   */
+  public function providerBooleanDataType(): \Generator {
+    // @see core/modules/config/tests/config_test/config/install/config_test.types.yml
+    $key = 'boolean';
+
+    // No magic: values 2–4 are identical; no validation errors (value 5).
+    yield "$key: NO MAGIC: `true`" => [$key, TRUE, TRUE, TRUE, []];
+    yield "$key: NO MAGIC: `false`" => [$key, FALSE, FALSE, FALSE, []];
+    // Every key can be marked optional: the validator should not complain.
+    yield "$key: NO MAGIC: `null`" => [$key, NULL, NULL, NULL, []];
+
+    // Magic: values 2–4 are not identical.
+    // First: intentional magic — no validation errors triggered.
+    yield "$key: 🪄 `0` → `false`" => [$key, 0, 0, FALSE, [], 'variable type is integer but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData'];
+    yield "$key: 🪄 `1` → `true`" => [$key, 1, 1, TRUE, [], 'variable type is integer but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData'];
+    yield "$key: 🪄 `'1'` → `true`" => [$key, '1', '1', TRUE, [], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData'];
+    yield "$key: 🪄 `'0'` → `false`" => [$key, '0', '0', FALSE, [], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData'];
+    // Second: accidental magic — validation errors are triggered.
+    yield "$key: 🪄 `'test'` → `true`" => [$key, 'test', 'test', TRUE, [$key => 'This value should be of the correct primitive type.'], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData'];
+    yield "$key: 🪄 `'yes'` → `true`" => [$key, 'no', 'no', TRUE, [$key => 'This value should be of the correct primitive type.'], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData'];
+    yield "$key: 🪄 `'no'` → `true` ⚠️" => [$key, 'no', 'no', TRUE, [$key => 'This value should be of the correct primitive type.'], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData'];
+    yield "$key: 🪄 `'false'` → `true` ⚠️" => [$key, 'false', 'false', TRUE, [$key => 'This value should be of the correct primitive type.'], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData'];
+    yield "$key: 🪄 `''` → `false`" => [$key, '', '', FALSE, [$key => 'This value should be of the correct primitive type.'], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData'];
+  }
+
+  /**
+   * Provides test cases for testing the `type: integer` primitive type.
+   *
+   * @return \Generator
+   *   Each returned value is an array with at least 4 values, potentially 6, to
+   *   pass into ::assertPrimitiveDataTypesConsistency():
+   *   1. the config key whose value to set
+   *   2. the value to set
+   *   3. the value we expect to be validated
+   *   4. the value we expect to be saved
+   *   5. the expected validation errors
+   *   6. whether we expect a complaint from the ConfigSchemaChecker when saving
+   *      as trusted data (and hence bypassing the magic-cast-during-save logic).
+   */
+  public function providerIntegerDataType(): \Generator {
+    // @see core/modules/config/tests/config_test/config/install/config_test.types.yml
+    $key = 'int';
+
+    // No magic: array items 2–4 are identical; no validation errors (item 5).
+    yield "$key: NO MAGIC: `0`" => [$key, 0, 0, 0, []];
+    yield "$key: NO MAGIC: `1`" => [$key, 1, 1, 1, []];
+    yield "$key: NO MAGIC: `-1`" => [$key, -1, -1, -1, []];
+    yield "$key: NO MAGIC: `-2147483648`" => [$key, -2147483648, -2147483648, -2147483648, []];
+    // Every key can be marked optional: the validator should not complain.
+    yield "$key: NO MAGIC: `null`" => [$key, NULL, NULL, NULL, []];
+
+    // Magic: array items 2–4 are not identical.
+    // First: intentional magic — no validation errors triggered.
+    yield "$key: 🪄 `'55'` → `55`" => [$key, '55', '55', 55, [], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData'];
+    yield "$key: 🪄 `true` → `1`" => [$key, TRUE, TRUE, 1, [], 'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData'];
+    // Second: accidental magic: validation errors are triggered.
+    yield "$key: 🪄 `''` → `null`" => [$key, '', '', NULL, [$key => 'This value should be of the correct primitive type.'], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData'];
+    yield "$key: 🪄 `'55%'` → `55`" => [$key, '55%', '55%', 55, [$key => 'This value should be of the correct primitive type.'], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData'];
+    yield "$key: 🪄 `false` → `0`" => [$key, FALSE, FALSE, 0, [$key => 'This value should be of the correct primitive type.'], 'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData'];
+  }
+
+  /**
+   * Provides test cases for testing the `type: float` primitive type.
+   *
+   * @return \Generator
+   *   Each returned value is an array with at least 4 values, potentially 6, to
+   *   pass into ::assertPrimitiveDataTypesConsistency():
+   *   1. the config key whose value to set
+   *   2. the value to set
+   *   3. the value we expect to be validated
+   *   4. the value we expect to be saved
+   *   5. the expected validation errors
+   *   6. whether we expect a complaint from the ConfigSchemaChecker when saving
+   *      as trusted data (and hence bypassing the magic-cast-during-save logic).
+   */
+  public function providerFloatDataType(): \Generator {
+    // @see core/modules/config/tests/config_test/config/install/config_test.types.yml
+    $key = 'float';
+
+    // No magic: array items 2–4 are identical; no validation errors (item 5).
+    yield "$key: NO MAGIC: `0.0`" => [$key, 0.0, 0.0, 0.0, []];
+    yield "$key: NO MAGIC: `1.0`" => [$key, 1.0, 1.0, 1.0, []];
+    yield "$key: NO MAGIC: `-1.0`" => [$key, -1.0, -1.0, -1.0, []];
+    yield "$key: NO MAGIC: `3.14159`" => [$key, 3.14159, 3.14159, 3.14159, []];
+    yield "$key: NO MAGIC: `-3.14159`" => [$key, 3.14159, 3.14159, 3.14159, []];
+    // Every key can be marked optional: the validator should not complain.
+    yield "$key: NO MAGIC: `null`" => [$key, NULL, NULL, NULL, []];
+
+    // Reasonable magical conversions: integers can be represented as floats;
+    // array items 2 and 3 are identical, array item 4 is a float.
+    yield "$key: REASONABLE MAGIC: `0`" => [$key, 0, 0, 0.0, []];
+    yield "$key: REASONABLE MAGIC: `1`" => [$key, 1, 1, 1.0, []];
+    yield "$key: REASONABLE MAGIC: `-1`" => [$key, -1, -1, -1.0, []];
+    yield "$key: REASONABLE MAGIC: `-2147483648`" => [$key, -2147483648, -2147483648, -2147483648.0, []];
+
+    // Magic: array items 2–4 are not identical.
+    // First: intentional magic — no validation errors triggered.
+    yield "$key: 🪄 `'3.14159'` → `3.14159`" => [$key, '3.14159', '3.14159', 3.14159, [], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\FloatData'];
+    yield "$key: 🪄 `true` → `1.0`" => [$key, TRUE, TRUE, 1.0, [], 'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\FloatData'];
+    // Second: accidental magic: validation errors are triggered.
+    yield "$key: 🪄 `''` → `null`" => [$key, '', '', NULL, [$key => 'This value should be of the correct primitive type.'], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\FloatData'];
+    yield "$key: 🪄 `'55%'` → `55.0`" => [$key, '55%', '55%', 55.0, [$key => 'This value should be of the correct primitive type.'], 'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\FloatData'];
+    yield "$key: 🪄 `false` → `0`" => [$key, FALSE, FALSE, 0.0, [$key => 'This value should be of the correct primitive type.'], 'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\FloatData'];
+  }
+
+  /**
+   * Provides test cases for testing the `type: string` primitive type.
+   *
+   * @return \Generator
+   *   Each returned value is an array with at least 4 values, potentially 6, to
+   *   pass into ::assertPrimitiveDataTypesConsistency():
+   *   1. the config key whose value to set
+   *   2. the value to set
+   *   3. the value we expect to be validated
+   *   4. the value we expect to be saved
+   *   5. the expected validation errors
+   *   6. whether we expect a complaint from the ConfigSchemaChecker when saving
+   *      as trusted data (and hence bypassing the magic-cast-during-save logic).
+   */
+  public function providerStringDataType(): \Generator {
+    // @see core/modules/config/tests/config_test/config/install/config_test.types.yml
+    $key = 'string';
+
+    // No magic: array items 2–4 are identical.
+    yield "$key: NO MAGIC: `''`" => [$key, '', '', '', []];
+    yield "$key: NO MAGIC: `'55%'`" => [$key, '55%', '55%', '55%', []];
+    // Every key can be marked optional: the validator should not complain.
+    yield "$key: NO MAGIC: `null`" => [$key, NULL, NULL, NULL, []];
+
+    // Magic: array items 2–4 are not identical.
+    // First: intentional magic — no validation errors triggered.
+    // Booleans.
+    yield "$key: 🪄 `true` → `'1'`" => [$key, TRUE, TRUE, '1', [], 'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData'];
+    yield "$key: 🪄 `false` → `''`" => [$key, FALSE, FALSE, '', [], 'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData'];
+    // Integers.
+    yield "$key: 🪄: `0` → `'0'`" => [$key, 0, 0, '0', [], 'variable type is integer but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData'];
+    yield "$key: 🪄: `1` → `'1'`" => [$key, 1, 1, '1', [], 'variable type is integer but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData'];
+    yield "$key: 🪄: `-1` → `'-1'`" => [$key, -1, -1, '-1', [], 'variable type is integer but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData'];
+    yield "$key: 🪄: `-2147483648` -> '-2147483648'" => [$key, -2147483648, -2147483648, '-2147483648', [], 'variable type is integer but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData'];
+    // Floats.
+    yield "$key:🪄: `0.0` → `'0'`" => [$key, 0.0, 0.0, '0', [], 'variable type is double but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData'];
+    yield "$key:🪄: `1.0` → `'1'`" => [$key, 1.0, 1.0, '1', [], 'variable type is double but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData'];
+    yield "$key:🪄: `-1.0` → `'-1'`" => [$key, -1.0, -1.0, '-1', [], 'variable type is double but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData'];
+    yield "$key:🪄: `3.14159` -> '3.14159'" => [$key, 3.14159, 3.14159, '3.14159', [], 'variable type is double but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData'];
+    yield "$key:🪄: `-3.14159` -> '-3.14159'" => [$key, -3.14159, -3.14159, '-3.14159', [], 'variable type is double but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData'];
+    // Second: accidental magic: validation errors are triggered.
+    // None.
+  }
+
+  /**
+   * @dataProvider providerBooleanDataType
+   * @dataProvider providerIntegerDataType
+   * @dataProvider providerFloatDataType
+   * @dataProvider providerStringDataType
+   */
+  public function testPrimitiveDataTypesConsistency(...$arguments): void {
+    // Config schema checker errors cannot happen because the magic-cast-during-
+    // save logic always casts primitives to comply with the type, even if the
+    // original value does not have a sensible casting. Unset the 6th argument,
+    // and instead trigger a deprecation error to keep track of these dangerous
+    // pieces of magic.
+    // @see \Drupal\Core\Config\StorableConfigBase::castValue()
+    if (count($arguments) === 6) {
+      // Warn Drupal core developers explicitly when there is a mismatch between
+      // the validation constraint logic and the magical casting logic.
+      $expects_validation_error = !empty($arguments[4]);
+      $expects_config_schema_checker_error = ($arguments[5] !== NULL);
+      if ($expects_validation_error && $expects_config_schema_checker_error) {
+        // phpcs:disable
+        @trigger_error(sprintf(
+          '⚠️ The `type: %s` config schema type uses magical casting for the %s value `%s` that is inconsistent with the validation logic in %s.',
+          $arguments[0],
+          gettype($arguments[1]),
+          print_r($arguments[1], TRUE),
+          PrimitiveTypeConstraintValidator::class
+        ), E_USER_DEPRECATED);
+        // phpcs:enable
+      }
+      unset($arguments[5]);
+    }
+    $this->assertPrimitiveDataTypesConsistency(FALSE, ...$arguments);
+  }
+
+  /**
+   * @dataProvider providerBooleanDataType
+   * @dataProvider providerIntegerDataType
+   * @dataProvider providerFloatDataType
+   * @dataProvider providerStringDataType
+   * @todo Update this to expect deprecation errors in https://www.drupal.org/project/drupal/issues/3347842
+   */
+  public function testPrimitiveDataTypesConsistencyWhenTrustingData(...$arguments): void {
+    // When trusting data, the provided value is saved without magic. Set the
+    // 5th argument ($expected_saved_value) to the 2nd argument ($value_to_set).
+    $arguments[3] = $arguments[1];
+    $this->assertPrimitiveDataTypesConsistency(TRUE, ...$arguments);
+  }
+
+  /**
+   * Asserts consistency of primitive config data while validating and saving.
+   *
+   * @param bool $trust_data
+   *   Whether to tell Config::save() to trust the config data or not.
+   * @param string $key
+   *   The key to set in the `config_test.types` config object.
+   * @param mixed $value_to_set
+   *   The value to set for the key.
+   * @param mixed $expected_validated_value
+   *   The value expected in PrimitiveTypeConstraintValidator.
+   * @param mixed $expected_saved_value
+   *   The value expected in the saved config object.
+   * @param string[] $expected_validation_errors
+   *   The expected validation errors (empty array if none are expected).
+   * @param string|null $expected_config_schema_checker_error
+   *   (optional) The expected config schema checker error, if any.
+   */
+  public function assertPrimitiveDataTypesConsistency(bool $trust_data, string $key, mixed $value_to_set, mixed $expected_validated_value, mixed $expected_saved_value, array $expected_validation_errors, ?string $expected_config_schema_checker_error = NULL): void {
+    // Ensure no config consistency problem goes unnoticed.
+    // phpcs:disable
+    if ($expected_validated_value !== $value_to_set) {
+      @trigger_error(sprintf('The `type: %s` config schema type uses magical casting when validating.', $key), E_USER_DEPRECATED);
+    }
+    if ($expected_saved_value !== $value_to_set) {
+      @trigger_error(sprintf('The `type: %s` config schema type uses magical casting when saving.', $key), E_USER_DEPRECATED);
+    }
+    // phpcs:enable
+
+    $name = 'config_test.types';
+    $config = $this->config($name);
+
+    // 1. Verify the original config object is valid.
+    $typed_config_manager = $this->container->get('config.typed');
+    $typed_config = $typed_config_manager->get($name);
+    $this->assertSame([], static::violationListToArray(($typed_config->validate())));
+
+    // 2. Set the given value: $value_to_set.
+    $typed_config->set($key, $value_to_set);
+    $this->assertSame($value_to_set, $typed_config->get($key)->getValue());
+
+    // TRICKY: to be able to observe the value passed into
+    // PrimitiveTypeConstraintValidator, the default recursive validator and the
+    // default recursive contextual validator both have to be overridden.
+    $introspectable_recursive_validator = new class(
+      new ExecutionContextFactory(new DrupalTranslator()),
+      new ConstraintValidatorFactory($this->container->get('class_resolver')),
+      $typed_config_manager
+    ) extends RecursiveValidator {
+
+      public ?string $propertyPathToInspect = NULL;
+      public mixed $propertyPathValueDuringValidation;
+
+      /**
+       * {@inheritdoc}
+       */
+      public function startContext($root = NULL): ContextualValidatorInterface {
+        $recursive_contextual_validator = new class(
+          $this->contextFactory->createContext($this, $root),
+          $this,
+          $this->constraintValidatorFactory,
+          $this->typedDataManager
+        ) extends RecursiveContextualValidator {
+          public ?RecursiveValidator $containingRecursiveValidator;
+
+          /**
+           * {@inheritdoc}
+           */
+          protected function validateNode(TypedDataInterface $data, $constraints = NULL, $is_root_call = FALSE) {
+            if ($data->getPropertyPath() === $this->containingRecursiveValidator->propertyPathToInspect) {
+              // @see
+              $this->containingRecursiveValidator->propertyPathValueDuringValidation = $this->typedDataManager->getCanonicalRepresentation($data);
+            }
+            return parent::validateNode($data, $constraints, $is_root_call);
+          }
+
+        };
+        $recursive_contextual_validator->containingRecursiveValidator = $this;
+
+        return $recursive_contextual_validator;
+      }
+
+    };
+    $introspectable_recursive_validator->propertyPathToInspect = "$name.$key";
+
+    // 3. Validate, and assert the expected value is validated, and the expected
+    //    validation errors are present.
+    $typed_config_manager->setValidator($introspectable_recursive_validator);
+    $violations = $typed_config->validate();
+    $this->assertSame($introspectable_recursive_validator->propertyPathValueDuringValidation, $expected_validated_value);
+    $this->assertSame($expected_validation_errors, static::violationListToArray($violations));
+
+    // Transfer the data in $typed_config to the corresponding $config to allow
+    // it to be saved.
+    $developer_provided_data = $typed_config->toArray();
+    $config->setData($developer_provided_data);
+    $this->assertSame($value_to_set, $config->get($key));
+    $config->save($trust_data);
+
+    // 4. Verify the expected value is saved.
+    $this->assertSame($expected_saved_value, $config->get($key));
+
+    // 5 Verify the ConfigSchemaChecker is able to verify post-save.
+    $this->assertSame($expected_config_schema_checker_error === NULL
+      ? TRUE
+      : ["config_test.types:$key" => $expected_config_schema_checker_error],
+      $this->checkConfigSchema($typed_config_manager, $name, $config->get())
+    );
+  }
+
+  /**
+   * Asserts a set of validation errors is raised when the entity is validated.
+   *
+   * @param array<string, string|string[]> $expected_messages
+   *   The expected validation error messages. Keys are property paths, values
+   *   are the expected messages: a string if a single message is expected, an
+   *   array of strings if multiple are expected.
+   * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violation_list
+   *   The actual constraint violation list to compare against.
+   */
+  protected function assertValidationErrorsOLD(array $expected_messages, ConstraintViolationListInterface $violation_list): void {
+    $actual_messages = [];
+    foreach ($violation_list as $violation) {
+      $property_path = $violation->getPropertyPath();
+
+      if (!isset($actual_messages[$property_path])) {
+        $actual_messages[$property_path] = (string) $violation->getMessage();
+      }
+      else {
+        // Transform value from string to array.
+        if (is_string($actual_messages[$property_path])) {
+          $actual_messages[$property_path] = (array) $actual_messages[$violation->getPropertyPath()];
+        }
+        // And append.
+        $actual_messages[$property_path][] = (string) $violation->getMessage();
+      }
+    }
+    ksort($expected_messages);
+    ksort($actual_messages);
+    $this->assertSame($expected_messages, $actual_messages);
+  }
+
+  protected static function violationListToArray(ConstraintViolationListInterface $violation_list): array {
+    $actual_messages = [];
+    foreach ($violation_list as $violation) {
+      $property_path = $violation->getPropertyPath();
+
+      if (!isset($actual_messages[$property_path])) {
+        $actual_messages[$property_path] = (string) $violation->getMessage();
+      }
+      else {
+        // Transform value from string to array.
+        if (is_string($actual_messages[$property_path])) {
+          $actual_messages[$property_path] = (array) $actual_messages[$violation->getPropertyPath()];
+        }
+        // And append.
+        $actual_messages[$property_path][] = (string) $violation->getMessage();
+      }
+    }
+    ksort($actual_messages);
+    return $actual_messages;
   }
 
   /**

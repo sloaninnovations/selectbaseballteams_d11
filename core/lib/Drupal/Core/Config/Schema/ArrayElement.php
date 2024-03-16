@@ -167,6 +167,8 @@ abstract class ArrayElement extends Element implements \IteratorAggregate, Typed
    */
   public function set($property_name, $value, $notify = TRUE) {
     $this->value[$property_name] = $value;
+    // Changing the value requires re-parsing.
+    unset($this->elements);
     // Config schema elements do not make use of notifications. Thus, we skip
     // notifying parents.
     return $this;
