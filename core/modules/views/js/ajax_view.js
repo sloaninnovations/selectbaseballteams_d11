@@ -68,7 +68,7 @@
         /_/g,
         '-',
       )}-${settings.view_display_id.replace(/_/g, '-')}`,
-    )
+    );
 
     // Retrieve the path to use for views' ajax.
     let ajaxPath = drupalSettings.views.ajax_path;
@@ -88,10 +88,15 @@
         .replace(/q=[^&]+&?|&?render=[^&]+/, '');
 
       // Remove current exposed filters.
-      const params = decodeURI(queryString).split('&').filter(param => {
-        let [name, value] = param.split('=');
-        return this.$exposed_form.find(`input[name="${name}"]`).length === 0 && name !== 'page';
-      });
+      const params = decodeURI(queryString)
+        .split('&')
+        .filter((param) => {
+          const [name, value] = param.split('=');
+          return (
+            this.$exposed_form.find(`input[name="${name}"]`).length === 0 &&
+            name !== 'page'
+          );
+        });
       queryString = encodeURI(params.join('&'));
 
       // If there is a '?' in ajaxPath, clean URL are on and & should be
