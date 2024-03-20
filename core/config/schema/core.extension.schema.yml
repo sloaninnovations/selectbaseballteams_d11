@@ -1,18 +1,24 @@
 core.extension:
   type: config_object
   label: 'Extension settings'
+  constraints:
+    FullyValidatable: ~
   mapping:
     module:
       type: sequence
       label: 'Enabled modules'
+      # @todo Figure out a way to allow validating the SEQUENCE KEYS, ideally this would allow reusing the `ExtensionName: []` and `ExtensionExists: module`
+      constraints: {}
       sequence:
-        type: integer
+        type: weight
         label: 'Weight'
     theme:
       type: sequence
       label: 'Installed themes'
+      # @todo Figure out a way to allow validating the SEQUENCE KEYS, ideally this would allow reusing the `ExtensionName: []` and `ExtensionExists: theme`
+      constraints: {}
       sequence:
-        type: integer
+        type: weight
         label: 'Weight'
     profile:
       type: string
@@ -23,3 +29,7 @@ core.extension:
       # will be removed.
       requiredKey: false
       label: 'Install profile'
+      constraints:
+        NotBlank: []
+        ExtensionName: []
+        ExtensionExists: profile
