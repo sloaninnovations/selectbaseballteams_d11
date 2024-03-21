@@ -7,16 +7,24 @@ core.extension:
     module:
       type: sequence
       label: 'Enabled modules'
-      # @todo Figure out a way to allow validating the SEQUENCE KEYS, ideally this would allow reusing the `ExtensionName: []` and `ExtensionExists: module`
-      constraints: {}
+      constraints:
+        SequenceKeys:
+          constraints:
+            NotBlank: []
+            ExtensionName: []
+            ExtensionExists: module
       sequence:
         type: weight
         label: 'Weight'
     theme:
       type: sequence
       label: 'Installed themes'
-      # @todo Figure out a way to allow validating the SEQUENCE KEYS, ideally this would allow reusing the `ExtensionName: []` and `ExtensionExists: theme`
-      constraints: {}
+      constraints:
+        SequenceKeys:
+          constraints:
+            NotBlank: []
+            ExtensionName: []
+            ExtensionExists: theme
       sequence:
         type: weight
         label: 'Weight'
