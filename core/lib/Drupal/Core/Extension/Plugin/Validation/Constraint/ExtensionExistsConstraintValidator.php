@@ -6,6 +6,7 @@ namespace Drupal\Core\Extension\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
@@ -37,8 +38,14 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
    *   The module handler service.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler service.
+   * @param \Drupal\Core\Extension\ProfileExtensionList $profileExtensionList
+   *   The profile extension list.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler) {
+  public function __construct(
+    ModuleHandlerInterface $module_handler,
+    ThemeHandlerInterface $theme_handler,
+    protected readonly ProfileExtensionList $profileExtensionList
+  ) {
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;
   }
@@ -49,7 +56,8 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('module_handler'),
-      $container->get('theme_handler')
+      $container->get('theme_handler'),
+      $container->get(ProfileExtensionList::class)
     );
   }
 
@@ -82,6 +90,16 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
           return;
         }
         if (!$this->themeHandler->themeExists($extension_name)) {
+          $this->context->addViolation($constraint->themeMessage, $variables);
+        }
+        break;
+
+      case 'profile':
+        // This constraint may be used to validate nullable (optional) values.
+        if ($extension_name === NULL) {
+          return;
+        }
+        if (!$this->profileExtensionList->exists($extension_name)) {
           $this->context->addViolation($constraint->themeMessage, $variables);
         }
         break;
