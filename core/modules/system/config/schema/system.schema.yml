@@ -334,9 +334,10 @@ system.file:
       label: 'Default download method'
       constraints:
         Choice:
-          - public
-          - private
-          - temporary
+          choices:
+            - 'public'
+            - 'private'
+            - 'temporary'
     path:
       type: mapping
       label: 'Path settings'
