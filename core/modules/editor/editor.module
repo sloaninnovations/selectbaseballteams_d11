@@ -207,6 +207,151 @@ function editor_filter_xss($html, ?FilterFormatInterface $format = NULL, ?Filter
 }
 
 /**
+ * Implements hook_entity_insert().
+ */
+function editor_entity_insert(EntityInterface $entity) {
+  // Only act on content entities.
+  if (!($entity instanceof FieldableEntityInterface)) {
+    return;
+  }
+  $referenced_files_by_field = _editor_get_file_uuids_by_field($entity);
+  foreach ($referenced_files_by_field as $uuids) {
+    _editor_record_file_usage($uuids, $entity);
+  }
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function editor_entity_update(EntityInterface $entity) {
+  // Only act on content entities.
+  if (!($entity instanceof FieldableEntityInterface)) {
+    return;
+  }
+
+  // On new revisions, all files are considered to be a new usage and no
+  // deletion of previous file usages are necessary.
+  if (!empty($entity->original) && $entity->getRevisionId() != $entity->original->getRevisionId()) {
+    $referenced_files_by_field = _editor_get_file_uuids_by_field($entity);
+    foreach ($referenced_files_by_field as $uuids) {
+      _editor_record_file_usage($uuids, $entity);
+    }
+  }
+  // On modified revisions, detect which file references have been added (and
+  // record their usage) and which ones have been removed (delete their usage).
+  // File references that existed both in the previous version of the revision
+  // and in the new one don't need their usage to be updated.
+  else {
+    $original_uuids_by_field = empty($entity->original) ? [] :
+      _editor_get_file_uuids_by_field($entity->original);
+
+    $uuids_by_field = _editor_get_file_uuids_by_field($entity);
+
+    // Detect file usages that should be incremented.
+    foreach ($uuids_by_field as $field => $uuids) {
+      $original_uuids = $original_uuids_by_field[$field] ?? [];
+
+      if ($added_files = array_diff($uuids_by_field[$field], $original_uuids)) {
+        _editor_record_file_usage($added_files, $entity);
+      }
+    }
+
+    // Detect file usages that should be decremented.
+    foreach ($original_uuids_by_field as $field => $uuids) {
+      $removed_files = array_diff($original_uuids_by_field[$field], $uuids_by_field[$field]);
+      _editor_delete_file_usage($removed_files, $entity, 1);
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function editor_entity_delete(EntityInterface $entity) {
+  // Only act on content entities.
+  if (!($entity instanceof FieldableEntityInterface)) {
+    return;
+  }
+  // Before delete entity usage, delete its translation usage.
+  if (count($entity->getTranslationLanguages()) > 1) {
+    $languages = $entity->getTranslationLanguages();
+    $default_langcode = $entity->language()->getId();
+    foreach ($languages as $langcode => $languages) {
+      if ($langcode != $default_langcode) {
+        $translation = $entity->getTranslation($langcode);
+        $reference_revisions_entities = _editor_get_entity_reference_revisions($translation);
+        foreach ($reference_revisions_entities as $reference_revisions_entity) {
+          if ($reference_revisions_entity instanceof EntityInterface) {
+            $referenced_files_by_field = _editor_get_file_uuids_by_field($reference_revisions_entity);
+            foreach ($referenced_files_by_field as $uuids) {
+              _editor_delete_file_usage($uuids, $reference_revisions_entity, 0);
+            }
+          }
+        }
+        if ($translation instanceof EntityInterface) {
+          $referenced_files_by_field = _editor_get_file_uuids_by_field($translation);
+          foreach ($referenced_files_by_field as $uuids) {
+            _editor_delete_file_usage($uuids, $translation, 0);
+          }
+        }
+      }
+    }
+  }
+  $reference_revisions_entities = _editor_get_entity_reference_revisions($entity);
+  foreach ($reference_revisions_entities as $reference_revisions_entity) {
+    if ($reference_revisions_entity instanceof EntityInterface) {
+      $referenced_files_by_field = _editor_get_file_uuids_by_field($reference_revisions_entity);
+      foreach ($referenced_files_by_field as $uuids) {
+        _editor_delete_file_usage($uuids, $reference_revisions_entity, 0);
+      }
+    }
+  }
+  $referenced_files_by_field = _editor_get_file_uuids_by_field($entity);
+  foreach ($referenced_files_by_field as $uuids) {
+    _editor_delete_file_usage($uuids, $entity, 0);
+  }
+}
+
+/**
+ * Implements hook_entity_translation_delete().
+ */
+function editor_entity_translation_delete(EntityInterface $translation) {
+  // Only act on content entities.
+  if (!($translation instanceof FieldableEntityInterface)) {
+    return;
+  }
+  $reference_revisions_entities = _editor_get_entity_reference_revisions($translation);
+  foreach ($reference_revisions_entities as $reference_revisions_entity) {
+    if ($reference_revisions_entity instanceof EntityInterface) {
+      $referenced_files_by_field = _editor_get_file_uuids_by_field($reference_revisions_entity);
+      foreach ($referenced_files_by_field as $uuids) {
+        _editor_delete_file_usage($uuids, $reference_revisions_entity, 0);
+      }
+    }
+  }
+
+  // Delete entity usage for the current entity.
+  $referenced_files_by_field = _editor_get_file_uuids_by_field($entity);
+  foreach ($referenced_files_by_field as $uuids) {
+    _editor_delete_file_usage($uuids, $entity, 0);
+  }
+}
+
+/**
+ * Implements hook_entity_revision_delete().
+ */
+function editor_entity_revision_delete(EntityInterface $entity) {
+  // Only act on content entities.
+  if (!($entity instanceof FieldableEntityInterface)) {
+    return;
+  }
+  $referenced_files_by_field = _editor_get_file_uuids_by_field($entity);
+  foreach ($referenced_files_by_field as $uuids) {
+    _editor_delete_file_usage($uuids, $entity, 1);
+  }
+}
+
+/**
  * Records file usage of files referenced by formatted text fields.
  *
  * Every referenced file that is temporally saved will be resaved as permanent.
@@ -245,6 +390,11 @@ function _editor_record_file_usage(array $uuids, EntityInterface $entity) {
 function _editor_delete_file_usage(array $uuids, EntityInterface $entity, $count) {
   foreach ($uuids as $uuid) {
     if ($file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid)) {
+      if (empty(\Drupal::service('file.usage')->listUsage($file))) {
+        // Set File Temporary.
+        $file->setTemporary();
+        $file->save();
+      }
       \Drupal::service('file.usage')->delete($file, 'editor', $entity->getEntityTypeId(), $entity->id(), $count);
     }
   }
@@ -303,6 +453,32 @@ function _editor_get_formatted_text_fields(FieldableEntityInterface $entity) {
     $plugin_class = $field_type_manager->getPluginClass($type);
     return is_subclass_of($plugin_class, TextItemBase::class);
   }));
+}
+
+/**
+ * Get the entity reference revisions fields on an entity.
+ *
+ * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+ *   An entity whose fields to analyze.
+ *
+ * @return array
+ *   The names of the fields on this entity that entity reference revisions.
+ */
+function _editor_get_entity_reference_revisions(FieldableEntityInterface $entity, &$result = []) {
+  $field_definitions = $entity->getFieldDefinitions();
+  if (empty($field_definitions)) {
+    return $result;
+  }
+  foreach ($field_definitions as $field => $field_definition) {
+    if ($field_definition->getType() == 'entity_reference_revisions') {
+      $entity_reference_revisions = $entity->get($field)->entity;
+      $result[] = $entity_reference_revisions;
+      if ($entity_reference_revisions instanceof FieldableEntityInterface) {
+        _editor_get_entity_reference_revisions($entity_reference_revisions, $result);
+      }
+    }
+  }
+  return $result;
 }
 
 /**
