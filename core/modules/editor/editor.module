@@ -331,9 +331,9 @@ function editor_entity_translation_delete(EntityInterface $translation) {
   }
 
   // Delete entity usage for the current entity.
-  $referenced_files_by_field = _editor_get_file_uuids_by_field($entity);
+  $referenced_files_by_field = _editor_get_file_uuids_by_field($translation);
   foreach ($referenced_files_by_field as $uuids) {
-    _editor_delete_file_usage($uuids, $entity, 0);
+    _editor_delete_file_usage($uuids, $translation, 0);
   }
 }
 
