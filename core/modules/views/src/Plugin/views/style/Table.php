@@ -336,9 +336,9 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
         '#default_value' => !empty($this->options['info'][$field]['align']) ? $this->options['info'][$field]['align'] : '',
         '#options' => [
           '' => $this->t('None'),
-          'views-align-left' => $this->t('Left', [], ['context' => 'Text alignment']),
-          'views-align-center' => $this->t('Center', [], ['context' => 'Text alignment']),
-          'views-align-right' => $this->t('Right', [], ['context' => 'Text alignment']),
+          'text-align-left' => $this->t('Left', [], ['context' => 'Text alignment']),
+          'text-align-center' => $this->t('Center', [], ['context' => 'Text alignment']),
+          'text-align-right' => $this->t('Right', [], ['context' => 'Text alignment']),
         ],
         '#states' => [
           'visible' => [

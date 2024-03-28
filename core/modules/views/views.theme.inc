@@ -504,11 +504,9 @@ function template_preprocess_views_view_table(&$variables) {
         $variables['header'][$field]['attributes']->addClass($options['info'][$field]['responsive']);
         $responsive = TRUE;
       }
-      // Add a CSS align class to each field if one was set. The classes are
-      // stored as views-align-left etc. but we want to use system/base generic
-      // text-align-left.
+      // Add a CSS align class to each field if one was set.
       if (!empty($options['info'][$field]['align'])) {
-        $variables['header'][$field]['attributes']->addClass(Html::cleanCssIdentifier(str_replace('views-', 'text-', $options['info'][$field]['align'])));
+        $variables['header'][$field]['attributes']->addClass(Html::cleanCssIdentifier($options['info'][$field]['align']));
       }
       // Add a header label wrapper if one was selected.
       if ($variables['header'][$field]['content']) {
