@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function jsonapi_test_entity_query_alter_query_entity_query_alter(Drupal\Core\Database\Query\AlterableInterface $query) {
+  $request = Drupal::request();
+  $renderer = \Drupal::service('renderer');
+  if ($request->isMethodCacheable() && $renderer->hasRenderContext()) {
+    $build = ['#cache' => ['contexts' => ['url.query_args:custom_nid']]];
+    $renderer->render($build);
+  }
+
+  $resource_type = \Drupal::routeMatch()->getParameter('resource_type');
+  $custom_nid = $request->get('custom_nid');
+  if ($custom_nid && $resource_type && $resource_type instanceof \Drupal\jsonapi\ResourceType\ResourceType) {
+    if ($resource_type->getEntityTypeId() == 'node') {
+      $query->condition('base_table.nid', $custom_nid);
+    }
+  }
+}
