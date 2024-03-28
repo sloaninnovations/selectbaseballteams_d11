@@ -3,7 +3,6 @@
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\Core\Url;
 use Drupal\jsonapi\Query\OffsetPage;
 use Drupal\node\Entity\Node;
 
@@ -18,9 +17,9 @@ use Drupal\node\Entity\Node;
 class JsonApiFunctionalEntityQueryAlterTest extends JsonApiFunctionalTestBase {
 
   /**
-   * {@inheritdoc}
+   * @var string[]
    */
-  public static $modules = [
+  protected static $modules = [
     'jsonapi_test_entity_query_alter',
     'page_cache',
   ];
@@ -40,7 +39,7 @@ class JsonApiFunctionalEntityQueryAlterTest extends JsonApiFunctionalTestBase {
     $this->assertEquals(2, count($collection_output['data']));
 
     $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
-      'query' =>  [
+      'query' => [
         'sort' => 'drupal_internal__nid',
         'custom_nid' => 1
       ],
@@ -50,7 +49,7 @@ class JsonApiFunctionalEntityQueryAlterTest extends JsonApiFunctionalTestBase {
     $this->assertEquals(1, $collection_output['data'][0]['attributes']['drupal_internal__nid']);
 
     $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
-      'query' =>  [
+      'query' => [
         'sort' => 'drupal_internal__nid',
         'custom_nid' => 2
       ],
