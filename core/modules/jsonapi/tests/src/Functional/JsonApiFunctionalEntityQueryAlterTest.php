@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\jsonapi\Query\OffsetPage;
-use Drupal\node\Entity\Node;
 
 /**
  * General functional test class.
@@ -41,7 +41,7 @@ class JsonApiFunctionalEntityQueryAlterTest extends JsonApiFunctionalTestBase {
     $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
       'query' => [
         'sort' => 'drupal_internal__nid',
-        'custom_nid' => 1
+        'custom_nid' => 1,
       ],
     ]));
     $this->assertSession()->statusCodeEquals(200);
@@ -51,7 +51,7 @@ class JsonApiFunctionalEntityQueryAlterTest extends JsonApiFunctionalTestBase {
     $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
       'query' => [
         'sort' => 'drupal_internal__nid',
-        'custom_nid' => 2
+        'custom_nid' => 2,
       ],
     ]));
     $this->assertSession()->statusCodeEquals(200);
@@ -59,4 +59,5 @@ class JsonApiFunctionalEntityQueryAlterTest extends JsonApiFunctionalTestBase {
     $this->assertEquals(2, $collection_output['data'][0]['attributes']['drupal_internal__nid']);
 
   }
+
 }
