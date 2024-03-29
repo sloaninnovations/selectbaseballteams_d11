@@ -5,6 +5,8 @@
  * Functions to support theming in the Stable9 theme.
  */
 
+use Drupal\Component\Utility\Html;
+
 /**
  * Implements hook_preprocess_item_list__search_results().
  *
@@ -43,9 +45,10 @@ function stable9_preprocess_views_view(&$variables) {
  *   - view: A ViewExecutable object.
  *   - rows: The raw row data.
  */
-function template_preprocess_views_view_table(&$variables) {
+function stable9_preprocess_views_view_table(&$variables) {
   $view = $variables['view'];
   $options = $view->style_plugin->options;
+  $handler = $view->style_plugin;
 
   $fields = &$view->field;
   $columns = $handler->sanitizeColumns($options['columns'], $fields);

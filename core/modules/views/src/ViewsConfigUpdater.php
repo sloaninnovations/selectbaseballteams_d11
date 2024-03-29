@@ -194,7 +194,7 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
     $return = FALSE;
     foreach ($displays as $display_id => $display) {
       if ($display['display_plugin'] === 'table') {
-        foreach ($display['display_options']['fields'] as $field_name =>$field) {
+        foreach ($display['display_options']['fields'] as $field) {
           if (isset($field['align'])) {
             $displays[$display_id]['display_options']['fields']['align'] = str_replace('views-', 'text-', $field['align']);
             $return = TRUE;
