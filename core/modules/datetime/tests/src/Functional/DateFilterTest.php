@@ -87,14 +87,18 @@ class DateFilterTest extends ViewTestBase {
     $this->drupalGet('test_exposed_filter_datetime');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->optionExists('edit-field-date-value-op', '=');
+    $this->assertSession()->optionExists('edit-field-date-value-op', '!=');
     $this->assertSession()->optionNotExists('edit-field-date-value-op', '>');
     $this->assertSession()->optionNotExists('edit-field-date-value-op', '>=');
 
     // Because there are not operators that use the min and max fields, those
     // fields should not be in the exposed form.
-    $this->assertSession()->fieldExists('edit-field-date-value-value');
-    $this->assertSession()->fieldNotExists('edit-field-date-value-min');
-    $this->assertSession()->fieldNotExists('edit-field-date-value-max');
+    $this->assertSession()->fieldExists('edit-field-date-value-value-date');
+    $this->assertSession()->fieldExists('edit-field-date-value-value-time');
+    $this->assertSession()->fieldNotExists('edit-field-date-value-min-date');
+    $this->assertSession()->fieldNotExists('edit-field-date-value-min-time');
+    $this->assertSession()->fieldNotExists('edit-field-date-value-max-date');
+    $this->assertSession()->fieldNotExists('edit-field-date-value-max-time');
 
     $edit = [];
     $edit['options[operator]'] = '>';
@@ -112,9 +116,12 @@ class DateFilterTest extends ViewTestBase {
     $this->assertSession()->optionExists('edit-field-date-value-op', '>');
     $this->assertSession()->optionExists('edit-field-date-value-op', '>=');
 
-    $this->assertSession()->fieldExists('edit-field-date-value-value');
-    $this->assertSession()->fieldExists('edit-field-date-value-min');
-    $this->assertSession()->fieldExists('edit-field-date-value-max');
+    $this->assertSession()->fieldExists('edit-field-date-value-value-date');
+    $this->assertSession()->fieldExists('edit-field-date-value-value-time');
+    $this->assertSession()->fieldExists('edit-field-date-value-min-date');
+    $this->assertSession()->fieldExists('edit-field-date-value-min-time');
+    $this->assertSession()->fieldExists('edit-field-date-value-max-date');
+    $this->assertSession()->fieldExists('edit-field-date-value-max-time');
 
     // Set the default to an excluded operator.
     $edit = [];
