@@ -60,6 +60,7 @@ function stable9_preprocess_views_view_table(&$variables) {
     if ($field == $column && empty($fields[$field]->options['exclude'])) {
       // Add a CSS align class to each field if one was set.
       if (!empty($options['info'][$field]['align'])) {
+        // Adding views-align for backward compatibility.
         $variables['header'][$field]['attributes']->addClass('views-align-' . Html::cleanCssIdentifier($options['info'][$field]['align']));
       }
     }
