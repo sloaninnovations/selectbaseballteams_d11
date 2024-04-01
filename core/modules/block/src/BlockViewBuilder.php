@@ -75,6 +75,9 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
         $build[$entity_id] += [
           '#lazy_builder' => [static::class . '::lazyBuilder', [$entity_id, $view_mode, $langcode]],
         ];
+        if ($plugin->getBaseId() === 'block_content') {
+          $build[$entity_id]['#create_placeholder'] = TRUE;
+        }
       }
     }
 
