@@ -231,3 +231,11 @@ function field_test_entity_reference_selection_alter(array &$definitions): void 
     unset($definitions['broken']);
   }
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter() for the registration form.
+ */
+function field_test_form_user_form_alter(&$form, FormStateInterface $form_state) {
+  $form['account']['pass']['#attributes']['class'][] = 'test-password-class';
+  $form['account']['pass']['#pass2_attributes']['class'][] = 'test-password-confirm-class';
+}
