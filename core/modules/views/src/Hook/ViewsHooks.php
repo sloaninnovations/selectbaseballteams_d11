@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Hook;
 
+use Drupal\block\BlockPluginInterface;
 use Drupal\views\ViewsConfigUpdater;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\Plugin\Derivative\ViewsLocalTask;
@@ -372,6 +373,16 @@ class ViewsHooks {
     /** @var \Drupal\views\ViewsConfigUpdater $config_updater */
     $config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
     $config_updater->updateAll($view);
+  }
+
+  /**
+   * Implements hook_block_build_BASE_BLOCK_ID_alter().
+   */
+  #[Hook('block_build_views_block_alter')]
+  public function blockBuildViewsBlockAlter(array &$build, BlockPluginInterface $block): void {
+    // Always create placeholders for views blocks so that they are rendered and
+    // cached in isolation from the rest of the page content.
+    $build['#create_placeholder'] = TRUE;
   }
 
 }

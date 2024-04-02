@@ -3,6 +3,7 @@
 namespace Drupal\block_content\Hook;
 
 use Drupal\block\BlockInterface;
+use Drupal\block\BlockPluginInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\block_content\BlockContentInterface;
 use Drupal\Core\Database\Query\SelectInterface;
@@ -154,6 +155,16 @@ class BlockContentHooks {
       }
     }
     return $operations;
+  }
+
+  /**
+   * Implements hook_block_build_BASE_BLOCK_ID_alter().
+   */
+  #[Hook('block_build_block_content_alter']
+  public function blockBuildBlockContentAlter(array &$build, BlockPluginInterface $block): void {
+    // Always create placeholders for content blocks so that they are rendered
+    // and cached in isolation from the rest of the page content.
+    $build['#create_placeholder'] = TRUE;
   }
 
 }
