@@ -12,6 +12,7 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
  */
 #[MigrateSource(
   id: 'sql_count_cache',
+  source_module: 'migrate',
 )]
 class SqlCountCache extends SqlBase {
 

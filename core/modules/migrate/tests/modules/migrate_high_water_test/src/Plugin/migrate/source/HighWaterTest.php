@@ -12,6 +12,7 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
  */
 #[MigrateSource(
   id: 'high_water_test',
+  source_module: 'migrate',
 )]
 class HighWaterTest extends SqlBase {
 

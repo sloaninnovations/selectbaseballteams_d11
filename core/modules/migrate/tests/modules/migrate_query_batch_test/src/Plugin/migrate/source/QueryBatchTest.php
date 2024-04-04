@@ -12,6 +12,7 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
  */
 #[MigrateSource(
   id: 'query_batch_test',
+  source_module: 'migrate',
 )]
 class QueryBatchTest extends SqlBase {
 

@@ -12,6 +12,7 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
  */
 #[MigrateSource(
   id: 'track_changes_test',
+  source_module: 'migrate',
 )]
 class TrackChangesTest extends SqlBase {
 
