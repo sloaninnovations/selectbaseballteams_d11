@@ -626,9 +626,6 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
     if (!empty($this->configuration['source_module'])) {
       return $this->configuration['source_module'];
     }
-    elseif (!empty($this->pluginDefinition['source_module'])) {
-      return $this->pluginDefinition['source_module'];
-    }
     return NULL;
   }
 

@@ -96,11 +96,11 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
     // enforcement.
     $applied_tags = array_intersect($this->getEnforcedSourceModuleTags(), $definition['migration_tags']);
     if ($applied_tags) {
-      // Throw an exception if the source plugin definition does not define a
-      // source_module.
+      // Throw an exception if the source plugin has migrate_drupal as a
+      // provider but does not define a source_module.
       $source_id = $definition['source']['plugin'];
       $source_definition = $this->sourceManager->getDefinition($source_id);
-      if (empty($source_definition['source_module'])) {
+      if (in_array('migrate_drupal', $source_definition['provider'], TRUE) && empty($source_definition['source_module'])) {
         throw new BadPluginDefinitionException($source_id, 'source_module');
       }
     }

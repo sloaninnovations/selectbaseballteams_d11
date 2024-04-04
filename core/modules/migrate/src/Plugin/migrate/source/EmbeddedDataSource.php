@@ -42,8 +42,7 @@ use Drupal\migrate\Plugin\MigrationInterface;
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
  *
  * @MigrateSource(
- *   id = "embedded_data",
- *   source_module = "migrate"
+ *   id = "embedded_data"
  * )
  */
 class EmbeddedDataSource extends SourcePluginBase {
