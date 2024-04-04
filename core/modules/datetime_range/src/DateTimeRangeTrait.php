@@ -18,7 +18,7 @@ trait DateTimeRangeTrait {
    */
   protected static function dateTimeRangeDefaultSettings(): array {
     return [
-      'from_to' => DateTimeRangeDisplayOptions::BOTH->value,
+      'from_to' => DateTimeRangeDisplayOptions::Both->value,
       'separator' => '-',
     ];
   }
@@ -81,7 +81,7 @@ trait DateTimeRangeTrait {
       '#default_value' => $this->getSetting('separator'),
       '#states' => [
         'visible' => [
-          'select[name="fields[' . $field_name . '][settings_edit_form][settings][from_to]"]' => ['value' => DateTimeRangeDisplayOptions::BOTH->value],
+          'select[name="fields[' . $field_name . '][settings_edit_form][settings][from_to]"]' => ['value' => DateTimeRangeDisplayOptions::Both->value],
         ],
       ],
     ];
@@ -104,7 +104,7 @@ trait DateTimeRangeTrait {
       }
     }
 
-    if (($separator = $this->getSetting('separator')) && $this->getSetting('from_to') === DateTimeRangeDisplayOptions::BOTH->value) {
+    if (($separator = $this->getSetting('separator')) && $this->getSetting('from_to') === DateTimeRangeDisplayOptions::Both->value) {
       $summary[] = $this->t('Separator: %separator', ['%separator' => $separator]);
     }
 
@@ -119,9 +119,9 @@ trait DateTimeRangeTrait {
    */
   protected function getFromToOptions(): array {
     return [
-      DateTimeRangeDisplayOptions::BOTH->value => $this->t('Display both start and end dates'),
-      DateTimeRangeDisplayOptions::START_DATE->value => $this->t('Display start date only'),
-      DateTimeRangeDisplayOptions::END_DATE->value => $this->t('Display end date only'),
+      DateTimeRangeDisplayOptions::Both->value => $this->t('Display both start and end dates'),
+      DateTimeRangeDisplayOptions::StartDate->value => $this->t('Display start date only'),
+      DateTimeRangeDisplayOptions::EndDate->value => $this->t('Display end date only'),
     ];
   }
 
@@ -133,8 +133,8 @@ trait DateTimeRangeTrait {
    */
   protected function startDateIsDisplayed(): bool {
     switch ($this->getSetting('from_to')) {
-      case DateTimeRangeDisplayOptions::BOTH->value:
-      case DateTimeRangeDisplayOptions::START_DATE->value:
+      case DateTimeRangeDisplayOptions::Both->value:
+      case DateTimeRangeDisplayOptions::StartDate->value:
         return TRUE;
     }
 
@@ -149,8 +149,8 @@ trait DateTimeRangeTrait {
    */
   protected function endDateIsDisplayed(): bool {
     switch ($this->getSetting('from_to')) {
-      case DateTimeRangeDisplayOptions::BOTH->value:
-      case DateTimeRangeDisplayOptions::END_DATE->value:
+      case DateTimeRangeDisplayOptions::Both->value:
+      case DateTimeRangeDisplayOptions::EndDate->value:
         return TRUE;
     }
 
@@ -173,13 +173,13 @@ trait DateTimeRangeTrait {
   protected function renderStartEnd(DrupalDateTime $start_date, string $separator, DrupalDateTime $end_date): array {
     $element = [];
     if ($this->startDateIsDisplayed()) {
-      $element[DateTimeRangeDisplayOptions::START_DATE->value] = $this->buildDate($start_date);
+      $element[DateTimeRangeDisplayOptions::StartDate->value] = $this->buildDate($start_date);
     }
     if ($this->startDateIsDisplayed() && $this->endDateIsDisplayed()) {
       $element['separator'] = ['#plain_text' => ' ' . $separator . ' '];
     }
     if ($this->endDateIsDisplayed()) {
-      $element[DateTimeRangeDisplayOptions::END_DATE->value] = $this->buildDate($end_date);
+      $element[DateTimeRangeDisplayOptions::EndDate->value] = $this->buildDate($end_date);
     }
     return $element;
   }
@@ -200,13 +200,13 @@ trait DateTimeRangeTrait {
   protected function renderStartEndWithIsoAttribute(DrupalDateTime $start_date, string $separator, DrupalDateTime $end_date): array {
     $element = [];
     if ($this->startDateIsDisplayed()) {
-      $element[DateTimeRangeDisplayOptions::START_DATE->value] = $this->buildDateWithIsoAttribute($start_date);
+      $element[DateTimeRangeDisplayOptions::StartDate->value] = $this->buildDateWithIsoAttribute($start_date);
     }
     if ($this->startDateIsDisplayed() && $this->endDateIsDisplayed()) {
       $element['separator'] = ['#plain_text' => ' ' . $separator . ' '];
     }
     if ($this->endDateIsDisplayed()) {
-      $element[DateTimeRangeDisplayOptions::END_DATE->value] = $this->buildDateWithIsoAttribute($end_date);
+      $element[DateTimeRangeDisplayOptions::EndDate->value] = $this->buildDateWithIsoAttribute($end_date);
     }
     return $element;
   }

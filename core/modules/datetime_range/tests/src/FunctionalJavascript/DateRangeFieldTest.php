@@ -84,13 +84,13 @@ class DateRangeFieldTest extends WebDriverTestBase {
 
     // Assert that date separator field is visible if 'from_to' is set to
     // BOTH.
-    $this->assertSession()->fieldValueEquals($from_to_locator, DateTimeRangeDisplayOptions::BOTH->value);
+    $this->assertSession()->fieldValueEquals($from_to_locator, DateTimeRangeDisplayOptions::Both->value);
     $this->assertTrue($separator->isVisible());
     // Assert that the date separator is not visible if 'from_to' is set to
     // START_DATE or END_DATE.
-    $page->selectFieldOption($from_to_locator, DateTimeRangeDisplayOptions::START_DATE->value);
+    $page->selectFieldOption($from_to_locator, DateTimeRangeDisplayOptions::StartDate->value);
     $this->assertFalse($separator->isVisible());
-    $page->selectFieldOption($from_to_locator, DateTimeRangeDisplayOptions::END_DATE->value);
+    $page->selectFieldOption($from_to_locator, DateTimeRangeDisplayOptions::EndDate->value);
     $this->assertFalse($separator->isVisible());
   }
 

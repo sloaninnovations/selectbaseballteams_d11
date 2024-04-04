@@ -10,8 +10,8 @@ enum DateTimeRangeDisplayOptions: string {
   /**
    * Values for the 'from_to' formatter setting.
    */
-  case BOTH = 'both';
-  case START_DATE = 'start_date';
-  case END_DATE = 'end_date';
+  case Both = 'both';
+  case StartDate = 'start_date';
+  case EndDate = 'end_date';
 
 }

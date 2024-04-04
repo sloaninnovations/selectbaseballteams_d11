@@ -40,7 +40,7 @@ class DateRangeFieldTest extends DateTestBase {
   protected $defaultSettings = [
     'timezone_override' => '',
     'separator' => '-',
-    'from_to' => DateTimeRangeDisplayOptions::BOTH->value,
+    'from_to' => DateTimeRangeDisplayOptions::Both->value,
   ];
 
   /**
@@ -1502,44 +1502,44 @@ class DateRangeFieldTest extends DateTestBase {
     $datetime_types = [
       DateRangeItem::DATETIME_TYPE_DATE => [
         'daterange_default' => [
-          DateTimeRangeDisplayOptions::START_DATE->value => '31 Dec 2012',
-          DateTimeRangeDisplayOptions::END_DATE->value => '6 Jun 2013',
+          DateTimeRangeDisplayOptions::StartDate->value => '31 Dec 2012',
+          DateTimeRangeDisplayOptions::EndDate->value => '6 Jun 2013',
         ],
         'daterange_plain' => [
-          DateTimeRangeDisplayOptions::START_DATE->value => '2012-12-31',
-          DateTimeRangeDisplayOptions::END_DATE->value => '2013-06-06',
+          DateTimeRangeDisplayOptions::StartDate->value => '2012-12-31',
+          DateTimeRangeDisplayOptions::EndDate->value => '2013-06-06',
         ],
         'daterange_custom' => [
-          DateTimeRangeDisplayOptions::START_DATE->value => '2012-12-31',
-          DateTimeRangeDisplayOptions::END_DATE->value => '2013-06-06',
+          DateTimeRangeDisplayOptions::StartDate->value => '2012-12-31',
+          DateTimeRangeDisplayOptions::EndDate->value => '2013-06-06',
         ],
       ],
       DateRangeItem::DATETIME_TYPE_DATETIME => [
         'daterange_default' => [
-          DateTimeRangeDisplayOptions::START_DATE->value => '31 Dec 2012 - 00:00',
-          DateTimeRangeDisplayOptions::END_DATE->value => '6 Jun 2013 - 00:00',
+          DateTimeRangeDisplayOptions::StartDate->value => '31 Dec 2012 - 00:00',
+          DateTimeRangeDisplayOptions::EndDate->value => '6 Jun 2013 - 00:00',
         ],
         'daterange_plain' => [
-          DateTimeRangeDisplayOptions::START_DATE->value => '2012-12-31T00:00:00',
-          DateTimeRangeDisplayOptions::END_DATE->value => '2013-06-06T00:00:00',
+          DateTimeRangeDisplayOptions::StartDate->value => '2012-12-31T00:00:00',
+          DateTimeRangeDisplayOptions::EndDate->value => '2013-06-06T00:00:00',
         ],
         'daterange_custom' => [
-          DateTimeRangeDisplayOptions::START_DATE->value => '2012-12-31T00:00:00',
-          DateTimeRangeDisplayOptions::END_DATE->value => '2013-06-06T00:00:00',
+          DateTimeRangeDisplayOptions::StartDate->value => '2012-12-31T00:00:00',
+          DateTimeRangeDisplayOptions::EndDate->value => '2013-06-06T00:00:00',
         ],
       ],
       DateRangeItem::DATETIME_TYPE_ALLDAY => [
         'daterange_default' => [
-          DateTimeRangeDisplayOptions::START_DATE->value => '31 Dec 2012',
-          DateTimeRangeDisplayOptions::END_DATE->value => '6 Jun 2013',
+          DateTimeRangeDisplayOptions::StartDate->value => '31 Dec 2012',
+          DateTimeRangeDisplayOptions::EndDate->value => '6 Jun 2013',
         ],
         'daterange_plain' => [
-          DateTimeRangeDisplayOptions::START_DATE->value => '2012-12-31',
-          DateTimeRangeDisplayOptions::END_DATE->value => '2013-06-06',
+          DateTimeRangeDisplayOptions::StartDate->value => '2012-12-31',
+          DateTimeRangeDisplayOptions::EndDate->value => '2013-06-06',
         ],
         'daterange_custom' => [
-          DateTimeRangeDisplayOptions::START_DATE->value => '2012-12-31',
-          DateTimeRangeDisplayOptions::END_DATE->value => '2013-06-06',
+          DateTimeRangeDisplayOptions::StartDate->value => '2012-12-31',
+          DateTimeRangeDisplayOptions::EndDate->value => '2013-06-06',
         ],
       ],
     ];
@@ -1551,9 +1551,9 @@ class DateRangeFieldTest extends DateTestBase {
         // Both start and end date.
         $return[$datetime_type . '-' . $field_formatter_type . '-both'] = [
           'expected' => [
-            $dates[DateTimeRangeDisplayOptions::START_DATE->value] => TRUE,
+            $dates[DateTimeRangeDisplayOptions::StartDate->value] => TRUE,
             $separator => TRUE,
-            $dates[DateTimeRangeDisplayOptions::END_DATE->value] => TRUE,
+            $dates[DateTimeRangeDisplayOptions::EndDate->value] => TRUE,
           ],
           'datetime_type' => $datetime_type,
           'field_formatter_type' => $field_formatter_type,
@@ -1562,25 +1562,25 @@ class DateRangeFieldTest extends DateTestBase {
         // Only start date.
         $return[$datetime_type . '-' . $field_formatter_type . '-start_date'] = [
           'expected' => [
-            $dates[DateTimeRangeDisplayOptions::START_DATE->value] => TRUE,
+            $dates[DateTimeRangeDisplayOptions::StartDate->value] => TRUE,
             $separator => FALSE,
-            $dates[DateTimeRangeDisplayOptions::END_DATE->value] => FALSE,
+            $dates[DateTimeRangeDisplayOptions::EndDate->value] => FALSE,
           ],
           'datetime_type' => $datetime_type,
           'field_formatter_type' => $field_formatter_type,
-          ['from_to' => DateTimeRangeDisplayOptions::START_DATE->value],
+          ['from_to' => DateTimeRangeDisplayOptions::StartDate->value],
         ];
 
         // Only end date.
         $return[$datetime_type . '-' . $field_formatter_type . '-end_date'] = [
           'expected' => [
-            $dates[DateTimeRangeDisplayOptions::START_DATE->value] => FALSE,
+            $dates[DateTimeRangeDisplayOptions::StartDate->value] => FALSE,
             $separator => FALSE,
-            $dates[DateTimeRangeDisplayOptions::END_DATE->value] => TRUE,
+            $dates[DateTimeRangeDisplayOptions::EndDate->value] => TRUE,
           ],
           'datetime_type' => $datetime_type,
           'field_formatter_type' => $field_formatter_type,
-          ['from_to' => DateTimeRangeDisplayOptions::END_DATE->value],
+          ['from_to' => DateTimeRangeDisplayOptions::EndDate->value],
         ];
       }
     }
