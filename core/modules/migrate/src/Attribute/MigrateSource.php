@@ -63,7 +63,7 @@ class MigrateSource extends Plugin implements MultipleProviderAttributeInterface
     public readonly string $id,
     public readonly ?string $source_module = NULL,
     public bool $requirements_met = TRUE,
-    public readonly mixed $minimum_version = '',
+    public readonly mixed $minimum_version = NULL,
     public readonly ?string $deriver = NULL,
   ) {}
 
