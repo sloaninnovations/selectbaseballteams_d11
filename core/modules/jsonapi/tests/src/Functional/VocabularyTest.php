@@ -40,6 +40,12 @@ class VocabularyTest extends ConfigEntityResourceTestBase {
    */
   protected $entity;
 
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $firstCreatedEntityId = 'special';
+
   /**
    * {@inheritdoc}
    */
@@ -101,8 +107,15 @@ class VocabularyTest extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getPostDocument() {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => 'taxonomy_vocabulary--taxonomy_vocabulary',
+        'attributes' => [
+          'drupal_internal__vid' => 'special',
+          'name' => 'My special vocabulary',
+        ],
+      ],
+    ];
   }
 
   /**
