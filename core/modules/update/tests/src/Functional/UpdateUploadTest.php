@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\update\Functional;
 
 use Drupal\Core\Extension\InfoParserDynamic;
@@ -23,7 +25,7 @@ class UpdateUploadTest extends UpdateUploaderTestBase {
    *
    * @var array
    */
-  protected static $modules = ['update', 'update_test', 'file'];
+  protected static $modules = ['file'];
 
   /**
    * {@inheritdoc}
@@ -118,7 +120,7 @@ class UpdateUploadTest extends UpdateUploaderTestBase {
     $info = $info_parser->parse($installedInfoFilePath);
     $this->assertEquals('8.x-1.0', $info['version']);
 
-    // Enable the module.
+    // Install the module.
     $this->drupalGet('admin/modules');
     $this->submitForm(['modules[update_test_new_module][enable]' => TRUE], 'Install');
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\action\Functional\Node;
 
 use Drupal\Component\Serialization\Json;
@@ -11,6 +13,7 @@ use Drupal\user\Entity\User;
  * Tests configuration of actions provided by the Node module.
  *
  * @group action
+ * @group legacy
  */
 class NodeActionsConfigurationTest extends BrowserTestBase {
 

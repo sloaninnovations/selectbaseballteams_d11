@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\update\Functional;
 
 use Drupal\Core\Url;
@@ -24,6 +26,11 @@ use Drupal\Tests\BrowserTestBase;
  */
 abstract class UpdateTestBase extends BrowserTestBase {
   use UpdateTestTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['update', 'update_test'];
 
   /**
    * Denotes a security update will be required in the test case.

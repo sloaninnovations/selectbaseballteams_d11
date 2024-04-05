@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\statistics\Functional\migrate_drupal\d7;
 
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
@@ -17,7 +19,6 @@ class UpgradeTest extends MigrateUpgradeExecuteTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'book',
     'config_translation',
     'content_translation',
     'datetime_range',
@@ -66,9 +67,9 @@ class UpgradeTest extends MigrateUpgradeExecuteTestBase {
    */
   protected function getEntityCounts() {
     return [
-      'action' => 27,
-      'base_field_override' => 3,
-      'block' => 27,
+      'action' => 24,
+      'base_field_override' => 2,
+      'block' => 26,
       'block_content' => 1,
       'block_content_type' => 1,
       'comment' => 4,
@@ -81,7 +82,7 @@ class UpgradeTest extends MigrateUpgradeExecuteTestBase {
       'entity_form_display' => 19,
       'entity_form_mode' => 1,
       'entity_view_display' => 28,
-      'entity_view_mode' => 12,
+      'entity_view_mode' => 11,
       'field_config' => 33,
       'field_storage_config' => 19,
       'file' => 1,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
@@ -67,7 +69,7 @@ class TermTest extends ResourceTestBase {
   protected function setUpAuthorization($method) {
     switch ($method) {
       case 'GET':
-        $this->grantPermissionsToTestedRole(['access content']);
+        $this->grantPermissionsToTestedRole(['access content', 'view vocabulary labels']);
         break;
 
       case 'POST':

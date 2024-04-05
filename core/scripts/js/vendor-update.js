@@ -3,8 +3,8 @@
  * Copy files for JS vendor dependencies from node_modules to the assets/vendor
  * folder.
  *
- * This script handles all dependencies except CKEditor and Modernizr, which
- * require a custom build step.
+ * This script handles all dependencies except CKEditor, which require a custom
+ * build step.
  */
 
 const path = require('path');
@@ -85,15 +85,6 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
         { from: 'dist/jquery.js', to: 'jquery.js' },
         { from: 'dist/jquery.min.js', to: 'jquery.min.js' },
         { from: 'dist/jquery.min.map', to: 'jquery.min.map' },
-      ],
-    },
-    {
-      pack: 'jquery-form',
-      library: 'internal.jquery.form',
-      files: [
-        { from: 'dist/jquery.form.min.js', to: 'jquery.form.min.js' },
-        { from: 'dist/jquery.form.min.js.map', to: 'jquery.form.min.js.map' },
-        { from: 'src/jquery.form.js', to: 'src/jquery.form.js' },
       ],
     },
     {

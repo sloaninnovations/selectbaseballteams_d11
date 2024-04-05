@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\action\Functional\Jsonapi;
 
 use Drupal\Core\Url;
@@ -12,6 +14,7 @@ use Drupal\user\RoleInterface;
  *
  * @group action
  * @group #slow
+ * @group legacy
  */
 class ActionTest extends ConfigEntityResourceTestBase {
 

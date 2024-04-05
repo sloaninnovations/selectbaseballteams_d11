@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\update\Functional;
 
 use Drupal\Core\Utility\ProjectInfo;
@@ -30,8 +32,6 @@ class UpdateContribTest extends UpdateTestBase {
    * @var array
    */
   protected static $modules = [
-    'update_test',
-    'update',
     'aaa_update_test',
     'bbb_update_test',
     'ccc_update_test',
@@ -335,17 +335,17 @@ class UpdateContribTest extends UpdateTestBase {
   }
 
   /**
-   * Tests that disabled themes are only shown when desired.
+   * Tests that uninstalled themes are only shown when desired.
    *
    * @todo https://www.drupal.org/node/2338175 extensions can not be hidden and
    *   base themes have to be installed.
    */
   public function testUpdateShowDisabledThemes() {
     $update_settings = $this->config('update.settings');
-    // Make sure all the update_test_* themes are disabled.
+    // Make sure all the update_test_* themes are uninstalled.
     $extension_config = $this->config('core.extension');
     foreach ($extension_config->get('theme') as $theme => $weight) {
-      if (preg_match('/^update_test_/', $theme)) {
+      if (str_starts_with($theme, 'update_test_')) {
         $extension_config->clear("theme.$theme");
       }
     }
@@ -423,7 +423,7 @@ class UpdateContribTest extends UpdateTestBase {
       ],
     ]);
     $projects = \Drupal::service('update.manager')->getProjects();
-    $theme_data = \Drupal::service('theme_handler')->rebuildThemeData();
+    $theme_data = \Drupal::service('extension.list.theme')->reset()->getList();
     $project_info = new ProjectInfo();
     $project_info->processInfoList($projects, $theme_data, 'theme', TRUE);
 

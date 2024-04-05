@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\help\Functional;
 
 use Drupal\Core\Extension\ExtensionLifecycle;
@@ -342,7 +344,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
       '#type' => 'inline_template',
       '#template' => $content . "\n{# " . rand() . " #}",
     ];
-    return (string) \Drupal::service('renderer')->renderPlain($build);
+    return (string) \Drupal::service('renderer')->renderInIsolation($build);
   }
 
 }

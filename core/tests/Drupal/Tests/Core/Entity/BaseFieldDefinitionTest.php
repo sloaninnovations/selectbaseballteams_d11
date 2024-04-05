@@ -166,8 +166,9 @@ class BaseFieldDefinitionTest extends UnitTestCase {
     ];
     $expected_default_value = [$default_value];
     $definition->setDefaultValue($default_value);
-    $entity = $this->getMockBuilder('Drupal\Core\Entity\ContentEntityBase')
+    $entity = $this->getMockBuilder(ContentEntityBaseMockableClass::class)
       ->disableOriginalConstructor()
+      ->onlyMethods([])
       ->getMock();
     // Set the field item list class to be used to avoid requiring the typed
     // data manager to retrieve it.
@@ -214,13 +215,14 @@ class BaseFieldDefinitionTest extends UnitTestCase {
     ];
     $expected_default_value = [$default_value];
     $definition->setInitialValue($default_value);
-    $entity = $this->getMockBuilder('Drupal\Core\Entity\ContentEntityBase')
+    $entity = $this->getMockBuilder(ContentEntityBaseMockableClass::class)
       ->disableOriginalConstructor()
+      ->onlyMethods([])
       ->getMock();
     // Set the field item list class to be used to avoid requiring the typed
     // data manager to retrieve it.
     $definition->setClass('Drupal\Core\Field\FieldItemList');
-    $this->assertEquals($expected_default_value, $definition->getInitialValue($entity));
+    $this->assertEquals($expected_default_value, $definition->getInitialValue());
 
     $data_definition = $this->getMockBuilder('Drupal\Core\TypedData\DataDefinition')
       ->disableOriginalConstructor()
@@ -232,19 +234,19 @@ class BaseFieldDefinitionTest extends UnitTestCase {
 
     // Set default value only with a literal.
     $definition->setInitialValue($default_value['value']);
-    $this->assertEquals($expected_default_value, $definition->getInitialValue($entity));
+    $this->assertEquals($expected_default_value, $definition->getInitialValue());
 
     // Set default value with an indexed array.
     $definition->setInitialValue($expected_default_value);
-    $this->assertEquals($expected_default_value, $definition->getInitialValue($entity));
+    $this->assertEquals($expected_default_value, $definition->getInitialValue());
 
     // Set default value with an empty array.
     $definition->setInitialValue([]);
-    $this->assertEquals([], $definition->getInitialValue($entity));
+    $this->assertEquals([], $definition->getInitialValue());
 
     // Set default value with NULL.
     $definition->setInitialValue(NULL);
-    $this->assertEquals([], $definition->getInitialValue($entity));
+    $this->assertEquals([], $definition->getInitialValue());
   }
 
   /**

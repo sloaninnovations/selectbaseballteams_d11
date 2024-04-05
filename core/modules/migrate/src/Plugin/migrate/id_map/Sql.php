@@ -590,14 +590,23 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
   public function lookupSourceId(array $destination_id_values) {
     $source_id_fields = $this->sourceIdFields();
     $query = $this->getDatabase()->select($this->mapTableName(), 'map');
+    // To allow source field names to be defined with spaces and special
+    // characters, create an alias map of column alias to source field name,
+    // since SQL column aliases do not support spaces or special characters.
+    $alias_map = [];
     foreach ($source_id_fields as $source_field_name => $id_map_field_name) {
-      $query->addField('map', $id_map_field_name, $source_field_name);
+      $alias = $query->addField('map', $id_map_field_name);
+      $alias_map[$alias] = $source_field_name;
     }
     foreach ($this->destinationIdFields() as $field_name => $destination_id) {
       $query->condition("map.$destination_id", $destination_id_values[$field_name], '=');
     }
-    $result = $query->execute();
-    return $result->fetchAssoc() ?: [];
+    $result = $query->execute()->fetchAssoc() ?: [];
+    $source_ids = [];
+    foreach ($result as $alias => $id) {
+      $source_ids[$alias_map[$alias]] = $id;
+    }
+    return $source_ids;
   }
 
   /**
@@ -904,8 +913,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    *
    * This is called before beginning a foreach loop.
    */
-  #[\ReturnTypeWillChange]
-  public function rewind() {
+  public function rewind(): void {
     $this->currentRow = NULL;
     $fields = [];
     foreach ($this->sourceIdFields() as $field) {
@@ -926,8 +934,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    *
    * This is called when entering a loop iteration, returning the current row.
    */
-  #[\ReturnTypeWillChange]
-  public function current() {
+  public function current(): mixed {
     return $this->currentRow;
   }
 
@@ -938,8 +945,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * current row. It must be a scalar - we will serialize to fulfill the
    * requirement, but using getCurrentKey() is preferable.
    */
-  #[\ReturnTypeWillChange]
-  public function key() {
+  public function key(): mixed {
     return serialize($this->currentKey);
   }
 
@@ -983,8 +989,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * This is called at the bottom of the loop implicitly, as well as explicitly
    * from rewind().
    */
-  #[\ReturnTypeWillChange]
-  public function next() {
+  public function next(): void {
     $this->currentRow = $this->result->fetchAssoc();
     $this->currentKey = [];
     if ($this->currentRow) {
@@ -1002,8 +1007,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * This is called at the top of the loop, returning TRUE to process the loop
    * and FALSE to terminate it.
    */
-  #[\ReturnTypeWillChange]
-  public function valid() {
+  public function valid(): bool {
     return $this->currentRow !== FALSE;
   }
 

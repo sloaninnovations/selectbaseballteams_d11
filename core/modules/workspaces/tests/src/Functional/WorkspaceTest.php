@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workspaces\Functional;
 
 use Drupal\Tests\BrowserTestBase;
@@ -78,15 +80,16 @@ class WorkspaceTest extends BrowserTestBase {
    */
   public function testSpecialCharacters() {
     $this->drupalLogin($this->editor1);
+    $page = $this->getSession()->getPage();
 
     // Test a valid workspace name.
-    $this->createWorkspaceThroughUi('Workspace 1', 'a0_$()+-/');
+    $this->createAndActivateWorkspaceThroughUi('Workspace 1', 'workspace_1');
+    $this->assertSession()->elementTextContains('css', '.workspaces-toolbar-tab', 'Workspace 1');
 
     // Test and invalid workspace name.
     $this->drupalGet('/admin/config/workflow/workspaces/add');
     $this->assertSession()->statusCodeEquals(200);
 
-    $page = $this->getSession()->getPage();
     $page->fillField('label', 'workspace2');
     $page->fillField('id', 'A!"£%^&*{}#~@?');
     $page->findButton('Save')->click();
@@ -245,15 +248,13 @@ class WorkspaceTest extends BrowserTestBase {
    */
   public function testDeleteWorkspaceWithExistingContent() {
     $this->createContentType(['type' => 'test', 'label' => 'Test']);
-    $this->setupWorkspaceSwitcherBlock();
 
     // Login and create a workspace.
     $this->drupalLogin($this->rootUser);
-    $may_4 = $this->createWorkspaceThroughUi('May 4', 'may_4');
-    $this->switchToWorkspace($may_4);
+    $this->createAndActivateWorkspaceThroughUi('May 4', 'may_4');
 
     // Create a node in the workspace.
-    $node = $this->createNodeThroughUi('A mayfly flies / In May or June', 'test');
+    $this->createNodeThroughUi('A mayfly flies / In May or June', 'test');
 
     // Delete the workspace.
     $this->drupalGet('/admin/config/workflow/workspaces/manage/may_4/delete');
@@ -297,6 +298,16 @@ class WorkspaceTest extends BrowserTestBase {
     // 'Live' is no longer the active workspace, so it's 'Switch to Live'
     // operation should be visible now.
     $assert_session->linkExists('Switch to Live');
+
+    // Delete any of the workspace owners and visit workspaces listing.
+    $this->drupalLogin($this->editor2);
+    user_cancel([], $this->editor1->id(), 'user_cancel_reassign');
+    $user = \Drupal::service('entity_type.manager')->getStorage('user')->load($this->editor1->id());
+    $user->delete();
+    $this->drupalGet('/admin/config/workflow/workspaces');
+    $this->assertSession()->pageTextContains('Summer event');
+    $summer_event_workspace_row = $page->find('css', 'table tbody tr:nth-of-type(3)');
+    $this->assertEquals('N/A', $summer_event_workspace_row->find('css', 'td:nth-of-type(2)')->getText());
   }
 
   /**

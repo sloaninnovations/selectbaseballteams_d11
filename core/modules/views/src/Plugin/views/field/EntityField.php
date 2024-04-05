@@ -23,6 +23,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\views\Attribute\ViewsField;
 use Drupal\views\FieldAPIHandlerTrait;
 use Drupal\views\Entity\Render\EntityFieldRenderer;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
@@ -35,9 +36,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * A field that displays entity field data.
  *
  * @ingroup views_field_handlers
- *
- * @ViewsField("field")
  */
+#[ViewsField("field")]
 class EntityField extends FieldPluginBase implements CacheableDependencyInterface, MultiItemsFieldHandlerInterface, DependentWithRemovalPluginInterface {
 
   use FieldAPIHandlerTrait;
@@ -356,6 +356,9 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    *
    * @return \Drupal\Core\Field\FieldStorageDefinitionInterface
    *   The field storage definition used by this handler.
+   *
+   * @throws \Exception
+   *   If no field storage definition was found for the given entity type and field name.
    */
   protected function getFieldStorageDefinition() {
     $entity_type_id = $this->definition['entity_type'];
@@ -391,7 +394,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       }
     }
 
-    return NULL;
+    throw new \Exception("No field storage definition found for entity type {$this->definition['entity_type']} and field {$this->definition['field_name']} on view {$this->view->storage->id()}");
   }
 
   /**

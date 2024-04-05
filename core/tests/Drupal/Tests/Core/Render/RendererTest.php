@@ -634,7 +634,7 @@ class RendererTest extends RendererTestBase {
       '#access' => AccessResult::allowed()->addCacheContexts(['user']),
     ];
 
-    $this->renderer->renderPlain($build);
+    $this->renderer->renderInIsolation($build);
 
     $this->assertEqualsCanonicalizing(['languages:language_interface', 'theme', 'user'], $build['#cache']['contexts']);
   }
@@ -832,7 +832,7 @@ class RendererTest extends RendererTestBase {
    */
   public function testRenderCache($child_access, $expected_tags) {
     $this->setUpRequest();
-    $this->setupMemoryCache();
+    $this->setUpMemoryCache();
 
     // Create an empty element.
     $test_element = [
@@ -882,7 +882,7 @@ class RendererTest extends RendererTestBase {
    */
   public function testRenderCacheMaxAge($max_age, $is_render_cached, $render_cache_item_expire) {
     $this->setUpRequest();
-    $this->setupMemoryCache();
+    $this->setUpMemoryCache();
 
     $element = [
       '#cache' => [
@@ -927,7 +927,7 @@ class RendererTest extends RendererTestBase {
    */
   public function testRenderCacheProperties(array $expected_results) {
     $this->setUpRequest();
-    $this->setupMemoryCache();
+    $this->setUpMemoryCache();
 
     $element = $original = [
       '#cache' => [

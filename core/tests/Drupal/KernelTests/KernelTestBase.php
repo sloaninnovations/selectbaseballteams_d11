@@ -414,7 +414,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->container->get('config.storage')->write('core.extension', [
       'module' => array_fill_keys($modules, 0),
       'theme' => [],
-      'profile' => '',
     ]);
 
     $settings = Settings::getAll();
@@ -1040,7 +1039,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    *
    * @see vendor/phpunit/phpunit/src/Util/PHP/Template/TestCaseMethod.tpl.dist
    */
-  public function __sleep() {
+  public function __sleep(): array {
     return [];
   }
 

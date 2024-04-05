@@ -174,7 +174,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   /**
    * {@inheritdoc}
    */
-  public function save() {
+  public function save(): void {
     if ($this->isCli()) {
       // We don't have anything to do if we are not allowed to save the session.
       return;
@@ -234,9 +234,14 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     if (!$this->writeSafeHandler->isSessionWritable() || $this->isCli()) {
       return;
     }
-    $this->connection->delete('sessions')
-      ->condition('uid', $uid)
-      ->execute();
+    // The sessions table may not have been created yet.
+    try {
+      $this->connection->delete('sessions')
+        ->condition('uid', $uid)
+        ->execute();
+    }
+    catch (\Exception) {
+    }
   }
 
   /**

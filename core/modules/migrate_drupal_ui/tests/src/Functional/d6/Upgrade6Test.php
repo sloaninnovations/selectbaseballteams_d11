@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional\d6;
 
 use Drupal\node\Entity\Node;
@@ -94,7 +96,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'search_page' => 3,
       'shortcut' => 2,
       'shortcut_set' => 1,
-      'action' => 33,
+      'action' => 30,
       'menu' => 8,
       'path_alias' => 8,
       'taxonomy_term' => 15,

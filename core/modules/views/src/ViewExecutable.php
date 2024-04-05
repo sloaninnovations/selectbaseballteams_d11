@@ -8,6 +8,7 @@ use Drupal\Component\Utility\Tags;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\views\Plugin\views\display\DisplayRouterInterface;
+use Drupal\views\Plugin\ViewsPluginManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -471,14 +472,21 @@ class ViewExecutable {
    *   The views data.
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayPluginManager
+   *   The plugin manager for display.
    */
-  public function __construct(ViewEntityInterface $storage, AccountInterface $user, ViewsData $views_data, RouteProviderInterface $route_provider) {
+  public function __construct(ViewEntityInterface $storage, AccountInterface $user, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL) {
     // Reference the storage and the executable to each other.
     $this->storage = $storage;
     $this->storage->set('executable', $this);
     $this->user = $user;
     $this->viewsData = $views_data;
     $this->routeProvider = $route_provider;
+    if ($this->displayPluginManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $displayPluginManager argument is deprecated in drupal:10.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410349', E_USER_DEPRECATED);
+      $this->displayPluginManager = \Drupal::service('plugin.manager.views.display');
+    }
+
   }
 
   /**
@@ -712,7 +720,7 @@ class ViewExecutable {
       }
 
       // If we have no input at all, check for remembered input via session.
-      if (empty($this->exposed_input) && $this->request->hasSession()) {
+      if (empty($this->exposed_input)) {
         $session = $this->request->getSession();
         // If filters are not overridden, store the 'remember' settings on the
         // default display. If they are, store them on this display. This way,
@@ -738,9 +746,8 @@ class ViewExecutable {
     if (isset($this->current_display)) {
       return TRUE;
     }
-
     // Initialize the display cache array.
-    $this->displayHandlers = new DisplayPluginCollection($this, Views::pluginManager('display'));
+    $this->displayHandlers = new DisplayPluginCollection($this, $this->displayPluginManager);
 
     $this->current_display = 'default';
     $this->display_handler = $this->displayHandlers->get('default');
@@ -1956,17 +1963,6 @@ class ViewExecutable {
 
     if (!isset($args)) {
       $args = $this->args;
-
-      // Exclude arguments that were computed, not passed on the URL.
-      $position = 0;
-      if (!empty($this->argument)) {
-        foreach ($this->argument as $argument) {
-          if (!empty($argument->is_default)) {
-            unset($args[$position]);
-          }
-          $position++;
-        }
-      }
     }
 
     $path = $this->getPath();
@@ -2097,6 +2093,7 @@ class ViewExecutable {
       $defaults['user'],
       $defaults['request'],
       $defaults['routeProvider'],
+      $defaults['displayPluginManager'],
       $defaults['viewsData']
     );
 
@@ -2502,7 +2499,7 @@ class ViewExecutable {
    * @return array
    *   The names of all variables that should be serialized.
    */
-  public function __sleep() {
+  public function __sleep(): array {
     // Limit to only the required data which is needed to properly restore the
     // state during unserialization.
     $this->serializationData = [
@@ -2522,7 +2519,7 @@ class ViewExecutable {
   /**
    * Magic method implementation to unserialize the view executable.
    */
-  public function __wakeup() {
+  public function __wakeup(): void {
     // There are cases, like in testing where we don't have a container
     // available.
     if (\Drupal::hasContainer() && !empty($this->serializationData)) {
@@ -2535,6 +2532,7 @@ class ViewExecutable {
       $this->user = \Drupal::currentUser();
       $this->viewsData = \Drupal::service('views.views_data');
       $this->routeProvider = \Drupal::service('router.route_provider');
+      $this->displayPluginManager = \Drupal::service('plugin.manager.views.display');
 
       // Restore the state of this executable.
       if ($request = \Drupal::request()) {

@@ -101,15 +101,7 @@ class TestDiscovery {
       }
 
       // Add PHPUnit test namespaces.
-      $this->testNamespaces["Drupal\\Tests\\$name\\Unit\\"][] = "$base_path/tests/src/Unit";
-      $this->testNamespaces["Drupal\\Tests\\$name\\Kernel\\"][] = "$base_path/tests/src/Kernel";
-      $this->testNamespaces["Drupal\\Tests\\$name\\Functional\\"][] = "$base_path/tests/src/Functional";
-      $this->testNamespaces["Drupal\\Tests\\$name\\Build\\"][] = "$base_path/tests/src/Build";
-      $this->testNamespaces["Drupal\\Tests\\$name\\FunctionalJavascript\\"][] = "$base_path/tests/src/FunctionalJavascript";
-
-      // Add discovery for traits which are shared between different test
-      // suites.
-      $this->testNamespaces["Drupal\\Tests\\$name\\Traits\\"][] = "$base_path/tests/src/Traits";
+      $this->testNamespaces["Drupal\\Tests\\$name\\"][] = "$base_path/tests/src";
     }
 
     foreach ($this->testNamespaces as $prefix => $paths) {
@@ -174,7 +166,7 @@ class TestDiscovery {
       }
       catch (MissingGroupException $e) {
         // If the class name ends in Test and is not a migrate table dump.
-        if (preg_match('/Test$/', $classname) && !str_contains($classname, 'migrate_drupal\Tests\Table')) {
+        if (str_ends_with($classname, 'Test') && !str_contains($classname, 'migrate_drupal\Tests\Table')) {
           throw $e;
         }
         // If the class is @group annotation just skip it. Most likely it is an

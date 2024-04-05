@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\update\Functional;
 
 /**
@@ -8,13 +10,6 @@ namespace Drupal\Tests\update\Functional;
  * @group update
  */
 class FileTransferAuthorizeFormTest extends UpdateUploaderTestBase {
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  protected static $modules = ['update', 'update_test'];
 
   /**
    * {@inheritdoc}

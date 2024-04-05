@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workspaces\Functional;
 
 use Drupal\Tests\block\Traits\BlockCreationTrait;
@@ -45,6 +47,32 @@ trait WorkspaceTestUtilities {
   }
 
   /**
+   * Creates and activates a new Workspace through the UI.
+   *
+   * @param string $label
+   *   The label of the workspace to create.
+   * @param string $id
+   *   The ID of the workspace to create.
+   * @param string $parent
+   *   (optional) The ID of the parent workspace. Defaults to '_none'.
+   *
+   * @return \Drupal\workspaces\WorkspaceInterface
+   *   The workspace that was just created.
+   */
+  protected function createAndActivateWorkspaceThroughUi(string $label, string $id, string $parent = '_none'): WorkspaceInterface {
+    $this->drupalGet('/admin/config/workflow/workspaces/add');
+    $this->submitForm([
+      'id' => $id,
+      'label' => $label,
+      'parent' => $parent,
+    ], 'Save and switch');
+
+    $this->getSession()->getPage()->hasContent("$label ($id)");
+
+    return Workspace::load($id);
+  }
+
+  /**
    * Creates a new Workspace through the UI.
    *
    * @param string $label
@@ -82,12 +110,8 @@ trait WorkspaceTestUtilities {
       'region' => 'sidebar_first',
       'label' => 'Workspace switcher',
     ]);
-
-    // Confirm the block shows on the front page.
     $this->drupalGet('<front>');
-    $page = $this->getSession()->getPage();
 
-    $this->assertTrue($page->hasContent('Workspace switcher'));
     $this->switcherBlockConfigured = TRUE;
   }
 

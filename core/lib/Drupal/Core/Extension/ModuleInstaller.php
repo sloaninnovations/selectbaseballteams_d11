@@ -89,16 +89,12 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * @see \Drupal\Core\DrupalKernel
    * @see \Drupal\Core\CoreServiceProvider
    */
-  public function __construct($root, ModuleHandlerInterface $module_handler, DrupalKernelInterface $kernel, Connection $connection, UpdateHookRegistry $update_registry, protected ?LoggerInterface $logger = NULL) {
+  public function __construct($root, ModuleHandlerInterface $module_handler, DrupalKernelInterface $kernel, Connection $connection, UpdateHookRegistry $update_registry, protected LoggerInterface $logger) {
     $this->root = $root;
     $this->moduleHandler = $module_handler;
     $this->kernel = $kernel;
     $this->connection = $connection;
     $this->updateRegistry = $update_registry;
-    if ($this->logger === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $logger argument is deprecated in drupal:10.1.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2932520', E_USER_DEPRECATED);
-      $this->logger = \Drupal::service('logger.channel.system');
-    }
   }
 
   /**
@@ -500,7 +496,15 @@ class ModuleInstaller implements ModuleInstallerInterface {
 
       // Remove the module's entry from the config. Don't check schema when
       // uninstalling a module since we are only clearing a key.
-      \Drupal::configFactory()->getEditable('core.extension')->clear("module.$module")->save(TRUE);
+      $core_extension = \Drupal::configFactory()->getEditable('core.extension');
+      $core_extension->clear("module.$module");
+      // If the install profile is being uninstalled then remove the site's
+      // profile key to indicate that the site no longer has an installation
+      // profile.
+      if ($core_extension->get('profile') === $module) {
+        $core_extension->clear('profile');
+      }
+      $core_extension->save(TRUE);
 
       // Update the module handler to remove the module.
       // The current ModuleHandler instance is obsolete with the kernel rebuild

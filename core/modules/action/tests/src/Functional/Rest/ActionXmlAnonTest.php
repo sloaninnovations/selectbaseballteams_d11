@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\action\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\AnonResourceTestTrait;
@@ -7,6 +9,7 @@ use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrai
 
 /**
  * @group action
+ * @group legacy
  */
 class ActionXmlAnonTest extends ActionResourceTestBase {
 

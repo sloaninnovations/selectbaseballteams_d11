@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Render\PlainTextOutput;
@@ -16,7 +18,7 @@ use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 
-// cspell:ignore èxample
+// cspell:ignore èxample msword
 
 /**
  * Tests binary data file upload route.

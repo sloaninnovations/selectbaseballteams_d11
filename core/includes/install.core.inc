@@ -147,10 +147,7 @@ function install_drupal($class_loader, $settings = [], callable $callback = NULL
   // installations can send output to the browser or redirect the user to the
   // next page.
   if ($state['interactive']) {
-    // If a session has been initiated in this request, make sure to save it.
-    if (\Drupal::request()->hasSession()) {
-      \Drupal::request()->getSession()->save();
-    }
+    \Drupal::request()->getSession()->save();
     if ($state['parameters_changed']) {
       // Redirect to the correct page if the URL parameters have changed.
       install_goto(install_redirect_url($state));
@@ -306,8 +303,16 @@ function install_begin_request($class_loader, &$install_state) {
   }
 
   // Validate certain core settings that are used throughout the installation.
-  if (!empty($install_state['parameters']['profile'])) {
+  if (array_key_exists('profile', $install_state['parameters'])) {
     $install_state['parameters']['profile'] = preg_replace('/[^a-zA-Z_0-9]/', '', $install_state['parameters']['profile']);
+    // If the site is not using an install profile then profile will be set to
+    // an empty string in the query parameters. Convert this to a FALSE value so
+    // that \Drupal\Core\Installer\InstallerKernel::getInstallProfile() returns
+    // the same value as \Drupal\Core\DrupalKernel::getInstallProfile() when the
+    // site does not have an install profile.
+    if ($install_state['parameters']['profile'] === '') {
+      $install_state['parameters']['profile'] = FALSE;
+    }
   }
   if (!empty($install_state['parameters']['langcode'])) {
     $install_state['parameters']['langcode'] = preg_replace('/[^a-zA-Z_0-9\-]/', '', $install_state['parameters']['langcode']);
@@ -389,8 +394,7 @@ function install_begin_request($class_loader, &$install_state) {
   if ($install_state['settings_verified']) {
     try {
       $system_schema = system_schema();
-      end($system_schema);
-      $table = key($system_schema);
+      $table = array_key_last($system_schema);
       $install_state['base_system_verified'] = Database::getConnection()->schema()->tableExists($table);
     }
     catch (DatabaseExceptionWrapper $e) {
@@ -455,7 +459,8 @@ function install_begin_request($class_loader, &$install_state) {
     $module_list->setPathname($name, $profile->getPathname());
   }
 
-  if ($profile = _install_select_profile($install_state)) {
+  $profile = _install_select_profile($install_state);
+  if ($profile !== NULL) {
     $install_state['parameters']['profile'] = $profile;
     install_load_profile($install_state);
     if (isset($install_state['profile_info']['distribution']['install']['theme'])) {
@@ -558,9 +563,7 @@ function install_run_tasks(&$install_state, callable $callback = NULL) {
     // so we regenerate the remaining tasks based on the installation state,
     // each time through the loop.
     $tasks_to_perform = install_tasks_to_perform($install_state);
-    // Run the first task on the list.
-    reset($tasks_to_perform);
-    $task_name = key($tasks_to_perform);
+    $task_name = array_key_first($tasks_to_perform);
     $task = array_shift($tasks_to_perform);
     $install_state['active_task'] = $task_name;
     $original_parameters = $install_state['parameters'];
@@ -648,10 +651,7 @@ function install_run_task($task, &$install_state) {
       $url = Url::fromUri('base:install.php', ['query' => $install_state['parameters'], 'script' => '']);
       $response = batch_process($url, clone $url);
       if ($response instanceof Response) {
-        if (\Drupal::request()->hasSession()) {
-          \Drupal::request()->getSession()->save();
-        }
-        // Send the response.
+        \Drupal::request()->getSession()->save();
         $response->send();
         exit;
       }
@@ -666,10 +666,7 @@ function install_run_task($task, &$install_state) {
       // @todo Replace this when we refactor the installer to use a request-
       //   response workflow.
       if ($output instanceof Response) {
-        if (\Drupal::request()->hasSession()) {
-          \Drupal::request()->getSession()->save();
-        }
-        // Send the response.
+        \Drupal::request()->getSession()->save();
         $output->send();
         exit;
       }
@@ -847,15 +844,17 @@ function install_tasks($install_state) {
     // Load the profile install file, because it is not always loaded when
     // hook_install_tasks() is invoked (e.g. batch processing).
     $profile = $install_state['parameters']['profile'];
-    $profile_install_file = $install_state['profiles'][$profile]->getPath() . '/' . $profile . '.install';
-    if (file_exists($profile_install_file)) {
-      include_once \Drupal::root() . '/' . $profile_install_file;
-    }
-    $function = $install_state['parameters']['profile'] . '_install_tasks';
-    if (function_exists($function)) {
-      $result = $function($install_state);
-      if (is_array($result)) {
-        $tasks += $result;
+    if ($profile !== FALSE) {
+      $profile_install_file = $install_state['profiles'][$profile]->getPath() . '/' . $profile . '.install';
+      if (file_exists($profile_install_file)) {
+        include_once \Drupal::root() . '/' . $profile_install_file;
+      }
+      $function = $install_state['parameters']['profile'] . '_install_tasks';
+      if (function_exists($function)) {
+        $result = $function($install_state);
+        if (is_array($result)) {
+          $tasks += $result;
+        }
       }
     }
   }
@@ -958,16 +957,7 @@ function install_get_form($form_id, array &$install_state) {
     // values taken from the installation state.
     $install_form_id = $form_builder->getFormId($form_id, $form_state);
     if (!empty($install_state['forms'][$install_form_id])) {
-      $values = $install_state['forms'][$install_form_id];
-      if ($install_form_id === 'install_settings_form' && isset($values['driver']) && !str_contains($values['driver'], "\\")) {
-        @trigger_error("Passing a database driver name '{$values['driver']}' to " . __FUNCTION__ . '() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Pass a database driver namespace instead. See https://www.drupal.org/node/3258175', E_USER_DEPRECATED);
-        $driverExtension = Database::getDriverList()->getFromDriverName($values['driver']);
-        $tmp = [];
-        $tmp['driver'] = $driverExtension->getName();
-        $tmp[$driverExtension->getName()] = $values[$values['driver']];
-        $values = $tmp;
-      }
-      $form_state->setValues($values);
+      $form_state->setValues($install_state['forms'][$install_form_id]);
     }
     $form_builder->submitForm($form_id, $form_state);
 
@@ -1167,8 +1157,7 @@ function install_verify_database_settings($site_path) {
  */
 function install_verify_database_ready() {
   $system_schema = system_schema();
-  end($system_schema);
-  $table = key($system_schema);
+  $table = array_key_last($system_schema);
 
   $existing_install = FALSE;
   if (Database::getConnectionInfo()) {
@@ -1224,7 +1213,7 @@ function install_database_errors($database, $settings_file) {
  *   thrown if a profile cannot be chosen automatically.
  */
 function install_select_profile(&$install_state) {
-  if (empty($install_state['parameters']['profile'])) {
+  if (!array_key_exists('profile', $install_state['parameters'])) {
     // If there are no profiles at all, installation cannot proceed.
     if (empty($install_state['profiles'])) {
       throw new NoProfilesException(\Drupal::service('string_translation'));
@@ -1267,9 +1256,9 @@ function install_select_profile(&$install_state) {
  *   The current installer state, containing a 'profiles' key, which is an
  *   associative array of profiles with the machine-readable names as keys.
  *
- * @return string|null
+ * @return string|null|false
  *   The machine-readable name of the selected profile or NULL if no profile was
- *   selected.
+ *   selected or FALSE if the site has no profile.
  *
  *  @see install_select_profile()
  */
@@ -1279,9 +1268,9 @@ function _install_select_profile(&$install_state) {
     return key($install_state['profiles']);
   }
   // If a valid profile has already been selected, return the selection.
-  if (!empty($install_state['parameters']['profile'])) {
+  if (array_key_exists('profile', $install_state['parameters'])) {
     $profile = $install_state['parameters']['profile'];
-    if (isset($install_state['profiles'][$profile])) {
+    if ($profile === FALSE || isset($install_state['profiles'][$profile])) {
       return $profile;
     }
   }
@@ -1519,8 +1508,10 @@ function _install_get_version_info($version) {
  */
 function install_load_profile(&$install_state) {
   $profile = $install_state['parameters']['profile'];
-  $install_state['profiles'][$profile]->load();
-  $install_state['profile_info'] = install_profile_info($profile, $install_state['parameters']['langcode'] ?? 'en');
+  if ($profile !== FALSE) {
+    $install_state['profiles'][$profile]->load();
+    $install_state['profile_info'] = install_profile_info($profile, $install_state['parameters']['langcode'] ?? 'en');
+  }
 
   $sync_directory = Settings::get('config_sync_directory');
   if (!empty($install_state['parameters']['existing_config']) && !empty($sync_directory)) {
@@ -2069,10 +2060,13 @@ function install_check_translations($langcode, $server_pattern) {
  * Checks installation requirements and reports any errors.
  */
 function install_check_requirements($install_state) {
+  $requirements = [];
   $profile = $install_state['parameters']['profile'];
 
-  // Check the profile requirements.
-  $requirements = drupal_check_profile($profile);
+  if ($profile !== FALSE) {
+    // Check the profile requirements.
+    $requirements = drupal_check_profile($profile);
+  }
 
   if ($install_state['settings_verified']) {
     return $requirements;
@@ -2312,7 +2306,7 @@ function install_display_requirements($install_state, $requirements) {
               'description' => $requirement['description'],
             ],
           ];
-          $failures[] = \Drupal::service('renderer')->renderPlain($render_array);
+          $failures[] = \Drupal::service('renderer')->renderInIsolation($render_array);
         }
       }
       if (!empty($failures)) {
