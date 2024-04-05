@@ -118,7 +118,7 @@ function views_theme($existing, $type, $theme, $path) {
       'attachment_before' => [],
       'attachment_after' => [],
     ],
-    'style' => ['view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL],
+    'style' => ['view' => NULL, 'options' => NULL, 'rows' => NULL, 'title' => NULL, 'grouping_label_element' => NULL],
     'row' => ['view' => NULL, 'options' => NULL, 'row' => NULL, 'field_alias' => NULL],
     'exposed_form' => ['view' => NULL, 'options' => NULL],
     'pager' => [
@@ -137,7 +137,7 @@ function views_theme($existing, $type, $theme, $path) {
     'variables' => ['view' => NULL, 'field' => NULL, 'row' => NULL],
   ];
   $hooks['views_view_grouping'] = $base + [
-    'variables' => ['view' => NULL, 'grouping' => NULL, 'grouping_level' => NULL, 'rows' => NULL, 'title' => NULL],
+    'variables' => ['view' => NULL, 'grouping' => NULL, 'grouping_level' => NULL, 'grouping_label_element' => NULL, 'rows' => NULL, 'title' => NULL],
   ];
 
   // Only display, pager, row, and style plugins can provide theme hooks.
