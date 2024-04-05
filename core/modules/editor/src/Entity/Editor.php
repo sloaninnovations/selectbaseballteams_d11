@@ -28,6 +28,7 @@ use Drupal\editor\EditorInterface;
  *   handlers = {
  *     "access" = "Drupal\editor\EditorAccessControlHandler",
  *   },
+ *   admin_permission = "administer filters",
  *   entity_keys = {
  *     "id" = "format"
  *   },
