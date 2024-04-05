@@ -196,8 +196,7 @@ abstract class DrupalSqlBase extends SqlBase implements DependentPluginInterface
    *   The source module or NULL if not found.
    */
   public function getSourceModule(): ?string {
-    $source_module = parent::getSourceModule();
-    return $source_module ?? $this->pluginDefinition['source_module'] ?? NULL;
+    return $parent::getSourceModule() ?? $this->pluginDefinition['source_module'] ?? NULL;
   }
 
 }
