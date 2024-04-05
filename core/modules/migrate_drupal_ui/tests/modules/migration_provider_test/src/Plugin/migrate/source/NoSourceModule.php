@@ -10,9 +10,7 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 /**
  * A test source plugin without a source_module.
  */
-#[MigrateSource(
-  id: 'no_source_module',
-)]
+#[MigrateSource('no_source_module')]
 class NoSourceModule extends DrupalSqlBase {
 
   /**

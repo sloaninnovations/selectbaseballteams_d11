@@ -10,10 +10,7 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 /**
  * Source plugin for Sql count cache test.
  */
-#[MigrateSource(
-  id: 'sql_count_cache',
-  source_module: 'migrate',
-)]
+#[MigrateSource('sql_count_cache')]
 class SqlCountCache extends SqlBase {
 
   /**

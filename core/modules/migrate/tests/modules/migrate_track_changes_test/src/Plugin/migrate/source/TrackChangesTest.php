@@ -10,10 +10,7 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 /**
  * Source plugin for migration track changes tests.
  */
-#[MigrateSource(
-  id: 'track_changes_test',
-  source_module: 'migrate',
-)]
+#[MigrateSource('track_changes_test')]
 class TrackChangesTest extends SqlBase {
 
   /**

@@ -10,10 +10,7 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 /**
  * Source plugin for migration high water tests.
  */
-#[MigrateSource(
-  id: 'query_batch_test',
-  source_module: 'migrate',
-)]
+#[MigrateSource('query_batch_test')]
 class QueryBatchTest extends SqlBase {
 
   /**

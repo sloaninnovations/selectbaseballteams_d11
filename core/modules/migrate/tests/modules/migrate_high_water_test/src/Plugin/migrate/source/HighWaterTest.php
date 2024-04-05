@@ -10,10 +10,7 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 /**
  * Source plugin for migration high water tests.
  */
-#[MigrateSource(
-  id: 'high_water_test',
-  source_module: 'migrate',
-)]
+#[MigrateSource('high_water_test')]
 class HighWaterTest extends SqlBase {
 
   /**
