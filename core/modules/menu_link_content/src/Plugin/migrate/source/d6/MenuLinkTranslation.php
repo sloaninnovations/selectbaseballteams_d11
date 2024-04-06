@@ -2,8 +2,8 @@
 
 namespace Drupal\menu_link_content\Plugin\migrate\source\d6;
 
-use Drupal\content_translation\Plugin\migrate\source\I18nQueryTrait;
 use Drupal\migrate\Attribute\MigrateSource;
+use Drupal\migrate\Plugin\migrate\source\I18nQueryTrait;
 use Drupal\migrate\Row;
 use Drupal\menu_link_content\Plugin\migrate\source\MenuLink;
 
@@ -11,11 +11,6 @@ use Drupal\menu_link_content\Plugin\migrate\source\MenuLink;
 
 /**
  * Drupal 6 i18n menu link translations source from database.
- *
- * @MigrateSource(
- *   id = "d6_menu_link_translation",
- *   source_module = "i18nmenu"
- * )
  */
 #[MigrateSource(
   id: 'd6_menu_link_translation',
