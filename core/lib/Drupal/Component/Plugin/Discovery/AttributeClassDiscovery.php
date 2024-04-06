@@ -136,7 +136,13 @@ class AttributeClassDiscovery implements DiscoveryInterface {
   protected function parseClass(string $class, \SplFileInfo $fileinfo): array {
     // @todo Consider performance improvements over using reflection.
     // @see https://www.drupal.org/project/drupal/issues/3395260.
-    $reflection_class = new \ReflectionClass($class);
+    try {
+      $reflection_class = new \ReflectionClass($class);
+    }
+    catch (\Error $e) {
+      // Error exception thrown if the class extends an unknown class.
+      return ['id' => NULL, 'content' => NULL];
+    }
 
     $id = $content = NULL;
     if ($attributes = $reflection_class->getAttributes($this->pluginDefinitionAttributeName, \ReflectionAttribute::IS_INSTANCEOF)) {
