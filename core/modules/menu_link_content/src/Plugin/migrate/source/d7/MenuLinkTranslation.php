@@ -11,6 +11,11 @@ use Drupal\menu_link_content\Plugin\migrate\source\MenuLink;
 
 /**
  * Drupal 7 i18n menu link translations source from database.
+ *
+ * @MigrateSource(
+ *   id = "d7_menu_link_translation",
+ *   source_module = "i18n_menu"
+ * )
  */
 #[MigrateSource(
   id: 'd7_menu_link_translation',
