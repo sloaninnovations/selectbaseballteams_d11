@@ -48,6 +48,43 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   protected $cacheBackend;
 
   /**
+   * Whether the static cache should be ignored.
+   *
+   * This property will be set internally when loading an unchanged revision
+   * via ::loadRevisionUnchanged() before calling ::loadRevision() to load the
+   * revision without using the static revision cache.
+   *
+   * Note that when loading an unchanged entity via ::loadUnchanged() the static
+   * entity cache is cleared instead of simply being ignored. Thus, this flag is
+   * ignored in ::loadUnchanged(). This is done for backwards compatibility and
+   * differs from the behavior with revisions.
+   *
+   * @var bool
+   *
+   * @see \Drupal\Core\Entity\ContentEntityStorageBase::loadRevisionUnchanged()
+   * @see \Drupal\Core\Entity\ContentEntityStorageBase::loadMultipleRevisions()
+   * @see \Drupal\Core\Entity\ContentEntityStorageBase::loadUnchanged()
+   */
+  protected $ignoreStaticCache = FALSE;
+
+  /**
+   * Whether to invalidate all revisions of an entity in ::resetCache() or not.
+   *
+   * By default, all revisions of an entity are invalidated by ::resetCache()
+   * as we cannot easily determine which revisions would be affected by changes
+   * to non-revisionable fields, for example. When an entity is saved, however,
+   * we can determine this, so we avoid unnecessarily invalidating all cached
+   * revisions by setting this flag to FALSE in ::doResetCacheOnSave(). This
+   * cause only the default revision to be invalidated.
+   *
+   * @var bool
+   *
+   * @see \Drupal\Core\Entity\ContentEntityStorageBase::resetCache()
+   * @see \Drupal\Core\Entity\ContentEntityStorageBase::doResetCacheOnSave()
+   */
+  protected $invalidateAllRevisions = TRUE;
+
+  /**
    * Stores the latest revision IDs for entities.
    *
    * @var array
@@ -600,30 +637,62 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   protected function preLoad(array &$ids = NULL) {
     $entities = [];
 
+    // Remove null values from array that may get here by calling
+    // loadUnchanged(NULL), eg.
+    // @todo Remove when https://www.drupal.org/project/drupal/issues/3099709
+    // is committed
+    if (is_array($ids)) {
+      $ids = array_filter($ids, function ($e) {
+        return $e !== NULL;
+      });
+      if (empty($ids)) {
+        return $entities;
+      }
+    }
+    $flipped_ids = $ids ? array_flip($ids) : FALSE;
+    // Get from preload cache.
+    if ($ids && $this->entityType->isStaticallyCacheable()) {
+      foreach ($ids as $id) {
+        if ($cached = $this->memoryCache->get($this->buildCacheId($id) . $this->preLoadCacheIdSuffix)) {
+          $entities[$id] = $cached->data;
+        }
+      }
+      $ids = array_keys(array_diff_key($flipped_ids, $entities));
+    }
+    // Keep preload cache and "normal" cache completely separate, so that
+    // preloaded entities do not mix up with regularly loaded ones.
+    $ignore_static_cache_original = $this->ignoreStaticCache;
+    $this->ignoreStaticCache = TRUE;
     // Call hook_entity_preload().
-    $preload_ids = $ids ?: [];
-    $preload_entities = $this->moduleHandler()->invokeAll('entity_preload', [$preload_ids, $this->entityTypeId]);
-    foreach ((array) $preload_entities as $entity) {
-      $entities[$entity->id()] = $entity;
+    if ($ids === NULL || $ids) {
+      $preload_ids = $ids ?: [];
+      $preload_entities = $this->moduleHandler()->invokeAll('entity_preload', [$preload_ids, $this->entityTypeId]);
+      foreach ((array) $preload_entities as $entity) {
+        $entities[$entity->id()] = $entity;
+        $this->memoryCache->set($this->buildCacheId($entity->id() . $this->preLoadCacheIdSuffix),
+          $entity,
+          MemoryCacheInterface::CACHE_PERMANENT,
+          [$this->memoryCacheTag, $this->memoryCacheTag . ':preloaded']);
+      }
+      if ($entities) {
+        // If any entities were pre-loaded, remove them from the IDs still to
+        // load.
+        if ($ids !== NULL) {
+          $ids = array_keys(array_diff_key(array_flip($ids), $entities));
+        }
+        // If we had to load all the entities ($ids was set to NULL), get an
+        // array of IDs that still need to be loaded.
+        else {
+          $result = $this->getQuery()
+            ->accessCheck(FALSE)
+            ->condition($this->entityType->getKey('id'), array_keys($entities), 'NOT IN')
+            ->execute();
+          $ids = array_values($result);
+        }
+      }
     }
 
-    if ($entities) {
-      // If any entities were pre-loaded, remove them from the IDs still to
-      // load.
-      if ($ids !== NULL) {
-        $ids = array_keys(array_diff_key(array_flip($ids), $entities));
-      }
-      // If we had to load all the entities ($ids was set to NULL), get an array
-      // of IDs that still need to be loaded.
-      else {
-        $result = $this->getQuery()
-          ->accessCheck(FALSE)
-          ->condition($this->entityType->getKey('id'), array_keys($entities), 'NOT IN')
-          ->execute();
-        $ids = array_values($result);
-      }
-    }
-
+    $this->ignoreStaticCache = $ignore_static_cache_original;
     return $entities;
   }
 
@@ -639,26 +708,87 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * {@inheritdoc}
    */
-  public function loadMultipleRevisions(array $revision_ids) {
-    $revisions = $this->doLoadMultipleRevisionsFieldItems($revision_ids);
+  public function loadRevisionUnchanged($revision_id) {
+    // Load the revision by ignoring the static entity revision cache.
+    $revision_ids = [$revision_id];
+    $revisions = $this->getFromPersistentCache($revision_ids, TRUE);
+    if ($revisions) {
+      $revision = $revisions[$revision_id];
+      $entities = [$revision->id() => $revision];
+      $this->postLoad($entities);
+    }
+    else {
+      $this->ignoreStaticCache = TRUE;
+      $revision = $this->loadRevision($revision_id);
+      $this->ignoreStaticCache = FALSE;
+    }
+    return $revision;
+  }
 
-    // The hooks are executed with an array of entities keyed by the entity ID.
-    // As we could load multiple revisions for the same entity ID at once we
-    // have to build groups of entities where the same entity ID is present only
-    // once.
-    $entity_groups = [];
-    $entity_group_mapping = [];
-    foreach ($revisions as $revision) {
-      $entity_id = $revision->id();
-      $entity_group_key = isset($entity_group_mapping[$entity_id]) ? $entity_group_mapping[$entity_id] + 1 : 0;
-      $entity_group_mapping[$entity_id] = $entity_group_key;
-      $entity_groups[$entity_group_key][$entity_id] = $revision;
+  /**
+   * {@inheritdoc}
+   */
+  public function loadMultipleRevisions(array $revision_ids) {
+    $revisions = [];
+
+    // Create a new variable which is either a prepared version of the
+    // $revision_ids array for later comparison with the revision cache, or
+    // FALSE if no $revision_ids were passed. The $revision_ids array is reduced
+    // as items are loaded from cache, allowing storage queries to be avoided.
+    $flipped_revision_ids = !empty($revision_ids) ? array_flip($revision_ids) : FALSE;
+    // Try to load entities from the static cache.
+    if (!$this->ignoreStaticCache && $revision_ids) {
+      $revisions += $this->getFromStaticCache($revision_ids, TRUE);
+      // If any revisions were loaded, remove them from the ids still to load.
+      if ($flipped_revision_ids) {
+        $revision_ids = array_keys(array_diff_key($flipped_revision_ids, $revisions));
+      }
     }
 
-    // Invoke the entity hooks for each group.
-    foreach ($entity_groups as $entities) {
-      $this->invokeStorageLoadHook($entities);
-      $this->postLoad($entities);
+    // Load any remaining revisions from the storage. This is the case if there
+    // are any revision ids left to load.
+    if ($revision_ids) {
+      $queried_revisions = $this->doLoadMultipleRevisionsFieldItems($revision_ids);
+    }
+
+    // Pass all revisions loaded from the database through $this->postLoad(),
+    // which attaches fields (if supported by the entity type) and calls the
+    // entity type specific load callback, for example hook_node_load().
+    if (!empty($queried_revisions)) {
+      // The hooks are executed with an array of entities keyed by the entity
+      // ID. Multiple revisions of the same entity may be loaded, these can be
+      // grouped and passed to hooks together, to minimize hook invocations.
+      $entity_groups = [];
+      $entity_group_mapping = [];
+      foreach ($queried_revisions as $revision) {
+        $entity_id = $revision->id();
+        $entity_group_key = isset($entity_group_mapping[$entity_id]) ? $entity_group_mapping[$entity_id] + 1 : 0;
+        $entity_group_mapping[$entity_id] = $entity_group_key;
+        $entity_groups[$entity_group_key][$entity_id] = $revision;
+      }
+
+      // Invoke the entity hooks for each group.
+      foreach ($entity_groups as $entities) {
+        $this->postLoad($entities);
+      }
+      $revisions += $queried_revisions;
+
+      if (!$this->ignoreStaticCache) {
+        // Add entities to the static cache.
+        $this->setStaticCache($queried_revisions);
+      }
+    }
+
+    // Ensure that the returned array is ordered the same as the original
+    // $revision_ids array if this was passed in and remove any invalid revision
+    // IDs.
+    if ($flipped_revision_ids) {
+      // Remove any invalid revision IDs from the array.
+      $flipped_revision_ids = array_intersect_key($flipped_revision_ids, $revisions);
+      foreach ($revisions as $revision_id => $revision) {
+        $flipped_revision_ids[$revision_id] = $revision;
+      }
+      $revisions = $flipped_revision_ids;
     }
 
     // Ensure that the returned array is ordered the same as the original
@@ -771,6 +901,38 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * {@inheritdoc}
    */
+  protected function doResetCacheOnSave(EntityInterface $entity) {
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+
+    // Tentatively set the flag for ::resetCache() to skip invalidating all
+    // revisions of the entity in the static and persistent caches.
+    $this->invalidateAllRevisions = FALSE;
+
+    if ($this->entityType->isRevisionable()) {
+      // Invalidate revisions of the saved entity in the static and persistent
+      // caches if the entity has writable, non-revisionable fields.
+      foreach ($entity->getFieldDefinitions() as $field_definition) {
+        if (!$field_definition->isReadOnly() && !$field_definition->getFieldStorageDefinition()->isRevisionable()) {
+          $this->invalidateAllRevisions = TRUE;
+          break;
+        }
+      }
+
+      // If saving in the current revision we always have to invalidate the
+      // revision cache for the loaded revision.
+      if (!$this->invalidateAllRevisions && !$entity->isNewRevision()) {
+        $this->resetRevisionCache([$entity->getLoadedRevisionId()]);
+      }
+    }
+    $this->resetCache([$entity->id()]);
+
+    // Reinstate the default behavior of ::resetCache().
+    $this->invalidateAllRevisions = TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function doPostSave(EntityInterface $entity, $update) {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
 
@@ -818,6 +980,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       }
       $this->invokeFieldMethod('deleteRevision', $revision);
       $this->doDeleteRevisionFieldItems($revision);
+      $this->resetRevisionCache([$revision_id]);
       $this->invokeHook('revision_delete', $revision);
     }
   }
@@ -1081,11 +1244,15 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * @param array|null &$ids
    *   If not empty, return entities that match these IDs. IDs that were found
    *   will be removed from the list.
+   * @param bool $revision
+   *   (optional) Defines whether the passed $ids are entity IDs or revision
+   *   IDs. TRUE to retrieve the entities from the persistent revision cache,
+   *   FALSE to use the persistent entity cache. Defaults to FALSE.
    *
    * @return \Drupal\Core\Entity\ContentEntityInterface[]
    *   Array of entities from the persistent cache.
    */
-  protected function getFromPersistentCache(array &$ids = NULL) {
+  protected function getFromPersistentCache(array &$ids = NULL, $revision = FALSE) {
     if (!$this->entityType->isPersistentlyCacheable() || empty($ids)) {
       return [];
     }
@@ -1093,7 +1260,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     // Build the list of cache entries to retrieve.
     $cid_map = [];
     foreach ($ids as $id) {
-      $cid_map[$id] = $this->buildCacheId($id);
+      $cid_map[$id] = $this->buildCacheId($id, $revision);
     }
     $cids = array_values($cid_map);
     if ($cache = $this->cacheBackend->getMultiple($cids)) {
@@ -1119,23 +1286,154 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     if (!$this->entityType->isPersistentlyCacheable()) {
       return;
     }
+    $revisionable = $this->entityType->isRevisionable();
 
     $cache_tags = [
       $this->entityTypeId . '_values',
       'entity_field_info',
     ];
     $items = [];
-    foreach ($entities as $id => $entity) {
-      $items[$this->buildCacheId($id)] = [
-        'data' => $entity,
-        'tags' => $cache_tags,
-      ];
+    foreach ($entities as $entity) {
+      $id = $entity->id();
+      if ($entity->isDefaultRevision()) {
+        $entity_cache_tags = $cache_tags;
+        if ($revisionable) {
+          // When the default revision is cleared from the revision cache via
+          // ::resetRevisionCache() we must clear the respective entity from
+          // the entity cache, as well. To do this, we add a tag with the
+          // revision ID of the default revision to the entity's cache entry.
+          // This tag will be invalidated by ::resetRevisionCache().
+          // @see \Drupal\Core\Entity\ContentEntityStorageBase::resetRevisionCache()
+          $entity_cache_tags[] = "default_revision:{$this->entityTypeId}:{$entity->getRevisionId()}";
+        }
+        $items[$this->buildCacheId($id)] = [
+          'data' => $entity,
+          'tags' => $entity_cache_tags,
+        ];
+      }
+      if ($revisionable) {
+        $revision_cache_tags = $cache_tags;
+        // When an entity is cleared from the entity cache via ::resetCache()
+        // we must clear the related revisions from the revision cache, as well.
+        // In ::doResetCacheOnSave() is decided whether ::resetCache() should
+        // clear the caches for all revisions or just for the default revision.
+        // To make this possible, we add a tag with the entity's ID to the
+        // revision's cache entry. Either of these tags will then be invalidated
+        // by ::resetCache().
+        // @see \Drupal\Core\Entity\ContentEntityStorageBase::doResetCacheOnSave()
+        // @see \Drupal\Core\Entity\ContentEntityStorageBase::resetCache()
+        $revision_cache_tags[] = "revision_of:{$this->entityTypeId}:{$id}";
+        if ($entity->isDefaultRevision()) {
+          $revision_cache_tags[] = "default_revision_of:{$this->entityTypeId}:{$id}";
+        }
+        $items[$this->buildCacheId($entity->getRevisionId(), TRUE)] = [
+          'data' => $entity,
+          'tags' => $revision_cache_tags,
+        ];
+      }
     }
     $this->cacheBackend->setMultiple($items);
   }
 
   /**
-   * {@inheritdoc}
+   * Builds the cache ID for the passed in entity ID or revision ID.
+   *
+   * @param int $id
+   *   Entity ID or revision ID for which the cache ID should be built.
+   * @param bool $revision
+   *   (optional) Defines whether the passed $id is the entity ID or the
+   *   revision ID. TRUE to build the cache ID for the revision cache, FALSE to
+   *   build it for the entity cache. Defaults to FALSE.
+   *
+   * @return string
+   *   Cache ID that can be passed to the cache backend.
+   */
+  protected function buildCacheId($id, $revision = FALSE) {
+    return $revision ? "values:{$this->entityTypeId}:revision:$id" : parent::buildCacheId($id);
+  }
+
+  /**
+   * Gets entities from the static cache.
+   *
+   * @param array $ids
+   *   If not empty, return entities that match these IDs.
+   * @param bool $revision
+   *   (optional) Defines whether the passed $ids are entity IDs or entity
+   *   revision IDs. TRUE to retrieve the entities from the static entity
+   *   revision cache, FALSE to use the static entity cache. Defaults to FALSE.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface[]
+   *   Array of entities from the entity cache.
+   */
+  protected function getFromStaticCache(array $ids, $revision = FALSE) {
+    $entities = [];
+    if ($revision) {
+      // Load any available entities from the internal revision cache.
+      if ($this->entityType->isStaticallyCacheable()) {
+        $cache_ids = array_map(function ($id) {
+          return $this->buildCacheId($id, TRUE);
+        }, $ids);
+        $map = array_combine($cache_ids, $ids);
+
+        $cache_items = $this->memoryCache->getMultiple($cache_ids);
+        foreach ($cache_items as $cache_id => $item) {
+          $entities[$map[$cache_id]] = $item->data;
+        }
+      }
+    }
+    else {
+      $entities = parent::getFromStaticCache($ids);
+    }
+    return $entities;
+  }
+
+  /**
+   * Stores entities in the static entity and entity revision cache.
+   *
+   * Default revisions will be stored both in the entity and entity revision
+   * cache, while non-default revisions will be stored only in the entity
+   * revision cache.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
+   *   Entities to store in the cache.
+   */
+  protected function setStaticCache(array $entities) {
+    // Do not call the parent implementation so that non-default revisions do
+    // not get cached in the entity cache.
+    if ($this->entityType->isStaticallyCacheable()) {
+      $revisionable = $this->entityType->isRevisionable();
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      foreach ($entities as $entity) {
+        $id = $entity->id();
+        if ($entity->isDefaultRevision()) {
+          $cache_tags = [$this->memoryCacheTag];
+          // @see \Drupal\Core\Entity\ContentEntityStorageBase::setPersistentCache()
+          if ($revisionable) {
+            $cache_tags[] = "default_revision:{$this->entityTypeId}:{$entity->getRevisionId()}";
+          }
+          $this->memoryCache->set($this->buildCacheId($id), $entity, MemoryCacheInterface::CACHE_PERMANENT, $cache_tags);
+        }
+        if ($revisionable) {
+          // @see \Drupal\Core\Entity\ContentEntityStorageBase::setPersistentCache()
+          $cache_tags_revision = [$this->memoryCacheTag, "revision_of:{$this->entityTypeId}:{$id}"];
+          if ($entity->isDefaultRevision()) {
+            $cache_tags_revision[] = "default_revision_of:{$this->entityTypeId}:{$id}";
+          }
+          $this->memoryCache->set($this->buildCacheId($entity->getRevisionId(), TRUE), $entity, MemoryCacheInterface::CACHE_PERMANENT, $cache_tags_revision);
+        }
+      }
+    }
+  }
+
+  /**
+   * Resets the static and persistent entity cache.
+   *
+   * Additionally the revisions of the entities will be invalidated in the
+   * static and persistent revision caches.
+   *
+   * @param $id
+   *   (optional) If specified, the cache is reset for the entities with the
+   *   given id only.
    */
   public function loadUnchanged($id) {
     $entities = [];
@@ -1195,13 +1493,38 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   public function resetCache(array $ids = NULL) {
     if ($ids) {
       parent::resetCache($ids);
-      if ($this->entityType->isPersistentlyCacheable()) {
-        $cids = [];
-        foreach ($ids as $id) {
-          unset($this->latestRevisionIds[$id]);
-          $cids[] = $this->buildCacheId($id);
+      $revisionable = $this->entityType->isRevisionable();
+      $cids = [];
+      $revision_cache_tags = [];
+      foreach ($ids as $id) {
+        unset($this->latestRevisionIds[$id]);
+        $cids[] = $this->buildCacheId($id);
+
+        // Invalidate related entity revisions in the persistent entity cache.
+        if ($revisionable) {
+          // Either invalidate all revisions or only the default revision.
+          // If not all revisions should be invalidated, because an entity is
+          // being saved, invalidating the default revision is theoretically
+          // only necessary if the entity is being saved as a default revision.
+          // Checking this, however, would require additional complexity in
+          // ::doPostSave() so we always invalidate the default revision here in
+          // this case.
+          $revision_cache_tags[] = $this->invalidateAllRevisions ?
+            "revision_of:{$this->entityTypeId}:{$id}" :
+            "default_revision_of:{$this->entityTypeId}:{$id}";
         }
+      }
+
+      if ($this->entityType->isPersistentlyCacheable()) {
         $this->cacheBackend->deleteMultiple($cids);
+        if ($revisionable) {
+          // Invalidate related entity revisions in the persistent entity cache.
+          Cache::invalidateTags($revision_cache_tags);
+        }
+      }
+      if ($this->entityType->isStaticallyCacheable() && $revisionable) {
+        // Invalidate related entity revisions in the static entity cache.
+        $this->memoryCache->invalidateTags($revision_cache_tags);
       }
     }
     else {
@@ -1210,6 +1533,29 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         Cache::invalidateTags([$this->entityTypeId . '_values']);
       }
       $this->latestRevisionIds = [];
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function resetRevisionCache(array $revision_ids) {
+    $cache_ids = array_map(function ($revision_id) {
+      return $this->buildCacheId($revision_id, TRUE);
+    }, $revision_ids);
+    // Make sure that the default revision will always be removed from
+    // entity cache as well.
+    $cache_tags = array_map(function ($revision_id) {
+      return "default_revision:{$this->entityTypeId}:{$revision_id}";
+    }, $revision_ids);
+
+    if ($this->entityType->isStaticallyCacheable()) {
+      $this->memoryCache->deleteMultiple($cache_ids);
+      $this->memoryCache->invalidateTags($cache_tags);
+    }
+    if ($this->entityType->isPersistentlyCacheable()) {
+      $this->cacheBackend->deleteMultiple($cache_ids);
+      Cache::invalidateTags($cache_tags);
     }
   }
 

@@ -45,6 +45,20 @@ interface RevisionableStorageInterface extends EntityStorageInterface {
   public function loadMultipleRevisions(array $revision_ids);
 
   /**
+   * Loads an unchanged entity by revision ID from the database.
+   *
+   * @param int $revision_id
+   *   The revision ID of the entity to load.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|null
+   *   The unchanged entity, or NULL if the entity cannot be loaded.
+   *
+   * @todo Remove this method once we have a reliable way to retrieve the
+   *   unchanged revision from the entity object.
+   */
+  public function loadRevisionUnchanged($revision_id);
+
+  /**
    * Deletes a specific entity revision.
    *
    * A revision can only be deleted if it's not the currently active one.
@@ -64,5 +78,17 @@ interface RevisionableStorageInterface extends EntityStorageInterface {
    *   The latest revision identifier or NULL if no revision could be found.
    */
   public function getLatestRevisionId($entity_id);
+
+  /**
+   * Resets the static and persistent revision caches.
+   *
+   * If a revision ID denotes a default revision then the corresponding entity
+   * will be invalidated in the entity static and persistent caches, as well.
+   *
+   * @param $revision_ids
+   *   The entity revision IDs to reset the static and persistent revision
+   *   caches for.
+   */
+  public function resetRevisionCache(array $revision_ids);
 
 }
