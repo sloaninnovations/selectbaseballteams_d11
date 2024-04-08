@@ -45,13 +45,6 @@ class TestSqlIdMap extends Sql implements \Iterator {
   public $message;
 
   /**
-   * {@inheritdoc}
-   */
-  public function getDatabase() {
-    return parent::getDatabase();
-  }
-
-  /**
    * Gets the field schema.
    *
    * @param array $id_definition
@@ -84,20 +77,6 @@ class TestSqlIdMap extends Sql implements \Iterator {
       default:
         throw new MigrateException($id_definition['type'] . ' not supported');
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function ensureTables() {
-    parent::ensureTables();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getMigrationPluginManager() {
-    return parent::getMigrationPluginManager();
   }
 
 }

@@ -48,46 +48,4 @@ class FieldDiscoveryTestClass extends FieldDiscovery {
     return parent::getAllFields($core);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getBundleFields($core, $entity_type_id, $bundle) {
-    return parent::getBundleFields($core, $entity_type_id, $bundle);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getEntityFields($core, $entity_type_id) {
-    return parent::getEntityFields($core, $entity_type_id);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getFieldInstanceStubMigrationDefinition($core) {
-    return parent::getFieldInstanceStubMigrationDefinition($core);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCoreVersion(MigrationInterface $migration) {
-    return parent::getCoreVersion($migration);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getFieldPlugin($field_type, MigrationInterface $migration) {
-    return parent::getFieldPlugin($field_type, $migration);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getSourcePlugin($core) {
-    return parent::getSourcePlugin($core);
-  }
-
 }
