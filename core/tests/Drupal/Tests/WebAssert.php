@@ -45,9 +45,16 @@ class WebAssert extends MinkWebAssert {
   }
 
   /**
-   * {@inheritdoc}
+   * Trims scriptname from the URL.
+   *
+   * @param string|Url $url
+   *   A url string, or object.
+   * @param bool $include_query
+   *   Whether to include the query string in the return value.
+   *
+   * @return string
    */
-  protected function cleanUrl($url, $include_query = FALSE) {
+  protected function cleanUrl(string|Url $url, bool $include_query = FALSE): string {
     if ($url instanceof Url) {
       $url = $url->setAbsolute()->toString();
     }
@@ -752,9 +759,16 @@ class WebAssert extends MinkWebAssert {
   }
 
   /**
-   * {@inheritdoc}
+   * Checks that current session address is equals to provided one.
+   *
+   * @param string|Url $page
+   *   A url string, or object.
+   *
+   * @return void
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException
    */
-  public function addressEquals($page) {
+  public function addressEquals(string|Url $page): void {
     $expected = $this->cleanUrl($page, TRUE);
     $actual = $this->cleanUrl($this->session->getCurrentUrl(), str_contains($expected, '?'));
 
@@ -762,9 +776,14 @@ class WebAssert extends MinkWebAssert {
   }
 
   /**
-   * {@inheritdoc}
+   * Checks that current session address is not equals to provided one.
+   *
+   * @param string|Url $page
+   *   A url string, or object.
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException
    */
-  public function addressNotEquals($page) {
+  public function addressNotEquals(string|Url $page): void {
     $expected = $this->cleanUrl($page, TRUE);
     $actual = $this->cleanUrl($this->session->getCurrentUrl(), str_contains($expected, '?'));
 
