@@ -45,9 +45,9 @@ class WebAssert extends MinkWebAssert {
   }
 
   /**
-   * Trims scriptname from the URL.
+   * Trims the base URL from the URL.
    *
-   * @param string|Url $url
+   * @param string|\Drupal\Core\Url $url
    *   A url string, or object.
    * @param bool $include_query
    *   Whether to include the query string in the return value.
@@ -761,7 +761,7 @@ class WebAssert extends MinkWebAssert {
   /**
    * Checks that current session address is equals to provided one.
    *
-   * @param string|Url $page
+   * @param string|\Drupal\Core\Url $page
    *   A url string, or object.
    *
    * @return void
@@ -778,7 +778,7 @@ class WebAssert extends MinkWebAssert {
   /**
    * Checks that current session address is not equals to provided one.
    *
-   * @param string|Url $page
+   * @param string|\Drupal\Core\Url $page
    *   A url string, or object.
    *
    * @throws \Behat\Mink\Exception\ExpectationException
