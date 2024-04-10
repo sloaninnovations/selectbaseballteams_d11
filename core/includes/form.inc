@@ -93,7 +93,7 @@ function form_select_options($element, $choices = NULL) {
  * @see https://www.drupal.org/node/3412600
  */
 function form_get_options($element, $key) {
-  @trigger_error('form_get_options() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Form\FormOptionsHelper::formGetOptions(). See https://www.drupal.org/node/3412600',
+  @trigger_error('form_get_options() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3412600',
     E_USER_DEPRECATED);
   $keys = [];
   foreach ($element['#options'] as $index => $choice) {
