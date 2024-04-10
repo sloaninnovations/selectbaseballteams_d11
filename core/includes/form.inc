@@ -75,7 +75,7 @@ function form_select_options($element, $choices = NULL) {
  * index is not sufficient, and supporting this would make the
  * "helper" too complicated and cumbersome to be of any help.
  *
- * As usual with functions that can return [] or FALSE, do not
+ * As usual with functions that can return array() or FALSE, do not
  * forget to use === and !== if needed.
  *
  * @param $element
@@ -87,7 +87,7 @@ function form_select_options($element, $choices = NULL) {
  *   An array of indexes that match the given $key. Array will be
  *   empty if no elements were found. FALSE if optgroups were found.
  *
- * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0.
+ * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0.
  *    There is no direct replacement.
  *
  * @see https://www.drupal.org/node/3412600
@@ -95,7 +95,21 @@ function form_select_options($element, $choices = NULL) {
 function form_get_options($element, $key) {
   @trigger_error('form_get_options() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Form\FormOptionsHelper::formGetOptions(). See https://www.drupal.org/node/3412600',
     E_USER_DEPRECATED);
-  return FormOptionsHelper::formGetOptions($element, $key);
+  $keys = [];
+  foreach ($element['#options'] as $index => $choice) {
+    if (is_array($choice)) {
+      return FALSE;
+    }
+    elseif (is_object($choice)) {
+      if (isset($choice->option[$key])) {
+        $keys[] = $index;
+      }
+    }
+    elseif ($index == $key) {
+      $keys[] = $index;
+    }
+  }
+  return $keys;
 }
 
 /**
