@@ -54,7 +54,7 @@ class WebAssert extends MinkWebAssert {
    *
    * @return string
    */
-  protected function cleanUrl(string|Url $url, bool $include_query = FALSE): string {
+  protected function cleanUrl(string|Url $url, bool $include_query = FALSE) {
     if ($url instanceof Url) {
       $url = $url->setAbsolute()->toString();
     }
@@ -768,7 +768,7 @@ class WebAssert extends MinkWebAssert {
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    */
-  public function addressEquals(string|Url $page): void {
+  public function addressEquals(string|Url $page) {
     $expected = $this->cleanUrl($page, TRUE);
     $actual = $this->cleanUrl($this->session->getCurrentUrl(), str_contains($expected, '?'));
 
@@ -783,7 +783,7 @@ class WebAssert extends MinkWebAssert {
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    */
-  public function addressNotEquals(string|Url $page): void {
+  public function addressNotEquals(string|Url $page) {
     $expected = $this->cleanUrl($page, TRUE);
     $actual = $this->cleanUrl($this->session->getCurrentUrl(), str_contains($expected, '?'));
 
