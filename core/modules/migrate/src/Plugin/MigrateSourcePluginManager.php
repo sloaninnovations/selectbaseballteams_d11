@@ -5,6 +5,7 @@ namespace Drupal\migrate\Plugin;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
+use Drupal\migrate\Attribute\MigrateSource;
 use Drupal\migrate\Plugin\Discovery\AnnotatedClassDiscoveryAutomatedProviders;
 use Drupal\migrate\Plugin\Discovery\AttributeClassDiscoveryAutomatedProviders;
 use Drupal\migrate\Plugin\Discovery\AttributeDiscoveryWithAnnotationsAutomatedProviders;
@@ -37,7 +38,7 @@ class MigrateSourcePluginManager extends MigratePluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct($type, \Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct($type, $namespaces, $cache_backend, $module_handler, 'Drupal\migrate\Attribute\MigrateSource', 'Drupal\migrate\Annotation\MigrateSource');
+    parent::__construct($type, $namespaces, $cache_backend, $module_handler, MigrateSource::class, 'Drupal\migrate\Annotation\MigrateSource');
   }
 
   /**

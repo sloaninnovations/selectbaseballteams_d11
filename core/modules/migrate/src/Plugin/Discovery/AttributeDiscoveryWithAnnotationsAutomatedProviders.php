@@ -59,6 +59,9 @@ class AttributeDiscoveryWithAnnotationsAutomatedProviders extends AttributeDisco
     // file. However, StaticReflectionParser needs a finder, so use a
     // mock version.
     $finder = MockFileFinder::create($fileinfo->getPathName());
+    // Note that the parser is instantiated here with FALSE as the last
+    // parameter. This is needed so that the parser includes the 'extends'
+    // declaration and extracts providers from ancestor classes.
     $parser = new BaseStaticReflectionParser($class, $finder, FALSE);
 
     $reflection_class = $parser->getReflectionClass();
