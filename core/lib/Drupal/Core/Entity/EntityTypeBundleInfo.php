@@ -109,6 +109,14 @@ class EntityTypeBundleInfo implements EntityTypeBundleInfoInterface {
         }
         $this->moduleHandler->alter('entity_bundle_info', $this->bundleInfo);
         $this->cacheSet("entity_bundle_info:$langcode", $this->bundleInfo, Cache::PERMANENT, ['entity_types', 'entity_bundles']);
+
+        // The loading of entities above may have triggered the setting of the
+        // data type cache but potentially without all derived entity bundle
+        // data types. Since the bundle information is now fully built and
+        // cached, triggering a rebuild of the data type information will yield
+        // all derived entity bundle data types.
+        /* @see \Drupal\Core\Entity\Plugin\DataType\Deriver\EntityDeriver */
+        $this->typedDataManager->clearCachedDefinitions();
       }
     }
 

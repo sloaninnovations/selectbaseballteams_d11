@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\TypedData;
 
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
@@ -22,6 +23,13 @@ class TypedDataDefinitionEntityBundleTest extends KernelTestBase {
    * @var \Drupal\Core\TypedData\TypedDataManager
    */
   protected TypedDataManagerInterface $typedDataManager;
+
+  /**
+   * The entity type bundle information.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected EntityTypeBundleInfoInterface $entityTypeBundleInfo;
 
   /**
    * The storage for the 'entity_test_bundle' entity type.
@@ -42,6 +50,7 @@ class TypedDataDefinitionEntityBundleTest extends KernelTestBase {
     parent::setUp();
 
     $this->typedDataManager = $this->container->get('typed_data_manager');
+    $this->entityTypeBundleInfo = $this->container->get('entity_type.bundle.info');
 
     $entityTypeManager = $this->container->get('entity_type.manager');
     assert($entityTypeManager instanceof EntityTypeManagerInterface);
@@ -60,8 +69,23 @@ class TypedDataDefinitionEntityBundleTest extends KernelTestBase {
     $this->assertNotContains('entity:entity_test_with_bundle:test', $dataTypes);
 
     // Add a bundle and make sure the bundle-specific data type is registered.
+    // The bundle and data type cache will be cleared automatically.
+    /* @see \Drupal\Core\Entity\EntityBundleListener::onBundleCreate() */
     $bundle = $this->entityTestBundleStorage->create(['id' => 'test']);
     $bundle->save();
+    $dataTypes = array_keys($this->typedDataManager->getDefinitions());
+    $this->assertContains('entity:entity_test_with_bundle', $dataTypes);
+    $this->assertContains('entity:entity_test_with_bundle:test', $dataTypes);
+
+    // Make sure that fetching the bundle information first (after clearing both
+    // bundle and data type cache) does not corrupt the data type cache.
+    /* @see \Drupal\Core\Entity\EntityTypeBundleInfo::clearCachedBundles() */
+    $this->entityTypeBundleInfo->clearCachedBundles();
+    // Note that the data type cache will be primed *during* the building the of
+    // the bundle cache.
+    /* @see entity_test_entity_test_bundle_load() */
+    $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo('entity_test_with_bundle'));
+    $this->assertContains('test', $bundles);
     $dataTypes = array_keys($this->typedDataManager->getDefinitions());
     $this->assertContains('entity:entity_test_with_bundle', $dataTypes);
     $this->assertContains('entity:entity_test_with_bundle:test', $dataTypes);
