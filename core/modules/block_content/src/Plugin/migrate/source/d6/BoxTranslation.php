@@ -12,11 +12,6 @@ use Drupal\migrate\Attribute\MigrateSource;
  *
  * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
- *
- * @MigrateSource(
- *   id = "d6_box_translation",
- *   source_module = "i18nblocks"
- * )
  */
 #[MigrateSource(
   id: 'd6_box_translation',
