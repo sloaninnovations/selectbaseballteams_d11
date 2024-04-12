@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Entity\EntityReferenceSelection;
 
 use Drupal\comment\Tests\CommentTestTrait;
@@ -47,6 +49,14 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
     'text',
     'user',
   ];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}

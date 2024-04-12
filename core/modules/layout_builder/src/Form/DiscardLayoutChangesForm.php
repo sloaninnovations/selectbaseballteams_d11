@@ -17,6 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class DiscardLayoutChangesForm extends ConfirmFormBase {
 
+  use WorkspaceSafeFormTrait;
+
   /**
    * The layout tempstore repository.
    *
@@ -79,7 +81,7 @@ class DiscardLayoutChangesForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return $this->sectionStorage->getRedirectUrl();
+    return $this->sectionStorage->getLayoutBuilderUrl();
   }
 
   /**
@@ -87,6 +89,7 @@ class DiscardLayoutChangesForm extends ConfirmFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, SectionStorageInterface $section_storage = NULL) {
     $this->sectionStorage = $section_storage;
+    $this->markWorkspaceSafe($form_state);
     // Mark this as an administrative page for JavaScript ("Back to site" link).
     $form['#attached']['drupalSettings']['path']['currentPathIsAdmin'] = TRUE;
     return parent::buildForm($form, $form_state);
@@ -100,7 +103,7 @@ class DiscardLayoutChangesForm extends ConfirmFormBase {
 
     $this->messenger->addMessage($this->t('The changes to the layout have been discarded.'));
 
-    $form_state->setRedirectUrl($this->getCancelUrl());
+    $form_state->setRedirectUrl($this->sectionStorage->getRedirectUrl());
   }
 
 }

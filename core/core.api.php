@@ -1555,9 +1555,7 @@
  * Ideally, all code that is included in Drupal Core and contributed modules,
  * themes, and distributions will be secure, internationalized, maintainable,
  * and efficient. In order to facilitate this, the Drupal community has
- * developed a set of guidelines and standards for developers to follow. Most of
- * these standards can be found under
- * @link https://www.drupal.org/developing/best-practices Best practices on Drupal.org @endlink
+ * developed a set of guidelines and standards for developers to follow.
  *
  * Standards and best practices that developers should be aware of include:
  * - Security: https://www.drupal.org/writing-secure-code and the
@@ -2169,7 +2167,7 @@ function hook_countries_alter(&$countries) {
  *   The array of display variant definitions, keyed by plugin ID.
  *
  * @see \Drupal\Core\Display\VariantManager
- * @see \Drupal\Core\Display\Annotation\DisplayVariant
+ * @see \Drupal\Core\Display\Attribute\DisplayVariant
  */
 function hook_display_variant_plugin_alter(array &$definitions) {
   $definitions['full_page']['admin_label'] = t('Block layout');
@@ -2465,7 +2463,7 @@ function hook_validation_constraint_alter(array &$definitions) {
  * @section sec_query Query parameters in Ajax requests
  * If a form uses an Ajax field, all the query parameters in the current request
  * will be also added to the Ajax POST requests along with an additional
- * 'ajax_form=1' parameter (See \Drupal\Core\Render\Element\RenderElement).
+ * 'ajax_form=1' parameter (See \Drupal\Core\Render\Element\RenderElementBase).
  * @code
  * $settings['options']['query'] += \Drupal::request()->query->all();
  * $settings['options']['query'][FormBuilderInterface::AJAX_FORM_REQUEST] = TRUE;
@@ -2596,7 +2594,7 @@ function hook_validation_constraint_alter(array &$definitions) {
  *   this class is subscribed to, and which methods on the class should be
  *   called for each one. Example:
  *   @code
- *   public static function getSubscribedEvents() {
+ *   public static function getSubscribedEvents(): array {
  *     // Subscribe to kernel terminate with priority 100.
  *     $events[KernelEvents::TERMINATE][] = array('onTerminate', 100);
  *     // Subscribe to kernel request with default priority of 0.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
@@ -15,6 +17,7 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
  *
  * @group Entity
  * @group Validation
+ * @group #slow
  */
 class EntityViewDisplayValidationTest extends ConfigEntityValidationTestBase {
 

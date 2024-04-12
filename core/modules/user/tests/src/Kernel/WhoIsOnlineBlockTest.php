@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\block\Entity\Block;
@@ -17,6 +19,14 @@ class WhoIsOnlineBlockTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = ['system', 'user', 'block', 'views'];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * The block being tested.
@@ -115,7 +125,8 @@ class WhoIsOnlineBlockTest extends KernelTestBase {
     $this->assertText($user2->getAccountName(), 'Active user 2 found in online list.');
     $this->assertNoText($user3->getAccountName(), 'Inactive user not found in online list.');
     // Verify that online users are ordered correctly.
-    $this->assertGreaterThan(strpos($this->getRawContent(), $user2->getAccountName()), strpos($this->getRawContent(), $user1->getAccountName()));
+    $raw_content = (string) $this->getRawContent();
+    $this->assertGreaterThan(strpos($raw_content, $user2->getAccountName()), strpos($raw_content, $user1->getAccountName()));
   }
 
 }

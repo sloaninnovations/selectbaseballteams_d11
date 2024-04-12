@@ -50,10 +50,13 @@ class WorkspaceSwitcherTest extends BrowserTestBase {
    * Tests switching workspace via the switcher block and admin page.
    */
   public function testSwitchingWorkspaces() {
-    $vultures = $this->createWorkspaceThroughUi('Vultures', 'vultures');
-    $this->switchToWorkspace($vultures);
-
+    $this->createAndActivateWorkspaceThroughUi('Vultures', 'vultures');
     $gravity = $this->createWorkspaceThroughUi('Gravity', 'gravity');
+
+    // Confirm the block shows on the front page.
+    $this->drupalGet('<front>');
+    $page = $this->getSession()->getPage();
+    $this->assertTrue($page->hasContent('Workspace switcher'));
 
     $this->drupalGet('/admin/config/workflow/workspaces/manage/' . $gravity->id() . '/activate');
 

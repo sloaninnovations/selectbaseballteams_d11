@@ -11,7 +11,6 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\Dependency;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Installer\InstallerKernel;
-use Drupal\Core\Site\SettingsEditor;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -109,8 +108,7 @@ function drupal_install_profile_distribution_name() {
     }
   }
   // At all other times, we load the profile via standard methods.
-  else {
-    $profile = \Drupal::installProfile();
+  elseif ($profile = \Drupal::installProfile()) {
     $info = \Drupal::service('extension.list.profile')->getExtensionInfo($profile);
   }
   return $info['distribution']['name'] ?? 'Drupal';
@@ -142,200 +140,6 @@ function drupal_install_profile_distribution_version() {
 }
 
 /**
- * Replaces values in settings.php with values in the submitted array.
- *
- * This function replaces values in place if possible, even for
- * multidimensional arrays. This way the old settings do not linger,
- * overridden and also the doxygen on a value remains where it should be.
- *
- * @param $settings
- *   An array of settings that need to be updated. Multidimensional arrays
- *   are dumped up to a stdClass object. The object can have value, required
- *   and comment properties.
- *   @code
- *   $settings['settings']['config_sync_directory'] = (object) array(
- *     'value' => 'config_hash/sync',
- *     'required' => TRUE,
- *   );
- *   @endcode
- *   gets dumped as:
- *   @code
- *   $settings['config_sync_directory'] = 'config_hash/sync'
- *   @endcode
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   SettingsEditor::rewrite() instead. Note $settings_file argument becomes
- *   required and the first argument of the method.
- *
- * @see https://www.drupal.org/node/3244583
- * @see \Drupal\Core\Site\SettingsEditor::rewrite()
- */
-function drupal_rewrite_settings($settings = [], $settings_file = NULL) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use SettingsEditor::rewrite() instead. The order of the arguments has also changed: $settings_file is now required and is the first argument of the method. See https://www.drupal.org/node/3244583', E_USER_DEPRECATED);
-  SettingsEditor::rewrite(
-    $settings_file ?? \Drupal::getContainer()->getParameter('site.path') . '/settings.php',
-    $settings
-  );
-}
-
-/**
- * Helper for drupal_rewrite_settings().
- *
- * Checks whether this token represents a scalar or NULL.
- *
- * @param int $type
- *   The token type.
- * @param string $value
- *   The value of the token.
- *
- * @return bool
- *   TRUE if this token represents a scalar or NULL.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   SettingsEditor::rewrite() instead. As internal API,
- *   _drupal_rewrite_settings_is_simple() may also be removed in a minor
- *   release.
- *
- * @see https://www.drupal.org/node/3244583
- * @see token_name()
- */
-function _drupal_rewrite_settings_is_simple($type, $value) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use SettingsEditor::rewrite() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3244583', E_USER_DEPRECATED);
-  $is_integer = $type == T_LNUMBER;
-  $is_float = $type == T_DNUMBER;
-  $is_string = $type == T_CONSTANT_ENCAPSED_STRING;
-  $is_boolean_or_null = $type == T_STRING && in_array(strtoupper($value), ['TRUE', 'FALSE', 'NULL']);
-  return $is_integer || $is_float || $is_string || $is_boolean_or_null;
-}
-
-/**
- * Helper for drupal_rewrite_settings().
- *
- * Checks whether this token represents a valid array index: a number or a
- * string.
- *
- * @param int $type
- *   The token type.
- *
- * @return bool
- *   TRUE if this token represents a number or a string.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   SettingsEditor::rewrite() instead. As internal API,
- *   _drupal_rewrite_settings_is_array_index() may also be removed in a minor
- *   release.
- *
- * @see https://www.drupal.org/node/3244583
- * @see token_name()
- */
-function _drupal_rewrite_settings_is_array_index($type) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use SettingsEditor::rewrite() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3244583', E_USER_DEPRECATED);
-  $is_integer = $type == T_LNUMBER;
-  $is_float = $type == T_DNUMBER;
-  $is_string = $type == T_CONSTANT_ENCAPSED_STRING;
-  return $is_integer || $is_float || $is_string;
-}
-
-/**
- * Helper for drupal_rewrite_settings().
- *
- * Makes the new settings global.
- *
- * @param array|null $ref
- *   A reference to a nested index in $GLOBALS.
- * @param array|object $variable
- *   The nested value of the setting being copied.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   SettingsEditor::rewrite() instead. As internal API,
- *   _drupal_rewrite_settings_global() may also be removed in a minor
- *   release.
- *
- * @see https://www.drupal.org/node/3244583
- */
-function _drupal_rewrite_settings_global(&$ref, $variable) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use SettingsEditor::rewrite() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3244583', E_USER_DEPRECATED);
-  if (is_object($variable)) {
-    $ref = $variable->value;
-  }
-  else {
-    foreach ($variable as $k => $v) {
-      _drupal_rewrite_settings_global($ref[$k], $v);
-    }
-  }
-}
-
-/**
- * Helper for drupal_rewrite_settings().
- *
- * Dump the relevant value properties.
- *
- * @param array|object $variable
- *   The container for variable values.
- * @param string $variable_name
- *   Name of variable.
- *
- * @return string
- *   A string containing valid PHP code of the variable suitable for placing
- *   into settings.php.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   SettingsEditor::rewrite() instead. As internal API,
- *   _drupal_rewrite_settings_dump() may also be removed in a minor
- *   release.
- *
- * @see https://www.drupal.org/node/3244583
- */
-function _drupal_rewrite_settings_dump($variable, $variable_name) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use SettingsEditor::rewrite() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3244583', E_USER_DEPRECATED);
-  $return = '';
-  if (is_object($variable)) {
-    if (!empty($variable->required)) {
-      $return .= _drupal_rewrite_settings_dump_one($variable, "$variable_name = ", "\n");
-    }
-  }
-  else {
-    foreach ($variable as $k => $v) {
-      $return .= _drupal_rewrite_settings_dump($v, $variable_name . "['" . $k . "']");
-    }
-  }
-  return $return;
-}
-
-/**
- * Helper for drupal_rewrite_settings().
- *
- * Dump the value of a value property and adds the comment if it exists.
- *
- * @param object $variable
- *   A stdClass object with at least a value property.
- * @param string $prefix
- *   A string to prepend to the variable's value.
- * @param string $suffix
- *   A string to append to the variable's value.
- *
- * @return string
- *   A string containing valid PHP code of the variable suitable for placing
- *   into settings.php.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   SettingsEditor::rewrite() instead. As internal API,
- *   _drupal_rewrite_settings_dump_one() may also be removed in a minor
- *   release.
- *
- * @see https://www.drupal.org/node/3244583
- */
-function _drupal_rewrite_settings_dump_one(\stdClass $variable, $prefix = '', $suffix = '') {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use SettingsEditor::rewrite() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3244583', E_USER_DEPRECATED);
-  $return = $prefix . var_export($variable->value, TRUE) . ';';
-  if (!empty($variable->comment)) {
-    $return .= ' // ' . $variable->comment;
-  }
-  $return .= $suffix;
-  return $return;
-}
-
-/**
  * Verifies that all dependencies are met for a given installation profile.
  *
  * @param $install_state
@@ -343,9 +147,15 @@ function _drupal_rewrite_settings_dump_one(\stdClass $variable, $prefix = '', $s
  *
  * @return array
  *   The list of modules to install.
+ *
+ * @todo https://www.drupal.org/i/3005959 Rework this method as it is not only
+ *   about profiles.
  */
 function drupal_verify_profile($install_state) {
   $profile = $install_state['parameters']['profile'];
+  if ($profile === FALSE) {
+    return [];
+  }
   $info = $install_state['profile_info'];
 
   // Get the list of available modules for the selected installation profile.
@@ -429,9 +239,14 @@ function drupal_install_system($install_state) {
 
   // Store the installation profile in configuration to populate the
   // 'install_profile' container parameter.
-  \Drupal::configFactory()->getEditable('core.extension')
-    ->set('profile', $install_state['parameters']['profile'])
-    ->save();
+  $config = \Drupal::configFactory()->getEditable('core.extension');
+  if ($install_state['parameters']['profile'] === FALSE) {
+    $config->clear('profile');
+  }
+  else {
+    $config->set('profile', $install_state['parameters']['profile']);
+  }
+  $config->save();
 
   $connection = Database::getConnection();
   $provider = $connection->getProvider();

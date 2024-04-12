@@ -9,7 +9,6 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -94,10 +93,6 @@ class CallableResolverTest extends UnitTestCase {
       'Non-static function, instantiated by class resolver, container injection' => [
         '\Drupal\Tests\Core\Utility\MockContainerInjection::getResult',
         'Drupal\Tests\Core\Utility\MockContainerInjection::getResult-foo',
-      ],
-      'Non-static function, instantiated by class resolver, container aware' => [
-        '\Drupal\Tests\Core\Utility\MockContainerAware::getResult',
-        'Drupal\Tests\Core\Utility\MockContainerAware::getResult',
       ],
       'Service notation' => [
         'test_service:method',
@@ -247,27 +242,4 @@ class NoInstantiationMockStaticCallable {
 }
 
 class NoMethodCallable {
-}
-
-class MockContainerAware implements ContainerAwareInterface {
-
-  /**
-   * The service container.
-   */
-  protected ContainerInterface $container;
-
-  /**
-   * Sets the service container.
-   */
-  public function setContainer(?ContainerInterface $container): void {
-    $this->container = $container;
-  }
-
-  public function getResult($suffix) {
-    if (empty($this->container)) {
-      throw new \Exception('Container was not injected.');
-    }
-    return __METHOD__ . '+' . $suffix;
-  }
-
 }

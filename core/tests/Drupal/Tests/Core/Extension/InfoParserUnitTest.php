@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Extension;
 
+// cspell:ignore skynet
+
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\InfoParser;
-use Drupal\Core\Extension\InfoParserDynamic;
 use Drupal\Core\Extension\InfoParserException;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
@@ -534,14 +535,6 @@ INFO;
         "Extension Module for That (%s) has a 'lifecycle_link' entry that is not a valid URL.",
       ],
     ];
-  }
-
-  /**
-   * @group legacy
-   */
-  public function testDeprecation(): void {
-    $this->expectDeprecation('Calling InfoParserDynamic::__construct() without the $app_root argument is deprecated in drupal:10.1.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3293709');
-    new InfoParserDynamic();
   }
 
 }

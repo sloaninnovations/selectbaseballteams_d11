@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\book\Kernel\Plugin\migrate\source;
 
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
@@ -9,6 +11,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 /**
  * @covers \Drupal\book\Plugin\migrate\source\Book
  * @group book
+ * @group legacy
  */
 class BookTest extends MigrateSqlSourceTestBase {
 

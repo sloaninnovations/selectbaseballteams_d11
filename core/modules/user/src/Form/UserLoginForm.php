@@ -7,6 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\BareHtmlPageRendererInterface;
 use Drupal\Core\Url;
+use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserAuthInterface;
 use Drupal\user\UserInterface;
 use Drupal\user\UserStorageInterface;
@@ -37,7 +38,7 @@ class UserLoginForm extends FormBase {
   /**
    * The user authentication object.
    *
-   * @var \Drupal\user\UserAuthInterface
+   * @var \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface
    */
   protected $userAuth;
 
@@ -62,16 +63,19 @@ class UserLoginForm extends FormBase {
    *   The user flood control service.
    * @param \Drupal\user\UserStorageInterface $user_storage
    *   The user storage.
-   * @param \Drupal\user\UserAuthInterface $user_auth
+   * @param \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface $user_auth
    *   The user authentication object.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bare_html_renderer
    *   The renderer.
    */
-  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, UserAuthInterface $user_auth, RendererInterface $renderer, BareHtmlPageRendererInterface $bare_html_renderer) {
+  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, UserAuthInterface|UserAuthenticationInterface $user_auth, RendererInterface $renderer, BareHtmlPageRendererInterface $bare_html_renderer) {
     $this->userFloodControl = $user_flood_control;
     $this->userStorage = $user_storage;
+    if (!$user_auth instanceof UserAuthenticationInterface) {
+      @trigger_error('The $user_auth parameter not implementing UserAuthenticationInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3411040');
+    }
     $this->userAuth = $user_auth;
     $this->renderer = $renderer;
     $this->bareHtmlPageRenderer = $bare_html_renderer;
@@ -144,8 +148,7 @@ class UserLoginForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $uid = $form_state->get('uid');
-    if (!$uid) {
+    if (empty($uid = $form_state->get('uid'))) {
       return;
     }
     $account = $this->userStorage->load($uid);
@@ -197,8 +200,13 @@ class UserLoginForm extends FormBase {
         $form_state->set('flood_control_triggered', 'ip');
         return;
       }
-      $accounts = $this->userStorage->loadByProperties(['name' => $form_state->getValue('name')]);
-      $account = reset($accounts);
+      if ($this->userAuth instanceof UserAuthenticationInterface) {
+        $account = $this->userAuth->lookupAccount($form_state->getValue('name'));
+      }
+      else {
+        $accounts = $this->userStorage->loadByProperties(['name' => $form_state->getValue('name')]);
+        $account = reset($accounts);
+      }
       if ($account && $account->isBlocked()) {
         $form_state->setErrorByName('name', $this->t('The username %name has not been activated or is blocked.', ['%name' => $form_state->getValue('name')]));
       }
@@ -235,8 +243,12 @@ class UserLoginForm extends FormBase {
         }
         // We are not limited by flood control, so try to authenticate.
         // Store the user ID in form state as a flag for self::validateFinal().
-        if ($this->userAuth->authenticateAccount($account, $password)) {
-          $form_state->set('uid', $account->id());
+        if ($this->userAuth instanceof UserAuthenticationInterface) {
+          $form_state->set('uid', $this->userAuth->authenticateAccount($account, $password) ? $account->id() : FALSE);
+        }
+        else {
+          $uid = $this->userAuth->authenticate($form_state->getValue('name'), $password);
+          $form_state->set('uid', $uid);
         }
       }
     }

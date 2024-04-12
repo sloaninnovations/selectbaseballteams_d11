@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\book\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
@@ -22,6 +24,7 @@ use Symfony\Component\Routing\Route;
  * Tests multilingual books.
  *
  * @group book
+ * @group legacy
  */
 class BookMultilingualTest extends KernelTestBase {
 

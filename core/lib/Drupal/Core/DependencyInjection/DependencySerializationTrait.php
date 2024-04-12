@@ -30,7 +30,7 @@ trait DependencySerializationTrait {
   /**
    * {@inheritdoc}
    */
-  public function __sleep() {
+  public function __sleep(): array {
     $vars = get_object_vars($this);
     try {
       $container = \Drupal::getContainer();
@@ -70,16 +70,20 @@ trait DependencySerializationTrait {
   /**
    * {@inheritdoc}
    */
-  #[\ReturnTypeWillChange]
-  public function __wakeup() {
+  public function __wakeup(): void {
+    // Avoid trying to wakeup if there's nothing to do.
+    if (empty($this->_serviceIds) && empty($this->_entityStorages)) {
+      return;
+    }
+    $container = \Drupal::getContainer();
     foreach ($this->_serviceIds as $key => $service_id) {
-      $this->$key = \Drupal::service($service_id);
+      $this->$key = $container->get($service_id);
     }
     $this->_serviceIds = [];
 
     if ($this->_entityStorages) {
       /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
-      $entity_type_manager = \Drupal::service('entity_type.manager');
+      $entity_type_manager = $container->get('entity_type.manager');
       foreach ($this->_entityStorages as $key => $entity_type_id) {
         $this->$key = $entity_type_manager->getStorage($entity_type_id);
       }

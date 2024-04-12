@@ -11,7 +11,6 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,8 +69,6 @@ class ControllerResolverTest extends UnitTestCase {
       ['some_service:getResult', 'Drupal\Tests\Core\Controller\MockController', 'This is a regular controller.'],
       // Tests a class with injection.
       ['Drupal\Tests\Core\Controller\MockContainerInjection::getResult', 'Drupal\Tests\Core\Controller\MockContainerInjection', 'This used injection.'],
-      // Tests a ContainerAware class.
-      ['Drupal\Tests\Core\Controller\MockContainerAware::getResult', 'Drupal\Tests\Core\Controller\MockContainerAware', 'This is container aware.'],
     ];
   }
 
@@ -113,7 +110,11 @@ class ControllerResolverTest extends UnitTestCase {
   public static function providerTestGetController() {
     return [
       // Tests passing a controller via the request.
-      [['_controller' => 'Drupal\Tests\Core\Controller\MockContainerAware::getResult'], 'Drupal\Tests\Core\Controller\MockContainerAware', 'This is container aware.'],
+      [
+        ['_controller' => MockContainerInjection::class . '::getResult'],
+        MockContainerInjection::class,
+        'This used injection.',
+      ],
       // Tests a request with no controller specified.
       [[], FALSE],
     ];
@@ -219,28 +220,7 @@ class MockContainerInjection implements ContainerInjectionInterface {
   }
 
 }
-class MockContainerAware implements ContainerAwareInterface {
 
-  /**
-   * The service container.
-   */
-  protected ContainerInterface $container;
-
-  /**
-   * Sets the service container.
-   */
-  public function setContainer(?ContainerInterface $container): void {
-    $this->container = $container;
-  }
-
-  public function getResult() {
-    if (empty($this->container)) {
-      throw new \Exception('Container was not injected.');
-    }
-    return 'This is container aware.';
-  }
-
-}
 class MockInvokeController {
 
   public function __invoke() {

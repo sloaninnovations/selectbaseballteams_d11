@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config;
 
@@ -11,6 +11,7 @@ use Drupal\KernelTests\KernelTestBase;
  *
  * @group config
  * @group Validation
+ * @group #slow
  */
 class SimpleConfigValidationTest extends KernelTestBase {
 

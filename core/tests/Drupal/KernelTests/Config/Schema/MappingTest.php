@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\KernelTests\Config\Schema;
 
@@ -214,7 +214,10 @@ class MappingTest extends KernelTestBase {
         'theme',
         'profile',
       ],
-      ['_core'],
+      [
+        '_core',
+        'profile',
+      ],
       [],
     ];
 
