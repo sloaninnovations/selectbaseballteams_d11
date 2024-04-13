@@ -16,7 +16,7 @@ use Drupal\KernelTests\KernelTestBase;
  *
  * @group migrate
  */
-class MigrateSourceAnnotationDiscoveryTest extends KernelTestBase {
+class MigrateSourceDiscoveryTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
@@ -26,7 +26,41 @@ class MigrateSourceAnnotationDiscoveryTest extends KernelTestBase {
   /**
    * @covers \Drupal\migrate\Plugin\MigrateSourcePluginManager::getDefinitions
    */
-  public function testGetDefinitions(): void {
+  public function testAttributeGetDefinitions(): void {
+    // First, check the expected plugins provied by migrate only.
+    $expected = ['embedded_data', 'empty'];
+    $source_plugins = $this->container->get('plugin.manager.migrate.source')->getDefinitions();
+    ksort($source_plugins);
+    $this->assertSame($expected, array_keys($source_plugins));
+
+    // Next, install the file module, which has 4 migrate source plugins, all of
+    // which depend on migrate_drupal. Since migrate_drupal is not installed,
+    // none of the source plugins from file should be discovered.
+    $expected = ['embedded_data', 'empty'];
+    $this->enableModules(['file']);
+    $source_plugins = $this->container->get('plugin.manager.migrate.source')->getDefinitions();
+    ksort($source_plugins);
+    $this->assertSame($expected, array_keys($source_plugins));
+
+    // Install migrate_drupal and now the source plugins from the file modules
+    // should be found.
+    $expected = [
+      'd6_file',
+      'd6_upload',
+      'd6_upload_instance',
+      'd7_file',
+      'embedded_data',
+      'empty',
+    ];
+    $this->enableModules(['migrate_drupal']);
+    $source_plugins = $this->container->get('plugin.manager.migrate.source')->getDefinitions();
+    $this->assertSame(array_diff($expected, array_keys($source_plugins)), []);
+  }
+
+  /**
+   * @covers \Drupal\migrate\Plugin\MigrateSourcePluginManager::getDefinitions
+   */
+  public function testAnnotationGetDefinitionsBackwardsCompatibility(): void {
     // First, test attribute-only discovery.
     $expected = ['embedded_data', 'empty'];
     $source_plugins = $this->container->get('plugin.manager.migrate.source')->getDefinitions();
