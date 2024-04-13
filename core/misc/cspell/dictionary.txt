@@ -364,6 +364,7 @@ druplicon
 drush
 drépal
 détruire
+eacute
 editables
 eerste
 egulias
@@ -430,6 +431,7 @@ fielditem
 fieldlayout
 fieldlinks
 fieldnames
+fieldnid
 fieldsets
 filelist
 filemime

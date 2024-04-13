@@ -250,7 +250,7 @@ class LayoutBuilder extends RenderElement implements ContainerFactoryPluginInter
               // links that were cached before the 'move' link was added.
               // @see layout_builder.links.contextual.yml
               'metadata' => [
-                'operations' => 'move:update:remove',
+                'operations' => 'move:update:remove:visibility',
               ],
             ],
           ];
