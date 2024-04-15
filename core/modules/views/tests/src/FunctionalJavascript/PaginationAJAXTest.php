@@ -257,7 +257,7 @@ class PaginationAJAXTest extends WebDriverTestBase {
   /**
    * Tests when a user navigates directly using a page number parameter.
    */
-  public function testPaginationAjaxWithTitleFilter() {
+  public function testPaginationAjaxWithTitleFilter(): void {
     // Visit the page url /test-content-ajax-filter?page=3.
     $this->drupalGet('test-content-ajax-filter', ['query' => ['page' => 3]]);
     $session_assert = $this->assertSession();
