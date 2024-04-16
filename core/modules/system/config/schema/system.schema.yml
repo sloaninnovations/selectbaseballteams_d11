@@ -338,6 +338,7 @@ system.file:
     path:
       type: mapping
       label: 'Path settings'
+      requiredKey: false
     temporary_maximum_age:
       type: integer
       label: 'Maximum age for temporary files'
