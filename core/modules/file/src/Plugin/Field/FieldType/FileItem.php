@@ -394,4 +394,14 @@ class FileItem extends EntityReferenceItem {
     return [];
   }
 
+  /**
+   * Computes all supported schemes.
+   *
+   * @return string[]
+   *   Returns a list of ALL valid schemes.
+   */
+  public static function getValidSchemes() {
+    return array_keys(\Drupal::service('stream_wrapper_manager')->getNames());
+  }
+
 }
