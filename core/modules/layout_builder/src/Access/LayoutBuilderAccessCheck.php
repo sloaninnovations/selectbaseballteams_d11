@@ -3,6 +3,7 @@
 namespace Drupal\layout_builder\Access;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -43,7 +44,16 @@ class LayoutBuilderAccessCheck implements AccessInterface {
     }
 
     if ($access instanceof RefinableCacheableDependencyInterface) {
-      $access->addCacheableDependency($section_storage);
+      if ($section_storage instanceof CacheableDependencyInterface) {
+        $access->addCacheableDependency($section_storage);
+      }
+      else {
+        // TODO: SimpleConfigSectionStorage is the only class that does not
+        // implement CacheableDependencyInterface. We can leave this check. Or
+        // we can make SectionStorageInterface extend
+        // CacheableDependencyInterface. Which one is better?
+        $access->setCacheMaxAge(0);
+      }
     }
     return $access;
   }
