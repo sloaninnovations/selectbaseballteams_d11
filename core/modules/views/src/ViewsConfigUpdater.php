@@ -156,6 +156,9 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
       if ($this->addLabelIfMissing($view)) {
         $changed = TRUE;
       }
+      if ($this->updateTableAlignmentClasses($view)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }
@@ -175,6 +178,32 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Changes the alignment css class name for table styles.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view to update.
+   *
+   * @return bool
+   *   Whether the view was updated.
+   */
+  public function updateTableAlignmentClasses(ViewEntityInterface $view): bool {
+    $displays = $view->get('display');
+    $return = FALSE;
+    foreach ($displays as $display_id => $display) {
+      if ($display['display_plugin'] === 'table') {
+        foreach ($display['display_options']['fields'] as $field) {
+          if (isset($field['align'])) {
+            $displays[$display_id]['display_options']['fields']['align'] = str_replace('views-align-', '', $field['align']);
+            $return = TRUE;
+          }
+        }
+      }
+    }
+    $view->set('display', $displays);
+    return $return;
   }
 
   /**
