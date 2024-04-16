@@ -2,12 +2,13 @@
 
 namespace Drupal\Core\Menu;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Defines an interface for menu local actions.
  */
-interface LocalActionInterface {
+interface LocalActionInterface extends CacheableDependencyInterface {
 
   /**
    * Get the route name from the settings.
