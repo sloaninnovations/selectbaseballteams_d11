@@ -4,6 +4,7 @@ namespace Drupal\field_ui\Access;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
@@ -81,7 +82,15 @@ class FieldReuseAccessCheck implements AccessInterface {
           $access = $access->orIf(AccessResult::allowedIfHasPermission($account, $permission));
         }
       }
-      $access->addCacheableDependency($this->entityFieldManager);
+      // TODO: The result of the check is always FALSE (EntityFieldManager isn't
+      // a cacheable dependency). Should we remove this completely? Should we
+      // always set the cache max age to 0?
+      if ($this->entityFieldManager instanceof CacheableDependencyInterface) {
+        $access->addCacheableDependency($this->entityFieldManager);
+      }
+      else {
+        $access->setCacheMaxAge(0);
+      }
     }
     return $access;
   }
