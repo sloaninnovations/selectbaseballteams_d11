@@ -1301,6 +1301,11 @@ parameters:
 			path: modules/jsonapi/src/Revisions/VersionNegotiator.php
 
 		-
+			message: "#^Anonymous class extends @internal class  Drupal\\\\jsonapi\\\\JsonApiResource\\\\Data\\.$#"
+			count: 1
+			path: modules/jsonapi/tests/src/Functional/JsonApiFunctionalTest.php
+
+		-
 			message: "#^Variable \\$created_entity might not be defined\\.$#"
 			count: 1
 			path: modules/jsonapi/tests/src/Functional/ResourceTestBase.php
