@@ -101,6 +101,8 @@ user.flood:
     ip_window:
       type: integer
       label: 'IP window'
+      # Minimum value should be 72 seconds considering the default values of ip_limit and ip_window.
+      # @see documentation in \Drupal\basic_auth\Authentication\Provider\BasicAuth::authenticate()
       constraints:
         Range:
           min: 72
@@ -113,6 +115,8 @@ user.flood:
     user_window:
       type: integer
       label: 'User window'
+      # Minimum value should be 4320 seconds considering the default values of user_limit and user_window.
+      # @see documentation in \Drupal\basic_auth\Authentication\Provider\BasicAuth::authenticate()
       constraints:
         Range:
           min: 4320
