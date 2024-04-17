@@ -93,6 +93,7 @@ class NodeForm extends ContentEntityForm {
     $store = $this->tempStoreFactory->get('node_preview');
 
     // Because of the temp store integration, this is not cacheable.
+    // @todo add the correct cache contexts in https://www.drupal.org/project/drupal/issues/3397987
     $form['#cache']['max-age'] = 0;
 
     // Attempt to load from preview when the uuid is present unless we are
