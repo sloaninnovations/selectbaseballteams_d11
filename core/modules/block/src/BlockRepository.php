@@ -59,19 +59,21 @@ class BlockRepository implements BlockRepositoryInterface {
 
     $full = [];
     foreach ($this->blockStorage->loadByProperties(['theme' => $active_theme->getName()]) as $block_id => $block) {
-      /** @var \Drupal\block\BlockInterface $block */
-      $access = $block->access('view', NULL, TRUE);
       $region = $block->getRegion();
-      if (!isset($cacheable_metadata[$region])) {
-        $cacheable_metadata[$region] = CacheableMetadata::createFromObject($access);
-      }
-      else {
-        $cacheable_metadata[$region] = $cacheable_metadata[$region]->merge(CacheableMetadata::createFromObject($access));
-      }
+      if (in_array($region, array_keys($empty))) {
+        /** @var \Drupal\block\BlockInterface $block */
+        $access = $block->access('view', NULL, TRUE);
+        if (!isset($cacheable_metadata[$region])) {
+          $cacheable_metadata[$region] = CacheableMetadata::createFromObject($access);
+        }
+        else {
+          $cacheable_metadata[$region] = $cacheable_metadata[$region]->merge(CacheableMetadata::createFromObject($access));
+        }
 
-      // Set the contexts on the block before checking access.
-      if ($access->isAllowed()) {
-        $full[$region][$block_id] = $block;
+        // Set the contexts on the block before checking access.
+        if ($access->isAllowed()) {
+          $full[$region][$block_id] = $block;
+        }
       }
     }
 
