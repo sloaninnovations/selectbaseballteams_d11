@@ -15,6 +15,7 @@ use Drupal\migrate\Plugin\migrate\source\I18nQueryTrait as MigrateI18nQueryTrait
  * @see https://www.drupal.org/node/3439256
  */
 trait I18nQueryTrait {
+
   use MigrateI18nQueryTrait;
 
 }
