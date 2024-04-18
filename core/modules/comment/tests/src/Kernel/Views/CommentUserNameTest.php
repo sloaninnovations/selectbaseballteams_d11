@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel\Views;
 
 use Drupal\comment\Entity\Comment;
@@ -109,6 +111,7 @@ class CommentUserNameTest extends ViewsKernelTestBase {
     $view_id = $this->randomMachineName();
     $view = View::create([
       'id' => $view_id,
+      'label' => $view_id,
       'base_table' => 'comment_field_data',
       'display' => [
         'default' => [

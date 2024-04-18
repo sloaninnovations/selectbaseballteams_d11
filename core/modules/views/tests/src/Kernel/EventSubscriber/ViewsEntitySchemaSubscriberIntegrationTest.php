@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\EventSubscriber;
 
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -12,6 +14,7 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
  * Tests \Drupal\views\EventSubscriber\ViewsEntitySchemaSubscriber.
  *
  * @group Views
+ * @group #slow
  */
 class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 

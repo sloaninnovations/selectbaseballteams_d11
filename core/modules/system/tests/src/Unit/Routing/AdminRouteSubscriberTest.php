@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Unit\Routing;
 
 use Drupal\Core\Routing\RouteBuildEvent;
@@ -28,7 +30,7 @@ class AdminRouteSubscriberTest extends UnitTestCase {
     $this->assertSame($is_admin, $route->getOption('_admin_route'));
   }
 
-  public function providerTestAlterRoutes() {
+  public static function providerTestAlterRoutes() {
     $data = [];
     $data['non-admin'] = [
       new Route('/foo'),

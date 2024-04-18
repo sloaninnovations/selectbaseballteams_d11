@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Plugin;
 
 use Drupal\Component\Plugin\PluginManagerBase;
@@ -54,7 +56,7 @@ class FilteredPluginManagerTraitTest extends UnitTestCase {
   /**
    * Provides test data for ::testGetFilteredDefinitions().
    */
-  public function providerTestGetFilteredDefinitions() {
+  public static function providerTestGetFilteredDefinitions() {
     $data = [];
     $data['populated context'] = [
       ['context1' => 'fake context'],

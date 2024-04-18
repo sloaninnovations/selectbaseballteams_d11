@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Image;
 
 use Drupal\Core\File\FileSystemInterface;
@@ -7,11 +9,14 @@ use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Image\ImageInterface;
 use Drupal\KernelTests\KernelTestBase;
 
+// cspell:ignore imagecreatefrom
+
 /**
  * Tests for the GD image toolkit.
  *
  * @coversDefaultClass \Drupal\system\Plugin\ImageToolkit\GDToolkit
  * @group Image
+ * @group #slow
  * @requires extension gd
  */
 class ToolkitGdTest extends KernelTestBase {
@@ -61,7 +66,7 @@ class ToolkitGdTest extends KernelTestBase {
     $this->assertEquals('gd', $this->imageFactory->getToolkitId(), 'The image factory is set to use the \'gd\' image toolkit.');
 
     // Prepare a directory for test file results.
-    $this->directory = 'public://imagetest';
+    $this->directory = 'public://image_test';
     \Drupal::service('file_system')->prepareDirectory($this->directory, FileSystemInterface::CREATE_DIRECTORY);
   }
 
@@ -104,7 +109,7 @@ class ToolkitGdTest extends KernelTestBase {
   /**
    * Data provider for ::testManipulations().
    */
-  public function providerTestImageFiles(): array {
+  public static function providerTestImageFiles(): array {
     // Typically the corner colors will be unchanged. These colors are in the
     // order of top-left, top-right, bottom-right, bottom-left.
     $default_corners = [static::RED, static::GREEN, static::BLUE, static::TRANSPARENT];
@@ -322,27 +327,13 @@ class ToolkitGdTest extends KernelTestBase {
       }
 
       // Get the location of the corner.
-      switch ($key) {
-        case 0:
-          $x = 0;
-          $y = 0;
-          break;
+      [$x, $y] = match ($key) {
+        0 => [0, 0],
+        1 => [$image->getWidth() - 1, 0],
+        2 => [$image->getWidth() - 1, $image->getHeight() - 1],
+        3 => [0, $image->getHeight() - 1],
+      };
 
-        case 1:
-          $x = $image->getWidth() - 1;
-          $y = 0;
-          break;
-
-        case 2:
-          $x = $image->getWidth() - 1;
-          $y = $image->getHeight() - 1;
-          break;
-
-        case 3:
-          $x = 0;
-          $y = $image->getHeight() - 1;
-          break;
-      }
       $actual_color = $this->getPixelColor($image, $x, $y);
 
       // If image cannot handle transparent colors, skip the pixel color test.
@@ -389,7 +380,7 @@ class ToolkitGdTest extends KernelTestBase {
   /**
    * Data provider for ::testCreateImageFromScratch().
    */
-  public function providerSupportedImageTypes(): array {
+  public static function providerSupportedImageTypes(): array {
     return [
       [IMAGETYPE_PNG],
       [IMAGETYPE_GIF],
@@ -532,31 +523,6 @@ class ToolkitGdTest extends KernelTestBase {
         ]),
       ],
     ], $this->imageFactory->get()->getToolkit()->getRequirements());
-  }
-
-  /**
-   * Tests deprecated setResource() and getResource().
-   *
-   * @group legacy
-   */
-  public function testResourceDeprecation() {
-    $toolkit = $this->imageFactory->get()->getToolkit();
-    $image = imagecreate(10, 10);
-    $this->expectDeprecation('Drupal\system\Plugin\ImageToolkit\GDToolkit::setResource() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::setImage() instead. See https://www.drupal.org/node/3265963');
-    $toolkit->setResource($image);
-    $this->expectDeprecation('Checking the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead.');
-    $this->assertTrue(isset($toolkit->resource));
-    $this->expectDeprecation('Drupal\system\Plugin\ImageToolkit\GDToolkit::getResource() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::getImage() instead. See https://www.drupal.org/node/3265963');
-    $this->assertSame($image, $toolkit->getResource());
-    $this->expectDeprecation('Accessing the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead.');
-    $this->assertSame($image, $toolkit->resource);
-    $this->expectDeprecation('Setting the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead.');
-    $toolkit->resource = NULL;
-    $this->assertNull($toolkit->getImage());
-    $this->expectDeprecation('Unsetting the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead.');
-    $toolkit->setImage($image);
-    unset($toolkit->resource);
-    $this->assertNull($toolkit->getImage());
   }
 
 }

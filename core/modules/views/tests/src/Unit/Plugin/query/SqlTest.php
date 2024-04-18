@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Unit\Plugin\query;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -295,7 +297,7 @@ class SqlTest extends UnitTestCase {
       'id' => 1,
     ]);
     // Note: Let the same entity be returned multiple times, for example to
-    // support the translation usecase.
+    // support the translation use case.
     $result[] = new ResultRow([
       'id' => 2,
     ]);

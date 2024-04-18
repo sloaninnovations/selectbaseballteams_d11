@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Unit\Event;
 
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
@@ -70,7 +72,7 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    *   Arrays with original name, allowed extensions, expected name and
    *   (optional) expected name 'allow_insecure_uploads' is set to TRUE.
    */
-  public function provideFilenames() {
+  public static function provideFilenames() {
     return [
       'All extensions allowed filename not munged' => ['foo.txt', '', 'foo.txt'],
       'All extensions allowed with .php file' => ['foo.php', '', 'foo.php_.txt', 'foo.php'],
@@ -140,7 +142,7 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    * @return array
    *   Arrays with original name and allowed extensions.
    */
-  public function provideFilenamesNoMunge() {
+  public static function provideFilenamesNoMunge() {
     return [
       // The following filename would be rejected by 'FileExtension' constraint
       // and therefore remains unchanged.

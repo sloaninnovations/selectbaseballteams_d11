@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\PageCache;
 
 use Drupal\Core\PageCache\RequestPolicyInterface;
@@ -54,7 +56,7 @@ class CommandLineOrUnsafeMethodTest extends UnitTestCase {
    * @return array
    *   Test data and expected results.
    */
-  public function providerTestHttpMethod() {
+  public static function providerTestHttpMethod() {
     return [
       [NULL, 'GET'],
       [NULL, 'HEAD'],

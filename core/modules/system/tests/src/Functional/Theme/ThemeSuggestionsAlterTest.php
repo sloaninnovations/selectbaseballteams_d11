@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Component\Utility\Xss;
@@ -55,6 +57,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
   public function testGeneralSuggestionsAlter() {
     $this->drupalGet('theme-test/general-suggestion-alter');
     $this->assertSession()->pageTextContains('Original template for testing hook_theme_suggestions_alter().');
+    $this->assertSession()->pageTextContains('Hooks: theme_test_theme none');
 
     // Install test_theme and test that themes can alter template suggestions.
     $this->config('system.theme')
@@ -62,6 +65,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
       ->save();
     $this->drupalGet('theme-test/general-suggestion-alter');
     $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by the test_theme theme via hook_theme_suggestions_alter().');
+    $this->assertSession()->pageTextContains('Hooks: theme_test_theme test_theme_theme_suggestions_alter');
 
     // Enable the theme_suggestions_test module to test modules implementing
     // suggestions alter hooks.
@@ -69,6 +73,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
     $this->resetAll();
     $this->drupalGet('theme-test/general-suggestion-alter');
     $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by a module via hook_theme_suggestions_alter().');
+    $this->assertSession()->pageTextContains('Hooks: theme_suggestions_test_theme_suggestions_alter test_theme_theme_suggestions_alter');
   }
 
   /**

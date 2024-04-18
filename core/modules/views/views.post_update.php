@@ -96,6 +96,17 @@ function views_post_update_fix_revision_id_part(&$sandbox = NULL): void {
 }
 
 /**
+ * Add labels to views which don't have one.
+ */
+function views_post_update_add_missing_labels(&$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->addLabelIfMissing($view);
+  });
+}
+
+/**
  * Remove the skip_cache settings.
  */
 function views_post_update_remove_skip_cache_setting(): void {
@@ -113,5 +124,38 @@ function views_post_update_remove_default_argument_skip_url(array &$sandbox = NU
   $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
     return $view_config_updater->needsDefaultArgumentSkipUrlUpdate($view);
+  });
+}
+
+/**
+ * Removes User context from views with taxonomy filters.
+ */
+function views_post_update_taxonomy_filter_user_context(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsTaxonomyTermFilterUpdate($view);
+  });
+}
+
+/**
+ * Adds a default pager heading.
+ */
+function views_post_update_pager_heading(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsPagerHeadingUpdate($view);
+  });
+}
+
+/**
+ * Removes entity display cache metadata from views with rendered entity fields.
+ */
+function views_post_update_rendered_entity_field_cache_metadata(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsRenderedEntityFieldUpdate($view);
   });
 }

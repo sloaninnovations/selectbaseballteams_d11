@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel\Migrate\d7;
 
 use Drupal\comment\Entity\CommentType;
@@ -119,7 +121,7 @@ class MigrateCommentTypeTest extends MigrateDrupal7TestBase {
   /**
    * Provides test cases for ::testNoCommentTypeMigration().
    */
-  public function providerTestNoCommentTypeMigration() {
+  public static function providerTestNoCommentTypeMigration() {
     return [
       'Node module is disabled in source' => [
         'Disabled source modules' => ['node'],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Unit\Query;
 
 use Drupal\Core\Cache\Context\CacheContextsManager;
@@ -47,7 +49,7 @@ class EntityConditionTest extends UnitTestCase {
   /**
    * Data provider for testDenormalize.
    */
-  public function queryParameterProvider() {
+  public static function queryParameterProvider() {
     return [
       [['path' => 'some_field', 'value' => NULL, 'operator' => '=']],
       [['path' => 'some_field', 'operator' => '=', 'value' => 'some_string']],
@@ -85,7 +87,7 @@ class EntityConditionTest extends UnitTestCase {
   /**
    * Data provider for testValidation.
    */
-  public function validationProvider() {
+  public static function validationProvider() {
     return [
       [['path' => 'some_field', 'value' => 'some_value'], NULL],
       [

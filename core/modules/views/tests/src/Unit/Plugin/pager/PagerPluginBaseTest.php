@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\views\Unit\Plugin\pager\PagerPluginBaseTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit\Plugin\pager;
 
@@ -188,7 +185,7 @@ class PagerPluginBaseTest extends UnitTestCase {
    *
    * @see self::testHasMoreRecords
    */
-  public function providerTestHasMoreRecords() {
+  public static function providerTestHasMoreRecords() {
     return [
       // No items per page, so there can't be more available records.
       [0, 0, 0, FALSE],

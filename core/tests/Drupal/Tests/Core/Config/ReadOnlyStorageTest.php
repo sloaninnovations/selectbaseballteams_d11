@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Config;
 
 use Drupal\Core\Config\MemoryStorage;
@@ -65,7 +67,7 @@ class ReadOnlyStorageTest extends UnitTestCase {
    * @return array
    *   The data.
    */
-  public function readMethodsProvider() {
+  public static function readMethodsProvider() {
     $fixture = [
       StorageInterface::DEFAULT_COLLECTION => ['config.a', 'config.b', 'other.a'],
     ];

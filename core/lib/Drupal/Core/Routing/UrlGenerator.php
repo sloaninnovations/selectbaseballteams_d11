@@ -96,11 +96,8 @@ class UrlGenerator implements UrlGeneratorInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * phpcs:ignore Drupal.Commenting.FunctionComment.VoidReturn
-   * @return void
    */
-  public function setContext(SymfonyRequestContext $context) {
+  public function setContext(SymfonyRequestContext $context): void {
     $this->context = $context;
   }
 
@@ -321,10 +318,10 @@ class UrlGenerator implements UrlGeneratorInterface {
       // otherwise we would generate a URI that, when followed by a user agent
       // (e.g. browser), does not match this route
       $path = strtr($path, ['/../' => '/%2E%2E/', '/./' => '/%2E/']);
-      if ('/..' === substr($path, -3)) {
+      if (str_ends_with($path, '/..')) {
         $path = substr($path, 0, -2) . '%2E%2E';
       }
-      elseif ('/.' === substr($path, -2)) {
+      elseif (str_ends_with($path, '/.')) {
         $path = substr($path, 0, -1) . '%2E';
       }
     }

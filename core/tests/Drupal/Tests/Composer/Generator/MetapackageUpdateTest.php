@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Composer\Generator;
 
 use Drupal\Composer\Generator\Builder\DrupalCoreRecommendedBuilder;
@@ -20,7 +22,7 @@ class MetapackageUpdateTest extends TestCase {
   /**
    * Provides test data for testUpdated.
    */
-  public function updatedTestData() {
+  public static function updatedTestData() {
     return [
       [
         DrupalCoreRecommendedBuilder::class,

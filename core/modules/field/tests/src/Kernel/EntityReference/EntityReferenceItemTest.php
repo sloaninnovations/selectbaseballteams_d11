@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\EntityReference;
 
 use Drupal\comment\Entity\Comment;
@@ -23,7 +25,7 @@ use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\user\Entity\User;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 
 /**
  * Tests the new entity API for the entity reference field type.
@@ -32,7 +34,7 @@ use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
  */
 class EntityReferenceItemTest extends FieldKernelTestBase {
 
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
 
   /**
    * Modules to install.
@@ -404,6 +406,17 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $field_storage->save();
     $field = FieldConfig::load($field->id());
     $this->assertEquals('views', $field->getSetting('handler'));
+
+    // Check that selection handlers aren't changed during sync.
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'entity_test',
+      'settings' => [
+        'handler' => 'fake:thing',
+      ],
+      'isSyncing' => TRUE,
+    ]);
+    $this->assertEquals('fake:thing', $field->getSetting('handler'));
   }
 
   /**

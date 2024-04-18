@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests;
 
 use Behat\Mink\Driver\BrowserKitDriver;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Session\AccountInterface;
@@ -83,14 +84,16 @@ trait UiHelperTrait {
     foreach ($edit as $name => $value) {
       $field = $assert_session->fieldExists($name, $form);
 
-      // Provide support for the values '1' and '0' for checkboxes instead of
-      // TRUE and FALSE.
-      // @todo Get rid of supporting 1/0 by converting all tests cases using
-      // this to boolean values.
-      $field_type = $field->getAttribute('type');
-      if ($field_type === 'checkbox') {
-        $value = (bool) $value;
-      }
+      $value = match ($field->getAttribute('type')) {
+        // Provide support for the values '1' and '0' for checkboxes instead of
+        // TRUE and FALSE.
+        // @todo Get rid of supporting 1/0 by converting all tests cases using
+        // this to boolean values.
+        'checkbox' => (bool) $value,
+        // Mink only allows strings for text, number and radio button values.
+        'text', 'number', 'radio' => (string) $value,
+        default => $value,
+      };
 
       $field->setValue($value);
     }
@@ -161,7 +164,7 @@ trait UiHelperTrait {
 
     // @see ::drupalUserIsLoggedIn()
     $account->sessionId = $this->getSession()->getCookie(\Drupal::service('session_configuration')->getOptions(\Drupal::request())['name']);
-    $this->assertTrue($this->drupalUserIsLoggedIn($account), new FormattableMarkup('User %name successfully logged in.', ['%name' => $account->getAccountName()]));
+    $this->assertTrue($this->drupalUserIsLoggedIn($account), "User {$account->getAccountName()} successfully logged in.");
 
     $this->loggedInUser = $account;
     $this->container->get('current_user')->setAccount($account);
@@ -231,6 +234,16 @@ trait UiHelperTrait {
 
     $this->prepareRequest();
     foreach ($headers as $header_name => $header_value) {
+      if (is_int($header_name)) {
+        // @todo Trigger deprecation in
+        //   https://www.drupal.org/project/drupal/issues/3421105.
+        [$header_name, $header_value] = explode(':', $header_value);
+      }
+      if (is_null($header_value)) {
+        // @todo Trigger deprecation in
+        //   https://www.drupal.org/project/drupal/issues/3421105.
+        $header_value = '';
+      }
       $session->setRequestHeader($header_name, $header_value);
     }
 

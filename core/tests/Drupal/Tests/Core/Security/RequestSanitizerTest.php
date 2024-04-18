@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Security;
 
 use Drupal\Core\Security\RequestSanitizer;
@@ -97,7 +99,7 @@ class RequestSanitizerTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestRequestSanitization() {
+  public static function providerTestRequestSanitization() {
     $tests = [];
 
     $request = new Request(['q' => 'index.php']);
@@ -312,7 +314,7 @@ class RequestSanitizerTest extends UnitTestCase {
   /**
    * Data provider for testing acceptable destinations.
    */
-  public function providerTestAcceptableDestinations() {
+  public static function providerTestAcceptableDestinations() {
     $data = [];
     // Standard internal example node path is present in the 'destination'
     // parameter.
@@ -329,7 +331,7 @@ class RequestSanitizerTest extends UnitTestCase {
   /**
    * Data provider for testing sanitized destinations.
    */
-  public function providerTestSanitizedDestinations() {
+  public static function providerTestSanitizedDestinations() {
     $data = [];
     // External URL without scheme is not allowed.
     $data[] = ['//example.com/test'];

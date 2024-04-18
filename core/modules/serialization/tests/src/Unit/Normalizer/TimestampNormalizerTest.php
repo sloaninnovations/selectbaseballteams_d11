@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -99,7 +101,7 @@ class TimestampNormalizerTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestDenormalizeValidFormats() {
+  public static function providerTestDenormalizeValidFormats() {
     $expected_stamp = 1478422920;
 
     $data = [];

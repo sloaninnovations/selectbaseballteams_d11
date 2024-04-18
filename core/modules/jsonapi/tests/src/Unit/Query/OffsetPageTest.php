@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Unit\Query;
 
 use Drupal\Core\Cache\Context\CacheContextsManager;
@@ -44,7 +46,7 @@ class OffsetPageTest extends UnitTestCase {
   /**
    * Data provider for testCreateFromQueryParameter.
    */
-  public function parameterProvider() {
+  public static function parameterProvider() {
     return [
       [['offset' => 12, 'limit' => 20], ['offset' => 12, 'limit' => 20]],
       [['offset' => 12, 'limit' => 60], ['offset' => 12, 'limit' => 50]],

@@ -185,22 +185,6 @@ use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
  * @see \Drupal\ckeditor5\Annotation\CKEditor5AspectsOfCKEditor5Plugin
  * @see \Drupal\ckeditor5\Annotation\DrupalAspectsOfCKEditor5Plugin
  *
- * @section upgrade_path Upgrade path
- *
- * Modules can provide upgrade paths similar to the built-in upgrade path for
- * Drupal core's CKEditor 4 to CKEditor 5, by providing a CKEditor4To5Upgrade
- * plugin. This plugin type allows:
- * - mapping a CKEditor 4 button to an equivalent CKEditor 5 toolbar item
- * - mapping CKEditor 4 plugin settings to equivalent CKEditor 5 plugin
- *   configuration.
- * The supported CKEditor 4 buttons and/or CKEditor 4 plugin settings must be
- * specified in the annotation.
- * See Drupal core's implementation for an example.
- *
- * @see \Drupal\ckeditor5\Annotation\CKEditor4To5Upgrade
- * @see \Drupal\ckeditor5\Plugin\CKEditor4To5UpgradePluginInterface
- * @see \Drupal\ckeditor5\Plugin\CKEditor4To5Upgrade\Core
- *
  * @section public_api Public API
  *
  * The CKEditor 5 module provides no public API, other than:
@@ -242,6 +226,7 @@ use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
  * @see \Drupal\ckeditor5\Plugin\CKEditor5PluginManager
  */
 function hook_ckeditor5_plugin_info_alter(array &$plugin_definitions): void {
+  // Add a link decorator to the link plugin.
   assert($plugin_definitions['ckeditor5_link'] instanceof CKEditor5PluginDefinition);
   $link_plugin_definition = $plugin_definitions['ckeditor5_link']->toArray();
   $link_plugin_definition['ckeditor5']['config']['link']['decorators'][] = [
@@ -252,24 +237,16 @@ function hook_ckeditor5_plugin_info_alter(array &$plugin_definitions): void {
     ],
   ];
   $plugin_definitions['ckeditor5_link'] = new CKEditor5PluginDefinition($link_plugin_definition);
-}
 
-/**
- * Modify the list of available CKEditor 4 to 5 Upgrade plugins.
- *
- * This hook may be used to modify plugin properties after they have been
- * specified by other modules. For example, to override a default upgrade path.
- *
- * @param array $plugin_definitions
- *   An array of all the existing plugin definitions, passed by reference.
- *
- * @see \Drupal\ckeditor5\Plugin\CKEditor4To5UpgradePluginManager
- */
-function hook_ckeditor4to5upgrade_plugin_info_alter(array &$plugin_definitions): void {
-  // Remove core's upgrade path for the "Maximize" button (which is: there is no
-  // equivalent). This allows a different CKEditor4To5Upgrade plugin to define
-  // this upgrade path instead.
-  unset($plugin_definitions['core']['cke4_buttons']['Maximize']);
+  // Add a custom file type to the image upload plugin. Note that 'tiff' below
+  // should be an IANA image media type Name, with the "image/" prefix omitted.
+  // In other words: a subtype of type image.
+  // @see https://www.iana.org/assignments/media-types/media-types.xhtml#image
+  // @see https://ckeditor.com/docs/ckeditor5/latest/api/module_image_imageconfig-ImageUploadConfig.html#member-types
+  assert($plugin_definitions['ckeditor5_imageUpload'] instanceof CKEditor5PluginDefinition);
+  $image_upload_plugin_definition = $plugin_definitions['ckeditor5_imageUpload']->toArray();
+  $image_upload_plugin_definition['ckeditor5']['config']['image']['upload']['types'][] = 'tiff';
+  $plugin_definitions['ckeditor5_imageUpload'] = new CKEditor5PluginDefinition($image_upload_plugin_definition);
 }
 
 /**

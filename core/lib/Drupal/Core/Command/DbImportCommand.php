@@ -22,7 +22,7 @@ class DbImportCommand extends DbCommandBase {
   /**
    * {@inheritdoc}
    */
-  protected function configure() {
+  protected function configure(): void {
     parent::configure();
     $this->setName('import')
       ->setDescription('Import database from a generation script.')
@@ -56,7 +56,7 @@ class DbImportCommand extends DbCommandBase {
   protected function runScript(Connection $connection, $script) {
     $old_key = Database::setActiveConnection($connection->getKey());
 
-    if (substr($script, -3) == '.gz') {
+    if (str_ends_with($script, '.gz')) {
       $script = "compress.zlib://$script";
     }
     try {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Cache\Context;
 
 use Drupal\Core\Cache\Context\HeadersCacheContext;
@@ -32,7 +34,7 @@ class HeadersCacheContextTest extends UnitTestCase {
   /**
    * Provides a list of headers and expected cache contexts.
    */
-  public function providerTestGetContext() {
+  public static function providerTestGetContext() {
     return [
       [[], NULL, ''],
       [[], 'foo', ''],

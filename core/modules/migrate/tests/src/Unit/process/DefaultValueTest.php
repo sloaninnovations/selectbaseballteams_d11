@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\Plugin\migrate\process\DefaultValue;
@@ -30,7 +32,7 @@ class DefaultValueTest extends MigrateProcessTestCase {
    *
    * @return array
    */
-  public function defaultValueDataProvider() {
+  public static function defaultValueDataProvider() {
     return [
       'strict_true_value_populated_array' => [
         'configuration' => [

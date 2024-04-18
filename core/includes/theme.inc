@@ -8,24 +8,19 @@
  * customized by user themes.
  */
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Url;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Render\MarkupInterface;
-use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\StorageException;
-use Drupal\Core\Render\AttachmentsInterface;
-use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\Core\Theme\ThemeSettings;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Utility\TableSort;
+use Drupal\Core\Installer\InstallerKernel;
 
 /**
  * @defgroup content_flags Content markers
@@ -72,40 +67,6 @@ const RESPONSIVE_PRIORITY_LOW = 'priority-low';
  */
 
 /**
- * Gets the theme registry.
- *
- * @param bool $complete
- *   Optional boolean to indicate whether to return the complete theme registry
- *   array or an instance of the Drupal\Core\Utility\ThemeRegistry class.
- *   If TRUE, the complete theme registry array will be returned. This is useful
- *   if you want to foreach over the whole registry, use array_* functions or
- *   inspect it in a debugger. If FALSE, an instance of the
- *   Drupal\Core\Utility\ThemeRegistry class will be returned, this provides an
- *   ArrayObject which allows it to be accessed with array syntax and isset(),
- *   and should be more lightweight than the full registry. Defaults to TRUE.
- *
- * @return array|\Drupal\Core\Utility\ThemeRegistry
- *   The complete theme registry array, or an instance of the
- *   Drupal\Core\Utility\ThemeRegistry class.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   theme.registry service methods get() or getRuntime() instead.
- *
- * @see https://www.drupal.org/node/3348850
- */
-function theme_get_registry($complete = TRUE) {
-  $theme_registry = \Drupal::service('theme.registry');
-  if ($complete) {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use theme.registry service method get() instead. See https://www.drupal.org/node/3348850', E_USER_DEPRECATED);
-    return $theme_registry->get();
-  }
-  else {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use theme.registry service method getRuntime() instead. See https://www.drupal.org/node/3348850', E_USER_DEPRECATED);
-    return $theme_registry->getRuntime();
-  }
-}
-
-/**
  * Returns an array of default theme features.
  *
  * @see \Drupal\Core\Extension\ThemeExtensionList::$defaults
@@ -118,22 +79,6 @@ function _system_default_theme_features() {
     'comment_user_picture',
     'comment_user_verification',
   ];
-}
-
-/**
- * Forces the system to rebuild the theme registry.
- *
- * This function should be called when modules are added to the system, or when
- * a dynamic system needs to add more theme hooks.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   theme.registry service reset() method instead.
- *
- * @see https://www.drupal.org/node/3348853
- */
-function drupal_theme_rebuild() {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use theme.registry service reset() method instead. See https://www.drupal.org/node/3348853', E_USER_DEPRECATED);
-  \Drupal::service('theme.registry')->reset();
 }
 
 /**
@@ -338,87 +283,6 @@ function theme_get_setting($setting_name, $theme = NULL) {
 }
 
 /**
- * Escapes and renders variables for theme functions.
- *
- * This method is used in theme functions to ensure that the result is safe for
- * output inside HTML fragments. This mimics the behavior of the auto-escape
- * functionality in Twig.
- *
- * Note: This function should be kept in sync with
- * \Drupal\Core\Template\TwigExtension::escapeFilter().
- *
- * @param mixed $arg
- *   The string, object, or render array to escape if needed.
- *
- * @return string
- *   The rendered string, safe for use in HTML. The string is not safe when used
- *   as any part of an HTML attribute name or value.
- *
- * @throws \Exception
- *   Thrown when an object is passed in which cannot be printed.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. There is no
- *   replacement. Theme engines must handle escaping by themselves.
- *
- * @see https://www.drupal.org/node/3336253
- */
-function theme_render_and_autoescape($arg) {
-  @trigger_error('theme_render_and_autoescape() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. There is no replacement. Theme engines must handle escaping by themselves. See https://www.drupal.org/node/3336253', E_USER_DEPRECATED);
-
-  // If it's a renderable, then it'll be up to the generated render array it
-  // returns to contain the necessary cacheability & attachment metadata. If
-  // it doesn't implement CacheableDependencyInterface or AttachmentsInterface
-  // then there is nothing to do here.
-  if (!($arg instanceof RenderableInterface) && ($arg instanceof CacheableDependencyInterface || $arg instanceof AttachmentsInterface)) {
-    $arg_bubbleable = [];
-    BubbleableMetadata::createFromObject($arg)
-      ->applyTo($arg_bubbleable);
-    \Drupal::service('renderer')->render($arg_bubbleable);
-  }
-
-  if ($arg instanceof MarkupInterface) {
-    return (string) $arg;
-  }
-  $return = NULL;
-
-  if (is_scalar($arg)) {
-    $return = (string) $arg;
-  }
-  elseif (is_object($arg)) {
-    if ($arg instanceof RenderableInterface) {
-      $arg = $arg->toRenderable();
-    }
-    elseif (method_exists($arg, '__toString')) {
-      $return = (string) $arg;
-    }
-    // You can't throw exceptions in the magic PHP __toString methods, see
-    // http://php.net/manual/language.oop5.magic.php#object.tostring so
-    // we also support a toString method.
-    elseif (method_exists($arg, 'toString')) {
-      $return = $arg->toString();
-    }
-    else {
-      throw new \Exception('Object of type ' . get_class($arg) . ' cannot be printed.');
-    }
-  }
-
-  // We have a string or an object converted to a string: Escape it!
-  if (isset($return)) {
-    return $return instanceof MarkupInterface ? $return : Html::escape($return);
-  }
-
-  // This is a normal render array, which is safe by definition, with special
-  // simple cases already handled.
-
-  // Early return if this element was pre-rendered (no need to re-render).
-  if (isset($arg['#printed']) && $arg['#printed'] == TRUE && isset($arg['#markup']) && strlen($arg['#markup']) > 0) {
-    return (string) $arg['#markup'];
-  }
-  $arg['#printed'] = FALSE;
-  return (string) \Drupal::service('renderer')->render($arg);
-}
-
-/**
  * Converts theme settings to configuration.
  *
  * @see system_theme_settings_submit()
@@ -448,7 +312,7 @@ function theme_settings_convert_to_config(array $theme_settings, Config $config)
     elseif ($key == 'favicon_mimetype') {
       $config->set('favicon.mimetype', $value);
     }
-    elseif (substr($key, 0, 7) == 'toggle_') {
+    elseif (str_starts_with($key, 'toggle_')) {
       $config->set('features.' . mb_substr($key, 7), $value);
     }
     elseif (!in_array($key, ['theme', 'logo_upload'])) {
@@ -1505,13 +1369,18 @@ function template_preprocess_maintenance_page(&$variables) {
  * @see template_preprocess_maintenance_page()
  */
 function template_preprocess_install_page(&$variables) {
+  $installer_active_task = NULL;
+  if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE === 'install' && InstallerKernel::installationAttempted()) {
+    $installer_active_task = $GLOBALS['install_state']['active_task'];
+  }
+
   template_preprocess_maintenance_page($variables);
 
   // Override the site name that is displayed on the page, since Drupal is
   // still in the process of being installed.
   $distribution_name = drupal_install_profile_distribution_name();
   $variables['site_name'] = $distribution_name;
-  $variables['site_version'] = drupal_install_profile_distribution_version();
+  $variables['site_version'] = $installer_active_task ? drupal_install_profile_distribution_version() : '';
 }
 
 /**
@@ -1743,6 +1612,7 @@ function template_preprocess_breadcrumb(&$variables) {
  *     - #tags: An array of labels for the controls in the pager.
  *     - #element: An optional integer to distinguish between multiple pagers on
  *       one page.
+ *     - #pagination_heading_level: An optional heading level for the pager.
  *     - #parameters: An associative array of query string parameters to append
  *       to the pager links.
  *     - #route_parameters: An associative array of the route parameters.
@@ -1869,6 +1739,10 @@ function template_preprocess_pager(&$variables) {
 
   $variables['items'] = $items;
   $variables['heading_id'] = Html::getUniqueId('pagination-heading');
+  $variables['pagination_heading_level'] = $variables['pager']['#pagination_heading_level'] ?? 'h4';
+  if (!preg_match('/^h[1-6]$/', $variables['pagination_heading_level'])) {
+    $variables['pagination_heading_level'] = 'h4';
+  }
 
   // The rendered link needs to play well with any other query parameter used
   // on the page, like exposed filters, so for the cacheability all query
@@ -1897,10 +1771,6 @@ function template_preprocess_menu_local_task(&$variables) {
 
   if (!empty($variables['element']['#active'])) {
     $variables['is_active'] = TRUE;
-
-    // Add text to indicate active tab for non-visual users.
-    $active = new FormattableMarkup('<span class="visually-hidden">@label</span>', ['@label' => t('(active tab)')]);
-    $link_text = t('@local-task-title@active', ['@local-task-title' => $link_text, '@active' => $active]);
   }
 
   $link['localized_options']['set_active_class'] = TRUE;

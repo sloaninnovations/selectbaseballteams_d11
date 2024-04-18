@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Common;
 
 use Drupal\Core\Template\Attribute;
@@ -17,7 +19,7 @@ class AttributesTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestAttributeData() {
+  public static function providerTestAttributeData() {
     return [
       // Verify that special characters are HTML encoded.
       [['&"\'<>' => 'value'], ' &amp;&quot;&#039;&lt;&gt;="value"', 'HTML encode attribute names.'],

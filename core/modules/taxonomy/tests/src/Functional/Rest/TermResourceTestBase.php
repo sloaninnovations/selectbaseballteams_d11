@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Functional\Rest;
 
 use Drupal\Core\Cache\Cache;
@@ -220,7 +222,6 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
         ],
       ],
       'revision_user' => [],
-      'revision_log_message' => [],
       'revision_translation_affected' => [
         [
           'value' => TRUE,
@@ -241,12 +242,12 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
       ],
       'name' => [
         [
-          'value' => 'Dramallama',
+          'value' => 'Drama llama',
         ],
       ],
       'description' => [
         [
-          'value' => 'Dramallamas are the coolest camelids.',
+          'value' => 'Drama llamas are the coolest camelids.',
           'format' => NULL,
         ],
       ],
@@ -357,7 +358,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
     $this->assertSame($expected, $actual);
   }
 
-  public function providerTestGetTermWithParent() {
+  public static function providerTestGetTermWithParent() {
     return [
       'root parent: [0] (= no parent)' => [
         [0],

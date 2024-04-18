@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -93,7 +95,7 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * Provides test data for testGet.
    */
-  public function providerTestGet() {
+  public static function providerTestGet() {
     return [
       [[], 'provider', NULL],
       [['provider' => ''], 'provider', ''],
@@ -107,7 +109,7 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * Provides test data for testSet.
    */
-  public function providerTestSet() {
+  public static function providerTestSet() {
     return [
       ['provider', NULL],
       ['provider', ''],
@@ -121,7 +123,7 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * Provides test data.
    */
-  public function providerTestGetKeys() {
+  public static function providerTestGetKeys() {
     return [
       [[], ['revision' => '', 'bundle' => '', 'langcode' => '']],
       [['id' => 'id'], ['id' => 'id', 'revision' => '', 'bundle' => '', 'langcode' => '']],
@@ -283,7 +285,7 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * @covers ::getOriginalClass
    */
-  public function testgetOriginalClassUnchanged() {
+  public function testGetOriginalClassUnchanged() {
     $class = $this->randomMachineName();
     $entity_type = $this->setUpEntityType(['class' => $class]);
     $this->assertEquals($class, $entity_type->getOriginalClass());
@@ -293,7 +295,7 @@ class EntityTypeTest extends UnitTestCase {
    * @covers ::setClass
    * @covers ::getOriginalClass
    */
-  public function testgetOriginalClassChanged() {
+  public function testGetOriginalClassChanged() {
     $class = $this->randomMachineName();
     $entity_type = $this->setUpEntityType(['class' => $class]);
     $entity_type->setClass($this->randomMachineName());
@@ -431,7 +433,7 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * Provides test data for ::testGetBundleLabel().
    */
-  public function providerTestGetBundleLabel() {
+  public static function providerTestGetBundleLabel() {
     return [
       [['label' => 'Entity Label Foo'], 'Entity Label Foo bundle'],
       [['bundle_label' => 'Bundle Label Bar'], 'Bundle Label Bar'],

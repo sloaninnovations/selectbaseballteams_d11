@@ -313,6 +313,8 @@ function hook_views_data() {
       'id' => 'standard',
       // Default label for relationship in the UI.
       'label' => t('Example node'),
+      // Description shown within the add relationship handler in the UI.
+      'help' => t('Relationship between the node and node field data'),
     ],
   ];
 
@@ -420,6 +422,25 @@ function hook_views_data() {
     ],
   ];
 
+  // Computed field example. Computed fields are not associated with actual data
+  // tables and fields, and therefore have no schema. Instead, they are computed
+  // when the value is read from the entity. Here's the definition of a computed
+  // field that exists for a particular entity type. The value of the field will
+  // be calculated by a defined class. If the defined class for the computed
+  // fields differs between multiple bundles of the same entity type, then each
+  // of those fields should be added separately.
+  // @see \Drupal\Core\TypedData\DataDefinitionInterface::setComputed().
+  // @see \Drupal\Core\TypedData\DataDefinitionInterface::setClass().
+  $data['example_table']['computed_bundle_field'] = [
+    'title' => t('Computed Bundle Field'),
+    'help' => t('The computed bundle field'),
+    'field' => [
+      'id' => 'field',
+      'default_formatter' => 'string',
+      'field_name' => 'computed_bundle_field',
+    ],
+  ];
+
   // Area example. Areas are not generally associated with actual data
   // tables and fields. This example is from views_views_data(), which defines
   // the "Global" table (not really a table, but a group of Fields, Filters,
@@ -476,8 +497,8 @@ function hook_views_data_alter(array &$data) {
   // In Views data definitions, each field can have only one relationship. So
   // rather than adding this relationship directly to the $data['foo']['fid']
   // field entry, which could overwrite an existing relationship, we define
-  // a dummy field key to handle the relationship.
-  $data['foo']['unique_dummy_name'] = [
+  // a placeholder field key to handle the relationship.
+  $data['foo']['unique_placeholder_name'] = [
     'title' => t('Title seen while adding relationship'),
     'help' => t('More information about the relationship'),
 
@@ -487,11 +508,13 @@ function hook_views_data_alter(array &$data) {
       // Database field name in example_table for the join.
       'base field' => 'eid',
       // Real database field name in foo for the join, to override
-      // 'unique_dummy_name'.
+      // 'unique_placeholder_name'.
       'field' => 'fid',
       // ID of relationship handler plugin to use.
       'id' => 'standard',
       'label' => t('Default label for relationship'),
+      // Description shown within the add relationship handler in the UI.
+      'help' => t('Description of the placeholder field relationship'),
     ],
   ];
 

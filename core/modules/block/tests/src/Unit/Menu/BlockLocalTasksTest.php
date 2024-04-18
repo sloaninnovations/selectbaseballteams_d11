@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Unit\Menu;
 
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
@@ -81,7 +83,7 @@ class BlockLocalTasksTest extends LocalTaskIntegrationTestBase {
   /**
    * Provides a list of routes to test.
    */
-  public function providerTestBlockAdminDisplay() {
+  public static function providerTestBlockAdminDisplay() {
     return [
       ['block.admin_display', [['block.admin_display'], ['block.admin_display_theme:test_b', 'block.admin_display_theme:test_c']]],
       ['block.admin_display_theme', [['block.admin_display'], ['block.admin_display_theme:test_b', 'block.admin_display_theme:test_c']]],

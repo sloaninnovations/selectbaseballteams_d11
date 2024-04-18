@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_translation\Functional;
 
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\language\Traits\LanguageTestTrait;
 
 /**
  * Tests the untranslatable fields behaviors.
@@ -14,10 +17,20 @@ use Drupal\language\Entity\ConfigurableLanguage;
  */
 class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendingRevisionTestBase {
 
+  use LanguageTestTrait;
+
   /**
    * {@inheritdoc}
    */
   protected static $modules = ['field_test'];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -29,14 +42,11 @@ class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendi
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->doSetup();
 
     // Configure one field as untranslatable.
     $this->drupalLogin($this->administrator);
-    $edit = [
-      'settings[' . $this->entityTypeId . '][' . $this->bundle . '][fields][' . $this->fieldName . ']' => 0,
-    ];
-    $this->drupalGet('admin/config/regional/content-language');
-    $this->submitForm($edit, 'Save configuration');
+    static::setFieldTranslatable($this->entityTypeId, $this->bundle, $this->fieldName, FALSE);
 
     /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
     $entity_field_manager = $this->container->get('entity_field.manager');

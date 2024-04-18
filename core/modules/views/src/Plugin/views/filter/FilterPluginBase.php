@@ -21,8 +21,8 @@ use Drupal\views\ViewExecutable;
  * Plugins that handle views filtering.
  *
  * Filter handler plugins extend
- * \Drupal\views\Plugin\views\filter\FilterPluginBase. They must be annotated
- * with \Drupal\views\Annotation\ViewsFilter annotation, and they must be in
+ * \Drupal\views\Plugin\views\filter\FilterPluginBase. They must be attributed
+ * with \Drupal\views\Attribute\ViewsFilter attribute, and they must be in
  * namespace directory Plugin\views\filter.
  *
  * The following items can go into a hook_views_data() implementation in a
@@ -717,6 +717,9 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @return bool
    */
   protected function hasValidGroupedValue(array $group) {
+    if (!method_exists($this, 'operators')) {
+      throw new \LogicException(get_class($this) . '::operators() not implemented');
+    }
     $operators = $this->operators();
     if ($operators[$group['operator']]['values'] == 0) {
       // Some filters, such as "is empty," do not require a value to be
@@ -753,6 +756,12 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         if (empty($group['remove'])) {
           $has_valid_value = $this->hasValidGroupedValue($group);
           if ($has_valid_value && $group['title'] == '') {
+            if (!method_exists($this, 'operators')) {
+              throw new \LogicException(get_class($this) . '::operators() not implemented');
+            }
+            if (!$this instanceof FilterOperatorsInterface) {
+              @trigger_error('Implementing operators() in class ' . get_class($this) . ' without it implementing \Drupal\views\Plugin\views\filter\FilterOperatorsInterface is deprecated in drupal:10.3.0 and will throw a LogicException in drupal:12.0.0. See https://www.drupal.org/node/3412013', E_USER_DEPRECATED);
+            }
             $operators = $this->operators();
             if ($operators[$group['operator']]['values'] == 0) {
               $form_state->setError($form['group_info']['group_items'][$id]['title'], $this->t('A label is required for the specified operator.'));
@@ -1073,49 +1082,6 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       '#title' => $this->t('Allow multiple selections'),
       '#description' => $this->t('Enable to allow users to select multiple items.'),
       '#default_value' => $this->options['group_info']['multiple'],
-    ];
-    $form['group_info']['widget'] = [
-      '#type' => 'radios',
-      '#default_value' => $this->options['group_info']['widget'],
-      '#title' => $this->t('Widget type'),
-      '#options' => [
-        'radios' => $this->t('Radios'),
-        'select' => $this->t('Select'),
-      ],
-      '#description' => $this->t('Select which kind of widget will be used to render the group of filters'),
-    ];
-    $form['group_info']['remember'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Remember'),
-      '#description' => $this->t('Remember the last setting the user gave this filter.'),
-      '#default_value' => $this->options['group_info']['remember'],
-    ];
-
-    if (!empty($this->options['group_info']['identifier'])) {
-      $identifier = $this->options['group_info']['identifier'];
-    }
-    else {
-      $identifier = 'group_' . $this->options['expose']['identifier'];
-    }
-    $form['group_info']['identifier'] = [
-      '#type' => 'textfield',
-      '#default_value' => $identifier,
-      '#title' => $this->t('Filter identifier'),
-      '#size' => 40,
-      '#description' => $this->t('This will appear in the URL after the ? to identify this filter. Cannot be blank. Only letters, digits and the dot ("."), hyphen ("-"), underscore ("_"), and tilde ("~") characters are allowed. @reserved_identifiers are reserved words and cannot be used.',
-        ['@reserved_identifiers' => '"' . implode('", "', self::RESTRICTED_IDENTIFIERS) . '"']),
-    ];
-    $form['group_info']['label'] = [
-      '#type' => 'textfield',
-      '#default_value' => $this->options['group_info']['label'],
-      '#title' => $this->t('Label'),
-      '#size' => 40,
-    ];
-    $form['group_info']['optional'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Optional'),
-      '#description' => $this->t('This exposed filter is optional and will have added options to allow it not to be set.'),
-      '#default_value' => $this->options['group_info']['optional'],
     ];
     $form['group_info']['widget'] = [
       '#type' => 'radios',

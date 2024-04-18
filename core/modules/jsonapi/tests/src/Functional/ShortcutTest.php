@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
@@ -15,6 +17,7 @@ use GuzzleHttp\RequestOptions;
  * JSON:API integration test for the "Shortcut" content entity type.
  *
  * @group jsonapi
+ * @group #slow
  */
 class ShortcutTest extends ResourceTestBase {
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\big_pipe\Unit\Render\Placeholder;
 
 use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
@@ -61,7 +63,7 @@ class BigPipeStrategyTest extends UnitTestCase {
   /**
    * @see \Drupal\big_pipe_test\BigPipePlaceholderTestCases
    */
-  public function placeholdersProvider() {
+  public static function placeholdersProvider() {
     $cases = BigPipePlaceholderTestCases::cases();
 
     // Generate $placeholders variable as expected by

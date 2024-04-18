@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Unit\source;
 
 use Drupal\Core\Database\Connection;
@@ -131,7 +133,7 @@ class DrupalSqlBaseTest extends MigrateTestCase {
   /**
    * Provides data for testMinimumVersion.
    */
-  public function providerMinimumVersion() {
+  public static function providerMinimumVersion() {
     return [
       'minimum less than schema' => [
         TRUE,

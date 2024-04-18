@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Functional;
 
 use Drupal\block_content\Entity\BlockContentType;
@@ -233,7 +235,7 @@ class BlockContentTypeTest extends BlockContentTestBase {
         $this->clickLink('foo');
         // Create a new block.
         $edit = ['info[0][value]' => $this->randomMachineName(8)];
-        $this->submitForm($edit, 'Save');
+        $this->submitForm($edit, 'Save and configure');
         $blocks = $storage->loadByProperties(['info' => $edit['info[0][value]']]);
         if (!empty($blocks)) {
           $block = reset($blocks);

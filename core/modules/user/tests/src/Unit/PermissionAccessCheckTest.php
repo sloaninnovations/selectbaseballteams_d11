@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Unit;
 
 use Drupal\Core\Access\AccessResult;
@@ -51,7 +53,7 @@ class PermissionAccessCheckTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestAccess() {
+  public static function providerTestAccess() {
     return [
       [[], FALSE],
       [['_permission' => 'allowed'], TRUE, ['user.permissions']],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\MigrateException;
@@ -47,7 +49,7 @@ class NullCoalesceTest extends MigrateProcessTestCase {
   /**
    * Provides Data for ::testTransform.
    */
-  public function transformDataProvider() {
+  public static function transformDataProvider() {
     return [
       'all null' => [
         'source' => [NULL, NULL, NULL],
@@ -101,7 +103,7 @@ class NullCoalesceTest extends MigrateProcessTestCase {
   /**
    * Provides Data for ::testTransformWithDefault.
    */
-  public function transformWithDefaultProvider() {
+  public static function transformWithDefaultProvider() {
     return [
       'default not used' => [
         'source' => [NULL, NULL, 'Test', 'Test 2'],

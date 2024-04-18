@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field_ui\FunctionalJavascript;
 
 use Drupal\Core\Entity\Entity\EntityFormMode;
@@ -141,7 +143,7 @@ class DisplayModeBundleSelectionTest extends WebDriverTestBase {
   /**
    * Data provider for testBundleSelection().
    */
-  public function providerBundleSelection() {
+  public static function providerBundleSelection() {
     return [
       'view display' => ['view', 'display', 'full'],
       'form display' => ['form', 'form-display', 'foobar'],

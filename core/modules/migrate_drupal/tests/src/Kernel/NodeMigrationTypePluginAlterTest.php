@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Kernel;
 
 use Drupal\migrate_drupal\NodeMigrateType;
@@ -51,7 +53,7 @@ class NodeMigrationTypePluginAlterTest extends MigrateTestBase {
   /**
    * Data provider for testMigrationPluginAlter().
    */
-  public function providerMigrationPluginAlter() {
+  public static function providerMigrationPluginAlter() {
     $tests = [];
 
     $migrations = [

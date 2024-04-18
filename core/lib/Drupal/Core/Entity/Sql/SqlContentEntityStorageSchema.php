@@ -1455,9 +1455,6 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *   The entity type.
    * @param array $schema
    *   The table schema, passed by reference.
-   *
-   * @return array
-   *   A partial schema array for the base table.
    */
   protected function processDataTable(ContentEntityTypeInterface $entity_type, array &$schema) {
     // Marking the respective fields as NOT NULL makes the indexes more
@@ -1470,11 +1467,8 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *
    * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
    *   The entity type.
-   * @param array $schema
+   * @param array &$schema
    *   The table schema, passed by reference.
-   *
-   * @return array
-   *   A partial schema array for the base table.
    */
   protected function processRevisionDataTable(ContentEntityTypeInterface $entity_type, array &$schema) {
     // Marking the respective fields as NOT NULL makes the indexes more
@@ -1752,7 +1746,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       }
     }
     else {
-      if ($this->hasColumnChanges($storage_definition, $original)) {
+      if (empty($storage_definition->getSetting('column_changes_handled')) && $this->hasColumnChanges($storage_definition, $original)) {
         throw new FieldStorageDefinitionUpdateForbiddenException('The SQL storage cannot change the schema for an existing field (' . $storage_definition->getName() . ' in ' . $storage_definition->getTargetEntityTypeId() . ' entity) with data.');
       }
       // There is data, so there are no column changes. Drop all the prior
@@ -1845,7 +1839,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       }
     }
     else {
-      if ($this->hasColumnChanges($storage_definition, $original)) {
+      if (empty($storage_definition->getSetting('column_changes_handled')) && $this->hasColumnChanges($storage_definition, $original)) {
         throw new FieldStorageDefinitionUpdateForbiddenException('The SQL storage cannot change the schema for an existing field (' . $storage_definition->getName() . ' in ' . $storage_definition->getTargetEntityTypeId() . ' entity) with data.');
       }
 

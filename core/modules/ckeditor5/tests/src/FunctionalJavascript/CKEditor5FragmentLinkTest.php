@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -97,8 +99,6 @@ class CKEditor5FragmentLinkTest extends WebDriverTestBase {
     $ckeditor_id = '#cke_edit-body-0-value';
 
     $this->drupalGet('node/add/page');
-
-    $session->getPage();
 
     // Add a bottom margin to the title field to be sure the body field is not
     // visible.

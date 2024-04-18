@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Cache\Context;
 
 use Drupal\Core\Cache\Context\SessionCacheContext;
@@ -56,6 +58,7 @@ class SessionCacheContextTest extends UnitTestCase {
     $this->request->setSession($this->session);
     $cache_context = new SessionCacheContext($this->requestStack);
 
+    // cspell:disable-next-line
     $session_id = 'aSebeZ52bbM6SvADurQP89SFnEpxY6j8';
     $this->session->expects($this->exactly(2))
       ->method('getId')
@@ -76,6 +79,7 @@ class SessionCacheContextTest extends UnitTestCase {
 
     // cspell:disable-next-line
     $session1_id = 'pjH_8aSoofyCDQiuVYXJcbfyr-CPtkUY';
+    // cspell:disable-next-line
     $session2_id = 'aSebeZ52bbM6SvADurQP89SFnEpxY6j8';
     $this->session->expects($this->exactly(2))
       ->method('getId')
@@ -87,15 +91,6 @@ class SessionCacheContextTest extends UnitTestCase {
 
     $this->assertStringNotContainsString($session1_id, $context1, 'Session ID not contained in cache context');
     $this->assertStringNotContainsString($session2_id, $context2, 'Session ID not contained in cache context');
-  }
-
-  /**
-   * @covers ::getContext
-   */
-  public function testContextWithoutSessionInRequest() {
-    $cache_context = new SessionCacheContext($this->requestStack);
-
-    $this->assertSame('none', $cache_context->getContext());
   }
 
 }

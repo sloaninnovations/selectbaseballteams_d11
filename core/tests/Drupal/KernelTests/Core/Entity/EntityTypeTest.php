@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\EntityType;
@@ -43,7 +45,7 @@ class EntityTypeTest extends KernelTestBase {
       }
 
       /**
-       * @return array
+       * Always throw an exception.
        */
       public function __serialize(): array {
         throw new \Exception();

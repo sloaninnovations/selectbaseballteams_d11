@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -139,7 +141,7 @@ class SettingsTest extends WebDriverTestBase {
   /**
    * Data provider for testCredentialForm.
    */
-  public function providerTestCredentialForm() {
+  public static function providerTestCredentialForm() {
     return [
       'no values in settings.php' => [
         'source_connection' => "",

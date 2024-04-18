@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\book\Unit\Menu;
 
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
@@ -8,6 +10,7 @@ use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
  * Tests existence of book local tasks.
  *
  * @group book
+ * @group legacy
  */
 class BookLocalTasksTest extends LocalTaskIntegrationTestBase {
 
@@ -37,7 +40,7 @@ class BookLocalTasksTest extends LocalTaskIntegrationTestBase {
   /**
    * Provides a list of routes to test.
    */
-  public function getBookAdminRoutes() {
+  public static function getBookAdminRoutes() {
     return [
       ['book.admin'],
       ['book.settings'],
@@ -58,7 +61,7 @@ class BookLocalTasksTest extends LocalTaskIntegrationTestBase {
   /**
    * Provides a list of routes to test.
    */
-  public function getBookNodeRoutes() {
+  public static function getBookNodeRoutes() {
     return [
       ['entity.node.canonical'],
       ['entity.node.book_outline_form'],

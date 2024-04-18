@@ -455,12 +455,18 @@ class ConfigImporter {
 
     $this->extensionChangelist['module']['install'] = array_keys($install_required + $install_non_required);
 
-    // If we're installing the install profile ensure it comes last. This will
-    // occur when installing a site from configuration.
-    $install_profile_key = array_search($new_extensions['profile'], $this->extensionChangelist['module']['install'], TRUE);
-    if ($install_profile_key !== FALSE) {
-      unset($this->extensionChangelist['module']['install'][$install_profile_key]);
-      $this->extensionChangelist['module']['install'][] = $new_extensions['profile'];
+    // If we're installing the install profile ensure it comes last in the
+    // list of modules to be installed. This will occur when installing a site
+    // from configuration.
+    if (isset($new_extensions['profile'])) {
+      $install_profile_key = array_search($new_extensions['profile'], $this->extensionChangelist['module']['install'], TRUE);
+      // If the profile is not in the list of modules to be installed this will
+      // generate a validation error. See
+      // \Drupal\Core\EventSubscriber\ConfigImportSubscriber::validateModules().
+      if ($install_profile_key !== FALSE) {
+        unset($this->extensionChangelist['module']['install'][$install_profile_key]);
+        $this->extensionChangelist['module']['install'][] = $new_extensions['profile'];
+      }
     }
 
     // Get a list of themes with dependency weights as values.
@@ -556,6 +562,9 @@ class ConfigImporter {
    *   Exception thrown if the $sync_step can not be called.
    */
   public function doSyncStep($sync_step, &$context) {
+    if ($this->validated) {
+      $this->storageComparer->writeMode();
+    }
     if (is_string($sync_step) && method_exists($this, $sync_step)) {
       \Drupal::service('config.installer')->setSyncing(TRUE);
       $this->$sync_step($context);
@@ -870,8 +879,8 @@ class ConfigImporter {
       ->setSourceStorage($this->storageComparer->getSourceStorage());
     if ($type == 'module') {
       $this->moduleInstaller->$op([$name], FALSE);
-      // Installing a module can cause a kernel boot therefore reinject all the
-      // services.
+      // Installing a module can cause a kernel boot therefore inject all the
+      // services again.
       $this->reInjectMe();
       // During a module install or uninstall the container is rebuilt and the
       // module handler is called. This causes the container's instance of the
@@ -991,6 +1000,9 @@ class ConfigImporter {
     }
     else {
       $config = new Config($name, $this->storageComparer->getTargetStorage($collection), $this->eventDispatcher, $this->typedConfigManager);
+    }
+    if ($old_data = $this->storageComparer->getTargetStorage($collection)->read($name)) {
+      $config->initWithData($old_data);
     }
     if ($op == 'delete') {
       $config->delete();
@@ -1129,6 +1141,8 @@ class ConfigImporter {
     // the new container.
     $this->__sleep();
     $this->__wakeup();
+    $this->storageComparer->__sleep();
+    $this->storageComparer->__wakeup();
   }
 
 }

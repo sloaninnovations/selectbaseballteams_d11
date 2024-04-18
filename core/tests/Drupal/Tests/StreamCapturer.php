@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests;
 
 /**
@@ -9,8 +11,7 @@ class StreamCapturer extends \php_user_filter {
 
   public static $cache = '';
 
-  #[\ReturnTypeWillChange]
-  public function filter($in, $out, &$consumed, $closing) {
+  public function filter($in, $out, &$consumed, $closing): int {
     while ($bucket = stream_bucket_make_writeable($in)) {
       self::$cache .= $bucket->data;
       // cSpell:disable-next-line

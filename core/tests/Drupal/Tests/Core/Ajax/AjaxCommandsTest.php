@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Ajax;
 
 use Drupal\Core\Ajax\AnnounceCommand;
@@ -41,7 +43,7 @@ class AjaxCommandsTest extends UnitTestCase {
    *   - Array of css elements
    *   - Expected value
    */
-  public function providerCss() {
+  public static function providerCss() {
     return [
       'empty' => [
         [],
@@ -125,23 +127,6 @@ class AjaxCommandsTest extends UnitTestCase {
   }
 
   /**
-   * @covers \Drupal\Core\Ajax\AddCssCommand
-   * @group legacy
-   */
-  public function testStringAddCssCommand() {
-    $this->expectDeprecation("The Drupal\Core\Ajax\AddCssCommand with a string argument is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. See http://www.drupal.org/node/3154948");
-
-    $command = new AddCssCommand('<style>p{ text-decoration:blink; }</style>');
-
-    $expected = [
-      'command' => 'add_css',
-      'data' => '<style>p{ text-decoration:blink; }</style>',
-    ];
-
-    $this->assertEquals($expected, $command->render());
-  }
-
-  /**
    * @covers \Drupal\Core\Ajax\AfterCommand
    */
   public function testAfterCommand() {
@@ -194,7 +179,7 @@ class AjaxCommandsTest extends UnitTestCase {
   /**
    * Data provider for testAnnounceCommand().
    */
-  public function announceCommandProvider() {
+  public static function announceCommandProvider() {
     return [
       'no priority' => [
         'Things are going to change!',

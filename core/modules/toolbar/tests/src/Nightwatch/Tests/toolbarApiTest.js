@@ -8,8 +8,7 @@ module.exports = {
   before(browser) {
     browser
       .drupalInstall()
-      .drupalInstallModule('breakpoint')
-      .drupalInstallModule('toolbar')
+      .drupalInstallModule('toolbar', true)
       .drupalCreateUser({
         name: 'user',
         password: '123',
@@ -82,7 +81,7 @@ module.exports = {
         toReturn.toolbarModelOffsetsRight =
           models.toolbarModel.get('offsets').right === 0;
         toReturn.toolbarModelOffsetsTop =
-          models.toolbarModel.get('offsets').top === 79;
+          models.toolbarModel.get('offsets').top === 80;
         toReturn.toolbarModelSubtrees =
           models.menuModel.get('subtrees') === null;
         return toReturn;

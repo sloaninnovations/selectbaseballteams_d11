@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\File;
 
 use Drupal\Core\File\Exception\FileException;
@@ -43,8 +45,7 @@ class FileSystemTest extends UnitTestCase {
 
     $settings = new Settings([]);
     $this->streamWrapperManager = $this->createMock(StreamWrapperManagerInterface::class);
-    $this->logger = $this->createMock('Psr\Log\LoggerInterface');
-    $this->fileSystem = new FileSystem($this->streamWrapperManager, $settings, $this->logger);
+    $this->fileSystem = new FileSystem($this->streamWrapperManager, $settings);
   }
 
   /**
@@ -80,8 +81,6 @@ class FileSystemTest extends UnitTestCase {
    */
   public function testChmodUnsuccessful() {
     vfsStream::setup('dir');
-    $this->logger->expects($this->once())
-      ->method('error');
     $this->assertFalse($this->fileSystem->chmod('vfs://dir/test.txt'));
   }
 
@@ -111,7 +110,7 @@ class FileSystemTest extends UnitTestCase {
     $this->assertSame($expected, $this->fileSystem->basename($uri, $suffix));
   }
 
-  public function providerTestBasename() {
+  public static function providerTestBasename() {
     $data = [];
     $data[] = [
       'public://nested/dir',

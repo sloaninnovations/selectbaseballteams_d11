@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Access\AccessResult;
@@ -45,7 +47,7 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestAccess() {
+  public static function providerTestAccess() {
     $no_access = FALSE;
     $access = TRUE;
 

@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Cache\Context\CacheContextsManagerTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Cache\Context;
 
@@ -14,6 +11,8 @@ use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\Container;
+
+// cspell:ignore cnenzrgre
 
 /**
  * @coversDefaultClass \Drupal\Core\Cache\Context\CacheContextsManager
@@ -67,7 +66,7 @@ class CacheContextsManagerTest extends UnitTestCase {
   /**
    * Provides a list of context token sets.
    */
-  public function providerTestOptimizeTokens() {
+  public static function providerTestOptimizeTokens() {
     return [
       [['a', 'x'], ['a', 'x']],
       [['a.b', 'x'], ['a.b', 'x']],
@@ -150,7 +149,7 @@ class CacheContextsManagerTest extends UnitTestCase {
   /**
    * Provides a list of invalid 'baz' cache contexts: the parameter is missing.
    */
-  public function providerTestInvalidCalculatedContext() {
+  public static function providerTestInvalidCalculatedContext() {
     return [
       ['baz'],
       ['baz:'],
@@ -201,7 +200,7 @@ class CacheContextsManagerTest extends UnitTestCase {
    *
    * @return array
    */
-  public function validateTokensProvider() {
+  public static function validateTokensProvider() {
     return [
       [[], FALSE],
       [['foo'], FALSE],

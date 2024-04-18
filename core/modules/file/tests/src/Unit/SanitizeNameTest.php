@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Unit;
 
 use Drupal\Component\Transliteration\PhpTransliteration;
@@ -74,7 +76,7 @@ class SanitizeNameTest extends UnitTestCase {
    * @return array
    *   Arrays with original name, expected name, and sanitization options.
    */
-  public function provideFilenames() {
+  public static function provideFilenames() {
     return [
       'Test default options' => [
         'TÉXT-œ.txt',

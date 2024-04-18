@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Functional;
 
 use Drupal\Component\Render\PlainTextOutput;
@@ -15,6 +17,8 @@ use Drupal\rest\RestResourceConfigInterface;
 use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
+
+// cspell:ignore èxample msword
 
 /**
  * Tests binary data file upload route.
@@ -193,7 +197,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     // header with no 'file' prefix.
     $response = $this->fileRequest($uri, $this->testFileData, ['Content-Disposition' => 'filename="example.txt"']);
     $this->assertSame(201, $response->getStatusCode());
-    $expected = $this->getExpectedNormalizedEntity(2, 'example_0.txt');
+    $expected = $this->getExpectedNormalizedEntity(2, 'example_0.txt', TRUE);
     $this->assertResponseData($expected, $response);
 
     // Check the actual file data.
@@ -237,7 +241,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
       ],
       'name' => [
         [
-          'value' => 'Dramallama',
+          'value' => 'Drama llama',
         ],
       ],
       'field_rest_file_test' => [
@@ -267,26 +271,26 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
 
     // An empty Content-Disposition header should return a 400.
     $response = $this->fileRequest($uri, $this->testFileData, ['Content-Disposition' => FALSE]);
-    $this->assertResourceErrorResponse(400, '"Content-Disposition" header is required. A file name in the format "filename=FILENAME" must be provided', $response);
+    $this->assertResourceErrorResponse(400, '"Content-Disposition" header is required. A file name in the format "filename=FILENAME" must be provided.', $response);
 
     // An empty filename with a context in the Content-Disposition header should
     // return a 400.
     $response = $this->fileRequest($uri, $this->testFileData, ['Content-Disposition' => 'file; filename=""']);
-    $this->assertResourceErrorResponse(400, 'No filename found in "Content-Disposition" header. A file name in the format "filename=FILENAME" must be provided', $response);
+    $this->assertResourceErrorResponse(400, 'No filename found in "Content-Disposition" header. A file name in the format "filename=FILENAME" must be provided.', $response);
 
     // An empty filename without a context in the Content-Disposition header
     // should return a 400.
     $response = $this->fileRequest($uri, $this->testFileData, ['Content-Disposition' => 'filename=""']);
-    $this->assertResourceErrorResponse(400, 'No filename found in "Content-Disposition" header. A file name in the format "filename=FILENAME" must be provided', $response);
+    $this->assertResourceErrorResponse(400, 'No filename found in "Content-Disposition" header. A file name in the format "filename=FILENAME" must be provided.', $response);
 
     // An invalid key-value pair in the Content-Disposition header should return
     // a 400.
     $response = $this->fileRequest($uri, $this->testFileData, ['Content-Disposition' => 'not_a_filename="example.txt"']);
-    $this->assertResourceErrorResponse(400, 'No filename found in "Content-Disposition" header. A file name in the format "filename=FILENAME" must be provided', $response);
+    $this->assertResourceErrorResponse(400, 'No filename found in "Content-Disposition" header. A file name in the format "filename=FILENAME" must be provided.', $response);
 
     // Using filename* extended format is not currently supported.
     $response = $this->fileRequest($uri, $this->testFileData, ['Content-Disposition' => 'filename*="UTF-8 \' \' example.txt"']);
-    $this->assertResourceErrorResponse(400, 'The extended "filename*" format is currently not supported in the "Content-Disposition" header', $response);
+    $this->assertResourceErrorResponse(400, 'The extended "filename*" format is currently not supported in the "Content-Disposition" header.', $response);
   }
 
   /**
@@ -315,7 +319,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $this->assertSame(201, $response->getStatusCode());
 
     // Loading expected normalized data for file 2, the duplicate file.
-    $expected = $this->getExpectedNormalizedEntity(2, 'example_0.txt');
+    $expected = $this->getExpectedNormalizedEntity(2, 'example_0.txt', TRUE);
     $this->assertResponseData($expected, $response);
 
     // Check the actual file data.

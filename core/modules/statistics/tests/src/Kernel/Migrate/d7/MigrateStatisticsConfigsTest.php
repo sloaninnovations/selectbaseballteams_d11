@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\statistics\Kernel\Migrate\d7;
 
 use Drupal\Tests\SchemaCheckTestTrait;
@@ -25,6 +27,13 @@ class MigrateStatisticsConfigsTest extends MigrateDrupal7TestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->executeMigration('statistics_settings');
+  }
+
+  /**
+   * Gets the path to the fixture file.
+   */
+  protected function getFixtureFilePath() {
+    return __DIR__ . '/../../../../fixtures/drupal7.php';
   }
 
   /**

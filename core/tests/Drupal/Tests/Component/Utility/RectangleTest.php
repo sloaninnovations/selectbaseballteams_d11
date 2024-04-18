@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\Rectangle;
@@ -94,7 +96,7 @@ class RectangleTest extends TestCase {
    *
    * @see testRotateDimensions()
    */
-  public function providerPhp55RotateDimensions() {
+  public static function providerPhp55RotateDimensions() {
     // The dataset is stored in a .json file because it is very large and causes
     // problems for PHPCS.
     return json_decode(file_get_contents(__DIR__ . '/fixtures/RectangleTest.json'));

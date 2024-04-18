@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Theme;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -8,12 +10,14 @@ use Drupal\Core\Extension\ExtensionNameReservedException;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleUninstallValidatorException;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
+use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Tests installing and uninstalling of themes.
  *
  * @group Extension
+ * @group #slow
  */
 class ThemeInstallerTest extends KernelTestBase {
 
@@ -53,7 +57,7 @@ class ThemeInstallerTest extends KernelTestBase {
     $this->assertEmpty(array_keys(\Drupal::service('theme_handler')->listInfo()));
 
     // Rebuilding available themes should always yield results though.
-    $this->assertNotEmpty($this->themeHandler()->rebuildThemeData()['stark'], 'ThemeHandler::rebuildThemeData() yields all available themes.');
+    $this->assertNotEmpty($this->extensionListTheme()->reset()->getList()['stark'], 'ThemeExtensionList::getList() yields all available themes.');
 
     // theme_get_setting() should return global default theme settings.
     $this->assertTrue(theme_get_setting('features.favicon'));
@@ -191,7 +195,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Data provider for testInstallThemeWithUnmetModuleDependencies().
    */
-  public function providerTestInstallThemeWithUnmetModuleDependencies() {
+  public static function providerTestInstallThemeWithUnmetModuleDependencies() {
     return [
       'theme with uninstalled module dependencies' => [
         'test_theme_depending_on_modules',
@@ -355,17 +359,8 @@ class ThemeInstallerTest extends KernelTestBase {
     $themes = $this->themeHandler()->listInfo();
     $this->assertEmpty(array_keys($themes));
 
-    try {
-      $message = 'ThemeInstaller::uninstall() throws UnknownExtensionException upon uninstalling a non-existing theme.';
-      $this->themeInstaller()->uninstall([$name]);
-      $this->fail($message);
-    }
-    catch (\Exception $e) {
-      $this->assertInstanceOf(UnknownExtensionException::class, $e);
-    }
-
-    $themes = $this->themeHandler()->listInfo();
-    $this->assertEmpty(array_keys($themes));
+    $this->expectException(UnknownExtensionException::class);
+    $this->themeInstaller()->uninstall([$name]);
   }
 
   /**
@@ -397,14 +392,10 @@ class ThemeInstallerTest extends KernelTestBase {
   public function testUninstallNotInstalled() {
     $name = 'test_basetheme';
 
-    try {
-      $message = 'ThemeInstaller::uninstall() throws UnknownExtensionException upon uninstalling a theme that is not installed.';
-      $this->themeInstaller()->uninstall([$name]);
-      $this->fail($message);
-    }
-    catch (\Exception $e) {
-      $this->assertInstanceOf(UnknownExtensionException::class, $e);
-    }
+    $themes = $this->themeHandler()->listInfo();
+    $this->assertEmpty(array_keys($themes));
+    $this->expectException(UnknownExtensionException::class);
+    $this->themeInstaller()->uninstall([$name]);
   }
 
   /**
@@ -498,6 +489,15 @@ class ThemeInstallerTest extends KernelTestBase {
    */
   protected function moduleInstaller() {
     return $this->container->get('module_installer');
+  }
+
+  /**
+   * Returns the ThemeExtensionList.
+   *
+   * @return \Drupal\Core\Extension\ThemeExtensionList
+   */
+  protected function extensionListTheme(): ThemeExtensionList {
+    return $this->container->get('extension.list.theme');
   }
 
 }

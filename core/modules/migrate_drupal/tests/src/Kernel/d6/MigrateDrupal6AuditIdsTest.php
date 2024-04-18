@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Kernel\d6;
 
 use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
@@ -35,6 +37,7 @@ class MigrateDrupal6AuditIdsTest extends MigrateDrupal6TestBase {
     $this->installEntitySchemas();
 
     // Install required schemas.
+    // @todo Remove book in https://www.drupal.org/project/drupal/issues/3376101
     $this->installSchema('book', ['book']);
     $this->installSchema('dblog', ['watchdog']);
     // @todo Remove forum in https://www.drupal.org/project/drupal/issues/3261653

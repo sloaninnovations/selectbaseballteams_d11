@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Extension;
 
 use Drupal\Tests\UnitTestCase;
@@ -27,7 +29,7 @@ class DefaultConfigTest extends UnitTestCase {
     $expected = [
       'module' => [],
       'theme' => [],
-      'profile' => '',
+      'profile' => NULL,
     ];
     $this->assertEquals($expected, $config);
   }

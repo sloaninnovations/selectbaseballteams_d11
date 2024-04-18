@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Batch;
 
 use Drupal\Core\Batch\Percentage;
@@ -30,7 +32,7 @@ class PercentagesTest extends UnitTestCase {
    * @return array
    *   An array of data used by the test.
    */
-  public function providerTestPercentages() {
+  public static function providerTestPercentages() {
     // Set up an array of test cases.
     return [
       // array(total, current, expected).

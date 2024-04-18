@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\link\Unit\Plugin\Validation\Constraint;
 
 use Drupal\Component\Utility\UrlHelper;
@@ -49,7 +51,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
   /**
    * Data provider for ::testValidate.
    */
-  public function providerValidate() {
+  public static function providerValidate() {
     $data = [];
 
     // Test allowed protocols.

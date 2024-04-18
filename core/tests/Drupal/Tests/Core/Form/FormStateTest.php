@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Form\FormStateTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Form;
 
@@ -40,7 +37,7 @@ class FormStateTest extends UnitTestCase {
    * @return array
    *   Returns some test data.
    */
-  public function providerTestGetRedirect() {
+  public static function providerTestGetRedirect() {
     $data = [];
     $data[] = [[], NULL];
 
@@ -83,7 +80,7 @@ class FormStateTest extends UnitTestCase {
     $this->assertSame($error, $form_state->getError($element));
   }
 
-  public function providerTestGetError() {
+  public static function providerTestGetError() {
     return [
       [[], ['foo']],
       [['foo][bar' => 'Fail'], []],
@@ -116,7 +113,7 @@ class FormStateTest extends UnitTestCase {
     $this->assertSame($expected_errors, $form_state->getErrors());
   }
 
-  public function providerTestSetErrorByName() {
+  public static function providerTestSetErrorByName() {
     return [
       // Only validate the 'options' element.
       [[['options']], ['options' => '']],
@@ -267,7 +264,7 @@ class FormStateTest extends UnitTestCase {
   /**
    * Provides test data for testIsCached().
    */
-  public function providerTestIsCached() {
+  public static function providerTestIsCached() {
     $data = [];
     $data[] = [
       TRUE,
@@ -338,7 +335,7 @@ class FormStateTest extends UnitTestCase {
   /**
    * Provides test data for testIsMethodType().
    */
-  public function providerTestIsMethodType() {
+  public static function providerTestIsMethodType() {
     $data = [];
     $data[] = [
       'get',
@@ -373,10 +370,10 @@ class FormStateTest extends UnitTestCase {
     $this->assertFalse($form_state->hasTemporaryValue('rainbow_sparkles'));
     $form_state->setTemporaryValue('rainbow_sparkles', 'yes');
     $this->assertSame($form_state->getTemporaryValue('rainbow_sparkles'), 'yes');
-    $this->assertTrue($form_state->hasTemporaryValue('rainbow_sparkles'), TRUE);
+    $this->assertTrue($form_state->hasTemporaryValue('rainbow_sparkles'));
     $form_state->setTemporaryValue(['rainbow_sparkles', 'magic_ponies'], 'yes');
     $this->assertSame($form_state->getTemporaryValue(['rainbow_sparkles', 'magic_ponies']), 'yes');
-    $this->assertTrue($form_state->hasTemporaryValue(['rainbow_sparkles', 'magic_ponies']), TRUE);
+    $this->assertTrue($form_state->hasTemporaryValue(['rainbow_sparkles', 'magic_ponies']));
   }
 
   /**

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit;
 
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\migrate\Plugin\Migration;
 use Drupal\migrate\Plugin\MigrationPluginManager;
 use Drupal\Tests\UnitTestCase;
@@ -66,9 +69,28 @@ class MigrationPluginManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that expandPluginIds returns all derivatives.
+   */
+  public function testExpandPluginIds() {
+    $backend = $this->prophesize(CacheBackendInterface::class);
+    $cache = new \stdClass();
+    $cache->data = [
+      'a:a' => ['provider' => 'core'],
+      'a:b' => ['provider' => 'core'],
+      'b' => ['provider' => 'core'],
+    ];
+    $backend->get('migration_plugins')->willReturn($cache);
+    $this->pluginManager->setCacheBackend($backend->reveal(), 'migration_plugins');
+    $plugin_ids = $this->pluginManager->expandPluginIds(['b', 'a']);
+    $this->assertContains('a:a', $plugin_ids);
+    $this->assertContains('a:b', $plugin_ids);
+    $this->assertContains('b', $plugin_ids);
+  }
+
+  /**
    * Provide dependency data for testing.
    */
-  public function dependencyProvider() {
+  public static function dependencyProvider() {
     return [
       // Just one migration, with no dependencies.
       [

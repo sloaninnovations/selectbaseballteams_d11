@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Plugin;
 
 use Drupal\Component\Plugin\PluginBase;
@@ -28,7 +30,7 @@ class PluginWithFormsTraitTest extends UnitTestCase {
   /**
    * @return array
    */
-  public function providerGetFormClass() {
+  public static function providerGetFormClass() {
     $block_plugin_without_forms = new TestClass([], 'block_plugin_without_forms', [
       'provider' => 'block_test',
     ]);

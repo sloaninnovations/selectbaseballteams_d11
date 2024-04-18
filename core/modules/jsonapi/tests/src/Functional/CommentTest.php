@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\comment\Entity\Comment;
@@ -21,6 +23,7 @@ use GuzzleHttp\RequestOptions;
  * JSON:API integration test for the "Comment" content entity type.
  *
  * @group jsonapi
+ * @group #slow
  */
 class CommentTest extends ResourceTestBase {
 
@@ -244,7 +247,7 @@ class CommentTest extends ResourceTestBase {
         'attributes' => [
           'entity_type' => 'entity_test',
           'field_name' => 'comment',
-          'subject' => 'Dramallama',
+          'subject' => 'Drama llama',
           'comment_body' => [
             'value' => 'Llamas are awesome.',
             'format' => 'plain_text',

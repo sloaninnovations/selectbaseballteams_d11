@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -26,7 +28,7 @@ class TextfieldTest extends UnitTestCase {
   /**
    * Data provider for testValueCallback().
    */
-  public function providerTestValueCallback() {
+  public static function providerTestValueCallback() {
     $data = [];
     $data[] = [NULL, FALSE];
     $data[] = [NULL, NULL];

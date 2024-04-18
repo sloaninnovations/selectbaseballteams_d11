@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Plugin\ContextHandlerTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Plugin;
 
@@ -204,7 +201,7 @@ class ContextHandlerTest extends UnitTestCase {
   /**
    * Provides data for testFilterPluginDefinitionsByContexts().
    */
-  public function providerTestFilterPluginDefinitionsByContexts() {
+  public static function providerTestFilterPluginDefinitionsByContexts() {
     $data = [];
 
     $plugins = [];

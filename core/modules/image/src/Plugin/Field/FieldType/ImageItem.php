@@ -9,6 +9,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
@@ -23,8 +24,8 @@ use Drupal\file\Plugin\Field\FieldType\FileItem;
  *   label = @Translation("Image"),
  *   description = {
  *     @Translation("For uploading images"),
- *     @Translation("Allows a user to upload an image with configurable extensions, image resolutions, upload size"),
- *     @Translation("Can be configured with options such as allowed file extensions, maximum upload size and image resolution minimums/maximums"),
+ *     @Translation("Allows a user to upload an image with configurable extensions, image dimensions, upload size"),
+ *     @Translation("Can be configured with options such as allowed file extensions, maximum upload size and image dimensions minimums/maximums"),
  *   },
  *   category = "file_upload",
  *   default_widget = "image_image",
@@ -51,6 +52,8 @@ use Drupal\file\Plugin\Field\FieldType\FileItem;
  * )
  */
 class ImageItem extends FileItem {
+
+  use LoggerChannelTrait;
 
   /**
    * {@inheritdoc}
@@ -208,11 +211,11 @@ class ImageItem extends FileItem {
 
     $settings = $this->getSettings();
 
-    // Add maximum and minimum resolution settings.
+    // Add maximum and minimum dimensions settings.
     $max_resolution = explode('x', $settings['max_resolution']) + ['', ''];
     $element['max_resolution'] = [
       '#type' => 'item',
-      '#title' => $this->t('Maximum image resolution'),
+      '#title' => $this->t('Maximum image dimensions'),
       '#element_validate' => [[static::class, 'validateResolution']],
       '#weight' => 4.1,
       '#description' => $this->t('The maximum allowed image size expressed as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction. If a larger image is uploaded, it will be resized to reflect the given width and height. Resizing images on upload will cause the loss of <a href="http://wikipedia.org/wiki/Exchangeable_image_file_format">EXIF data</a> in the image.'),
@@ -239,7 +242,7 @@ class ImageItem extends FileItem {
     $min_resolution = explode('x', $settings['min_resolution']) + ['', ''];
     $element['min_resolution'] = [
       '#type' => 'item',
-      '#title' => $this->t('Minimum image resolution'),
+      '#title' => $this->t('Minimum image dimensions'),
       '#element_validate' => [[static::class, 'validateResolution']],
       '#weight' => 4.2,
       '#description' => $this->t('The minimum allowed image size expressed as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction. If a smaller image is uploaded, it will be rejected.'),
@@ -332,7 +335,7 @@ class ImageItem extends FileItem {
       }
     }
     else {
-      trigger_error(sprintf("Missing file with ID %s.", $this->target_id), E_USER_WARNING);
+      $this->getLogger('image')->warning("Missing file with ID %id.", ['%id' => $this->target_id]);
     }
   }
 
@@ -406,7 +409,7 @@ class ImageItem extends FileItem {
   }
 
   /**
-   * Element validate function for resolution fields.
+   * Element validate function for dimensions fields.
    */
   public static function validateResolution($element, FormStateInterface $form_state) {
     if (!empty($element['x']['#value']) || !empty($element['y']['#value'])) {

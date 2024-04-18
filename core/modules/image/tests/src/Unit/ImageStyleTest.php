@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\image\Unit;
 
 use Drupal\Component\Utility\Crypt;
@@ -138,7 +140,7 @@ class ImageStyleTest extends UnitTestCase {
       ->getMock();
     $image_effect->expects($this->any())
       ->method('getDerivativeExtension')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     $image_style = $this->getImageStyleMock($image_effect_id, $image_effect);
     $this->assertEquals($image_style->buildUri('public://test.jpeg'), 'public://styles/' . $image_style->id() . '/public/test.jpeg');
@@ -181,7 +183,7 @@ class ImageStyleTest extends UnitTestCase {
       ->getMock();
     $image_effect->expects($this->any())
       ->method('getDerivativeExtension')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     $image_style = $this->getImageStyleMock($image_effect_id, $image_effect, ['getPrivateKey', 'getHashSalt']);
     $image_style->expects($this->any())

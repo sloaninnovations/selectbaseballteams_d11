@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -126,7 +127,7 @@ class NodeTokenReplaceTest extends TokenReplaceKernelTestBase {
 
     foreach ($tests as $input => $expected) {
       $output = $this->tokenService->replace($input, ['node' => $node], ['language' => $this->interfaceLanguage]);
-      $this->assertEquals($output, $expected, new FormattableMarkup('Node token %token replaced for unpublished node.', ['%token' => $input]));
+      $this->assertEquals($output, $expected, "Node token $input replaced for unpublished node.");
     }
 
     // Repeat for a node without a summary.

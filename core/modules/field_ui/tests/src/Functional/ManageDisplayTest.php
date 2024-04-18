@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field_ui\Functional;
 
 use Behat\Mink\Exception\ExpectationException;
@@ -17,6 +19,7 @@ use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
  * Tests the Field UI "Manage display" and "Manage form display" screens.
  *
  * @group field_ui
+ * @group #slow
  */
 class ManageDisplayTest extends BrowserTestBase {
 
@@ -107,7 +110,7 @@ class ManageDisplayTest extends BrowserTestBase {
     // For this test, use a formatter setting value that is an integer unlikely
     // to appear in a rendered node other than as part of the field being tested
     // (for example, unlikely to be part of the "Submitted by ... on ..." line).
-    $value = 12345;
+    $value = '12345';
     $settings = [
       'type' => $this->type,
       'field_test' => [['value' => $value]],
@@ -245,12 +248,12 @@ class ManageDisplayTest extends BrowserTestBase {
     $this->assertOrderInPage(['RSS', 'Teaser']);
 
     $edit = [
-      'label' => 'Breezer',
+      'label' => 'Breezier',
     ];
     $this->drupalGet('admin/structure/display-modes/view/manage/node.teaser');
     $this->submitForm($edit, 'Save');
 
-    $this->assertOrderInPage(['Breezer', 'RSS']);
+    $this->assertOrderInPage(['Breezier', 'RSS']);
   }
 
   /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Core\Database\Database;
@@ -222,6 +224,27 @@ class StyleTableTest extends ViewTestBase {
     foreach ($expected_captions as $raw_caption) {
       $this->assertSession()->assertEscaped($raw_caption);
     }
+  }
+
+  /**
+   * Tests responsive classes and column assigning.
+   */
+  public function testResponsiveMergedColumns() {
+    /** @var \Drupal\views\ViewEntityInterface $view */
+    $view = \Drupal::entityTypeManager()->getStorage('view')->load('test_table');
+
+    // Merge the two job columns together and set the responsive priority on
+    // the column that is merged to.
+    $display = &$view->getDisplay('default');
+    $display['display_options']['style']['options']['columns']['job'] = 'job_1';
+    $display['display_options']['style']['options']['info']['job_1']['separator'] = ', ';
+    $display['display_options']['style']['options']['info']['job_1']['responsive'] = 'priority-low';
+    $view->save();
+
+    // Ensure that both columns are properly combined.
+    $this->drupalGet('test-table');
+    $this->assertSession()->elementExists('xpath', '//tbody/tr/td[contains(concat(" ", @class, " "), " priority-low views-field views-field-job views-field-job-1 ")]');
+    $this->assertSession()->elementExists('xpath', '//tbody/tr/td[contains(., "Drummer, Drummer")]');
   }
 
   /**

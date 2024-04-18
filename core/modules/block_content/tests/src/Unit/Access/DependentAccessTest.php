@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Unit\Access;
 
 use Drupal\block_content\Access\AccessGroupAnd;
@@ -140,7 +142,7 @@ class DependentAccessTest extends UnitTestCase {
    * mergeAccessDependency() first. A call to either should behave the same on a
    * new RefinableDependentAccessInterface object.
    */
-  public function providerTestSetFirst() {
+  public static function providerTestSetFirst() {
     return [
       [TRUE],
       [FALSE],

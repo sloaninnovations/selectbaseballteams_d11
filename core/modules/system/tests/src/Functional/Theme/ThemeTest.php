@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Component\Serialization\Json;
@@ -12,6 +14,7 @@ use Symfony\Component\Routing\Route;
  * Tests low-level theme functions.
  *
  * @group Theme
+ * @group #slow
  */
 class ThemeTest extends BrowserTestBase {
 

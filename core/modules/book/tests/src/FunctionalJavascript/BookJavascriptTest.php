@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\book\FunctionalJavascript;
 
 use Behat\Mink\Exception\ExpectationException;
@@ -11,6 +13,7 @@ use Drupal\node\Entity\Node;
  * Tests Book javascript functionality.
  *
  * @group book
+ * @group legacy
  */
 class BookJavascriptTest extends WebDriverTestBase {
 

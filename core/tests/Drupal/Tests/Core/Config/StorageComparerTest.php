@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Config;
 
 use Drupal\Component\Uuid\Php;
@@ -49,10 +51,10 @@ class StorageComparerTest extends UnitTestCase {
 
     $this->sourceStorage->expects($this->atLeastOnce())
       ->method('getCollectionName')
-      ->will($this->returnValue(StorageInterface::DEFAULT_COLLECTION));
+      ->willReturn(StorageInterface::DEFAULT_COLLECTION);
     $this->targetStorage->expects($this->atLeastOnce())
       ->method('getCollectionName')
-      ->will($this->returnValue(StorageInterface::DEFAULT_COLLECTION));
+      ->willReturn(StorageInterface::DEFAULT_COLLECTION);
 
     $this->storageComparer = new StorageComparer($this->sourceStorage, $this->targetStorage);
   }
@@ -97,8 +99,8 @@ class StorageComparerTest extends UnitTestCase {
         ],
       ],
       // Simple config.
-      'system.performance' => [
-        'stale_file_threshold' => 2592000,
+      'system.logging' => [
+        'error_level' => 'hide',
       ],
 
     ];

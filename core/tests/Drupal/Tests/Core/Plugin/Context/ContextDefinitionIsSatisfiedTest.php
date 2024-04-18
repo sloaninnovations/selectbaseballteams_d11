@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Plugin\Context;
 
 use Drupal\Core\Cache\NullBackend;
@@ -80,7 +82,7 @@ class ContextDefinitionIsSatisfiedTest extends UnitTestCase {
   /**
    * Provides test data for ::testIsSatisfiedBy().
    */
-  public function providerTestIsSatisfiedBy() {
+  public static function providerTestIsSatisfiedBy() {
     $data = [];
 
     // Simple data types.

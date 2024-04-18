@@ -15,7 +15,7 @@ use Drupal\views\Plugin\views\PluginBase;
  * and setting up the pager.
  *
  * Pager plugins extend \Drupal\views\Plugin\views\pager\PagerPluginBase. They
- * must be annotated with \Drupal\views\Annotation\ViewsPager annotation,
+ * must be attributed with \Drupal\views\Annotation\ViewsPager attribute,
  * and they must be in namespace directory Plugin\views\pager.
  *
  * @ingroup views_plugins
@@ -35,6 +35,18 @@ abstract class PagerPluginBase extends PluginBase {
    * {@inheritdoc}
    */
   protected $usesOptions = TRUE;
+
+  /**
+   * Options available for setting pagination headers.
+   */
+  protected array $headingOptions = [
+    'h1' => 'H1',
+    'h2' => 'H2',
+    'h3' => 'H3',
+    'h4' => 'H4',
+    'h5' => 'H5',
+    'h6' => 'H6',
+  ];
 
   /**
    * Get how many items per page this pager will display.
@@ -70,6 +82,23 @@ abstract class PagerPluginBase extends PluginBase {
    */
   public function setOffset($offset) {
     $this->options['offset'] = $offset;
+  }
+
+  /**
+   * Get the pager heading tag.
+   *
+   * @return string
+   *   Heading level for the pager.
+   */
+  public function getHeadingLevel(): string {
+    return $this->options['pagination_heading_level'] ?? 'h4';
+  }
+
+  /**
+   * Set the pager heading.
+   */
+  public function setHeadingLevel($headingLevel): void {
+    $this->options['pagination_heading_level'] = $headingLevel;
   }
 
   /**

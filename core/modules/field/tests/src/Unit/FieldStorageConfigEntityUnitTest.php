@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\field\Unit\FieldStorageConfigEntityUnitTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\field\Unit;
 
@@ -205,7 +202,7 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
    * @return array
    *   Test cases.
    */
-  public function providerInvalidEnforcedCardinality() {
+  public static function providerInvalidEnforcedCardinality() {
     return [
       'zero' => [0],
       'negative_other_than_-1' => [-70],

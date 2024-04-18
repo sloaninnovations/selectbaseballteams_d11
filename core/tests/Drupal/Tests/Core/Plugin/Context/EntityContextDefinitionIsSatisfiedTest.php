@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Plugin\Context;
 
 use Drupal\Core\Cache\NullBackend;
@@ -242,7 +244,7 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
   /**
    * Provides test data for ::testIsSatisfiedByGenerateBundledEntity().
    */
-  public function providerTestIsSatisfiedByGenerateBundledEntity() {
+  public static function providerTestIsSatisfiedByGenerateBundledEntity() {
     $data = [];
     $data['no requirement'] = [
       TRUE,
@@ -320,7 +322,7 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
   /**
    * Provides test data for ::testIsSatisfiedByPassBundledEntity().
    */
-  public function providerTestIsSatisfiedByPassBundledEntity() {
+  public static function providerTestIsSatisfiedByPassBundledEntity() {
     $data = [];
     $data[] = [TRUE, []];
     $data[] = [FALSE, ['first_bundle']];

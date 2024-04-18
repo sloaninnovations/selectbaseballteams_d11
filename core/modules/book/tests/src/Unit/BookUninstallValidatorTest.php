@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\book\Unit;
 
 use Drupal\Tests\UnitTestCase;
@@ -7,6 +9,7 @@ use Drupal\Tests\UnitTestCase;
 /**
  * @coversDefaultClass \Drupal\book\BookUninstallValidator
  * @group book
+ * @group legacy
  */
 class BookUninstallValidatorTest extends UnitTestCase {
 

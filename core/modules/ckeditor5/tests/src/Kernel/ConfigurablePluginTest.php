@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\ckeditor5\Kernel;
 
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
@@ -89,8 +91,11 @@ class ConfigurablePluginTest extends KernelTestBase {
         ],
       ],
       'ckeditor5_list' => [
-        'reversed' => TRUE,
-        'startIndex' => TRUE,
+        'properties' => [
+          'reversed' => TRUE,
+          'startIndex' => TRUE,
+        ],
+        'multiBlock' => TRUE,
       ],
       'ckeditor5_alignment' => [
         'enabled_alignments' => [

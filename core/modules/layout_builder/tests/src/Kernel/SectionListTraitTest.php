@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\layout_builder\Section;
@@ -10,6 +12,7 @@ use Drupal\layout_builder\SectionListTrait;
  * @coversDefaultClass \Drupal\layout_builder\SectionListTrait
  *
  * @group layout_builder
+ * @group #slow
  */
 class SectionListTraitTest extends SectionListTestBase {
 

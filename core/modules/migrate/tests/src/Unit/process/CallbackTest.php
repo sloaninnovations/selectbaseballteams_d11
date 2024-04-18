@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\MigrateException;
@@ -27,7 +29,7 @@ class CallbackTest extends MigrateProcessTestCase {
   /**
    * Data provider for ::testCallback().
    */
-  public function providerCallback() {
+  public static function providerCallback() {
     return [
       'function' => ['strtolower'],
       'class method' => [[self::class, 'strtolower']],
@@ -49,7 +51,7 @@ class CallbackTest extends MigrateProcessTestCase {
   /**
    * Data provider for ::testCallbackArray().
    */
-  public function providerCallbackArray() {
+  public static function providerCallbackArray() {
     return [
       'date format' => [
         'date',
@@ -98,7 +100,7 @@ class CallbackTest extends MigrateProcessTestCase {
   /**
    * Data provider for ::testCallbackExceptions().
    */
-  public function providerCallbackExceptions() {
+  public static function providerCallbackExceptions() {
     return [
       'not set' => [
         'message' => 'The "callable" must be set.',

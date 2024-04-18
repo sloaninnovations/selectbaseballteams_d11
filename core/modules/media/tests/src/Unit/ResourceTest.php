@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Unit;
 
 use Drupal\media\OEmbed\Resource;
@@ -14,7 +16,7 @@ class ResourceTest extends UnitTestCase {
   /**
    * Test cases for ::testSetDimensions.
    */
-  public function setDimensionsTestCases() {
+  public static function setDimensionsTestCases() {
     return [
       'Standard rich dimensions' => [
         'rich',

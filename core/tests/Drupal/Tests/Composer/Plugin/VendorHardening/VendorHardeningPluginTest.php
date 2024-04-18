@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Composer\Plugin\VendorHardening;
 
 use Composer\Composer;
@@ -33,6 +35,7 @@ class VendorHardeningPluginTest extends TestCase {
           'tests' => [
             'SomeTest.php' => '<?php',
           ],
+          'SomeFile.php' => '<?php',
         ],
       ],
     ]);
@@ -90,14 +93,16 @@ class VendorHardeningPluginTest extends TestCase {
     $ref_io->setValue($plugin, $io->reveal());
 
     $this->assertFileExists(vfsStream::url('vendor/drupal/package/tests/SomeTest.php'));
+    $this->assertFileExists(vfsStream::url('vendor/drupal/package/SomeFile.php'));
 
     $package = $this->prophesize(PackageInterface::class);
     $package->getName()->willReturn('drupal/package');
 
     $ref_clean = new \ReflectionMethod($plugin, 'cleanPathsForPackage');
-    $ref_clean->invokeArgs($plugin, [$package->reveal(), ['tests']]);
+    $ref_clean->invokeArgs($plugin, [$package->reveal(), ['tests', 'SomeFile.php']]);
 
     $this->assertFileDoesNotExist(vfsStream::url('vendor/drupal/package/tests'));
+    $this->assertFileDoesNotExist(vfsStream::url('vendor/drupal/package/SomeFile.php'));
   }
 
   /**
@@ -111,8 +116,7 @@ class VendorHardeningPluginTest extends TestCase {
       ->method('getAllCleanupPaths')
       ->willReturn(['drupal/package' => ['tests']]);
 
-    $package = $this->getMockBuilder(PackageInterface::class)
-      ->getMockForAbstractClass();
+    $package = $this->createMock(PackageInterface::class);
     $package->expects($this->any())
       ->method('getName')
       ->willReturn('drupal/package');
@@ -162,15 +166,13 @@ class VendorHardeningPluginTest extends TestCase {
     $this->assertDirectoryExists($dir);
 
     $this->assertFileDoesNotExist($dir . '/.htaccess');
-    $this->assertFileDoesNotExist($dir . '/web.config');
 
     $plugin->writeAccessRestrictionFiles($dir);
 
     $this->assertFileExists($dir . '/.htaccess');
-    $this->assertFileExists($dir . '/web.config');
   }
 
-  public function providerFindBinOverlap() {
+  public static function providerFindBinOverlap() {
     return [
       [
         [],

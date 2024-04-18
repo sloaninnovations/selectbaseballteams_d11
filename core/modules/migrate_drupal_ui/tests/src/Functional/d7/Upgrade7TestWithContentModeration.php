@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional\d7;
 
 use Drupal\workflows\Entity\Workflow;
@@ -9,6 +11,7 @@ use Drupal\workflows\WorkflowInterface;
  * Tests Drupal 7 upgrade using the migrate UI with Content Moderation.
  *
  * @group migrate_drupal_ui
+ * @group #slow
  */
 class Upgrade7TestWithContentModeration extends Upgrade7Test {
 

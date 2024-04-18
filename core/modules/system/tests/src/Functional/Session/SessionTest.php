@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Session;
 
 use Drupal\Core\Database\Database;
@@ -9,6 +11,7 @@ use Drupal\Tests\BrowserTestBase;
  * Drupal session handling tests.
  *
  * @group Session
+ * @group #slow
  */
 class SessionTest extends BrowserTestBase {
 
@@ -400,7 +403,7 @@ class SessionTest extends BrowserTestBase {
   }
 
   /**
-   * Assert whether $_SESSION is empty at the beginning of the request.
+   * Assert whether the session is empty at the beginning of the request.
    *
    * @internal
    */

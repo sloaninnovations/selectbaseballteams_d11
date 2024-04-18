@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Kernel\d7;
 
 use Drupal\node\Entity\Node;
@@ -59,7 +61,7 @@ class FollowUpMigrationsTest extends MigrateDrupal7TestBase {
   protected function getFileMigrationInfo() {
     return [
       'path' => 'public://sites/default/files/cube.jpeg',
-      'size' => '3620',
+      'size' => 3620,
       'base_path' => 'public://',
       'plugin_id' => 'd7_file',
     ];
@@ -119,7 +121,7 @@ class FollowUpMigrationsTest extends MigrateDrupal7TestBase {
   /**
    * Data provider for testEntityReferenceTranslations().
    */
-  public function providerTestEntityReferenceTranslations() {
+  public static function providerTestEntityReferenceTranslations() {
     return [
       [
         ['d7_node', 'd7_node_translation'],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\Plugin\migrate\source\d6;
 
 /**
@@ -18,7 +20,7 @@ class FieldInstanceOptionTranslationTest extends FieldOptionTranslationTest {
   /**
    * {@inheritdoc}
    */
-  public function providerSource() {
+  public static function providerSource() {
     $test = parent::providerSource();
 
     // FieldInstanceOptionTranslation extends FieldOptionTranslation so the

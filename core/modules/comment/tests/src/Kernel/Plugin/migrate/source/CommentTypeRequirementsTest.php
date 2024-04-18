@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel\Plugin\migrate\source;
 
 use Drupal\migrate\Exception\RequirementsException;
@@ -47,7 +49,7 @@ class CommentTypeRequirementsTest extends MigrateDrupal7TestBase {
   /**
    * Test cases for ::testCheckCommentTypeRequirements().
    */
-  public function providerTestCheckCommentTypeRequirements() {
+  public static function providerTestCheckCommentTypeRequirements() {
     return [
       'D6 comment is disabled on source' => [
         'Disabled source modules' => ['comment'],

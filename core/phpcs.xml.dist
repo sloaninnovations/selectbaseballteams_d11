@@ -8,6 +8,8 @@
   <exclude-pattern>*/node_modules/*</exclude-pattern>
   <!--Exclude third party code.-->
   <exclude-pattern>./assets/vendor/*</exclude-pattern>
+  <!--Exclude the PHPStan baseline from coding standards.-->
+  <exclude-pattern>./core/.phpstan-baseline.php</exclude-pattern>
   <!-- Exclude third-party code maintained within core that does not follow our standards. -->
   <!-- @todo This rule may be removed when https://www.drupal.org/node/1848264 is resolved. -->
   <exclude-pattern>./core/lib/Drupal/Component/Diff/</exclude-pattern>
@@ -123,6 +125,7 @@
   <rule ref="Drupal.Semantics.FunctionT">
     <exclude name="Drupal.Semantics.FunctionT.NotLiteralString"/>
   </rule>
+  <rule ref="Drupal.Semantics.FunctionTriggerError"/>
   <rule ref="Drupal.Semantics.FunctionWatchdog"/>
   <rule ref="Drupal.Semantics.InstallHooks"/>
   <rule ref="Drupal.Semantics.LStringTranslatable"/>
@@ -266,6 +269,21 @@
          <element value="/@inheritDoc/"/>
        </property>
     </properties>
+  </rule>
+  <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+    <properties>
+      <property name="spacesCountAroundEqualsSign" value="0" />
+    </properties>
+    <!-- @todo Broaden this in https://www.drupal.org/project/drupal/issues/3400434 -->
+    <!-- <include-pattern>*/tests/*</include-pattern> -->
+    <include-pattern>*/tests/src/*</include-pattern>
+    <include-pattern>./tests/Drupal/*</include-pattern>
+    <include-pattern>./tests/TestSuites/*</include-pattern>
+    <include-pattern>./modules/system/src/Tests/Routing/*</include-pattern>
+    <exclude-pattern>./tests/Drupal/Tests/*/Fixture/*</exclude-pattern>
+    <exclude-pattern>./tests/Drupal/Tests/*/fixtures/*</exclude-pattern>
+    <!-- @todo remove this in https://www.drupal.org/project/drupal/issues/3402707 -->
+    <exclude-pattern>./tests/Drupal/KernelTests/AssertContentTrait.php</exclude-pattern>
   </rule>
 
   <!-- Squiz sniffs -->

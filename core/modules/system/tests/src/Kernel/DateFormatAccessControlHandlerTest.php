@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel;
 
 use Drupal\Core\Access\AccessResult;
@@ -29,6 +31,14 @@ class DateFormatAccessControlHandlerTest extends KernelTestBase {
     'system',
     'user',
   ];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * The date_format access control handler.
@@ -69,6 +79,7 @@ class DateFormatAccessControlHandlerTest extends KernelTestBase {
       ? ['locked' => FALSE]
       : ['locked' => TRUE];
     $entity_values['id'] = $entity_values['label'] = $this->randomMachineName();
+    $entity_values['pattern'] = 'Y-m-d';
     $entity = DateFormat::create($entity_values);
     $entity->save();
 
@@ -79,7 +90,7 @@ class DateFormatAccessControlHandlerTest extends KernelTestBase {
     static::assertEquals($create_access_result, $this->accessControlHandler->createAccess(NULL, $user, [], TRUE));
   }
 
-  public function testAccessProvider() {
+  public static function testAccessProvider() {
     $c = new ContainerBuilder();
     $cache_contexts_manager = (new Prophet())->prophesize(CacheContextsManager::class);
     $cache_contexts_manager->assertValidTokens()->willReturn(TRUE);

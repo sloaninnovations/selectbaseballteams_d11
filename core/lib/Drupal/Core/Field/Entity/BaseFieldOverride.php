@@ -37,6 +37,9 @@ use Drupal\Core\Field\FieldException;
  *     "default_value_callback",
  *     "settings",
  *     "field_type",
+ *   },
+ *   constraints = {
+ *     "ImmutableProperties" = {"id", "entity_type", "bundle", "field_name", "field_type"},
  *   }
  * )
  */
@@ -148,6 +151,13 @@ class BaseFieldOverride extends FieldConfigBase {
   /**
    * {@inheritdoc}
    */
+  public function isInternal(): bool {
+    return $this->getBaseFieldDefinition()->isInternal();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getClass() {
     return $this->getBaseFieldDefinition()->getClass();
   }
@@ -249,7 +259,7 @@ class BaseFieldOverride extends FieldConfigBase {
   /**
    * Implements the magic __sleep() method.
    */
-  public function __sleep() {
+  public function __sleep(): array {
     // Only serialize necessary properties, excluding those that can be
     // recalculated.
     unset($this->baseFieldDefinition);

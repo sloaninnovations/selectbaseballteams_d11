@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Functional\Views;
 
 use Drupal\Component\Serialization\Json;
@@ -288,11 +290,11 @@ class DisplayBlockTest extends ViewTestBase {
     $this->drupalGet('');
     $this->assertSession()->elementNotExists('xpath', $block_title_xpath);
 
-    $this->assertCacheTags(array_merge($block->getCacheTags(), ['block_view', 'config:block_list', 'config:system.site', 'config:views.view.test_view_block', 'http_response', 'rendered']));
+    $this->assertCacheTags(array_merge($block->getCacheTags(), ['block_view', 'config:block_list', 'config:system.site', 'config:views.view.test_view_block', 'http_response', 'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form', 'rendered']));
   }
 
   /**
-   * Tests the various testcases of empty block rendering.
+   * Tests the various test cases of empty block rendering.
    */
   public function testBlockEmptyRendering() {
     $url = new Url('test_page_test.test_page');

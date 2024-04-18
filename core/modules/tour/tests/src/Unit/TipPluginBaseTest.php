@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\tour\Unit;
 
 use Drupal\Tests\UnitTestCase;
@@ -9,6 +11,7 @@ use Drupal\tour\TipPluginBase;
  * @coversDefaultClass \Drupal\tour\TipPluginBase
  *
  * @group tour
+ * @group legacy
  */
 class TipPluginBaseTest extends UnitTestCase {
 

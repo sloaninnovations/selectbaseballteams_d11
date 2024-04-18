@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity\Sql;
 
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
@@ -321,7 +323,7 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   field name, base field status, list of field columns, name of the column
    *   to be retrieved, expected result, whether an exception is expected.
    */
-  public function providerTestGetFieldColumnName() {
+  public static function providerTestGetFieldColumnName() {
     $data = [];
     // Base field with single column.
     $data[] = [TRUE, ['foo'], 'foo', 'test'];
@@ -414,7 +416,7 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   A nested array where each inner array has the following values: a list of
    *   table names and the expected table name.
    */
-  public function providerTestGetFieldTableName() {
+  public static function providerTestGetFieldTableName() {
     $data = [];
 
     $data[] = [['data' => 'data_table', 'base' => 'base_table', 'revision' => 'revision_table'], 'data_table'];
@@ -494,7 +496,7 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   consisting of the entity type ID, field name and a table prefix, followed
    *   by the expected data table name and the revision table name.
    */
-  public function providerTestGetDedicatedTableName() {
+  public static function providerTestGetDedicatedTableName() {
     $data = [];
 
     $data['short entity type; short field name; no prefix'] = [
@@ -517,21 +519,21 @@ class DefaultTableMappingTest extends UnitTestCase {
     ];
     $data['long entity type; short field name; no prefix'] = [
       [
-        'entity_type_id' => 'long_entity_type_abcdefghijklmnopqrstuvwxyz',
+        'entity_type_id' => 'long_entity_type_all_forty_three_characters',
         'field_name' => 'short_field_name',
         'prefix' => '',
       ],
-      'long_entity_type_abcdefghijklmno__a526e4e042',
-      'long_entity_type_abcdefghijklmno_r__a526e4e042',
+      'long_entity_type_all_forty_three__d52fc85045',
+      'long_entity_type_all_forty_three_r__d52fc85045',
     ];
     $data['long entity type; long field name; no prefix'] = [
       [
-        'entity_type_id' => 'long_entity_type_abcdefghijklmnopqrstuvwxyz',
-        'field_name' => 'long_field_name_abcdefghijklmnopqrstuvwxyz',
+        'entity_type_id' => 'long_entity_type_all_forty_three_characters',
+        'field_name' => 'long_field_name_using_forty_two_characters',
         'prefix' => '',
       ],
-      'long_entity_type_abcdefghijklmno__7705d52d75',
-      'long_entity_type_abcdefghijklmno_r__7705d52d75',
+      'long_entity_type_all_forty_three__7f5744e4fd',
+      'long_entity_type_all_forty_three_r__7f5744e4fd',
     ];
 
     $data['short entity type; short field name; with prefix'] = [

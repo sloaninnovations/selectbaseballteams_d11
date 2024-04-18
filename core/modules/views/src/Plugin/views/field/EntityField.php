@@ -9,6 +9,7 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
@@ -22,6 +23,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\views\Attribute\ViewsField;
 use Drupal\views\FieldAPIHandlerTrait;
 use Drupal\views\Entity\Render\EntityFieldRenderer;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
@@ -34,9 +36,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * A field that displays entity field data.
  *
  * @ingroup views_field_handlers
- *
- * @ViewsField("field")
  */
+#[ViewsField("field")]
 class EntityField extends FieldPluginBase implements CacheableDependencyInterface, MultiItemsFieldHandlerInterface, DependentWithRemovalPluginInterface {
 
   use FieldAPIHandlerTrait;
@@ -127,6 +128,13 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   protected $entityFieldRenderer;
 
   /**
+   * The entity type bundle info service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected $entityTypeBundleInfo;
+
+  /**
    * The fields that we are actually grouping on.
    */
   public array $group_fields;
@@ -154,8 +162,10 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    *   The entity repository.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle info service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, FormatterPluginManager $formatter_plugin_manager, FieldTypePluginManagerInterface $field_type_plugin_manager, LanguageManagerInterface $language_manager, RendererInterface $renderer, EntityRepositoryInterface $entity_repository, EntityFieldManagerInterface $entity_field_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, FormatterPluginManager $formatter_plugin_manager, FieldTypePluginManagerInterface $field_type_plugin_manager, LanguageManagerInterface $language_manager, RendererInterface $renderer, EntityRepositoryInterface $entity_repository, EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
@@ -165,6 +175,11 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     $this->renderer = $renderer;
     $this->entityRepository = $entity_repository;
     $this->entityFieldManager = $entity_field_manager;
+    if ($entity_type_bundle_info === NULL) {
+      $entity_type_bundle_info = \Drupal::service('entity_type.bundle.info');
+      @trigger_error('Calling ' . __CLASS__ . '::__construct() without the $entity_type_bundle_info argument is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. See https://www.drupal.org/node/3380621', E_USER_DEPRECATED);
+    }
+    $this->entityTypeBundleInfo = $entity_type_bundle_info;
 
     // @todo Unify 'entity field'/'field_name' instead of converting back and
     //   forth. https://www.drupal.org/node/2410779
@@ -188,7 +203,8 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       $container->get('language_manager'),
       $container->get('renderer'),
       $container->get('entity.repository'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('entity_type.bundle.info')
     );
   }
 
@@ -313,7 +329,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   }
 
   /**
-   * Called to determine what to tell the clicksorter.
+   * Called to determine what to tell the click sorter.
    */
   public function clickSort($order) {
     // No column selected, can't continue.
@@ -340,6 +356,9 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    *
    * @return \Drupal\Core\Field\FieldStorageDefinitionInterface
    *   The field storage definition used by this handler.
+   *
+   * @throws \Exception
+   *   If no field storage definition was found for the given entity type and field name.
    */
   protected function getFieldStorageDefinition() {
     $entity_type_id = $this->definition['entity_type'];
@@ -363,6 +382,19 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     if (isset($this->definition['field_name']) && isset($base_fields[$this->definition['field_name']])) {
       return $base_fields[$this->definition['field_name']]->getFieldStorageDefinition();
     }
+
+    // If there is still no field storage definition found, we are dealing with
+    // a bundle field. Get the storage from the field definition on the first
+    // bundle we find which has this field.
+    $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
+    foreach ($bundles as $bundle_id => $bundle) {
+      $bundle_fields = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle_id);
+      if (isset($this->definition['field_name']) && isset($bundle_fields[$this->definition['field_name']])) {
+        return $bundle_fields[$this->definition['field_name']]->getFieldStorageDefinition();
+      }
+    }
+
+    throw new \Exception("No field storage definition found for entity type {$this->definition['entity_type']} and field {$this->definition['field_name']} on view {$this->view->storage->id()}");
   }
 
   /**
@@ -957,7 +989,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
 
         if (is_array($raw)) {
           if (isset($raw[$id]) && is_scalar($raw[$id])) {
-            $tokens['{{ ' . $this->options['id'] . '__' . $id . ' }}'] = Xss::filterAdmin($raw[$id]);
+            $tokens['{{ ' . $this->options['id'] . '__' . $id . ' }}'] = $raw[$id];
           }
           else {
             // Make sure that empty values are replaced as well.
@@ -970,7 +1002,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
           // Check if TypedDataInterface is implemented so we know how to render
           // the item as a string.
           if (!empty($property) && $property instanceof TypedDataInterface) {
-            $tokens['{{ ' . $this->options['id'] . '__' . $id . ' }}'] = Xss::filterAdmin($property->getString());
+            $tokens['{{ ' . $this->options['id'] . '__' . $id . ' }}'] = $property->getString();
           }
           else {
             // Make sure that empty values are replaced as well.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Routing;
 
 use Drupal\Core\Url;
@@ -28,9 +30,9 @@ class PathEncodedTest extends BrowserTestBase {
 
   public function testGetEncoded() {
     $route_paths = [
-      'path_encoded_test.colon' => '/hi/llamma:party',
-      'path_encoded_test.atsign' => '/bloggy/@Dries',
-      'path_encoded_test.parens' => '/cat(box)',
+      'path_encoded_test.colon' => '/hi/llama:party',
+      'path_encoded_test.at_sign' => '/blog/@Dries',
+      'path_encoded_test.parentheses' => '/cat(box)',
     ];
     foreach ($route_paths as $route_name => $path) {
       $this->drupalGet(Url::fromRoute($route_name));
@@ -40,9 +42,9 @@ class PathEncodedTest extends BrowserTestBase {
 
   public function testAliasToEncoded() {
     $route_paths = [
-      'path_encoded_test.colon' => '/hi/llamma:party',
-      'path_encoded_test.atsign' => '/bloggy/@Dries',
-      'path_encoded_test.parens' => '/cat(box)',
+      'path_encoded_test.colon' => '/hi/llama:party',
+      'path_encoded_test.at_sign' => '/blog/@Dries',
+      'path_encoded_test.parentheses' => '/cat(box)',
     ];
     $aliases = [];
     foreach ($route_paths as $route_name => $path) {

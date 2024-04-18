@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
@@ -25,6 +27,14 @@ class RssFieldsTest extends ViewsKernelTestBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
+
+  /**
+   * {@inheritdoc}
    */
   public static $testViews = ['test_display_feed'];
 
@@ -37,25 +47,27 @@ class RssFieldsTest extends ViewsKernelTestBase {
     $this->installConfig(['node', 'filter']);
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
-    $this->installEntitySchema('path_alias');
     $this->createContentType(['type' => 'article']);
   }
 
   /**
-   * Tests correct processing of link fields.
+   * Tests correct processing of RSS fields.
    *
    * This overlaps with \Drupal\Tests\views\Functional\Plugin\DisplayFeedTest to
    * ensure that root-relative links also work in a scenario without
    * subdirectory.
    */
-  public function testLink() {
+  public function testRssFields() {
     // Set up the current user as uid 1 so the test doesn't need to deal with
     // permission.
     $this->setUpCurrentUser(['uid' => 1]);
 
+    $date = '1975-05-18';
+
     $node = $this->createNode([
       'type' => 'article',
       'title' => 'Article title',
+      'created' => strtotime($date),
       'body' => [
         0 => [
           'value' => 'A paragraph',
@@ -72,6 +84,7 @@ class RssFieldsTest extends ViewsKernelTestBase {
     $output = $view->preview('feed_2');
     $output = (string) $renderer->renderRoot($output);
     $this->assertStringContainsString('<link>' . $node_url . '</link>', $output);
+    $this->assertStringContainsString('<pubDate>' . $date . '</pubDate>', $output);
   }
 
 }

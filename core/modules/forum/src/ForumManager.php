@@ -415,6 +415,9 @@ class ForumManager implements ForumManagerInterface {
     $forums = [];
     $_forums = $this->entityTypeManager->getStorage('taxonomy_term')->loadTree($vid, $tid, NULL, TRUE);
     foreach ($_forums as $forum) {
+      if (!$forum->access('view')) {
+        continue;
+      }
       // Merge in the topic and post counters.
       if (($count = $this->getForumStatistics($forum->id()))) {
         $forum->num_topics = $count->topic_count;
@@ -499,7 +502,7 @@ class ForumManager implements ForumManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function __sleep() {
+  public function __sleep(): array {
     $vars = $this->defaultSleep();
     // Do not serialize static cache.
     unset($vars['history'], $vars['index'], $vars['lastPostData'], $vars['forumChildren'], $vars['forumStatistics']);
@@ -509,7 +512,7 @@ class ForumManager implements ForumManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function __wakeup() {
+  public function __wakeup(): void {
     $this->defaultWakeup();
     // Initialize static cache.
     $this->history = [];

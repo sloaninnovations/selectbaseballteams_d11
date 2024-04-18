@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Extension;
 
 use Drupal\Core\Database\Database;
@@ -60,21 +62,21 @@ class ModuleInstallerTest extends KernelTestBase {
    */
   public function testCacheBinCleanup() {
     $schema = $this->container->get('database')->schema();
-    $table = 'cache_module_cachebin';
+    $table = 'cache_module_cache_bin';
 
     $module_installer = $this->container->get('module_installer');
-    $module_installer->install(['module_cachebin']);
+    $module_installer->install(['module_cache_bin']);
 
     // Prime the bin.
     /** @var \Drupal\Core\Cache\CacheBackendInterface $cache_bin */
-    $cache_bin = $this->container->get('module_cachebin.cache_bin');
+    $cache_bin = $this->container->get('module_cache_bin.cache_bin');
     $cache_bin->set('foo', 'bar');
 
     // A database backend is used so there is a convenient way check whether the
     // backend is uninstalled.
     $this->assertTrue($schema->tableExists($table));
 
-    $module_installer->uninstall(['module_cachebin']);
+    $module_installer->uninstall(['module_cache_bin']);
     $this->assertFalse($schema->tableExists($table));
   }
 
@@ -102,7 +104,7 @@ class ModuleInstallerTest extends KernelTestBase {
   /**
    * Data provider for testInvalidCoreInstall().
    */
-  public function providerTestInvalidCoreInstall() {
+  public static function providerTestInvalidCoreInstall() {
     return [
       'no dependencies system_core_incompatible_semver_test' => [
         'system_core_incompatible_semver_test',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
@@ -16,6 +18,7 @@ use GuzzleHttp\RequestOptions;
  * JSON:API integration test for the "Term" content entity type.
  *
  * @group jsonapi
+ * @group #slow
  */
 class TermTest extends ResourceTestBase {
 
@@ -66,7 +69,7 @@ class TermTest extends ResourceTestBase {
   protected function setUpAuthorization($method) {
     switch ($method) {
       case 'GET':
-        $this->grantPermissionsToTestedRole(['access content']);
+        $this->grantPermissionsToTestedRole(['access content', 'view vocabulary labels']);
         break;
 
       case 'POST':
@@ -280,8 +283,7 @@ class TermTest extends ResourceTestBase {
           'drupal_internal__tid' => 1,
           'status' => TRUE,
           'drupal_internal__revision_id' => 1,
-          'revision_created' => (new \DateTime())->setTimestamp($this->entity->getRevisionCreationTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
-          'revision_log_message' => NULL,
+          'revision_created' => (new \DateTime())->setTimestamp((int) $this->entity->getRevisionCreationTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           // @todo Attempt to remove this in https://www.drupal.org/project/drupal/issues/2933518.
           'revision_translation_affected' => TRUE,
         ],
@@ -350,9 +352,9 @@ class TermTest extends ResourceTestBase {
       'data' => [
         'type' => 'taxonomy_term--camelids',
         'attributes' => [
-          'name' => 'Dramallama',
+          'name' => 'Drama llama',
           'description' => [
-            'value' => 'Dramallamas are the coolest camelids.',
+            'value' => 'Drama llamas are the coolest camelids.',
             'format' => NULL,
           ],
         ],
@@ -484,7 +486,7 @@ class TermTest extends ResourceTestBase {
   /**
    * Data provider for ::testGetIndividualTermWithParent().
    */
-  public function providerTestGetIndividualTermWithParent() {
+  public static function providerTestGetIndividualTermWithParent() {
     return [
       'root parent: [0] (= no parent)' => [
         [0],

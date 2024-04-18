@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Unit;
 
 use Drupal\content_moderation\Entity\Handler\ModerationHandler;
@@ -144,7 +146,7 @@ class ModerationInformationTest extends UnitTestCase {
   /**
    * Data provider for several tests.
    */
-  public function providerWorkflow() {
+  public static function providerWorkflow() {
     return [
       [NULL, FALSE],
       ['workflow', TRUE],

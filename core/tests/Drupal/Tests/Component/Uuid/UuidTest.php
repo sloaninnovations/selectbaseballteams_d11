@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Uuid;
 
 use Drupal\Component\Uuid\Uuid;
@@ -39,7 +41,7 @@ class UuidTest extends TestCase {
    *
    * @return array
    */
-  public function providerUuidInstances() {
+  public static function providerUuidInstances() {
 
     $instances = [];
     $instances[][] = new Php();
@@ -82,7 +84,7 @@ class UuidTest extends TestCase {
    *   - (bool) Whether or not the Uuid is valid.
    *   - Failure message.
    */
-  public function providerTestValidation() {
+  public static function providerTestValidation() {
     return [
       // These valid UUIDs.
       ['6ba7b810-9dad-11d1-80b4-00c04fd430c8', TRUE, 'Basic FQDN UUID did not validate'],

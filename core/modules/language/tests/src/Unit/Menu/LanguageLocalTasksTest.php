@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Unit\Menu;
 
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
@@ -33,7 +35,7 @@ class LanguageLocalTasksTest extends LocalTaskIntegrationTestBase {
   /**
    * Provides a list of routes to test.
    */
-  public function getLanguageAdminOverviewRoutes() {
+  public static function getLanguageAdminOverviewRoutes() {
     return [
       ['entity.configurable_language.collection', [['entity.configurable_language.collection', 'language.negotiation']]],
       ['language.negotiation', [['entity.configurable_language.collection', 'language.negotiation']]],

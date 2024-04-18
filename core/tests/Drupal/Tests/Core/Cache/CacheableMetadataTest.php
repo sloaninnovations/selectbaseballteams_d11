@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Cache;
 
 use Drupal\Core\Cache\Cache;
@@ -66,7 +68,7 @@ class CacheableMetadataTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestMerge() {
+  public static function providerTestMerge() {
     return [
       // All empty.
       [(new CacheableMetadata()), (new CacheableMetadata()), (new CacheableMetadata())],
@@ -120,7 +122,7 @@ class CacheableMetadataTest extends UnitTestCase {
   /**
    * Data provider for testSetCacheMaxAge.
    */
-  public function providerSetCacheMaxAge() {
+  public static function providerSetCacheMaxAge() {
     return [
       [0 , FALSE],
       ['http', TRUE],
@@ -145,7 +147,7 @@ class CacheableMetadataTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestCreateFromRenderArray() {
+  public static function providerTestCreateFromRenderArray() {
     $data = [];
 
     $empty_metadata = new CacheableMetadata();
@@ -181,7 +183,7 @@ class CacheableMetadataTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestCreateFromObject() {
+  public static function providerTestCreateFromObject() {
     $data = [];
 
     $empty_metadata = new CacheableMetadata();

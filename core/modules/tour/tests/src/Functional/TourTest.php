@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\tour\Functional;
 
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\tour\Entity\Tour;
 
+// cspell:ignore pioggia spagna
+
 /**
  * Tests the functionality of tour tips.
  *
  * @group tour
+ * @group legacy
  */
 class TourTest extends TourTestBasic {
 

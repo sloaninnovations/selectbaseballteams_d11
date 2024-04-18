@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Unit;
 
 use Drupal\Core\PrivateKey;
@@ -21,7 +23,7 @@ class IFrameUrlHelperTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerIsSecure() {
+  public static function providerIsSecure() {
     return [
       'no domain' => [
         '/path/to/media.php',

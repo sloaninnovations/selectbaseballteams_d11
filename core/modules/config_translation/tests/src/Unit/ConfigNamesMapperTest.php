@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\config_translation\Unit\ConfigNamesMapperTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\config_translation\Unit;
 
@@ -526,7 +523,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
    *   hasConfigSchema() as the first value and the expected return value of
    *   ConfigNamesMapper::hasSchema() as the second value.
    */
-  public function providerTestHasSchema() {
+  public static function providerTestHasSchema() {
     return [
       [[TRUE], TRUE],
       [[FALSE], FALSE],
@@ -573,7 +570,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
    *   hasTranslatable() as the first value and the expected return value of
    *   ConfigNamesMapper::hasTranslatable() as the second value.
    */
-  public function providerTestHasTranslatable() {
+  public static function providerTestHasTranslatable() {
     return [
       [[], FALSE],
       [[TRUE], TRUE],
@@ -624,7 +621,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
    *   hasTranslation() as the first value and the expected return value of
    *   ConfigNamesMapper::hasTranslation() as the second value.
    */
-  public function providerTestHasTranslation() {
+  public static function providerTestHasTranslation() {
     return [
       [[TRUE], TRUE],
       [[FALSE], FALSE],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Config;
 
 use Drupal\Core\Config\Entity\ConfigDependencyManager;
@@ -23,7 +25,7 @@ class ConfigDependencyManagerTest extends UnitTestCase {
     $this->assertEquals($expected_order, $dependency_manager->sortAll());
   }
 
-  public function providerTestSortAll() {
+  public static function providerTestSortAll() {
     $datasets[] = [
       [
         'provider.entity_b' => [],

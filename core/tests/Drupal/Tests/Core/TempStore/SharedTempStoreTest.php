@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\TempStore;
 
 use Drupal\Core\Session\AccountProxyInterface;
@@ -99,12 +101,12 @@ class SharedTempStoreTest extends UnitTestCase {
    * @covers ::get
    */
   public function testGet() {
-    $this->keyValue->expects($this->exactly(2))
+    $calls = ['test_2', 'test'];
+    $this->keyValue->expects($this->exactly(count($calls)))
       ->method('get')
-      ->withConsecutive(
-        ['test_2'],
-        ['test'],
-      )
+      ->with($this->callback(function (string $key) use (&$calls): bool {
+        return array_shift($calls) == $key;
+      }))
       ->willReturnOnConsecutiveCalls(
         FALSE,
         $this->ownObject,
@@ -120,13 +122,12 @@ class SharedTempStoreTest extends UnitTestCase {
    * @covers ::getIfOwner
    */
   public function testGetIfOwner() {
-    $this->keyValue->expects($this->exactly(3))
+    $calls = ['test_2', 'test', 'test'];
+    $this->keyValue->expects($this->exactly(count($calls)))
       ->method('get')
-      ->withConsecutive(
-        ['test_2'],
-        ['test'],
-        ['test'],
-      )
+      ->with($this->callback(function (string $key) use (&$calls): bool {
+        return array_shift($calls) == $key;
+      }))
       ->willReturnOnConsecutiveCalls(
         FALSE,
         $this->ownObject,
@@ -245,7 +246,7 @@ class SharedTempStoreTest extends UnitTestCase {
     $this->keyValue->expects($this->exactly(2))
       ->method('get')
       ->with('test')
-      ->will($this->onConsecutiveCalls($this->ownObject, $this->otherObject));
+      ->willReturn($this->ownObject, $this->otherObject);
 
     $this->assertTrue($this->tempStore->setIfOwner('test', 'test_data'));
     $this->assertFalse($this->tempStore->setIfOwner('test', 'test_data'));
@@ -264,9 +265,9 @@ class SharedTempStoreTest extends UnitTestCase {
 
     $metadata = $this->tempStore->getMetadata('test');
     $this->assertInstanceOf(Lock::class, $metadata);
-    $this->assertObjectHasAttribute('updated', $metadata);
+    $this->assertObjectHasProperty('updated', $metadata);
     // Data should get removed.
-    $this->assertObjectNotHasAttribute('data', $metadata);
+    $this->assertObjectNotHasProperty('data', $metadata);
 
     $this->assertNull($this->tempStore->getMetadata('test'));
   }
@@ -326,13 +327,12 @@ class SharedTempStoreTest extends UnitTestCase {
       ->with('test_2')
       ->willReturn(TRUE);
 
-    $this->keyValue->expects($this->exactly(3))
+    $calls = ['test_1', 'test_2', 'test_3'];
+    $this->keyValue->expects($this->exactly(count($calls)))
       ->method('get')
-      ->withConsecutive(
-        ['test_1'],
-        ['test_2'],
-        ['test_3'],
-      )
+      ->with($this->callback(function (string $key) use (&$calls): bool {
+        return array_shift($calls) == $key;
+      }))
       ->willReturnOnConsecutiveCalls(
         FALSE,
         $this->ownObject,
@@ -379,9 +379,9 @@ class SharedTempStoreTest extends UnitTestCase {
 class UnserializableRequest extends Request {
 
   /**
-   * @return array
+   * Always throw an exception.
    */
-  public function __serialize(): array {
+  public function __serialize() {
     throw new \LogicException('Oops!');
   }
 

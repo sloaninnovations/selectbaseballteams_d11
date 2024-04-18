@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Unit\PageCache;
 
 use Drupal\Core\PageCache\ResponsePolicyInterface;
@@ -75,7 +77,7 @@ class DenyNodePreviewTest extends UnitTestCase {
    * @return array
    *   Data and expected results.
    */
-  public function providerPrivateImageStyleDownloadPolicy() {
+  public static function providerPrivateImageStyleDownloadPolicy() {
     return [
       [ResponsePolicyInterface::DENY, 'entity.node.preview'],
       [NULL, 'some.other.route'],

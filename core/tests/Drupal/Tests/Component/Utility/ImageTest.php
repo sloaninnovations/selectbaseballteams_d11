@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\Image;
@@ -42,7 +44,7 @@ class ImageTest extends TestCase {
    *
    * @see testScaleDimensions()
    */
-  public function providerTestScaleDimensions() {
+  public static function providerTestScaleDimensions() {
     // Define input / output datasets to test different branch conditions.
     $tests = [];
 

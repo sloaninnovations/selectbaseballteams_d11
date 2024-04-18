@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests;
 
 use Behat\Mink\Exception\ExpectationException;
@@ -43,9 +45,16 @@ class WebAssert extends MinkWebAssert {
   }
 
   /**
-   * {@inheritdoc}
+   * Trims the base URL from the URL.
+   *
+   * @param string|\Drupal\Core\Url $url
+   *   A url string, or object.
+   * @param bool $include_query
+   *   Whether to include the query string in the return value.
+   *
+   * @return string
    */
-  protected function cleanUrl($url, $include_query = FALSE) {
+  protected function cleanUrl(string|Url $url, bool $include_query = FALSE) {
     if ($url instanceof Url) {
       $url = $url->setAbsolute()->toString();
     }
@@ -137,6 +146,11 @@ class WebAssert extends MinkWebAssert {
    *   When the element doesn't exist.
    */
   public function buttonExists($button, TraversableElement $container = NULL) {
+    if (!is_string($button)) {
+      // @todo Trigger deprecation in
+      //   https://www.drupal.org/project/drupal/issues/3421105.
+      $button = (string) $button;
+    }
     $container = $container ?: $this->session->getPage();
     $node = $container->findButton($button);
 
@@ -388,6 +402,29 @@ class WebAssert extends MinkWebAssert {
   }
 
   /**
+   * Passes if a link with a given href is found.
+   *
+   * @param string $href
+   *   The full value of the 'href' attribute of the anchor tag.
+   * @param int $index
+   *   Link position counting from zero.
+   * @param string $message
+   *   (optional) A message to display with the assertion. Do not translate
+   *   messages: use \Drupal\Component\Render\FormattableMarkup to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException
+   *   Thrown when element doesn't exist, or the link label is a different one.
+   */
+  public function linkByHrefExistsExact(string $href, int $index = 0, string $message = ''): void {
+    $xpath = $this->buildXPathQuery('//a[@href=:href]', [':href' => $href]);
+    $message = ($message ?: strtr('No link with href %href found.', ['%href' => $href]));
+    $links = $this->session->getPage()->findAll('xpath', $xpath);
+    $this->assert(!empty($links[$index]), $message);
+  }
+
+  /**
    * Passes if a link containing a given href (part) is not found.
    *
    * @param string $href
@@ -404,6 +441,27 @@ class WebAssert extends MinkWebAssert {
   public function linkByHrefNotExists($href, $message = '') {
     $xpath = $this->buildXPathQuery('//a[contains(@href, :href)]', [':href' => $href]);
     $message = ($message ? $message : strtr('Link containing href %href found.', ['%href' => $href]));
+    $links = $this->session->getPage()->findAll('xpath', $xpath);
+    $this->assert(empty($links), $message);
+  }
+
+  /**
+   * Passes if a link with a given href is not found.
+   *
+   * @param string $href
+   *   The full value of the 'href' attribute of the anchor tag.
+   * @param string $message
+   *   (optional) A message to display with the assertion. Do not translate
+   *   messages: use \Drupal\Component\Render\FormattableMarkup to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException
+   *   Thrown when element doesn't exist, or the link label is a different one.
+   */
+  public function linkByHrefNotExistsExact(string $href, string $message = ''): void {
+    $xpath = $this->buildXPathQuery('//a[@href=:href]', [':href' => $href]);
+    $message = ($message ?: strtr('Link with href %href found.', ['%href' => $href]));
     $links = $this->session->getPage()->findAll('xpath', $xpath);
     $this->assert(empty($links), $message);
   }
@@ -701,9 +759,16 @@ class WebAssert extends MinkWebAssert {
   }
 
   /**
-   * {@inheritdoc}
+   * Checks that current session address is equals to provided one.
+   *
+   * @param string|\Drupal\Core\Url $page
+   *   A url string, or object.
+   *
+   * @return void
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException
    */
-  public function addressEquals($page) {
+  public function addressEquals(string|Url $page) {
     $expected = $this->cleanUrl($page, TRUE);
     $actual = $this->cleanUrl($this->session->getCurrentUrl(), str_contains($expected, '?'));
 
@@ -711,9 +776,14 @@ class WebAssert extends MinkWebAssert {
   }
 
   /**
-   * {@inheritdoc}
+   * Checks that current session address is not equals to provided one.
+   *
+   * @param string|\Drupal\Core\Url $page
+   *   A url string, or object.
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException
    */
-  public function addressNotEquals($page) {
+  public function addressNotEquals(string|Url $page) {
     $expected = $this->cleanUrl($page, TRUE);
     $actual = $this->cleanUrl($this->session->getCurrentUrl(), str_contains($expected, '?'));
 
@@ -870,6 +940,51 @@ class WebAssert extends MinkWebAssert {
     }
 
     return $selector;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function responseHeaderEquals($name, $value) {
+    if (!is_string($name)) {
+      // @todo Trigger deprecation in
+      //   https://www.drupal.org/project/drupal/issues/3421105.
+      $name = (string) $name;
+    }
+    if ($value === NULL) {
+      // @todo Trigger deprecation in
+      //   https://www.drupal.org/project/drupal/issues/3421105.
+      $this->responseHeaderDoesNotExist($name);
+      return;
+    }
+    if (!is_string($value)) {
+      $value = (string) $value;
+    }
+    parent::responseHeaderEquals($name, $value);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function pageTextContains($text) {
+    if (!is_string($text)) {
+      // @todo Trigger deprecation in
+      //   https://www.drupal.org/project/drupal/issues/3421105.
+      $text = (string) $text;
+    }
+    parent::pageTextContains($text);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldValueEquals(string $field, $value, TraversableElement $container = NULL) {
+    if (!is_string($value)) {
+      // @todo Trigger deprecation in
+      //   https://www.drupal.org/project/drupal/issues/3421105.
+      $value = (string) $value;
+    }
+    parent::fieldValueEquals($field, $value, $container);
   }
 
 }

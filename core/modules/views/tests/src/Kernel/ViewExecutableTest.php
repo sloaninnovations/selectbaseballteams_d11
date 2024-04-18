@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Database\Database;
 use Drupal\node\Entity\NodeType;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
@@ -20,13 +22,13 @@ use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\Plugin\views\pager\PagerPluginBase;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views_test_data\Plugin\views\display\DisplayTest;
-use PHPUnit\Framework\Error\Warning;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests the ViewExecutable class.
  *
  * @group views
+ * @group #slow
  * @see \Drupal\views\ViewExecutable
  */
 class ViewExecutableTest extends ViewsKernelTestBase {
@@ -133,7 +135,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
       if ($type == 'relationship') {
         continue;
       }
-      $this->assertGreaterThan(0, count($view->$type), new FormattableMarkup('Make sure a %type instance got instantiated.', ['%type' => $type]));
+      $this->assertGreaterThan(0, count($view->$type), "Make sure a $type instance got instantiated.");
     }
 
     // initHandlers() should create display handlers automatically as well.
@@ -202,17 +204,22 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   }
 
   public function testSetDisplayWithInvalidDisplay() {
+    \Drupal::service('module_installer')->install(['dblog']);
     $view = Views::getView('test_executable_displays');
     $view->initDisplay();
 
-    // Error is triggered while calling the wrong display.
-    try {
-      $view->setDisplay('invalid');
-      $this->fail('Expected error, when setDisplay() called with invalid display ID');
-    }
-    catch (Warning $e) {
-      $this->assertEquals('setDisplay() called with invalid display ID "invalid".', $e->getMessage());
-    }
+    // Error is logged while calling the wrong display.
+    $view->setDisplay('invalid');
+    $arguments = [
+      '@display_id' => 'invalid',
+    ];
+    $logged = Database::getConnection()->select('watchdog')
+      ->fields('watchdog', ['variables'])
+      ->condition('type', 'views')
+      ->condition('message', 'setDisplay() called with invalid display ID "@display_id".')
+      ->execute()
+      ->fetchField();
+    $this->assertEquals(serialize($arguments), $logged);
 
     $this->assertEquals('default', $view->current_display, 'If setDisplay is called with an invalid display id the default display should be used.');
     $this->assertEquals(spl_object_hash($view->displayHandlers->get('default')), spl_object_hash($view->display_handler));
@@ -346,7 +353,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   }
 
   /**
-   * Tests the deconstructor to be sure that necessary objects are removed.
+   * Tests the destructor to be sure that necessary objects are removed.
    */
   public function testDestroy() {
     $view = Views::getView('test_destroy');
@@ -374,6 +381,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
       $defaults['user'],
       $defaults['request'],
       $defaults['routeProvider'],
+      $defaults['displayPluginManager'],
       $defaults['viewsData']
     );
 
@@ -445,9 +453,9 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $count = 0;
     foreach ($view->displayHandlers as $id => $display) {
       $match = function ($value) use ($display) {
-        return str_contains($value, $display->display['display_title']);
+        return str_contains((string) $value, $display->display['display_title']);
       };
-      $this->assertNotEmpty(array_filter($validate[$id], $match), new FormattableMarkup('Error message found for @id display', ['@id' => $id]));
+      $this->assertNotEmpty(array_filter($validate[$id], $match), "Error message found for $id display");
       $count++;
     }
 

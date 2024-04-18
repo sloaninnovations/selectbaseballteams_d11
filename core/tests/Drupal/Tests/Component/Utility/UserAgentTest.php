@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\Random;
@@ -84,7 +86,7 @@ class UserAgentTest extends TestCase {
    *   - An accept-language string.
    *   - Expected best matching language code.
    */
-  public function providerTestGetBestMatchingLangcode() {
+  public static function providerTestGetBestMatchingLangcode() {
     // Random generator.
     $random = new Random();
 

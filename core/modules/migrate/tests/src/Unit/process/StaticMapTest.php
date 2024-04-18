@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\Component\Utility\Variable;
@@ -109,6 +111,16 @@ class StaticMapTest extends MigrateProcessTestCase {
     $this->plugin = new StaticMap($configuration, 'map', []);
     $value = $this->plugin->transform(NULL, $this->migrateExecutable, $this->row, 'destination_property');
     $this->assertSame('mapped NULL', $value);
+  }
+
+  /**
+   * Tests when there is a dot in a map key.
+   */
+  public function testMapDotInKey(): void {
+    $configuration['map']['foo.bar'] = 'baz';
+    $this->plugin = new StaticMap($configuration, 'map', []);
+    $value = $this->plugin->transform('foo.bar', $this->migrateExecutable, $this->row, 'destination_property');
+    $this->assertSame('baz', $value);
   }
 
 }

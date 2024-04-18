@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Plugin;
 
 use PHPUnit\Framework\TestCase;
@@ -29,7 +31,7 @@ class PluginBaseTest extends TestCase {
    *
    * @return array
    */
-  public function providerTestGetPluginId() {
+  public static function providerTestGetPluginId() {
     return [
       ['base_id', 'base_id'],
       ['base_id:derivative', 'base_id:derivative'],
@@ -56,7 +58,7 @@ class PluginBaseTest extends TestCase {
    *
    * @return array
    */
-  public function providerTestGetBaseId() {
+  public static function providerTestGetBaseId() {
     return [
       ['base_id', 'base_id'],
       ['base_id:derivative', 'base_id'],
@@ -83,7 +85,7 @@ class PluginBaseTest extends TestCase {
    *
    * @return array
    */
-  public function providerTestGetDerivativeId() {
+  public static function providerTestGetDerivativeId() {
     return [
       ['base_id', NULL],
       ['base_id:derivative', 'derivative'],

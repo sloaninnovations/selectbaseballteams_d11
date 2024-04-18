@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Functional;
 
 use Drupal\Component\Utility\Html;
@@ -12,6 +14,7 @@ use Drupal\user\RoleInterface;
  * Tests basic block functionality.
  *
  * @group block
+ * @group #slow
  */
 class BlockTest extends BlockTestBase {
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workspaces\Kernel;
 
 use Drupal\Core\Entity\EntityStorageException;
@@ -9,7 +11,7 @@ use Drupal\entity_test\Entity\EntityTestMulRevPub;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\system\Form\SiteInformationForm;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -27,7 +29,7 @@ use Drupal\workspaces\WorkspacePublishException;
 class WorkspaceIntegrationTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
   use NodeCreationTrait;
   use UserCreationTrait;
   use ViewResultAssertionTrait;
@@ -405,9 +407,13 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     // revision is tracked in the workspace association data. Note that revision
     // '5' has been created as an unpublished default revision in Live, so it is
     // not tracked.
-    $this->createNode(['title' => 'stage - 4 - r6 - published', 'created' => $this->createdTimestamp++, 'status' => TRUE]);
+    $node = $this->createNode(['title' => 'stage - 4 - r6 - published', 'created' => $this->createdTimestamp++, 'status' => TRUE]);
     $expected_workspace_association = ['stage' => [6]];
     $this->assertWorkspaceAssociation($expected_workspace_association, 'node');
+
+    // Check that the entity object that was saved has been updated to point to
+    // the workspace-specific revision.
+    $this->assertEquals(6, $node->getRevisionId());
 
     // Delete revision '6' and check that the workspace association does not
     // track it anymore.
@@ -744,7 +750,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     if (!$allowed) {
       $this->expectException(EntityStorageException::class);
-      $this->expectExceptionMessage('This entity can only be deleted in the default workspace.');
+      $this->expectExceptionMessage("This {$entity->getEntityType()->getSingularLabel()} can only be deleted in the Live workspace.");
     }
     $entity->delete();
   }
@@ -752,7 +758,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   /**
    * Data provider for allowed entity CRUD operations.
    */
-  public function providerTestAllowedEntityCrudInNonDefaultWorkspace() {
+  public static function providerTestAllowedEntityCrudInNonDefaultWorkspace() {
     return [
       'workspace-provided non-internal entity type' => [
         'entity_type_id' => 'workspace',
@@ -874,23 +880,6 @@ class WorkspaceIntegrationTest extends KernelTestBase {
           $this->assertNoRaw($expected_entity_values[$entity_keys['label']]);
         }
       }
-
-      // Add a filter on a field that is stored in a dedicated table in order to
-      // test field joins with extra conditions (e.g. 'deleted' and 'langcode').
-      $view->destroy();
-      $view->setDisplay('page_1');
-      $filters = $view->displayHandlers->get('page_1')->getOption('filters');
-      $view->displayHandlers->get('page_1')->overrideOption('filters', $filters + [
-        'body_value' => [
-          'id' => 'body_value',
-          'table' => 'node__body',
-          'field' => 'body_value',
-          'operator' => 'not empty',
-          'plugin_id' => 'string',
-        ],
-      ]);
-      $view->execute();
-      $this->assertIdenticalResultset($view, $expected_frontpage, ['nid' => 'nid']);
     }
   }
 

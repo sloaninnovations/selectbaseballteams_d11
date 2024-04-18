@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Path;
 
 use Drupal\Core\ParamConverter\ParamNotConvertedException;
@@ -77,7 +79,7 @@ class PathValidatorTest extends UnitTestCase {
   }
 
   /**
-   * Tests the isValid() method for <none> (used for jumplinks).
+   * Tests the isValid() method for <none> (used for jump links).
    *
    * @covers ::isValid
    */

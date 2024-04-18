@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\FileSecurity;
 
 use Drupal\Component\FileSecurity\FileSecurity;
@@ -59,38 +61,6 @@ class FileSecurityTest extends TestCase {
   public function testWriteHtaccessFailure() {
     vfsStream::setup('root');
     $this->assertFalse(FileSecurity::writeHtaccess(vfsStream::url('root') . '/foo'));
-  }
-
-  /**
-   * @covers ::writeWebConfig
-   */
-  public function testWriteWebConfig() {
-    vfsStream::setup('root');
-    $this->assertTrue(FileSecurity::writeWebConfig(vfsStream::url('root')));
-    $web_config_file = vfsStream::url('root') . '/web.config';
-    $this->assertFileExists($web_config_file);
-    $this->assertEquals('0444', substr(sprintf('%o', fileperms($web_config_file)), -4));
-  }
-
-  /**
-   * @covers ::writeWebConfig
-   */
-  public function testWriteWebConfigForceOverwrite() {
-    vfsStream::setup('root');
-    $web_config_file = vfsStream::url('root') . '/web.config';
-    file_put_contents($web_config_file, "foo");
-    $this->assertTrue(FileSecurity::writeWebConfig(vfsStream::url('root'), TRUE));
-    $this->assertFileExists($web_config_file);
-    $this->assertEquals('0444', substr(sprintf('%o', fileperms($web_config_file)), -4));
-    $this->assertStringNotContainsString("foo", $web_config_file);
-  }
-
-  /**
-   * @covers ::writeWebConfig
-   */
-  public function testWriteWebConfigFailure() {
-    vfsStream::setup('root');
-    $this->assertFalse(FileSecurity::writeWebConfig(vfsStream::url('root') . '/foo'));
   }
 
 }

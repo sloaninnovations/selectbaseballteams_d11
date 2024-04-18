@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\migrate\Kernel\SqlBaseTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel;
 
@@ -132,6 +129,10 @@ class SqlBaseTest extends MigrateTestBase {
    * Tests the exception when a connection is defined but not available.
    */
   public function testBrokenConnection(): void {
+    if (Database::getConnection()->driver() === 'sqlite') {
+      $this->markTestSkipped('Not compatible with sqlite');
+    }
+
     $sql_base = new TestSqlBase([], $this->migration);
     $target = 'test_state_db_target2';
     $key = 'test_state_migrate_connection2';
@@ -190,7 +191,7 @@ class SqlBaseTest extends MigrateTestBase {
    * @return array
    *   The scenarios to test.
    */
-  public function highWaterDataProvider() {
+  public static function highWaterDataProvider() {
     return [
       'no high-water value set' => [],
       'high-water value set' => [33],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Display;
 
 use Drupal\Core\Form\FormState;
@@ -85,7 +87,7 @@ class DisplayVariantTest extends UnitTestCase {
   /**
    * Provides test data for testGetConfiguration().
    */
-  public function providerTestGetConfiguration() {
+  public static function providerTestGetConfiguration() {
     $data = [];
     $data[] = [
       [],

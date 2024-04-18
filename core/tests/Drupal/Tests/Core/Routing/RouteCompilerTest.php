@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Routing;
 
 use Drupal\Core\Routing\RouteCompiler;
@@ -37,7 +39,7 @@ class RouteCompilerTest extends UnitTestCase {
    *   be calculated as the first value and the expected fit as the second
    *   value.
    */
-  public function providerTestGetFit() {
+  public static function providerTestGetFit() {
     return [
       ['test', 1],
       ['/estWithLeadingSlash', 1],

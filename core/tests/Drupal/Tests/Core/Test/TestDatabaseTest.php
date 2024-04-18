@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Test;
 
 use Drupal\Core\Test\TestDatabase;
@@ -41,7 +43,7 @@ class TestDatabaseTest extends UnitTestCase {
   /**
    * Data provider for self::testConstructor()
    */
-  public function providerTestConstructor() {
+  public static function providerTestConstructor() {
     return [
       ['test1234', 'test1234', 'sites/simpletest/1234'],
       ['test123456test234567', 'test123456test234567', 'sites/simpletest/234567'],

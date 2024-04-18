@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views_test_data\Plugin\views\display_extender\DisplayExtenderTest as DisplayExtenderTestData;
 use Drupal\views\Views;
@@ -54,7 +55,7 @@ class DisplayExtenderTest extends ViewsKernelTestBase {
 
     foreach ($view->displayHandlers as $id => $display) {
       $this->assertArrayHasKey($id, $errors);
-      $this->assertContains('Display extender test error.', $errors[$id], new FormattableMarkup('Error message found for @id display', ['@id' => $id]));
+      $this->assertContains('Display extender test error.', $errors[$id], "Error message found for $id display");
     }
   }
 

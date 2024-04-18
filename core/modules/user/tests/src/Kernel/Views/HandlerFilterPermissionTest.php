@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Views;
 
 use Drupal\Component\Utility\Html;
@@ -105,7 +107,7 @@ class HandlerFilterPermissionTest extends UserKernelTestBase {
     }
     foreach (['system' => 'System', 'user' => 'User'] as $module => $title) {
       $expected = array_map(function ($permission) {
-        return Html::escape(strip_tags($permission['title']));
+        return Html::escape(strip_tags((string) $permission['title']));
       }, $permission_by_module[$module]);
 
       $this->assertEquals($expected, $value_options[$title], 'Ensure the all permissions are available');

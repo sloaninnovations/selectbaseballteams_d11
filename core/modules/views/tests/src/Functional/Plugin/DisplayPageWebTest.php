@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
@@ -28,6 +30,14 @@ class DisplayPageWebTest extends ViewTestBase {
    * @var array
    */
   protected static $modules = ['block', 'views_ui'];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -63,13 +73,13 @@ class DisplayPageWebTest extends ViewTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertCacheContexts(['languages:language_interface', 'route', 'theme', 'url']);
     $this->assertSession()->elementsCount('xpath', $xpath, 1);
-    $this->assertSession()->elementTextEquals('xpath', $xpath, 1);
+    $this->assertSession()->elementTextEquals('xpath', $xpath, '1');
 
     // Ensure that just the filtered entry is returned.
     $this->drupalGet('test_route_with_suffix/1/suffix');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->elementsCount('xpath', $xpath, 1);
-    $this->assertSession()->elementTextEquals('xpath', $xpath, 1);
+    $this->assertSession()->elementTextEquals('xpath', $xpath, '1');
 
     // Ensure that no result is returned.
     $this->drupalGet('test_route_with_suffix_and_argument/1/suffix/2');
@@ -80,13 +90,13 @@ class DisplayPageWebTest extends ViewTestBase {
     $this->drupalGet('test_route_with_suffix_and_argument/1/suffix/1');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->elementsCount('xpath', $xpath, 1);
-    $this->assertSession()->elementTextEquals('xpath', $xpath, 1);
+    $this->assertSession()->elementTextEquals('xpath', $xpath, '1');
 
     // Ensure that just the filtered entry is returned.
     $this->drupalGet('test_route_with_long_argument/1');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->elementsCount('xpath', $xpath, 1);
-    $this->assertSession()->elementTextEquals('xpath', $xpath, 1);
+    $this->assertSession()->elementTextEquals('xpath', $xpath, '1');
   }
 
   /**

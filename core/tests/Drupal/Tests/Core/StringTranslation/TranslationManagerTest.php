@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\StringTranslation\TranslationManagerTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\StringTranslation;
 
@@ -37,7 +34,7 @@ class TranslationManagerTest extends UnitTestCase {
    * Provides some test data for formatPlural()
    * @return array
    */
-  public function providerTestFormatPlural() {
+  public static function providerTestFormatPlural() {
     return [
       [1, 'Singular', '@count plural', [], [], 'Singular'],
       [2, 'Singular', '@count plural', [], [], '2 plural'],
@@ -91,7 +88,7 @@ class TranslationManagerTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestTranslatePlaceholder() {
+  public static function providerTestTranslatePlaceholder() {
     return [
       ['foo @bar', ['@bar' => 'bar'], 'foo bar'],
       ['bar %baz', ['%baz' => 'baz'], 'bar <em class="placeholder">baz</em>'],

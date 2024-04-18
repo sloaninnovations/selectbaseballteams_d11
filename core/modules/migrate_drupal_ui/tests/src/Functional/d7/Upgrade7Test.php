@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional\d7;
 
 use Drupal\node\Entity\Node;
@@ -14,6 +16,7 @@ use Drupal\user\Entity\User;
  * The test method is provided by the MigrateUpgradeTestBase class.
  *
  * @group migrate_drupal_ui
+ * @group #slow
  */
 class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
 
@@ -21,13 +24,11 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'book',
     'config_translation',
     'content_translation',
     'datetime_range',
     'language',
     'migrate_drupal_ui',
-    'statistics',
     'telephone',
   ];
 
@@ -55,6 +56,11 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
     $this->nodeStorage->delete($this->nodeStorage->loadMultiple());
 
     $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal7.php');
+
+    // Enable saving the logs and set the post migration admin user name.
+    $this->outputLogs = TRUE;
+    $this->migratedAdminUserName = 'admin';
+    $this->expectedLoggedErrors = 27;
   }
 
   /**
@@ -69,7 +75,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
    */
   protected function getEntityCounts() {
     return [
-      'block' => 28,
+      'block' => 27,
       'block_content' => 1,
       'block_content_type' => 1,
       'comment' => 4,
@@ -93,7 +99,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'search_page' => 3,
       'shortcut' => 6,
       'shortcut_set' => 2,
-      'action' => 27,
+      'action' => 24,
       'menu' => 7,
       'taxonomy_term' => 25,
       'taxonomy_vocabulary' => 8,
@@ -106,8 +112,8 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'entity_form_display' => 23,
       'entity_form_mode' => 1,
       'entity_view_display' => 33,
-      'entity_view_mode' => 12,
-      'base_field_override' => 3,
+      'entity_view_mode' => 11,
+      'base_field_override' => 2,
     ];
   }
 
@@ -133,7 +139,6 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
     return [
       'Block languages',
       'Block',
-      'Book',
       'Chaos tools',
       'Comment',
       'Contact',
@@ -165,7 +170,6 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'Phone',
       'Search',
       'Shortcut',
-      'Statistics',
       'String translation',
       'Synchronize translations',
       'System',
@@ -198,10 +202,12 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
   protected function getMissingPaths() {
     return [
       'Aggregator',
+      'Book',
       'Color',
       'Forum',
       'RDF',
       'References',
+      'Statistics',
       'Translation sets',
       'Variable realm',
       'Variable store',

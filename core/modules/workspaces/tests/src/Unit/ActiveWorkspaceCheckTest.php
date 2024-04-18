@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workspaces\Unit;
 
 use Drupal\Core\Access\AccessResult;
@@ -44,7 +46,7 @@ class ActiveWorkspaceCheckTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestAccess() {
+  public static function providerTestAccess() {
     return [
       [[], FALSE, FALSE],
       [[], TRUE, FALSE],

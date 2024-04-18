@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -385,7 +387,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * @return array
    *   An array of data values.
    */
-  public function lookupDestinationIdMappingDataProvider() {
+  public static function lookupDestinationIdMappingDataProvider() {
     return [
       [1, 1],
       [2, 2],
@@ -603,7 +605,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * @return array
    *   An array of data values.
    */
-  public function lookupSourceIdMappingDataProvider() {
+  public static function lookupSourceIdMappingDataProvider() {
     return [
       [1, 1],
       [2, 2],
@@ -623,6 +625,42 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * @dataProvider lookupSourceIdMappingDataProvider
    */
   public function testLookupSourceIdMapping($num_source_fields, $num_destination_fields) {
+    $source_id_property_prefix = 'source_id_property_';
+    $this->doTestLookupSourceIdMapping($num_source_fields, $num_destination_fields, $source_id_property_prefix);
+  }
+
+  /**
+   * Performs the source ID test on source and destination fields.
+   *
+   * This performs same test as ::testLookupSourceIdMapping, except with source
+   * property names including spaces and special characters not allowed in SQL
+   * column aliases.
+   *
+   * @param int $num_source_fields
+   *   Number of source fields to test.
+   * @param int $num_destination_fields
+   *   Number of destination fields to test.
+   *
+   * @dataProvider lookupSourceIdMappingDataProvider
+   */
+  public function testLookupSourceIdMappingNonSqlCharacters($num_source_fields, $num_destination_fields) {
+    $source_id_property_prefix = '$ource id property * ';
+    $this->doTestLookupSourceIdMapping($num_source_fields, $num_destination_fields, $source_id_property_prefix);
+  }
+
+  /**
+   * Performs the source ID test on source and destination fields.
+   *
+   * @param int $num_source_fields
+   *   Number of source fields to test.
+   * @param int $num_destination_fields
+   *   Number of destination fields to test.
+   * @param string $source_id_property_prefix
+   *   Prefix for the source ID properties.
+   *
+   * @dataProvider lookupSourceIdMappingDataProvider
+   */
+  public function doTestLookupSourceIdMapping(int $num_source_fields, int $num_destination_fields, string $source_id_property_prefix): void {
     // Adjust the migration configuration according to the number of source and
     // destination fields.
     $this->sourceIds = [];
@@ -633,8 +671,8 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     for ($i = 1; $i <= $num_source_fields; $i++) {
       $row["sourceid$i"] = "source_id_value_$i";
       $source_ids_values = [$row["sourceid$i"]];
-      $expected_result["source_id_property_$i"] = "source_id_value_$i";
-      $this->sourceIds["source_id_property_$i"] = [];
+      $expected_result[$source_id_property_prefix . $i] = "source_id_value_$i";
+      $this->sourceIds[$source_id_property_prefix . $i] = [];
     }
     $destination_id_values = [];
     $nonexistent_id_values = [];
@@ -760,7 +798,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * @return array
    *   An array of data values.
    */
-  public function updateCountDataProvider() {
+  public static function updateCountDataProvider() {
     return [
       [0],
       [1],
@@ -808,7 +846,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * @return array
    *   An array of data values.
    */
-  public function errorCountDataProvider() {
+  public static function errorCountDataProvider() {
     return [
       [0],
       [1],
@@ -1094,7 +1132,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * @return array
    *   An array of data values.
    */
-  public function getHighestIdDataProvider() {
+  public static function getHighestIdDataProvider() {
     return [
       'Destination ID type integer' => [
         'dest_ids' => [
@@ -1159,7 +1197,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * @return array
    *   An array of data values.
    */
-  public function getHighestIdInvalidDataProvider() {
+  public static function getHighestIdInvalidDataProvider() {
     return [
       'Destination ID type string' => [
         'ids' => [
@@ -1192,7 +1230,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $container->set('plugin.manager.migration', $migration_plugin_manager);
     \Drupal::setContainer($container);
 
-    $this->expectDeprecation('deprecated in drupal:9.5.0 and is removed from drupal:11.0.0. Use $this->migrationPluginManager instead. See https://www.drupal.org/node/3277306');
+    $this->expectDeprecation('Drupal\migrate\Plugin\migrate\id_map\Sql::getMigrationPluginManager() is deprecated in drupal:9.5.0 and is removed from drupal:11.0.0. Use $this->migrationPluginManager instead. See https://www.drupal.org/node/3277306');
     $id_map = $this->getIdMap();
     $id_map->getMigrationPluginManager();
   }

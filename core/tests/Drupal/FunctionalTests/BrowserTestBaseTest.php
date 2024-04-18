@@ -1,22 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests;
 
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\Component\Serialization\Json;
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\StreamCapturer;
 use Drupal\Tests\Traits\Core\CronRunTrait;
 use Drupal\user\Entity\Role;
 use PHPUnit\Framework\ExpectationFailedException;
+use Symfony\Component\HttpFoundation\Request;
+
+// cspell:ignore htkey
 
 /**
  * Tests BrowserTestBase functionality.
  *
  * @group browsertestbase
+ * @group #slow
  */
 class BrowserTestBaseTest extends BrowserTestBase {
 
@@ -38,6 +43,22 @@ class BrowserTestBaseTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * Tests that JavaScript Drupal settings can be read.
+   */
+  public function testDrupalSettings() {
+    // Trigger a 403 because those pages have very little else going on.
+    $this->drupalGet('admin');
+    $this->assertSame([], $this->getDrupalSettings());
+
+    // Now try the same 403 as an authenticated user and verify that Drupal
+    // settings do show up.
+    $account = $this->drupalCreateUser();
+    $this->drupalLogin($account);
+    $this->drupalGet('admin');
+    $this->assertNotSame([], $this->getDrupalSettings());
+  }
 
   /**
    * Tests basic page test.
@@ -119,7 +140,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
     // Check that the hidden field exists and has a specific value.
     $this->assertSession()->hiddenFieldExists('strawberry');
     $this->assertSession()->hiddenFieldExists('red');
-    $this->assertSession()->hiddenFieldExists('redstrawberryhiddenfield');
+    $this->assertSession()->hiddenFieldExists('red-strawberry-hidden-field');
     $this->assertSession()->hiddenFieldValueNotEquals('strawberry', 'brown');
     $this->assertSession()->hiddenFieldValueEquals('strawberry', 'red');
 
@@ -191,81 +212,6 @@ class BrowserTestBaseTest extends BrowserTestBase {
     $this->expectException('\Exception');
     $this->expectExceptionMessage('User notice: foo');
     $this->drupalGet('test-error');
-  }
-
-  /**
-   * Tests linkExists() with pipe character (|) in locator.
-   *
-   * @see \Drupal\Tests\WebAssert::linkExists()
-   */
-  public function testPipeCharInLocator() {
-    $this->drupalGet('test-pipe-char');
-    $this->assertSession()->linkExists('foo|bar|baz');
-  }
-
-  /**
-   * Tests linkExistsExact() functionality.
-   *
-   * @see \Drupal\Tests\WebAssert::linkExistsExact()
-   */
-  public function testLinkExistsExact() {
-    $this->drupalGet('test-pipe-char');
-    $this->assertSession()->linkExistsExact('foo|bar|baz');
-  }
-
-  /**
-   * Tests linkExistsExact() functionality fail.
-   *
-   * @see \Drupal\Tests\WebAssert::linkExistsExact()
-   */
-  public function testInvalidLinkExistsExact() {
-    $this->drupalGet('test-pipe-char');
-    $this->expectException(ExpectationException::class);
-    $this->expectExceptionMessage('Link with label foo|bar not found');
-    $this->assertSession()->linkExistsExact('foo|bar');
-  }
-
-  /**
-   * Tests linkNotExistsExact() functionality.
-   *
-   * @see \Drupal\Tests\WebAssert::linkNotExistsExact()
-   */
-  public function testLinkNotExistsExact() {
-    $this->drupalGet('test-pipe-char');
-    $this->assertSession()->linkNotExistsExact('foo|bar');
-  }
-
-  /**
-   * Tests responseHeaderDoesNotExist() functionality.
-   *
-   * @see \Drupal\Tests\WebAssert::responseHeaderDoesNotExist()
-   */
-  public function testResponseHeaderDoesNotExist() {
-    $this->drupalGet('test-pipe-char');
-    $this->assertSession()->responseHeaderDoesNotExist('Foo-Bar');
-  }
-
-  /**
-   * Tests linkNotExistsExact() functionality fail.
-   *
-   * @see \Drupal\Tests\WebAssert::linkNotExistsExact()
-   */
-  public function testInvalidLinkNotExistsExact() {
-    $this->drupalGet('test-pipe-char');
-    $this->expectException(ExpectationException::class);
-    $this->expectExceptionMessage('Link with label foo|bar|baz found');
-    $this->assertSession()->linkNotExistsExact('foo|bar|baz');
-  }
-
-  /**
-   * Tests legacy text asserts.
-   */
-  public function testTextAsserts() {
-    $this->drupalGet('test-encoded');
-    $dangerous = 'Bad html <script>alert(123);</script>';
-    $sanitized = Html::escape($dangerous);
-    $this->assertSession()->responseNotContains($dangerous);
-    $this->assertSession()->responseContains($sanitized);
   }
 
   /**
@@ -411,41 +357,6 @@ class BrowserTestBaseTest extends BrowserTestBase {
   }
 
   /**
-   * Tests legacy field asserts for button field type.
-   */
-  public function testFieldAssertsForButton() {
-    $this->drupalGet('test-field-xpath');
-
-    // Verify if the test passes with button ID.
-    $this->assertSession()->buttonExists('edit-save');
-    // Verify if the test passes with button Value.
-    $this->assertSession()->buttonExists('Save');
-    // Verify if the test passes with button Name.
-    $this->assertSession()->buttonExists('op');
-
-    // Verify if the test passes with button ID.
-    $this->assertSession()->buttonNotExists('i-do-not-exist');
-    // Verify if the test passes with button Value.
-    $this->assertSession()->buttonNotExists('I do not exist');
-    // Verify if the test passes with button Name.
-    $this->assertSession()->buttonNotExists('no');
-
-    // Test that multiple fields with the same name are validated correctly.
-    $this->assertSession()->buttonExists('duplicate_button');
-    $this->assertSession()->buttonExists('Duplicate button 1');
-    $this->assertSession()->buttonExists('Duplicate button 2');
-    $this->assertSession()->buttonNotExists('Rabbit');
-
-    try {
-      $this->assertSession()->buttonNotExists('Duplicate button 2');
-      $this->fail('The "duplicate_button" field with the value Duplicate button 2 was not found.');
-    }
-    catch (ExpectationException $e) {
-      // Expected exception; just continue testing.
-    }
-  }
-
-  /**
    * Tests legacy field asserts for checkbox field type.
    */
   public function testFieldAssertsForCheckbox() {
@@ -453,13 +364,13 @@ class BrowserTestBaseTest extends BrowserTestBase {
 
     // Part 1 - Test by name.
     // Test that checkboxes are found/not found correctly by name, when using
-    // TRUE or FALSE to match their 'checked' state.
+    // '1' or '' to match their 'checked' state.
     $this->assertSession()->fieldExists('checkbox_enabled');
     $this->assertSession()->fieldExists('checkbox_disabled');
-    $this->assertSession()->fieldValueEquals('checkbox_enabled', TRUE);
-    $this->assertSession()->fieldValueEquals('checkbox_disabled', FALSE);
-    $this->assertSession()->fieldValueNotEquals('checkbox_enabled', FALSE);
-    $this->assertSession()->fieldValueNotEquals('checkbox_disabled', TRUE);
+    $this->assertSession()->fieldValueEquals('checkbox_enabled', '1');
+    $this->assertSession()->fieldValueEquals('checkbox_disabled', '');
+    $this->assertSession()->fieldValueNotEquals('checkbox_enabled', '');
+    $this->assertSession()->fieldValueNotEquals('checkbox_disabled', '1');
 
     // Test that we have legacy support.
     $this->assertSession()->fieldValueEquals('checkbox_enabled', '1');
@@ -467,7 +378,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
 
     // Test that the assertion fails correctly if given the right value.
     try {
-      $this->assertSession()->fieldValueNotEquals('checkbox_enabled', TRUE);
+      $this->assertSession()->fieldValueNotEquals('checkbox_enabled', '1');
       $this->fail('fieldValueNotEquals failed to throw an exception.');
     }
     catch (ExpectationException $e) {
@@ -476,11 +387,11 @@ class BrowserTestBaseTest extends BrowserTestBase {
 
     // Part 2 - Test by ID.
     // Test that checkboxes are found/not found correctly by ID, when using
-    // TRUE or FALSE to match their 'checked' state.
-    $this->assertSession()->fieldValueEquals('edit-checkbox-enabled', TRUE);
-    $this->assertSession()->fieldValueEquals('edit-checkbox-disabled', FALSE);
-    $this->assertSession()->fieldValueNotEquals('edit-checkbox-enabled', FALSE);
-    $this->assertSession()->fieldValueNotEquals('edit-checkbox-disabled', TRUE);
+    // '1' or '' to match their 'checked' state.
+    $this->assertSession()->fieldValueEquals('edit-checkbox-enabled', '1');
+    $this->assertSession()->fieldValueEquals('edit-checkbox-disabled', '');
+    $this->assertSession()->fieldValueNotEquals('edit-checkbox-enabled', '');
+    $this->assertSession()->fieldValueNotEquals('edit-checkbox-disabled', '1');
 
     // Test that checkboxes are found by ID, when using NULL to ignore the
     // 'checked' state.
@@ -617,7 +528,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests the protections provided by .htkey.
    */
-  public function testHtkey() {
+  public function testHtKey() {
     // Remove the Simpletest private key file so we can test the protection
     // against requests that forge a valid testing user agent to gain access
     // to the installer.
@@ -632,45 +543,27 @@ class BrowserTestBaseTest extends BrowserTestBase {
   }
 
   /**
-   * Tests pageContainsNoDuplicateId() functionality.
-   *
-   * @see \Drupal\Tests\WebAssert::pageContainsNoDuplicateId()
+   * Tests that a usable session is on the request in test-runner.
    */
-  public function testPageContainsNoDuplicateId() {
-    $assert_session = $this->assertSession();
-    $this->drupalGet(Url::fromRoute('test_page_test.page_without_duplicate_ids'));
-    $assert_session->pageContainsNoDuplicateId();
+  public function testSessionOnRequest(): void {
+    /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
+    $session = $this->container->get('request_stack')->getSession();
 
-    $this->drupalGet(Url::fromRoute('test_page_test.page_with_duplicate_ids'));
-    $this->expectException(ExpectationException::class);
-    $this->expectExceptionMessage('The page contains a duplicate HTML ID "page-element".');
-    $assert_session->pageContainsNoDuplicateId();
+    $session->set('some-val', 'do-not-cleanup');
+    $this->assertEquals('do-not-cleanup', $session->get('some-val'));
+
+    $session->set('some-other-val', 'do-cleanup');
+    $this->assertEquals('do-cleanup', $session->remove('some-other-val'));
   }
 
   /**
-   * Tests assertEscaped() and assertUnescaped().
+   * Tests deprecation of modified request stack lacking a session.
    *
-   * @see \Drupal\Tests\WebAssert::assertNoEscaped()
-   * @see \Drupal\Tests\WebAssert::assertEscaped()
+   * @group legacy
    */
-  public function testEscapingAssertions() {
-    $assert = $this->assertSession();
-
-    $this->drupalGet('test-escaped-characters');
-    $assert->assertNoEscaped('<div class="escaped">');
-    $assert->responseContains('<div class="escaped">');
-    $assert->assertEscaped('Escaped: <"\'&>');
-
-    $this->drupalGet('test-escaped-script');
-    $assert->assertNoEscaped('<div class="escaped">');
-    $assert->responseContains('<div class="escaped">');
-    $assert->assertEscaped("<script>alert('XSS');alert(\"XSS\");</script>");
-
-    $this->drupalGet('test-unescaped-script');
-    $assert->assertNoEscaped('<div class="unescaped">');
-    $assert->responseContains('<div class="unescaped">');
-    $assert->responseContains("<script>alert('Marked safe');alert(\"Marked safe\");</script>");
-    $assert->assertNoEscaped("<script>alert('Marked safe');alert(\"Marked safe\");</script>");
+  public function testDeprecatedSessionMissing(): void {
+    $this->expectDeprecation('Pushing requests without a session onto the request_stack is deprecated in drupal:10.3.0 and an error will be thrown from drupal:11.0.0. See https://www.drupal.org/node/3337193');
+    $this->container->get('request_stack')->push(Request::create('/'));
   }
 
   /**
@@ -708,11 +601,11 @@ class BrowserTestBaseTest extends BrowserTestBase {
    * Tests the dump() function provided by the var-dumper Symfony component.
    */
   public function testVarDump() {
-    // Append the stream capturer to the STDOUT stream, so that we can test the
+    // Append the stream capturer to the STDERR stream, so that we can test the
     // dump() output and also prevent it from actually outputting in this
     // particular test.
     stream_filter_register("capture", StreamCapturer::class);
-    stream_filter_append(STDOUT, "capture");
+    stream_filter_append(STDERR, "capture");
 
     // Dump some variables to check that dump() in test code produces output
     // on the command line that is running the test.

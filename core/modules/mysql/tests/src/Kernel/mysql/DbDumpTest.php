@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\mysql\Kernel\mysql;
 
-use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Command\DbDumpApplication;
 use Drupal\Core\Config\DatabaseStorage;
 use Drupal\Core\Database\Database;
@@ -26,6 +28,8 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    // @todo system can be removed from this test once
+    //   https://www.drupal.org/project/drupal/issues/2851705 is committed.
     'system',
     'config',
     'dblog',
@@ -75,7 +79,9 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
     $container->register('cache_factory', 'Drupal\Core\Cache\DatabaseBackendFactory')
       ->addArgument(new Reference('database'))
       ->addArgument(new Reference('cache_tags.invalidator.checksum'))
-      ->addArgument(new Reference('settings'));
+      ->addArgument(new Reference('settings'))
+      ->addArgument(new Reference('serialization.phpserialize'))
+      ->addArgument(new Reference(TimeInterface::class));
   }
 
   /**
@@ -85,7 +91,6 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
     parent::setUp();
 
     // Create some schemas so our export contains tables.
-    $this->installSchema('system', ['sessions']);
     $this->installSchema('dblog', ['watchdog']);
     $this->installEntitySchema('block_content');
     $this->installEntitySchema('user');
@@ -129,7 +134,6 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
       'menu_link_content_data',
       'menu_link_content_revision',
       'menu_link_content_field_revision',
-      'sessions',
       'path_alias',
       'path_alias_revision',
       'user__roles',
@@ -196,9 +200,9 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
     // The tables should now exist and the schemas should match the originals.
     foreach ($this->tables as $table) {
       $this->assertTrue($schema
-        ->tableExists($table), new FormattableMarkup('Table @table created by the database script.', ['@table' => $table]));
-      $this->assertSame($this->originalTableSchemas[$table], $this->getTableSchema($table), new FormattableMarkup('The schema for @table was properly restored.', ['@table' => $table]));
-      $this->assertSame($this->originalTableIndexes[$table], $this->getTableIndexes($table), new FormattableMarkup('The indexes for @table were properly restored.', ['@table' => $table]));
+        ->tableExists($table), "Table $table created by the database script.");
+      $this->assertSame($this->originalTableSchemas[$table], $this->getTableSchema($table), "The schema for $table was properly restored.");
+      $this->assertSame($this->originalTableIndexes[$table], $this->getTableIndexes($table), "The indexes for $table were properly restored.");
     }
 
     // Ensure the test config has been replaced.

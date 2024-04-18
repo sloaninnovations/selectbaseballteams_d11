@@ -2,7 +2,10 @@
 
 namespace Drupal\Core\TypedData\Plugin\DataType;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\Attribute\DataType;
 use Drupal\Core\TypedData\ComplexDataInterface;
+use Drupal\Core\TypedData\ListDataDefinition;
 use Drupal\Core\TypedData\ListInterface;
 use Drupal\Core\TypedData\TypedData;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -16,13 +19,12 @@ use Drupal\Core\TypedData\TypedDataInterface;
  * Note: The class cannot be called "List" as list is a reserved PHP keyword.
  *
  * @ingroup typed_data
- *
- * @DataType(
- *   id = "list",
- *   label = @Translation("List of items"),
- *   definition_class = "\Drupal\Core\TypedData\ListDataDefinition"
- * )
  */
+#[DataType(
+  id: "list",
+  label: new TranslatableMarkup("List of items"),
+  definition_class: ListDataDefinition::class,
+)]
 class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
 
   /**
@@ -168,8 +170,7 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
   /**
    * {@inheritdoc}
    */
-  #[\ReturnTypeWillChange]
-  public function offsetExists($offset) {
+  public function offsetExists($offset): bool {
     // We do not want to throw exceptions here, so we do not use get().
     return isset($this->list[$offset]);
   }
@@ -177,24 +178,21 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
   /**
    * {@inheritdoc}
    */
-  #[\ReturnTypeWillChange]
-  public function offsetUnset($offset) {
+  public function offsetUnset($offset): void {
     $this->removeItem($offset);
   }
 
   /**
    * {@inheritdoc}
    */
-  #[\ReturnTypeWillChange]
-  public function offsetGet($offset) {
+  public function offsetGet($offset): mixed {
     return $this->get($offset);
   }
 
   /**
    * {@inheritdoc}
    */
-  #[\ReturnTypeWillChange]
-  public function offsetSet($offset, $value) {
+  public function offsetSet($offset, $value): void {
     if (!isset($offset)) {
       // The [] operator has been used.
       $this->appendItem($value);
@@ -233,16 +231,14 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
   /**
    * {@inheritdoc}
    */
-  #[\ReturnTypeWillChange]
-  public function getIterator() {
+  public function getIterator(): \ArrayIterator {
     return new \ArrayIterator($this->list);
   }
 
   /**
    * {@inheritdoc}
    */
-  #[\ReturnTypeWillChange]
-  public function count() {
+  public function count(): int {
     return count($this->list);
   }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Unit\Plugin\area;
 
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
@@ -141,7 +143,7 @@ class EntityTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestTokens() {
+  public static function providerTestTokens() {
     return [
       ['{{ raw_arguments.test1 }}', 5],
       ['{{ arguments.test2 }}', 6],

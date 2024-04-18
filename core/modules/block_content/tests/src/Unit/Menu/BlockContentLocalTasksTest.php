@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Unit\Menu;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -78,7 +80,7 @@ class BlockContentLocalTasksTest extends LocalTaskIntegrationTestBase {
   /**
    * Provides a list of routes to test.
    */
-  public function getBlockContentListingRoutes() {
+  public static function getBlockContentListingRoutes() {
     return [
       ['entity.block_content.collection', 'system.admin_content'],
     ];

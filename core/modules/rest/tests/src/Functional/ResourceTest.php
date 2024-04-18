@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Functional;
 
 use Drupal\Core\Session\AccountInterface;
@@ -15,6 +17,7 @@ use GuzzleHttp\RequestOptions;
  * Tests the structure of a REST resource.
  *
  * @group rest
+ * @group #slow
  */
 class ResourceTest extends BrowserTestBase {
 

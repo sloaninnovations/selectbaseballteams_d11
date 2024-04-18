@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\Plugin\migrate\process\Log;
@@ -35,7 +37,7 @@ class LogTest extends MigrateProcessTestCase {
    * @return string[][]
    *   An array of test data arrays.
    */
-  public function providerTestLog() {
+  public static function providerTestLog() {
     $object = (object) [
       'a' => 'test',
       'b' => 'test2',

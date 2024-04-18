@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Functional;
 
 use Drupal\Tests\content_translation\Functional\ContentTranslationTestBase;
@@ -41,6 +43,7 @@ class LayoutBuilderTranslationTest extends ContentTranslationTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->doSetup();
     $this->setUpViewDisplay();
     $this->setUpEntities();
   }

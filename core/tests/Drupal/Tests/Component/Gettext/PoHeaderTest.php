@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Gettext;
 
 use Drupal\Component\Gettext\PoHeader;
@@ -47,7 +49,7 @@ class PoHeaderTest extends TestCase {
    *   Pairs of plural expressions and expected plural positions keyed by plural
    *   value.
    */
-  public function providerTestPluralsFormula() {
+  public static function providerTestPluralsFormula() {
     return [
       [
         'nplurals=1; plural=0;',

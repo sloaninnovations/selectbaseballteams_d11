@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Annotation;
 
 use Drupal\Core\Annotation\PluralTranslation;
@@ -56,7 +58,7 @@ class PluralTranslationTest extends UnitTestCase {
     new PluralTranslation($data);
   }
 
-  public function providerTestMissingData() {
+  public static function providerTestMissingData() {
     $data = [];
     $data['all-missing'] = [[]];
     $data['singular-missing'] = [['plural' => 'muh']];

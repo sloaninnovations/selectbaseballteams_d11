@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -13,6 +15,7 @@ use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
  * @coversDefaultClass \Drupal\layout_builder\Field\LayoutSectionItemList
  *
  * @group layout_builder
+ * @group #slow
  */
 class LayoutSectionItemListTest extends SectionListTestBase {
 

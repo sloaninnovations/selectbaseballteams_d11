@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\statistics\Kernel\Migrate\d6;
 
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
@@ -46,6 +48,13 @@ class MigrateNodeCounterTest extends MigrateDrupal6TestBase {
       'd6_node_translation',
       'statistics_node_counter',
     ]);
+  }
+
+  /**
+   * Gets the path to the fixture file.
+   */
+  protected function getFixtureFilePath() {
+    return __DIR__ . '/../../../../fixtures/drupal6.php';
   }
 
   /**

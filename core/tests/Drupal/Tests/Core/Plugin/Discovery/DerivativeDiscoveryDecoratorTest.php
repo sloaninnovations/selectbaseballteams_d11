@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Plugin\Discovery;
 
 use Drupal\Component\Plugin\Definition\DerivablePluginDefinitionInterface;
@@ -241,12 +243,15 @@ class DerivativeDiscoveryDecoratorTest extends UnitTestCase {
       'null_value' => NULL,
     ];
 
-    $this->discoveryMain->expects($this->exactly(2))
+    $ids = [
+      $derivative_definition['id'],
+      $base_definition['id'],
+    ];
+    $this->discoveryMain->expects($this->exactly(count($ids)))
       ->method('getDefinition')
-      ->withConsecutive(
-        ['non_container_aware_discovery:test_discovery_1'],
-        ['non_container_aware_discovery'],
-      )
+      ->with($this->callback(function (string $id) use (&$ids): bool {
+        return array_shift($ids) === $id;
+      }))
       ->willReturnOnConsecutiveCalls(
         $derivative_definition,
         $base_definition,

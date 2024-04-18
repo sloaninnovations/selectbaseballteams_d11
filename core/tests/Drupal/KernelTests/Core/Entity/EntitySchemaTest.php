@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -113,27 +114,27 @@ class EntitySchemaTest extends EntityKernelTestBase {
     // Initially only the base table and the dedicated field data table should
     // exist.
     foreach ($tables as $index => $table) {
-      $this->assertEquals(!$index, $schema_handler->tableExists($table), new FormattableMarkup('Entity schema correct for the @table table.', ['@table' => $table]));
+      $this->assertEquals(!$index, $schema_handler->tableExists($table), "Entity schema correct for the $table table.");
     }
-    $this->assertTrue($schema_handler->tableExists($dedicated_tables[0]), new FormattableMarkup('Field schema correct for the @table table.', ['@table' => $table]));
+    $this->assertTrue($schema_handler->tableExists($dedicated_tables[0]), "Field schema correct for the $table table.");
 
     // Update the entity type definition and check that the entity schema now
     // supports translations and revisions.
     $this->updateEntityType(TRUE);
     foreach ($tables as $table) {
-      $this->assertTrue($schema_handler->tableExists($table), new FormattableMarkup('Entity schema correct for the @table table.', ['@table' => $table]));
+      $this->assertTrue($schema_handler->tableExists($table), "Entity schema correct for the $table table.");
     }
     foreach ($dedicated_tables as $table) {
-      $this->assertTrue($schema_handler->tableExists($table), new FormattableMarkup('Field schema correct for the @table table.', ['@table' => $table]));
+      $this->assertTrue($schema_handler->tableExists($table), "Field schema correct for the $table table.");
     }
 
     // Revert changes and check that the entity schema now does not support
     // neither translations nor revisions.
     $this->updateEntityType(FALSE);
     foreach ($tables as $index => $table) {
-      $this->assertEquals(!$index, $schema_handler->tableExists($table), new FormattableMarkup('Entity schema correct for the @table table.', ['@table' => $table]));
+      $this->assertEquals(!$index, $schema_handler->tableExists($table), "Entity schema correct for the $table table.");
     }
-    $this->assertTrue($schema_handler->tableExists($dedicated_tables[0]), new FormattableMarkup('Field schema correct for the @table table.', ['@table' => $table]));
+    $this->assertTrue($schema_handler->tableExists($dedicated_tables[0]), "Field schema correct for the $table table.");
   }
 
   /**
@@ -158,32 +159,20 @@ class EntitySchemaTest extends EntityKernelTestBase {
     $entity_type = $update_manager->getEntityType($entity_type_id);
 
     /* @see \Drupal\Core\Entity\ContentEntityBase::baseFieldDefinitions() */
-    switch ($field_name) {
-      case 'id':
-        $field = BaseFieldDefinition::create('integer')
-          ->setLabel('ID')
-          ->setReadOnly(TRUE)
-          ->setSetting('unsigned', TRUE);
-        break;
-
-      case 'revision_id':
-        $field = BaseFieldDefinition::create('integer')
-          ->setLabel('Revision ID')
-          ->setReadOnly(TRUE)
-          ->setSetting('unsigned', TRUE);
-        break;
-
-      case 'langcode':
-        $field = BaseFieldDefinition::create('language')
-          ->setLabel('Language');
-        if ($entity_type->isRevisionable()) {
-          $field->setRevisionable(TRUE);
-        }
-        if ($entity_type->isTranslatable()) {
-          $field->setTranslatable(TRUE);
-        }
-        break;
-    }
+    $field = match ($field_name) {
+      'id' => BaseFieldDefinition::create('integer')
+        ->setLabel('ID')
+        ->setReadOnly(TRUE)
+        ->setSetting('unsigned', TRUE),
+      'revision_id' => BaseFieldDefinition::create('integer')
+        ->setLabel('Revision ID')
+        ->setReadOnly(TRUE)
+        ->setSetting('unsigned', TRUE),
+      'langcode' => BaseFieldDefinition::create('language')
+        ->setLabel('Language')
+        ->setRevisionable($entity_type->isRevisionable())
+        ->setTranslatable($entity_type->isTranslatable()),
+    };
 
     $field
       ->setName($field_name)
@@ -283,7 +272,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
    * @return array
    *   An array of test cases consisting of an entity type ID and a field name.
    */
-  public function providerTestPrimaryKeyUpdate() {
+  public static function providerTestPrimaryKeyUpdate() {
     // Build up test cases for all possible entity type configurations.
     // For each entity type we test reinstalling each field that is part of
     // any table's primary key.

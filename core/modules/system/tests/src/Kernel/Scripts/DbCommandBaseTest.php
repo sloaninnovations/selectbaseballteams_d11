@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\system\Kernel\Scripts\DbCommandBaseTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Scripts;
 
@@ -114,7 +111,7 @@ class DbCommandBaseTester extends DbCommandBase {
   /**
    * {@inheritdoc}
    */
-  public function configure() {
+  public function configure(): void {
     parent::configure();
     $this->setName('test');
   }

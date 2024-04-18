@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Unit;
 
 use Drupal\content_moderation\ModerationInformationInterface;
@@ -96,7 +98,7 @@ class StateTransitionValidationTest extends UnitTestCase {
   /**
    * Data provider for the user transition test.
    */
-  public function userTransitionsProvider() {
+  public static function userTransitionsProvider() {
     // The user has the right permission, so let it through.
     $ret[] = ['draft', 'draft', 'use process transition draft', TRUE, TRUE];
 

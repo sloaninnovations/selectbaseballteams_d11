@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Menu\LocalTaskDefaultTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Menu;
 
@@ -193,7 +190,7 @@ class LocalTaskDefaultTest extends UnitTestCase {
    * @return array
    *   A list or test plugin definition and expected weight.
    */
-  public function providerTestGetWeight() {
+  public static function providerTestGetWeight() {
     return [
       // Manually specify a weight, so this is used.
       [['weight' => 314], 'test_id', 314],

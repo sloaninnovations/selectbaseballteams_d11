@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\tour\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -8,6 +10,7 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
  * General Tour tests that require JavaScript.
  *
  * @group tour
+ * @group legacy
  */
 class TourJavascriptTest extends WebDriverTestBase {
 

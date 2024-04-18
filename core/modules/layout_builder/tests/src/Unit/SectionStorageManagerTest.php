@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Unit;
 
 use Drupal\Component\Plugin\Context\ContextInterface;
@@ -190,7 +192,7 @@ class SectionStorageManagerTest extends UnitTestCase {
   /**
    * Provides test data for ::testFindByContext().
    */
-  public function providerTestFindByContext() {
+  public static function providerTestFindByContext() {
     // Data provider values are:
     // - the result for the plugin's isApplicable() method to return.
     $data = [];

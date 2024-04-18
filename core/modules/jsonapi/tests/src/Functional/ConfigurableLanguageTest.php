@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
@@ -13,6 +15,7 @@ use GuzzleHttp\RequestOptions;
  * JSON:API integration test for the "ConfigurableLanguage" config entity type.
  *
  * @group jsonapi
+ * @group #slow
  */
 class ConfigurableLanguageTest extends ConfigEntityResourceTestBase {
 

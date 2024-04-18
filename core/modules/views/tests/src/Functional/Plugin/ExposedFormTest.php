@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Component\Utility\Html;
@@ -15,6 +17,7 @@ use Drupal\views\Plugin\views\filter\FilterPluginBase;
  * Tests exposed forms functionality.
  *
  * @group views
+ * @group #slow
  */
 class ExposedFormTest extends ViewTestBase {
 
@@ -321,7 +324,7 @@ class ExposedFormTest extends ViewTestBase {
    * @return array
    *   Array of display names to test.
    */
-  public function providerTestExposedBlock() {
+  public static function providerTestExposedBlock() {
     return [
       'page_display' => ['page_1'],
       'block_display' => ['block_1'],

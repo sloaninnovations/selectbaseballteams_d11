@@ -8,16 +8,17 @@ use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\FormElementInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
 /**
  * Provides a plugin manager for element plugins.
  *
- * @see \Drupal\Core\Render\Annotation\RenderElement
- * @see \Drupal\Core\Render\Annotation\FormElement
- * @see \Drupal\Core\Render\Element\RenderElement
- * @see \Drupal\Core\Render\Element\FormElement
+ * @see \Drupal\Core\Render\Attribute\RenderElement
+ * @see \Drupal\Core\Render\Attribute\FormElement
+ * @see \Drupal\Core\Render\Element\RenderElementBase
+ * @see \Drupal\Core\Render\Element\FormElementBase
  * @see \Drupal\Core\Render\Element\ElementInterface
  * @see \Drupal\Core\Render\Element\FormElementInterface
  * @see plugin_api
@@ -73,12 +74,12 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     $this->setCacheBackend($cache_backend, 'element_info');
     $this->themeManager = $theme_manager;
     if ($theme_handler instanceof CacheTagsInvalidatorInterface) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $cache_tag_invalidator argument is deprecated and replaced with $theme_handler in drupal:10.2.0 and will be removed in drupal:11.0.0.', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $cache_tag_invalidator argument is deprecated in drupal:10.2.0 and will be removed in drupal:11.0.0. Pass $theme_handler instead. See https://www.drupal.org/node/3355227', E_USER_DEPRECATED);
       $theme_handler = \Drupal::service('theme_handler');
     }
     $this->themeHandler = $theme_handler;
 
-    parent::__construct('Element', $namespaces, $module_handler, 'Drupal\Core\Render\Element\ElementInterface', 'Drupal\Core\Render\Annotation\RenderElement');
+    parent::__construct('Element', $namespaces, $module_handler, 'Drupal\Core\Render\Element\ElementInterface', RenderElement::class, 'Drupal\Core\Render\Annotation\RenderElement');
     $this->alterInfo('element_plugin');
   }
 

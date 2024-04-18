@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\TempStore;
 
 use Drupal\Core\TempStore\Lock;
@@ -100,13 +102,12 @@ class PrivateTempStoreTest extends UnitTestCase {
    * @covers ::get
    */
   public function testGet() {
-    $this->keyValue->expects($this->exactly(3))
+    $calls = ['1:test_2', '1:test', '1:test'];
+    $this->keyValue->expects($this->exactly(count($calls)))
       ->method('get')
-      ->withConsecutive(
-        ['1:test_2'],
-        ['1:test'],
-        ['1:test'],
-      )
+      ->with($this->callback(function (string $key) use (&$calls): bool {
+        return array_shift($calls) == $key;
+      }))
       ->willReturnOnConsecutiveCalls(
         FALSE,
         $this->ownObject,
@@ -175,10 +176,10 @@ class PrivateTempStoreTest extends UnitTestCase {
 
     $metadata = $this->tempStore->getMetadata('test');
     $this->assertInstanceOf(Lock::class, $metadata);
-    $this->assertObjectHasAttribute('ownerId', $metadata);
-    $this->assertObjectHasAttribute('updated', $metadata);
+    $this->assertObjectHasProperty('ownerId', $metadata);
+    $this->assertObjectHasProperty('updated', $metadata);
     // Data should get removed.
-    $this->assertObjectNotHasAttribute('data', $metadata);
+    $this->assertObjectNotHasProperty('data', $metadata);
 
     $this->assertNull($this->tempStore->getMetadata('test'));
   }
@@ -246,13 +247,12 @@ class PrivateTempStoreTest extends UnitTestCase {
       ->with('1:test_2')
       ->willReturn(TRUE);
 
-    $this->keyValue->expects($this->exactly(3))
+    $calls = ['1:test_1', '1:test_2', '1:test_3'];
+    $this->keyValue->expects($this->exactly(count($calls)))
       ->method('get')
-      ->withConsecutive(
-        ['1:test_1'],
-        ['1:test_2'],
-        ['1:test_3'],
-      )
+      ->with($this->callback(function (string $key) use (&$calls): bool {
+        return array_shift($calls) == $key;
+      }))
       ->willReturnOnConsecutiveCalls(
         FALSE,
         $this->ownObject,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Form;
 
 use Drupal\form_test\Form\FormTestFileForm;
@@ -26,7 +28,7 @@ class FileElementTest extends KernelTestBase {
 
     $this->assertSame('file', $form['file']['#type']);
     $this->assertTrue($form['file']['#multiple']);
-    $this->assertContains('cagatio', $form['file']['#attributes']['class']);
+    $this->assertContains('some-class', $form['file']['#attributes']['class']);
   }
 
 }

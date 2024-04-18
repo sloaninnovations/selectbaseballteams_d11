@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Render;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -67,10 +70,10 @@ class AjaxPageStateTest extends BrowserTestBase {
   public function testDrupalSettingsIsNotLoaded() {
     $this->drupalGet('node',
       [
-        "query" =>
+        'query' =>
           [
             'ajax_page_state' => [
-              'libraries' => 'core/drupalSettings',
+              'libraries' => UrlHelper::compressQueryParameter('core/drupalSettings'),
             ],
           ],
       ]
@@ -89,9 +92,13 @@ class AjaxPageStateTest extends BrowserTestBase {
    * comma separated.
    */
   public function testMultipleLibrariesAreNotLoaded() {
-    $this->drupalGet('node',
-      ['query' => ['ajax_page_state' => ['libraries' => 'core/drupal,core/drupalSettings']]]
-    );
+    $this->drupalGet('node', [
+      'query' => [
+        'ajax_page_state' => [
+          'libraries' => UrlHelper::compressQueryParameter('core/drupal,core/drupalSettings'),
+        ],
+      ],
+    ]);
     $this->assertSession()->statusCodeEquals(200);
     // The drupal library from core should be excluded from loading.
     $this->assertSession()->responseNotContains('/core/misc/drupal.js');

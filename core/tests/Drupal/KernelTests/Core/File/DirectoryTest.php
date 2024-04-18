@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\File;
 
 use Drupal\Component\FileSecurity\FileSecurity;
 use Drupal\Component\FileSystem\FileSystem;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Database\Database;
 use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 
 /**
@@ -77,7 +79,7 @@ class DirectoryTest extends FileTestBase {
     // Make sure directory actually exists.
     $this->assertDirectoryExists($directory);
     $file_system = \Drupal::service('file_system');
-    if (substr(PHP_OS, 0, 3) != 'WIN') {
+    if (!str_starts_with(PHP_OS, 'WIN')) {
       // PHP on Windows doesn't support any kind of useful read-only mode for
       // directories. When executing a chmod() on a directory, PHP only sets the
       // read-only flag, which doesn't prevent files to actually be written
@@ -124,14 +126,14 @@ class DirectoryTest extends FileTestBase {
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     $path = $file_system->createFilename($basename, $directory);
-    $this->assertEquals($original, $path, new FormattableMarkup('New filepath %new equals %original.', ['%new' => $path, '%original' => $original]));
+    $this->assertEquals($original, $path, "New filepath $path equals $original.");
 
     // Then we test against a file that already exists within that directory.
     $basename = 'druplicon.png';
     $original = $directory . '/' . $basename;
     $expected = $directory . '/druplicon_0.png';
     $path = $file_system->createFilename($basename, $directory);
-    $this->assertEquals($expected, $path, new FormattableMarkup('Creating a new filepath from %original equals %new (expected %expected).', ['%new' => $path, '%original' => $original, '%expected' => $expected]));
+    $this->assertEquals($expected, $path, "Creating a new filepath from $path equals $original (expected $expected).");
 
     // @TODO: Finally we copy a file into a directory several times, to ensure a properly iterating filename suffix.
   }
@@ -144,9 +146,9 @@ class DirectoryTest extends FileTestBase {
    *
    * If a file exists, ::getDestinationFilename($destination, $replace) will
    * either return:
-   * - the existing filepath, if $replace is FileSystemInterface::EXISTS_REPLACE
-   * - a new filepath if FileSystemInterface::EXISTS_RENAME
-   * - an error (returning FALSE) if FileSystemInterface::EXISTS_ERROR.
+   * - the existing filepath, if $replace is FileExists::Replace
+   * - a new filepath if FileExists::Rename
+   * - an error (returning FALSE) if FileExists::Error.
    * If the file doesn't currently exist, then it will simply return the
    * filepath.
    */
@@ -155,25 +157,25 @@ class DirectoryTest extends FileTestBase {
     $destination = 'core/misc/xyz.txt';
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
-    $path = $file_system->getDestinationFilename($destination, FileSystemInterface::EXISTS_REPLACE);
-    $this->assertEquals($destination, $path, 'Non-existing filepath destination is correct with FileSystemInterface::EXISTS_REPLACE.');
-    $path = $file_system->getDestinationFilename($destination, FileSystemInterface::EXISTS_RENAME);
-    $this->assertEquals($destination, $path, 'Non-existing filepath destination is correct with FileSystemInterface::EXISTS_RENAME.');
-    $path = $file_system->getDestinationFilename($destination, FileSystemInterface::EXISTS_ERROR);
-    $this->assertEquals($destination, $path, 'Non-existing filepath destination is correct with FileSystemInterface::EXISTS_ERROR.');
+    $path = $file_system->getDestinationFilename($destination, FileExists::Replace);
+    $this->assertEquals($destination, $path, 'Non-existing filepath destination is correct with FileExists::Replace.');
+    $path = $file_system->getDestinationFilename($destination, FileExists::Rename);
+    $this->assertEquals($destination, $path, 'Non-existing filepath destination is correct with FileExists::Rename.');
+    $path = $file_system->getDestinationFilename($destination, FileExists::Error);
+    $this->assertEquals($destination, $path, 'Non-existing filepath destination is correct with FileExists::Error.');
 
     $destination = 'core/misc/druplicon.png';
-    $path = $file_system->getDestinationFilename($destination, FileSystemInterface::EXISTS_REPLACE);
-    $this->assertEquals($destination, $path, 'Existing filepath destination remains the same with FileSystemInterface::EXISTS_REPLACE.');
-    $path = $file_system->getDestinationFilename($destination, FileSystemInterface::EXISTS_RENAME);
-    $this->assertNotEquals($destination, $path, 'A new filepath destination is created when filepath destination already exists with FileSystemInterface::EXISTS_RENAME.');
-    $path = $file_system->getDestinationFilename($destination, FileSystemInterface::EXISTS_ERROR);
-    $this->assertFalse($path, 'An error is returned when filepath destination already exists with FileSystemInterface::EXISTS_ERROR.');
+    $path = $file_system->getDestinationFilename($destination, FileExists::Replace);
+    $this->assertEquals($destination, $path, 'Existing filepath destination remains the same with FileExists::Replace.');
+    $path = $file_system->getDestinationFilename($destination, FileExists::Rename);
+    $this->assertNotEquals($destination, $path, 'A new filepath destination is created when filepath destination already exists with FileExists::Rename.');
+    $path = $file_system->getDestinationFilename($destination, FileExists::Error);
+    $this->assertFalse($path, 'An error is returned when filepath destination already exists with FileExists::Error.');
 
     // Invalid UTF-8 causes an exception.
     $this->expectException(FileException::class);
     $this->expectExceptionMessage("Invalid filename 'a\xFFtest\x80€.txt'");
-    $file_system->getDestinationFilename("core/misc/a\xFFtest\x80€.txt", FileSystemInterface::EXISTS_REPLACE);
+    $file_system->getDestinationFilename("core/misc/a\xFFtest\x80€.txt", FileExists::Replace);
   }
 
   /**

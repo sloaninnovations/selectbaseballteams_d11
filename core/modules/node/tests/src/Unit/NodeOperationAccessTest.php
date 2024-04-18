@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Unit;
 
 use Drupal\Core\Access\AccessResult;
@@ -127,7 +129,7 @@ class NodeOperationAccessTest extends UnitTestCase {
    * @return array
    *   Data for testing.
    */
-  public function providerTestRevisionOperations() {
+  public static function providerTestRevisionOperations() {
     $data = [];
 
     // Tests 'bypass node access' never works on revision operations.

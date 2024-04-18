@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\link\Unit\Plugin\migrate\process;
 
 use Drupal\link\Plugin\migrate\process\FieldLink;
@@ -31,7 +33,7 @@ class FieldLinkTest extends UnitTestCase {
   /**
    * Data provider for testCanonicalizeUri.
    */
-  public function canonicalizeUriDataProvider() {
+  public static function canonicalizeUriDataProvider() {
     return [
       'Simple front-page' => [
         '<front>',

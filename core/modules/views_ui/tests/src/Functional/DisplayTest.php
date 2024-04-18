@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
+use Drupal\Component\Utility\Unicode;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
 
@@ -9,6 +12,7 @@ use Drupal\views\Views;
  * Tests the display UI.
  *
  * @group views_ui
+ * @group #slow
  */
 class DisplayTest extends UITestBase {
 
@@ -226,7 +230,7 @@ class DisplayTest extends UITestBase {
       $view->save();
 
       $this->drupalGet("admin/structure/views/view/{$view->id()}");
-      $escaped = views_ui_truncate($input, 25);
+      $escaped = Unicode::truncate($input, 25, FALSE, TRUE);
       $this->assertSession()->assertEscaped($escaped);
       $this->assertSession()->responseNotContains($xss_markup);
 

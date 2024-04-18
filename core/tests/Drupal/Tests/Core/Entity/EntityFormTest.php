@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Entity\EntityForm;
@@ -70,7 +72,7 @@ class EntityFormTest extends UnitTestCase {
   /**
    * Provides test data for testFormId().
    */
-  public function providerTestFormIds() {
+  public static function providerTestFormIds() {
     return [
       [
         'node_article_form',

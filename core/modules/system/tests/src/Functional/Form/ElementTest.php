@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Tests\BrowserTestBase;
@@ -8,6 +10,7 @@ use Drupal\Tests\BrowserTestBase;
  * Tests building and processing of core form elements.
  *
  * @group Form
+ * @group #slow
  */
 class ElementTest extends BrowserTestBase {
 

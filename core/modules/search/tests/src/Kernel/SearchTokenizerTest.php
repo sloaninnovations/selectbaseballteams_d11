@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\search\SearchTextProcessorInterface;
+
+// cspell:ignore bopomofo jamo lisu
 
 /**
  * Tests that CJK tokenizer works as intended.
@@ -16,6 +20,14 @@ class SearchTokenizerTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = ['search'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->installConfig(['search']);
+  }
 
   /**
    * Verifies that strings of CJK characters are tokenized.
@@ -54,8 +66,8 @@ class SearchTokenizerTest extends KernelTestBase {
       'Katakana Ext' => 0x31f0,
       'CJK Reserve 1' => 0x20000,
       'CJK Reserve 2' => 0x30000,
-      'Bomofo' => 0x3100,
-      'Bomofo Ext' => 0x31a0,
+      'Bopomofo' => 0x3100,
+      'Bopomofo Ext' => 0x31a0,
       'Lisu' => 0xa4d0,
       'Yi' => 0xa000,
     ];
@@ -78,8 +90,8 @@ class SearchTokenizerTest extends KernelTestBase {
       'Katakana Ext' => 0x31ff,
       'CJK Reserve 1' => 0x2fffd,
       'CJK Reserve 2' => 0x3fffd,
-      'Bomofo' => 0x312f,
-      'Bomofo Ext' => 0x31b7,
+      'Bopomofo' => 0x312f,
+      'Bopomofo Ext' => 0x31b7,
       'Lisu' => 0xa4fd,
       'Yi' => 0xa48f,
     ];

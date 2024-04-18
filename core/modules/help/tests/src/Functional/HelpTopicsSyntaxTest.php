@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\help\Functional;
 
 use Drupal\Core\Extension\ExtensionLifecycle;
@@ -13,13 +15,8 @@ use PHPUnit\Framework\AssertionFailedError;
 /**
  * Verifies that all core Help topics can be rendered and comply with standards.
  *
- * @todo This test should eventually be folded into
- * Drupal\Tests\system\Functional\Module\InstallUninstallTest
- * when help_topics becomes stable, so that it will test with only one module
- * at a time installed and not duplicate the effort of installing. See issue
- * https://www.drupal.org/project/drupal/issues/3074040
- *
  * @group help
+ * @group #slow
  */
 class HelpTopicsSyntaxTest extends BrowserTestBase {
 
@@ -31,6 +28,14 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
     'help_topics_twig_tester',
     'locale',
   ];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -347,7 +352,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
       '#type' => 'inline_template',
       '#template' => $content . "\n{# " . rand() . " #}",
     ];
-    return (string) \Drupal::service('renderer')->renderPlain($build);
+    return (string) \Drupal::service('renderer')->renderInIsolation($build);
   }
 
 }

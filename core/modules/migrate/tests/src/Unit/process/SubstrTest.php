@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\MigrateException;
@@ -39,7 +41,7 @@ class SubstrTest extends MigrateProcessTestCase {
   /**
    * Data provider for testSubstr().
    */
-  public function providerTestSubstr() {
+  public static function providerTestSubstr() {
     return [
       // Tests with valid start and length values.
       [0, 7, 'Captain'],

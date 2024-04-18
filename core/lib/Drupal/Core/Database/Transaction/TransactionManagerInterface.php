@@ -36,6 +36,8 @@ interface TransactionManagerInterface {
    * This begins a client connection transaction if there is not one active,
    * or adds a savepoint to the active one.
    *
+   * This method should only be called internally by a database driver.
+   *
    * @param string $name
    *   (optional) The name of the savepoint.
    *
@@ -54,15 +56,19 @@ interface TransactionManagerInterface {
    * This method should only be called by a Transaction object going out of
    * scope.
    *
+   * This method should only be called internally by a database driver.
+   *
    * @param string $name
-   *   (optional) The name of the savepoint.
+   *   The name of the transaction.
+   * @param string $id
+   *   The id of the transaction.
    *
    * @throws \Drupal\Core\Database\TransactionOutOfOrderException
    *   If a Drupal Transaction with the specified name does not exist.
    * @throws \Drupal\Core\Database\TransactionCommitFailedException
    *   If the commit of the root transaction failed.
    */
-  public function unpile(string $name): void;
+  public function unpile(string $name, string $id): void;
 
   /**
    * Rolls back a Drupal transaction.
@@ -72,8 +78,12 @@ interface TransactionManagerInterface {
    * to rolling back the client connection (or to committing it in the edge
    * case when the root was unpiled earlier).
    *
+   * This method should only be called internally by a database driver.
+   *
    * @param string $name
-   *   (optional) The name of the savepoint.
+   *   The name of the transaction.
+   * @param string $id
+   *   The id of the transaction.
    *
    * @throws \Drupal\Core\Database\TransactionNoActiveException
    *   If there is no active client connection.
@@ -83,7 +93,20 @@ interface TransactionManagerInterface {
    * @throws \Drupal\Core\Database\TransactionCommitFailedException
    *   If the commit of the root transaction failed.
    */
-  public function rollback(string $name): void;
+  public function rollback(string $name, string $id): void;
+
+  /**
+   * Voids the client connection.
+   *
+   * In some cases the active transaction can be automatically committed by the
+   * database server (for example, MySql when a DDL statement is executed
+   * during a transaction). In such cases we need to void the remaining items
+   * on the stack so that when outliving Transaction object get out of scope
+   * the do not try operations on the database.
+   *
+   * This method should only be called internally by a database driver.
+   */
+  public function voidClientTransaction(): void;
 
   /**
    * Adds a root transaction end callback.

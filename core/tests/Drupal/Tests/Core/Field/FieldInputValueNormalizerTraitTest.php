@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Field;
 
 use Drupal\Core\Field\FieldInputValueNormalizerTrait;
@@ -24,7 +26,7 @@ class FieldInputValueNormalizerTraitTest extends UnitTestCase {
   /**
    * Provides test cases for ::testKeyValueByDelta.
    */
-  public function keyValueByDeltaTestCases() {
+  public static function keyValueByDeltaTestCases() {
     return [
       'Integer' => [
         1,

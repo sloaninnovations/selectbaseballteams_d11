@@ -98,7 +98,7 @@ language.entity.*:
       type: string
       label: 'Direction'
     weight:
-      type: integer
+      type: weight
       label: 'Weight'
     locked:
       type: boolean
@@ -117,6 +117,8 @@ language.content_settings.*.*:
     target_bundle:
       type:  string
       label: 'Bundle'
+      constraints:
+        EntityBundleExists: '%parent.target_entity_type_id'
     default_langcode:
       type: langcode
       label: 'Default language'
@@ -135,11 +137,3 @@ condition.plugin.language:
       type: sequence
       sequence:
         type: langcode
-
-field.widget.settings.language_select:
-  type: mapping
-  label: 'Language format settings'
-  mapping:
-    include_locked:
-      type: boolean
-      label: 'Include locked languages'

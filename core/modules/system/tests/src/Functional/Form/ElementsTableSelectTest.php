@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Core\Form\FormState;
@@ -9,6 +11,7 @@ use Drupal\Tests\BrowserTestBase;
  * Tests the tableselect form element for expected behavior.
  *
  * @group Form
+ * @group #slow
  */
 class ElementsTableSelectTest extends BrowserTestBase {
 
@@ -152,7 +155,7 @@ class ElementsTableSelectTest extends BrowserTestBase {
   /**
    * Tests error handling for invalid tableselect values with checkboxes.
    */
-  public function testMultipleTrueOptionchecker() {
+  public function testMultipleTrueOptionChecker() {
 
     [$header, $options] = _form_test_tableselect_get_data();
 
@@ -175,7 +178,7 @@ class ElementsTableSelectTest extends BrowserTestBase {
   /**
    * Tests error handling for invalid tableselect values with radio buttons.
    */
-  public function testMultipleFalseOptionchecker() {
+  public function testMultipleFalseOptionChecker() {
 
     [$header, $options] = _form_test_tableselect_get_data();
 

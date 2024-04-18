@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Unit\Plugin\migrate\process\d6;
 
 use Drupal\field\Plugin\migrate\process\d6\FieldInstanceSettings;
@@ -42,7 +44,7 @@ class FieldInstanceSettingsTest extends UnitTestCase {
   /**
    * Provides field settings for testGetSettings().
    */
-  public function getSettingsProvider() {
+  public static function getSettingsProvider() {
     return [
       'imagefield size set' => [
         'imagefield_widget',

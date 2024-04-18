@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field_ui\Traits;
 
 /**
@@ -49,6 +51,7 @@ trait FieldUiJSTestTrait {
       $field_card = $this->getFieldFromGroupJS($field_type);
     }
     $field_card?->click();
+    $page->findButton('Continue')->click();
     $field_label = $page->findField('edit-label');
     $this->assertTrue($field_label->isVisible());
     $field_label = $page->find('css', 'input[data-drupal-selector="edit-label"]');
@@ -64,10 +67,7 @@ trait FieldUiJSTestTrait {
     $page->findButton('Continue')->click();
     $assert_session->waitForText("These settings apply to the $label field everywhere it is used.");
     if ($save_settings) {
-      // Second step: 'Storage settings' form.
-      $page->findButton('Continue')->click();
-
-      // Third step: 'Field settings' form.
+      // Second step: Save field settings.
       $page->findButton('Save settings')->click();
       $assert_session->pageTextContains("Saved $label configuration.");
 
@@ -141,11 +141,12 @@ trait FieldUiJSTestTrait {
     foreach ($groups as $group) {
       $group_field_card = $this->getSession()->getPage()->find('css', "[name='new_storage_type'][value='$group']")->getParent();
       $group_field_card->click();
-      $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->getSession()->getPage()->pressButton('Continue');
       $field_card = $this->getSession()->getPage()->find('css', "[name='group_field_options_wrapper'][value='$field_type']");
       if ($field_card) {
         break;
       }
+      $this->getSession()->getPage()->pressButton('Back');
     }
     return $field_card->getParent();
   }

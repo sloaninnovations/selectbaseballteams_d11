@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\options\Functional;
 
 use Drupal\entity_test\Entity\EntityTest;
@@ -11,6 +13,7 @@ use Drupal\Tests\field\Functional\FieldTestBase;
  * Tests the Options widgets.
  *
  * @group options
+ * @group #slow
  */
 class OptionsWidgetsTest extends FieldTestBase {
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Unit;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -146,7 +148,7 @@ class DefaultsSectionStorageTest extends UnitTestCase {
   /**
    * Provides data for ::testExtractEntityFromRoute().
    */
-  public function providerTestExtractEntityFromRoute() {
+  public static function providerTestExtractEntityFromRoute() {
     // Data provider values are:
     // - whether a successful result is expected
     // - the expected entity ID

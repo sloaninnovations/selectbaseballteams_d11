@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field_layout\Unit;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -237,12 +239,12 @@ class FieldLayoutBuilderTest extends UnitTestCase {
       ],
       '_field_layout' => [
         'left' => [
-          '#process' => ['\Drupal\Core\Render\Element\RenderElement::processGroup'],
-          '#pre_render' => ['\Drupal\Core\Render\Element\RenderElement::preRenderGroup'],
+          '#process' => ['\Drupal\Core\Render\Element\RenderElementBase::processGroup'],
+          '#pre_render' => ['\Drupal\Core\Render\Element\RenderElementBase::preRenderGroup'],
         ],
         'right' => [
-          '#process' => ['\Drupal\Core\Render\Element\RenderElement::processGroup'],
-          '#pre_render' => ['\Drupal\Core\Render\Element\RenderElement::preRenderGroup'],
+          '#process' => ['\Drupal\Core\Render\Element\RenderElementBase::processGroup'],
+          '#pre_render' => ['\Drupal\Core\Render\Element\RenderElementBase::preRenderGroup'],
         ],
         '#in_preview' => FALSE,
         '#settings' => [

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\MigrateException;
@@ -101,7 +103,7 @@ class FormatDateTest extends MigrateProcessTestCase {
    * @return array
    *   Array of date formats and actual/expected values.
    */
-  public function datesDataProvider() {
+  public static function datesDataProvider() {
     return [
       'datetime_date' => [
         'configuration' => [

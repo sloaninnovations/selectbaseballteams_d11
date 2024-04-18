@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Authentication\AuthenticationManagerTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Authentication;
 
@@ -67,7 +64,7 @@ class AuthenticationManagerTest extends UnitTestCase {
   /**
    * Provides data to self::testDefaultFilter().
    */
-  public function providerTestDefaultFilter() {
+  public static function providerTestDefaultFilter() {
     $data = [];
     // No route, cookie is global, should apply.
     $data[] = [TRUE, FALSE, [], 'cookie', TRUE];

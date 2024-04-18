@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Unit;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -106,7 +108,7 @@ class UserAuthTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestAuthenticateWithMissingCredentials() {
+  public static function providerTestAuthenticateWithMissingCredentials() {
     return [
       [NULL, NULL],
       [NULL, ''],

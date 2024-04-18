@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Kernel\ResourceType;
 
 use Drupal\Core\Cache\Cache;
@@ -10,6 +12,7 @@ use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
 /**
  * @coversDefaultClass \Drupal\jsonapi\ResourceType\ResourceTypeRepository
  * @group jsonapi
+ * @group #slow
  *
  * @internal
  */
@@ -93,10 +96,10 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
   /**
    * Data provider for testGet.
    *
-   * @returns array
+   * @return array
    *   The data for the test method.
    */
-  public function getProvider() {
+  public static function getProvider() {
     return [
       ['node', 'article', 'Drupal\node\Entity\Node'],
       ['node', '42', 'Drupal\node\Entity\Node'],
@@ -143,10 +146,10 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
    * mapping: the special-cased names "type" or "id", and the name
    * "{$entity_type_id}_type" or "{$entity_type_id}_id", respectively.
    *
-   * @returns array
+   * @return array
    *   The data for the test method.
    */
-  public function getFieldsProvider() {
+  public static function getFieldsProvider() {
     return [
       [['type', 'node_type']],
       [['id', 'node_id']],

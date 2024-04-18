@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Unit\Menu;
 
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
@@ -36,7 +38,7 @@ class LocaleLocalTasksTest extends LocalTaskIntegrationTestBase {
   /**
    * Provides a list of routes to test.
    */
-  public function getLocalePageRoutes() {
+  public static function getLocalePageRoutes() {
     return [
       ['locale.translate_page'],
       ['locale.translate_import'],

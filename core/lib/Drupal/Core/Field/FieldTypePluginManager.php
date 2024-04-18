@@ -101,7 +101,7 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
     }
 
     if ($definition['category'] instanceof TranslatableMarkup) {
-      @trigger_error('Using a translatable string as a category for field type is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3364271', E_USER_DEPRECATED);
+      @trigger_error('Using a translatable string as a category for field type is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3375748', E_USER_DEPRECATED);
       $definition['category'] = FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY;
     }
     elseif (empty($definition['category'])) {
@@ -224,6 +224,15 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
     }
 
     return $definitions;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityTypeUiDefinitions(string $entity_type_id): array {
+    $ui_definitions = $this->getUiDefinitions();
+    $this->moduleHandler->alter('field_info_entity_type_ui_definitions', $ui_definitions, $entity_type_id);
+    return $ui_definitions;
   }
 
   /**

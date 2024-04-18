@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\Core\Test\AssertMailTrait;
@@ -33,7 +35,7 @@ class UserMailNotifyTest extends EntityKernelTestBase {
    *
    * @return array
    */
-  public function userMailsProvider() {
+  public static function userMailsProvider() {
     return [
       'cancel confirm notification' => [
         'cancel_confirm',

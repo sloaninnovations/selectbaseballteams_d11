@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Unit\EventSubscriber;
 
 use Drupal\Component\Serialization\Json;
@@ -35,7 +37,7 @@ class ResourceResponseSubscriberTest extends UnitTestCase {
    */
   public function testSerialization($data, $expected_response = FALSE) {
     $request = new Request();
-    $route_match = new RouteMatch('test', new Route('/rest/test', ['_rest_resource_config' => 'restplugin'], ['_format' => 'json']));
+    $route_match = new RouteMatch('test', new Route('/rest/test', ['_rest_resource_config' => 'rest_plugin'], ['_format' => 'json']));
 
     $handler_response = new ResourceResponse($data);
     $resource_response_subscriber = $this->getFunctioningResourceResponseSubscriber($route_match);
@@ -51,7 +53,7 @@ class ResourceResponseSubscriberTest extends UnitTestCase {
     $this->assertEquals($expected_response !== FALSE ? $expected_response : Json::encode($data), $event->getResponse()->getContent());
   }
 
-  public function providerTestSerialization() {
+  public static function providerTestSerialization() {
     return [
       // The default data for \Drupal\rest\ResourceResponse.
       'default' => [NULL, ''],
@@ -216,7 +218,7 @@ class ResourceResponseSubscriberTest extends UnitTestCase {
    *   6. expected response content type
    *   7. expected response body
    */
-  public function providerTestResponseFormat() {
+  public static function providerTestResponseFormat() {
     $json_encoded = Json::encode(['REST' => 'Drupal']);
     $xml_encoded = "<?xml version=\"1.0\"?>\n<response><REST>Drupal</REST></response>\n";
 

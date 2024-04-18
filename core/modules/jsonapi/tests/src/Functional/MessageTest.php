@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Utility\NestedArray;
@@ -13,6 +15,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  * JSON:API integration test for the "Message" content entity type.
  *
  * @group jsonapi
+ * @group #slow
  */
 class MessageTest extends ResourceTestBase {
 
@@ -98,7 +101,7 @@ class MessageTest extends ResourceTestBase {
       'data' => [
         'type' => 'contact_message--camelids',
         'attributes' => [
-          'subject' => 'Dramallama',
+          'subject' => 'Drama llama',
           'message' => 'http://www.urbandictionary.com/define.php?term=drama%20llama',
         ],
       ],

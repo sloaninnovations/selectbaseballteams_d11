@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Unit\Routing;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -196,7 +198,7 @@ class RoutesTest extends UnitTestCase {
   /**
    * Lists routes which should have been created.
    */
-  public function expectedRoutes() {
+  public static function expectedRoutes() {
     return [
       ['jsonapi.entity_type_1--bundle_1_1.individual'],
       ['jsonapi.entity_type_1--bundle_1_1.collection'],
@@ -230,7 +232,7 @@ class RoutesTest extends UnitTestCase {
   /**
    * Lists routes which should have been created.
    */
-  public function notExpectedRoutes() {
+  public static function notExpectedRoutes() {
     return [
       ['jsonapi.entity_type_2--bundle_2_1.individual'],
       ['jsonapi.entity_type_2--bundle_2_1.collection'],

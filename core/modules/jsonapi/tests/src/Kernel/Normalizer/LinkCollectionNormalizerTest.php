@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Kernel\Normalizer;
 
 use Drupal\Core\Cache\CacheableMetadata;
@@ -168,7 +170,7 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
    *
    * @return array[]
    */
-  public function linkAccessTestData() {
+  public static function linkAccessTestData() {
     return [
       'the edit-form link is present because uid 2 has access to the targeted resource (its own edit form)' => [
         'uid' => 2,

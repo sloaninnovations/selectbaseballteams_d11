@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
@@ -14,6 +16,7 @@ use Drupal\workflows\Entity\Workflow;
  * @coversDefaultClass \Drupal\content_moderation\Plugin\views\filter\ModerationStateFilter
  *
  * @group content_moderation
+ * @group #slow
  */
 class ViewsModerationStateFilterTest extends ViewTestBase {
 
@@ -260,7 +263,7 @@ class ViewsModerationStateFilterTest extends ViewTestBase {
    * @return string[]
    *   An array of view IDs.
    */
-  public function providerTestWorkflowChanges() {
+  public static function providerTestWorkflowChanges() {
     return [
       'view on base table, filter on base table' => [
         'test_content_moderation_state_filter_base_table',
@@ -340,7 +343,7 @@ class ViewsModerationStateFilterTest extends ViewTestBase {
     // Check that the size of the select element does not exceed 8 options.
     if ($check_size) {
       $this->assertGreaterThan(8, count($states));
-      $assert_session->elementAttributeContains('css', '#edit-default-revision-state', 'size', 8);
+      $assert_session->elementAttributeContains('css', '#edit-default-revision-state', 'size', '8');
     }
 
     // Check that an option exists for each of the expected states.

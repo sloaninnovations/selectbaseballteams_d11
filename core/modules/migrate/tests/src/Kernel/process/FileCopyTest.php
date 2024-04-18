@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel\process;
 
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
@@ -109,7 +111,7 @@ class FileCopyTest extends FileTestBase {
   /**
    * Provides the source and destination path files.
    */
-  public function providerSuccessfulReuse() {
+  public static function providerSuccessfulReuse() {
     return [
       [
         'local_source_path' => static::getDrupalRoot() . '/core/tests/fixtures/files/image-test.jpg',

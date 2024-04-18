@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Functional;
 
 /**
  * Tests moderation state node type integration.
  *
  * @group content_moderation
+ * @group #slow
  */
 class ModerationStateNodeTypeTest extends ModerationStateTestBase {
 

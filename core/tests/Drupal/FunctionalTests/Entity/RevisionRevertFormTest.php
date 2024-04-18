@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Entity;
 
 use Drupal\Component\Render\FormattableMarkup;
@@ -13,6 +15,7 @@ use Drupal\Tests\BrowserTestBase;
  * Tests reverting a revision with revision revert form.
  *
  * @group Entity
+ * @group #slow
  * @coversDefaultClass \Drupal\Core\Entity\Form\RevisionRevertForm
  */
 class RevisionRevertFormTest extends BrowserTestBase {
@@ -85,7 +88,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
   /**
    * Data provider for testPageTitle.
    */
-  public function providerPageTitle(): array {
+  public static function providerPageTitle(): array {
     return [
       ['entity_test_rev', 'Are you sure you want to revert the revision?'],
       ['entity_test_revlog', 'Are you sure you want to revert to the revision from Sun, 01/11/2009 - 16:00?'],
@@ -226,7 +229,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
   /**
    * Data provider for testSubmitForm.
    */
-  public function providerSubmitForm(): array {
+  public static function providerSubmitForm(): array {
     $data = [];
 
     $data['not supporting revision log, no version history access'] = [

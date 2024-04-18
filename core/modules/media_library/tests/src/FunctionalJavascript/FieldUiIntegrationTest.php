@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media_library\FunctionalJavascript;
+
+// cspell:ignore shatner
 
 /**
  * Tests field UI integration for media library widget.
@@ -67,11 +71,10 @@ class FieldUiIntegrationTest extends MediaLibraryTestBase {
 
     $this->drupalGet('/admin/structure/types/manage/article/fields/add-field');
     $page->find('css', "[name='new_storage_type'][value='field_ui:entity_reference:media']")->getParent()->click();
+    $page->findButton('Continue')->click();
     $this->assertNotNull($assert_session->waitForField('label'));
     $page->fillField('label', 'Shatner');
     $this->waitForText('field_shatner');
-    $page->pressButton('Continue');
-    $this->assertMatchesRegularExpression('/.*article\/add-storage\/node\/field_shatner.*/', $this->getUrl());
     $page->pressButton('Continue');
     $this->assertMatchesRegularExpression('/.*article\/add-field\/node\/field_shatner.*/', $this->getUrl());
     $assert_session->pageTextNotContains('Undefined index: target_bundles');
@@ -91,7 +94,7 @@ class FieldUiIntegrationTest extends MediaLibraryTestBase {
       ->pressButton('Add media');
     $this->waitForText('Add or select media');
     $this->selectMediaItem(0);
-    $this->pressInsertSelected();
+    $this->pressInsertSelected('Added one media item.');
 
     $page->pressButton('Save settings');
     $assert_session->pageTextContains('Saved Shatner configuration.');

@@ -1,10 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
 use Twig\Error\SyntaxError;
+
+// cspell:ignore contaynz errrf herro kontex muun playsholdr starrrrr starzzzz
+// cspell:ignore sunz sunzzzzzzz txtzzzz
 
 /**
  * Tests Twig "trans" tags.
@@ -109,7 +114,7 @@ class TwigTransTest extends BrowserTestBase {
     $renderer = \Drupal::service('renderer');
 
     try {
-      $renderer->renderPlain($elements);
+      $renderer->renderInIsolation($elements);
 
       $this->fail('{% trans %}{% endtrans %} did not throw an exception.');
     }
@@ -179,7 +184,7 @@ class TwigTransTest extends BrowserTestBase {
     // Makes sure https://www.drupal.org/node/2489024 doesn't happen without
     // twig debug.
     // Ensure that running php code inside a Twig trans is not possible.
-    $this->assertSession()->pageTextNotContains(pi());
+    $this->assertSession()->pageTextNotContains((string) pi());
   }
 
   /**

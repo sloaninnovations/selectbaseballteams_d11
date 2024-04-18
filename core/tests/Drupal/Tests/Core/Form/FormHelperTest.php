@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Form;
 
 use Drupal\Component\Serialization\Json;
@@ -97,7 +99,7 @@ class FormHelperTest extends UnitTestCase {
   /**
    * Provides a list of elements to test.
    */
-  public function providerElements() {
+  public static function providerElements() {
     return [
       [
         [

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\toolbar\Unit\PageCache;
 
 use Drupal\toolbar\PageCache\AllowToolbarPath;
@@ -47,7 +49,7 @@ class AllowToolbarPathTest extends UnitTestCase {
    * @return array
    *   Data and expected results.
    */
-  public function providerTestAllowToolbarPath() {
+  public static function providerTestAllowToolbarPath() {
     return [
       [NULL, '/'],
       [NULL, '/other-path?q=/toolbar/subtrees/'],

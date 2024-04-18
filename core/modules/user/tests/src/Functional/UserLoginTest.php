@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Core\Test\AssertMailTrait;
@@ -341,6 +343,17 @@ class UserLoginTest extends BrowserTestBase {
     $resetURL = $urls[0];
     $this->drupalGet($resetURL);
     $this->submitForm([], 'Log in');
+  }
+
+  /**
+   * Tests that user login form has the autocomplete attributes.
+   */
+  public function testAutocompleteHtmlAttributes() {
+    $this->drupalGet('user/login');
+    $name_field = $this->getSession()->getPage()->findField('name');
+    $pass_field = $this->getSession()->getPage()->findField('pass');
+    $this->assertEquals('username', $name_field->getAttribute('autocomplete'));
+    $this->assertEquals('current-password', $pass_field->getAttribute('autocomplete'));
   }
 
 }

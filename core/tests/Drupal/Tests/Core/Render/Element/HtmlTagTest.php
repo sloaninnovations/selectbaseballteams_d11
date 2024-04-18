@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Render\Element;
 
 use Drupal\Core\Render\Markup;
@@ -40,7 +42,7 @@ class HtmlTagTest extends RendererTestBase {
   /**
    * Data provider for preRenderHtmlTag test.
    */
-  public function providerPreRenderHtmlTag() {
+  public static function providerPreRenderHtmlTag() {
     $tags = [];
 
     // Value prefix/suffix.

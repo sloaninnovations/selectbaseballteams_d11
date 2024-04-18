@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\toolbar\Functional;
 
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
@@ -26,6 +28,7 @@ use Drupal\user\RoleInterface;
  * menu subtrees is compared to the new hash.
  *
  * @group toolbar
+ * @group #slow
  */
 class ToolbarAdminMenuTest extends BrowserTestBase {
 

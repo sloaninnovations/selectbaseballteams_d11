@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit;
 
 use Drupal\Component\Plugin\Exception\PluginException;
@@ -64,7 +66,7 @@ class MigrateLookupTest extends MigrateTestCase {
   /**
    * Provides data for testExceptionOnMigrationNotFound.
    */
-  public function providerExceptionOnMigrationNotFound() {
+  public static function providerExceptionOnMigrationNotFound() {
     return [
       'string' => [
         'bad_plugin',
@@ -94,7 +96,7 @@ class MigrateLookupTest extends MigrateTestCase {
   /**
    * Provides data for testExceptionOnMultipleMigrationsNotFound.
    */
-  public function providerExceptionOnMultipleMigrationsNotFound() {
+  public static function providerExceptionOnMultipleMigrationsNotFound() {
     return [
       'array two items' => [
         ['foo', 'bar'],

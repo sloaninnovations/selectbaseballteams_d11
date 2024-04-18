@@ -182,6 +182,9 @@ class ThemeManager implements ThemeManagerInterface {
     }
 
     $info = $theme_registry->get($hook);
+    if (isset($info['deprecated'])) {
+      @trigger_error($info['deprecated'], E_USER_DEPRECATED);
+    }
 
     // If a renderable array is passed as $variables, then set $variables to
     // the arguments expected by the theme function.
@@ -365,7 +368,7 @@ class ThemeManager implements ThemeManagerInterface {
    * @internal
    *   This method may change at any time. It is not for use outside this class.
    */
-  protected function buildThemeHookSuggestions(string $hook, string $info_base_hook, array $variables): array {
+  protected function buildThemeHookSuggestions(string $hook, string $info_base_hook, array &$variables): array {
     // Set base hook for later use. For example if '#theme' => 'node__article'
     // is called, we run hook_theme_suggestions_node_alter() rather than
     // hook_theme_suggestions_node__article_alter(), and also pass in the base
@@ -433,7 +436,7 @@ class ThemeManager implements ThemeManagerInterface {
       }
     }
 
-    $theme_keys = array_keys($theme->getBaseThemeExtensions());
+    $theme_keys = array_reverse(array_keys($theme->getBaseThemeExtensions()));
     $theme_keys[] = $theme->getName();
     $functions = [];
     foreach ($theme_keys as $theme_key) {

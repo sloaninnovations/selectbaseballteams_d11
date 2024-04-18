@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\PathProcessor;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -39,7 +41,7 @@ class PathProcessorFrontTest extends UnitTestCase {
   /**
    * Inbound paths and expected results.
    */
-  public function providerProcessInbound() {
+  public static function providerProcessInbound() {
     return [
       'accessing frontpage' => ['/node', '/', '/node'],
       'accessing non frontpage' => ['/node', '/user', '/user'],

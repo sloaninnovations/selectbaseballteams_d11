@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -12,6 +14,7 @@ use Drupal\user\Entity\User;
  * JSON:API integration test for the "EntityTest" content entity type.
  *
  * @group jsonapi
+ * @group #slow
  */
 class EntityTestTest extends ResourceTestBase {
 
@@ -120,7 +123,7 @@ class EntityTestTest extends ResourceTestBase {
           'self' => ['href' => $self_url],
         ],
         'attributes' => [
-          'created' => (new \DateTime())->setTimestamp($this->entity->get('created')->value)->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
+          'created' => (new \DateTime())->setTimestamp((int) $this->entity->get('created')->value)->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'field_test_text' => NULL,
           'langcode' => 'en',
           'name' => 'Llama',
@@ -154,7 +157,7 @@ class EntityTestTest extends ResourceTestBase {
       'data' => [
         'type' => 'entity_test--entity_test',
         'attributes' => [
-          'name' => 'Dramallama',
+          'name' => 'Drama llama',
         ],
       ],
     ];

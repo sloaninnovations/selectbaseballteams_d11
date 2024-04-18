@@ -195,7 +195,7 @@ class SiteSettingsForm extends FormBase {
       // These are generic errors, so we do not have any specific key of the
       // database connection array to attach them to; therefore, we just put
       // them in the error array with standard numeric keys.
-      $form_errors[$database['driver'] . '][0'] = $this->renderer->renderPlain($error_message);
+      $form_errors[$database['driver'] . '][0'] = $this->renderer->renderInIsolation($error_message);
     }
 
     return $form_errors;
@@ -294,7 +294,7 @@ class SiteSettingsForm extends FormBase {
       // that they can later be added to git. Since this directory is
       // auto-created, we have to write out the README rather than just adding
       // it to the drupal core repo.
-      $text = 'This directory contains configuration to be imported into your Drupal site. To make this configuration active, visit admin/config/development/configuration/sync.' . ' For information about deploying configuration between servers, see https://www.drupal.org/documentation/administer/config';
+      $text = 'This directory contains configuration to be imported into your Drupal site. To make this configuration active, visit admin/config/development/configuration. For information about deploying configuration between servers, see https://www.drupal.org/documentation/administer/config';
       file_put_contents($config_sync_directory . '/README.txt', $text);
     }
 

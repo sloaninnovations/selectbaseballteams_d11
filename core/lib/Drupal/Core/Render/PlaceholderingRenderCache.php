@@ -85,7 +85,7 @@ class PlaceholderingRenderCache extends RenderCache {
    */
   public function __construct(RequestStack $request_stack, $cache_factory, CacheContextsManager $cache_contexts_manager, PlaceholderGeneratorInterface $placeholder_generator) {
     if ($cache_factory instanceof CacheFactoryInterface) {
-      @trigger_error('Injecting ' . __CLASS__ . ' with the "cache_factory" service is deprecated in drupal:10.2.0, use "variation_cache_factory" instead.', E_USER_DEPRECATED);
+      @trigger_error('Injecting ' . __CLASS__ . ' with the "cache_factory" service is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use "variation_cache_factory" instead. See https://www.drupal.org/node/3365546', E_USER_DEPRECATED);
       $cache_factory = \Drupal::service('variation_cache_factory');
     }
     parent::__construct($request_stack, $cache_factory, $cache_contexts_manager);
@@ -96,10 +96,6 @@ class PlaceholderingRenderCache extends RenderCache {
    * {@inheritdoc}
    */
   public function get(array $elements) {
-    // @todo remove this check when https://www.drupal.org/node/2367555 lands.
-    if (!$this->requestStack->getCurrentRequest()->isMethodCacheable()) {
-      return FALSE;
-    }
 
     // When rendering placeholders, special case auto-placeholdered elements:
     // avoid retrieving them from cache again, or rendering them again.
@@ -130,7 +126,9 @@ class PlaceholderingRenderCache extends RenderCache {
   public function set(array &$elements, array $pre_bubbling_elements) {
     $result = parent::set($elements, $pre_bubbling_elements);
 
-    // @todo remove this check when https://www.drupal.org/node/2367555 lands.
+    // Writes to the render cache are disabled on uncacheable HTTP requests, to
+    // prevent very low hit rate items from being written. If we're not writing
+    // to the cache, there's also no benefit to placeholdering either.
     if (!$this->requestStack->getCurrentRequest()->isMethodCacheable()) {
       return FALSE;
     }

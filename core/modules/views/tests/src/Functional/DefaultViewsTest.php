@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -13,7 +14,7 @@ use Drupal\views\Views;
 use Drupal\comment\Entity\Comment;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 
 /**
  * Tests the default views provided by views.
@@ -23,7 +24,7 @@ use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
 class DefaultViewsTest extends ViewTestBase {
 
   use CommentTestTrait;
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
 
   /**
    * Modules to enable.
@@ -90,7 +91,7 @@ class DefaultViewsTest extends ViewTestBase {
     $this->createEntityReferenceField('node', 'page', $field_name, NULL, 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
 
     // Create a time in the past for the archive.
-    $time = REQUEST_TIME - 3600;
+    $time = \Drupal::time()->getRequestTime() - 3600;
 
     $this->addDefaultCommentField('node', 'page');
 
@@ -155,8 +156,7 @@ class DefaultViewsTest extends ViewTestBase {
 
         $view->execute();
 
-        $tokens = ['@name' => $name, '@display_id' => $display_id];
-        $this->assertTrue($view->executed, new FormattableMarkup('@name:@display_id has been executed.', $tokens));
+        $this->assertTrue($view->executed, "$name:$display_id has been executed.");
 
         $this->assertNotEmpty($view->result);
         $view->destroy();
@@ -211,7 +211,7 @@ class DefaultViewsTest extends ViewTestBase {
     $columns = ['nid', 'created_year_month', 'num_records'];
     $column_map = array_combine($columns, $columns);
     // Create time of additional nodes created in the setup method.
-    $created_year_month = date('Ym', REQUEST_TIME - 3600);
+    $created_year_month = date('Ym', \Drupal::time()->getRequestTime() - 3600);
     $expected_result = [
       [
         'nid' => 1,

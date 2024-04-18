@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -151,7 +153,7 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestNormalize() {
+  public static function providerTestNormalize() {
     return [
       // @see \Drupal\datetime\Plugin\Field\FieldType\DateTimeItem::DATETIME_TYPE_DATE
       'datetime field, configured to store only date: must be handled by DateTimeIso8601Normalizer' => [
@@ -195,7 +197,7 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestDenormalizeValidFormats() {
+  public static function providerTestDenormalizeValidFormats() {
     $data = [];
     $data['just a date'] = ['date-only', '2016-11-06', '2016-11-06'];
 

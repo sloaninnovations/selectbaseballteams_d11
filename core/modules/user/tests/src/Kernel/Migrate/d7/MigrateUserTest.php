@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Migrate\d7;
 
 use Drupal\Core\Database\Database;
@@ -194,10 +196,10 @@ class MigrateUserTest extends MigrateDrupal7TestBase {
         $source->name,
         $source->mail,
         $source->pass,
-        $source->created,
-        $source->access,
-        $source->login,
-        $source->status,
+        (int) $source->created,
+        (int) $source->access,
+        (int) $source->login,
+        (bool) $source->status,
         $entity_language,
         $source->language,
         $source->timezone,

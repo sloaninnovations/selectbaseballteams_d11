@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_discovery\Kernel;
 
 use Drupal\Core\Form\FormState;
@@ -9,6 +11,7 @@ use Drupal\KernelTests\KernelTestBase;
  * Tests Layout functionality.
  *
  * @group Layout
+ * @group #slow
  */
 class LayoutTest extends KernelTestBase {
 
@@ -71,7 +74,7 @@ class LayoutTest extends KernelTestBase {
     $build_id_input = $this->cssSelect('input[name="form_build_id"]')[0]->asXML();
     $form_id_input = '<input data-drupal-selector="edit-the-form-id" type="hidden" name="form_id" value="the_form_id"/>';
     $html[] = 'Test suffix';
-    $html[] = $build_id_input . $form_id_input . '</form>';
+    $html[] = $build_id_input . "\n" . $form_id_input . "\n" . '</form>';
 
     // Match the HTML to the full form element.
     $this->assertSame(implode("\n", $html), $this->cssSelect('#the-form-id')[0]->asXML());
@@ -90,7 +93,7 @@ class LayoutTest extends KernelTestBase {
   /**
    * Data provider for testRenderLayout().
    */
-  public function renderLayoutData() {
+  public static function renderLayoutData() {
     $html = [];
     $html[] = '<div data-drupal-selector="edit-layout" class="layout layout--onecol">';
     $html[] = '<div data-drupal-selector="edit-content" class="layout__region layout__region--content">';

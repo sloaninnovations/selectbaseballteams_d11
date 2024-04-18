@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Unit;
 
 use Drupal\Component\Utility\Html;
@@ -59,7 +61,7 @@ class CategoryAutocompleteTest extends UnitTestCase {
    *
    * @return array
    */
-  public function providerTestAutocompleteSuggestions() {
+  public static function providerTestAutocompleteSuggestions() {
     $test_parameters = [];
     $test_parameters[] = [
       'string' => 'Com',

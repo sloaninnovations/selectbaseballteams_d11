@@ -8,8 +8,10 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\views\Attribute\ViewsQuery;
 use Drupal\views\Plugin\views\join\JoinPluginBase;
 use Drupal\views\Plugin\views\HandlerBase;
 use Drupal\views\ResultRow;
@@ -21,13 +23,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Views query plugin for an SQL query.
  *
  * @ingroup views_query_plugins
- *
- * @ViewsQuery(
- *   id = "views_query",
- *   title = @Translation("SQL Query"),
- *   help = @Translation("Query will be generated and run using the Drupal database API.")
- * )
  */
+#[ViewsQuery(
+  id: 'views_query',
+  title: new TranslatableMarkup('SQL Query'),
+  help: new TranslatableMarkup('Query will be generated and run using the Drupal database API.')
+)]
 class Sql extends QueryPluginBase {
 
   /**
@@ -581,7 +582,7 @@ class Sql extends QueryPluginBase {
    * table.
    *
    * @param $table
-   *   The unaliased name of the table to ensure.
+   *   The un-aliased name of the table to ensure.
    * @param $relationship
    *   The relationship to ensure the table links to. Each relationship will
    *   get a unique instance of the table being added. If not specified,
@@ -1293,10 +1294,10 @@ class Sql extends QueryPluginBase {
   }
 
   /**
-   * Generates a query and a countquery from all of the information supplied.
+   * Generates a query and count query from all of the information supplied.
    *
    * @param $get_count
-   *   Provide a countquery if this is true, otherwise provide a normal query.
+   *   Provide a countQuery if this is true, otherwise provide a normal query.
    */
   public function query($get_count = FALSE) {
     // Check query distinct value.

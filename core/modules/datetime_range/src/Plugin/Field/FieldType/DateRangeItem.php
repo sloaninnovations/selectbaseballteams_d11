@@ -16,7 +16,12 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
  * @FieldType(
  *   id = "daterange",
  *   label = @Translation("Date range"),
- *   description = @Translation("Create and store date ranges."),
+ *   category = "date_time",
+ *   description = {
+ *     @Translation("Ideal for storing durations that consist of start and end dates (and times)"),
+ *     @Translation("Choose between setting both date and time, or date only, for each duration"),
+ *     @Translation("The system automatically validates that the end date (and time) is later than the start, and both fields are completed"),
+ *   },
  *   default_widget = "daterange_default",
  *   default_formatter = "daterange_default",
  *   list_class = "\Drupal\datetime_range\Plugin\Field\FieldType\DateRangeFieldItemList"
@@ -94,7 +99,7 @@ class DateRangeItem extends DateTimeItem {
 
     // Just pick a date in the past year. No guidance is provided by this Field
     // type.
-    $start = REQUEST_TIME - mt_rand(0, 86400 * 365) - 86400;
+    $start = \Drupal::time()->getRequestTime() - mt_rand(0, 86400 * 365) - 86400;
     $end = $start + 86400;
     if ($type == static::DATETIME_TYPE_DATETIME) {
       $values['value'] = gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start);

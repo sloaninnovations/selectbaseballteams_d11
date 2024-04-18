@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Unit\Normalizer;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -101,7 +103,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
    * @return array
    *   The data for the test method.
    */
-  public function denormalizeProvider() {
+  public static function denormalizeProvider() {
     return [
       [
         [
@@ -238,7 +240,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
   /**
    * Provides test cases for testDenormalizeUuid.
    */
-  public function denormalizeUuidProvider() {
+  public static function denormalizeUuidProvider() {
     return [
       'valid' => ['76dd5c18-ea1b-4150-9e75-b21958a2b836', FALSE],
       'missing' => [NULL, FALSE],

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Template;
 
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
@@ -9,7 +12,6 @@ use Drupal\Core\Template\AttributeArray;
 use Drupal\Core\Template\AttributeString;
 use Drupal\Core\Template\Loader\StringLoader;
 use Drupal\Tests\UnitTestCase;
-use Drupal\Component\Render\MarkupInterface;
 use Twig\Environment;
 
 /**
@@ -279,7 +281,7 @@ class AttributeTest extends UnitTestCase {
    *   An array of test data each containing of a twig template string,
    *   a resulting string of classes and an optional array of attributes.
    */
-  public function providerTestAttributeClassHelpers() {
+  public static function providerTestAttributeClassHelpers() {
     // cSpell:disable
     return [
       ["{{ attributes.class }}", ''],
@@ -362,7 +364,7 @@ class AttributeTest extends UnitTestCase {
     $this->assertEquals($expected, (new Attribute($attributes))->__toString());
   }
 
-  public function providerTestAttributeValues() {
+  public static function providerTestAttributeValues() {
     $data = [];
 
     $string = '"> <script>alert(123)</script>"';
@@ -447,8 +449,7 @@ class AttributeTest extends UnitTestCase {
    *   The number of results that are found.
    */
   protected function getXPathResultCount($query, $html) {
-    $document = new \DOMDocument();
-    $document->loadHTML($html);
+    $document = Html::load($html);
     $xpath = new \DOMXPath($document);
 
     return $xpath->query($query)->length;
@@ -470,7 +471,7 @@ class AttributeTest extends UnitTestCase {
    *   An array of test data each containing an array of attributes, the name
    *   of the attribute to check existence of, and the expected result.
    */
-  public function providerTestHasAttribute() {
+  public static function providerTestHasAttribute() {
     return [
       [['class' => ['example-class']], 'class', TRUE],
       [[], 'class', FALSE],
@@ -496,7 +497,7 @@ class AttributeTest extends UnitTestCase {
    *   An array of test data each containing an initial Attribute object, an
    *   Attribute object or array to be merged, and the expected result.
    */
-  public function providerTestMerge() {
+  public static function providerTestMerge() {
     return [
       [new Attribute([]), new Attribute(['class' => ['class1']]), new Attribute(['class' => ['class1']])],
       [new Attribute(['class' => ['example-class']]), new Attribute(['class' => ['class1']]), new Attribute(['class' => ['example-class', 'class1']])],

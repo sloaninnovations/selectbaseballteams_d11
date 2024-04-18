@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Routing;
 
 use ColinODell\PsrTestLogger\TestLogger;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Routing\MatcherDumper;
 use Drupal\Core\Routing\RouteCompiler;
+use Drupal\Core\Lock\NullLockBackend;
 use Drupal\Core\State\State;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Core\Routing\RoutingFixtures;
@@ -46,7 +51,8 @@ class MatcherDumperTest extends KernelTestBase {
     parent::setUp();
 
     $this->fixtures = new RoutingFixtures();
-    $this->state = new State(new KeyValueMemoryFactory());
+    $time = $this->prophesize(TimeInterface::class)->reveal();
+    $this->state = new State(new KeyValueMemoryFactory(), new MemoryBackend($time), new NullLockBackend());
     $this->logger = new TestLogger();
   }
 
@@ -155,8 +161,8 @@ class MatcherDumperTest extends KernelTestBase {
     $collection = new RouteCollection();
     $collection->add('test_route_1', new Route('/test-length-3/{my}/path'));
     $collection->add('test_route_2', new Route('/test-length-3/hello/path'));
-    $collection->add('test_route_3', new Route('/test-length-5/{my}/path/marvin/magrathea'));
-    $collection->add('test_route_4', new Route('/test-length-7/{my}/path/marvin/magrathea/earth/ursa-minor'));
+    $collection->add('test_route_3', new Route('/test-length-5/{my}/path/marvin/android'));
+    $collection->add('test_route_4', new Route('/test-length-7/{my}/path/marvin/android/earth/ursa-minor'));
 
     $dumper->addRoutes($collection);
 

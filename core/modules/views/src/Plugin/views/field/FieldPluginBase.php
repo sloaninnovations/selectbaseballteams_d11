@@ -24,9 +24,9 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * Field handlers handle both querying and display of fields in views.
  *
  * Field handler plugins extend
- * \Drupal\views\Plugin\views\field\FieldPluginBase. They must be
- * annotated with \Drupal\views\Annotation\ViewsField annotation, and they
- * must be in namespace directory Plugin\views\field.
+ * \Drupal\views\Plugin\views\field\FieldPluginBase. They must be attributed
+ * with \Drupal\views\Attribute\ViewsField attribute, and they must be in
+ * namespace directory Plugin\views\field.
  *
  * The following items can go into a hook_views_data() implementation in a
  * field section to affect how the field handler will behave:
@@ -1700,21 +1700,23 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
    *     'foo' => array(
    *       'a' => 'value',
    *       'b' => 'value',
+   *       'c.d' => 'invalid value',
+   *       '&invalid' => 'invalid value',
    *     ),
    *     'bar' => array(
    *       'a' => 'value',
    *       'b' => array(
-   *         'c' => value,
+   *         'c' => 'value',
    *       ),
    *     ),
    *   );
    *
    * Would yield the following array of tokens:
    *   array(
-   *     '%foo_a' => 'value'
-   *     '%foo_b' => 'value'
-   *     '%bar_a' => 'value'
-   *     '%bar_b_c' => 'value'
+   *     '{{ arguments.foo.a }}' => 'value',
+   *     '{{ arguments.foo.b }}' => 'value',
+   *     '{{ arguments.bar.a }}' => 'value',
+   *     '{{ arguments.bar.b.c }}' => 'value',
    *   );
    *
    * @param $array
@@ -1729,6 +1731,10 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     $tokens = [];
 
     foreach ($array as $param => $val) {
+      if (!is_numeric($param) && preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $param) === 0) {
+        // Skip as the parameter is not a valid Twig variable name.
+        continue;
+      }
       if (is_array($val)) {
         // Copy parent_keys array, so we don't affect other elements of this
         // iteration.

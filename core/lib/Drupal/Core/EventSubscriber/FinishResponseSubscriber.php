@@ -3,6 +3,7 @@
 namespace Drupal\Core\EventSubscriber;
 
 use Drupal\Component\Datetime\DateTimePlus;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -12,7 +13,6 @@ use Drupal\Core\PageCache\ResponsePolicyInterface;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -75,15 +75,32 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    *   A policy rule determining the cacheability of a response.
    * @param \Drupal\Core\Cache\Context\CacheContextsManager $cache_contexts_manager
    *   The cache contexts manager service.
+   * @param \Drupal\Component\Datetime\TimeInterface|null|bool $time
+   *   The time service.
    * @param bool $http_response_debug_cacheability_headers
    *   (optional) Whether to send cacheability headers for debugging purposes.
    */
-  public function __construct(LanguageManagerInterface $language_manager, ConfigFactoryInterface $config_factory, RequestPolicyInterface $request_policy, ResponsePolicyInterface $response_policy, CacheContextsManager $cache_contexts_manager, $http_response_debug_cacheability_headers = FALSE) {
+  public function __construct(
+    LanguageManagerInterface $language_manager,
+    ConfigFactoryInterface $config_factory,
+    RequestPolicyInterface $request_policy,
+    ResponsePolicyInterface $response_policy,
+    CacheContextsManager $cache_contexts_manager,
+    protected TimeInterface|bool|null $time = NULL,
+    $http_response_debug_cacheability_headers = FALSE,
+  ) {
     $this->languageManager = $language_manager;
     $this->config = $config_factory->get('system.performance');
     $this->requestPolicy = $request_policy;
     $this->responsePolicy = $response_policy;
     $this->cacheContextsManager = $cache_contexts_manager;
+    if (!$time || is_bool($time)) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $time argument is deprecated in drupal:10.3.0 and it will be the 5th argument in drupal:11.0.0. See https://www.drupal.org/node/3387233', E_USER_DEPRECATED);
+      if (is_bool($time)) {
+        $http_response_debug_cacheability_headers = $time;
+      }
+      $this->time = \Drupal::service(TimeInterface::class);
+    }
     $this->debugCacheabilityHeaders = $http_response_debug_cacheability_headers;
   }
 
@@ -123,8 +140,10 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     // different from the declared content-type, since that can lead to
     // XSS and other vulnerabilities.
     // https://owasp.org/www-project-secure-headers
-    $response->headers->set('X-Content-Type-Options', 'nosniff', FALSE);
-    $response->headers->set('X-Frame-Options', 'SAMEORIGIN', FALSE);
+    $response->headers->set('X-Content-Type-Options', 'nosniff');
+    if (!$response->headers->has('X-Frame-Options')) {
+      $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+    }
 
     // If the current response isn't an implementation of the
     // CacheableResponseInterface, we assume that a Response is either
@@ -209,6 +228,14 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    *   TRUE when Cache-Control header was set explicitly on the given response.
    */
   protected function isCacheControlCustomized(Response $response) {
+    // Symfony >= 3.2 explicitly removes the Cache-Control header for 301
+    // redirects which do not have a custom Cache-Control header. Treat those
+    // redirect responses as not customized.
+    // @see https://github.com/symfony/symfony/issues/17139
+    if ($response->getStatusCode() === 301 && !$response->headers->has('Cache-Control')) {
+      return FALSE;
+    }
+
     $cache_control = $response->headers->get('Cache-Control');
     return $cache_control != 'no-cache, private' && $cache_control != 'private, must-revalidate';
   }
@@ -256,8 +283,8 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     // In order to support HTTP cache-revalidation, ensure that there is a
     // Last-Modified and an ETag header on the response.
     if (!$response->headers->has('Last-Modified')) {
-      $timestamp = REQUEST_TIME;
-      $response->setLastModified(new \DateTime(gmdate(DateTimePlus::RFC7231, REQUEST_TIME)));
+      $timestamp = $this->time->getRequestTime();
+      $response->setLastModified(new \DateTime(gmdate(DateTimePlus::RFC7231, $this->time->getRequestTime())));
     }
     else {
       $timestamp = $response->getLastModified()->getTimestamp();
@@ -300,21 +327,6 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Sets the Content-Length header on the response.
-   *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
-   *   The event to process.
-   */
-  public function setContentLengthHeader(ResponseEvent $event): void {
-    $response = $event->getResponse();
-    if ($response instanceof StreamedResponse) {
-      return;
-    }
-
-    $response->headers->set('Content-Length', strlen($response->getContent()), TRUE);
-  }
-
-  /**
    * Registers the methods in this class that should be listeners.
    *
    * @return array
@@ -325,10 +337,6 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     // There is no specific reason for choosing 16 beside it should be executed
     // before ::onRespond().
     $events[KernelEvents::RESPONSE][] = ['onAllResponds', 16];
-    // Run very late, after all other response subscribers have run. However,
-    // any response subscribers that convert a response to a streamed response
-    // must run after this and undo what this does.
-    $events[KernelEvents::RESPONSE][] = ['setContentLengthHeader', -1024];
     return $events;
   }
 

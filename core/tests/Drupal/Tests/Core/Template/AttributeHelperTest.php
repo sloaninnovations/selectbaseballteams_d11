@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Template;
 
 use Drupal\Core\Template\Attribute;
@@ -19,7 +21,7 @@ class AttributeHelperTest extends UnitTestCase {
    *   An array of test data each containing an array of attributes, the name
    *   of the attribute to check existence of, and the expected result.
    */
-  public function providerTestAttributeExists() {
+  public static function providerTestAttributeExists() {
     return [
       [['class' => ['example-class']], 'class', TRUE],
       [[], 'class', FALSE],
@@ -46,7 +48,7 @@ class AttributeHelperTest extends UnitTestCase {
    *   An array of test data each containing an initial attribute collection, an
    *   Attribute object or array to be merged, and the expected result.
    */
-  public function providerTestMergeCollections() {
+  public static function providerTestMergeCollections() {
     return [
       [[], ['class' => ['class1']], ['class' => ['class1']]],
       [[], new Attribute(['class' => ['class1']]), ['class' => ['class1']]],

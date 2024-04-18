@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Composer\Generator;
 
 use PHPUnit\Framework\TestCase;
@@ -14,7 +16,7 @@ class OverlapWithTopLevelDependenciesTest extends TestCase {
   /**
    * Provides data for testOverlapWithTemplateProject().
    */
-  public function templateProjectPathProvider() {
+  public static function templateProjectPathProvider() {
     return [
       [
         'composer/Template/RecommendedProject',

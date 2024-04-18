@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel;
 
 use Drupal\Core\Entity\EntityStorageException;
@@ -13,6 +15,7 @@ use Drupal\field\Entity\FieldStorageConfig;
  * Tests field storage create, read, update, and delete.
  *
  * @group field
+ * @group #slow
  */
 class FieldStorageCrudTest extends FieldKernelTestBase {
 

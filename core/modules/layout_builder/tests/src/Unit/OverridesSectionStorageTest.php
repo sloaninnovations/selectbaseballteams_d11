@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Unit;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -118,7 +120,7 @@ class OverridesSectionStorageTest extends UnitTestCase {
   /**
    * Provides data for ::testExtractEntityFromRoute().
    */
-  public function providerTestExtractEntityFromRoute() {
+  public static function providerTestExtractEntityFromRoute() {
     // Data provider values are:
     // - whether a successful result is expected
     // - the expected entity ID
@@ -132,7 +134,7 @@ class OverridesSectionStorageTest extends UnitTestCase {
       [],
     ];
     $data['with value, without layout'] = [
-      FALSE,
+      TRUE,
       'my_entity_type',
       'my_entity_type.entity_without_layout',
       [],

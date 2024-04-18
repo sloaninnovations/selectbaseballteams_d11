@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\Core\Url;
@@ -9,6 +11,7 @@ use Drupal\node\Entity\Node;
  * Tests general content moderation workflow for nodes.
  *
  * @group content_moderation
+ * @group #slow
  */
 class ModerationStateNodeTest extends ModerationStateTestBase {
 

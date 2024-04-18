@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\Plugin\migrate\process\Get;
@@ -95,7 +97,7 @@ class GetTest extends MigrateProcessTestCase {
    *
    * @return array
    */
-  public function integerValuesDataProvider() {
+  public static function integerValuesDataProvider() {
     return [
       [
         'source' => [0 => 0, 1 => 'test'],

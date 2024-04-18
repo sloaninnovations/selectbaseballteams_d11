@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\contact\Functional\Rest;
 
 use Drupal\contact\Entity\ContactForm;
@@ -74,7 +76,7 @@ abstract class MessageResourceTestBase extends EntityResourceTestBase {
     return [
       'subject' => [
         [
-          'value' => 'Dramallama',
+          'value' => 'Drama llama',
         ],
       ],
       'contact_form' => [

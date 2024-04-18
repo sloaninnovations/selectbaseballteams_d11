@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Behat\Mink\Element\NodeElement;
@@ -10,6 +12,7 @@ use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
  * Tests the JavaScript functionality of the block add filter.
  *
  * @group layout_builder
+ * @group legacy
  */
 class BlockFilterTest extends WebDriverTestBase {
 
@@ -21,6 +24,7 @@ class BlockFilterTest extends WebDriverTestBase {
     'node',
     'datetime',
     'layout_builder',
+    'layout_builder_expose_all_field_blocks',
     'user',
   ];
 

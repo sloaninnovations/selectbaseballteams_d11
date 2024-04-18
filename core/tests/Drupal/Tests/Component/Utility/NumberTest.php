@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\Number;
@@ -143,7 +145,7 @@ class NumberTest extends TestCase {
    *     - The integer value.
    *     - The alphadecimal value.
    */
-  public function providerTestConversions() {
+  public static function providerTestConversions() {
     return [
       [0, '00'],
       [1, '01'],

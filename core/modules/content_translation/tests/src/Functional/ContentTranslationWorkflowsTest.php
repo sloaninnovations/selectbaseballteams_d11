@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_translation\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
@@ -74,6 +76,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->doSetup();
 
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_reference',

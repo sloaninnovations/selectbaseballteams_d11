@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Unit;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
@@ -49,7 +51,7 @@ class MigrateFieldPluginManagerTest extends UnitTestCase {
    * @return array
    *   The data.
    */
-  public function weightsData() {
+  public static function weightsData() {
     return [
       'Field 1, D6' => [
         'field_type' => 'field_1',

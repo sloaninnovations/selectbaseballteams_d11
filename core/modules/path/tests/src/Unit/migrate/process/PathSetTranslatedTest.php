@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\path\Unit\migrate\process;
 
 use Drupal\path\Plugin\migrate\process\PathSetTranslated;
@@ -38,7 +40,7 @@ class PathSetTranslatedTest extends MigrateProcessTestCase {
    * @return array
    *   The data.
    */
-  public function transformDataProvider() {
+  public static function transformDataProvider() {
     return [
       'non-node-path' => [
         'path' => '/non-node-path',

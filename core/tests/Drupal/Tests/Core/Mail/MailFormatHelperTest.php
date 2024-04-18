@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Mail;
 
 use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Tests\UnitTestCase;
+
+// cspell:ignore officedocument openxmlformats wordprocessingml
 
 /**
  * @coversDefaultClass \Drupal\Core\Mail\MailFormatHelper

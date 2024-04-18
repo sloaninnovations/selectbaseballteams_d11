@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Theme;
 
 use Drupal\Core\Access\CsrfTokenGenerator;
@@ -66,7 +68,7 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
     $this->assertSame($expected, $result);
   }
 
-  public function providerTestApplies() {
+  public static function providerTestApplies() {
     $data = [];
     $data['empty'] = [[], FALSE];
     $data['no_theme'] = [['ajax_page_state' => ['theme' => '', 'theme_token' => '']], FALSE];

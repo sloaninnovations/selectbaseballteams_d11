@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workflows\Unit;
 
 use Drupal\Core\Access\AccessResult;
@@ -48,7 +50,7 @@ class WorkflowStateTransitionOperationsAccessCheckTest extends UnitTestCase {
   /**
    * Test cases for ::testAccess.
    */
-  public function accessTestCases() {
+  public static function accessTestCases() {
     return [
       'Transition add' => [
         'add-transition',
@@ -138,7 +140,7 @@ class WorkflowStateTransitionOperationsAccessCheckTest extends UnitTestCase {
   /**
    * Test cases for ::testInvalidOperationName.
    */
-  public function invalidOperationNameTestCases() {
+  public static function invalidOperationNameTestCases() {
     return [
       ['invalid-op'],
       ['foo-add-transition'],

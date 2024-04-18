@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_translation\Functional\Views;
 
 use Drupal\Tests\content_translation\Functional\ContentTranslationTestBase;
@@ -42,6 +44,7 @@ class TranslationLinkTest extends ContentTranslationTestBase {
     $this->entityTypeId = 'user';
 
     parent::setUp();
+    $this->doSetup();
 
     // Assign user 1  a language code so that the entity can be translated.
     $user = User::load(1);

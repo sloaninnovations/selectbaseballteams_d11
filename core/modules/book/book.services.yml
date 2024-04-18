@@ -7,6 +7,7 @@ services:
   book.manager:
     class: Drupal\book\BookManager
     arguments: ['@entity_type.manager', '@string_translation', '@config.factory', '@book.outline_storage', '@renderer', '@language_manager', '@entity.repository', '@book.backend_chained_cache', '@book.memory_cache']
+    lazy: true
   Drupal\book\BookManagerInterface: '@book.manager'
   book.outline:
     class: Drupal\book\BookOutline
@@ -29,9 +30,7 @@ services:
       - { name: access_check, applies_to: _access_book_removable }
   cache_context.route.book_navigation:
     class: Drupal\book\Cache\BookNavigationCacheContext
-    arguments: ['@current_route_match']
-    calls:
-      - [setContainer, ['@service_container']]
+    arguments: ['@current_route_match', '@book.manager']
     tags:
       - { name: cache.context}
 
@@ -42,7 +41,11 @@ services:
     arguments: ['@book.outline_storage', '@entity_type.manager', '@string_translation']
     lazy: true
   book.memory_cache:
-    class: Drupal\Core\Cache\MemoryCache\MemoryCache
+    class: Drupal\Core\Cache\MemoryCache\MemoryCacheInterface
+    tags:
+      - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
+    factory: ['@cache_factory', 'get']
+    arguments: [memory_cache]
   book.backend_chained_cache:
     class: Drupal\Core\Cache\BackendChain
     calls:
@@ -51,4 +54,4 @@ services:
     tags:
       # This tag ensures that Drupal's cache_tags.invalidator service
       # invalidates also this cache data.
-      - { name: cache.bin }
+      - { name: cache.bin.memory }

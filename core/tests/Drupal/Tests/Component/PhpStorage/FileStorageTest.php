@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\PhpStorage;
 
 use Drupal\Component\PhpStorage\FileStorage;
@@ -47,16 +49,6 @@ class FileStorageTest extends PhpStorageTestBase {
   public function testCRUD() {
     $php = new FileStorage($this->standardSettings);
     $this->assertCRUD($php);
-  }
-
-  /**
-   * @covers ::writeable
-   * @group legacy
-   */
-  public function testWritable() {
-    $this->expectDeprecation('Drupal\Component\PhpStorage\FileStorage::writeable() is deprecated in drupal:10.1.0 and will be removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3155413');
-    $php = new FileStorage($this->standardSettings);
-    $this->assertTrue($php->writeable());
   }
 
   /**

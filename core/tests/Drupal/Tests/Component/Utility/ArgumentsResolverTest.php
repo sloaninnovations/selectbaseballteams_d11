@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Component\Utility\ArgumentsResolverTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Utility;
 
@@ -36,7 +33,7 @@ class ArgumentsResolverTest extends TestCase {
   /**
    * Provides test data to testGetArgument().
    */
-  public function providerTestGetArgument() {
+  public static function providerTestGetArgument() {
     $data = [];
 
     // Test an optional parameter with no provided value.
@@ -60,7 +57,7 @@ class ArgumentsResolverTest extends TestCase {
     ];
 
     // Test with a raw value that overrides the provided upcast value, since
-    // it is not typehinted.
+    // it is not type hinted.
     $scalars = ['foo' => 'baz'];
     $objects = ['foo' => new \stdClass()];
     $data[] = [
@@ -127,11 +124,11 @@ class ArgumentsResolverTest extends TestCase {
   }
 
   /**
-   * Tests getArgument() with a wildcard parameter with no typehint.
+   * Tests getArgument() with a wildcard parameter with no type hint.
    *
-   * Without the typehint, the wildcard object will not be passed to the callable.
+   * Without the type hint, the wildcard object will not be passed to the callable.
    */
-  public function testGetWildcardArgumentNoTypehint() {
+  public function testGetWildcardArgumentNoTypeHint() {
     $a = $this->getMockBuilder('\Drupal\Tests\Component\Utility\Test1Interface')->getMock();
     $wildcards = [$a];
     $resolver = new ArgumentsResolver([], [], $wildcards);
@@ -143,12 +140,12 @@ class ArgumentsResolverTest extends TestCase {
   }
 
   /**
-   * Tests getArgument() with a named parameter with no typehint and a value.
+   * Tests getArgument() with a named parameter with no type hint and a value.
    *
-   * Without the typehint, passing a value to a named parameter will still
+   * Without the type hint, passing a value to a named parameter will still
    * receive the provided value.
    */
-  public function testGetArgumentRouteNoTypehintAndValue() {
+  public function testGetArgumentRouteNoTypeHintAndValue() {
     $scalars = ['route' => 'foo'];
     $resolver = new ArgumentsResolver($scalars, [], []);
 
@@ -186,7 +183,7 @@ class ArgumentsResolverTest extends TestCase {
   /**
    * Provides test data to testHandleUnresolvedArgument().
    */
-  public function providerTestHandleUnresolvedArgument() {
+  public static function providerTestHandleUnresolvedArgument() {
     $data = [];
     $data[] = [function ($foo) {}];
     $data[] = [[new TestClass(), 'access']];

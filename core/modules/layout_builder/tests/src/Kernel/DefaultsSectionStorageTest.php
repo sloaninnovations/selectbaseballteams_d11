@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\Core\Plugin\Context\Context;
@@ -18,6 +20,7 @@ use Drupal\layout_builder\SectionStorage\SectionStorageDefinition;
  * @coversDefaultClass \Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage
  *
  * @group layout_builder
+ * @group #slow
  */
 class DefaultsSectionStorageTest extends KernelTestBase {
 
@@ -108,7 +111,7 @@ class DefaultsSectionStorageTest extends KernelTestBase {
   /**
    * Provides test data for ::testAccess().
    */
-  public function providerTestAccess() {
+  public static function providerTestAccess() {
     $section_data = [
       new Section(
         'layout_onecol',

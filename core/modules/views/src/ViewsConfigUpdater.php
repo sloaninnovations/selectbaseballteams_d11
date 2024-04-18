@@ -3,11 +3,13 @@
 namespace Drupal\views;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\TimestampFormatter;
+use Drupal\Core\Language\LanguageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -148,8 +150,31 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
       if ($this->processDefaultArgumentSkipUrlUpdate($handler, $handler_type)) {
         $changed = TRUE;
       }
+      if ($this->processDefaultPagerHeadingUpdate($handler, $handler_type)) {
+        $changed = TRUE;
+      }
+      if ($this->addLabelIfMissing($view)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
+  }
+
+  /**
+   * Adds a label to views which don't have one.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view to update.
+   *
+   * @return bool
+   *   Whether the view was updated.
+   */
+  public function addLabelIfMissing(ViewEntityInterface $view): bool {
+    if (!$view->get('label')) {
+      $view->set('label', $view->id());
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
@@ -212,14 +237,33 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
   protected function processDisplayHandlers(ViewEntityInterface $view, $return_on_changed, callable $handler_processor) {
     $changed = FALSE;
     $displays = $view->get('display');
-    $handler_types = ['field', 'argument', 'sort', 'relationship', 'filter'];
+    $handler_types = [
+      'field' => 'fields',
+      'argument' => 'arguments',
+      'sort' => 'sorts',
+      'relationship' => 'relationships',
+      'filter' => 'filters',
+      'pager' => 'pager',
+    ];
+
+    $compound_display_handlers = [
+      'pager',
+    ];
 
     foreach ($displays as $display_id => &$display) {
-      foreach ($handler_types as $handler_type) {
-        $handler_type_plural = $handler_type . 's';
-        if (!empty($display['display_options'][$handler_type_plural])) {
-          foreach ($display['display_options'][$handler_type_plural] as $key => &$handler) {
-            if ($handler_processor($handler, $handler_type, $key, $display_id)) {
+      foreach ($handler_types as $handler_type => $handler_type_lookup) {
+        if (!empty($display['display_options'][$handler_type_lookup])) {
+          if (in_array($handler_type_lookup, $compound_display_handlers)) {
+            if ($handler_processor($display['display_options'][$handler_type_lookup], $handler_type, NULL, $display_id)) {
+              $changed = TRUE;
+              if ($return_on_changed) {
+                return $changed;
+              }
+            }
+            continue;
+          }
+          foreach ($display['display_options'][$handler_type_lookup] as $key => &$handler) {
+            if (is_array($handler) && $handler_processor($handler, $handler_type, $key, $display_id)) {
               $changed = TRUE;
               if ($return_on_changed) {
                 return $changed;
@@ -281,7 +325,7 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
     $deprecations_triggered = &$this->triggeredDeprecations['3212351'][$view->id()];
     if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
-      @trigger_error(sprintf('The oEmbed loading attribute update for view "%s" is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Profile, module and theme provided configuration should be updated to accommodate the changes described at https://www.drupal.org/node/3275103.', $view->id()), E_USER_DEPRECATED);
+      @trigger_error(sprintf('The oEmbed loading attribute update for view "%s" is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3275103', $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;
@@ -448,6 +492,132 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Removes user context from all views using term filter configurations.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View to update.
+   *
+   * @return bool
+   *   Whether the view was updated.
+   */
+  public function needsTaxonomyTermFilterUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) use ($view) {
+      return $this->processTaxonomyTermFilterHandler($handler, $handler_type, $view);
+    });
+  }
+
+  /**
+   * Processes taxonomy_index_tid type filters.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View being updated.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  protected function processTaxonomyTermFilterHandler(array &$handler, string $handler_type, ViewEntityInterface $view): bool {
+    $changed = FALSE;
+
+    // Force view resave if using taxonomy id filter.
+    $plugin_id = $handler['plugin_id'] ?? '';
+    if ($handler_type === 'filter' && $plugin_id === 'taxonomy_index_tid') {
+
+      // This cannot be done in View::preSave() due to trusted data.
+      $executable = $view->getExecutable();
+      $displays = $view->get('display');
+      foreach ($displays as $display_id => &$display) {
+        $executable->setDisplay($display_id);
+
+        $cache_metadata = $executable->getDisplay()->calculateCacheMetadata();
+        $display['cache_metadata']['contexts'] = $cache_metadata->getCacheContexts();
+        // Always include at least the 'languages:' context as there will most
+        // probably be translatable strings in the view output.
+        $display['cache_metadata']['contexts'] = Cache::mergeContexts($display['cache_metadata']['contexts'], ['languages:' . LanguageInterface::TYPE_INTERFACE]);
+        sort($display['cache_metadata']['contexts']);
+      }
+      $view->set('display', $displays);
+      $changed = TRUE;
+    }
+    return $changed;
+  }
+
+  /**
+   * Checks for each view if pagination_heading_level needs to be added.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view has any displays that need to have
+   *   pagination_heading_level added.
+   */
+  public function needsPagerHeadingUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type) {
+      return $this->processDefaultPagerHeadingUpdate($handler, $handler_type);
+    });
+  }
+
+  /**
+   * Processes displays and adds pagination_heading_level if necessary.
+   *
+   * @param $compound_handler
+   *   A compound display handler.
+   * @param string $handler_type
+   *   The handler type.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  public function processDefaultPagerHeadingUpdate(array &$compound_handler, string $handler_type): bool {
+    $allow_pager_type_update = [
+      'mini',
+      'full',
+    ];
+
+    if ($handler_type === 'pager' && in_array($compound_handler['type'], $allow_pager_type_update) && !isset($compound_handler['options']['pagination_heading_level'])) {
+      $compound_handler['options']['pagination_heading_level'] = 'h4';
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Checks for entity view display cache tags from rendered entity fields.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View to update.
+   *
+   * @return bool
+   *   TRUE if view has rendered_entity fields.
+   */
+  public function needsRenderedEntityFieldUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) {
+      return $this->processRenderedEntityFieldHandler($handler, $handler_type);
+    });
+  }
+
+  /**
+   * Processes rendered_entity type fields.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  protected function processRenderedEntityFieldHandler(array &$handler, string $handler_type): bool {
+    // Force view re-save if using rendered entity field.
+    $plugin_id = $handler['plugin_id'] ?? '';
+    return $handler_type === 'field' && $plugin_id === 'rendered_entity';
   }
 
 }

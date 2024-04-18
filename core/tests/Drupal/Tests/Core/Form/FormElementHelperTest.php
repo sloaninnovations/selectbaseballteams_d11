@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Form;
 
 use Drupal\Core\Form\FormElementHelper;
@@ -29,7 +31,7 @@ class FormElementHelperTest extends UnitTestCase {
   /**
    * Provides test data.
    */
-  public function getElementByNameProvider() {
+  public static function getElementByNameProvider() {
     $data = [];
     $data[] = ['id', [], []];
     $data[] = [
@@ -115,7 +117,7 @@ class FormElementHelperTest extends UnitTestCase {
   /**
    * Provides test data.
    */
-  public function getElementTitleProvider() {
+  public static function getElementTitleProvider() {
     $data = [];
     $data[] = ['id', [], ''];
     $data[] = [

@@ -79,28 +79,15 @@ function drupal_phpunit_contrib_extension_directory_roots($root = NULL) {
  *   An associative array of extension directories, keyed by their namespace.
  */
 function drupal_phpunit_get_extension_namespaces($dirs) {
-  $suite_names = ['Unit', 'Kernel', 'Functional', 'Build', 'FunctionalJavascript'];
   $namespaces = [];
   foreach ($dirs as $extension => $dir) {
     if (is_dir($dir . '/src')) {
       // Register the PSR-4 directory for module-provided classes.
       $namespaces['Drupal\\' . $extension . '\\'][] = $dir . '/src';
     }
-    $test_dir = $dir . '/tests/src';
-    if (is_dir($test_dir)) {
-      foreach ($suite_names as $suite_name) {
-        $suite_dir = $test_dir . '/' . $suite_name;
-        if (is_dir($suite_dir)) {
-          // Register the PSR-4 directory for PHPUnit-based suites.
-          $namespaces['Drupal\\Tests\\' . $extension . '\\' . $suite_name . '\\'][] = $suite_dir;
-        }
-      }
-      // Extensions can have a \Drupal\Tests\extension\Traits namespace for
-      // cross-suite trait code.
-      $trait_dir = $test_dir . '/Traits';
-      if (is_dir($trait_dir)) {
-        $namespaces['Drupal\\Tests\\' . $extension . '\\Traits\\'][] = $trait_dir;
-      }
+    if (is_dir($dir . '/tests/src')) {
+      // Register the PSR-4 directory for PHPUnit-based suites.
+      $namespaces['Drupal\\Tests\\' . $extension . '\\'][] = $dir . '/tests/src';
     }
   }
   return $namespaces;
@@ -173,14 +160,13 @@ mb_language('uni');
 // reduce the fragility of the testing system in general.
 date_default_timezone_set('Australia/Sydney');
 
-// Runtime assertions. PHPUnit follows the php.ini assert.active setting for
-// runtime assertions. By default this setting is on. Ensure exceptions are
-// thrown if an assert fails.
-assert_options(ASSERT_EXCEPTION, TRUE);
-
 // Ensure ignored deprecation patterns listed in .deprecation-ignore.txt are
 // considered in testing.
 if (getenv('SYMFONY_DEPRECATIONS_HELPER') === FALSE) {
   $deprecation_ignore_filename = realpath(__DIR__ . "/../.deprecation-ignore.txt");
   putenv("SYMFONY_DEPRECATIONS_HELPER=ignoreFile=$deprecation_ignore_filename");
 }
+
+// Drupal expects to be run from its root directory. This ensures all test types
+// are consistent.
+chdir(dirname(__DIR__, 2));

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Scripts;
 
 use Drupal\Component\FileSystem\FileSystem;
@@ -10,6 +12,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+
+// cspell:ignore htkey
 
 /**
  * Tests core/scripts/test-site.php.
@@ -42,7 +46,6 @@ class TestSiteApplicationTest extends UnitTestCase {
     parent::setUp();
     $php_executable_finder = new PhpExecutableFinder();
     $this->php = $php_executable_finder->find();
-    $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
   }
 
   /**

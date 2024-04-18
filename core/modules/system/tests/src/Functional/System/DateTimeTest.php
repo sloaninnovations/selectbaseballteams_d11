@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
@@ -215,9 +217,9 @@ class DateTimeTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     $storage_edit = [
-      'settings[datetime_type]' => 'datetime',
-      'cardinality' => 'number',
-      'cardinality_number' => '1',
+      'field_storage[subform][settings][datetime_type]' => 'datetime',
+      'field_storage[subform][cardinality]' => 'number',
+      'field_storage[subform][cardinality_number]' => '1',
     ];
     $this->fieldUIAddNewField('admin/structure/types/manage/page_with_date', 'dt', 'dt', 'datetime', $storage_edit);
 

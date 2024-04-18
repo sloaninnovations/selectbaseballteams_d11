@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\views\Tests\Plugin\PluginBaseTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 

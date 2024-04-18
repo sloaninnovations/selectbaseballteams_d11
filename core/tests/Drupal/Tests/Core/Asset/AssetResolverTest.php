@@ -1,12 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Asset\AssetResolverTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Asset;
 
+use Drupal\Component\Datetime\Time;
 use Drupal\Core\Asset\AssetResolver;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
@@ -118,8 +116,8 @@ class AssetResolverTest extends UnitTestCase {
     $this->languageManager = $this->createMock('\Drupal\Core\Language\LanguageManagerInterface');
     $this->languageManager->expects($this->any())
       ->method('getCurrentLanguage')
-      ->will($this->onConsecutiveCalls($english, $english, $japanese, $japanese));
-    $this->cache = new TestMemoryBackend();
+      ->willReturn($english, $english, $japanese, $japanese);
+    $this->cache = new TestMemoryBackend(new Time());
 
     $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache);
   }
@@ -148,7 +146,7 @@ class AssetResolverTest extends UnitTestCase {
     $this->assertCount($expected_cache_item_count * 2, $this->cache->getAllCids());
   }
 
-  public function providerAttachedAssets() {
+  public static function providerAttachedAssets() {
     $time = time();
     return [
       'same libraries, different timestamps' => [
