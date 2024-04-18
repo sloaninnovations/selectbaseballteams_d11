@@ -27,7 +27,7 @@ class MigrateSourceDiscoveryTest extends KernelTestBase {
    * @covers \Drupal\migrate\Plugin\MigrateSourcePluginManager::getDefinitions
    */
   public function testGetDefinitions(): void {
-    // First, check the expected plugins provied by migrate only.
+    // First, check the expected plugins are provided by migrate only.
     $expected = ['embedded_data', 'empty'];
     $source_plugins = $this->container->get('plugin.manager.migrate.source')->getDefinitions();
     ksort($source_plugins);
