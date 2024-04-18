@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\content_translation\Unit;
 
@@ -29,6 +29,7 @@ class I18nQueryTraitDeprecationTest extends UnitTestCase {
     });
 
     try {
+      // @phpstan-ignore-next-line
       $this->getMockForTrait(I18nQueryTrait::class);
       $this->fail('No deprecation error triggered.');
     }
