@@ -333,8 +333,7 @@ system.file:
       type: string
       label: 'Default download method'
       constraints:
-        Choice:
-          callback: \Drupal\file\Plugin\Field\FieldType\FileItem::getValidSchemes
+        Callback: [\Drupal\file\Plugin\Field\FieldType\FileItem, isValidScheme]
     path:
       type: mapping
       label: 'Path settings'
