@@ -15,6 +15,7 @@ settings:
   id: node_syndicate_block
   label: 'RSS feed'
   label_display: '0'
+  condition_logic: and
   provider: node
   block_count: 10
 visibility: {  }

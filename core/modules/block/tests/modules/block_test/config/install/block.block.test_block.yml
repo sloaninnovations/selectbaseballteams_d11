@@ -13,5 +13,6 @@ plugin: test_html
 settings:
   label: 'Test HTML block'
   label_display: hidden
+  condition_logic: and
   provider: block_test
 visibility: {  }

@@ -17,6 +17,7 @@ settings:
   id: 'system_menu_block:main'
   label: 'Main navigation'
   label_display: '0'
+  condition_logic: and
   provider: system
   level: 1
   depth: 2

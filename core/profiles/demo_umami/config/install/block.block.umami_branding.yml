@@ -15,6 +15,7 @@ settings:
   id: system_branding_block
   label: 'Site branding'
   label_display: '0'
+  condition_logic: and
   provider: system
   use_site_logo: true
   use_site_name: false

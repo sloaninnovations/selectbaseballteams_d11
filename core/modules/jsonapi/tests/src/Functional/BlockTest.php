@@ -126,6 +126,7 @@ class BlockTest extends ConfigEntityResourceTestBase {
             'label' => '',
             'provider' => 'core',
             'label_display' => 'visible',
+            'condition_logic' => 'and',
           ],
           'visibility' => [],
           'drupal_internal__id' => 'llama',

@@ -643,4 +643,50 @@ class BlockTest extends BlockTestBase {
     $this->assertEquals("$title (disabled)", $elements[0]->getText());
   }
 
+  /**
+   * Tests block condition logic plugin.
+   */
+  public function testBlockConditionLogicToggle(): void {
+    $this->drupalLogin($this->adminUser);
+    $page1 = $this->drupalCreateNode(['type' => 'page']);
+    $page2 = $this->drupalCreateNode(['type' => 'page']);
+    $article1 = $this->drupalCreateNode(['type' => 'article']);
+
+    $block_name = 'system_powered_by_block';
+    // Create a random title for the block.
+    $title = $this->randomMachineName();
+    // Enable a standard block.
+    $default_theme = $this->config('system.theme')->get('default');
+    $edit = [
+      'id' => $this->randomMachineName(),
+      'region' => 'sidebar_first',
+      'settings[label]' => $title,
+      'settings[label_display]' => TRUE,
+      'settings[condition_logic]' => 'or',
+      'visibility[entity_bundle:node][bundles][article]' => 'article',
+      'visibility[request_path][pages]' => '/node/1',
+    ];
+    $this->drupalGet('admin/structure/block/add/' . $block_name . '/' . $default_theme);
+    $this->submitForm($edit, 'Save block');
+    $this->assertSession()->statusMessageContains('The block configuration has been saved.', 'status');
+
+    $this->clickLink('Configure');
+    $this->assertSession()->checkboxChecked('edit-visibility-entity-bundlenode-bundles-article');
+    $this->assertSession()->fieldValueEquals('edit-settings-condition-logic', 'or');
+    $this->assertSession()->fieldValueEquals('edit-visibility-request-path-pages', '/node/1');
+
+    // Test that basic page with URL /test has block.
+    $this->drupalGet($page1->toUrl());
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains($title);
+
+    // Test that random article node has block.
+    $this->drupalGet($article1->toUrl());
+    $this->assertSession()->pageTextContains($title);
+
+    // Test that basic page without URL /test doesn't have block.
+    $this->drupalGet($page2->toUrl());
+    $this->assertSession()->pageTextNotContains($title);
+  }
+
 }

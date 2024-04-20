@@ -17,6 +17,7 @@ settings:
   id: 'views_block:recipe_collections-block'
   label: ''
   label_display: visible
+  condition_logic: and
   provider: views
   views_label: ''
   items_per_page: none

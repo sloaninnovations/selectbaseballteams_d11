@@ -15,6 +15,7 @@ settings:
   id: search_form_block
   label: 'Search form (wide)'
   label_display: '0'
+  condition_logic: and
   provider: search
   page_id: ''
 visibility: {  }

@@ -15,6 +15,7 @@ settings:
   id: 'block_content:fb5e8434-3617-4a1d-a252-8273e95ec30e'
   label: 'Foobar Gorilla'
   label_display: visible
+  condition_logic: and
   provider: block_content
   status: true
   info: ''

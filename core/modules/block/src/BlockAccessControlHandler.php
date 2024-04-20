@@ -101,6 +101,7 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
         $conditions[$condition_id] = $condition;
       }
 
+      $condition = $entity->get('settings')['condition_logic'] ?? 'and';
       if ($missing_context) {
         // If any context is missing then we might be missing cacheable
         // metadata, and don't know based on what conditions the block is
@@ -113,7 +114,7 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
         // missing context on any non-node route like the frontpage.
         $access = AccessResult::forbidden();
       }
-      elseif ($this->resolveConditions($conditions, 'and') !== FALSE) {
+      elseif ($this->resolveConditions($conditions, $condition) !== FALSE) {
         // Delegate to the plugin.
         $block_plugin = $entity->getPlugin();
         try {

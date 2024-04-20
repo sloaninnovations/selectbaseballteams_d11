@@ -15,6 +15,7 @@ settings:
   id: search_form_block
   label: Search
   label_display: visible
+  condition_logic: and
   provider: search
   page_id: node_search
 visibility: {  }

@@ -15,5 +15,6 @@ settings:
   id: system_main_block
   label: 'Main page content'
   label_display: '0'
+  condition_logic: and
   provider: system
 visibility: {  }

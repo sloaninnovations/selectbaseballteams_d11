@@ -13,6 +13,7 @@ settings:
   id: local_tasks_block
   label: Tabs
   label_display: '0'
+  condition_logic: and
   provider: core
   primary: true
   secondary: true

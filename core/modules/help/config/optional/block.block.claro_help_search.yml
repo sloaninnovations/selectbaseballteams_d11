@@ -19,6 +19,7 @@ settings:
   id: search_form_block
   label: 'Search help'
   label_display: visible
+  condition_logic: and
   provider: search
   page_id: help_search
 visibility:

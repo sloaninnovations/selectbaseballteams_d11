@@ -15,6 +15,7 @@ settings:
   id: book_navigation
   label: 'Book navigation'
   label_display: visible
+  condition_logic: and
   provider: book
   block_mode: 'book pages'
 visibility: {  }

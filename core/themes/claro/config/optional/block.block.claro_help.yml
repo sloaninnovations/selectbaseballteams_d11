@@ -15,5 +15,6 @@ settings:
   id: help_block
   label: Help
   label_display: '0'
+  condition_logic: and
   provider: help
 visibility: {  }

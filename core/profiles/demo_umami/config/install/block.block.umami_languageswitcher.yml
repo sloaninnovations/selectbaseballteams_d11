@@ -15,5 +15,6 @@ settings:
   id: 'language_block:language_interface'
   label: 'Language switcher'
   label_display: '0'
+  condition_logic: and
   provider: language
 visibility: {  }

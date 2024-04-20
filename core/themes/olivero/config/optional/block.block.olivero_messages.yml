@@ -15,5 +15,6 @@ settings:
   id: system_messages_block
   label: 'Status messages'
   label_display: '0'
+  condition_logic: and
   provider: system
 visibility: {  }

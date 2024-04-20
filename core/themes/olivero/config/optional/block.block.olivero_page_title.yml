@@ -13,5 +13,6 @@ settings:
   id: page_title_block
   label: 'Page title'
   label_display: '0'
+  condition_logic: and
   provider: core
 visibility: {  }

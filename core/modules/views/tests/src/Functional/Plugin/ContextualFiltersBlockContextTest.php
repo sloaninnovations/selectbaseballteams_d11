@@ -125,6 +125,7 @@ class ContextualFiltersBlockContextTest extends ViewTestBase {
       'label_display' => 'visible',
       'views_label' => '',
       'items_per_page' => 'none',
+      'condition_logic' => 'and',
       'context_mapping' => ['nid' => '@node.node_route_context:node'],
     ];
     $this->assertEquals($expected_settings, $block->getPlugin()->getConfiguration(), 'Block settings are correct.');

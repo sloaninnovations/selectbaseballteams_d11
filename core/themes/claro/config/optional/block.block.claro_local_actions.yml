@@ -13,5 +13,6 @@ settings:
   id: local_actions_block
   label: 'Primary admin actions'
   label_display: '0'
+  condition_logic: and
   provider: core
 visibility: {  }

@@ -112,6 +112,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'user',
       'label_display' => '0',
+      'condition_logic' => 'and',
     ];
     $this->assertEntity('user', $visibility, 'sidebar', 'olivero', -10, $settings);
 
@@ -121,6 +122,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => 'zu - Navigation',
       'provider' => 'system',
       'label_display' => 'visible',
+      'condition_logic' => 'and',
       'level' => 1,
       'expand_all_items' => FALSE,
       'depth' => 0,
@@ -144,6 +146,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'core',
       'label_display' => '0',
+      'condition_logic' => 'and',
       'items_per_page' => '5',
     ];
     $this->assertEntity('user_2', $visibility, 'sidebar', 'olivero', -11, $settings);
@@ -165,6 +168,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'core',
       'label_display' => '0',
+      'condition_logic' => 'and',
       'items_per_page' => '10',
     ];
     $this->assertEntity('user_3', $visibility, 'sidebar', 'olivero', -10, $settings);
@@ -182,6 +186,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'system',
       'label_display' => '0',
+      'condition_logic' => 'and',
     ];
     $this->assertEntity('system', $visibility, 'footer_top', 'olivero', -5, $settings);
 
@@ -191,6 +196,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'core',
       'label_display' => '0',
+      'condition_logic' => 'and',
     ];
     $this->assertEntity('menu', [], 'header', 'olivero', -5, $settings);
 
@@ -200,6 +206,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'core',
       'label_display' => '0',
+      'condition_logic' => 'and',
       'block_count' => 7,
       'feed' => '5',
     ];
@@ -211,6 +218,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'core',
       'label_display' => '0',
+      'condition_logic' => 'and',
       'block_mode' => 'book pages',
     ];
     $this->assertEntity('book', [], 'sidebar', 'olivero', -4, $settings);
@@ -221,6 +229,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'core',
       'label_display' => '0',
+      'condition_logic' => 'and',
       'block_count' => 3,
     ];
     $this->assertEntity('forum', [], 'sidebar', 'olivero', -8, $settings);
@@ -230,6 +239,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'core',
       'label_display' => '0',
+      'condition_logic' => 'and',
       'block_count' => 4,
     ];
     $this->assertEntity('forum_1', [], 'sidebar', 'olivero', -9, $settings);
@@ -240,6 +250,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'core',
       'label_display' => '0',
+      'condition_logic' => 'and',
       'top_day_num' => 7,
       'top_all_num' => 8,
       'top_last_num' => 9,
@@ -259,6 +270,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => 'Static Block',
       'provider' => 'block_content',
       'label_display' => 'visible',
+      'condition_logic' => 'and',
       'status' => TRUE,
       'info' => '',
       'view_mode' => 'full',
@@ -277,6 +289,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => 'Another Static Block',
       'provider' => 'block_content',
       'label_display' => 'visible',
+      'condition_logic' => 'and',
       'status' => TRUE,
       'info' => '',
       'view_mode' => 'full',
@@ -290,6 +303,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'block_content',
       'label_display' => '0',
+      'condition_logic' => 'and',
       'status' => TRUE,
       'info' => '',
       'view_mode' => 'full',

@@ -95,6 +95,7 @@ trait BlockPluginTrait {
       'id' => $this->getPluginId(),
       'label' => '',
       'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
+      'condition_logic' => 'and',
       'provider' => $this->pluginDefinition['provider'],
     ];
   }
@@ -184,6 +185,18 @@ trait BlockPluginTrait {
       '#return_value' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
     ];
 
+    $condition_options = [
+      'and' => $this->t('And'),
+      'or' => $this->t('Or'),
+    ];
+
+    $form['condition_logic'] = [
+      '#type' => 'select',
+      '#title' => t('Conditions logic'),
+      '#options' => $condition_options,
+      '#default_value' => $this->configuration['condition_logic'] ?? 'and',
+    ];
+
     // Add plugin-specific settings for this block type.
     $form += $this->blockForm($form, $form_state);
     return $form;
@@ -230,6 +243,7 @@ trait BlockPluginTrait {
     if (!$form_state->getErrors()) {
       $this->configuration['label'] = $form_state->getValue('label');
       $this->configuration['label_display'] = $form_state->getValue('label_display');
+      $this->configuration['condition_logic'] = $form_state->getValue('condition_logic');
       $this->configuration['provider'] = $form_state->getValue('provider');
       $this->blockSubmit($form, $form_state);
     }
