@@ -34,7 +34,7 @@ class I18nQueryTraitDeprecationTest extends UnitTestCase {
       $this->fail('No deprecation error triggered.');
     }
     catch (\ErrorException $e) {
-      $this->assertSame('\Drupal\content_translation\Plugin\migrate\source\I18nQueryTrait is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Instead, use \Drupal\migrate\Plugin\migrate\source\I18nQueryTrait. See https://www.drupal.org/node/3439256', $e->getMessage());
+      $this->assertSame('\Drupal\content_translation\Plugin\migrate\source\I18nQueryTrait is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Instead, use \Drupal\migrate_drupal\Plugin\migrate\source\I18nQueryTrait. See https://www.drupal.org/node/3439256', $e->getMessage());
     }
 
     restore_error_handler();

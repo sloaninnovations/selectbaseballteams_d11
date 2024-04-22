@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\menu_link_content\Plugin\migrate\source\d6;
+namespace Drupal\migrate_drupal\Plugin\migrate\source\d6;
 
 use Drupal\migrate\Attribute\MigrateSource;
-use Drupal\migrate\Plugin\migrate\source\I18nQueryTrait;
+use Drupal\migrate_drupal\Plugin\migrate\source\I18nQueryTrait;
 use Drupal\migrate\Row;
 use Drupal\menu_link_content\Plugin\migrate\source\MenuLink;
 

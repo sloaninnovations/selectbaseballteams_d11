@@ -11,7 +11,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 /**
  * Tests i18n content block translations source plugin.
  *
- * @covers \Drupal\block_content\Plugin\migrate\source\d7\BlockCustomTranslation
+ * @covers \Drupal\migrate_drupal\Plugin\migrate\source\d7\BlockCustomTranslation
  *
  * @group content_translation
  */

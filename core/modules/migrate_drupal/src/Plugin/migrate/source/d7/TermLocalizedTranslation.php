@@ -1,10 +1,11 @@
 <?php
 
-namespace Drupal\taxonomy\Plugin\migrate\source\d7;
+namespace Drupal\migrate_drupal\Plugin\migrate\source\d7;
 
 use Drupal\migrate\Attribute\MigrateSource;
-use Drupal\migrate\Plugin\migrate\source\I18nQueryTrait;
+use Drupal\migrate_drupal\Plugin\migrate\source\I18nQueryTrait;
 use Drupal\migrate\Row;
+use Drupal\taxonomy\Plugin\migrate\source\d7\Term;
 
 // cspell:ignore ltlanguage objectid
 
