@@ -108,7 +108,7 @@
       });
     },
   };
-  $.extend(Drupal.tableDrag.prototype.row.prototype, {
+  $.extend(Drupal.TableDrag.prototype, {
     /**
      * Add an asterisk or other marker to the changed row.
      *
@@ -122,7 +122,9 @@
       if (cell.find('.js-tabledrag-changed-marker').length === 0) {
         cell.find('.js-tabledrag-handle').after(marker);
       }
-      Drupal.tableDrag[this.table.id].changedRowIds.add(this.element.id);
+      Drupal.TableDrag.instances[this.table.id].changedRowIds.add(
+        this.element.id,
+      );
     },
 
     /**
