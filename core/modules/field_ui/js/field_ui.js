@@ -228,7 +228,7 @@
           true,
         );
         rowObject.markChanged();
-        rowObject.addChangedWarning();
+        thisTableDrag.addChangedWarning();
       } else {
         // Ajax-update the rows.
         Drupal.fieldUIOverview.AJAXRefreshRows(refreshRows);
