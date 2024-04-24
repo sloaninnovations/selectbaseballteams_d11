@@ -77,3 +77,15 @@ function system_post_update_convert_empty_country_and_timezone_settings_to_null(
     $system_date_settings->save();
   }
 }
+
+/**
+ * Updates system.theme:admin config if it's still at the default.
+ */
+function system_post_update_set_theme_admin_to_null() {
+  $theme_settings = \Drupal::configFactory()->getEditable('system.theme');
+  if ($theme_settings->get('admin') === '') {
+    $theme_settings
+      ->set('admin', NULL)
+      ->save(TRUE);
+  }
+}
