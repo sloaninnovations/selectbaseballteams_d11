@@ -3,13 +3,12 @@
 system.site:
   type: config_object
   label: 'Site information'
+  constraints:
+    FullyValidatable: ~
   mapping:
     uuid:
       type: uuid
       label: 'Site UUID'
-      constraints:
-        Uuid: []
-        NotNull: []
     name:
       type: label
       label: 'Site name'
@@ -26,24 +25,41 @@ system.site:
         403:
           type: path
           label: 'Default 403 (access denied) page'
+          constraints:
+            Regex:
+              pattern: '/^\//'
+              message: "The path %value has to start with a slash."
         404:
           type: path
           label: 'Default 404 (not found) page'
+          constraints:
+            Regex:
+              pattern: '/^\//'
+              message: "The path %value has to start with a slash."
         front:
           type: path
           label: 'Default front page'
+          constraints:
+            Regex:
+              pattern: '/^\//'
+              message: "The path %value has to start with a slash."
     admin_compact_mode:
       type: boolean
       label: 'Compact mode'
     weight_select_max:
       type: integer
       label: 'Weight element maximum value'
+      constraints:
+        Range:
+          # @see PHP_INT_MAX
+          max: 2147483647
     default_langcode:
       type: langcode
       label: 'Site default language code'
     mail_notification:
-      type: string
+      type: email
       label: 'Notification email address'
+      nullable: true
 
 system.maintenance:
   type: config_object
