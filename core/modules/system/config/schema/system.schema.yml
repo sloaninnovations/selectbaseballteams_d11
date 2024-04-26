@@ -9,15 +9,31 @@ system.site:
     uuid:
       type: uuid
       label: 'Site UUID'
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     name:
       type: label
       label: 'Site name'
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     mail:
       type: email
       label: 'Email address'
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     slogan:
       type: label
       label: 'Slogan'
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     page:
       type: mapping
       label: 'Pages'
@@ -25,6 +41,7 @@ system.site:
         403:
           type: path
           label: 'Default 403 (access denied) page'
+          nullable: true
           constraints:
             Regex:
               pattern: '/^\//'
@@ -32,6 +49,7 @@ system.site:
         404:
           type: path
           label: 'Default 404 (not found) page'
+          nullable: true
           constraints:
             Regex:
               pattern: '/^\//'

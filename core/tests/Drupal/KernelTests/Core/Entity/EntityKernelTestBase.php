@@ -88,7 +88,7 @@ abstract class EntityKernelTestBase extends KernelTestBase {
       $class = get_parent_class($class);
     }
 
-    $this->installConfig(['field']);
+    $this->installConfig(['field', 'system']);
   }
 
   /**
