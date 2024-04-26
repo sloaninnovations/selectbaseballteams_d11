@@ -114,7 +114,7 @@ class UserMailNotifyTest extends EntityKernelTestBase {
    * Tests recovery email content and token langcode is aligned.
    */
   public function testUserRecoveryMailLanguage(): void {
-
+    $this->installConfig(['system']);
     // Install locale schema.
     $this->installSchema('locale', [
       'locales_source',

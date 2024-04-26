@@ -78,6 +78,7 @@ class ThemeTest extends KernelTestBase {
    * Tests function theme_get_suggestions() for SA-CORE-2009-003.
    */
   public function testThemeSuggestions(): void {
+    $this->installConfig(['system']);
     // Set the front page as something random otherwise the CLI
     // test runner fails.
     $this->config('system.site')->set('page.front', '/nobody-home')->save();

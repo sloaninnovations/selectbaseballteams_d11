@@ -24,7 +24,7 @@ class SiteSettingsUpdateTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles() {
     $this->databaseDumpFiles = [
-      DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-9.4.0.bare.standard.php.gz',
+      DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz',
     ];
   }
 
@@ -32,6 +32,11 @@ class SiteSettingsUpdateTest extends UpdatePathTestBase {
    * Tests update of system.site:* empty values to NULL.
    */
   public function testUpdate(): void {
+    // Fixture already has defaults, so replaced with ''.
+    $this->config('system.site')->set('uuid', '')->save();
+    $this->config('system.site')->set('name', '')->save();
+    $this->config('system.site')->set('mail', '')->save();
+
     $config_before = $this->config('system.site');
     $this->assertSame('', $config_before->get('uuid'));
     $this->assertSame('', $config_before->get('name'));

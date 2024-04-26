@@ -108,7 +108,7 @@ class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
       // langcode and default_langcode are not handled by the migration.
       'langcode' => 'en',
       // uuid is not handled by the migration.
-      'uuid' => '',
+      'uuid' => NULL,
       'name' => 'The Site Name',
       'mail' => 'joseph@flattandsons.com',
       'slogan' => 'The Slogan',
