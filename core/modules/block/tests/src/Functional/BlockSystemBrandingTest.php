@@ -139,4 +139,5 @@ class BlockSystemBrandingTest extends BlockTestBase {
     // Check that the slogan shows on the page.
     $this->assertSession()->pageTextContains('Community carpentry');
   }
+
 }
