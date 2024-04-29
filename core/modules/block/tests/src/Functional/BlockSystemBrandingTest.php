@@ -117,27 +117,6 @@ class BlockSystemBrandingTest extends BlockTestBase {
     $this->assertSession()->elementNotExists('xpath', $site_name_xpath);
     $this->assertSession()->elementTextNotContains('xpath', $site_slogan_xpath, 'Community carpentry');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:system.site');
-
-    // Set a valid slogan in order to test with Olivero.
-    $this->config('system.site')
-      ->set('slogan', 'Community carpentry')
-      ->save();
-
-    // Install Olivero and set as default.
-    $this->container->get('theme_installer')->install(['olivero'], TRUE);
-    $this->container->get('config.factory')
-      ->getEditable('system.theme')
-      ->set('default', 'olivero')
-      ->save();
-
-    // Turn the slogan on.
-    $this->config('block.block.olivero_site_branding')
-      ->set('settings.use_site_slogan', TRUE)
-      ->save();
-
-    $this->drupalGet('');
-    // Check that the slogan shows on the page.
-    $this->assertSession()->pageTextContains('Community carpentry');
   }
 
 }

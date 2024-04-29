@@ -163,4 +163,16 @@ class OliveroTest extends BrowserTestBase {
     }
   }
 
+  /**
+   * Tests slogan of system branding block.
+   */
+  public function testSystemSiteBrandingSlogan() {
+    $this->config('system.site')
+      ->set('slogan', 'Community carpentry')
+      ->save();
+
+    $this->drupalGet('');
+    $this->assertSession()->pageTextContains('Community carpentry');
+  }
+
 }
