@@ -111,7 +111,8 @@ class SiteInformationForm extends ConfigFormBase {
       '#config_target' => new ConfigTarget(
         'system.site',
         'slogan',
-        toConfig: fn(?string $value) => $value ?: NULL
+        static::class . '::transformSloganValue',
+        static::class . '::transformSloganValue',
       ),
       '#description' => $this->t("How this is used depends on your site's theme."),
       '#maxlength' => 255,
@@ -122,7 +123,7 @@ class SiteInformationForm extends ConfigFormBase {
       '#config_target' => new ConfigTarget(
         'system.site',
         'mail',
-        fromConfig: fn($value) => $value ?: ini_get('sendmail_from'),
+        static::class . '::transformMailValue',
       ),
       '#description' => $this->t("The <em>From</em> address in automated emails sent during registration and new password requests, and other notifications. (Use an address ending in your site's domain to help prevent this email being flagged as spam.)"),
       '#required' => TRUE,
@@ -171,8 +172,25 @@ class SiteInformationForm extends ConfigFormBase {
     // Get the normal path of the front page.
     $form_state->setValueForElement($form['front_page']['site_frontpage'], $this->aliasManager->getPathByAlias($form_state->getValue('site_frontpage')));
     // Validate front page path.
+    if (($value = $form_state->getValue('site_frontpage')) && $value[0] !== '/') {
+      $form_state->setErrorByName('site_frontpage', $this->t("The path '%path' has to start with a slash.", ['%path' => $form_state->getValue('site_frontpage')]));
+
+    }
     if (!$this->pathValidator->isValid($form_state->getValue('site_frontpage'))) {
       $form_state->setErrorByName('site_frontpage', $this->t("Either the path '%path' is invalid or you do not have access to it.", ['%path' => $form_state->getValue('site_frontpage')]));
+    }
+    // Get the normal paths of both error pages.
+    if (!$form_state->isValueEmpty('site_403')) {
+      $form_state->setValueForElement($form['error_page']['site_403'], $this->aliasManager->getPathByAlias($form_state->getValue('site_403')));
+    }
+    if (!$form_state->isValueEmpty('site_404')) {
+      $form_state->setValueForElement($form['error_page']['site_404'], $this->aliasManager->getPathByAlias($form_state->getValue('site_404')));
+    }
+    if (($value = $form_state->getValue('site_403')) && $value[0] !== '/') {
+      $form_state->setErrorByName('site_403', $this->t("The path '%path' has to start with a slash.", ['%path' => $form_state->getValue('site_403')]));
+    }
+    if (($value = $form_state->getValue('site_404')) && $value[0] !== '/') {
+      $form_state->setErrorByName('site_404', $this->t("The path '%path' has to start with a slash.", ['%path' => $form_state->getValue('site_404')]));
     }
     // Validate 403 error path.
     if (!$form_state->isValueEmpty('site_403') && !$this->pathValidator->isValid($form_state->getValue('site_403'))) {
@@ -195,6 +213,14 @@ class SiteInformationForm extends ConfigFormBase {
       ->save();
 
     parent::submitForm($form, $form_state);
+  }
+
+  public static function transformSloganValue(?string $value): ?string {
+    return $value ?: NULL;
+  }
+
+  public static function transformMailValue($value): string {
+    return $value ?: ini_get('sendmail_from');
   }
 
 }
