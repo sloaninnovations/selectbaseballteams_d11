@@ -98,10 +98,11 @@ class Number {
    * @see \Drupal\Component\Utility\Number::intToAlphadecimal
    */
   public static function alphadecimalToInt($string = '00') {
-    if (!ctype_alnum(substr($string, 1))) {
+    $alpha_decimal_substring = substr($string, 1);
+    if (!ctype_alnum($alpha_decimal_substring)) {
       throw new \InvalidArgumentException("Invalid characters passed for attempted conversion: $string");
     }
-    return (int) base_convert(substr($string, 1), 36, 10);
+    return (int) base_convert($alpha_decimal_substring, 36, 10);
   }
 
 }
