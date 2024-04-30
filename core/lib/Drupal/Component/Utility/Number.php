@@ -91,10 +91,16 @@ class Number {
    *
    * @return int
    *   The integer value.
+   * 
+   * @throws \InvalidArgumentException
+   *  If $string contains invalid characters, throw an exception.
    *
    * @see \Drupal\Component\Utility\Number::intToAlphadecimal
    */
   public static function alphadecimalToInt($string = '00') {
+    if (!ctype_alnum(substr($string, 1))) {
+      throw new \InvalidArgumentException("Invalid characters passed for attempted conversion: $string");
+    }
     return (int) base_convert(substr($string, 1), 36, 10);
   }
 
