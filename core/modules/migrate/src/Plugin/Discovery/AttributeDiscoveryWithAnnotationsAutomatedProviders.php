@@ -78,7 +78,7 @@ class AttributeDiscoveryWithAnnotationsAutomatedProviders extends AttributeDisco
     // will trigger a fatal error with such classes, so only call it if the
     // class has a class attribute.
     if ($reflection_class->hasClassAttribute($this->pluginDefinitionAttributeName)) {
-      return parent::parseClass($class, $fileinfo);
+      return $this->attributeDiscovery->parseClass($class, $fileinfo);
     }
     return ['id' => NULL, 'content' => NULL];
   }
