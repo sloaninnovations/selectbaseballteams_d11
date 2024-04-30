@@ -6,8 +6,6 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\migrate\Attribute\MigrateSource;
-use Drupal\migrate\Plugin\Discovery\AnnotatedClassDiscoveryAutomatedProviders;
-use Drupal\migrate\Plugin\Discovery\AttributeClassDiscoveryAutomatedProviders;
 use Drupal\migrate\Plugin\Discovery\AttributeDiscoveryWithAnnotationsAutomatedProviders;
 use Drupal\migrate\Plugin\Discovery\ProviderFilterDecorator;
 
@@ -46,30 +44,13 @@ class MigrateSourcePluginManager extends MigratePluginManager {
    */
   protected function getDiscovery() {
     if (!$this->discovery) {
-      if (isset($this->pluginDefinitionAttributeName) && isset($this->pluginDefinitionAnnotationName)) {
-        $discovery = new AttributeDiscoveryWithAnnotationsAutomatedProviders(
-          $this->subdir,
-          $this->namespaces,
-          $this->pluginDefinitionAttributeName,
-          $this->pluginDefinitionAnnotationName,
-          $this->additionalAnnotationNamespaces,
-        );
-      }
-      elseif (isset($this->pluginDefinitionAttributeName)) {
-        $discovery = new AttributeClassDiscoveryAutomatedProviders(
-          $this->subdir,
-          $this->namespaces,
-          $this->pluginDefinitionAttributeName,
-        );
-      }
-      else {
-        $discovery = new AnnotatedClassDiscoveryAutomatedProviders(
-          $this->subdir,
-          $this->namespaces,
-          $this->pluginDefinitionAnnotationName,
-          $this->additionalAnnotationNamespaces,
-        );
-      }
+      $discovery = new AttributeDiscoveryWithAnnotationsAutomatedProviders(
+        $this->subdir,
+        $this->namespaces,
+        $this->pluginDefinitionAttributeName,
+        $this->pluginDefinitionAnnotationName,
+        $this->additionalAnnotationNamespaces,
+      );
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($discovery);
     }
     return $this->discovery;
