@@ -91,9 +91,9 @@ class Number {
    *
    * @return int
    *   The integer value.
-   * 
+   *
    * @throws \InvalidArgumentException
-   *  If $string contains invalid characters, throw an exception.
+   *   If $string contains invalid characters, throw an exception.
    *
    * @see \Drupal\Component\Utility\Number::intToAlphadecimal
    */
