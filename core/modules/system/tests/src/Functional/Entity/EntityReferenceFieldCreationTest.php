@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Entity;
 
 use Drupal\Tests\BrowserTestBase;
@@ -20,6 +22,14 @@ class EntityReferenceFieldCreationTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'node', 'field_ui'];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}

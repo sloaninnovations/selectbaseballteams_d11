@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel;
 
 use Drupal\Component\DependencyInjection\ReverseContainer;
@@ -7,7 +9,7 @@ use Drupal\decorated_service_test\TestServiceDecorator;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
- * Test handling of decorated services in DependencySerializationTraitPass.
+ * Test handling of decorated services with the reverse container.
  *
  * @group system
  */

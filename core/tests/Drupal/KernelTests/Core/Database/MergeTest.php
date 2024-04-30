@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Query\Merge;
@@ -217,21 +219,6 @@ class MergeTest extends DatabaseTestBase {
     $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {select}')->fetchField();
     $this->assertEquals($num_records_before + 1, $num_records_after, 'Merge inserted properly.');
 
-    $person = $this->connection->query('SELECT * FROM {select} WHERE [id] = :id', [':id' => 2])->fetch();
-    $this->assertEquals('', $person->update);
-    $this->assertEquals('2', $person->id);
-  }
-
-  /**
-   * Tests deprecation of Merge::key() with array $field argument.
-   *
-   * @group legacy
-   */
-  public function testDeprecatedKeyArrayArgument(): void {
-    $this->expectDeprecation('Passing an array to the $field argument of Drupal\Core\Database\Query\Merge::key() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/2205327');
-    $this->connection->merge('select')
-      ->key(['id' => 2])
-      ->execute();
     $person = $this->connection->query('SELECT * FROM {select} WHERE [id] = :id', [':id' => 2])->fetch();
     $this->assertEquals('', $person->update);
     $this->assertEquals('2', $person->id);

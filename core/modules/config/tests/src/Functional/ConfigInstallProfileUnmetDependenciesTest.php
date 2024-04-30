@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\FunctionalTests\Installer\InstallerTestBase;
@@ -80,7 +82,7 @@ class ConfigInstallProfileUnmetDependenciesTest extends InstallerTestBase {
         mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
       }
       else {
-        copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+        copy((string) $item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
       }
     }
 

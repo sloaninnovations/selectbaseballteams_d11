@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Bootstrap;
 
 use Drupal\Core\Url;
@@ -19,6 +21,14 @@ class DrupalMessengerServiceTest extends BrowserTestBase {
    * @var array
    */
   protected static $modules = ['system_test'];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Module;
 
 use Drupal\Component\Serialization\Yaml;
@@ -131,7 +133,7 @@ class DependencyTest extends ModuleTestBase {
     $this->assertSession()->fieldEnabled('modules[system_no_module_version_dependency_test][enable]');
     $this->assertSession()->fieldDisabled('modules[system_no_module_version_test][enable]');
 
-    // Remove the version requirement from the the dependency definition
+    // Remove the version requirement from the dependency definition
     $info = [
       'type' => 'module',
       'core_version_requirement' => '*',

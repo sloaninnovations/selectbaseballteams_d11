@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field_ui\Functional;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -138,7 +140,7 @@ class ManageFieldsMultipleTypesTest extends ManageFieldsFunctionalTestBase {
    * @return array
    *   Test cases.
    */
-  public function entityTypesProvider() {
+  public static function entityTypesProvider() {
     return [
       'node' => [
         'entity_type' => 'node',

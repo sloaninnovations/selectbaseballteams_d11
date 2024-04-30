@@ -201,7 +201,7 @@ class ConfigImporter {
    * @param \Drupal\Core\Extension\ThemeExtensionList $extension_list_theme
    *   The theme extension list.
    */
-  public function __construct(StorageComparerInterface $storage_comparer, EventDispatcherInterface $event_dispatcher, ConfigManagerInterface $config_manager, LockBackendInterface $lock, TypedConfigManagerInterface $typed_config, ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, ThemeHandlerInterface $theme_handler, TranslationInterface $string_translation, ModuleExtensionList $extension_list_module, ThemeExtensionList $extension_list_theme = NULL) {
+  public function __construct(StorageComparerInterface $storage_comparer, EventDispatcherInterface $event_dispatcher, ConfigManagerInterface $config_manager, LockBackendInterface $lock, TypedConfigManagerInterface $typed_config, ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, ThemeHandlerInterface $theme_handler, TranslationInterface $string_translation, ModuleExtensionList $extension_list_module, ThemeExtensionList $extension_list_theme) {
     $this->moduleExtensionList = $extension_list_module;
     $this->storageComparer = $storage_comparer;
     $this->eventDispatcher = $event_dispatcher;
@@ -212,10 +212,6 @@ class ConfigImporter {
     $this->moduleInstaller = $module_installer;
     $this->themeHandler = $theme_handler;
     $this->stringTranslation = $string_translation;
-    if ($extension_list_theme === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $extension_list_theme argument is deprecated in drupal:10.1.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3284397', E_USER_DEPRECATED);
-      $extension_list_theme = \Drupal::service('extension.list.theme');
-    }
     $this->themeExtensionList = $extension_list_theme;
     foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
       $this->processedConfiguration[$collection] = $this->storageComparer->getEmptyChangelist();
@@ -455,12 +451,18 @@ class ConfigImporter {
 
     $this->extensionChangelist['module']['install'] = array_keys($install_required + $install_non_required);
 
-    // If we're installing the install profile ensure it comes last. This will
-    // occur when installing a site from configuration.
-    $install_profile_key = array_search($new_extensions['profile'], $this->extensionChangelist['module']['install'], TRUE);
-    if ($install_profile_key !== FALSE) {
-      unset($this->extensionChangelist['module']['install'][$install_profile_key]);
-      $this->extensionChangelist['module']['install'][] = $new_extensions['profile'];
+    // If we're installing the install profile ensure it comes last in the
+    // list of modules to be installed. This will occur when installing a site
+    // from configuration.
+    if (isset($new_extensions['profile'])) {
+      $install_profile_key = array_search($new_extensions['profile'], $this->extensionChangelist['module']['install'], TRUE);
+      // If the profile is not in the list of modules to be installed this will
+      // generate a validation error. See
+      // \Drupal\Core\EventSubscriber\ConfigImportSubscriber::validateModules().
+      if ($install_profile_key !== FALSE) {
+        unset($this->extensionChangelist['module']['install'][$install_profile_key]);
+        $this->extensionChangelist['module']['install'][] = $new_extensions['profile'];
+      }
     }
 
     // Get a list of themes with dependency weights as values.

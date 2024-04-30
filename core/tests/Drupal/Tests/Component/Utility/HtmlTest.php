@@ -9,7 +9,6 @@ use Drupal\Component\Render\MarkupTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Random;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 // cspell:ignore répét répété
 
@@ -21,8 +20,6 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
  * @coversDefaultClass \Drupal\Component\Utility\Html
  */
 class HtmlTest extends TestCase {
-
-  use ExpectDeprecationTrait;
 
   /**
    * {@inheritdoc}
@@ -64,7 +61,7 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public function providerTestCleanCssIdentifier() {
+  public static function providerTestCleanCssIdentifier() {
     $id1 = 'abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ-0123456789';
     $id2 = '¡¢£¤¥';
     $id3 = 'css__identifier__with__double__underscores';
@@ -77,7 +74,7 @@ class HtmlTest extends TestCase {
       [$id3, $id3],
       // Verify that invalid characters (including non-breaking space) are
       // stripped from the identifier.
-      ['invalididentifier', 'invalid !"#$%&\'()*+,./:;<=>?@[\\]^`{|}~ identifier', []],
+      ['invalid_identifier', 'invalid_ !"#$%&\'()*+,./:;<=>?@[\\]^`{|}~ identifier', []],
       // Verify that an identifier starting with a digit is replaced.
       ['_css_identifier', '1css_identifier', []],
       // Verify that an identifier starting with a hyphen followed by a digit is
@@ -132,7 +129,7 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public function providerTestHtmlGetUniqueId() {
+  public static function providerTestHtmlGetUniqueId() {
     // cSpell:disable
     $id = 'abcdefghijklmnopqrstuvwxyz-0123456789';
     return [
@@ -184,7 +181,7 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public function providerTestHtmlGetUniqueIdWithAjaxIds() {
+  public static function providerTestHtmlGetUniqueIdWithAjaxIds() {
     return [
       ['test-unique-id1--', 'test-unique-id1'],
       // Note, we truncate two hyphens at the end.
@@ -217,7 +214,7 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public function providerTestHtmlGetId() {
+  public static function providerTestHtmlGetId() {
     // cSpell:disable
     $id = 'abcdefghijklmnopqrstuvwxyz-0123456789';
     return [
@@ -249,7 +246,7 @@ class HtmlTest extends TestCase {
    *
    * @see testDecodeEntities()
    */
-  public function providerDecodeEntities() {
+  public static function providerDecodeEntities() {
     return [
       ['Drupal', 'Drupal'],
       ['<script>', '<script>'],
@@ -290,7 +287,7 @@ class HtmlTest extends TestCase {
    *
    * @see testEscape()
    */
-  public function providerEscape() {
+  public static function providerEscape() {
     return [
       ['Drupal', 'Drupal'],
       ['&lt;script&gt;', '<script>'],
@@ -364,7 +361,7 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public function providerTestTransformRootRelativeUrlsToAbsolute() {
+  public static function providerTestTransformRootRelativeUrlsToAbsolute() {
     $data = [];
 
     // Random generator.
@@ -409,26 +406,13 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public function providerTestTransformRootRelativeUrlsToAbsoluteAssertion() {
+  public static function providerTestTransformRootRelativeUrlsToAbsoluteAssertion() {
     return [
       'only relative path' => ['llama'],
       'only root-relative path' => ['/llama'],
       'host and path' => ['example.com/llama'],
       'scheme, host and path' => ['http://example.com/llama'],
     ];
-  }
-
-  /**
-   * Test deprecations.
-   *
-   * @group legacy
-   */
-  public function testDeprecations(): void {
-    $this->expectDeprecation('Passing NULL to Drupal\Component\Utility\Html::decodeEntities is deprecated in drupal:9.5.0 and will trigger a PHP error from drupal:11.0.0. Pass a string instead. See https://www.drupal.org/node/3318826');
-    $this->assertSame('', Html::decodeEntities(NULL));
-
-    $this->expectDeprecation('Passing NULL to Drupal\Component\Utility\Html::escape is deprecated in drupal:9.5.0 and will trigger a PHP error from drupal:11.0.0. Pass a string instead. See https://www.drupal.org/node/3318826');
-    $this->assertSame('', Html::escape(NULL));
   }
 
 }

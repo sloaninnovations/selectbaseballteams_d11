@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -32,8 +34,8 @@ class LocaleStringIsSafeTest extends KernelTestBase {
     $result = locale_string_is_safe($string);
     $this->assertTrue($result);
 
-    // Check an untranslatable string which includes untrustable HTML (according
-    // to the locale_string_is_safe() function definition).
+    // Check an untranslatable string which includes unsafe HTML (according to
+    // the locale_string_is_safe() function definition).
     $string = 'Hello <img src="world.png" alt="world" />!';
     $result = locale_string_is_safe($string);
     $this->assertFalse($result);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional;
 
 /**
@@ -55,7 +57,7 @@ class SourceProviderTest extends MigrateUpgradeTestBase {
   /**
    * Data provider for testSourceProvider.
    */
-  public function providerSourceProvider() {
+  public static function providerSourceProvider() {
     return [
       [
         'path_to_database' => '/tests/fixtures/drupal6.php',

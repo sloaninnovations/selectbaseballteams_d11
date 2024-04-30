@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\comment\Entity\Comment;
@@ -17,8 +19,6 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use GuzzleHttp\RequestOptions;
-
-// cspell:ignore llamalovers catcuddlers Cuddlers
 
 /**
  * JSON:API regression tests.
@@ -441,7 +441,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
               // cSpell:disable-next-line
               'sumary' => 'Boring old "Hello World".',
               // And finally, one that is completely absurd.
-              'foobarbaz' => '<script>alert("HI!");</script>',
+              'foobar' => '<script>alert("HI!");</script>',
             ],
           ],
         ],
@@ -454,7 +454,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
     $this->assertSame(422, $response->getStatusCode());
     $this->assertNotNull($data);
     // cSpell:disable-next-line
-    $this->assertSame("The properties 'form', 'sumary', 'foobarbaz' do not exist on the 'body' field of type 'text_with_summary'. Writable properties are: 'value', 'format', 'summary'.", $data['errors'][0]['detail']);
+    $this->assertSame("The properties 'form', 'sumary', 'foobar' do not exist on the 'body' field of type 'text_with_summary'. Writable properties are: 'value', 'format', 'summary'.", $data['errors'][0]['detail']);
 
     $request_options = [
       RequestOptions::HEADERS => [

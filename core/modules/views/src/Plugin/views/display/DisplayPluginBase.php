@@ -128,11 +128,13 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   /**
    * Keeps track whether the display uses exposed filters.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public bool $has_exposed;
 
   /**
    * The default display.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public DisplayPluginInterface $default_display;
 
   /**
@@ -2172,7 +2174,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    * {@inheritdoc}
    */
   public function render() {
-    $rows = (!empty($this->view->result) || $this->view->style_plugin->evenEmpty()) ? $this->view->style_plugin->render($this->view->result) : [];
+    $rows = (!empty($this->view->result) || $this->view->style_plugin->evenEmpty()) ? $this->view->style_plugin->render() : [];
 
     $element = [
       '#theme' => $this->themeFunctions(),

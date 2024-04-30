@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\text\Functional;
 
 use Drupal\Component\Utility\Html;
@@ -15,6 +17,7 @@ use Drupal\Tests\TestFileCreationTrait;
  * Tests the creation of text fields.
  *
  * @group text
+ * @group #slow
  */
 class TextFieldTest extends StringFieldTest {
 

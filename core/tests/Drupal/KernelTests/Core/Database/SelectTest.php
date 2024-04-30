@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\InvalidQueryException;
@@ -498,7 +500,7 @@ class SelectTest extends DatabaseTestBase {
    *     - the regular expression pattern to search for.
    *     - the regular expression operator 'REGEXP' or 'NOT REGEXP'.
    */
-  public function providerRegularExpressionCondition() {
+  public static function providerRegularExpressionCondition() {
     return [
       [['John'], 'name', 'hn$', 'REGEXP'],
       [['Paul'], 'name', '^Pau', 'REGEXP'],
@@ -598,7 +600,7 @@ class SelectTest extends DatabaseTestBase {
    *   Array of non array compatible operators and its value in the expected
    *   exception message.
    */
-  public function providerNonArrayOperatorWithArrayValueCondition() {
+  public static function providerNonArrayOperatorWithArrayValueCondition() {
     return [
       '=' => ['=', '='],
       '>' => ['>', '>'],
@@ -624,20 +626,6 @@ class SelectTest extends DatabaseTestBase {
     $this->connection->select('test', 't')
       ->fields('t')
       ->condition('age', [26, 27], $operator)
-      ->execute();
-  }
-
-  /**
-   * Tests thrown exception for non array operator conditions with array value.
-   *
-   * @dataProvider providerNonArrayOperatorWithArrayValueCondition
-   * @group legacy
-   */
-  public function testNonArrayOperatorWithArrayValueConditionDeprecated($operator, $operator_in_exception_message) {
-    $this->expectDeprecation('Calling Drupal\Core\Database\Query\Condition::condition() without an array compatible operator is deprecated in drupal:10.1.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3350985');
-    $this->connection->select('test', 't')
-      ->fields('t')
-      ->condition('age', [26], $operator)
       ->execute();
   }
 

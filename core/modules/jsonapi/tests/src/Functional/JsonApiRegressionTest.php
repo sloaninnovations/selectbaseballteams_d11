@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\comment\Entity\Comment;
@@ -20,8 +22,6 @@ use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 use GuzzleHttp\RequestOptions;
-
-// cspell:ignore llamalovers catcuddlers Cuddlers
 
 /**
  * JSON:API regression tests.

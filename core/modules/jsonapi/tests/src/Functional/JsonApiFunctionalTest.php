@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
@@ -536,6 +538,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->drupalGet('/some/normal/route');
     $this->assertFalse($this->drupalUserIsLoggedIn($this->userCanViewProfiles));
     $this->container->get('state')->set('system.maintenance_mode', FALSE);
+    $this->drupalResetSession();
 
     // Test that admin user can bypass maintenance mode.
     $admin_user = $this->drupalCreateUser([], NULL, TRUE);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Config\Entity;
 
+use Drupal\Component\Datetime\Time;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
@@ -139,7 +140,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $entity_query_factory = $this->prophesize(QueryFactoryInterface::class);
     $entity_query_factory->get($entity_type, 'AND')->willReturn($this->entityQuery->reveal());
 
-    $this->entityStorage = new ConfigEntityStorage($entity_type, $this->configFactory->reveal(), $this->uuidService->reveal(), $this->languageManager->reveal(), new MemoryCache());
+    $this->entityStorage = new ConfigEntityStorage($entity_type, $this->configFactory->reveal(), $this->uuidService->reveal(), $this->languageManager->reveal(), new MemoryCache(new Time()));
     $this->entityStorage->setModuleHandler($this->moduleHandler->reveal());
 
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
@@ -627,28 +628,6 @@ class ConfigEntityStorageTest extends UnitTestCase {
     foreach ($entities as $id => $entity) {
       $this->assertSame($id, $entity->id());
     }
-  }
-
-  /**
-   * @covers ::loadRevision
-   * @group legacy
-   */
-  public function testLoadRevision() {
-    $this->expectDeprecation('Drupal\Core\Config\Entity\ConfigEntityStorage::loadRevision() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Entity\RevisionableStorageInterface::loadRevision instead. See https://www.drupal.org/node/3294237');
-    $this->assertNull($this->entityStorage->loadRevision(1));
-  }
-
-  /**
-   * @covers ::deleteRevision
-   * @group legacy
-   */
-  public function testDeleteRevision() {
-    $this->expectDeprecation('Drupal\Core\Config\Entity\ConfigEntityStorage::deleteRevision() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Entity\RevisionableStorageInterface::deleteRevision instead. See https://www.drupal.org/node/3294237');
-
-    $this->cacheTagsInvalidator->invalidateTags(Argument::cetera())
-      ->shouldNotBeCalled();
-
-    $this->assertNull($this->entityStorage->deleteRevision(1));
   }
 
   /**

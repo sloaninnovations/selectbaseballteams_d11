@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Core\Database\Database;
@@ -16,6 +18,7 @@ use Drupal\Tests\BrowserTestBase;
  * values are not lost due to a wrong form rebuild.
  *
  * @group Form
+ * @group #slow
  */
 class StorageTest extends BrowserTestBase {
 

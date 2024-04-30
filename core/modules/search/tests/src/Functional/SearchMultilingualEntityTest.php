@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Functional;
 
 use Drupal\Core\Database\Database;
@@ -159,7 +161,7 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
     // Make sure index throttle is high enough, via the UI.
     $this->drupalGet('admin/config/search/pages');
     $this->submitForm(['cron_limit' => 20], 'Save configuration');
-    $this->assertEquals(20, $this->config('search.settings')->get('index.cron_limit', 100), 'Config setting was saved correctly');
+    $this->assertEquals(20, $this->config('search.settings')->get('index.cron_limit'), 'Config setting was saved correctly');
     // Get a new search plugin, to make sure it has this setting.
     $this->plugin = $this->container->get('plugin.manager.search')->createInstance('node_search');
 
@@ -228,7 +230,7 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
     // The request time is always the same throughout test runs. Update the
     // request time to a previous time, to simulate it having been marked
     // previously.
-    $current = REQUEST_TIME;
+    $current = \Drupal::time()->getRequestTime();
     $old = $current - 10;
     $connection = Database::getConnection();
     $connection->update('search_dataset')

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Component\Utility\Html;
@@ -565,7 +567,7 @@ class ConfigImporterTest extends KernelTestBase {
     $extensions['module']['unknown_module'] = 0;
     $extensions['theme']['unknown_theme'] = 0;
     // Add a module and a theme that depend on uninstalled extensions.
-    $extensions['module']['book'] = 0;
+    $extensions['module']['new_dependency_test'] = 0;
     $extensions['theme']['test_subtheme'] = 0;
 
     $sync->write('core.extension', $extensions);
@@ -578,7 +580,7 @@ class ConfigImporterTest extends KernelTestBase {
       $expected = [
         static::FAIL_MESSAGE,
         'Unable to install the <em class="placeholder">unknown_module</em> module since it does not exist.',
-        'Unable to install the <em class="placeholder">Book</em> module since it requires the <em class="placeholder">Node, Text, Field, Filter, User</em> modules.',
+        'Unable to install the <em class="placeholder">New Dependency test</em> module since it requires the <em class="placeholder">New Dependency test with service</em> module.',
         'Unable to install the <em class="placeholder">unknown_theme</em> theme since it does not exist.',
         'Unable to install the <em class="placeholder">Theme test subtheme</em> theme since it requires the <em class="placeholder">Theme test base theme</em> theme.',
         'Configuration <em class="placeholder">config_test.dynamic.dotted.config</em> depends on the <em class="placeholder">unknown</em> configuration that will not exist after import.',
@@ -591,7 +593,7 @@ class ConfigImporterTest extends KernelTestBase {
       $error_log = $config_importer->getErrors();
       $expected = [
         'Unable to install the <em class="placeholder">unknown_module</em> module since it does not exist.',
-        'Unable to install the <em class="placeholder">Book</em> module since it requires the <em class="placeholder">Node, Text, Field, Filter, User</em> modules.',
+        'Unable to install the <em class="placeholder">New Dependency test</em> module since it requires the <em class="placeholder">New Dependency test with service</em> module.',
         'Unable to install the <em class="placeholder">unknown_theme</em> theme since it does not exist.',
         'Configuration <em class="placeholder">config_test.dynamic.dotted.config</em> depends on the <em class="placeholder">unknown</em> configuration that will not exist after import.',
         'Configuration <em class="placeholder">config_test.dynamic.dotted.existing</em> depends on the <em class="placeholder">config_test.dynamic.dotted.deleted</em> configuration that will not exist after import.',
@@ -621,7 +623,7 @@ class ConfigImporterTest extends KernelTestBase {
       $expected = [
         static::FAIL_MESSAGE,
         'Unable to install the <em class="placeholder">unknown_module</em> module since it does not exist.',
-        'Unable to install the <em class="placeholder">Book</em> module since it requires the <em class="placeholder">Node, Text, Field, Filter, User</em> modules.',
+        'Unable to install the <em class="placeholder">New Dependency test</em> module since it requires the <em class="placeholder">New Dependency test with service</em> module.',
         'Unable to install the <em class="placeholder">unknown_theme</em> theme since it does not exist.',
         'Unable to install the <em class="placeholder">Theme test subtheme</em> theme since it requires the <em class="placeholder">Theme test base theme</em> theme.',
         'Configuration <em class="placeholder">config_test.dynamic.dotted.config</em> depends on configuration (<em class="placeholder">unknown, unknown2</em>) that will not exist after import.',
@@ -752,6 +754,10 @@ class ConfigImporterTest extends KernelTestBase {
    * @see \Drupal\Core\EventSubscriber\ConfigImportSubscriber
    */
   public function testInstallProfileMisMatch() {
+    // Install profiles can not be changed. They can only be uninstalled. We
+    // need to set an install profile prior to testing because KernelTestBase
+    // tests do not use one.
+    $this->setInstallProfile('minimal');
     $sync = $this->container->get('config.storage.sync');
 
     $extensions = $sync->read('core.extension');
@@ -765,14 +771,10 @@ class ConfigImporterTest extends KernelTestBase {
       $this->fail('ConfigImporterException not thrown; an invalid import was not stopped due to missing dependencies.');
     }
     catch (ConfigImporterException $e) {
-      $expected = static::FAIL_MESSAGE . PHP_EOL . 'Cannot change the install profile from <em class="placeholder"></em> to <em class="placeholder">this_will_not_work</em> once Drupal is installed.';
+      $expected = static::FAIL_MESSAGE . PHP_EOL . 'Cannot change the install profile from <em class="placeholder">minimal</em> to <em class="placeholder">this_will_not_work</em> once Drupal is installed.';
       $this->assertEquals($expected, $e->getMessage(), 'There were errors validating the config synchronization.');
       $error_log = $config_importer->getErrors();
-      // Install profiles can not be changed. Note that KernelTestBase currently
-      // does not use an install profile. This situation should be impossible
-      // to get in but site's can removed the install profile setting from
-      // settings.php so the test is valid.
-      $this->assertEquals(['Cannot change the install profile from  to this_will_not_work once Drupal is installed.'], $error_log);
+      $this->assertEquals(['Cannot change the install profile from minimal to this_will_not_work once Drupal is installed.'], $error_log);
     }
   }
 
@@ -924,8 +926,8 @@ class ConfigImporterTest extends KernelTestBase {
 
     $cronName = 'system.cron';
     $cron = $sync->read($cronName);
-    $this->assertEquals(1, $cron['logging']);
-    $cron['logging'] = 0;
+    $this->assertTrue($cron['logging']);
+    $cron['logging'] = FALSE;
     $sync->write($cronName, $cron);
 
     // Uninstall the theme in sync.

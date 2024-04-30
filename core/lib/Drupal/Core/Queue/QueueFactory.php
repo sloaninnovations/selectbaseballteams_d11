@@ -3,15 +3,13 @@
 namespace Drupal\Core\Queue;
 
 use Drupal\Core\Site\Settings;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 
 /**
  * Defines the queue factory.
  */
-class QueueFactory implements ContainerAwareInterface {
-
-  use ContainerAwareTrait;
+class QueueFactory {
 
   /**
    * Instantiated queues, keyed by name.
@@ -28,9 +26,18 @@ class QueueFactory implements ContainerAwareInterface {
   protected $settings;
 
   /**
-   * Constructs a queue factory.
+   * Constructs QueueFactory object.
+   *
+   * @param \Drupal\Core\Site\Settings $settings
+   *   The site settings.
+   * @param \Psr\Container\ContainerInterface $container
+   *   A service locator that contains the queue services.
    */
-  public function __construct(Settings $settings) {
+  public function __construct(
+    Settings $settings,
+    #[AutowireLocator('queue_factory')]
+    protected ContainerInterface $container,
+  ) {
     $this->settings = $settings;
   }
 
@@ -58,7 +65,8 @@ class QueueFactory implements ContainerAwareInterface {
       if (empty($service_name)) {
         $service_name = $this->settings->get('queue_service_' . $name, $this->settings->get('queue_default', 'queue.database'));
       }
-      $this->queues[$name] = $this->container->get($service_name)->get($name);
+      $factory = $this->container->get($service_name);
+      $this->queues[$name] = $factory->get($name);
     }
     return $this->queues[$name];
   }

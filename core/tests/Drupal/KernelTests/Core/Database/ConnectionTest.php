@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Database;
@@ -125,7 +127,7 @@ class ConnectionTest extends DatabaseTestBase {
       'test_table' => $connection_info['default']['prefix'] . '_bar',
     ];
     Database::addConnectionInfo('default', 'foo', $new_connection_info);
-    $this->expectError();
+    $this->expectException(\AssertionError::class);
     $foo_connection = Database::getConnection('foo', 'default');
   }
 
@@ -139,7 +141,7 @@ class ConnectionTest extends DatabaseTestBase {
       'default' => $connection_info['default']['prefix'],
     ];
     Database::addConnectionInfo('default', 'foo', $new_connection_info);
-    $this->expectError();
+    $this->expectException(\AssertionError::class);
     $foo_connection = Database::getConnection('foo', 'default');
   }
 
@@ -173,30 +175,10 @@ class ConnectionTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests deprecation of ::getUnprefixedTablesMap().
-   *
-   * @group legacy
-   */
-  public function testDeprecatedGetUnprefixedTablesMap() {
-    $this->expectDeprecation('Drupal\Core\Database\Connection::getUnprefixedTablesMap() is deprecated in drupal:10.0.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3257198');
-    $this->assertIsArray($this->connection->getUnprefixedTablesMap());
-  }
-
-  /**
    * Tests that the method ::hasJson() returns TRUE.
    */
   public function testHasJson() {
     $this->assertTrue($this->connection->hasJson());
-  }
-
-  /**
-   * Tests deprecation of ::tablePrefix().
-   *
-   * @group legacy
-   */
-  public function testDeprecatedTablePrefix(): void {
-    $this->expectDeprecation('Drupal\Core\Database\Connection::tablePrefix() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Instead, you should just use Connection::getPrefix(). See https://www.drupal.org/node/3260849');
-    $this->assertIsString($this->connection->tablePrefix());
   }
 
 }

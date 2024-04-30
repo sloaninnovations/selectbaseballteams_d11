@@ -2,7 +2,7 @@
 
 namespace Drupal\Core\Update;
 
-use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 
 /**
  * Provides module updates versions handling.
@@ -50,16 +50,19 @@ class UpdateHookRegistry {
   protected $allAvailableSchemaVersions = [];
 
   /**
-   * Constructs a new UpdateRegistry.
+   * Constructs a new UpdateHookRegistry.
    *
-   * @param string[] $enabled_modules
-   *   A list of enabled modules.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $key_value
-   *   The key value store.
+   * @param array $module_list
+   *   An associative array whose keys are the names of installed modules.
+   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
+   *   The key value factory.
    */
-  public function __construct(array $enabled_modules, KeyValueStoreInterface $key_value) {
-    $this->enabledModules = $enabled_modules;
-    $this->keyValue = $key_value;
+  public function __construct(
+    array $module_list,
+    KeyValueFactoryInterface $key_value_factory,
+  ) {
+    $this->enabledModules = array_keys($module_list);
+    $this->keyValue = $key_value_factory->get('system.schema');
   }
 
   /**

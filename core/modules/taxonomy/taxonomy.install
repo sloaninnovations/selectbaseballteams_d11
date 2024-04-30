@@ -9,5 +9,5 @@
  * Implements hook_update_last_removed().
  */
 function taxonomy_update_last_removed() {
-  return 8702;
+  return 10100;
 }

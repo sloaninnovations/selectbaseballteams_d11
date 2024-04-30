@@ -36,11 +36,19 @@ class PluralTranslatableMarkupTest extends UnitTestCase {
   /**
    * Data provider for ::testPluralTranslatableMarkupSerialization().
    */
-  public function providerPluralTranslatableMarkupSerialization() {
+  public static function providerPluralTranslatableMarkupSerialization() {
     return [
       [1, 'singular 1'],
       [2, 'plural 2'],
     ];
+  }
+
+  /**
+   * Tests when the plural translation is missing.
+   */
+  public function testMissingPluralTranslation() {
+    $markup = PluralTranslatableMarkup::createFromTranslatedString(2, 'There is no plural delimiter @count');
+    $this->assertEquals('There is no plural delimiter 2', $markup->render());
   }
 
 }

@@ -5,6 +5,7 @@ namespace Drupal\Core\Render\Element;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Html as HtmlUtility;
 use Drupal\Core\Form\FormHelper;
+use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url as CoreUrl;
@@ -25,10 +26,9 @@ use Drupal\Core\Url as CoreUrl;
  *   '#url' => \Drupal\Core\Url::fromRoute('examples.description')
  * ];
  * @endcode
- *
- * @RenderElement("link")
  */
-class Link extends RenderElement {
+#[RenderElement('link')]
+class Link extends RenderElementBase {
 
   /**
    * {@inheritdoc}
@@ -112,7 +112,7 @@ class Link extends RenderElement {
    *
    * This method can be added as a pre_render callback for a renderable array,
    * usually one which will be themed by links.html.twig. It iterates through
-   * all unrendered children of the element, collects any #links properties it
+   * all un-rendered children of the element, collects any #links properties it
    * finds, merges them into the parent element's #links array, and prevents
    * those children from being rendered separately.
    *
@@ -133,13 +133,6 @@ class Link extends RenderElement {
    *     '#theme' => 'links__node__comment',
    *     '#links' => array(
    *       // An array of links associated with node comments, suitable for
-   *       // passing in to links.html.twig.
-   *     ),
-   *   ),
-   *   'statistics' => array(
-   *     '#theme' => 'links__node__statistics',
-   *     '#links' => array(
-   *       // An array of links associated with node statistics, suitable for
    *       // passing in to links.html.twig.
    *     ),
    *   ),

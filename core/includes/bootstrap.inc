@@ -6,10 +6,11 @@
  */
 
 use Drupal\Component\Utility\Crypt;
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+
+// cspell:ignore htkey
 
 /**
  * Error reporting level: display no errors.
@@ -37,28 +38,16 @@ const ERROR_REPORTING_DISPLAY_VERBOSE = 'verbose';
 const DRUPAL_EXTENSION_NAME_MAX_LENGTH = 50;
 
 /**
- * Time of the current request in seconds elapsed since the Unix Epoch.
- *
- * This differs from $_SERVER['REQUEST_TIME'], which is stored as a float
- * since PHP 5.4.0. Float timestamps confuse most PHP functions
- * (including date_create()).
- *
- * @see http://php.net/manual/reserved.variables.server.php
- * @see http://php.net/manual/function.time.php
- *
- * @deprecated in drupal:8.3.0 and is removed from drupal:11.0.0.
- *   Use \Drupal::time()->getRequestTime();
- *
- * @see https://www.drupal.org/node/2785211
- */
-define('REQUEST_TIME', (int) $_SERVER['REQUEST_TIME']);
-
-/**
  * Defines the root directory of the Drupal installation.
  *
  * This strips two levels of directories off the current directory.
  */
 define('DRUPAL_ROOT', dirname(__DIR__, 2));
+
+/**
+ * Keep backward compatibility for sites with references to TranslationWrapper.
+ */
+class_alias(TranslatableMarkup::class, '\Drupal\Core\StringTranslation\TranslationWrapper', TRUE);
 
 /**
  * Translates a string to the current language or to a given language.
@@ -100,51 +89,6 @@ define('DRUPAL_ROOT', dirname(__DIR__, 2));
  */
 function t($string, array $args = [], array $options = []) {
   return new TranslatableMarkup($string, $args, $options);
-}
-
-/**
- * Logs an exception.
- *
- * This is a wrapper logging function which automatically decodes an exception.
- *
- * @param $type
- *   The category to which this message belongs.
- * @param $exception
- *   The exception that is going to be logged.
- * @param $message
- *   The message to store in the log. If empty, a text that contains all useful
- *   information about the passed-in exception is used.
- * @param $variables
- *   Array of variables to replace in the message on display or
- *   NULL if message is already translated or not possible to
- *   translate.
- * @param $severity
- *   The severity of the message, as per RFC 3164.
- * @param $link
- *   A link to associate with the message.
- *
- * @see \Drupal\Core\Utility\Error::decodeException()
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   Use \Drupal\Core\Utility\Error::logException() instead.
- *
- * @see https://www.drupal.org/node/2932520
- */
-function watchdog_exception($type, Exception $exception, $message = NULL, $variables = [], $severity = RfcLogLevel::ERROR, $link = NULL) {
-  @trigger_error('watchdog_exception() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Utility\Error::logException() instead. See https://www.drupal.org/node/2932520', E_USER_DEPRECATED);
-
-  // Use a default value if $message is not set.
-  if (empty($message)) {
-    $message = Error::DEFAULT_ERROR_MESSAGE;
-  }
-
-  if ($link) {
-    $variables['link'] = $link;
-  }
-
-  $variables += Error::decodeException($exception);
-
-  \Drupal::logger($type)->log($severity, $message, $variables);
 }
 
 /**
@@ -371,7 +315,7 @@ function drupal_maintenance_theme() {
  *
  * Example:
  * @code
- * function mymodule_log_stream_handle($new_handle = NULL) {
+ * function my_module_log_stream_handle($new_handle = NULL) {
  *   static $handle;
  *   if (isset($new_handle)) {
  *     $handle = $new_handle;
@@ -481,11 +425,6 @@ function &drupal_static($name, $default_value = NULL, $reset = FALSE) {
  *   unit tests with a clean environment.
  */
 function drupal_static_reset($name = NULL) {
-  switch ($name) {
-    case 'system_get_module_admin_tasks':
-      @trigger_error("Calling " . __FUNCTION__ . "() with 'system_get_module_admin_tasks' as an argument is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. There is no replacement for this usage. See https://www.drupal.org/node/3038972", E_USER_DEPRECATED);
-      break;
-  }
   drupal_static($name, NULL, TRUE);
 }
 

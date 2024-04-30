@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\File;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -43,7 +45,7 @@ class UrlTransformRelativeTest extends KernelTestBase {
     $this->assertSame($expected, \Drupal::service('file_url_generator')->transformRelative($url, $root_relative));
   }
 
-  public function providerFileUrlTransformRelative() {
+  public static function providerFileUrlTransformRelative() {
     $data = [
       'http' => [
         'example.com',

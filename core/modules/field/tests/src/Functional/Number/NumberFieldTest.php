@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional\Number;
 
 use Drupal\field\Entity\FieldConfig;
@@ -339,7 +341,7 @@ class NumberFieldTest extends BrowserTestBase {
     $this->assertSession()->responseContains('placeholder="0.00"');
 
     // Submit a signed decimal value within the allowed precision and scale.
-    $value = '-1234.5678';
+    $value = -1234.5678;
     $edit = [
       "{$field_name}[0][value]" => $value,
     ];

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Session;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,27 +30,6 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   use DependencySerializationTrait;
 
   /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
-   * The database connection to use.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
-   * The session configuration.
-   *
-   * @var \Drupal\Core\Session\SessionConfigurationInterface
-   */
-  protected $sessionConfiguration;
-
-  /**
    * Whether a lazy session has been started.
    *
    * @var bool
@@ -69,25 +49,30 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   /**
    * Constructs a new session manager instance.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
    * @param \Drupal\Core\Session\MetadataBag $metadata_bag
    *   The session metadata bag.
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
+   * @param \Drupal\Core\Session\SessionConfigurationInterface $sessionConfiguration
    *   The session configuration interface.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
    * @param \Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy|\SessionHandlerInterface|null $handler
    *   The object to register as a PHP session handler.
-   *   @see \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage::setSaveHandler()
+   *
+   * @see \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage::setSaveHandler()
    */
-  public function __construct(RequestStack $request_stack, Connection $connection, MetadataBag $metadata_bag, SessionConfigurationInterface $session_configuration, $handler = NULL) {
-    $options = [];
-    $this->sessionConfiguration = $session_configuration;
-    $this->requestStack = $request_stack;
-    $this->connection = $connection;
-
-    parent::__construct($options, $handler, $metadata_bag);
+  public function __construct(
+    protected RequestStack $requestStack,
+    protected Connection $connection,
+    MetadataBag $metadata_bag,
+    protected SessionConfigurationInterface $sessionConfiguration,
+    protected TimeInterface $time,
+    $handler = NULL,
+  ) {
+    parent::__construct([], $handler, $metadata_bag);
   }
 
   /**
@@ -155,7 +140,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   /**
    * {@inheritdoc}
    */
-  public function save() {
+  public function save(): void {
     if ($this->isCli()) {
       // We don't have anything to do if we are not allowed to save the session.
       return;
@@ -215,9 +200,14 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     if (!$this->writeSafeHandler->isSessionWritable() || $this->isCli()) {
       return;
     }
-    $this->connection->delete('sessions')
-      ->condition('uid', $uid)
-      ->execute();
+    // The sessions table may not have been created yet.
+    try {
+      $this->connection->delete('sessions')
+        ->condition('uid', $uid)
+        ->execute();
+    }
+    catch (\Exception) {
+    }
   }
 
   /**
@@ -242,7 +232,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     // setcookie() can only be called when headers are not yet sent.
     if ($cookies->has($session_name) && !headers_sent()) {
       $params = session_get_cookie_params();
-      setcookie($session_name, '', REQUEST_TIME - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+      setcookie($session_name, '', $this->time->getRequestTime() - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
       $cookies->remove($session_name);
     }
   }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Kernel;
 
 use Drupal\entity_test\Entity\EntityTestNoBundle;
@@ -235,6 +237,34 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
 
     // Filtering by the draft state will filter out the sample content.
     $view = Views::getView('test_content_moderation_filter_via_relationship');
+    $view->setExposedInput([
+      'moderation_state' => 'editorial-draft',
+    ]);
+    $view->execute();
+    $this->assertIdenticalResultset($view, [], ['name' => 'name']);
+
+    // Revision Data Table Relationship: Filtering by the published state will
+    // filter out the sample content.
+    $view = Views::getView('test_content_moderation_filter_via_revision_relationship');
+    $view->setExposedInput([
+      'moderation_state' => 'editorial-published',
+    ]);
+    $view->execute();
+    $this->assertIdenticalResultset($view, [
+      [
+        'name' => 'Test user',
+        'title' => 'Test node',
+        'moderation_state' => 'published',
+      ],
+    ], [
+      'name' => 'name',
+      'title' => 'title',
+      'moderation_state' => 'moderation_state',
+    ]);
+
+    // Revision Data Table Relationship: Filtering by the draft state will
+    // filter out the sample content.
+    $view = Views::getView('test_content_moderation_filter_via_revision_relationship');
     $view->setExposedInput([
       'moderation_state' => 'editorial-draft',
     ]);

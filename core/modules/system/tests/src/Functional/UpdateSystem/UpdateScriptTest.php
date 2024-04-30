@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\UpdateSystem;
 
 use Drupal\Component\Serialization\Yaml;
@@ -33,6 +35,14 @@ class UpdateScriptTest extends BrowserTestBase {
     'test_module_required_by_theme',
     'test_another_module_required_by_theme',
   ];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -277,7 +287,7 @@ class UpdateScriptTest extends BrowserTestBase {
   /**
    * Date provider for testExtensionCompatibilityChange().
    */
-  public function providerExtensionCompatibilityChange() {
+  public static function providerExtensionCompatibilityChange() {
     $incompatible_module_message = "The following module is installed, but it is incompatible with Drupal " . \Drupal::VERSION . ":";
     $incompatible_theme_message = "The following theme is installed, but it is incompatible with Drupal " . \Drupal::VERSION . ":";
     return [
@@ -551,7 +561,7 @@ class UpdateScriptTest extends BrowserTestBase {
    * @return array[]
    *   Set of test cases to pass to the test method.
    */
-  public function providerMissingExtension(): array {
+  public static function providerMissingExtension(): array {
     return [
       'core only' => [
         'core' => [

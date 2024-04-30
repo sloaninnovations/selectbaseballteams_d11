@@ -279,7 +279,7 @@ class TokenTest extends UnitTestCase {
     $this->assertEquals($expected, $result);
   }
 
-  public function providerTestReplaceEscaping() {
+  public static function providerTestReplaceEscaping() {
     $data = [];
 
     // No tokens. The first argument to Token::replace() should not be escaped.
@@ -329,16 +329,6 @@ class TokenTest extends UnitTestCase {
     $this->assertFalse(isset($token_wannabes['']['empty token type']), 'An empty token type has not been matched.');
     $this->assertFalse(isset($token_wannabes['']['']), 'An empty token and type has not been matched.');
     $this->assertTrue(isset($token_wannabes['node']), 'An existing valid token has been matched.');
-  }
-
-  /**
-   * Tests passing a non-string value to Token::scan().
-   *
-   * @group legacy
-   */
-  public function testScanDeprecation() {
-    $this->expectDeprecation('Calling Drupal\Core\Utility\Token::scan() with a $text parameter of type other than string is deprecated in drupal:10.1.0 and will cause an error in drupal:11.0.0. See https://www.drupal.org/node/3334317');
-    $this->assertSame([], $this->token->scan(NULL));
   }
 
   /**

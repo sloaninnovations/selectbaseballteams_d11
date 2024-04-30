@@ -2,8 +2,9 @@
 
 namespace Drupal\taxonomy\Plugin\views\argument;
 
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\views\Attribute\ViewsArgument;
 use Drupal\views\Plugin\views\argument\NumericArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -11,23 +12,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Argument handler for basic taxonomy tid.
  *
  * @ingroup views_argument_handlers
- *
- * @ViewsArgument("taxonomy")
  */
+#[ViewsArgument(
+  id: 'taxonomy',
+)]
 class Taxonomy extends NumericArgument implements ContainerFactoryPluginInterface {
-
-  /**
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $termStorage;
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $term_storage) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityRepositoryInterface $entityRepository) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->termStorage = $term_storage;
   }
 
   /**
@@ -38,7 +33,7 @@ class Taxonomy extends NumericArgument implements ContainerFactoryPluginInterfac
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')->getStorage('taxonomy_term')
+      $container->get('entity.repository')
     );
   }
 
@@ -48,9 +43,9 @@ class Taxonomy extends NumericArgument implements ContainerFactoryPluginInterfac
   public function title() {
     // There might be no valid argument.
     if ($this->argument) {
-      $term = $this->termStorage->load($this->argument);
+      $term = $this->entityRepository->getCanonical('taxonomy_term', $this->argument);
       if (!empty($term)) {
-        return $term->getName();
+        return $term->label();
       }
     }
     // TODO review text

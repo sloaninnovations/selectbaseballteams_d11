@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Functional;
 
 use Drupal\Core\Cache\Cache;
@@ -25,7 +27,7 @@ class BlockCacheTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * A user with permission to create and edit books and to administer blocks.
+   * A user with permission to administer blocks.
    *
    * @var object
    */

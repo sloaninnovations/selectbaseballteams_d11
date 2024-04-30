@@ -8,6 +8,8 @@ use Drupal\Core\Database\Connection;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\query\SqliteDateSql;
 
+// cspell:ignore unixepoch
+
 /**
  * Tests the MySQL-specific date query handler.
  *
@@ -63,7 +65,7 @@ class SqliteDateSqlTest extends UnitTestCase {
   /**
    * Provider for date formatting test.
    */
-  public function providerTestGetDateFormat() {
+  public static function providerTestGetDateFormat() {
     return [
       ['foo.field', 'Y-y-M-m', "strftime('%Y-%Y-%m-%m', foo.field, 'unixepoch')"],
       ['bar.field', 'n-F D d l', "strftime('%m-%m %d %d %d', bar.field, 'unixepoch')"],

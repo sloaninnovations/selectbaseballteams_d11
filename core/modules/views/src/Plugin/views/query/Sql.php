@@ -8,8 +8,10 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\views\Attribute\ViewsQuery;
 use Drupal\views\Plugin\views\join\JoinPluginBase;
 use Drupal\views\Plugin\views\HandlerBase;
 use Drupal\views\ResultRow;
@@ -21,13 +23,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Views query plugin for an SQL query.
  *
  * @ingroup views_query_plugins
- *
- * @ViewsQuery(
- *   id = "views_query",
- *   title = @Translation("SQL Query"),
- *   help = @Translation("Query will be generated and run using the Drupal database API.")
- * )
  */
+#[ViewsQuery(
+  id: 'views_query',
+  title: new TranslatableMarkup('SQL Query'),
+  help: new TranslatableMarkup('Query will be generated and run using the Drupal database API.')
+)]
 class Sql extends QueryPluginBase {
 
   /**
@@ -138,6 +139,7 @@ class Sql extends QueryPluginBase {
   /**
    * The count field definition.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public array $count_field;
 
   /**
@@ -352,10 +354,10 @@ class Sql extends QueryPluginBase {
    * relationship.
    *
    * An example of a relationship would be a node reference table.
-   * If you have a node reference named 'book_parent' which links to a
-   * parent node, you could set up a relationship 'node_book_parent'
+   * If you have a node reference named 'content_parent' which links to a
+   * parent node, you could set up a relationship 'node_content_parent'
    * to 'node'. Then, anything that links to 'node' can link to
-   * 'node_book_parent' instead, thus allowing all properties of
+   * 'node_content_parent' instead, thus allowing all properties of
    * both nodes to be available in the query.
    *
    * @param $alias
@@ -581,7 +583,7 @@ class Sql extends QueryPluginBase {
    * table.
    *
    * @param $table
-   *   The unaliased name of the table to ensure.
+   *   The un-aliased name of the table to ensure.
    * @param $relationship
    *   The relationship to ensure the table links to. Each relationship will
    *   get a unique instance of the table being added. If not specified,

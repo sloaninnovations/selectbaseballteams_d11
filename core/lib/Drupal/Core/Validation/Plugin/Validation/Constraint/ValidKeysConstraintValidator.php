@@ -20,7 +20,7 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
   /**
    * {@inheritdoc}
    */
-  public function validate(mixed $value, Constraint $constraint) {
+  public function validate(mixed $value, Constraint $constraint): void {
     assert($constraint instanceof ValidKeysConstraint);
 
     if (!is_array($value)) {
@@ -58,7 +58,7 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
     foreach ($invalid_keys as $key) {
       $this->context->buildViolation($constraint->invalidKeyMessage)
         ->setParameter('@key', $key)
-        ->atPath($key)
+        ->atPath((string) $key)
         ->setInvalidValue($key)
         ->addViolation();
     }

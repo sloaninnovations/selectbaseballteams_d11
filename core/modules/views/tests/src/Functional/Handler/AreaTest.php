@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Handler;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
@@ -128,7 +130,7 @@ class AreaTest extends ViewTestBase {
 
     // Test we have the site:name token in the output.
     $output = $view->preview();
-    $output = $this->container->get('renderer')->renderRoot($output);
+    $output = (string) $this->container->get('renderer')->renderRoot($output);
     $expected = \Drupal::token()->replace('[site:name]');
     $this->assertStringContainsString($expected, $output);
   }

@@ -3,6 +3,7 @@
 namespace Drupal\Core\Cache;
 
 use Drupal\Component\Assertion\Inspector;
+use Drupal\Component\Datetime\TimeInterface;
 
 /**
  * Stores cache items in the Alternative PHP Cache User Cache (APCu).
@@ -48,8 +49,15 @@ class ApcuBackend implements CacheBackendInterface {
    *   The prefix to use for all keys in the storage that belong to this site.
    * @param \Drupal\Core\Cache\CacheTagsChecksumInterface $checksum_provider
    *   The cache tags checksum provider.
+   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   *   The time service.
    */
-  public function __construct($bin, $site_prefix, CacheTagsChecksumInterface $checksum_provider) {
+  public function __construct(
+    $bin,
+    $site_prefix,
+    CacheTagsChecksumInterface $checksum_provider,
+    protected TimeInterface $time,
+  ) {
     $this->bin = $bin;
     $this->sitePrefix = $site_prefix;
     $this->checksumProvider = $checksum_provider;
@@ -145,7 +153,7 @@ class ApcuBackend implements CacheBackendInterface {
     $cache->tags = $cache->tags ? explode(' ', $cache->tags) : [];
 
     // Check expire time.
-    $cache->valid = $cache->expire == Cache::PERMANENT || $cache->expire >= REQUEST_TIME;
+    $cache->valid = $cache->expire == Cache::PERMANENT || $cache->expire >= $this->time->getRequestTime();
 
     // Check if invalidateTags() has been called with any of the entry's tags.
     if (!$this->checksumProvider->isValid($cache->checksum, $cache->tags)) {
@@ -235,7 +243,7 @@ class ApcuBackend implements CacheBackendInterface {
    */
   public function invalidateMultiple(array $cids) {
     foreach ($this->getMultiple($cids) as $cache) {
-      $this->set($cache->cid, $cache, REQUEST_TIME - 1);
+      $this->set($cache->cid, $cache, $this->time->getRequestTime() - 1);
     }
   }
 
@@ -245,7 +253,7 @@ class ApcuBackend implements CacheBackendInterface {
   public function invalidateAll() {
     foreach ($this->getAll() as $data) {
       $cid = str_replace($this->binPrefix, '', $data['key']);
-      $this->set($cid, $data['value'], REQUEST_TIME - 1);
+      $this->set($cid, $data['value'], $this->time->getRequestTime() - 1);
     }
   }
 

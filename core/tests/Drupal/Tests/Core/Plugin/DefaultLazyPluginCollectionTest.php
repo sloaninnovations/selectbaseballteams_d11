@@ -64,7 +64,7 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
    * @return array
    *   The test data.
    */
-  public function providerTestSortHelper() {
+  public static function providerTestSortHelper() {
     return [
       ['apple', 'apple', 0],
       ['apple', 'cherry', -1],
@@ -241,18 +241,6 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
     $expected['cherry'] = ['value' => 'kiwi', 'id' => 'cherry'];
     $config = $this->defaultPluginCollection->getConfiguration();
     $this->assertSame($expected, $config);
-  }
-
-  /**
-   * @covers ::setConfiguration
-   * @group legacy
-   */
-  public function testConfigurableSetConfigurationToNull(): void {
-    $this->setupPluginCollection($this->any());
-
-    $this->expectDeprecation('Calling Drupal\Core\Plugin\DefaultLazyPluginCollection::setConfiguration() with a non-array argument is deprecated in drupal:10.3.0 and will fail in drupal:11.0.0. See https://www.drupal.org/node/3406191');
-    $this->defaultPluginCollection->setConfiguration(NULL);
-    $this->assertSame([], $this->defaultPluginCollection->getConfiguration());
   }
 
   /**

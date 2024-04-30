@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Migrate\d6;
 
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
@@ -23,13 +25,13 @@ class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
         'requirements_error' => 1209600,
       ],
       // logging is not handled by the migration.
-      'logging' => 1,
+      'logging' => TRUE,
     ],
     'system.date' => [
       'first_day' => 4,
       // country is not handled by the migration.
       'country' => [
-        'default' => '',
+        'default' => NULL,
       ],
       // timezone is not handled by the migration.
       'timezone' => [

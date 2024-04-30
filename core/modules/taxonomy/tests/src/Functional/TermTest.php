@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Component\Utility\Tags;
@@ -13,6 +15,7 @@ use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
  * Tests load, save and delete for taxonomy terms.
  *
  * @group taxonomy
+ * @group #slow
  */
 class TermTest extends TaxonomyTestBase {
 

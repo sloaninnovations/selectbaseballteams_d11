@@ -81,6 +81,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $third_party_settings = [];
 
   /**
@@ -92,7 +93,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    *
    * @var array
    */
-  // phpcs:ignore Drupal.Classes.PropertyDeclaration
+  // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $_core = [];
 
   /**
@@ -158,7 +159,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * {@inheritdoc}
    */
   public function set($property_name, $value) {
-    if ($this instanceof EntityWithPluginCollectionInterface) {
+    if ($this instanceof EntityWithPluginCollectionInterface && !$this->isSyncing()) {
       $plugin_collections = $this->getPluginCollections();
       if (isset($plugin_collections[$property_name])) {
         // If external code updates the settings, pass it along to the plugin.
@@ -288,7 +289,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
     parent::preSave($storage);
 
-    if ($this instanceof EntityWithPluginCollectionInterface) {
+    if ($this instanceof EntityWithPluginCollectionInterface && !$this->isSyncing()) {
       // Any changes to the plugin configuration must be saved to the entity's
       // copy as well.
       foreach ($this->getPluginCollections() as $plugin_config_key => $plugin_collection) {
@@ -340,7 +341,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   /**
    * {@inheritdoc}
    */
-  public function __sleep() {
+  public function __sleep(): array {
     $keys_to_unset = [];
     if ($this instanceof EntityWithPluginCollectionInterface) {
       // Get the plugin collections first, so that the properties are

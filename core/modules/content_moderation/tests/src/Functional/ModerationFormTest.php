@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -27,6 +29,14 @@ class ModerationFormTest extends ModerationStateTestBase {
     'locale',
     'content_translation',
   ];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -312,7 +322,7 @@ class ModerationFormTest extends ModerationStateTestBase {
     $french = \Drupal::languageManager()->getLanguage('fr');
 
     $this->drupalGet($latest_version_path);
-    $this->assertSession()->statusCodeEquals('403');
+    $this->assertSession()->statusCodeEquals(403);
     $this->assertSession()->elementNotExists('xpath', '//ul[@class="entity-moderation-form"]');
 
     // Add french translation (revision 2).
@@ -326,7 +336,7 @@ class ModerationFormTest extends ModerationStateTestBase {
     ], 'Save (this translation)');
 
     $this->drupalGet($latest_version_path, ['language' => $french]);
-    $this->assertSession()->statusCodeEquals('403');
+    $this->assertSession()->statusCodeEquals(403);
     $this->assertSession()->elementNotExists('xpath', '//ul[@class="entity-moderation-form"]');
 
     // Add french pending revision (revision 3).

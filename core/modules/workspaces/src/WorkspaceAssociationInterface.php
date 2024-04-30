@@ -96,25 +96,15 @@ interface WorkspaceAssociationInterface {
    *
    * @param \Drupal\Core\Entity\RevisionableInterface $entity
    *   An entity object.
+   * @param bool $latest_revision
+   *   (optional) Whether to return only the workspaces in which the latest
+   *   revision of the entity is tracked. Defaults to FALSE.
    *
    * @return string[]
    *   An array of workspace IDs where the given entity is tracked, or an empty
    *   array if it is not tracked anywhere.
    */
-  public function getEntityTrackingWorkspaceIds(RevisionableInterface $entity);
-
-  /**
-   * Triggers clean-up operations after publishing a workspace.
-   *
-   * @param \Drupal\workspaces\WorkspaceInterface $workspace
-   *   A workspace entity.
-   *
-   * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use the
-   *   \Drupal\workspaces\Event\WorkspacePostPublishEvent event instead.
-   *
-   * @see https://www.drupal.org/node/3242573
-   */
-  public function postPublish(WorkspaceInterface $workspace);
+  public function getEntityTrackingWorkspaceIds(RevisionableInterface $entity, bool $latest_revision = FALSE);
 
   /**
    * Deletes all the workspace association records for the given workspace.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Core\Config\Schema\SchemaCheckTrait;
@@ -72,7 +74,7 @@ class SchemaCheckTraitTest extends KernelTestBase {
     $this->assertEquals($no_data_expectations, $ret);
   }
 
-  public function providerCheckConfigSchema(): array {
+  public static function providerCheckConfigSchema(): array {
     // Storage type check errors.
     // @see \Drupal\Core\Config\Schema\SchemaCheckTrait::checkValue()
     $expected_storage_null_check_errors = [

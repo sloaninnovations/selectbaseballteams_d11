@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\File;
 
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
@@ -219,7 +221,7 @@ class FileUrlGeneratorTest extends FileTestBase {
   /**
    * Data provider.
    */
-  public function providerGenerateURI() {
+  public static function providerGenerateURI() {
     return [
       'schemaless' =>
         [

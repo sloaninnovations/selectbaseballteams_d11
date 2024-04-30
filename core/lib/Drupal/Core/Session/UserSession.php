@@ -45,6 +45,7 @@ class UserSession implements AccountInterface {
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $preferred_langcode;
 
   /**
@@ -52,6 +53,7 @@ class UserSession implements AccountInterface {
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $preferred_admin_langcode;
 
   /**
@@ -119,7 +121,7 @@ class UserSession implements AccountInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasPermission($permission) {
+  public function hasPermission(string $permission) {
     return \Drupal::service('permission_checker')->hasPermission($permission, $this);
   }
 

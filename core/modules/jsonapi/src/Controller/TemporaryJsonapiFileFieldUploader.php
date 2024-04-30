@@ -2,22 +2,21 @@
 
 namespace Drupal\jsonapi\Controller;
 
-use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Lock\LockBackendInterface;
-use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
-use Drupal\file\Upload\ContentDispositionFilenameParser;
+use Drupal\file\Upload\FileUploadLocationTrait;
 use Drupal\file\Upload\InputStreamFileWriterInterface;
 use Drupal\file\Validation\FileValidatorInterface;
 use Drupal\file\Validation\FileValidatorSettingsTrait;
@@ -25,9 +24,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
 use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
 use Symfony\Component\HttpFoundation\File\Exception\UploadException;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
 
 /**
  * Reads data from an upload stream and creates a corresponding file entity.
@@ -45,131 +44,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class TemporaryJsonapiFileFieldUploader {
 
   use FileValidatorSettingsTrait;
+  use FileUploadLocationTrait {
+    getUploadLocation as getUploadDestination;
+  }
 
-  /**
-   * The regex used to extract the filename from the content disposition header.
-   *
-   * @var string
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
-   *   \Drupal\file\Upload\ContentDispositionFilenameParser::REQUEST_HEADER_FILENAME_REGEX
-   *   instead.
-   *
-   * @see https://www.drupal.org/node/3380380
-   */
-  const REQUEST_HEADER_FILENAME_REGEX = '@\bfilename(?<star>\*?)=\"(?<filename>.+)\"@';
-
-  /**
-   * The amount of bytes to read in each iteration when streaming file data.
-   *
-   * @var int
-   */
-  const BYTES_TO_READ = 8192;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * The file system service.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
-   * The MIME type guesser.
-   *
-   * @var \Symfony\Component\Mime\MimeTypeGuesserInterface
-   */
-  protected $mimeTypeGuesser;
-
-  /**
-   * The token replacement instance.
-   *
-   * @var \Drupal\Core\Utility\Token
-   */
-  protected $token;
-
-  /**
-   * The lock service.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface
-   */
-  protected $lock;
-
-  /**
-   * System file configuration.
-   *
-   * @var \Drupal\Core\Config\ImmutableConfig
-   */
-  protected $systemFileConfig;
-
-  /**
-   * The event dispatcher.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
-   */
-  protected $eventDispatcher;
-
-  /**
-   * The file validator.
-   *
-   * @var \Drupal\file\Validation\FileValidatorInterface
-   */
-  protected FileValidatorInterface $fileValidator;
-
-  /**
-   * The input stream file writer.
-   */
-  protected InputStreamFileWriterInterface $inputStreamFileWriter;
-
-  /**
-   * Constructs a FileUploadResource instance.
-   *
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
-   *   The file system service.
-   * @param \Symfony\Component\Mime\MimeTypeGuesserInterface $mime_type_guesser
-   *   The MIME type guesser.
-   * @param \Drupal\Core\Utility\Token $token
-   *   The token replacement instance.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|null $event_dispatcher
-   *   (optional) The event dispatcher.
-   * @param \Drupal\file\Validation\FileValidatorInterface|null $file_validator
-   *   The file validator.
-   * @param \Drupal\file\Upload\InputStreamFileWriterInterface|null $input_stream_file_writer
-   *   The stream file uploader.
-   */
-  public function __construct(LoggerInterface $logger, FileSystemInterface $file_system, $mime_type_guesser, Token $token, LockBackendInterface $lock, ConfigFactoryInterface $config_factory, EventDispatcherInterface $event_dispatcher = NULL, FileValidatorInterface $file_validator = NULL, InputStreamFileWriterInterface $input_stream_file_writer = NULL) {
-    $this->logger = $logger;
-    $this->fileSystem = $file_system;
-    $this->mimeTypeGuesser = $mime_type_guesser;
-    $this->token = $token;
-    $this->lock = $lock;
-    $this->systemFileConfig = $config_factory->get('system.file');
-    if (!$event_dispatcher) {
-      $event_dispatcher = \Drupal::service('event_dispatcher');
-    }
-    $this->eventDispatcher = $event_dispatcher;
-    if (!$file_validator) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $file_validator argument is deprecated in drupal:10.2.0 and is required in drupal:11.0.0. See https://www.drupal.org/node/3363700', E_USER_DEPRECATED);
-      $file_validator = \Drupal::service('file.validator');
-    }
-    $this->fileValidator = $file_validator;
-    if (!$input_stream_file_writer) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $input_stream_file_writer argument is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. See https://www.drupal.org/node/3380607', E_USER_DEPRECATED);
-      $input_stream_file_writer = \Drupal::service('file.input_stream_file_writer');
-    }
-    $this->inputStreamFileWriter = $input_stream_file_writer;
+  public function __construct(protected LoggerInterface $logger, protected FileSystemInterface $fileSystem, protected MimeTypeGuesserInterface $mimeTypeGuesser, protected Token $token, protected LockBackendInterface $lock, protected ConfigFactoryInterface $configFactory, protected EventDispatcherInterface $eventDispatcher, protected FileValidatorInterface $fileValidator, protected InputStreamFileWriterInterface $inputStreamFileWriter) {
   }
 
   /**
@@ -194,7 +73,7 @@ class TemporaryJsonapiFileFieldUploader {
   public function handleFileUploadForField(FieldDefinitionInterface $field_definition, $filename, AccountInterface $owner) {
     assert(is_a($field_definition->getClass(), FileFieldItemList::class, TRUE));
     $settings = $field_definition->getSettings();
-    $destination = $this->getUploadLocation($settings);
+    $destination = $this->getUploadDestination($field_definition);
 
     // Check the destination file path is writable.
     if (!$this->fileSystem->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY)) {
@@ -213,7 +92,7 @@ class TemporaryJsonapiFileFieldUploader {
 
     $temp_file_path = $this->streamUploadData();
 
-    $file_uri = $this->fileSystem->getDestinationFilename($file_uri, FileSystemInterface::EXISTS_RENAME);
+    $file_uri = $this->fileSystem->getDestinationFilename($file_uri, FileExists::Rename);
 
     // Lock based on the prepared file URI.
     $lock_id = $this->generateLockIdFromFileUri($file_uri);
@@ -245,11 +124,18 @@ class TemporaryJsonapiFileFieldUploader {
     }
 
     $file->setFileUri($file_uri);
+
+    // Update the filename with any changes as a result of security or renaming
+    // due to an existing file.
+    // @todo Remove this duplication by replacing with FileUploadHandler. See
+    // https://www.drupal.org/project/drupal/issues/3401734
+    $file->setFilename($this->fileSystem->basename($file->getFileUri()));
+
     // Move the file to the correct location after validation. Use
-    // FileSystemInterface::EXISTS_ERROR as the file location has already been
+    // FileExists::Error as the file location has already been
     // determined above in FileSystem::getDestinationFilename().
     try {
-      $this->fileSystem->move($temp_file_path, $file_uri, FileSystemInterface::EXISTS_ERROR);
+      $this->fileSystem->move($temp_file_path, $file_uri, FileExists::Error);
     }
     catch (FileException $e) {
       throw new HttpException(500, 'Temporary file could not be moved to file location');
@@ -270,29 +156,6 @@ class TemporaryJsonapiFileFieldUploader {
     $this->lock->release($lock_id);
 
     return $file;
-  }
-
-  /**
-   * Validates and extracts the filename from the Content-Disposition header.
-   *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request object.
-   *
-   * @return string
-   *   The filename extracted from the header.
-   *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-   *   Thrown when the 'Content-Disposition' request header is invalid.
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
-   *   \Drupal\file\Upload\ContentDispositionFilenameParser::parseFilename()
-   *   instead.
-   *
-   * @see https://www.drupal.org/node/3380380
-   */
-  public function validateAndParseContentDispositionHeader(Request $request) {
-    @trigger_error('Calling ' . __METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\file\Upload\ContentDispositionFilenameParser::parseFilename() instead. See https://www.drupal.org/node/3380380', E_USER_DEPRECATED);
-    return ContentDispositionFilenameParser::parseFilename($request);
   }
 
   /**
@@ -403,25 +266,6 @@ class TemporaryJsonapiFileFieldUploader {
     $event = new FileUploadSanitizeNameEvent($filename, $extensions);
     $this->eventDispatcher->dispatch($event);
     return $event->getFilename();
-  }
-
-  /**
-   * Determines the URI for a file field.
-   *
-   * @param array $settings
-   *   The array of field settings.
-   *
-   * @return string
-   *   An un-sanitized file directory URI with tokens replaced. The result of
-   *   the token replacement is then converted to plain text and returned.
-   */
-  protected function getUploadLocation(array $settings) {
-    $destination = trim($settings['file_directory'], '/');
-
-    // Replace tokens. As the tokens might contain HTML we convert it to plain
-    // text.
-    $destination = PlainTextOutput::renderFromHtml($this->token->replace($destination, [], [], new BubbleableMetadata()));
-    return $settings['uri_scheme'] . '://' . $destination;
   }
 
   /**

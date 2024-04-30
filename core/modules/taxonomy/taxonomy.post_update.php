@@ -17,5 +17,7 @@ function taxonomy_removed_post_updates() {
     'taxonomy_post_update_make_taxonomy_term_revisionable' => '9.0.0',
     'taxonomy_post_update_configure_status_field_widget' => '9.0.0',
     'taxonomy_post_update_clear_views_argument_validator_plugins_cache' => '10.0.0',
+    'taxonomy_post_update_set_new_revision' => '11.0.0',
+    'taxonomy_post_update_set_vocabulary_description_to_null' => '11.0.0',
   ];
 }

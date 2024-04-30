@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
@@ -15,6 +17,8 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstraint;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+
+// cspell:ignore kthxbai
 
 /**
  * Base class for testing validation of config entities.
@@ -130,7 +134,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
    * @return array[]
    *   The test cases.
    */
-  public function providerInvalidMachineNameCharacters(): array {
+  public static function providerInvalidMachineNameCharacters(): array {
     return [
       'INVALID: space separated' => ['space separated', FALSE],
       'INVALID: dash separated' => ['dash-separated', FALSE],
@@ -201,7 +205,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
    * @return array[]
    *   The test cases.
    */
-  public function providerConfigDependenciesValidation(): array {
+  public static function providerConfigDependenciesValidation(): array {
     return [
       'valid dependency types' => [
         [

@@ -44,8 +44,7 @@
          */
         const toggleBlockEntry = (index, link) => {
           const $link = $(link);
-          const textMatch =
-            link.textContent.toLowerCase().indexOf(query) !== -1;
+          const textMatch = link.textContent.toLowerCase().includes(query);
           // Checks if a category is currently hidden.
           // Toggles the category on if so.
           if (
@@ -167,6 +166,7 @@
             draggable: '.js-layout-builder-block',
             ghostClass: 'ui-state-drop',
             group: 'builder-region',
+            filter: '.contextual',
             onEnd: (event) =>
               Drupal.layoutBuilderBlockUpdate(event.item, event.from, event.to),
           });
