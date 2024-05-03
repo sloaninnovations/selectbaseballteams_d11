@@ -74,7 +74,10 @@ class HtmlToTextTest extends UnitTestCase {
   public function testTags(): void {
     global $base_path, $base_url;
     $tests = [
+      // Tests newlines are stripped from anchor text.
       '<a href = "https://www.drupal.org">Drupal' . "\n.org</a>" => "Drupal.org [1]\n\n[1] https://www.drupal.org\n",
+      // Tests newlines and carriage returns are stripped from anchor text.
+      '<a href = "https://www.drupal.org">Drupal' . "\r\n.org</a>" => "Drupal.org [1]\n\n[1] https://www.drupal.org\n",
       // @todo Trailing newlines should be trimmed.
       '<a href = "https://www.drupal.org">Drupal.org</a>' => "Drupal.org [1]\n\n[1] https://www.drupal.org\n",
       // @todo Footer URLs should be absolute.

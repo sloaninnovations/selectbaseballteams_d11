@@ -339,7 +339,7 @@ class MailFormatHelper {
         [, , $url, $label] = $match;
         // Ensure all URLs are absolute.
         static::$urls[] = strpos($url, '://') ? $url : preg_replace(static::$regexp, $base_url . '/', $url);
-        // Strip newlines from the label.
+        // Strip newlines and carriage returns from anchor text.
         return preg_replace('/\r?\n|\r/', '', $label) . ' [' . count(static::$urls) . ']';
       }
     }
