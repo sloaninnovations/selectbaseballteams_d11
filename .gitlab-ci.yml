@@ -1,4 +1,4 @@
-# cspell:ignore codequality Micheh micheh webide updatedb
+# cspell:ignore codequality Micheh micheh webide updatedb stylelintrc
 
 ################
 # Drupal GitLabCI template.
@@ -59,6 +59,7 @@ variables:
   _CONFIG_DOCKERHUB_ROOT: "drupalci"
   # Let composer know what self.version means.
   COMPOSER_ROOT_VERSION: "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}${CI_COMMIT_BRANCH}-dev"
+  COMPOSER_ALLOW_SUPERUSER: 1
   CONCURRENCY: 24
   GIT_DEPTH: "50"
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
@@ -204,6 +205,12 @@ default:
     _TARGET_PHP: "8.3"
     _TARGET_DB: "mariadb-10.3.22"
 
+'PHP 8.3 MariaDB 10.6':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.3"
+    _TARGET_DB: "mariadb-10.6"
+
 'PHP 8.3 PostgreSQL 14.1':
   <<: [ *default-stage, *run-on-mr ]
   variables:
@@ -222,10 +229,10 @@ default:
     _TARGET_PHP: "8.3"
     _TARGET_DB: "pgsql-16"
 
-'PHP 8.3 SQLite 3':
+'PHP 8.3 SQLite 3.45':
   <<: [ *default-stage, *run-on-mr ]
   variables:
-    _TARGET_PHP: "8.3"
+    _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "sqlite-3"
 
 # Jobs running on commits.
@@ -240,8 +247,8 @@ default:
   needs: [ '[Commit] PHP 8.3 MySQL 5.7' ]
   <<: [ *run-on-commit ]
 
-'[Commit] PHP 8.3 SQLite 3':
-  extends: 'PHP 8.3 SQLite 3'
+'[Commit] PHP 8.3 SQLite 3.45':
+  extends: 'PHP 8.3 SQLite 3.45'
   needs: [ '[Commit] PHP 8.3 PostgreSQL 16' ]
   <<: [ *run-on-commit ]
 
@@ -252,14 +259,14 @@ default:
   needs: [ 'DEFAULT: PHP 8.3 MySQL 8' ]
   <<: [ *run-daily ]
 
-'[Daily] PHP 8.3 SQLite 3':
-  extends: 'PHP 8.3 SQLite 3'
+'[Daily] PHP 8.3 SQLite 3.45':
+  extends: 'PHP 8.3 SQLite 3.45'
   needs: [ '[Daily] PHP 8.3 PostgreSQL 16' ]
   <<: [ *run-daily ]
 
 '[Daily] PHP 8.3 MariaDB 10.3.22':
   extends: 'PHP 8.3 MariaDB 10.3.22'
-  needs: [ '[Daily] PHP 8.3 SQLite 3' ]
+  needs: [ '[Daily] PHP 8.3 SQLite 3.45' ]
   <<: [ *run-daily ]
 
 ################
@@ -284,9 +291,9 @@ default:
       - vendor/
   script:
       - composer validate
-      - composer install
+      - composer install --optimize-autoloader
       - if [ -n "$COMPOSER_UPDATE" ]; then
-          composer update;
+          composer update --optimize-autoloader;
           composer outdated;
         fi
 
@@ -367,6 +374,8 @@ default:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
+        - core/.eslint*
+        - core/.prettier*
         - core/package.json
         - core/yarn.lock
         - "**/*.js"
@@ -392,6 +401,8 @@ default:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
+        - core/.stylelintrc.json
+        - core/.prettier*
         - core/package.json
         - core/yarn.lock
         - "**/*.css"
@@ -426,6 +437,7 @@ default:
   stage: 🪄 Lint
   variables:
     KUBERNETES_CPU_REQUEST: "2"
+    _TARGET_PHP: "8.3-ubuntu"
   # Run on MRs if config schema files have changed, or manually.
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -455,9 +467,9 @@ default:
     - git checkout -f $CI_MERGE_REQUEST_DIFF_BASE_SHA
     # Composer-install Drush & the Config Inspector module.
     - composer require drush/drush drupal/config_inspector || exit 100
-    # Install Drupal's Standard install profile + all core modules + the config inspector module.
+    # Install Drupal's Standard install profile + all core modules (except obsolete ones) + the config inspector module.
     - php core/scripts/drupal install standard
-    - ls core/modules | grep -v help_topics | xargs vendor/bin/drush pm:install --yes
+    - ls core/modules | grep -v sdc | xargs vendor/bin/drush pm:install --yes
     - vendor/bin/drush pm:install config_inspector --yes --quiet || exit 101
     # Compute statistics for coverage of validatable config for HEAD.
     - vendor/bin/drush config:inspect --statistics > HEAD.json

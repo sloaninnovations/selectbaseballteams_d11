@@ -47,7 +47,10 @@ class ClaroTest extends BrowserTestBase {
    * Tests Claro's configuration schema.
    */
   public function testConfigSchema() {
-    $this->drupalLogin($this->rootUser);
+    $permissions = [
+      'administer modules',
+    ];
+    $this->drupalLogin($this->drupalCreateUser($permissions));
     $this->drupalGet('admin/modules');
     $this->assertSession()->elementNotExists('css', '#block-claro-help');
 

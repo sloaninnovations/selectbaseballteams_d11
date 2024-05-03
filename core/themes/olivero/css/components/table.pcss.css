@@ -5,7 +5,6 @@
 
 @import "../base/media-queries.pcss.css";
 
-.forum table,
 .text-content table,
 .views-table,
 .draggable-table {
@@ -75,6 +74,13 @@
 
 .draggable-table .form-item {
   margin-top: 0;
+}
+
+.text-content table {
+  & td,
+  & th {
+    vertical-align: middle;
+  }
 }
 
 .tablesort {

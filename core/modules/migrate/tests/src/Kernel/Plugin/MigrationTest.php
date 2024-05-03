@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel\Plugin;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -51,7 +53,7 @@ class MigrationTest extends KernelTestBase {
    *
    * @dataProvider getProcessPluginsExceptionMessageProvider
    */
-  public function testGetProcessPluginsExceptionMessage(array $process) {
+  public function testGetProcessPluginsExceptionMessage(array $process): void {
     // Test with an invalid process pipeline.
     $plugin_definition = [
       'id' => 'foo',
@@ -69,33 +71,11 @@ class MigrationTest extends KernelTestBase {
   /**
    * Provides data for testing invalid process pipeline.
    */
-  public static function getProcessPluginsExceptionMessageProvider() {
-    return [
-      [
-        'Null' =>
-          [
-            'dest' => NULL,
-          ],
-      ],
-      [
-        'boolean' =>
-          [
-            'dest' => TRUE,
-          ],
-      ],
-      [
-        'integer' =>
-          [
-            'dest' => 2370,
-          ],
-      ],
-      [
-        'float' =>
-          [
-            'dest' => 1.61,
-          ],
-      ],
-    ];
+  public static function getProcessPluginsExceptionMessageProvider(): \Generator {
+    yield 'null' => ['process' => ['dest' => NULL]];
+    yield 'boolean' => ['process' => ['dest' => TRUE]];
+    yield 'integer' => ['process' => ['dest' => 2370]];
+    yield 'float' => ['process' => ['dest' => 1.61]];
   }
 
   /**
@@ -152,7 +132,7 @@ class MigrationTest extends KernelTestBase {
       ],
     ];
     $migration = $plugin_manager->createStubMigration($plugin_definition);
-    $this->assertSame(['required' => [], 'optional' => ['m1', 'm2', 'm3', 'm4', 'm5']], $migration->getMigrationDependencies(TRUE));
+    $this->assertSame(['required' => [], 'optional' => ['m1', 'm2', 'm3', 'm4', 'm5']], $migration->getMigrationDependencies());
   }
 
   /**
@@ -165,24 +145,6 @@ class MigrationTest extends KernelTestBase {
     $destination_ids = $migration->getDestinationIds();
     $this->assertNotEmpty($destination_ids, 'Destination ids are not empty');
     $this->assertEquals(['foo' => 'bar'], $destination_ids, 'Destination ids match the expected values.');
-  }
-
-  /**
-   * Tests Migration::getTrackLastImported()
-   *
-   * @covers ::getTrackLastImported
-   * @covers ::isTrackLastImported
-   *
-   * @group legacy
-   */
-  public function testGetTrackLastImported() {
-    $this->expectDeprecation('Drupal\migrate\Plugin\Migration::setTrackLastImported() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3282894');
-    $this->expectDeprecation('Drupal\migrate\Plugin\Migration::getTrackLastImported() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3282894');
-    $this->expectDeprecation('Drupal\migrate\Plugin\Migration::isTrackLastImported() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3282894');
-    $migration = \Drupal::service('plugin.manager.migration')->createStubMigration([]);
-    $migration->setTrackLastImported(TRUE);
-    $this->assertEquals(TRUE, $migration->getTrackLastImported());
-    $this->assertEquals(TRUE, $migration->isTrackLastImported());
   }
 
   /**

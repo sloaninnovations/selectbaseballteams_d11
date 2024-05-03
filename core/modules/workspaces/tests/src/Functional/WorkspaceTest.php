@@ -170,15 +170,20 @@ class WorkspaceTest extends BrowserTestBase {
 
   /**
    * Tests the manage workspace page.
-   *
-   * @group failing
    */
   public function testWorkspaceManagePage() {
-    $this->drupalLogin($this->rootUser);
+    $this->drupalCreateContentType(['type' => 'test', 'label' => 'Test']);
+
+    $permissions = [
+      'administer taxonomy',
+      'administer workspaces',
+      'create test content',
+      'delete any test content',
+    ];
+    $this->drupalLogin($this->drupalCreateUser($permissions));
     $this->setupWorkspaceSwitcherBlock();
     $assert_session = $this->assertSession();
 
-    $this->drupalCreateContentType(['type' => 'test', 'label' => 'Test']);
     $vocabulary = $this->createVocabulary();
 
     $test_1 = $this->createWorkspaceThroughUi('Test 1', 'test_1');
@@ -207,6 +212,23 @@ class WorkspaceTest extends BrowserTestBase {
 
     $this->drupalGet($test_1->toUrl()->toString());
     $assert_session->pageTextContains('2 content items, 1 taxonomy term');
+    $assert_session->linkExists('Node 1');
+    $assert_session->linkExists('Node 2');
+    $assert_session->linkExists('Term 1');
+
+    // Create 50 more nodes to test the pagination.
+    for ($i = 3; $i < 53; $i++) {
+      $this->createNodeThroughUi('Node ' . $i, 'test');
+    }
+
+    $this->drupalGet($test_1->toUrl()->toString());
+    $assert_session->pageTextContains('52 content items');
+    $assert_session->pageTextContains('1 taxonomy term');
+    $assert_session->linkExists('Node 52');
+    $assert_session->linkExists('Node 3');
+    $assert_session->linkNotExists('Term 1');
+
+    $this->drupalGet($test_1->toUrl()->toString(), ['query' => ['page' => '1']]);
     $assert_session->linkExists('Node 1');
     $assert_session->linkExists('Node 2');
     $assert_session->linkExists('Term 1');
@@ -250,7 +272,12 @@ class WorkspaceTest extends BrowserTestBase {
     $this->createContentType(['type' => 'test', 'label' => 'Test']);
 
     // Login and create a workspace.
-    $this->drupalLogin($this->rootUser);
+    $permissions = [
+      'administer workspaces',
+      'create test content',
+      'delete any test content',
+    ];
+    $this->drupalLogin($this->drupalCreateUser($permissions));
     $this->createAndActivateWorkspaceThroughUi('May 4', 'may_4');
 
     // Create a node in the workspace.
@@ -315,7 +342,11 @@ class WorkspaceTest extends BrowserTestBase {
    */
   public function testPublishWorkspace() {
     $this->createContentType(['type' => 'test', 'label' => 'Test']);
-    $this->drupalLogin($this->rootUser);
+    $permissions = [
+      'administer workspaces',
+      'create test content',
+    ];
+    $this->drupalLogin($this->drupalCreateUser($permissions));
 
     $this->drupalGet('/admin/config/workflow/workspaces/add');
     $this->submitForm([
@@ -332,7 +363,7 @@ class WorkspaceTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('There are no changes that can be published from Test workspace to Live.');
 
     // Create a node in the workspace.
-    $node = $this->createNodeThroughUi('Test node', 'test');
+    $this->createNodeThroughUi('Test node', 'test');
 
     $this->drupalGet('/admin/config/workflow/workspaces/manage/test_workspace/publish');
     $this->assertSession()->statusCodeEquals(200);

@@ -292,7 +292,7 @@ class NodeTest extends ResourceTestBase {
 
     // GET node's current normalization.
     $response = $this->request('GET', $url, $this->getAuthenticationRequestOptions());
-    $normalization = Json::decode((string) $response->getBody());
+    $normalization = $this->getDocumentFromResponse($response);
 
     // Change node's path alias.
     $normalization['data']['attributes']['path']['alias'] .= 's-rule-the-world';
@@ -311,8 +311,8 @@ class NodeTest extends ResourceTestBase {
 
     // Repeat PATCH request: 200.
     $response = $this->request('PATCH', $url, $request_options);
+    $updated_normalization = $this->getDocumentFromResponse($response);
     $this->assertResourceResponse(200, FALSE, $response);
-    $updated_normalization = Json::decode((string) $response->getBody());
     $this->assertSame($normalization['data']['attributes']['path']['alias'], $updated_normalization['data']['attributes']['path']['alias']);
   }
 
@@ -501,21 +501,21 @@ class NodeTest extends ResourceTestBase {
 
     // 0 results because the node is unpublished.
     $response = $this->request('GET', $collection_filter_url, $request_options);
-    $doc = Json::decode((string) $response->getBody());
+    $doc = $this->getDocumentFromResponse($response);
     $this->assertCount(0, $doc['data']);
 
     $this->grantPermissionsToTestedRole(['view own unpublished content']);
 
     // 1 result because the current user is the owner of the unpublished node.
     $response = $this->request('GET', $collection_filter_url, $request_options);
-    $doc = Json::decode((string) $response->getBody());
+    $doc = $this->getDocumentFromResponse($response);
     $this->assertCount(1, $doc['data']);
 
     $this->entity->setOwnerId(0)->save();
 
     // 0 results because the current user is no longer the owner.
     $response = $this->request('GET', $collection_filter_url, $request_options);
-    $doc = Json::decode((string) $response->getBody());
+    $doc = $this->getDocumentFromResponse($response);
     $this->assertCount(0, $doc['data']);
 
     // Assert bubbling of cacheability from query alter hook.
@@ -524,28 +524,6 @@ class NodeTest extends ResourceTestBase {
     $this->rebuildAll();
     $response = $this->request('GET', $collection_filter_url, $request_options);
     $this->assertContains('user.node_grants:view', explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]));
-  }
-
-  /**
-   * Tests deprecated entity reference items.
-   *
-   * @group legacy
-   */
-  public function testDeprecatedEntityReferenceFieldItem(): void {
-    \Drupal::service('module_installer')->install(['jsonapi_test_reference_types']);
-
-    $this->setUpAuthorization('GET');
-    // @todo Remove line below in favor of commented line in https://www.drupal.org/project/drupal/issues/2878463.
-    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
-    // $url = $this->entity->toUrl('jsonapi');
-    $query = ['include' => 'deprecated_reference'];
-    $url->setOption('query', $query);
-    $request_options = [];
-    $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
-    $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
-
-    $this->expectDeprecation('Entity reference field items not implementing Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItemInterface is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3279140');
-    $this->request('GET', $url, $request_options);
   }
 
 }

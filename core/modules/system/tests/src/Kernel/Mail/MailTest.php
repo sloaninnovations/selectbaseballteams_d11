@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Mail;
 
 use Drupal\Component\Utility\Random;
@@ -42,6 +44,7 @@ class MailTest extends KernelTestBase {
     parent::setUp();
     $this->installEntitySchema('user');
     $this->installEntitySchema('file');
+    $this->installConfig(['system']);
 
     // Set required site configuration.
     $this->config('system.site')

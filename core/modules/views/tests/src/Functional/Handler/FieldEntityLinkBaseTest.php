@@ -27,6 +27,7 @@ class FieldEntityLinkBaseTest extends ViewTestBase {
    */
   protected static $modules = ['node', 'language'];
 
+
   /**
    * {@inheritdoc}
    */
@@ -59,7 +60,10 @@ class FieldEntityLinkBaseTest extends ViewTestBase {
       $translation->save();
     }
 
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->createUser([
+      'delete any article content',
+      'edit any article content',
+    ]));
 
   }
 

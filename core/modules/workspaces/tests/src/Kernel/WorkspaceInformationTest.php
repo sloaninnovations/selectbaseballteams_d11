@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workspaces\Kernel;
 
 use Drupal\Core\Entity\EntityStorageException;
@@ -47,7 +49,6 @@ class WorkspaceInformationTest extends KernelTestBase {
    */
   protected static $modules = [
     'entity_test',
-    'path_alias',
     'user',
     'workspaces',
     'workspaces_test',

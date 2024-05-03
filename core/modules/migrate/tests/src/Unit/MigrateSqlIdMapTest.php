@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit;
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
-use Drupal\migrate\Plugin\MigrationPluginManager;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
@@ -1135,7 +1133,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   public static function getHighestIdDataProvider() {
     return [
       'Destination ID type integer' => [
-        'dest_ids' => [
+        'destination_ids' => [
           'nid' => [
             'type' => 'integer',
           ],
@@ -1149,7 +1147,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
         'expected' => 5,
       ],
       'Destination ID types integer and string' => [
-        'dest_ids' => [
+        'destination_ids' => [
           'nid' => [
             'type' => 'integer',
           ],
@@ -1200,14 +1198,14 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   public static function getHighestIdInvalidDataProvider() {
     return [
       'Destination ID type string' => [
-        'ids' => [
+        'destination_ids' => [
           'language' => [
             'type' => 'string',
           ],
         ],
       ],
       'Destination ID types int (not integer) and string' => [
-        'ids' => [
+        'destination_ids' => [
           'nid' => [
             'type' => 'int',
           ],
@@ -1217,22 +1215,6 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
         ],
       ],
     ];
-  }
-
-  /**
-   * Tests deprecation message from Sql::getMigrationPluginManager().
-   *
-   * @group legacy
-   */
-  public function testGetMigrationPluginManagerDeprecation() {
-    $container = new ContainerBuilder();
-    $migration_plugin_manager = $this->createMock(MigrationPluginManager::class);
-    $container->set('plugin.manager.migration', $migration_plugin_manager);
-    \Drupal::setContainer($container);
-
-    $this->expectDeprecation('Drupal\migrate\Plugin\migrate\id_map\Sql::getMigrationPluginManager() is deprecated in drupal:9.5.0 and is removed from drupal:11.0.0. Use $this->migrationPluginManager instead. See https://www.drupal.org/node/3277306');
-    $id_map = $this->getIdMap();
-    $id_map->getMigrationPluginManager();
   }
 
 }

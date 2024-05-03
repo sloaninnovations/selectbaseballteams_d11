@@ -47,7 +47,9 @@ class MinimalTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Administration');
 
     // Ensure that there are no pending updates after installation.
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer software updates',
+    ]));
     $this->drupalGet('update.php/selection');
     $this->updateRequirementsProblem();
     $this->drupalGet('update.php/selection');

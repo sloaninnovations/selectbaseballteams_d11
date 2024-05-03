@@ -77,9 +77,9 @@ class LayoutBuilderOverridesTest extends LayoutBuilderTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
-    // @todo In https://www.drupal.org/node/540008 switch this to logging in as
-    //   a user with the 'configure any layout' permission.
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+    ]));
 
     LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default')
       ->enableLayoutBuilder()

@@ -25,6 +25,7 @@ class UserBatchActionTest extends BrowserTestBase {
     'views',
   ];
 
+
   /**
    * {@inheritdoc}
    */
@@ -37,7 +38,7 @@ class UserBatchActionTest extends BrowserTestBase {
     $themes = ['stark', 'olivero', 'claro'];
     $this->container->get('theme_installer')->install($themes);
 
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->createUser(['administer users']));
 
     foreach ($themes as $theme) {
       $this->config('system.theme')->set('default', $theme)->save();

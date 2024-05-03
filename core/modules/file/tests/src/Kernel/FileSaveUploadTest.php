@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel;
 
 use Drupal\Core\Messenger\MessengerInterface;
@@ -7,12 +9,13 @@ use Drupal\KernelTests\KernelTestBase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Tests file_save_upload().
  *
  * @group file
- * @group legacy
  */
 class FileSaveUploadTest extends KernelTestBase {
 
@@ -43,7 +46,7 @@ class FileSaveUploadTest extends KernelTestBase {
         test: TRUE
       ),
     ]);
-
+    $request->setSession(new Session(new MockArraySessionStorage()));
     $requestStack = new RequestStack();
     $requestStack->push($request);
 
@@ -55,8 +58,7 @@ class FileSaveUploadTest extends KernelTestBase {
    */
   public function testFileSaveUploadEmptyExtensions(): void {
     // Allow all extensions.
-    $validators = ['file_validate_extensions' => ''];
-    $this->expectDeprecation('\'file_validate_extensions\' is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use the \'FileExtension\' constraint instead. See https://www.drupal.org/node/3363700');
+    $validators = ['FileExtension' => []];
     $files = file_save_upload('file', $validators);
     $this->assertCount(1, $files);
     $file = $files[0];

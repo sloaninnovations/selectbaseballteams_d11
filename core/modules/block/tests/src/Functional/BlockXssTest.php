@@ -85,7 +85,10 @@ class BlockXssTest extends BrowserTestBase {
    * Tests various modules that provide blocks for XSS.
    */
   public function testBlockXss() {
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer blocks',
+      'access administration pages',
+    ]));
 
     $this->doViewTest();
     $this->doMenuTest();

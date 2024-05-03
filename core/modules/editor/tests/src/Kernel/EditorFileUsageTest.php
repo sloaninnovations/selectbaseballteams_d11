@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\editor\Kernel;
 
 use Drupal\editor\Entity\Editor;
@@ -54,6 +56,9 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     $editor = Editor::create([
       'format' => 'filtered_html',
       'editor' => 'unicorn',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
     ]);
     $editor->save();
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workspaces\Kernel;
 
 use Drupal\Core\Access\AccessResult;
@@ -25,7 +27,6 @@ class WorkspaceAccessTest extends KernelTestBase {
     'system',
     'workspaces',
     'workspace_access_test',
-    'path_alias',
   ];
 
   /**

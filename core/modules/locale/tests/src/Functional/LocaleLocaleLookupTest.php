@@ -25,6 +25,7 @@ class LocaleLocaleLookupTest extends BrowserTestBase {
    */
   protected static $modules = ['locale', 'locale_test'];
 
+
   /**
    * {@inheritdoc}
    */
@@ -45,7 +46,9 @@ class LocaleLocaleLookupTest extends BrowserTestBase {
     ConfigurableLanguage::createFromLangcode('fr')->save();
     $this->config('system.site')->set('default_langcode', 'fr')->save();
 
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer modules',
+    ]));
   }
 
   /**
