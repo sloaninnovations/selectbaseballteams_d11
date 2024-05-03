@@ -10,9 +10,9 @@ use Drupal\KernelTests\KernelTestBase;
  * Tests discovery of source plugins with annotations.
  *
  * Migrate source plugins use a specific discovery class to accommodate multiple
- * providers. This is a backwards compatibility test that discovery for plugin
- * classes that have annotations still works even after all core plugins have
- * been converted to attributes.
+ * providers. This tests that the backwards compatibility of discovery for
+ * plugin classes using annotations still works, even after all core plugins
+ * have been converted to attributes.
  *
  * @group migrate
  */

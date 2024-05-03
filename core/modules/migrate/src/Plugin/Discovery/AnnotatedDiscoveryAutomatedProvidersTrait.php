@@ -19,6 +19,17 @@ trait AnnotatedDiscoveryAutomatedProvidersTrait {
   protected $finder;
 
   /**
+   * Extracts the provider name from a Drupal namespace.
+   *
+   * @param string $namespace
+   *   The namespace to extract the provider from.
+   *
+   * @return string|null
+   *   The matching provider name, or NULL otherwise.
+   */
+  abstract protected function getProviderFromNamespace($namespace);
+
+  /**
    * Prepares the annotation definition.
    *
    * This is modified from the prepareAnnotationDefinition method from annotated
@@ -40,9 +51,6 @@ trait AnnotatedDiscoveryAutomatedProvidersTrait {
     }
     if (!$parser) {
       throw new \LogicException('Parser argument must be passed for automated providers discovery.');
-    }
-    if (!method_exists($this, 'getProviderFromNamespace')) {
-      throw new \LogicException('Classes using \Drupal\migrate\Plugin\Discovery\AnnotatedDiscoveryAutomatedProvidersTrait must have getProviderFromNamespace() method.');
     }
     // @see \Drupal\Component\Annotation\Plugin\Discovery\AnnotatedClassDiscovery::prepareAnnotationDefinition()
     $annotation->setClass($class);
