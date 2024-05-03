@@ -1240,7 +1240,7 @@
 
       // Check if a target element exists in this row.
       if (targetElement) {
-        const sourceClass = `.${rowSettings.target}`;
+        const sourceClass = `.${rowSettings.source}`;
         const sourceElement = sourceRow.querySelector(sourceClass);
         switch (rowSettings.action) {
           case 'depth':
