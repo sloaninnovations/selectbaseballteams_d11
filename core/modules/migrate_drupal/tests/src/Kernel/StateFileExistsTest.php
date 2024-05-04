@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Kernel;
 
 use Drupal\Component\Discovery\YamlDiscovery;
@@ -39,8 +41,6 @@ class StateFileExistsTest extends MigrateDrupalTestBase {
     'ban',
     'block',
     'block_content',
-    // @todo Remove book in https://www.drupal.org/project/drupal/issues/3376101
-    'book',
     'comment',
     'config_translation',
     'contact',
@@ -50,8 +50,6 @@ class StateFileExistsTest extends MigrateDrupalTestBase {
     'field',
     'file',
     'filter',
-    // @todo Remove forum in https://www.drupal.org/project/drupal/issues/3261653
-    'forum',
     'image',
     'language',
     'link',
@@ -67,15 +65,11 @@ class StateFileExistsTest extends MigrateDrupalTestBase {
     'responsive_image',
     'search',
     'shortcut',
-    // @todo Remove statistics in https://www.drupal.org/project/drupal/issues/3341092
-    'statistics',
     'syslog',
     'system',
     'taxonomy',
     'telephone',
     'text',
-    // @todo Remove tracker in https://www.drupal.org/project/drupal/issues/3261452
-    'tracker',
     'update',
     'user',
   ];

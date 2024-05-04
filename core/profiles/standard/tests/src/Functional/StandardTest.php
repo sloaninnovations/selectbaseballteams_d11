@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\standard\Functional;
 
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
@@ -16,6 +18,7 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
 use Drupal\user\Entity\Role;
+use Drupal\user\Entity\User;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
@@ -293,6 +296,20 @@ class StandardTest extends BrowserTestBase {
       }
 
     }
+
+    // Tests that user 1 does not have an all-access pass.
+    $this->drupalLogin($this->rootUser);
+    $this->drupalGet('admin');
+    $this->assertSession()->statusCodeEquals(200);
+
+    User::load(1)
+      ->removeRole('administrator')
+      ->save();
+    // Clear caches so change take effect in system under test.
+    $this->rebuildAll();
+
+    $this->drupalGet('admin');
+    $this->assertSession()->statusCodeEquals(403);
   }
 
 }

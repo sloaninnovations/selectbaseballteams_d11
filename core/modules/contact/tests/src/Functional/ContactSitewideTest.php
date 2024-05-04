@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\contact\Functional;
 
 use Drupal\Core\Url;
@@ -254,7 +256,7 @@ class ContactSitewideTest extends BrowserTestBase {
 
     // Test contact form with no default form selected.
     $this->config('contact.settings')
-      ->set('default_form', '')
+      ->set('default_form', NULL)
       ->save();
     $this->drupalGet('contact');
     $this->assertSession()->statusCodeEquals(404);

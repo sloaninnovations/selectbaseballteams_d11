@@ -4,6 +4,7 @@ namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateLookupInterface;
 use Drupal\migrate\MigrateSkipRowException;
@@ -120,11 +121,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @see https://www.drupal.org/project/drupal/issues/3246666
  *
  * @see \Drupal\migrate\Plugin\MigrateProcessInterface
- *
- * @MigrateProcessPlugin(
- *   id = "migration_lookup"
- * )
  */
+#[MigrateProcess('migration_lookup')]
 class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
@@ -263,7 +261,22 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
         throw $e;
       }
       catch (MigrateSkipRowException $e) {
-        throw $e;
+        // Build a new message.
+        $skip_row_exception_message = $e->getMessage();
+        if (empty($skip_row_exception_message)) {
+          $new_message = sprintf("Migration lookup for destination '%s' attempted to create a stub using migration %s, which resulted in a row skip",
+            $destination_property,
+            $stub_migration,
+          );
+        }
+        else {
+          $new_message = sprintf("Migration lookup for destination '%s' attempted to create a stub using migration %s, which resulted in a row skip, with message '%s'",
+            $destination_property,
+            $stub_migration,
+            $skip_row_exception_message,
+          );
+        }
+        throw new MigrateSkipRowException($new_message, 0);
       }
       catch (\Exception $e) {
         throw new MigrateException(sprintf('%s was thrown while attempting to stub: %s', get_class($e), $e->getMessage()), $e->getCode(), $e);

@@ -128,6 +128,20 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   }
 
   /**
+   * Commits the entire transaction stack.
+   *
+   * @internal
+   *   This method exists only to work around a bug caused by Drupal incorrectly
+   *   relying on object destruction order to commit transactions. Xdebug 3.3.0
+   *   changes the order of object destruction when the develop mode is enabled.
+   */
+  public function commitAll(): void {
+    foreach (array_reverse($this->stack()) as $id => $item) {
+      $this->unpile($item->name, $id);
+    }
+  }
+
+  /**
    * Adds an item to the transaction stack.
    *
    * Drivers should not override this method unless they also override the
@@ -253,7 +267,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // DDL statement breaking an active transaction). That should be listed in
     // $voidedItems, so we can remove it from there.
     if (!isset($this->stack()[$id]) || $this->stack()[$id]->name !== $name) {
-      assert(isset($this->voidedItems[$id]), "Transaction {$id}/{$name} is out of sequence. Active stack: " . $this->dumpStackItemsAsString());
       unset($this->voidedItems[$id]);
       return;
     }
@@ -295,21 +308,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * {@inheritdoc}
    */
   public function rollback(string $name, string $id): void {
-    // @todo remove in drupal:11.0.0.
-    // Start of BC layer.
-    if ($id === 'bc-force-rollback') {
-      foreach ($this->stack() as $stackId => $item) {
-        if ($item->name === $name) {
-          $id = $stackId;
-          break;
-        }
-      }
-      if ($id === 'bc-force-rollback') {
-        throw new TransactionOutOfOrderException();
-      }
-    }
-    // End of BC layer.
-
     // Rolled back item should match the last one in stack.
     if ($id != array_key_last($this->stack()) || $name !== $this->stack()[$id]->name) {
       throw new TransactionOutOfOrderException("Error attempting rollback of {$id}\\{$name}. Active stack: " . $this->dumpStackItemsAsString());
@@ -330,9 +328,11 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         // If this was the root Drupal transaction, we can rollback the client
         // transaction. The transaction is closed.
         $this->processRootRollback();
-        // The Transaction object remains open, and when it will get destructed
-        // no commit should happen. Void the stack item.
-        $this->voidStackItem($id);
+        if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::RolledBack) {
+          // The Transaction object remains open, and when it will get destructed
+          // no commit should happen. Void the stack item.
+          $this->voidStackItem($id);
+        }
       }
       else {
         // The stack got corrupted.

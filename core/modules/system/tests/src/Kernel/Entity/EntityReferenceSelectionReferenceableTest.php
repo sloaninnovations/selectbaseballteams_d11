@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Entity;
 
 use Drupal\Component\Utility\Html;
@@ -14,6 +16,7 @@ use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
  * Tests entity reference selection plugins.
  *
  * @group entity_reference
+ * @group #slow
  */
 class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field_ui\Functional;
 
 use Drupal\field\Entity\FieldConfig;
@@ -320,22 +322,6 @@ class ManageFieldsTest extends BrowserTestBase {
     $this->fieldUIAddNewField($bundle_path, 'user_reference', NULL, 'field_ui:entity_reference:user', [], $field_edit);
     $field = FieldConfig::loadByName('node', 'kittens', $field_name);
     $this->assertEquals([['target_id' => $this->adminUser->id()]], $field->getDefaultValue(User::create(['name' => '1337'])));
-  }
-
-  /**
-   * Tests hook_form_field_storage_config_form_edit_alter().
-   *
-   * @group legacy
-   */
-  public function testFieldStorageFormAlter() {
-    $this->container->get('module_installer')->install(['field_ui_test_deprecated']);
-    $this->rebuildContainer();
-
-    $node_type = $this->drupalCreateContentType();
-    $bundle = $node_type->id();
-    $this->expectDeprecation('The deprecated alter hook hook_form_field_storage_config_edit_form_alter() is implemented in these functions: field_ui_test_deprecated_form_field_storage_config_edit_form_alter. Use hook_form_field_config_edit_form_alter() instead. See https://www.drupal.org/node/3386675.');
-    $this->drupalGet("/admin/structure/types/manage/$bundle/fields/node.$bundle.body");
-    $this->assertSession()->elementTextContains('css', '#edit-field-storage', 'Greetings from the field_storage_config_edit_form() alter.');
   }
 
   /**

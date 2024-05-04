@@ -127,7 +127,6 @@ class ManageGitIgnoreTest extends TestCase {
 /index.php
 /robots.txt
 /update.php
-/web.config
 EOT;
     // At this point we should have a .gitignore file, because although we did
     // not explicitly ask for .gitignore tracking, the vendor directory is not
@@ -242,7 +241,6 @@ Scaffolding files for fixtures/drupal-assets-fixture:
   - Copy [web-root]/index.php from assets/index.php
   - Skip [web-root]/robots.txt: overridden in fixtures/drupal-composer-drupal-project
   - Copy [web-root]/update.php from assets/update.php
-  - Copy [web-root]/web.config from assets/web.config
 Scaffolding files for fixtures/scaffold-override-fixture:
   - Copy [web-root]/sites/default/default.settings.php from assets/override-settings.php
 Scaffolding files for fixtures/drupal-composer-drupal-project:
@@ -250,7 +248,7 @@ Scaffolding files for fixtures/drupal-composer-drupal-project:
   - Copy [web-root]/robots.txt from assets/robots-default.txt
 
 EOT;
-    $this->assertEquals($expected, $output);
+    $this->assertStringContainsString($expected, $output);
     $this->assertFileExists($sut . '/docroot/index.php');
     $this->assertFileDoesNotExist($sut . '/docroot/sites/default/.gitignore');
   }

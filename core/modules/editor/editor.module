@@ -148,11 +148,6 @@ function editor_form_filter_format_form_alter(&$form, FormStateInterface $form_s
     '#weight' => -8,
     '#type' => 'container',
     '#id' => 'editor-settings-wrapper',
-    '#attached' => [
-      'library' => [
-        'editor/drupal.editor.admin',
-      ],
-    ],
   ];
 
   // Add editor-specific validation and submit handlers.
@@ -186,6 +181,9 @@ function editor_form_filter_admin_format_editor_configure($form, FormStateInterf
       $editor = Editor::create([
         'format' => $format->isNew() ? NULL : $format->id(),
         'editor' => $editor_value,
+        'image_upload' => [
+          'status' => FALSE,
+        ],
       ]);
       $form_state->set('editor', $editor);
     }
@@ -251,6 +249,15 @@ function editor_form_filter_admin_format_submit($form, FormStateInterface $form_
     $editor->set('format', $format_id);
     if ($settings = $form_state->getValue(['editor', 'settings'])) {
       $editor->setSettings($settings);
+    }
+    // When image uploads are disabled (status = FALSE), the schema for image
+    // upload settings does not allow other keys to be present.
+    // @see editor.image_upload_settings.*
+    // @see editor.image_upload_settings.1
+    // @see editor.schema.yml
+    $image_upload_settings = $editor->getImageUploadSettings();
+    if (!$image_upload_settings['status']) {
+      $editor->setImageUploadSettings(['status' => FALSE]);
     }
     $editor->save();
   }
@@ -619,6 +626,8 @@ function _editor_parse_file_uuids($text) {
  * Implements hook_ENTITY_TYPE_presave().
  *
  * Synchronizes the editor status to its paired text format status.
+ *
+ * @todo remove in https://www.drupal.org/project/drupal/issues/3231354.
  */
 function editor_filter_format_presave(FilterFormatInterface $format) {
   // The text format being created cannot have a text editor yet.

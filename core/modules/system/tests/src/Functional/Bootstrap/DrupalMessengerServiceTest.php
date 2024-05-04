@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Bootstrap;
 
 use Drupal\Core\Url;
@@ -53,7 +55,8 @@ class DrupalMessengerServiceTest extends BrowserTestBase {
 
     // Ensure messages survive a container rebuild.
     $assert = $this->assertSession();
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser(['administer modules']));
+
     $edit = [];
     $edit["modules[help][enable]"] = TRUE;
     $this->drupalGet('admin/modules');

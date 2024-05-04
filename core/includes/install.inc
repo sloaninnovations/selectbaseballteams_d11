@@ -11,7 +11,6 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\Dependency;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Installer\InstallerKernel;
-use Drupal\Core\Site\SettingsEditor;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -109,8 +108,7 @@ function drupal_install_profile_distribution_name() {
     }
   }
   // At all other times, we load the profile via standard methods.
-  else {
-    $profile = \Drupal::installProfile();
+  elseif ($profile = \Drupal::installProfile()) {
     $info = \Drupal::service('extension.list.profile')->getExtensionInfo($profile);
   }
   return $info['distribution']['name'] ?? 'Drupal';
@@ -142,303 +140,6 @@ function drupal_install_profile_distribution_version() {
 }
 
 /**
- * Detects all supported databases that are compiled into PHP.
- *
- * @return array
- *   An array of database types compiled into PHP.
- *
- * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
- *   DatabaseDriverList::getList() instead.
- *
- * @see https://www.drupal.org/node/3258175
- */
-function drupal_detect_database_types() {
-  @trigger_error('drupal_detect_database_types() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use DatabaseDriverList::getList() instead. See https://www.drupal.org/node/3258175', E_USER_DEPRECATED);
-  $databases = drupal_get_database_types();
-
-  foreach ($databases as $driver => $installer) {
-    $databases[$driver] = $installer->name();
-  }
-
-  return $databases;
-}
-
-/**
- * Returns all supported database driver installer objects.
- *
- * @return \Drupal\Core\Database\Install\Tasks[]
- *   An array of available database driver installer objects.
- *
- * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
- *   DatabaseDriverList::getList() instead.
- *
- * @see https://www.drupal.org/node/3258175
- */
-function drupal_get_database_types() {
-  @trigger_error('drupal_get_database_types() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use DatabaseDriverList::getList() instead. See https://www.drupal.org/node/3258175', E_USER_DEPRECATED);
-  $databases = [];
-  $drivers = [];
-
-  // The internal database driver name is any valid PHP identifier.
-  $mask = ExtensionDiscovery::PHP_FUNCTION_PATTERN;
-
-  // Find drivers in the Drupal\Driver namespace.
-  // @todo remove discovering in the Drupal\Driver namespace in D10.
-  /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-  $file_system = \Drupal::service('file_system');
-  $files = [];
-  if (is_dir(DRUPAL_ROOT . '/drivers/lib/Drupal/Driver/Database')) {
-    $files = $file_system->scanDirectory(DRUPAL_ROOT . '/drivers/lib/Drupal/Driver/Database/', $mask, ['recurse' => FALSE]);
-  }
-  foreach ($files as $file) {
-    if (file_exists($file->uri . '/Install/Tasks.php')) {
-      // The namespace doesn't need to be added here, because
-      // db_installer_object() will find it.
-      $drivers[$file->filename] = NULL;
-    }
-  }
-
-  // Find drivers in Drupal module namespaces.
-  /** @var \Composer\Autoload\ClassLoader $class_loader */
-  $class_loader = \Drupal::service('class_loader');
-  // We cannot use the file cache because it does not always exist.
-  $extension_discovery = new ExtensionDiscovery(DRUPAL_ROOT, FALSE, []);
-  $modules = $extension_discovery->scan('module');
-  foreach ($modules as $module) {
-    $module_driver_path = DRUPAL_ROOT . '/' . $module->getPath() . '/src/Driver/Database';
-    if (is_dir($module_driver_path)) {
-      $driver_files = $file_system->scanDirectory($module_driver_path, $mask, ['recurse' => FALSE]);
-      foreach ($driver_files as $driver_file) {
-        $tasks_file = $module_driver_path . '/' . $driver_file->filename . '/Install/Tasks.php';
-        if (file_exists($tasks_file)) {
-          $namespace = 'Drupal\\' . $module->getName() . '\\Driver\\Database\\' . $driver_file->filename;
-
-          // Add the driver with its own classes' namespace.
-          $drivers[$driver_file->filename] = $namespace;
-
-          // The directory needs to be added to the autoloader, because this is
-          // early in the installation process: the module hasn't been enabled
-          // yet and the database connection info array (including its 'autoload'
-          // key) hasn't been created yet.
-          $class_loader->addPsr4($namespace . '\\', $module->getPath() . '/src/Driver/Database/' . $driver_file->filename);
-        }
-      }
-    }
-  }
-
-  foreach ($drivers as $driver => $namespace) {
-    $installer_class = $namespace . "\\Install\\Tasks";
-    $installer = new $installer_class();
-    if ($installer->installable()) {
-      $databases[$driver] = $installer;
-    }
-  }
-
-  // Usability: unconditionally put the MySQL driver on top.
-  if (isset($databases['mysql'])) {
-    $mysql_database = $databases['mysql'];
-    unset($databases['mysql']);
-    $databases = ['mysql' => $mysql_database] + $databases;
-  }
-
-  return $databases;
-}
-
-/**
- * Replaces values in settings.php with values in the submitted array.
- *
- * This function replaces values in place if possible, even for
- * multidimensional arrays. This way the old settings do not linger,
- * overridden and also the doxygen on a value remains where it should be.
- *
- * @param $settings
- *   An array of settings that need to be updated. Multidimensional arrays
- *   are dumped up to a stdClass object. The object can have value, required
- *   and comment properties.
- *   @code
- *   $settings['settings']['config_sync_directory'] = (object) array(
- *     'value' => 'config_hash/sync',
- *     'required' => TRUE,
- *   );
- *   @endcode
- *   gets dumped as:
- *   @code
- *   $settings['config_sync_directory'] = 'config_hash/sync'
- *   @endcode
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   SettingsEditor::rewrite() instead. Note $settings_file argument becomes
- *   required and the first argument of the method.
- *
- * @see https://www.drupal.org/node/3244583
- * @see \Drupal\Core\Site\SettingsEditor::rewrite()
- */
-function drupal_rewrite_settings($settings = [], $settings_file = NULL) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use SettingsEditor::rewrite() instead. The order of the arguments has also changed: $settings_file is now required and is the first argument of the method. See https://www.drupal.org/node/3244583', E_USER_DEPRECATED);
-  SettingsEditor::rewrite(
-    $settings_file ?? \Drupal::getContainer()->getParameter('site.path') . '/settings.php',
-    $settings
-  );
-}
-
-/**
- * Helper for drupal_rewrite_settings().
- *
- * Checks whether this token represents a scalar or NULL.
- *
- * @param int $type
- *   The token type.
- * @param string $value
- *   The value of the token.
- *
- * @return bool
- *   TRUE if this token represents a scalar or NULL.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   SettingsEditor::rewrite() instead. As internal API,
- *   _drupal_rewrite_settings_is_simple() may also be removed in a minor
- *   release.
- *
- * @see https://www.drupal.org/node/3244583
- * @see token_name()
- */
-function _drupal_rewrite_settings_is_simple($type, $value) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use SettingsEditor::rewrite() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3244583', E_USER_DEPRECATED);
-  $is_integer = $type == T_LNUMBER;
-  $is_float = $type == T_DNUMBER;
-  $is_string = $type == T_CONSTANT_ENCAPSED_STRING;
-  $is_boolean_or_null = $type == T_STRING && in_array(strtoupper($value), ['TRUE', 'FALSE', 'NULL']);
-  return $is_integer || $is_float || $is_string || $is_boolean_or_null;
-}
-
-/**
- * Helper for drupal_rewrite_settings().
- *
- * Checks whether this token represents a valid array index: a number or a
- * string.
- *
- * @param int $type
- *   The token type.
- *
- * @return bool
- *   TRUE if this token represents a number or a string.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   SettingsEditor::rewrite() instead. As internal API,
- *   _drupal_rewrite_settings_is_array_index() may also be removed in a minor
- *   release.
- *
- * @see https://www.drupal.org/node/3244583
- * @see token_name()
- */
-function _drupal_rewrite_settings_is_array_index($type) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use SettingsEditor::rewrite() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3244583', E_USER_DEPRECATED);
-  $is_integer = $type == T_LNUMBER;
-  $is_float = $type == T_DNUMBER;
-  $is_string = $type == T_CONSTANT_ENCAPSED_STRING;
-  return $is_integer || $is_float || $is_string;
-}
-
-/**
- * Helper for drupal_rewrite_settings().
- *
- * Makes the new settings global.
- *
- * @param array|null $ref
- *   A reference to a nested index in $GLOBALS.
- * @param array|object $variable
- *   The nested value of the setting being copied.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   SettingsEditor::rewrite() instead. As internal API,
- *   _drupal_rewrite_settings_global() may also be removed in a minor
- *   release.
- *
- * @see https://www.drupal.org/node/3244583
- */
-function _drupal_rewrite_settings_global(&$ref, $variable) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use SettingsEditor::rewrite() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3244583', E_USER_DEPRECATED);
-  if (is_object($variable)) {
-    $ref = $variable->value;
-  }
-  else {
-    foreach ($variable as $k => $v) {
-      _drupal_rewrite_settings_global($ref[$k], $v);
-    }
-  }
-}
-
-/**
- * Helper for drupal_rewrite_settings().
- *
- * Dump the relevant value properties.
- *
- * @param array|object $variable
- *   The container for variable values.
- * @param string $variable_name
- *   Name of variable.
- *
- * @return string
- *   A string containing valid PHP code of the variable suitable for placing
- *   into settings.php.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   SettingsEditor::rewrite() instead. As internal API,
- *   _drupal_rewrite_settings_dump() may also be removed in a minor
- *   release.
- *
- * @see https://www.drupal.org/node/3244583
- */
-function _drupal_rewrite_settings_dump($variable, $variable_name) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use SettingsEditor::rewrite() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3244583', E_USER_DEPRECATED);
-  $return = '';
-  if (is_object($variable)) {
-    if (!empty($variable->required)) {
-      $return .= _drupal_rewrite_settings_dump_one($variable, "$variable_name = ", "\n");
-    }
-  }
-  else {
-    foreach ($variable as $k => $v) {
-      $return .= _drupal_rewrite_settings_dump($v, $variable_name . "['" . $k . "']");
-    }
-  }
-  return $return;
-}
-
-/**
- * Helper for drupal_rewrite_settings().
- *
- * Dump the value of a value property and adds the comment if it exists.
- *
- * @param object $variable
- *   A stdClass object with at least a value property.
- * @param string $prefix
- *   A string to prepend to the variable's value.
- * @param string $suffix
- *   A string to append to the variable's value.
- *
- * @return string
- *   A string containing valid PHP code of the variable suitable for placing
- *   into settings.php.
- *
- * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
- *   SettingsEditor::rewrite() instead. As internal API,
- *   _drupal_rewrite_settings_dump_one() may also be removed in a minor
- *   release.
- *
- * @see https://www.drupal.org/node/3244583
- */
-function _drupal_rewrite_settings_dump_one(\stdClass $variable, $prefix = '', $suffix = '') {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use SettingsEditor::rewrite() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3244583', E_USER_DEPRECATED);
-  $return = $prefix . var_export($variable->value, TRUE) . ';';
-  if (!empty($variable->comment)) {
-    $return .= ' // ' . $variable->comment;
-  }
-  $return .= $suffix;
-  return $return;
-}
-
-/**
  * Verifies that all dependencies are met for a given installation profile.
  *
  * @param $install_state
@@ -446,9 +147,15 @@ function _drupal_rewrite_settings_dump_one(\stdClass $variable, $prefix = '', $s
  *
  * @return array
  *   The list of modules to install.
+ *
+ * @todo https://www.drupal.org/i/3005959 Rework this method as it is not only
+ *   about profiles.
  */
 function drupal_verify_profile($install_state) {
   $profile = $install_state['parameters']['profile'];
+  if ($profile === FALSE) {
+    return [];
+  }
   $info = $install_state['profile_info'];
 
   // Get the list of available modules for the selected installation profile.
@@ -477,7 +184,7 @@ function drupal_verify_profile($install_state) {
       $build['#items'][] = ['#markup' => '<span class="admin-missing">' . Unicode::ucfirst($module) . '</span>'];
     }
 
-    $modules_list = \Drupal::service('renderer')->renderPlain($build);
+    $modules_list = \Drupal::service('renderer')->renderInIsolation($build);
     $requirements['required_modules'] = [
       'title' => t('Required modules'),
       'value' => t('Required modules not found.'),
@@ -511,7 +218,7 @@ function drupal_install_system($install_state) {
   $kernel = \Drupal::service('kernel');
   $kernel->shutdown();
   // Have installer rebuild from the disk, rather then building from scratch.
-  $kernel->rebuildContainer(FALSE);
+  $kernel->rebuildContainer();
   // Reboot the kernel with new container.
   $kernel->boot();
   $kernel->preHandle($request);
@@ -532,9 +239,14 @@ function drupal_install_system($install_state) {
 
   // Store the installation profile in configuration to populate the
   // 'install_profile' container parameter.
-  \Drupal::configFactory()->getEditable('core.extension')
-    ->set('profile', $install_state['parameters']['profile'])
-    ->save();
+  $config = \Drupal::configFactory()->getEditable('core.extension');
+  if ($install_state['parameters']['profile'] === FALSE) {
+    $config->clear('profile');
+  }
+  else {
+    $config->set('profile', $install_state['parameters']['profile']);
+  }
+  $config->save();
 
   $connection = Database::getConnection();
   $provider = $connection->getProvider();
@@ -1079,47 +791,4 @@ function install_profile_info($profile, $langcode = 'en') {
     $cache[$profile][$langcode] = $info;
   }
   return $cache[$profile][$langcode];
-}
-
-/**
- * Returns a database installer object.
- *
- * Before calling this function it is important the database installer object
- * is autoloadable. Database drivers provided by contributed modules are added
- * to the autoloader in drupal_get_database_types() and Settings::initialize().
- *
- * @param $driver
- *   The name of the driver.
- * @param string $namespace
- *   (optional) The database driver namespace.
- *
- * @return \Drupal\Core\Database\Install\Tasks
- *   A class defining the requirements and tasks for installing the database.
- *
- * @deprecated in drupal:10.0.0 and is removed from drupal:11.0.0. There is no
- *   replacement.
- *
- * @see https://www.drupal.org/node/3256641
- * @see drupal_get_database_types()
- * @see \Drupal\Core\Site\Settings::initialize()
- */
-function db_installer_object($driver, $namespace = NULL) {
-  @trigger_error('db_installer_object() is deprecated in drupal:10.0.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3256641', E_USER_DEPRECATED);
-
-  // We cannot use Database::getConnection->getDriverClass() here, because
-  // the connection object is not yet functional.
-  if ($namespace) {
-    $task_class = $namespace . "\\Install\\Tasks";
-    return new $task_class();
-  }
-  // Old Drupal 8 style contrib namespace.
-  $task_class = "Drupal\\Driver\\Database\\{$driver}\\Install\\Tasks";
-  if (class_exists($task_class)) {
-    return new $task_class();
-  }
-  else {
-    // Core provided driver.
-    $task_class = "Drupal\\Core\\Database\\Driver\\{$driver}\\Install\\Tasks";
-    return new $task_class();
-  }
 }

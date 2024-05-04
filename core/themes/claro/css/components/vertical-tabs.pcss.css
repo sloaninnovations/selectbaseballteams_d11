@@ -103,8 +103,6 @@
   margin-block-start: calc(var(--vertical-tabs-border-size) * -1);
   padding: var(--space-s) var(--space-s) var(--space-s) calc(var(--space-l) - var(--vertical-tabs-menu-link--active-border-size));
   text-decoration: none;
-  word-wrap: break-word;
-  hyphens: auto;
   color: var(--color-text);
   border: var(--vertical-tabs-border-size) solid transparent;
   border-block-width: var(--vertical-tabs-border-size);
@@ -170,6 +168,10 @@
   border-start-end-radius: 0;
   border-end-end-radius: 0;
   border-end-start-radius: var(--base-border-radius);
+
+  @media (forced-colors: active) {
+    border-inline-start: var(--vertical-tabs-menu-link--active-border-size) solid canvastext;
+  }
 }
 
 .vertical-tabs__menu-item.is-selected .vertical-tabs__menu-link:hover::before {

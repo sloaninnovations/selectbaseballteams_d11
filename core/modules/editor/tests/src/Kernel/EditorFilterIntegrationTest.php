@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\editor\Kernel;
 
 use Drupal\editor\Entity\Editor;
@@ -30,7 +32,13 @@ class EditorFilterIntegrationTest extends KernelTestBase {
     $format->save();
 
     // Create a paired editor.
-    Editor::create(['format' => $format->id(), 'editor' => 'unicorn'])->save();
+    Editor::create([
+      'format' => $format->id(),
+      'editor' => 'unicorn',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
+    ])->save();
 
     // Disable the text format.
     $format->disable()->save();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\KeyValueStore;
 
 use Drupal\Component\Serialization\PhpSerialize;
@@ -27,7 +29,7 @@ class GarbageCollectionTest extends KernelTestBase {
   public function testGarbageCollection() {
     $collection = $this->randomMachineName();
     $connection = Database::getConnection();
-    $store = new DatabaseStorageExpirable($collection, new PhpSerialize(), $connection);
+    $store = new DatabaseStorageExpirable($collection, new PhpSerialize(), $connection, \Drupal::time());
 
     // Insert some items and confirm that they're set.
     for ($i = 0; $i <= 3; $i++) {

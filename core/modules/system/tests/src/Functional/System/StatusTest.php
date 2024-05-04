@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Core\Url;
@@ -178,7 +180,7 @@ class StatusTest extends BrowserTestBase {
     $this->assertSession()->elementNotExists('xpath', "//a[contains(@href, 'http://example.com/deprecated_theme')]");
 
     // Check if pg_trgm extension is enabled on postgres.
-    if ($this->getDatabaseConnection()->databaseType() == 'pgsql') {
+    if (\Drupal::database()->databaseType() == 'pgsql') {
       $this->assertSession()->pageTextContains('PostgreSQL pg_trgm extension');
       $elements = $this->xpath('//details[@class="system-status-report__entry"]//div[contains(text(), :text)]', [
         ':text' => 'The pg_trgm PostgreSQL extension is present.',

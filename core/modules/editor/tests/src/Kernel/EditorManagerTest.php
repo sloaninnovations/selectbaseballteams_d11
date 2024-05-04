@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\editor\Kernel;
 
 use Drupal\editor\Entity\Editor;
@@ -81,6 +83,9 @@ class EditorManagerTest extends KernelTestBase {
     $editor = Editor::create([
       'format' => 'full_html',
       'editor' => 'unicorn',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
     ]);
     $editor->save();
     $this->assertSame([], $this->editorManager->getAttachments([]), 'No attachments when one text editor is enabled and retrieving attachments for zero text formats.');

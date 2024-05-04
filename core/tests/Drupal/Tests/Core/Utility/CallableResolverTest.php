@@ -9,8 +9,6 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -41,19 +39,10 @@ class CallableResolverTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider callableResolverTestCases
    * @covers ::getCallableFromDefinition
    */
-  public function testCallbackResolver($definition, $result) {
-    $argument = 'bar';
-    $this->assertEquals($result . '+' . $argument, $this->resolver->getCallableFromDefinition($definition)($argument));
-  }
-
-  /**
-   * Test cases for ::testCallbackResolver.
-   */
-  public function callableResolverTestCases() {
-    return [
+  public function testCallbackResolver() {
+    $cases = [
       'Inline function' => [
         function ($suffix) {
           return __METHOD__ . '+' . $suffix;
@@ -96,10 +85,6 @@ class CallableResolverTest extends UnitTestCase {
         '\Drupal\Tests\Core\Utility\MockContainerInjection::getResult',
         'Drupal\Tests\Core\Utility\MockContainerInjection::getResult-foo',
       ],
-      'Non-static function, instantiated by class resolver, container aware' => [
-        '\Drupal\Tests\Core\Utility\MockContainerAware::getResult',
-        'Drupal\Tests\Core\Utility\MockContainerAware::getResult',
-      ],
       'Service notation' => [
         'test_service:method',
         __CLASS__ . '::method',
@@ -113,6 +98,11 @@ class CallableResolverTest extends UnitTestCase {
         __CLASS__ . '::__invoke',
       ],
     ];
+
+    $argument = 'bar';
+    foreach ($cases as $label => [$definition, $result]) {
+      $this->assertEquals($result . '+' . $argument, $this->resolver->getCallableFromDefinition($definition)($argument), $label);
+    }
   }
 
   /**
@@ -248,17 +238,4 @@ class NoInstantiationMockStaticCallable {
 }
 
 class NoMethodCallable {
-}
-
-class MockContainerAware implements ContainerAwareInterface {
-
-  use ContainerAwareTrait;
-
-  public function getResult($suffix) {
-    if (empty($this->container)) {
-      throw new \Exception('Container was not injected.');
-    }
-    return __METHOD__ . '+' . $suffix;
-  }
-
 }

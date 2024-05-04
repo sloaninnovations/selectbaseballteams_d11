@@ -263,16 +263,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $root;
 
   /**
-   * A mapping from service classes to service IDs.
-   *
-   * @deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the
-   *   'Drupal\Component\DependencyInjection\ReverseContainer' service instead.
-   *
-   * @see https://www.drupal.org/node/3327942
-   */
-  protected $serviceIdMapping = [];
-
-  /**
    * Create a DrupalKernel object from a request.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -551,24 +541,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * phpcs:ignore Drupal.Commenting.FunctionComment.VoidReturn
-   * @return void
-   */
-  public function setContainer(ContainerInterface $container = NULL) {
-    if (isset($this->container)) {
-      throw new \Exception('The container should not override an existing container.');
-    }
-    if ($this->booted) {
-      throw new \Exception('The container cannot be set after a booted kernel.');
-    }
-
-    $this->container = $container;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
    */
   public function getCachedContainerDefinition() {
     $cache = $this->bootstrapContainer->get('cache.container')->get($this->getContainerCacheKey());
@@ -698,11 +670,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * phpcs:ignore Drupal.Commenting.FunctionComment.VoidReturn
-   * @return void
    */
-  public function terminate(Request $request, Response $response) {
+  public function terminate(Request $request, Response $response): void {
     if ($this->booted && $this->getHttpKernel() instanceof TerminableInterface) {
       // Only run terminate() when essential services have been set up properly
       // by preHandle() before.
@@ -850,39 +819,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Generate a unique hash for a service object.
-   *
-   * @param object $object
-   *   A service object.
-   *
-   * @return string
-   *   A unique hash value.
-   *
-   * @deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the
-   *   'Drupal\Component\DependencyInjection\ReverseContainer' service instead.
-   *
-   * @see https://www.drupal.org/node/3327942
-   */
-  public static function generateServiceIdHash($object) {
-    @trigger_error(__METHOD__ . "() is deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the 'Drupal\Component\DependencyInjection\ReverseContainer' service instead. See https://www.drupal.org/node/3327942", E_USER_DEPRECATED);
-    // Include class name as an additional namespace for the hash since
-    // spl_object_hash's return can be recycled. This still is not a 100%
-    // guarantee to be unique but makes collisions incredibly difficult and even
-    // then the interface would be preserved.
-    // @see https://php.net/spl_object_hash#refsect1-function.spl-object-hash-notes
-    return hash('sha256', get_class($object) . spl_object_hash($object));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getServiceIdMapping() {
-    @trigger_error(__METHOD__ . "() is deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the 'Drupal\Component\DependencyInjection\ReverseContainer' service instead. See https://www.drupal.org/node/3327942", E_USER_DEPRECATED);
-    $this->collectServiceIdMapping();
-    return $this->serviceIdMapping;
-  }
-
-  /**
    * Returns the container cache key based on the environment.
    *
    * The 'environment' consists of:
@@ -947,22 +883,15 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $all_messages = $this->container->get('messenger')->all();
     }
 
-    // If we haven't booted yet but there is a container, then we're asked to
-    // boot the container injected via setContainer().
-    // @see \Drupal\KernelTests\KernelTestBase::setUp()
-    if (isset($this->container) && !$this->booted) {
-      $container = $this->container;
-    }
-
     // If the module list hasn't already been set in updateModules and we are
     // not forcing a rebuild, then try and load the container from the cache.
     if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
       $container_definition = $this->getCachedContainerDefinition();
     }
 
-    // If there is no container and no cached container definition, build a new
-    // one from scratch.
-    if (!isset($container) && !isset($container_definition)) {
+    // If there is no cached container definition, build a new container from
+    // scratch.
+    if (!isset($container_definition)) {
       $container = $this->compileContainer();
 
       // Only dump the container if dumping is allowed. This is useful for
@@ -999,9 +928,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
       if ($request = $request_stack->getMainRequest()) {
         $subrequest = TRUE;
-        if ($request->hasSession()) {
-          $request->setSession($this->container->get('session'));
-        }
+        $request->setSession($this->container->get('session'));
       }
     }
 
@@ -1074,7 +1001,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Set sane locale settings, to ensure consistent string, dates, times and
     // numbers handling.
-    setlocale(LC_ALL, 'C');
+    setlocale(LC_ALL, 'C.UTF-8', 'C');
 
     // Set appropriate configuration for multi-byte strings.
     mb_internal_encoding('utf-8');
@@ -1211,6 +1138,88 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->moduleData = [];
     $this->containerNeedsRebuild = TRUE;
     return $this->initializeContainer();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function resetContainer(): ContainerInterface {
+    $session_started = FALSE;
+    $subrequest = FALSE;
+    $reload_module_handler = FALSE;
+
+    // Save the id of the currently logged in user.
+    if ($this->container->initialized('current_user')) {
+      $current_user_id = $this->container->get('current_user')->id();
+    }
+
+    if ($this->container->initialized('module_handler') && $this->container->get('module_handler')->isLoaded()) {
+      $reload_module_handler = TRUE;
+    }
+
+    // After rebuilding the container some objects will have stale services.
+    // Record a map of objects to service IDs prior to rebuilding the
+    // container in order to ensure
+    // \Drupal\Core\DependencyInjection\DependencySerializationTrait works as
+    // expected.
+    $this->container->get(ReverseContainer::class)->recordContainer();
+
+    // If there is a session, close and save it.
+    if ($this->container->initialized('session')) {
+      $session = $this->container->get('session');
+      if ($session->isStarted()) {
+        $session_started = TRUE;
+        $session->save();
+      }
+      unset($session);
+    }
+
+    $all_messages = $this->container->get('messenger')->all();
+
+    $persist = $this->getServicesToPersist($this->container);
+    $this->container->reset();
+    $this->persistServices($this->container, $persist);
+
+    $this->container->set('kernel', $this);
+
+    // Set the class loader which was registered as a synthetic service.
+    $this->container->set('class_loader', $this->classLoader);
+
+    if ($reload_module_handler) {
+      $this->container->get('module_handler')->reload();
+    }
+
+    if ($session_started) {
+      $this->container->get('session')->start();
+    }
+
+    // The request stack is preserved across container rebuilds. Re-inject the
+    // new session into the main request if one was present before.
+    if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
+      if ($request = $request_stack->getMainRequest()) {
+        $subrequest = TRUE;
+        $request->setSession($this->container->get('session'));
+      }
+    }
+
+    if (!empty($current_user_id)) {
+      $this->container->get('current_user')->setInitialAccountId($current_user_id);
+    }
+
+    // Re-add messages.
+    foreach ($all_messages as $type => $messages) {
+      foreach ($messages as $message) {
+        $this->container->get('messenger')->addMessage($message, $type);
+      }
+    }
+
+    // Allow other parts of the codebase to react on container reset in
+    // subrequest.
+    if (!empty($subrequest)) {
+      $this->container->get('event_dispatcher')->dispatch(new Event(), self::CONTAINER_INITIALIZE_SUBREQUEST_FINISHED);
+    }
+
+    return $this->container;
   }
 
   /**
@@ -1620,7 +1629,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // TrustedHostsRequestFactory makes sure to pass in the server variables
       // from the main request.
       $request_factory = new TrustedHostsRequestFactory($host);
-      Request::setFactory([$request_factory, 'createRequest']);
+      Request::setFactory([$request_factory, 'createRequest'](...));
 
     }
     catch (\UnexpectedValueException $e) {
@@ -1641,32 +1650,17 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Collect a mapping between service to ids.
-   *
-   * @deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the
-   *   'Drupal\Component\DependencyInjection\ReverseContainer' service instead.
-   *
-   * @see https://www.drupal.org/node/3327942
-   */
-  protected function collectServiceIdMapping() {
-    @trigger_error(__METHOD__ . "() is deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the 'Drupal\Component\DependencyInjection\ReverseContainer' service instead. See https://www.drupal.org/node/3327942", E_USER_DEPRECATED);
-    if (isset($this->container)) {
-      foreach ($this->container->getServiceIdMappings() as $hash => $service_id) {
-        $this->serviceIdMapping[$hash] = $service_id;
-      }
-    }
-  }
-
-  /**
    * Gets the active install profile.
    *
-   * @return string|null
-   *   The name of the any active install profile or distribution.
+   * @return string|false|null
+   *   The name of the active install profile or distribution, FALSE if there is
+   *   no install profile or NULL if Drupal is being installed.
    */
   protected function getInstallProfile() {
     $config = $this->getConfigStorage()->read('core.extension');
-
-    // Normalize an empty string to a NULL value.
+    if (is_array($config) && !array_key_exists('profile', $config)) {
+      return FALSE;
+    }
     return $config['profile'] ?? NULL;
   }
 

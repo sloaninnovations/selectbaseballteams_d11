@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\editor\Functional;
 
 use Drupal\Component\Serialization\Json;
@@ -123,6 +125,9 @@ class EditorSecurityTest extends BrowserTestBase {
     $editor = Editor::create([
       'format' => 'restricted_with_editor',
       'editor' => 'unicorn',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
     ]);
     $editor->save();
     $format = FilterFormat::create([
@@ -143,6 +148,9 @@ class EditorSecurityTest extends BrowserTestBase {
     $editor = Editor::create([
       'format' => 'restricted_plus_dangerous_tag_with_editor',
       'editor' => 'unicorn',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
     ]);
     $editor->save();
     $format = FilterFormat::create([
@@ -162,6 +170,9 @@ class EditorSecurityTest extends BrowserTestBase {
     $editor = Editor::create([
       'format' => 'unrestricted_with_editor',
       'editor' => 'unicorn',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
     ]);
     $editor->save();
 

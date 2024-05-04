@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Functional;
 
 use Drupal\Component\Utility\Html;
@@ -7,7 +9,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\Tests\BrowserTestBase;
 
-// cspell:ignore scriptalertxsssubjectscript
+// cspell:ignore displaymessage scriptalertxsssubjectscript
 
 /**
  * Tests that the block configuration UI exists and stores data correctly.

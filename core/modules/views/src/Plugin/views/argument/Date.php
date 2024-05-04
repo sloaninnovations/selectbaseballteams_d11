@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\node\NodeInterface;
+use Drupal\views\Attribute\ViewsArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -23,9 +24,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @see \Drupal\views\ManyToOneHelper
  *
  * @ingroup views_argument_handlers
- *
- * @ViewsArgument("date")
  */
+#[ViewsArgument(
+  id: 'date',
+)]
 class Date extends Formula implements ContainerFactoryPluginInterface {
 
   /**
@@ -42,6 +44,7 @@ class Date extends Formula implements ContainerFactoryPluginInterface {
    */
   protected $argFormat = 'Y-m-d';
 
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $option_name = 'default_argument_date';
 
   /**
@@ -71,7 +74,7 @@ class Date extends Formula implements ContainerFactoryPluginInterface {
    *   The route match.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
   public function __construct(
@@ -80,16 +83,12 @@ class Date extends Formula implements ContainerFactoryPluginInterface {
     $plugin_definition,
     RouteMatchInterface $route_match,
     DateFormatterInterface $date_formatter,
-    protected ?TimeInterface $time = NULL,
+    protected TimeInterface $time,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->routeMatch = $route_match;
     $this->dateFormatter = $date_formatter;
-    if (!$time) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $time argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3395991', E_USER_DEPRECATED);
-      $this->time = \Drupal::service('datetime.time');
-    }
   }
 
   /**

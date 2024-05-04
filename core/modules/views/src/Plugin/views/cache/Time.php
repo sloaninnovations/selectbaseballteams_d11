@@ -6,19 +6,20 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\views\Attribute\ViewsCache;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Simple caching of query results for Views displays.
  *
  * @ingroup views_cache_plugins
- *
- * @ViewsCache(
- *   id = "time",
- *   title = @Translation("Time-based"),
- *   help = @Translation("Simple time-based caching of data.")
- * )
  */
+#[ViewsCache(
+  id: 'time',
+  title: new TranslatableMarkup('Time-based'),
+  help: new TranslatableMarkup('Simple time-based caching of data.'),
+)]
 class Time extends CachePluginBase {
 
   /**
@@ -44,16 +45,12 @@ class Time extends CachePluginBase {
    *   The plugin implementation definition.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, DateFormatterInterface $date_formatter, protected ?TimeInterface $time = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, DateFormatterInterface $date_formatter, protected TimeInterface $time) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->dateFormatter = $date_formatter;
-    if (!$time) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $time argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3395991', E_USER_DEPRECATED);
-      $this->time = \Drupal::service('datetime.time');
-    }
   }
 
   /**

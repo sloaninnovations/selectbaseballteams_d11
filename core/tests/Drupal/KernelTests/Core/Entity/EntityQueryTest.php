@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Database\Database;
@@ -1290,6 +1292,60 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->execute();
     $this->assertCount(1, $result);
     $this->assertEquals($entity->id(), reset($result));
+  }
+
+  /**
+   * Test the entity query alter hooks are invoked.
+   *
+   * Hook functions in field_test.module add additional conditions to the query
+   * removing entities with specific ids.
+   */
+  public function testAlterHook(): void {
+    $basicQuery = $this->storage
+      ->getQuery()
+      ->accessCheck(FALSE)
+      ->exists($this->greetings, 'tr')
+      ->condition($this->figures . ".color", 'red')
+      ->sort('id');
+
+    // Verify assumptions about the unaltered result.
+    $query = clone $basicQuery;
+    $this->queryResults = $query->execute();
+    $this->assertResult(5, 7, 13, 15);
+
+    // field_test_entity_query_alter() removes the entity with id '5'.
+    $query = clone $basicQuery;
+    $this->queryResults = $query
+      // Add a tag that no hook function matches.
+      ->addTag('entity_query_alter_hook_test')
+      ->execute();
+    $this->assertResult(7, 13, 15);
+
+    // field_test_entity_query_entity_test_mulrev_alter() removes the
+    // entity with id '7'.
+    $query = clone $basicQuery;
+    $this->queryResults = $query
+      // Add a tag that no hook function matches.
+      ->addTag('entity_query_entity_test_mulrev_alter_hook_test')
+      ->execute();
+    $this->assertResult(5, 13, 15);
+
+    // field_test_entity_query_tag__entity_query_alter_tag_test_alter() removes
+    // the entity with id '13'.
+    $query = clone $basicQuery;
+    $this->queryResults = $query
+      ->addTag('entity_query_alter_tag_test')
+      ->execute();
+    $this->assertResult(5, 7, 15);
+
+    // field_test_entity_query_tag__entity_test_mulrev__entity_query_
+    // entity_test_mulrev_alter_tag_test_alter()
+    // removes the entity with id '15'.
+    $query = clone $basicQuery;
+    $this->queryResults = $query
+      ->addTag('entity_query_entity_test_mulrev_alter_tag_test')
+      ->execute();
+    $this->assertResult(5, 7, 13);
   }
 
   /**

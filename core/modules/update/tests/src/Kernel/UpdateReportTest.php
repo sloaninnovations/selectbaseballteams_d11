@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\update\Kernel;
 
 use Drupal\Core\Link;
@@ -60,7 +62,7 @@ class UpdateReportTest extends KernelTestBase {
   }
 
   /**
-   * Tests the error message when failing to fetch data without dblog enabled.
+   * Tests the error message when failing to fetch data without dblog installed.
    *
    * @see template_preprocess_update_fetch_error_message()
    */
@@ -82,7 +84,7 @@ class UpdateReportTest extends KernelTestBase {
   }
 
   /**
-   * Tests the error message when failing to fetch data with dblog enabled.
+   * Tests the error message when failing to fetch data with dblog installed.
    *
    * @see template_preprocess_update_fetch_error_message()
    */

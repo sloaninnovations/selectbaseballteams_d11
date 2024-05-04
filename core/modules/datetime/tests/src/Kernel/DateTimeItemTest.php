@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\datetime\Kernel;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -16,6 +18,7 @@ use PHPUnit\Framework\AssertionFailedError;
  * Tests the new entity API for the date field type.
  *
  * @group datetime
+ * @group #slow
  */
 class DateTimeItemTest extends FieldKernelTestBase {
 

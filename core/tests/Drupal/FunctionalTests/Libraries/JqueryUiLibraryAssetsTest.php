@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Libraries;
 
 use Drupal\Tests\BrowserTestBase;
@@ -216,7 +218,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
    *
    * @dataProvider providerTestAssetLoading
    */
-  public function testLibraryAssetLoadingOrder($library) {
+  public function testLibraryAssetLoadingOrder($library, array $expected_css, array $expected_js) {
     $this->drupalGet("jqueryui_library_assets_test/$library");
     $this->assertSession()->statusCodeEquals(200);
 

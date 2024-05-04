@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\Core\Cache\MemoryCounterBackendFactory;
@@ -45,8 +47,7 @@ abstract class MigrateSqlSourceTestBase extends MigrateSourceTestBase {
       // Use the biggest row to build the table schema.
       $counts = array_map('count', $rows);
       asort($counts);
-      end($counts);
-      $pilot = $rows[key($counts)];
+      $pilot = $rows[array_key_last($counts)];
 
       $connection->schema()
         ->createTable($table, [

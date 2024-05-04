@@ -52,16 +52,6 @@ class FileStorageTest extends PhpStorageTestBase {
   }
 
   /**
-   * @covers ::writeable
-   * @group legacy
-   */
-  public function testWritable() {
-    $this->expectDeprecation('Drupal\Component\PhpStorage\FileStorage::writeable() is deprecated in drupal:10.1.0 and will be removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3155413');
-    $php = new FileStorage($this->standardSettings);
-    $this->assertTrue($php->writeable());
-  }
-
-  /**
    * @covers ::deleteAll
    */
   public function testDeleteAll() {
@@ -106,9 +96,21 @@ class FileStorageTest extends PhpStorageTestBase {
       'bin' => 'test',
     ]);
     $code = "<?php\n echo 'here';";
-    $this->expectWarning();
-    $this->expectWarningMessage('mkdir(): Permission Denied');
+
+    // PHPUnit 10 cannot expect warnings, so we have to catch them ourselves.
+    $messages = [];
+    set_error_handler(function (int $errno, string $errstr) use (&$messages): void {
+      $messages[] = [$errno, $errstr];
+    });
+
     $storage->save('subdirectory/foo.php', $code);
+
+    restore_error_handler();
+    $this->assertCount(2, $messages);
+    $this->assertSame(E_USER_WARNING, $messages[0][0]);
+    $this->assertSame('mkdir(): Permission Denied', $messages[0][1]);
+    $this->assertSame(E_WARNING, $messages[1][0]);
+    $this->assertStringStartsWith('file_put_contents(vfs://permissionDenied/test/subdirectory/foo.php)', $messages[1][1]);
   }
 
 }

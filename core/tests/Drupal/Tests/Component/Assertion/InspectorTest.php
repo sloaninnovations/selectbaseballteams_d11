@@ -6,6 +6,7 @@ namespace Drupal\Tests\Component\Assertion;
 
 use PHPUnit\Framework\TestCase;
 use Drupal\Component\Assertion\Inspector;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @coversDefaultClass \Drupal\Component\Assertion\Inspector
@@ -13,17 +14,7 @@ use Drupal\Component\Assertion\Inspector;
  */
 class InspectorTest extends TestCase {
 
-  /**
-   * Tests asserting argument is an array or traversable object.
-   *
-   * @covers ::assertTraversable
-   */
-  public function testAssertTraversable() {
-    $this->assertTrue(Inspector::assertTraversable([]));
-    $this->assertTrue(Inspector::assertTraversable(new \ArrayObject()));
-    $this->assertFalse(Inspector::assertTraversable(new \stdClass()));
-    $this->assertFalse(Inspector::assertTraversable('foo'));
-  }
+  use ExpectDeprecationTrait;
 
   /**
    * Tests asserting all members are strings.
