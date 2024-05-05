@@ -42,10 +42,7 @@ function taxonomy_token_info() {
     'name' => t("Description"),
     'description' => t("The optional description of the taxonomy term."),
   ];
-  $term['node-count'] = [
-    'name' => t("Node count"),
-    'description' => t("The number of nodes tagged with the taxonomy term."),
-  ];
+
   $term['url'] = [
     'name' => t("URL"),
     'description' => t("The URL of the taxonomy term."),
@@ -64,10 +61,7 @@ function taxonomy_token_info() {
     'name' => t("Description"),
     'description' => t("The optional description of the taxonomy vocabulary."),
   ];
-  $vocabulary['node-count'] = [
-    'name' => t("Node count"),
-    'description' => t("The number of nodes tagged with terms belonging to the taxonomy vocabulary."),
-  ];
+
   $vocabulary['term-count'] = [
     'name' => t("Term count"),
     'description' => t("The number of terms belonging to the taxonomy vocabulary."),
@@ -90,6 +84,17 @@ function taxonomy_token_info() {
     'type' => 'date',
   ];
 
+  if (\Drupal::moduleHandler()->moduleExists('node')) {
+    $term['node-count'] = [
+      'name' => t("Node count"),
+      'description' => t("The number of nodes tagged with the taxonomy term."),
+    ];
+    $vocabulary['node-count'] = [
+      'name' => t("Node count"),
+      'description' => t("The number of nodes tagged with terms belonging to the taxonomy vocabulary."),
+    ];
+  }
+
   return [
     'types' => $types,
     'tokens' => [
@@ -104,6 +109,7 @@ function taxonomy_token_info() {
  */
 function taxonomy_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
   $token_service = \Drupal::token();
+  $node_module_installed = \Drupal::moduleHandler()->moduleExists('node');
 
   if (isset($options['langcode'])) {
     $url_options['language'] = \Drupal::languageManager()->getLanguage($options['langcode']);
@@ -143,11 +149,13 @@ function taxonomy_tokens($type, $tokens, array $data, array $options, Bubbleable
           break;
 
         case 'node-count':
-          $query = \Drupal::database()->select('taxonomy_index');
-          $query->condition('tid', $term->id());
-          $query->addTag('term_node_count');
-          $count = $query->countQuery()->execute()->fetchField();
-          $replacements[$original] = $count;
+          if ($node_module_installed) {
+            $query = \Drupal::database()->select('taxonomy_index');
+            $query->condition('tid', $term->id());
+            $query->addTag('term_node_count');
+            $count = $query->countQuery()->execute()->fetchField();
+            $replacements[$original] = $count;
+          }
           break;
 
         case 'vocabulary':
@@ -220,8 +228,10 @@ function taxonomy_tokens($type, $tokens, array $data, array $options, Bubbleable
           break;
 
         case 'node-count':
-          $taxonomy_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
-          $replacements[$original] = $taxonomy_storage->nodeCount($vocabulary->id());
+          if ($node_module_installed) {
+            $taxonomy_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+            $replacements[$original] = $taxonomy_storage->nodeCount($vocabulary->id());
+          }
           break;
       }
     }
