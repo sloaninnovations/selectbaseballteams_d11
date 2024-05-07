@@ -395,12 +395,15 @@ class FileItem extends EntityReferenceItem {
   }
 
   /**
-   * Computes all supported schemes.
+   * Validates whether a given scheme is valid.
    *
-   * @return string[]
-   *   Returns a list of ALL valid schemes.
+   * @param string $scheme
+   *   The file scheme to validate.
+   *
+   * @return bool
+   *   TRUE if the scheme is valid, FALSE otherwise.
    */
-  public static function isValidScheme($scheme) {
+  public static function isValidScheme(string $scheme): bool {
     return \Drupal::service('stream_wrapper_manager')->isValidScheme($scheme);
   }
 
