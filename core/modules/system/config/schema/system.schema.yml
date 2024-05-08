@@ -256,7 +256,7 @@ system.performance.fast_404.1:
       constraints:
         # Paths to exclude.
         # @see \Drupal\Core\EventSubscriber\Fast404ExceptionHtmlSubscriber
-        NotBlank: []
+        ValidRegex: {  }
     html:
       # @see \Drupal\Core\EventSubscriber\Fast404ExceptionHtmlSubscriber
       type: html
