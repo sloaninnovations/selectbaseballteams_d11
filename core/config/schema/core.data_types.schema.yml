@@ -89,6 +89,10 @@ plural_label:
 path:
   type: string
   label: 'Path'
+  constraints:
+    Regex:
+      pattern: '/^\//'
+      message: "The path %value has to start with a slash."
 
 # Human readable string that can contain multiple lines of text or HTML.
 text:
