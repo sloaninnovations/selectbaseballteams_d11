@@ -178,6 +178,8 @@ system.logging:
 system.performance:
   type: config_object
   label: 'Performance settings'
+  constraints:
+    FullyValidatable: ~
   mapping:
     cache:
       type: mapping
@@ -190,6 +192,11 @@ system.performance:
             max_age:
               type: integer
               label: 'Max age'
+              constraints:
+                # @see \Drupal\system\Form\PerformanceForm::buildForm()
+                DivisibleBy:
+                  value: 60
+                  message: 'This must be a multiple of 60.'
     css:
       type: mapping
       label: 'CSS performance settings'
@@ -201,21 +208,8 @@ system.performance:
           type: boolean
           label: 'Compress CSS files'
     fast_404:
-      type: mapping
+      type: system.performance.fast_404.[enabled]
       label: 'Fast 404 settings'
-      mapping:
-        enabled:
-          type: boolean
-          label: 'Fast 404 enabled'
-        paths:
-          type: string
-          label: 'Regular expression to match'
-        exclude_paths:
-          type: string
-          label: 'Regular expression to not match'
-        html:
-          type: string
-          label: 'Fast 404 page html'
     js:
       type: mapping
       label: 'JavaScript performance settings'
@@ -226,6 +220,47 @@ system.performance:
         gzip:
           type: boolean
           label: 'Compress JavaScript files.'
+
+# When `system.performance:fast_404.enabled = false`...
+system.performance.fast_404.*:
+  type: mapping
+  label: 'Fast 404'
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Fast 404 enabled'
+
+# When `system.performance:fast_404.enabled = true`...
+system.performance.fast_404.1:
+  type: system.performance.fast_404.*
+  label: 'Fast 404 settings'
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    paths:
+      type: string
+      label: 'Regular expression to match'
+      constraints:
+        Regex:
+          # Validates any file extension composed of alphanumeric characters,
+          # regardless of its name or length.
+          # @see \Drupal\Core\EventSubscriber\Fast404ExceptionHtmlSubscriber
+          pattern: '/\.[a-zA-Z0-9]+$/'
+          match: false
+          message: 'This is not a valid regex.'
+    exclude_paths:
+      type: string
+      label: 'Regular expression to not match'
+      constraints:
+        # Paths to exclude.
+        # @see \Drupal\Core\EventSubscriber\Fast404ExceptionHtmlSubscriber
+        NotBlank: []
+    html:
+      # @see \Drupal\Core\EventSubscriber\Fast404ExceptionHtmlSubscriber
+      type: html
+      label: 'Fast 404 page html'
 
 system.rss:
   type: config_object

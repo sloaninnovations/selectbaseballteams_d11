@@ -9,6 +9,7 @@ use Drupal\Component\Render\MarkupTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Random;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 // cspell:ignore répét répété
 
@@ -304,6 +305,19 @@ class HtmlTest extends TestCase {
       // cspell:disable-next-line
       ['Drup�al', "Drup\x80al"],
     ];
+  }
+
+  /**
+   * @covers ::validate
+   */
+  public function testValidate(): void {
+    $context = $this->createMock(ExecutionContextInterface::class);
+
+    $context->expects($this->atLeastOnce())
+      ->method('addViolation')
+      ->with($this->stringContains('No DOCTYPE specified.'));
+
+    Html::validate('<html></html>', $context);
   }
 
   /**

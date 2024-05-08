@@ -105,7 +105,10 @@ class InstallerTranslationTest extends InstallerTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     // Assert that the theme CSS was added to the page.
-    $edit = ['preprocess_css' => FALSE];
+    $edit = [
+      'preprocess_css' => FALSE,
+      'page_cache_maximum_age' => 0,
+    ];
     $this->drupalGet('admin/config/development/performance');
     $this->submitForm($edit, 'Save configuration');
     $this->drupalGet('<front>');

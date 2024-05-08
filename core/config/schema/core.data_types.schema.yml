@@ -108,6 +108,13 @@ text:
       match: false
       message: 'Text is not allowed to contain control characters, only visible characters.'
 
+# An arbitrary string of HTML.
+html:
+  type: string
+  label: 'HTML'
+  constraints:
+    Callback: ['\Drupal\Component\Utility\Html', validate]
+
 # A UUID.
 uuid:
   type: string

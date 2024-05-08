@@ -54,7 +54,9 @@ class Fast404Test extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Oops I did it again!');
 
     // Ensure disabling works.
-    $this->config('system.performance')->set('fast_404.enabled', FALSE)->save();
+    $config = $this->config('system.performance');
+    $values_before_disable = $config->get('fast_404');
+    $config->set('fast_404', ['enabled' => FALSE])->save();
     $this->drupalGet('does-not-exist.txt');
     $this->assertSession()->responseContains('modules/system/css/');
     $this->assertSession()->statusCodeEquals(404);
@@ -62,10 +64,11 @@ class Fast404Test extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('Oops I did it again!');
 
     // Ensure settings.php can override settings.
-    $settings['config']['system.performance']['fast_404']['enabled'] = (object) [
-      'value' => TRUE,
-      'required' => TRUE,
-    ];
+    $settings['config']['system.performance']['fast_404'] = array_map(
+      // Prepare the values for ::writeSettings().
+      fn ($value) => (object) ['value' => $value, 'required' => TRUE],
+      $values_before_disable,
+    );
     $this->writeSettings($settings);
     // Changing settings using an override means we need to rebuild everything.
     $this->rebuildAll();

@@ -4,6 +4,7 @@ namespace Drupal\Component\Utility;
 
 use Masterminds\HTML5;
 use Masterminds\HTML5\Serializer\Traverser;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Provides DOMDocument helpers for parsing and serializing HTML strings.
@@ -278,13 +279,9 @@ class Html {
    *   A \DOMDocument that represents the loaded HTML snippet.
    */
   public static function load($html) {
-    // Instantiate the HTML5 parser, but without the HTML5 namespace being
-    // added to the DOM document.
-    $html5 = new HTML5(['disable_html_ns' => TRUE, 'encoding' => 'UTF-8']);
-
     // Attach the provided HTML inside the body. Rely on the HTML5 parser to
     // close the body tag.
-    return $html5->loadHTML('<body>' . $html);
+    return static::getParser()->loadHTML('<body>' . $html);
   }
 
   /**
@@ -430,6 +427,38 @@ class Html {
    */
   public static function escape(string $text): string {
     return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+  }
+
+  /**
+   * Validates that a string is valid HTML.
+   *
+   * @param string $html
+   *   The string to validate.
+   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   *   The validation context.
+   */
+  public static function validate(string $html, ExecutionContextInterface $context): void {
+    $parser = static::getParser();
+
+    // Attach the provided HTML inside the body. Rely on the HTML5 parser to
+    // close the body tag.
+    $parser->loadHTML($html);
+
+    foreach ($parser->getErrors() as $error) {
+      $context->addViolation($error);
+    }
+  }
+
+  /**
+   * Instantiates an HTML 5 parser with specific options.
+   *
+   * @return \Masterminds\HTML5
+   *   The parser instance.
+   */
+  private static function getParser(): HTML5 {
+    // Instantiate the HTML5 parser, but without the HTML5 namespace being
+    // added to the DOM document.
+    return new HTML5(['disable_html_ns' => TRUE, 'encoding' => 'UTF-8']);
   }
 
   /**

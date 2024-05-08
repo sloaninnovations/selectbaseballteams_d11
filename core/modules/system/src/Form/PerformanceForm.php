@@ -8,6 +8,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -119,7 +120,11 @@ class PerformanceForm extends ConfigFormBase {
     $form['caching']['page_cache_maximum_age'] = [
       '#type' => 'select',
       '#title' => $this->t('Browser and proxy cache maximum age'),
-      '#config_target' => 'system.performance:cache.page.max_age',
+      '#config_target' => new ConfigTarget(
+        'system.performance',
+        'cache.page.max_age',
+        toConfig: fn ($value) => (int) $value,
+      ),
       '#options' => $period,
       '#description' => $this->t('This is used as the value for max-age in Cache-Control headers.'),
     ];
