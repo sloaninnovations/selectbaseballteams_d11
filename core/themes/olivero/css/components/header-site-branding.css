@@ -111,6 +111,14 @@
   }
 }
 
+@media (min-width: 43.75rem) {
+  .site-branding__logo {
+    display: flex;
+    align-items: center;
+    gap: var(--sp0-5);
+  }
+}
+
 .site-branding__text {
   color: var(--color--white);
 }

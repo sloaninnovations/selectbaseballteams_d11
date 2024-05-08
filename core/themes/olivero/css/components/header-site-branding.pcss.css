@@ -87,6 +87,12 @@
       max-height: calc(var(--header-height-wide-when-fixed) - var(--sp));
     }
   }
+
+  @media (--md) {
+    display: flex;
+    align-items: center;
+    gap: var(--sp0-5);
+  }
 }
 
 .site-branding__text {
