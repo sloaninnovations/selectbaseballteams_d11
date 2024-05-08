@@ -96,16 +96,16 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
   /**
    * An auto-reply message.
    *
-   * @var string
+   * @var string|null
    */
-  protected $reply = '';
+  protected $reply = NULL;
 
   /**
    * The weight of the category.
    *
-   * @var int
+   * @var int|null
    */
-  protected $weight = 0;
+  protected $weight = NULL;
 
   /**
    * {@inheritdoc}
@@ -169,7 +169,7 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
    * {@inheritdoc}
    */
   public function getReply() {
-    return $this->reply;
+    return $this->reply ?? '';
   }
 
   /**
@@ -184,7 +184,7 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
    * {@inheritdoc}
    */
   public function getWeight() {
-    return $this->weight;
+    return $this->weight ?? 0;
   }
 
   /**
