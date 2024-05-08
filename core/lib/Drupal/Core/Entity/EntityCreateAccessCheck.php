@@ -54,7 +54,8 @@ class EntityCreateAccessCheck implements AccessInterface {
     [$entity_type, $bundle] = explode(':', $route->getRequirement($this->requirementsKey) . ':');
 
     // For an entity type that has bundles, the $bundle must be specified.
-    if (empty($bundle) && $this->entityTypeManager->getDefinition($entity_type)->hasKey('bundle')) {
+    $entity_type_definition = $this->entityTypeManager->getDefinition($entity_type);
+    if (empty($bundle) && $entity_type_definition && $entity_type_definition->hasKey('bundle')) {
       throw new \Exception("The _entity_create_access route access requires a bundle parameter because the $entity_type entity type uses bundles.");
     }
 
