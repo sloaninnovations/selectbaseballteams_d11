@@ -88,7 +88,7 @@ class TransportTest extends KernelTestBase {
   /**
    * Provides test data for testBuiltinFactory().
    */
-  public function providerTestBuiltinFactory(): iterable {
+  public static function providerTestBuiltinFactory(): iterable {
     yield ['null', 'null', NullTransport::class];
     yield ['sendmail', 'default', SendmailTransport::class];
     yield ['smtp', 'default', EsmtpTransport::class];
