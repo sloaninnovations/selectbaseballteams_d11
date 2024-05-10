@@ -35,7 +35,7 @@ final class NavigationMenuLinkTreeSubscriber implements EventSubscriberInterface
         unset($tree[$key]);
       }
 
-      // Remove childs of content menu, if any.
+      // Remove child items of content menu, if any.
       $parent = $item->link->getParent();
       if ($parent == 'system.admin_content') {
         unset($tree[$key]);
