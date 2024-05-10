@@ -10,6 +10,11 @@ use Drupal\navigation\EventSubscriber\NavigationMenuLinkTreeSubscriber;
 use Drupal\Tests\Core\Menu\MenuLinkMock;
 use Drupal\Tests\UnitTestCase;
 
+/**
+ * Tests \Drupal\navigation\EventSubscriber\NavigationMenuLinkTreeSubscriber.
+ *
+ * @group navigation
+ */
 class NavigationMenuLinkTreeSubscriberTest extends UnitTestCase {
 
   /**
