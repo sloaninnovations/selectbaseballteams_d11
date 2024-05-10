@@ -342,9 +342,8 @@ system.file:
       type: integer
       label: 'Maximum age for temporary files'
       constraints:
-        NotNull: []
         Range:
-          min: 0
+          min: 21600
 
 system.image:
   type: config_object
