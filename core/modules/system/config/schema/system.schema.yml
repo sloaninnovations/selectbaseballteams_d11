@@ -329,6 +329,7 @@ system.file:
     allow_insecure_uploads:
       type: boolean
       label: 'Allow insecure uploads'
+      requiredKey: false
     default_scheme:
       type: string
       label: 'Default download method'
@@ -341,6 +342,7 @@ system.file:
     temporary_maximum_age:
       type: integer
       label: 'Maximum age for temporary files'
+      requiredKey: false
       constraints:
         Range:
           min: 21600
