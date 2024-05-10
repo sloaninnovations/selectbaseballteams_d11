@@ -148,8 +148,6 @@ function navigation_menu_links_discovered_alter(&$links) {
   $navigation_links = \Drupal::classResolver(NavigationContentLinks::class);
   assert($navigation_links instanceof NavigationContentLinks);
   $navigation_links->addMenuLinks($links);
-  $navigation_links->removeAdminContentLink($links);
-  $navigation_links->removeHelpLink($links);
 }
 
 /**

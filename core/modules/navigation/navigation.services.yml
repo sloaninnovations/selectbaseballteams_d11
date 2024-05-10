@@ -31,3 +31,13 @@ services:
     class: Drupal\navigation\UserLazyBuilder
     arguments: ['@module_handler', '@current_user']
   Drupal\navigation\UserLazyBuilders: '@navigation.user_lazy_builder'
+
+  navigation.navigation_tree_manipulators:
+    class: Drupal\navigation\NavigationMenuLinkTreeManipulators
+    arguments: ['@event_dispatcher']
+  Drupal\navigation\NavigationMenuLinkTreeManipulators: '@navigation.navigation_tree_manipulators'
+
+  navigation.event_subscriber:
+    class: Drupal\navigation\EventSubscriber\NavigationMenuLinkTreeSubscriber
+    tags:
+      - { name: event_subscriber }
