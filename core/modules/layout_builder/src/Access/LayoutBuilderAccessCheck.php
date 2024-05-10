@@ -44,14 +44,12 @@ class LayoutBuilderAccessCheck implements AccessInterface {
     }
 
     if ($access instanceof RefinableCacheableDependencyInterface) {
+      // TODO: https://www.drupal.org/project/drupal/issues/3446509 Decide if
+      // this logic needs to be changed.
       if ($section_storage instanceof CacheableDependencyInterface) {
         $access->addCacheableDependency($section_storage);
       }
       else {
-        // TODO: SimpleConfigSectionStorage is the only class that does not
-        // implement CacheableDependencyInterface. We can leave this check. Or
-        // we can make SectionStorageInterface extend
-        // CacheableDependencyInterface. Which one is better?
         $access->setCacheMaxAge(0);
       }
     }

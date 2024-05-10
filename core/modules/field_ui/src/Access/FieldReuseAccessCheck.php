@@ -82,9 +82,8 @@ class FieldReuseAccessCheck implements AccessInterface {
           $access = $access->orIf(AccessResult::allowedIfHasPermission($account, $permission));
         }
       }
-      // TODO: The result of the check is always FALSE (EntityFieldManager isn't
-      // a cacheable dependency). Should we remove this completely? Should we
-      // always set the cache max age to 0?
+      // TODO: https://www.drupal.org/project/drupal/issues/3446507 Decide if
+      // this logic needs to be changed or removed.
       if ($this->entityFieldManager instanceof CacheableDependencyInterface) {
         $access->addCacheableDependency($this->entityFieldManager);
       }
