@@ -116,8 +116,8 @@ class SystemBrandingOffCanvasForm extends PluginFormBase implements ContainerInj
     if (AccessResult::allowedIf(!$site_config->hasOverrides('name') && !$site_config->hasOverrides('slogan'))->isAllowed()) {
       $site_info = $form_state->getValue('site_information');
       $this->configFactory->getEditable('system.site')
-        ->set('name', $site_info['site_name'])
-        ->set('slogan', $site_info['site_slogan'])
+        ->set('name', ($site_info['site_name'] === '') ? NULL : $site_info['site_name'])
+        ->set('slogan', ($site_info['site_slogan'] === '') ? NULL : $site_info['site_slogan'])
         ->save();
     }
 
