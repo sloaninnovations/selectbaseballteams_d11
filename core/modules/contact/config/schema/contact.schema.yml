@@ -33,10 +33,6 @@ contact.form.*:
     weight:
       type: weight
       label: 'Weight'
-      nullable: true
-      constraints:
-        NotBlank:
-          allowNull: true
     message:
       type: text
       label: 'Message displayed to user on submission'

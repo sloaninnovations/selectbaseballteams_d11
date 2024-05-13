@@ -103,9 +103,9 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
   /**
    * The weight of the category.
    *
-   * @var int|null
+   * @var int
    */
-  protected $weight = NULL;
+  protected $weight = 0;
 
   /**
    * {@inheritdoc}
@@ -184,7 +184,7 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
    * {@inheritdoc}
    */
   public function getWeight() {
-    return $this->weight ?? 0;
+    return $this->weight;
   }
 
   /**
