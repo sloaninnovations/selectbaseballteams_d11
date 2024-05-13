@@ -44,6 +44,7 @@ system.site:
           nullable: true
           constraints:
             Regex:
+              # @see \Drupal\system\Form\SiteInformationForm::validateForm()
               pattern: '/^\//'
               message: "The path %value has to start with a slash."
         404:
@@ -52,6 +53,7 @@ system.site:
           nullable: true
           constraints:
             Regex:
+              # @see \Drupal\system\Form\SiteInformationForm::validateForm()
               pattern: '/^\//'
               message: "The path %value has to start with a slash."
         front:
@@ -59,6 +61,7 @@ system.site:
           label: 'Default front page'
           constraints:
             Regex:
+              # @see \Drupal\system\Form\SiteInformationForm::validateForm()
               pattern: '/^\//'
               message: "The path %value has to start with a slash."
     admin_compact_mode:
