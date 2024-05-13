@@ -75,9 +75,9 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
   /**
    * The message displayed to user on form submission.
    *
-   * @var string
+   * @var string|null
    */
-  protected $message;
+  protected $message = NULL;
 
   /**
    * List of recipient email addresses.

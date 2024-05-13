@@ -36,6 +36,10 @@ contact.form.*:
     message:
       type: text
       label: 'Message displayed to user on submission'
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     redirect:
       type: path
       label: 'Redirect path on submission'
