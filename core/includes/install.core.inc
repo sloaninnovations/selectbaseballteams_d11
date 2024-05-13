@@ -26,6 +26,8 @@ use Drupal\Core\Installer\Form\SiteSettingsForm;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManager;
+use Drupal\Core\Recipe\Recipe;
+use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
@@ -97,13 +99,13 @@ const INSTALL_TASK_RUN_IF_NOT_COMPLETED = 3;
  *   page request (optimized for the command line) and not send any output
  *   intended for the web browser. See install_state_defaults() for a list of
  *   elements that are allowed to appear in this array.
- * @param callable $callback
+ * @param callable|null $callback
  *   (optional) A callback to allow command line processes to update a progress
  *   bar. The callback is passed the $install_state variable.
  *
  * @see install_state_defaults()
  */
-function install_drupal($class_loader, $settings = [], callable $callback = NULL) {
+function install_drupal($class_loader, $settings = [], ?callable $callback = NULL) {
   global $install_state;
   // Initialize the installation state with the settings that were passed in,
   // as well as a boolean indicating whether or not this is an interactive
@@ -548,14 +550,14 @@ function install_begin_request($class_loader, &$install_state) {
  * @param $install_state
  *   An array of information about the current installation state. This is
  *   passed along to each task, so it can be modified if necessary.
- * @param callable $callback
+ * @param callable|null $callback
  *   (optional) A callback to allow command line processes to update a progress
  *   bar. The callback is passed the $install_state variable.
  *
  * @return array|null
  *   HTML output from the last completed task.
  */
-function install_run_tasks(&$install_state, callable $callback = NULL) {
+function install_run_tasks(&$install_state, ?callable $callback = NULL) {
   do {
     // Obtain a list of tasks to perform. The list of tasks itself can be
     // dynamic (e.g., some might be defined by the installation profile,
@@ -836,6 +838,27 @@ function install_tasks($install_state) {
     ];
     $tasks = array_slice($tasks, 0, $key, TRUE) +
       $config_tasks +
+      array_slice($tasks, $key, NULL, TRUE);
+  }
+
+  if (!empty($install_state['parameters']['recipe'])) {
+    // The install state indicates that we are installing from a recipe.
+    $key = array_search('install_profile_modules', array_keys($tasks), TRUE);
+    unset($tasks['install_profile_modules']);
+    unset($tasks['install_profile_themes']);
+    unset($tasks['install_install_profile']);
+    $recipe_tasks = [
+      'install_recipe_required_modules' => [
+        'display_name' => t('Install required modules'),
+        'type' => 'batch',
+      ],
+      'install_recipe_batch' => [
+        'display_name' => t('Install recipe'),
+        'type' => 'batch',
+      ],
+    ];
+    $tasks = array_slice($tasks, 0, $key, TRUE) +
+      $recipe_tasks +
       array_slice($tasks, $key, NULL, TRUE);
   }
 
@@ -1462,7 +1485,7 @@ function install_check_localization_server($uri) {
 }
 
 /**
- * Extracts version information from a drupal core version string.
+ * Extracts version information from a Drupal core version string.
  *
  * @param string $version
  *   Version info string (e.g., 8.0.0, 8.1.0, 8.0.0-dev, 8.0.0-unstable1,
@@ -1472,10 +1495,10 @@ function install_check_localization_server($uri) {
  *   Associative array of version info:
  *   - major: Major version (e.g., "8").
  *   - minor: Minor version (e.g., "0").
- *   - patch: Patch version (e.g., "0").
- *   - extra: Extra version info (e.g., "alpha2").
- *   - extra_text: The text part of "extra" (e.g., "alpha").
- *   - extra_number: The number part of "extra" (e.g., "2").
+ *   - (optional) patch: Patch version (e.g., "0").
+ *   - (optional) extra: Extra version info (e.g., "alpha2").
+ *   - (optional) extra_text: The text part of "extra" (e.g., "alpha").
+ *   - (optional) extra_number: The number part of "extra" (e.g., "2").
  */
 function _install_get_version_info($version) {
   preg_match('/
@@ -1483,8 +1506,11 @@ function _install_get_version_info($version) {
       (?P<major>[0-9]+)    # Major release number.
       \.          # .
       (?P<minor>[0-9]+)    # Minor release number.
-      \.          # .
-      (?P<patch>[0-9]+|x)  # Patch release number.
+      (
+        \.        # .
+        (?P<patch>[0-9]+|x) # Patch release number.
+        |         # OR no patch release.
+      )
     )             #
     (             #
       -           # - separator for "extra" version information.
@@ -2538,4 +2564,72 @@ function _install_config_locale_overrides_process_batch(array $names, array $lan
     }
   }
   $context['finished'] = 1;
+}
+
+/**
+ * Installs required modules prior to applying a recipe via the installer.
+ *
+ * @see install_tasks()
+ *
+ * @internal
+ *   All installer code is internal.
+ */
+function install_recipe_required_modules() {
+  // We need to manually trigger the installation of core-provided entity types,
+  // as those will not be handled by the module installer.
+  // @see install_profile_modules()
+  install_core_entity_type_definitions();
+
+  $batch_builder = new BatchBuilder();
+  $batch_builder
+    ->setFinishCallback([ConfigImporterBatch::class, 'finish'])
+    ->setTitle(t('Installing required modules'))
+    ->setInitMessage(t('Starting required module installation.'))
+    ->setErrorMessage(t('Required module installation has encountered an error.'));
+
+  $files = \Drupal::service('extension.list.module')->getList();
+
+  // Always install required modules first.
+  $required = [];
+
+  foreach ($files as $module => $extension) {
+    if (!empty($extension->info['required'])) {
+      $required[$module] = $extension->sort;
+    }
+  }
+  arsort($required);
+
+  // The system module is already installed. See install_base_system().
+  unset($required['system']);
+
+  foreach ($required as $module => $weight) {
+    $batch_builder->addOperation(
+      '_install_module_batch',
+      [$module, $files[$module]->info['name']],
+    );
+  }
+  return $batch_builder->toArray();
+}
+
+/**
+ * Creates a batch for the recipe system to process.
+ *
+ * @see install_tasks()
+ *
+ * @internal
+ *   This API is experimental.
+ */
+function install_recipe_batch(&$install_state) {
+  $batch_builder = new BatchBuilder();
+  $batch_builder
+    ->setTitle(t('Installing recipe'))
+    ->setInitMessage(t('Starting recipe installation.'))
+    ->setErrorMessage(t('Recipe installation has encountered an error.'));
+
+  $recipe = Recipe::createFromDirectory($install_state['parameters']['recipe']);
+  foreach (RecipeRunner::toBatchOperations($recipe) as $step) {
+    $batch_builder->addOperation(...$step);
+  }
+
+  return $batch_builder->toArray();
 }

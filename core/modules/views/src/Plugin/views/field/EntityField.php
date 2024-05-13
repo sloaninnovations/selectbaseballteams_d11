@@ -62,6 +62,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $limit_values;
 
   /**
@@ -69,6 +70,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $base_table;
 
   /**
@@ -137,6 +139,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   /**
    * The fields that we are actually grouping on.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public array $group_fields;
 
   /**
@@ -165,7 +168,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, FormatterPluginManager $formatter_plugin_manager, FieldTypePluginManagerInterface $field_type_plugin_manager, LanguageManagerInterface $language_manager, RendererInterface $renderer, EntityRepositoryInterface $entity_repository, EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, FormatterPluginManager $formatter_plugin_manager, FieldTypePluginManagerInterface $field_type_plugin_manager, LanguageManagerInterface $language_manager, RendererInterface $renderer, EntityRepositoryInterface $entity_repository, EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
@@ -175,10 +178,6 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     $this->renderer = $renderer;
     $this->entityRepository = $entity_repository;
     $this->entityFieldManager = $entity_field_manager;
-    if ($entity_type_bundle_info === NULL) {
-      $entity_type_bundle_info = \Drupal::service('entity_type.bundle.info');
-      @trigger_error('Calling ' . __CLASS__ . '::__construct() without the $entity_type_bundle_info argument is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. See https://www.drupal.org/node/3380621', E_USER_DEPRECATED);
-    }
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
 
     // @todo Unify 'entity field'/'field_name' instead of converting back and
@@ -532,7 +531,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
 
     // Get the settings form.
     $settings_form = ['#value' => []];
-    $format = isset($form_state->getUserInput()['options']['type']) ? $form_state->getUserInput()['options']['type'] : $this->options['type'];
+    $format = $form_state->getUserInput()['options']['type'] ?? $this->options['type'];
     if ($formatter = $this->getFormatterInstance($format)) {
       $settings_form = $formatter->settingsForm($form, $form_state);
       // Convert field UI selector states to work in the Views field form.

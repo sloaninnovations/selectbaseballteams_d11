@@ -1377,17 +1377,18 @@
         $newContent[effect.showEffect](effect.showSpeed);
       }
 
-      // Attach all JavaScript behaviors to the new content, if it was
-      // successfully added to the page, this if statement allows
-      // `#ajax['wrapper']` to be optional.
-      if ($newContent.parents('html').length) {
-        // Attach behaviors to all element nodes.
-        $newContent.each((index, element) => {
-          if (element.nodeType === Node.ELEMENT_NODE) {
-            Drupal.attachBehaviors(element, settings);
-          }
-        });
-      }
+      // Attach behaviors to all element nodes.
+      $newContent.each((index, element) => {
+        if (
+          element.nodeType === Node.ELEMENT_NODE &&
+          // Attach all JavaScript behaviors to the new content, if it was
+          // successfully added to the page, this condition allows
+          // `#ajax['wrapper']` to be optional.
+          document.documentElement.contains(element)
+        ) {
+          Drupal.attachBehaviors(element, settings);
+        }
+      });
     },
 
     /**
@@ -1422,7 +1423,7 @@
      *   The JSON response object from the Ajax request.
      * @param {string} response.selector
      *   A jQuery selector string.
-     * @param {boolean} [response.asterisk]
+     * @param {string} [response.asterisk]
      *   An optional CSS selector. If specified, an asterisk will be
      *   appended to the HTML inside the provided selector.
      * @param {number} [status]
@@ -1852,9 +1853,13 @@
       while ($(scrollTarget).scrollTop() === 0 && $(scrollTarget).parent()) {
         scrollTarget = $(scrollTarget).parent();
       }
+
       // Only scroll upward.
       if (offset.top - 10 < $(scrollTarget).scrollTop()) {
-        $(scrollTarget).animate({ scrollTop: offset.top - 10 }, 500);
+        scrollTarget.get(0).scrollTo({
+          top: offset.top - 10,
+          behavior: 'smooth',
+        });
       }
     },
   };

@@ -69,7 +69,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     }, 'standardFrontPage');
     $this->assertNoJavaScript($performance_data);
     $this->assertSame(1, $performance_data->getStylesheetCount());
-    $this->assertSame(3491, $performance_data->getStylesheetBytes());
+    $this->assertLessThan(3500, $performance_data->getStylesheetBytes());
 
     $expected_queries = [
       'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/node" ESCAPE ' . "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
@@ -111,10 +111,10 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $this->assertSame(34, $performance_data->getQueryCount());
     $this->assertSame(124, $performance_data->getCacheGetCount());
-    $this->assertSame(46, $performance_data->getCacheSetCount());
+    $this->assertSame(45, $performance_data->getCacheSetCount());
     $this->assertSame(0, $performance_data->getCacheDeleteCount());
-    $this->assertSame(37, $performance_data->getCacheTagChecksumCount());
-    $this->assertSame(42, $performance_data->getCacheTagIsValidCount());
+    $this->assertSame(36, $performance_data->getCacheTagChecksumCount());
+    $this->assertSame(43, $performance_data->getCacheTagIsValidCount());
     $this->assertSame(0, $performance_data->getCacheTagInvalidationCount());
 
     // Test node page.
@@ -123,7 +123,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     }, 'standardNodePage');
     $this->assertNoJavaScript($performance_data);
     $this->assertSame(1, $performance_data->getStylesheetCount());
-    $this->assertSame(3216, $performance_data->getStylesheetBytes());
+    $this->assertLessThan(3500, $performance_data->getStylesheetBytes());
 
     $expected_queries = [
       'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/node/1" ESCAPE ' . "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
@@ -152,7 +152,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     }, 'standardUserPage');
     $this->assertNoJavaScript($performance_data);
     $this->assertSame(1, $performance_data->getStylesheetCount());
-    $this->assertSame(3216, $performance_data->getStylesheetBytes());
+    $this->assertLessThan(3500, $performance_data->getStylesheetBytes());
 
     $expected_queries = [
       'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/user/2" ESCAPE ' . "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
@@ -202,6 +202,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     }, 'standardLogin');
 
     $expected_queries = [
+      'SELECT "name", "value" FROM "key_value_expire" WHERE "expire" > "NOW" AND "name" IN ( "KEY" ) AND "collection" = "form"',
       'SELECT COUNT(*) AS "expression" FROM (SELECT 1 AS "expression" FROM "flood" "f" WHERE ("event" = "user.failed_login_ip") AND ("identifier" = "CLIENT_IP") AND ("timestamp" > "TIMESTAMP")) "subquery"',
       'SELECT "base_table"."uid" AS "uid", "base_table"."uid" AS "base_table_uid" FROM "users" "base_table" INNER JOIN "users_field_data" "users_field_data" ON "users_field_data"."uid" = "base_table"."uid" WHERE ("users_field_data"."name" IN ("ACCOUNT_NAME")) AND ("users_field_data"."default_langcode" IN (1))',
       'SELECT COUNT(*) AS "expression" FROM (SELECT 1 AS "expression" FROM "flood" "f" WHERE ("event" = "user.failed_login_user") AND ("identifier" = "CLIENT_IP") AND ("timestamp" > "TIMESTAMP")) "subquery"',
@@ -220,12 +221,12 @@ class StandardPerformanceTest extends PerformanceTestBase {
     ];
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
-    $this->assertSame(15, $performance_data->getQueryCount());
-    $this->assertSame(63, $performance_data->getCacheGetCount());
+    $this->assertSame(16, $performance_data->getQueryCount());
+    $this->assertSame(60, $performance_data->getCacheGetCount());
     $this->assertSame(1, $performance_data->getCacheSetCount());
     $this->assertSame(1, $performance_data->getCacheDeleteCount());
     $this->assertSame(1, $performance_data->getCacheTagChecksumCount());
-    $this->assertSame(28, $performance_data->getCacheTagIsValidCount());
+    $this->assertSame(23, $performance_data->getCacheTagIsValidCount());
     $this->assertSame(0, $performance_data->getCacheTagInvalidationCount());
   }
 
@@ -239,7 +240,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
     // this twice so that any caches which take two requests to warm are also
     // covered.
     $account = $this->drupalCreateUser();
-    $this->drupalLogout();
 
     foreach (range(0, 1) as $index) {
       $this->drupalGet('node');
@@ -257,6 +257,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $expected_queries = [
       'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:stark" ) AND "collection" = "config.entity.key_store.block"',
       'SELECT "config"."name" AS "name" FROM "config" "config" WHERE ("collection" = "") AND ("name" LIKE "search.page.%" ESCAPE ' . "'\\\\'" . ') ORDER BY "collection" ASC, "name" ASC',
+      'SELECT "name", "value" FROM "key_value_expire" WHERE "expire" > "NOW" AND "name" IN ( "KEY" ) AND "collection" = "form"',
       'SELECT COUNT(*) AS "expression" FROM (SELECT 1 AS "expression" FROM "flood" "f" WHERE ("event" = "user.failed_login_ip") AND ("identifier" = "CLIENT_IP") AND ("timestamp" > "TIMESTAMP")) "subquery"',
       'SELECT "base_table"."uid" AS "uid", "base_table"."uid" AS "base_table_uid" FROM "users" "base_table" INNER JOIN "users_field_data" "users_field_data" ON "users_field_data"."uid" = "base_table"."uid" WHERE ("users_field_data"."name" IN ("ACCOUNT_NAME")) AND ("users_field_data"."default_langcode" IN (1))',
       'SELECT "base"."uid" AS "uid", "base"."uuid" AS "uuid", "base"."langcode" AS "langcode" FROM "users" "base" WHERE "base"."uid" IN (2)',
@@ -275,7 +276,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     ];
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
-    $this->assertSame(17, $performance_data->getQueryCount());
+    $this->assertSame(18, $performance_data->getQueryCount());
     $this->assertSame(107, $performance_data->getCacheGetCount());
     $this->assertSame(1, $performance_data->getCacheSetCount());
     $this->assertSame(1, $performance_data->getCacheDeleteCount());

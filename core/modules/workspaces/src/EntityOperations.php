@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\workspaces\Plugin\Validation\Constraint\EntityWorkspaceConflictConstraint;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -145,6 +144,16 @@ class EntityOperations implements ContainerInjectionInterface {
       // become the default revision only when it is replicated to the default
       // workspace.
       $entity->isDefaultRevision(FALSE);
+    }
+
+    // In ::entityFormEntityBuild() we mark the entity as a non-default revision
+    // so that validation constraints can rely on $entity->isDefaultRevision()
+    // always returning FALSE when an entity form is submitted in a workspace.
+    // However, after validation has run, we need to revert that flag so the
+    // first revision of a new entity is correctly seen by the system as the
+    // default revision.
+    if ($entity->isNew()) {
+      $entity->isDefaultRevision(TRUE);
     }
 
     // Track the workspaces in which the new revision was saved.
@@ -309,23 +318,16 @@ class EntityOperations implements ContainerInjectionInterface {
     if ($this->workspaceManager->hasActiveWorkspace()) {
       $form['#entity_builders'][] = [static::class, 'entityFormEntityBuild'];
     }
-
-    // Run the workspace conflict validation constraint when the entity form is
-    // being built so we can "disable" it early and display a message to the
-    // user, instead of allowing them to enter data that can never be saved.
-    foreach ($entity->validate()->getEntityViolations() as $violation) {
-      if ($violation->getConstraint() instanceof EntityWorkspaceConflictConstraint) {
-        $form['#markup'] = $violation->getMessage();
-        $form['#access'] = FALSE;
-        continue;
-      }
-    }
   }
 
   /**
    * Entity builder that marks all supported entities as pending revisions.
    */
   public static function entityFormEntityBuild($entity_type_id, RevisionableInterface $entity, &$form, FormStateInterface &$form_state) {
+    // Ensure that all entity forms are signaling that a new revision will be
+    // created.
+    $entity->setNewRevision(TRUE);
+
     // Set the non-default revision flag so that validation constraints are also
     // aware that a pending revision is about to be created.
     $entity->isDefaultRevision(FALSE);

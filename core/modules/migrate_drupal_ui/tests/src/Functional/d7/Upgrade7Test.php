@@ -57,10 +57,11 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
 
     $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal7.php');
 
-    // Enable saving the logs and set the post migration admin user name.
-    $this->outputLogs = TRUE;
-    $this->migratedAdminUserName = 'admin';
     $this->expectedLoggedErrors = 27;
+    // If saving the logs, then set the admin user.
+    if ($this->outputLogs) {
+      $this->migratedAdminUserName = 'admin';
+    }
   }
 
   /**
@@ -215,7 +216,6 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       // These modules are in the missing path list because they are installed
       // on the source site but they are not installed on the destination site.
       'Syslog',
-      // @todo Remove tracker in https://www.drupal.org/project/drupal/issues/3261452
       'Tracker',
       'Update manager',
     ];
@@ -234,6 +234,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
     $this->assertFollowUpMigrationResults();
     $this->assertEntityRevisionsCount('node', 19);
     $this->assertEmailsSent();
+    $this->assertLogError();
   }
 
   /**
