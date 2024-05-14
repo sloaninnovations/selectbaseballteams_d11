@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Theme;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -55,8 +54,14 @@ class TwigDebugMarkupTest extends BrowserTestBase {
     $output = (string) $renderer->renderRoot($build);
     $this->assertStringContainsString('<!-- THEME DEBUG -->', $output, 'Twig debug markup found in theme output when debug is enabled.');
     $this->assertStringContainsString("THEME HOOK: 'node'", $output, 'Theme call information found.');
-    $this->assertStringContainsString('▪️ node--1--full' . $extension . PHP_EOL . '   ✅ node--1' . $extension . PHP_EOL . '   ▪️ node--page--full' . $extension . PHP_EOL . '   ▪️ node--page' . $extension . PHP_EOL . '   ▪️ node--full' . $extension . PHP_EOL . '   ▪️ node' . $extension, $output, 'Suggested template files found in order and node ID specific template shown as current template.');
-    $this->assertStringContainsString(Html::escape('node--<script type="text/javascript">alert(\'yo\');</script>'), (string) $output);
+    $expected_templates_suggestions = '▪️ node--1--full' . $extension . PHP_EOL
+      . '   ✅ node--1' . $extension . PHP_EOL
+      . '   ▪️ node--page--full' . $extension . PHP_EOL
+      . '   ▪️ node--page' . $extension . PHP_EOL
+      . '   ▪️ node--full' . $extension . PHP_EOL
+      . '   ▪️ node' . $extension . PHP_EOL
+      . '-->' . PHP_EOL;
+    $this->assertStringContainsString($expected_templates_suggestions, $output, 'Suggested template files found in order and node ID specific template shown as current template.');
     $this->assertStringContainsString('<!-- INVALID FILE NAME SUGGESTIONS:' . PHP_EOL . '   See https://api.drupal.org/api/drupal/core!lib!Drupal!Core!Render!theme.api.php/function/hook_theme_suggestions_alter' . PHP_EOL . '   invalid_theme_suggestions' . PHP_EOL . '-->', $output, 'Twig debug markup found invalid suggestions.');
     $template_filename = $templates['node__1']['path'] . '/' . $templates['node__1']['template'] . $extension;
     $this->assertStringContainsString("💡 BEGIN CUSTOM TEMPLATE OUTPUT from '$template_filename'", $output, 'Full path to current template file found.');
@@ -75,7 +80,16 @@ class TwigDebugMarkupTest extends BrowserTestBase {
     $build += $builder->view($node3);
     $output = (string) $renderer->renderRoot($build);
     $this->assertStringContainsString("THEME HOOK: 'node__foo__bar'", $output, 'Theme call information found.');
-    $this->assertStringContainsString('▪️ node--foo--bar' . $extension . PHP_EOL . '   ▪️ node--foo' . $extension . PHP_EOL . '   ▪️ node--&lt;script type=&quot;text/javascript&quot;&gt;alert(&#039;yo&#039;);&lt;/script&gt;' . $extension . PHP_EOL . '   ▪️ node--3--full' . $extension . PHP_EOL . '   ▪️ node--3' . $extension . PHP_EOL . '   ▪️ node--page--full' . $extension . PHP_EOL . '   ▪️ node--page' . $extension . PHP_EOL . '   ▪️ node--full' . $extension . PHP_EOL . '   ✅ node' . $extension, $output, 'Suggested template files found in order and base template shown as current template.');
+    $expected_templates_suggestions = '▪️ node--foo--bar' . $extension . PHP_EOL
+      . '   ▪️ node--foo' . $extension . PHP_EOL
+      . '   ▪️ node--3--full' . $extension . PHP_EOL
+      . '   ▪️ node--3' . $extension . PHP_EOL
+      . '   ▪️ node--page--full' . $extension . PHP_EOL
+      . '   ▪️ node--page' . $extension . PHP_EOL
+      . '   ▪️ node--full' . $extension . PHP_EOL
+      . '   ✅ node' . $extension . PHP_EOL
+      . '-->' . PHP_EOL;
+    $this->assertStringContainsString($expected_templates_suggestions, $output, 'Suggested template files found in order and base template shown as current template.');
 
     // Disable debug, rebuild the service container, and clear all caches.
     $parameters = $this->container->getParameter('twig.config');

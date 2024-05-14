@@ -65,15 +65,15 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
       ->save();
     $this->drupalGet('theme-test/general-suggestion-alter');
     $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by the test_theme theme via hook_theme_suggestions_alter().');
-    $this->assertSession()->pageTextContains('Hooks: theme_test_theme test_theme_theme_suggestions_alter');
+    $this->assertSession()->pageTextContains('Hooks: theme_test_theme none');
 
     // Enable the theme_suggestions_test module to test modules implementing
     // suggestions alter hooks.
     \Drupal::service('module_installer')->install(['theme_suggestions_test']);
     $this->resetAll();
     $this->drupalGet('theme-test/general-suggestion-alter');
-    $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by a module via hook_theme_suggestions_alter().');
-    $this->assertSession()->pageTextContains('Hooks: theme_suggestions_test_theme_suggestions_alter test_theme_theme_suggestions_alter');
+    $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by the test_theme theme via hook_theme_suggestions_alter()');
+    $this->assertSession()->pageTextContains('Hooks: theme_test_theme none');
   }
 
   /**
@@ -95,7 +95,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
     \Drupal::service('module_installer')->install(['theme_suggestions_test']);
     $this->resetAll();
     $this->drupalGet('theme-test/suggestion-alter');
-    $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by a module via hook_theme_suggestions_HOOK_alter().');
+    $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by the test_theme theme via hook_theme_suggestions_HOOK_alter().');
   }
 
   /**
@@ -110,20 +110,11 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
       ->set('default', 'test_theme')
       ->save();
 
-    // Test a specific theme call similar to '#theme' => 'node__article'.
-    $this->drupalGet('theme-test/specific-suggestion-alter');
-    $this->assertSession()->pageTextContains('Template matching the specific theme call.');
-    $this->assertSession()->pageTextContains('theme_test_specific_suggestions__variant');
-
     // Ensure that the base hook is used to determine the suggestion alter hook.
     \Drupal::service('module_installer')->install(['theme_suggestions_test']);
     $this->resetAll();
     $this->drupalGet('theme-test/specific-suggestion-alter');
-    $this->assertSession()->pageTextContains('Template overridden based on suggestion alter hook determined by the base hook.');
-    $raw_content = $this->getSession()->getPage()->getContent();
-    // Verify that a specific theme call is added to the suggestions array
-    // before the suggestions alter hook.
-    $this->assertLessThan(strpos($raw_content, 'theme_test_specific_suggestions__variant__foo'), strpos($raw_content, 'theme_test_specific_suggestions__variant'));
+    $this->assertSession()->pageTextContains('Template overridden based on suggestion alter hook determined by a module\'s hook_theme_suggestions_HOOK_alter().');
   }
 
   /**
@@ -146,9 +137,10 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
     // Ensure that the order is first by extension, then for a given extension,
     // the hook-specific one after the generic one.
     $expected_order = [
+      'theme_test_theme_suggestions_theme_test_suggestions() executed.',
       'theme_suggestions_test_theme_suggestions_alter() executed.',
       'theme_suggestions_test_theme_suggestions_theme_test_suggestions_alter() executed.',
-      'theme_test_theme_suggestions_alter() executed for theme_test_suggestions.',
+      'theme_test_theme_suggestions_alter() executed.',
       'theme_test_theme_suggestions_theme_test_suggestions_alter() executed.',
       'test_theme_theme_suggestions_alter() executed.',
       'test_theme_theme_suggestions_theme_test_suggestions_alter() executed.',
