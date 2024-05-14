@@ -4,6 +4,7 @@ namespace Drupal\contact\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\contact\ContactFormInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Url;
 
 /**
@@ -193,6 +194,20 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
   public function setWeight($weight) {
     $this->weight = $weight;
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    if ($this->reply === '') {
+      $this->reply = NULL;
+    }
+    if ($this->message === '') {
+      $this->message = NULL;
+    }
   }
 
 }
