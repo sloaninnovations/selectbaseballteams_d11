@@ -208,6 +208,9 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
     if ($this->message === '') {
       $this->message = NULL;
     }
+    if ($this->redirect === '') {
+      $this->redirect = NULL;
+    }
   }
 
 }
