@@ -164,6 +164,16 @@ final class ComponentMetadata {
           ...(array) $type,
           'object',
         ]);
+
+        if (isset($prop_schema['items'])) {
+          foreach ($prop_schema['items']['properties'] as $subpropName => &$subprop) {
+            $type = $subprop['type'] ?? '';
+            $schema['properties'][$name]['items']['properties'][$subpropName]['type'] = array_unique([
+              ...(array) $type,
+              'object',
+            ]);
+          }
+        }
       }
     }
     $this->schema = $schema;

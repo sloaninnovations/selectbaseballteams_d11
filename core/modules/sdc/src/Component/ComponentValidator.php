@@ -98,6 +98,15 @@ final class ComponentValidator {
       $classes_per_prop
     );
 
+    foreach ($definition['props']['properties'] as &$prop) {
+      if (isset($prop['items'])) {
+        $prop['items'] = $this->nullifyClassPropsSchema(
+          $prop['items'],
+          $classes_per_prop
+        );
+      }
+    }
+
     $definition_object = Validator::arrayToObjectRecursive($definition);
     $this->validator->validate(
       $definition_object,
@@ -250,6 +259,16 @@ final class ComponentValidator {
       // Remove the non JSON Schema types for later JSON Schema validation.
       $props_raw[$prop_name] = NULL;
     }
+
+    foreach ($props_schema['properties'] as &$prop) {
+      if (isset($prop['items'])) {
+        $prop['items'] = $this->nullifyClassPropsSchema(
+          $prop['items'],
+          $classes_per_prop
+        );
+      }
+    }
+
     $props_schema = $this->nullifyClassPropsSchema($props_schema, $classes_per_prop);
     if (!empty($error_messages)) {
       $message = implode("/n", $error_messages);
