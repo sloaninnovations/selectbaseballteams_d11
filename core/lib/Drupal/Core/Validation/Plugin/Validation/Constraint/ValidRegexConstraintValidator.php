@@ -16,11 +16,11 @@ class ValidRegexConstraintValidator extends ConstraintValidator {
     if (!$constraint instanceof ValidRegexConstraint) {
       throw new UnexpectedTypeException($constraint, ValidRegexConstraint::class);
     }
-    if (NULL === $value || '' === $value) {
+    if ($value === NULL) {
       return;
     }
 
-    if (!\is_scalar($value) && !$value instanceof \Stringable) {
+    if (!is_string($value) && !$value instanceof \Stringable) {
       throw new UnexpectedValueException($value, 'string');
     }
 

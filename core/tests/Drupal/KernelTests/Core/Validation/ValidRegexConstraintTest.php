@@ -37,7 +37,7 @@ class ValidRegexConstraintTest extends KernelTestBase {
    * Provides data for testValidRegexConstraintPass().
    *
    * @return array[]
-   *   The data.
+   *   The test cases.
    */
   public static function validRegexConstraintPassProvider(): array {
     return [
@@ -50,14 +50,13 @@ class ValidRegexConstraintTest extends KernelTestBase {
   /**
    * Tests invalid regex values.
    *
-   * @param $value
+   * @param string $value
    *   The value to test
    *
    * @dataProvider validRegexConstraintFailProvider
    *
-   * @throws \Exception
    */
-  public function testValidRegexConstraintFail($value) {
+  public function testValidRegexConstraintFail(string $value): void {
     $definition = DataDefinition::create('string')
       ->addConstraint('ValidRegex');
     $data = $this->container->get('typed_data_manager')->create($definition);
@@ -76,9 +75,9 @@ class ValidRegexConstraintTest extends KernelTestBase {
    */
   public static function validRegexConstraintFailProvider(): array {
     return [
-      ['value' => '/test'],
-      ['value' => '%[0-9%'],
-      ['value' => 'no_delimiters'],
+      'no ending delimiter' => ['/test'],
+      'bad character class' => ['%[0-9%'],
+      'no delimiters' => ['no_delimiters'],
     ];
   }
 
