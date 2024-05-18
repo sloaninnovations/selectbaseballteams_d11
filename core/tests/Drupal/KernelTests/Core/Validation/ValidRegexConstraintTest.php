@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Validation;
 
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\TypedData\Plugin\DataType\StringData;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -15,69 +16,73 @@ use Drupal\KernelTests\KernelTestBase;
 class ValidRegexConstraintTest extends KernelTestBase {
 
   /**
-   * Tests valid regex values.
+   * Typed string data to test.
    *
-   * @param $value
-   *   The value to test
-   *
-   * @dataProvider validRegexConstraintPassProvider
-   *
-   * @throws \Exception
+   * @var \Drupal\Core\TypedData\Plugin\DataType\StringData
    */
-  public function testValidRegexConstraintPass($value) {
+  protected StringData $testString;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
     $definition = DataDefinition::create('string')
       ->addConstraint('ValidRegex');
-    $data = $this->container->get('typed_data_manager')->create($definition);
-    $data->setValue($value);
-    $this->assertCount(0, $data->validate());
+    $this->testString = $this->container->get('typed_data_manager')->create($definition);
+  }
+
+  /**
+   * Tests regex values.
+   *
+   * @param string $regex
+   *   The value to test
+   * @param string|null $message
+   *   The expected error message, if any.
+   *
+   * @dataProvider validRegexConstraintProvider
+   */
+  public function testValidRegexConstraint(string $regex, ?string $message = NULL): void {
+    $this->testString->setValue($regex);
+    $violations = $this->testString->validate();
+    if (!$message) {
+      $this->assertCount(0, $violations);
+      return;
+    }
+    $this->assertCount(1, $violations);
+    $this->assertSame($message, (string) $violations->get(0)->getMessage());
 
   }
 
   /**
-   * Provides data for testValidRegexConstraintPass().
+   * Provides data for testValidRegexConstraint().
    *
    * @return array[]
    *   The test cases.
    */
-  public static function validRegexConstraintPassProvider(): array {
+  public static function validRegexConstraintProvider(): array {
     return [
-      ['value' => '/test/'],
-      ['value' => '%^<\s*(/\s*)?([a-zA-Z0-9\-]+)\s*([^>]*)>?|(<!--.*?-->)$%'],
-      ['value' => '#[0-9].*#'],
-    ];
-  }
-
-  /**
-   * Tests invalid regex values.
-   *
-   * @param string $value
-   *   The value to test
-   *
-   * @dataProvider validRegexConstraintFailProvider
-   *
-   */
-  public function testValidRegexConstraintFail(string $value): void {
-    $definition = DataDefinition::create('string')
-      ->addConstraint('ValidRegex');
-    $data = $this->container->get('typed_data_manager')->create($definition);
-    $data->setValue($value);
-    $violations = $data->validate();
-    $this->assertCount(1, $violations);
-    $this->assertSame("The string '" . $value . "' is not a valid regular expression.", (string) $violations->get(0)->getMessage());
-
-  }
-
-  /**
-   * Provides data for testValidRegexConstraintFail().
-   *
-   * @return array[]
-   *   The data.
-   */
-  public static function validRegexConstraintFailProvider(): array {
-    return [
-      'no ending delimiter' => ['/test'],
-      'bad character class' => ['%[0-9%'],
-      'no delimiters' => ['no_delimiters'],
+      'invalid no ending delimiter' => [
+        'regex' => '/test',
+        'message' => 'The value "/test" is not valid: Internal error.',
+      ],
+      'invalid bad character class' => [
+        'regex' => '%[0-9%',
+        'message' => 'The value "%[0-9%" is not valid: Internal error.',
+      ],
+      'invalid no delimiters' => [
+        'regex' => 'no_delimiters',
+        'message' => 'The value "no_delimiters" is not valid: Internal error.',
+      ],
+      'valid simple regex' => [
+        'regex' => '/test/',
+      ],
+      'valid complex regex' => [
+        'regex' => '%^<\s*(/\s*)?([a-zA-Z0-9\-]+)\s*([^>]*)>?|(<!--.*?-->)$%',
+      ],
+      'valid with hashtag delimiters' => [
+        'regex' => '#[0-9].*#',
+      ],
     ];
   }
 

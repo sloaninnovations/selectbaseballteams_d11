@@ -158,6 +158,13 @@ machine_name:
       # @see \Drupal\Core\Config\Entity\ConfigEntityStorage::MAX_ID_LENGTH
       max: 166
 
+# A valid regular expression.
+regex:
+  type: string
+  label: 'Regular Expression'
+  constraints:
+    ValidRegex: ~
+
 # A language identifier.
 langcode:
   type: string

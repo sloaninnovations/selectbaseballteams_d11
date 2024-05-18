@@ -240,23 +240,11 @@ system.performance.fast_404.1:
     FullyValidatable: ~
   mapping:
     paths:
-      type: string
+      type: regex
       label: 'Regular expression to match'
-      constraints:
-        Regex:
-          # Validates any file extension composed of alphanumeric characters,
-          # regardless of its name or length.
-          # @see \Drupal\Core\EventSubscriber\Fast404ExceptionHtmlSubscriber
-          pattern: '/\.[a-zA-Z0-9]+$/'
-          match: false
-          message: 'This is not a valid regex.'
     exclude_paths:
-      type: string
+      type: regex
       label: 'Regular expression to not match'
-      constraints:
-        # Paths to exclude.
-        # @see \Drupal\Core\EventSubscriber\Fast404ExceptionHtmlSubscriber
-        ValidRegex: {  }
     html:
       # @see \Drupal\Core\EventSubscriber\Fast404ExceptionHtmlSubscriber
       type: html

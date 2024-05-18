@@ -29,8 +29,12 @@ class ValidRegexConstraintValidator extends ConstraintValidator {
     $valid_regex = preg_match($value, "") !== FALSE;
     restore_error_handler();
     if (!$valid_regex || preg_last_error() !== PREG_NO_ERROR) {
+      // The violation builder uses preg_match and will clear the error, so
+      // capture it now.
+      $message = preg_last_error_msg();
       $this->context->buildViolation($constraint->message)
-        ->setParameter('@value', $value)
+        ->setParameter('@regex', $value)
+        ->setParameter('@message', $message)
         ->addViolation();
     }
   }
