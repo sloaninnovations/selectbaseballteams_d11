@@ -17,6 +17,7 @@ use Drupal\node\Entity\NodeType;
  *
  * @group config_translation
  * @group #slow
+ * @group legacy
  */
 class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
 
