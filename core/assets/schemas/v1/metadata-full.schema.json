@@ -144,6 +144,9 @@
     "slots": {
       "$ref": "metadata.schema.json#/$defs/slotDefinition"
     },
+    "variants": {
+      "$ref": "metadata.schema.json#/$defs/variantDefinition"
+    },
     "template": {
       "type": "string",
       "title": "Template",

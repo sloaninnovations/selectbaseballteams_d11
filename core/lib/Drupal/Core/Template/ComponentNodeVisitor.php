@@ -46,6 +46,7 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
       return $node;
     }
     $component = $this->getComponent($node);
+    // $variant = $this->getVariant($node);
     if (!$component) {
       return $node;
     }
@@ -55,6 +56,9 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
     $emoji = static::emojiForString($component_id);
     if ($env->isDebug()) {
       $print_nodes[] = new PrintNode(new ConstantExpression(sprintf('<!-- %s Component start: %s -->', $emoji, $component_id), $line), $line);
+//      if ($variant) {
+//        $print_nodes[] = new PrintNode(new ConstantExpression(sprintf('<!--    with variant %s -->', $variant), $line), $line);
+//      }
     }
     $print_nodes[] = new PrintNode(new FunctionExpression(
       new TwigFunction('attach_library', [$env->getExtension(TwigExtension::class), 'attachLibrary']),
@@ -117,6 +121,13 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
     catch (ComponentNotFoundException) {
       return NULL;
     }
+  }
+
+  protected function getVariant(Node $node) : string {
+    $component_id = $node->getTemplateName();
+    [$component_id, $variant] = explode(Component::TEMPLATE_VARIANT_SEPARATOR, $component_id);
+    $variant ??= '';
+    return $variant;
   }
 
   /**

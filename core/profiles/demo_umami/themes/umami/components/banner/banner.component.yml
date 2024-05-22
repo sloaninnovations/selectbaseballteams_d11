@@ -33,3 +33,5 @@ slots:
     title: Image
     # A description.
     description: This is the banner image
+variants:
+  - red

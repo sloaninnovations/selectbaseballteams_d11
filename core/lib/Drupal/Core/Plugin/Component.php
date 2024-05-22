@@ -10,6 +10,8 @@ use Drupal\Core\Render\Component\Exception\InvalidComponentException;
  */
 class Component extends PluginBase {
 
+  public const TEMPLATE_VARIANT_SEPARATOR = '--';
+
   /**
    * The component's metadata.
    *

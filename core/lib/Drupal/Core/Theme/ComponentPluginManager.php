@@ -139,6 +139,10 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     if (empty($definitions)) {
       throw new ComponentNotFoundException('Unable to find any component definition.');
     }
+    $variant = '';
+    if (strpos($component_id, Component::TEMPLATE_VARIANT_SEPARATOR) > 0) {
+      [$component_id, $variant] = explode(Component::TEMPLATE_VARIANT_SEPARATOR, $component_id);
+    }
     $negotiated_plugin_id = $this->componentNegotiator->negotiate($component_id, $definitions);
     return $this->createInstance($negotiated_plugin_id ?? $component_id);
   }
