@@ -27,7 +27,7 @@ class EntityFormModeUpdatePathTest extends UpdatePathTestBase {
   /**
    * Tests update path for the entity form mode description value from '' to NULL.
    */
-  public function testRunUpdates() {
+  public function testRunUpdates(): void {
     $form_mode_type = EntityFormMode::load('user.register');
     $this->assertInstanceOf(EntityFormMode::class, $form_mode_type);
     $this->assertSame("\n", $form_mode_type->get('description'));

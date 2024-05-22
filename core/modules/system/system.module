@@ -1229,7 +1229,7 @@ function system_archiver_info_alter(&$info) {
  *
  * @see system_post_update_convert_empty_string_entity_form_modes_to_null()
  */
-function system_entity_form_mode_presave(EntityInterface $entity) {
+function system_entity_form_mode_presave(EntityInterface $entity): void {
   if (trim($entity->getDescription()) === '') {
     $entity->set('description', NULL);
   }
