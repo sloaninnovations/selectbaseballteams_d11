@@ -10,7 +10,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 /**
  * Tests update path for the entity form mode description value from '' to NULL.
  *
- * @group contact
+ * @group system
  */
 class EntityFormModeUpdatePathTest extends UpdatePathTestBase {
 
@@ -28,16 +28,17 @@ class EntityFormModeUpdatePathTest extends UpdatePathTestBase {
    * Tests update path for the entity form mode description value from '' to NULL.
    */
   public function testRunUpdates(): void {
-    $form_mode_type = EntityFormMode::load('user.register');
-    $this->assertInstanceOf(EntityFormMode::class, $form_mode_type);
-    $this->assertSame("\n", $form_mode_type->get('description'));
+    $form_mode = EntityFormMode::load('user.register');
+    $this->assertInstanceOf(EntityFormMode::class, $form_mode);
+    $this->assertSame("\n", $form_mode->get('description'));
+    $this->assertSame("\n", $form_mode->getDescription());
     $this->runUpdates();
 
-    $form_mode_type = EntityFormMode::load('user.register');
-    $this->assertInstanceOf(EntityFormMode::class, $form_mode_type);
+    $form_mode = EntityFormMode::load('user.register');
+    $this->assertInstanceOf(EntityFormMode::class, $form_mode);
 
-    $this->assertNull($form_mode_type->get('description'));
-    $this->assertSame('', $form_mode_type->getDescription());
+    $this->assertNull($form_mode->get('description'));
+    $this->assertSame('', $form_mode->getDescription());
   }
 
 }
