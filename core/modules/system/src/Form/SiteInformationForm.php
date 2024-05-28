@@ -220,6 +220,7 @@ class SiteInformationForm extends ConfigFormBase {
    *
    * @param string|null $value
    *   The site slogan value or NULL if no slogan is set.
+   *
    * @return string|null
    *   The site slogan string or NULL.
    *
@@ -230,10 +231,11 @@ class SiteInformationForm extends ConfigFormBase {
   }
 
   /**
-   * Transforms the email value either from what's stored in config or php.ini
+   * Transforms the email value either from what's stored in config or php.ini.
    *
    * @param $value
    *   The site email address. If empty, returns the email from php.ini.
+   *
    * @return string
    *   The site email address.
    *
