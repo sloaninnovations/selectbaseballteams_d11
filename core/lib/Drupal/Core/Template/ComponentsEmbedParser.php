@@ -27,6 +27,9 @@ use Twig\TwigFunction;
  */
 final class ComponentsEmbedParser extends IncludeTokenParser
 {
+  public function __construct(protected ComponentPluginManager $pluginManager) {}
+
+
   public function parse(Token $token): Node
   {
     $stream = $this->parser->getStream();
@@ -62,7 +65,7 @@ final class ComponentsEmbedParser extends IncludeTokenParser
     $stream->expect(/* Token::BLOCK_END_TYPE */ 3);
 
     $templateName = $module->getTemplateName();
-    return new EmbedNode($templateName, $module->getAttribute('index'), $variables, $only, $ignoreMissing, $token->getLine(), $this->getTag());
+    return new ComponentEmbedNode($templateName, $parentToken->getValue(), $variant, $module->getAttribute('index'), $variables, $only, $ignoreMissing, $token->getLine(), $this->getTag(), $this->pluginManager);
   }
 
   public function decideBlockEnd(Token $token): bool

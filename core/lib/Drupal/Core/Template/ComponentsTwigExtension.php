@@ -33,7 +33,7 @@ final class ComponentsTwigExtension extends AbstractExtension {
 
   public function getTokenParsers() {
     return [
-      new ComponentsEmbedParser(),
+      new ComponentsEmbedParser($this->pluginManager),
     ];
   }
 
