@@ -6,7 +6,7 @@ name: Banner
 
 # Status can be: "experimental", "stable", "deprecated", "obsolete".
 status: experimental
-
+mandatorySchemas: true
 props:
   # Props are always an object with keys. Each key is a variable in your
   # component template.

@@ -11,6 +11,7 @@ use Drupal\Core\Theme\ComponentPluginManager;
 use Twig\Environment;
 use Twig\Node\Nodes;
 use Twig\TwigFunction;
+use Twig\Node\EmbedNode;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FunctionExpression;
 use Twig\Node\ModuleNode;
@@ -35,6 +36,10 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
    * {@inheritdoc}
    */
   public function enterNode(Node $node, Environment $env): Node {
+    if (!$node instanceof ModuleNode) {
+      return $node;
+    }
+    $component = $this->getComponent($node);
     return $node;
   }
 
@@ -42,23 +47,28 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
    * {@inheritdoc}
    */
   public function leaveNode(Node $node, Environment $env): ?Node {
+    if ($node instanceof EmbedNode) {
+      return $node;
+    }
+
     if (!$node instanceof ModuleNode) {
       return $node;
     }
     $component = $this->getComponent($node);
-    // $variant = $this->getVariant($node);
     if (!$component) {
       return $node;
     }
+    $ctxt = $node->getSourceContext();
+    $variant = $this->getVariant($node);
     $line = $node->getTemplateLine();
     $print_nodes = [];
     $component_id = $component->getPluginId();
     $emoji = static::emojiForString($component_id);
     if ($env->isDebug()) {
       $print_nodes[] = new PrintNode(new ConstantExpression(sprintf('<!-- %s Component start: %s -->', $emoji, $component_id), $line), $line);
-//      if ($variant) {
-//        $print_nodes[] = new PrintNode(new ConstantExpression(sprintf('<!--    with variant %s -->', $variant), $line), $line);
-//      }
+      if ($variant) {
+        $print_nodes[] = new PrintNode(new ConstantExpression(sprintf('<!--    with variant %s -->', $variant), $line), $line);
+      }
     }
     $print_nodes[] = new PrintNode(new FunctionExpression(
       new TwigFunction('attach_library', [$env->getExtension(TwigExtension::class), 'attachLibrary']),
@@ -84,7 +94,6 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
         ...$print_nodes,
       ]),
     );
-
     if ($env->isDebug()) {
       // Append the closing comment to the display_end node.
       $node->setNode(

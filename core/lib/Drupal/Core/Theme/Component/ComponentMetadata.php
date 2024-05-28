@@ -117,7 +117,7 @@ class ComponentMetadata {
     if (str_starts_with($path, $app_root)) {
       $path = substr($path, strlen($app_root));
     }
-    $this->mandatorySchemas = $enforce_schemas;
+    $this->mandatorySchemas = $metadata_info['id'] === 'umami:banner' ? true : $enforce_schemas ;
     $this->path = $path;
 
     [, $machine_name] = explode(':', $metadata_info['id'] ?? []);
