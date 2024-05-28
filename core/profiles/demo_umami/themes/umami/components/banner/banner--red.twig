@@ -1,10 +1,10 @@
-<div{{ attributes.addClass('banner').addClass('red')}}>
-  <div class="container" style="border:1px solid red;">
+<div{{ attributes.addClass('banner').addClass('red').setAttribute('style', 'background-color: red;')}}>
+  <div class="container">
     <div class="banner__inner">
       <div class="banner__image">
         {% block image %}{% endblock %}
       </div>
-      <div class="banner__content">
+      <div class="banner__content" style="background-color: red;">
         {% block content %}{% endblock %}
       </div>
     </div>

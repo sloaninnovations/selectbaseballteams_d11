@@ -77,13 +77,12 @@ final class ComponentsTwigExtension extends AbstractExtension {
    */
   protected function mergeAdditionalRenderContext(Component $component, array $context): array {
     $context['componentMetadata'] = $component->metadata->normalize();
-    $context['variant'] = 'asdfsdf';
     $component_attributes = ['data-component-id' => $component->getPluginId()];
+    if (!empty($context['variant'])) {
+      $component_attributes['data-component-variant'] = $context['variant'];
+    }
     if (!isset($context['attributes'])) {
       $context['attributes'] = new Attribute($component_attributes);
-    }
-    if (!empty($variant)) {
-      $component_attributes['data-component-variant'] = $variant;
     }
     // If there is an "attributes" property, merge the additional attributes
     // into it if possible.

@@ -28,7 +28,8 @@
  */
 #}
 {% block content %}
-  {% embed 'umami:banner--red' with {
+  {% embed 'umami:banner' with {
+    variant: 'red',
     attributes: create_attribute(),
   } %}
     {% block image %}

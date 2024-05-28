@@ -124,9 +124,13 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
   }
 
   protected function getVariant(Node $node) : string {
-    $component_id = $node->getTemplateName();
-    [$component_id, $variant] = explode(Component::TEMPLATE_VARIANT_SEPARATOR, $component_id);
-    $variant ??= '';
+    $templateName = $node->getTemplateName();
+    if (strpos($templateName, Component::TEMPLATE_VARIANT_SEPARATOR) !== false) {
+      [$component_id, $variant] = explode(Component::TEMPLATE_VARIANT_SEPARATOR, $templateName, 2);
+    }
+    else {
+      [$component_id, $variant] = [$templateName, ''];
+    }
     return $variant;
   }
 
