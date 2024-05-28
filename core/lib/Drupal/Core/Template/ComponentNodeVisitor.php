@@ -36,10 +36,6 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
    * {@inheritdoc}
    */
   public function enterNode(Node $node, Environment $env): Node {
-    if (!$node instanceof ModuleNode) {
-      return $node;
-    }
-    $component = $this->getComponent($node);
     return $node;
   }
 
