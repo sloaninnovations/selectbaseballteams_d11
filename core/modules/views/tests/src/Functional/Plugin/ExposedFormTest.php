@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\views\Functional\Plugin;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
@@ -261,9 +262,9 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertSession()->elementNotExists('xpath', $xpath);
 
     // Test there is only one views exposed form on the page.
-    $xpath = '//form[@id="' . $this->getExpectedExposedFormId($view) . '"]';
-    $this->assertSession()->elementsCount('xpath', $xpath, 1);
-    $element = $this->assertSession()->elementExists('xpath', $xpath);
+    $css_selector = 'form[id^="' . $this->getExpectedExposedFormId($view) . '"]';
+    $this->assertSession()->elementsCount('css', $css_selector, 1);
+    $element = $this->assertSession()->elementExists('css', $css_selector);
 
     // Test that the correct option is selected after form submission.
     $this->assertCacheContext('url');
@@ -295,6 +296,20 @@ class ExposedFormTest extends ViewTestBase {
       'page_display' => ['page_1'],
       'block_display' => ['block_1'],
     ];
+  }
+
+  /**
+   * Test placing the same form twice on the same page.
+   */
+  public function testNoDoubleIdsForSameExposedForm() {
+    $view = Views::getView('test_exposed_block');
+    $view->setDisplay('page_1');
+    $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_block-page_1');
+    $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_block-page_1');
+
+    $this->drupalGet('test_exposed_block');
+
+    $this->assertNoDuplicateIds();
   }
 
   /**
@@ -509,6 +524,31 @@ class ExposedFormTest extends ViewTestBase {
         $this->assertSession()->pageTextNotContains($node->label());
       }
     }
+  }
+
+  /**
+   * Asserts that each HTML ID is used for just a single element on the page.
+   */
+  protected function assertNoDuplicateIds() {
+    $args = ['@url' => $this->getUrl()];
+
+    if (!$elements = $this->xpath('//*[@id]')) {
+      $this->fail(new FormattableMarkup('The page @url contains no HTML IDs.', $args));
+      return;
+    }
+
+    $message = new FormattableMarkup('The page @url contains duplicate HTML IDs', $args);
+
+    $seen_ids = [];
+    foreach ($elements as $element) {
+      $id = $element->getAttribute('id');
+      if (isset($seen_ids[$id])) {
+        $this->fail($message);
+        return;
+      }
+      $seen_ids[$id] = TRUE;
+    }
+    $this->assertTrue(TRUE, $message);
   }
 
   /**
