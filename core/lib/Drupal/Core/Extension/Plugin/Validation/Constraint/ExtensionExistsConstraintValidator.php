@@ -44,7 +44,7 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
   public function __construct(
     ModuleHandlerInterface $module_handler,
     ThemeHandlerInterface $theme_handler,
-    protected readonly ProfileExtensionList $profileExtensionList
+    protected readonly ProfileExtensionList $profileExtensionList,
   ) {
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;

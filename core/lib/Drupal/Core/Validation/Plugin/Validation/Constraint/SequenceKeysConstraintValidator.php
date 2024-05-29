@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class SequenceKeysConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface  {
+class SequenceKeysConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
   public function __construct(
     private readonly ConstraintManager $constraintManager,
