@@ -91,8 +91,9 @@ function system_post_update_convert_empty_string_entity_form_modes_to_null(array
       // config level if they are empty.
       if (trim($form_mode->getDescription()) === '') {
         $form_mode->set('description', NULL);
+        return TRUE;
       }
-      return TRUE;
+      return FALSE;
     });
 
 }
