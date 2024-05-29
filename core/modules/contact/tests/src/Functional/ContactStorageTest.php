@@ -16,7 +16,6 @@ use Drupal\user\RoleInterface;
  * is enabled for contact Message entities.
  *
  * @group contact
- * @group legacy
  */
 class ContactStorageTest extends ContactSitewideTest {
 

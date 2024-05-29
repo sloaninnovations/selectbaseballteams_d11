@@ -4,6 +4,7 @@ namespace Drupal\contact;
 
 use Drupal\Component\Utility\EmailValidatorInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -129,6 +130,25 @@ class ContactFormEditForm extends EntityForm implements ContainerInjectionInterf
     ];
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state) {
+    // Config schema dictates that the reply, redirect, and message values
+    // cannot be empty strings. So, if they're empty, remove them from the
+    // submitted values so they aren't copied to the entity.
+    if ($form_state->hasValue('reply') && trim($form_state->getValue('reply')) === '') {
+      $form_state->unsetValue('reply');
+    }
+    if ($form_state->hasValue('redirect') && trim($form_state->getValue('redirect')) === '') {
+      $form_state->unsetValue('redirect');
+    }
+    if ($form_state->hasValue('message') && trim($form_state->getValue('message')) === '') {
+      $form_state->unsetValue('message');
+    }
+    parent::copyFormValuesToEntity($entity, $form, $form_state);
   }
 
   /**
