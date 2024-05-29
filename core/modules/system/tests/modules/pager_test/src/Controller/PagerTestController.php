@@ -116,6 +116,7 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
       '#attributes' => ['class' => ['test-pager-0']],
       'pager' => [
         '#type' => 'pager',
+        '#route_name' => '<current>',
         '#element' => 0,
       ],
     ];
@@ -126,6 +127,7 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
       '#attributes' => ['class' => ['test-pager-1']],
       'pager' => [
         '#type' => 'pager',
+        '#route_name' => '<current>',
         '#element' => 1,
       ],
     ];
@@ -136,6 +138,7 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
       '#attributes' => ['class' => ['test-pager-4']],
       'pager' => [
         '#type' => 'pager',
+        '#route_name' => '<current>',
         '#element' => 4,
       ],
     ];
