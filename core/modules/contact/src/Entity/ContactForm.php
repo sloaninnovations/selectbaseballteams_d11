@@ -203,15 +203,15 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
     parent::preSave($storage);
 
     if ($this->reply === '') {
-      @trigger_error("Setting empty 'reply' is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3445976", E_USER_DEPRECATED);
+      @trigger_error('Setting reply to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3445976', E_USER_DEPRECATED);
       $this->reply = NULL;
     }
     if ($this->message === '') {
-      @trigger_error("Setting empty 'message' is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3445976", E_USER_DEPRECATED);
+      @trigger_error('Setting message to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3445976', E_USER_DEPRECATED);
       $this->message = NULL;
     }
     if ($this->redirect === '') {
-      @trigger_error("Setting empty 'redirect' is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3445976", E_USER_DEPRECATED);
+      @trigger_error('Setting redirect to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3445976', E_USER_DEPRECATED);
       $this->redirect = NULL;
     }
   }

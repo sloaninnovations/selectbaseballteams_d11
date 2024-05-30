@@ -19,7 +19,6 @@ use Drupal\user\RoleInterface;
  * @see \Drupal\Tests\contact\Functional\ContactStorageTest
  *
  * @group contact
- * @group legacy
  */
 class ContactSitewideTest extends BrowserTestBase {
 

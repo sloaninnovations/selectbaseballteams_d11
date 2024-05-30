@@ -12,7 +12,6 @@ use Drupal\Core\Site\Settings;
  *
  * @group Update
  * @group #slow
- * @group legacy
  */
 class UpdatePathTestBaseTest extends UpdatePathTestBase {
 
