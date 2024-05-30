@@ -528,7 +528,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    * @param mixed $source_field_value
    *   The value for the source field of the media item.
    * @param mixed $langcode
-   *    The langcode of the media item.
+   *   The langcode of the media item.
    *
    * @return \Drupal\media\MediaInterface
    *   An unsaved media entity.
