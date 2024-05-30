@@ -84,12 +84,12 @@ function system_post_update_convert_empty_country_and_timezone_settings_to_null(
 /**
  * Updates all entity_form_mode configuration entities to set description from empty string to null.
  */
-function system_post_update_convert_empty_string_entity_form_modes_to_null(array &$sandbox): void {
+function system_post_update_convert_empty_description_entity_form_modes_to_null(array &$sandbox): void {
   \Drupal::classResolver(ConfigEntityUpdater::class)
     ->update($sandbox, 'entity_form_mode', function (EntityFormModeInterface $form_mode): bool {
       // Entity form mode's `description` field must be stored as NULL at the
       // config level if they are empty.
-      if (trim($form_mode->getDescription()) === '') {
+      if (trim($form_mode->get('description')) === '') {
         $form_mode->set('description', NULL);
         return TRUE;
       }
