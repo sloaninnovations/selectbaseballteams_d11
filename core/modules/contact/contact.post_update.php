@@ -22,9 +22,23 @@ function contact_removed_post_updates() {
  * Updates Contact form's message, redirect and reply from '' to NULL.
  */
 function contact_post_update_set_empty_values_to_null(&$sandbox = []) {
-  $config_entity_updater = \Drupal::classResolver(ConfigEntityUpdater::class);
-  $config_entity_updater->update($sandbox, 'contact_form', function (ContactFormInterface $contact_form): bool {
-    // @see \Drupal\contact\Entity\ContactForm::preSave()
-    return $contact_form->get('redirect') === '' || $contact_form->get('reply') === '' || $contact_form->get('message') === '';
-  });
+  \Drupal::classResolver(ConfigEntityUpdater::class)
+    ->update($sandbox, 'contact_form', function (ContactFormInterface $contact_form): bool {
+      $fields = [
+        'redirect' => $contact_form->getRedirectPath(),
+        'reply' => $contact_form->getReply(),
+        'message' => $contact_form->getMessage(),
+      ];
+
+      $updated = FALSE;
+
+      foreach ($fields as $field => $value) {
+        if (trim($value) === '') {
+          $contact_form->set($field, NULL);
+          $updated = TRUE;
+        }
+      }
+
+      return $updated;
+    });
 }

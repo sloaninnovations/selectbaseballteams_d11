@@ -11,7 +11,6 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
  * Tests update path for the contact form values from '' to NULL.
  *
  * @group contact
- * @group legacy
  */
 class ContactFormUpdatePathTest extends UpdatePathTestBase {
 
@@ -29,9 +28,6 @@ class ContactFormUpdatePathTest extends UpdatePathTestBase {
    * Tests update path for the contact form's values from '' to NULL.
    */
   public function testRunUpdates() {
-    $this->expectDeprecation('Setting reply to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3445976');
-    $this->expectDeprecation('Setting message to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3445976');
-    $this->expectDeprecation('Setting redirect to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3445976');
     $this->assertSame('', ContactForm::load('feedback')->get('message'));
     $this->assertSame('', ContactForm::load('feedback')->get('redirect'));
     $this->assertSame('', ContactForm::load('feedback')->get('reply'));
