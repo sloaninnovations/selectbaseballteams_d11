@@ -223,8 +223,6 @@ class SiteInformationForm extends ConfigFormBase {
    *
    * @return string|null
    *   The site slogan string or NULL.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/3443432
    */
   public static function transformSloganValue(?string $value): ?string {
     return $value ?: NULL;
@@ -233,7 +231,7 @@ class SiteInformationForm extends ConfigFormBase {
   /**
    * Transforms the email value either from what's stored in config or php.ini.
    *
-   * @param $value
+   * @param string|null $value
    *   The site email address. If empty, returns the email from php.ini.
    *
    * @return string
@@ -241,7 +239,7 @@ class SiteInformationForm extends ConfigFormBase {
    *
    * @see https://www.php.net/manual/en/mail.configuration.php#ini.sendmail-from
    */
-  public static function transformMailValue($value): string {
+  public static function transformMailValue(?string $value): string {
     return $value ?: ini_get('sendmail_from');
   }
 
