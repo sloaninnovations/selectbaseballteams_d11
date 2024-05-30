@@ -89,7 +89,7 @@ function system_post_update_convert_empty_description_entity_form_modes_to_null(
     ->update($sandbox, 'entity_form_mode', function (EntityFormModeInterface $form_mode): bool {
       // Entity form mode's `description` field must be stored as NULL at the
       // config level if they are empty.
-      if (trim($form_mode->get('description')) === '') {
+      if (trim($form_mode->getDescription()) === '') {
         $form_mode->set('description', NULL);
         return TRUE;
       }
