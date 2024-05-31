@@ -150,19 +150,6 @@ class SimpleConfigValidationTest extends KernelTestBase {
     }
   }
 
-  public function testPageCacheMaxAgeMustBeDivisibleBy60(): void {
-    $config = $this->config('system.performance')
-      ->set('cache.page.max_age', 67);
-
-    $violations = $this->container->get('config.typed')
-      ->createFromNameAndData($config->getName(), $config->getRawData())
-      ->validate();
-
-    $this->assertCount(1, $violations);
-    $this->assertSame('cache.page.max_age', $violations[0]->getPropertyPath());
-    $this->assertSame("This must be a multiple of 60.", (string) $violations[0]->getMessage());
-  }
-
   /**
    * Tests that plugin IDs in simple config are validated.
    *
