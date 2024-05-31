@@ -8,7 +8,6 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
-use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -112,18 +111,17 @@ class PerformanceForm extends ConfigFormBase {
       '#title' => $this->t('Caching'),
       '#open' => TRUE,
     ];
+    // Identical options to the ones for block caching.
+    // @see \Drupal\Core\Block\BlockBase::buildConfigurationForm()
+    $period = [0, 60, 180, 300, 600, 900, 1800, 2700, 3600, 10800, 21600, 32400, 43200, 86400];
+    $period = array_map([$this->dateFormatter, 'formatInterval'], array_combine($period, $period));
+    $period[0] = '<' . $this->t('no caching') . '>';
     $form['caching']['page_cache_maximum_age'] = [
-      '#type' => 'number',
+      '#type' => 'select',
       '#title' => $this->t('Browser and proxy cache maximum age'),
-      '#config_target' => new ConfigTarget(
-        'system.performance',
-        'cache.page.max_age',
-        toConfig: fn ($value) => (int) $value,
-      ),
-      '#min' => 0,
-      '#max' => 31536000,
-      '#step' => 1,
-      '#description' => $this->t('This is the value in seconds to be used for max-age in Cache-Control headers.'),
+      '#config_target' => 'system.performance:cache.page.max_age',
+      '#options' => $period,
+      '#description' => $this->t('This is used as the value for max-age in Cache-Control headers.'),
     ];
     $form['caching']['internal_page_cache'] = [
       '#markup' => $this->t('Drupal provides an <a href=":module_enable">Internal Page Cache module</a> that is recommended for small to medium-sized websites.', [':module_enable' => Url::fromRoute('system.modules_list')->toString()]),

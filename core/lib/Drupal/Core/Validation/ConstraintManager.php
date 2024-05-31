@@ -12,7 +12,6 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\EmailConstraint;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
-use Symfony\Component\Validator\Constraints\DivisibleBy;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -122,11 +121,6 @@ class ConstraintManager extends DefaultPluginManager {
       'label' => new TranslatableMarkup('Image'),
       'class' => Image::class,
       'type' => ['string'],
-    ]);
-    $this->getDiscovery()->setDefinition('DivisibleBy', [
-      'label' => new TranslatableMarkup('Divisible by another number'),
-      'class' => DivisibleBy::class,
-      'type' => ['integer'],
     ]);
   }
 
