@@ -194,9 +194,9 @@ system.performance:
               label: 'Max age'
               constraints:
                 # @see \Drupal\system\Form\PerformanceForm::buildForm()
-                DivisibleBy:
-                  value: 60
-                  message: 'This must be a multiple of 60.'
+                Range:
+                  min: 0
+                  max: 31536000
     css:
       type: mapping
       label: 'CSS performance settings'
