@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Url;
+use GuzzleHttp\RequestOptions;
 
 /**
  * JSON:API integration test for the "DateFormat" config entity type.
@@ -109,9 +111,58 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'special';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getPostDocument() {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => 'date_format--date_format',
+        'attributes' => [
+          'drupal_internal__id' => 'special',
+          'label' => 'My special date format',
+          'pattern' => 'U',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * @testWith [null, "This value should not be null."]
+   *           ["⌚", "This is not a valid date format."]
+   */
+  public function testPostValidationErrors(?string $pattern, string $expected_validation_error) {
+    $this->setUpAuthorization('POST');
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+
+    $doc = $this->getPostDocument();
+    $doc['data']['attributes']['pattern'] = $pattern;
+
+    // Create date_format POST request.
+    $url = Url::fromRoute(sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
+    $request_options = $this->getAuthenticationRequestOptions();
+    $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
+    $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
+    $request_options[RequestOptions::BODY] = Json::encode($doc);
+
+    // POST request: 422 when adding relationships to non-existing resources.
+    $response = $this->request('POST', $url, $request_options);
+    $expected_document = [
+      'errors' => [
+        0 => [
+          'title' => 'Unprocessable Content',
+          'status' => '422',
+          'detail' => "pattern: $expected_validation_error",
+          'source' => [
+            'pointer' => '/data/attributes/pattern',
+          ],
+        ],
+      ],
+      'jsonapi' => static::$jsonApiMember,
+    ];
+    $this->assertResourceResponse(422, $expected_document, $response);
   }
 
 }

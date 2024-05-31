@@ -357,7 +357,20 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    */
   protected static function isMutableResourceType(EntityTypeInterface $entity_type, $bundle) {
     assert(is_string($bundle) && !empty($bundle), 'A bundle ID is required. Bundleless entity types should pass the entity type ID again.');
-    return !$entity_type instanceof ConfigEntityTypeInterface;
+    if (!$entity_type instanceof ConfigEntityTypeInterface) {
+      return TRUE;
+    }
+
+    // @todo this is inaccurate — it won't work for e.g. `field.field.*.*.*`. We
+    //   need the inverse of \Drupal\Core\Config\ConfigManager::getEntityTypeIdByName()
+    //   To build that, we would need to expand the `@ConfigEntityType`
+    //   annotation with a "id_parts" key-value pair, which defaults to 1, and
+    //   FieldConfig, FieldStorageConfig, EntityViewMode etc. would specify.
+    $config_schema_type_name = $entity_type->getConfigPrefix() . '.*';
+    $config_schema_type_definition = \Drupal::service('config.typed')->getDefinition($config_schema_type_name);
+
+    // Config entities are only mutable if they're fully validatable.
+    return array_key_exists('FullyValidatable', $config_schema_type_definition['constraints'] ?? []);
   }
 
   /**

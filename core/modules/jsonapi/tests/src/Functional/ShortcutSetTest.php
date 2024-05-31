@@ -52,10 +52,10 @@ class ShortcutSetTest extends ConfigEntityResourceTestBase {
         break;
 
       case 'POST':
-      case 'PATCH':
         $this->grantPermissionsToTestedRole(['access shortcuts', 'customize shortcut links']);
         break;
 
+      case 'PATCH':
       case 'DELETE':
         $this->grantPermissionsToTestedRole(['administer shortcuts']);
         break;
@@ -69,6 +69,9 @@ class ShortcutSetTest extends ConfigEntityResourceTestBase {
     switch ($method) {
       case 'GET':
         return "The 'access shortcuts' permission is required.";
+
+      case 'POST':
+        return "The 'administer shortcuts' permission is required.";
 
       default:
         return parent::getExpectedUnauthorizedAccessMessage($method);
@@ -124,9 +127,21 @@ class ShortcutSetTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'special';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getPostDocument() {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => 'shortcut_set--shortcut_set',
+        'attributes' => [
+          'drupal_internal__id' => 'special',
+          'label' => 'My special shortcut set',
+        ],
+      ],
+    ];
   }
 
 }

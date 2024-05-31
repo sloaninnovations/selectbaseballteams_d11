@@ -7,7 +7,7 @@ namespace Drupal\Tests\jsonapi\Functional;
 /**
  * Resource test base class for config entities.
  *
- * @todo Remove this in https://www.drupal.org/node/2300677.
+ * @todo Simplify this in https://www.drupal.org/node/3423459 or https://www.drupal.org/node/3423462.
  */
 abstract class ConfigEntityResourceTestBase extends ResourceTestBase {
 
@@ -17,10 +17,11 @@ abstract class ConfigEntityResourceTestBase extends ResourceTestBase {
    * @var array
    */
   const SKIP_METHODS = [
+    // @todo Remove in https://www.drupal.org/node/3423462: the FieldConfigs using this FieldStorageConfig
     'testRelated',
+    // @todo Remove in https://www.drupal.org/node/3423462: the `instances` (FieldConfigs) of this FieldStorageConfig
     'testRelationships',
-    'testPostIndividual',
-    'testPatchIndividual',
+    // @todo Remove in https://www.drupal.org/node/3423459.
     'testDeleteIndividual',
     'testRevisions',
   ];
