@@ -30,7 +30,7 @@ core.entity_form_mode.*.*:
       type: string
       label: 'ID'
       # Form mode IDs can only contain lowercase letters, numbers, and underscores
-      # prefixed by entity type name this view mode is used for and a dot.
+      # prefixed by entity type name this form mode is used for and a dot.
       # @see \Drupal\field_ui\Form\EntityDisplayModeFormBase::form()
       constraints:
         Regex:

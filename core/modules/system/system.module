@@ -1230,12 +1230,12 @@ function system_archiver_info_alter(&$info) {
  * @deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. Use NULL
  * instead.
  *
- * @see https://www.drupal.org/node/3448457
+ * @see https://www.drupal.org/node/3452144
  * @see system_post_update_convert_empty_string_entity_form_modes_to_null()
  */
 function system_entity_form_mode_presave(EntityInterface $entity): void {
   if ($entity->get('description') === '') {
-    @trigger_error("Setting description to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3448457", E_USER_DEPRECATED);
+    @trigger_error("Setting description to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3452144", E_USER_DEPRECATED);
     $entity->set('description', NULL);
   }
 }
