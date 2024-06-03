@@ -11,6 +11,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
  * Tests update path for the contact form values from '' to NULL.
  *
  * @group contact
+ * @covers contact_post_update_set_empty_values_to_null
  */
 class ContactFormUpdatePathTest extends UpdatePathTestBase {
 
@@ -27,16 +28,18 @@ class ContactFormUpdatePathTest extends UpdatePathTestBase {
   /**
    * Tests update path for the contact form's values from '' to NULL.
    */
-  public function testRunUpdates() {
-    $this->assertSame('', ContactForm::load('feedback')->get('message'));
-    $this->assertSame('', ContactForm::load('feedback')->get('redirect'));
-    $this->assertSame('', ContactForm::load('feedback')->get('reply'));
+  public function testRunUpdates(): void {
+    $form = ContactForm::load('feedback');
+    $this->assertSame('', $form->get('message'));
+    $this->assertSame('', $form->get('redirect'));
+    $this->assertSame('', $form->get('reply'));
 
     $this->runUpdates();
 
-    $this->assertNull(ContactForm::load('feedback')->get('message'));
-    $this->assertNull(ContactForm::load('feedback')->get('redirect'));
-    $this->assertNull(ContactForm::load('feedback')->get('reply'));
+    $form = ContactForm::load('feedback');
+    $this->assertNull($form->get('message'));
+    $this->assertNull($form->get('redirect'));
+    $this->assertNull($form->get('reply'));
   }
 
 }

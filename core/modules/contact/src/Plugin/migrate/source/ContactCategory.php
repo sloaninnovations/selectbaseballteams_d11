@@ -43,7 +43,7 @@ class ContactCategory extends DrupalSqlBase {
    */
   public function prepareRow(Row $row) {
     $row->setSourceProperty('recipients', explode(',', $row->getSourceProperty('recipients')));
-    $row->setSourceProperty('reply', ($row->getSourceProperty('reply') === '') ? NULL : $row->getSourceProperty('reply'));
+    $row->setSourceProperty('reply', trim($row->getSourceProperty('reply')) === '' ? NULL : $row->getSourceProperty('reply'));
     return parent::prepareRow($row);
   }
 
