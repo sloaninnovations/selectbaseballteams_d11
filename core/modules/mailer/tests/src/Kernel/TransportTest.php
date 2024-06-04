@@ -46,7 +46,7 @@ class TransportTest extends KernelTestBase {
     ?string $user = NULL,
     #[\SensitiveParameter] ?string $password = NULL,
     ?int $port = NULL,
-    array $options = []
+    array $options = [],
   ): void {
     $GLOBALS['config']['system.mail']['mailer_dsn'] = [
       'scheme' => $scheme,
