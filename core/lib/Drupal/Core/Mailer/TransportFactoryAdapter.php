@@ -30,7 +30,7 @@ class TransportFactoryAdapter implements ConfiguredTransportFactoryInterface {
    */
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
-    protected Transport $transport
+    protected Transport $transport,
   ) {
   }
 
