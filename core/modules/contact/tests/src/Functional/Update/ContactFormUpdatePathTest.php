@@ -33,6 +33,9 @@ class ContactFormUpdatePathTest extends UpdatePathTestBase {
     $this->assertSame('', $form->get('message'));
     $this->assertSame('', $form->get('redirect'));
     $this->assertSame('', $form->get('reply'));
+    $this->assertSame('', $form->getMessage());
+    $this->assertSame('', $form->getRedirectPath());
+    $this->assertSame('', $form->getReply());
 
     $this->runUpdates();
 
@@ -40,6 +43,9 @@ class ContactFormUpdatePathTest extends UpdatePathTestBase {
     $this->assertNull($form->get('message'));
     $this->assertNull($form->get('redirect'));
     $this->assertNull($form->get('reply'));
+    $this->assertSame('', $form->getMessage());
+    $this->assertSame('', $form->getRedirectPath());
+    $this->assertSame('', $form->getReply());
   }
 
 }
