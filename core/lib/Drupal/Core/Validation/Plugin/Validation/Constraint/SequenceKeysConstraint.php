@@ -4,12 +4,9 @@ declare(strict_types = 1);
 
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
-use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
 use Symfony\Component\Validator\Constraint as SymfonyConstraint;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * Checks that all the keys of a sequence match the specified constraints.
