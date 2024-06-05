@@ -70,7 +70,7 @@ class EntityFormModeValidationTest extends ConfigEntityValidationTestBase {
    *   Prefix for machine name.
    */
   public function testMachineNameLength(string $prefix = ''): void {
-    // Entity view mode IDs are prefixed by an entity type ID.
+    // Entity form mode IDs are prefixed by an entity type ID.
     parent::testMachineNameLength('test.');
   }
 
