@@ -24,15 +24,10 @@ function contact_removed_post_updates() {
 function contact_post_update_set_empty_values_to_null(&$sandbox = []) {
   \Drupal::classResolver(ConfigEntityUpdater::class)
     ->update($sandbox, 'contact_form', function (ContactFormInterface $contact_form): bool {
-      $fields = [
-        'redirect' => $contact_form->getRedirectPath(),
-        'reply' => $contact_form->getReply(),
-        'message' => $contact_form->getMessage(),
-      ];
-
       $updated = FALSE;
 
-      foreach ($fields as $field => $value) {
+      foreach (['redirect', 'message', 'reply'] as $field) {
+        $value = trim($contact_form->get($field));
         if (trim($value) === '') {
           $contact_form->set($field, NULL);
           $updated = TRUE;
