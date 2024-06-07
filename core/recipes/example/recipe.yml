@@ -32,6 +32,6 @@ config:
   actions:
     text.settings:
       simple_config_update:
-        default_summary_length: 600
+        default_summary_length: 700
 # A Drupal recipe can have a content directory. All content in this directory
 # will be created after the configuration is installed.
