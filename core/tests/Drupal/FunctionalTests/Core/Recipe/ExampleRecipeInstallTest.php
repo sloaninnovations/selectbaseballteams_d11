@@ -49,7 +49,7 @@ class ExampleRecipeInstallTest extends InstallerTestBase {
    */
   public function testExample(): void {
     // Check if the value for the config is the same we set in the Example recipe.
-    $store_text_settings =  $this->config('text.settings')->get('default_summary_length');
+    $store_text_settings = $this->config('text.settings')->get('default_summary_length');
     $this->assertSame(700, $store_text_settings, 'The default summary length is 700');
   }
 
