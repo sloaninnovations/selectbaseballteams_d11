@@ -65,6 +65,12 @@
     <!-- Example for changing the driver args to webdriver tests MINK_DRIVER_ARGS_WEBDRIVER value: '["chrome", { "goog:chromeOptions": { "w3c": false } }, "http://localhost:4444/wd/hub"]' For using the Firefox browser, replace "chrome" with "firefox" -->
     <env name="MINK_DRIVER_ARGS_WEBDRIVER" value=""/>
   </php>
+  <extensions>
+    <!-- Debug dump() printer. -->
+    <bootstrap class="Drupal\TestTools\Extension\Dump\DebugDump">
+      <parameter name="colors" value="true"/>
+    </bootstrap>
+  </extensions>
   <testsuites>
     <testsuite name="unit">
       <directory>tests/Drupal/Tests</directory>

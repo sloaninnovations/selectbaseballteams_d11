@@ -26,7 +26,6 @@ use Drupal\Tests\TestRequirementsTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use Drupal\TestTools\Extension\SchemaInspector;
-use Drupal\TestTools\TestVarDumper;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\TestCase;
@@ -223,14 +222,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * @var bool
    */
   protected bool $usesSuperUserAccessPolicy;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function setUpBeforeClass(): void {
-    parent::setUpBeforeClass();
-    VarDumper::setHandler(TestVarDumper::class . '::cliHandler');
-  }
 
   /**
    * {@inheritdoc}

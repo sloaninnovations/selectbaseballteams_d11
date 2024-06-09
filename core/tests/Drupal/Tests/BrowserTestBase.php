@@ -22,10 +22,8 @@ use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
-use Drupal\TestTools\TestVarDumper;
 use GuzzleHttp\Cookie\CookieJar;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Provides a test case for functional Drupal tests.
@@ -200,14 +198,6 @@ abstract class BrowserTestBase extends TestCase {
   public function __construct(string $name) {
     parent::__construct($name);
     $this->setRunTestInSeparateProcess(TRUE);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function setUpBeforeClass(): void {
-    parent::setUpBeforeClass();
-    VarDumper::setHandler(TestVarDumper::class . '::cliHandler');
   }
 
   /**
