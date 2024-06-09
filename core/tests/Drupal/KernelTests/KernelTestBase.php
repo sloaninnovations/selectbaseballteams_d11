@@ -37,7 +37,6 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamPrintVisitor;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Base class for functional integration tests.

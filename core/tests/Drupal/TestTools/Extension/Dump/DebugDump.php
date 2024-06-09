@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\Extension\Dump;
 
-use Drupal\Core\Utility\Error;
 use PHPUnit\Event\TestRunner\Finished as TestRunnerFinished;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
@@ -12,7 +11,6 @@ use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\VarDumper;
 
 /**
