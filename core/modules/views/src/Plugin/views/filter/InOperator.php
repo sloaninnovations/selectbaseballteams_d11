@@ -337,7 +337,7 @@ class InOperator extends FilterPluginBase {
     // Some filter_in_operator usage uses optgroups forms, so flatten it.
     $flat_options = OptGroup::flattenOptions($this->valueOptions);
 
-    if (!is_array($this->value)) {
+    if (!is_array($this->value) || $this->value === null) {
       return;
     }
 
