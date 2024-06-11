@@ -55,16 +55,34 @@ final class DebugDump implements Extension {
     $cloner = new VarCloner();
     $dumper = new CliDumper();
     $dumper->setColors(self::$colors);
+    $dump = [];
     $dumper->dump(
       $cloner->cloneVar($var),
-      function ($line, $depth, $indent_pad) use ($caller) {
+      function ($line, $depth, $indent_pad) use (&$dump) {
         // A negative depth means "end of dump".
         if ($depth >= 0) {
           // Adds a two spaces indentation to the line.
-          self::$dumps[$caller['test']->id()][$caller['file']][$caller['line']][] = str_repeat($indent_pad, $depth) . $line;
+          $dump[] = str_repeat($indent_pad, $depth) . $line;
         }
       }
     );
+    self::$dumps[] = self::encodeDump($caller['test']->id(), $caller['file'], $caller['line'], $dump);
+  }
+
+  private static function encodeDump(string $testId, ?string $file, ?int $line, array $dump): string {
+    $data = [
+      'test' => $testId,
+      'file' => $file,
+      'line' => $line,
+      'dump' => $dump,
+    ];
+    $jsonData = json_encode($data);
+    return base64_encode($jsonData);
+  }
+
+  private static function decodeDump(string $encodedData): array {
+    $jsonData = base64_decode($encodedData);
+    return (array) json_decode($jsonData);
   }
 
   private static function getCaller(): array {
@@ -89,19 +107,27 @@ final class DebugDump implements Extension {
     }
 
     print "\n\n";
+
     print "dump() output\n";
     print "-------------\n\n";
-    foreach (self::$dumps as $testId => $testDumps) {
+
+    $dumps = [];
+    foreach (self::$dumps as $encodedDump) {
+      $dump = self::decodeDump($encodedDump);
+      $test = $dump['test'];
+      unset($dump['test']);
+      $dumps[$test][] = $dump;
+    }
+    foreach ($dumps as $testId => $testDumps) {
       print $testId . "\n";
-      foreach ($testDumps as $fileName => $fileDumps) {
-        foreach ($fileDumps as $line => $dump) {
-          print "in " . $fileName . ", line " . $line . ":\n";
-          foreach ($dump as $line) {
-            print $line . "\n";
-          }
+      foreach ($testDumps as $dump) {
+        print "in " . $dump['file'] . ", line " . $dump['line'] . ":\n";
+        foreach ($dump['dump'] as $line) {
+          print $line . "\n";
         }
         print "\n";
       }
+      print "\n";
     }
     self::$dumps = [];
   }
