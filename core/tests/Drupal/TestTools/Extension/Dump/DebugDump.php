@@ -21,6 +21,11 @@ use Symfony\Component\VarDumper\VarDumper;
 final class DebugDump implements Extension {
 
   /**
+   * The path to the dump staging file.
+   */
+  private static string $stagingFilePath;
+
+  /**
    * Whether colors should be used for printing.
    */
   private static bool $colors = FALSE;
@@ -38,9 +43,19 @@ final class DebugDump implements Extension {
     Facade $facade,
     ParameterCollection $parameters,
   ): void {
+    // Determine staging file path.
+    self::$stagingFilePath = tempnam(sys_get_temp_dir(), 'dpd');
+
     // Determine color output.
     $colors = $parameters->has('colors') ? $parameters->get('colors') : FALSE;
     self::$colors = filter_var($colors, \FILTER_VALIDATE_BOOLEAN);
+
+    // Set the environment variable with the configuration.
+    $config = json_encode([
+      'stagingFilePath' => self::$stagingFilePath,
+      'colors' => self::$colors,
+    ]);
+    putenv('DRUPAL_PHPUNIT_DUMPER_CONFIG=' . $config);
 
     VarDumper::setHandler(self::class . '::cliHandler');
 
@@ -51,10 +66,11 @@ final class DebugDump implements Extension {
    * A CLI handler for \Symfony\Component\VarDumper\VarDumper.
    */
   public static function cliHandler($var) {
+    $config = (array) json_decode(getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG'));
     $caller = self::getCaller();
     $cloner = new VarCloner();
     $dumper = new CliDumper();
-    $dumper->setColors(self::$colors);
+    $dumper->setColors($config['colors']);
     $dump = [];
     $dumper->dump(
       $cloner->cloneVar($var),
@@ -130,6 +146,10 @@ final class DebugDump implements Extension {
       print "\n";
     }
     self::$dumps = [];
+
+    // Cleanup.
+    unlink(self::$stagingFilePath);
+    putenv('DRUPAL_PHPUNIT_DUMPER_CONFIG');
   }
 
 }
