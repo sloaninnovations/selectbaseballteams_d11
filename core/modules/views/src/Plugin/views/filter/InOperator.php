@@ -277,7 +277,7 @@ class InOperator extends FilterPluginBase {
         continue;
       }
       elseif (is_object($option) && !$option instanceof MarkupInterface) {
-        $keys = $keys = isset($option->option) && is_array($option->option) ? array_keys($option->option) : [];
+        $keys = isset($option->option) && is_array($option->option) ? array_keys($option->option) : [];
         $key = array_shift($keys);
         if (isset($this->options['value'][$key])) {
           $options[$id] = $option;
