@@ -33,15 +33,16 @@ class Select extends Query implements SelectInterface {
    * This property is a nested array. Each entry is an array representing
    * a single table against which to join. The structure of each entry is:
    *
-   * array(
+   * @code
+   * [
    *   'type' => $join_type (one of INNER, LEFT OUTER, RIGHT OUTER),
    *   'table' => $table,
    *   'alias' => $alias_of_the_table,
    *   'condition' => $join_condition (string or Condition object),
    *   'arguments' => $array_of_arguments_for_placeholders_in_the condition.
    *   'all_fields' => TRUE to SELECT $alias.*, FALSE or NULL otherwise.
-   * )
-   *
+   * ]
+   * @endcode
    * If $table is a string, it is taken as the name of a table. If it is
    * a Select query object, it is taken as a subquery.
    *
