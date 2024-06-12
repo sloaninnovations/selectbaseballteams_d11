@@ -1,4 +1,6 @@
 services:
+  _defaults:
+    autoconfigure: true
   mailer.transport_factory.abstract:
     abstract: true
     class: Symfony\Component\Mailer\Transport\AbstractTransportFactory
