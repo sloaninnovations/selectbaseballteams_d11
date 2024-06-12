@@ -11,7 +11,6 @@ use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Drupal's extension for printing dump() output results.
@@ -29,11 +28,6 @@ final class DebugDump implements Extension {
    * Whether colors should be used for printing.
    */
   private static bool $colors = FALSE;
-
-  /**
-   * The accumulated results of dump() calls.
-   */
-  private static array $dumps = [];
 
   /**
    * {@inheritdoc}
@@ -57,8 +51,6 @@ final class DebugDump implements Extension {
     ]);
     putenv('DRUPAL_PHPUNIT_DUMPER_CONFIG=' . $config);
 
-    VarDumper::setHandler(self::class . '::cliHandler');
-
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber($this));
   }
 
@@ -66,8 +58,14 @@ final class DebugDump implements Extension {
    * A CLI handler for \Symfony\Component\VarDumper\VarDumper.
    */
   public static function cliHandler($var) {
-    $config = (array) json_decode(getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG'));
+    $envConfig = getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG');
+    if ($envConfig === FALSE) {
+      return;
+    }
+    $config = (array) json_decode($envConfig);
+
     $caller = self::getCaller();
+
     $cloner = new VarCloner();
     $dumper = new CliDumper();
     $dumper->setColors($config['colors']);
@@ -82,7 +80,12 @@ final class DebugDump implements Extension {
         }
       }
     );
-    self::$dumps[] = self::encodeDump($caller['test']->id(), $caller['file'], $caller['line'], $dump);
+
+    file_put_contents(
+      $config['stagingFilePath'],
+      self::encodeDump($caller['test']->id(), $caller['file'], $caller['line'], $dump) . "\n",
+      FILE_APPEND,
+    );
   }
 
   private static function encodeDump(string $testId, ?string $file, ?int $line, array $dump): string {
@@ -118,7 +121,13 @@ final class DebugDump implements Extension {
    * Prints the dumps generated during the test.
    */
   public function testRunnerFinished(TestRunnerFinished $event): void {
-    if (empty(self::$dumps)) {
+    $contents = file_get_contents(self::$stagingFilePath);
+
+    // Cleanup.
+    unlink(self::$stagingFilePath);
+    putenv('DRUPAL_PHPUNIT_DUMPER_CONFIG');
+
+    if (empty($contents)) {
       return;
     }
 
@@ -127,8 +136,11 @@ final class DebugDump implements Extension {
     print "dump() output\n";
     print "-------------\n\n";
 
+    $encodedDumps = explode("\n", $contents);
+    array_pop($encodedDumps);
+
     $dumps = [];
-    foreach (self::$dumps as $encodedDump) {
+    foreach ($encodedDumps as $encodedDump) {
       $dump = self::decodeDump($encodedDump);
       $test = $dump['test'];
       unset($dump['test']);
@@ -145,11 +157,7 @@ final class DebugDump implements Extension {
       }
       print "\n";
     }
-    self::$dumps = [];
 
-    // Cleanup.
-    unlink(self::$stagingFilePath);
-    putenv('DRUPAL_PHPUNIT_DUMPER_CONFIG');
   }
 
 }
