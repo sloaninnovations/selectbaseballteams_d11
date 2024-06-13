@@ -9,11 +9,9 @@
 
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
-use Drupal\TestTools\Extension\Dump\DebugDump;
 use Drupal\TestTools\Extension\HtmlLogging\HtmlOutputLogger;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Finds all valid extension directories recursively within a given directory.
@@ -185,8 +183,6 @@ $browserTestOutputDirectory = getenv('BROWSERTEST_OUTPUT_DIRECTORY');
 if ($browserTestOutputDirectory !== FALSE) {
   HtmlOutputLogger::init($browserTestOutputDirectory, (bool) getenv('BROWSERTEST_OUTPUT_VERBOSE') ?? FALSE);
 }
-
-VarDumper::setHandler(DebugDump::class . '::cliHandler');
 
 // Drupal expects to be run from its root directory. This ensures all test types
 // are consistent.

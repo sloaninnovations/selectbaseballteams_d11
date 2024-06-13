@@ -54,15 +54,18 @@ final class DebugDump implements Extension {
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber($this));
   }
 
+  public static function isEnabled(): bool {
+    return getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG') !== FALSE;
+  }
+
   /**
    * A CLI handler for \Symfony\Component\VarDumper\VarDumper.
    */
   public static function cliHandler($var) {
-    $envConfig = getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG');
-    if ($envConfig === FALSE) {
+    if (!self::isEnabled()) {
       return;
     }
-    $config = (array) json_decode($envConfig);
+    $config = (array) json_decode(getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG'));
 
     $caller = self::getCaller();
 
@@ -117,17 +120,37 @@ final class DebugDump implements Extension {
     return $call;
   }
 
+  public static function getDumps(): array {
+    if (!self::isEnabled()) {
+      return [];
+    }
+    $config = (array) json_decode(getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG'));
+    $contents = rtrim(file_get_contents($config['stagingFilePath']));
+    if (empty($contents)) {
+      return [];
+    }
+    $encodedDumps = explode("\n", $contents);
+    $dumps = [];
+    foreach ($encodedDumps as $encodedDump) {
+      $dump = self::decodeDump($encodedDump);
+      $test = $dump['test'];
+      unset($dump['test']);
+      $dumps[$test][] = $dump;
+    }
+    return $dumps;
+  }
+
   /**
    * Prints the dumps generated during the test.
    */
   public function testRunnerFinished(TestRunnerFinished $event): void {
-    $contents = file_get_contents(self::$stagingFilePath);
+    $dumps = self::getDumps();
 
     // Cleanup.
     unlink(self::$stagingFilePath);
     putenv('DRUPAL_PHPUNIT_DUMPER_CONFIG');
 
-    if (empty($contents)) {
+    if (empty($dumps)) {
       return;
     }
 
@@ -136,16 +159,6 @@ final class DebugDump implements Extension {
     print "dump() output\n";
     print "-------------\n\n";
 
-    $encodedDumps = explode("\n", $contents);
-    array_pop($encodedDumps);
-
-    $dumps = [];
-    foreach ($encodedDumps as $encodedDump) {
-      $dump = self::decodeDump($encodedDump);
-      $test = $dump['test'];
-      unset($dump['test']);
-      $dumps[$test][] = $dump;
-    }
     foreach ($dumps as $testId => $testDumps) {
       print $testId . "\n";
       foreach ($testDumps as $dump) {
