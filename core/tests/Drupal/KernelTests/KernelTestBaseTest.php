@@ -7,7 +7,6 @@ namespace Drupal\KernelTests;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Database\Database;
 use Drupal\TestTools\Extension\Dump\DebugDump;
-use Drupal\user\Entity\Role;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -297,15 +296,18 @@ class KernelTestBaseTest extends KernelTestBase {
    */
   public function testVarDump() {
     // Dump some variables.
-    $this->enableModules(['system', 'user']);
-    $role = Role::create(['id' => 'test_role', 'label' => 'Test role']);
-    dump($role);
-    dump($role->id());
+    $object = (object) [
+      'Aldebaran' => 'Betelgeuse',
+    ];
+    dump($object);
+    dump('Alpheratz');
 
     $dumpString = json_encode(DebugDump::getDumps());
 
-    $this->assertStringContainsString('Drupal\user\Entity\Role', $dumpString);
-    $this->assertStringContainsString('test_role', $dumpString);
+    $this->assertStringContainsString('KernelTestBaseTest::testVarDump', $dumpString);
+    $this->assertStringContainsString('Aldebaran', $dumpString);
+    $this->assertStringContainsString('Betelgeuse', $dumpString);
+    $this->assertStringContainsString('Alpheratz', $dumpString);
   }
 
   /**

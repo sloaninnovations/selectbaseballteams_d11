@@ -12,7 +12,6 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\TestTools\Extension\Dump\DebugDump;
-use Drupal\user\Entity\Role;
 use PHPUnit\Framework\ExpectationFailedException;
 
 // cspell:ignore htkey
@@ -604,16 +603,19 @@ class BrowserTestBaseTest extends BrowserTestBase {
    * Tests the dump() function provided by the var-dumper Symfony component.
    */
   public function testVarDump() {
-    // Dump some variables to check that dump() in test code produces output
-    // on the command line that is running the test.
-    $role = Role::load('authenticated');
-    dump($role);
-    dump($role->id());
+    // Dump some variables.
+    $object = (object) [
+      'Aldebaran' => 'Betelgeuse',
+    ];
+    dump($object);
+    dump('Alpheratz');
 
     $dumpString = json_encode(DebugDump::getDumps());
 
-    $this->assertStringContainsString('Drupal\user\Entity\Role', $dumpString);
-    $this->assertStringContainsString('authenticated', $dumpString);
+    $this->assertStringContainsString('BrowserTestBaseTest::testVarDump', $dumpString);
+    $this->assertStringContainsString('Aldebaran', $dumpString);
+    $this->assertStringContainsString('Betelgeuse', $dumpString);
+    $this->assertStringContainsString('Alpheratz', $dumpString);
 
     // Visit a Drupal page with call to the dump() function to check that dump()
     // in site code produces output in the requested web page's HTML.
