@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\TestTools\Extension\Dump;
 
 use PHPUnit\Event\TestRunner\Finished as TestRunnerFinished;
+use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
@@ -54,14 +55,23 @@ final class DebugDump implements Extension {
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber($this));
   }
 
+  /**
+   * Determines if the extension is enabled.
+   *
+   * @return bool
+   *   TRUE if enabled, FALSE if disabled.
+   */
   public static function isEnabled(): bool {
     return getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG') !== FALSE;
   }
 
   /**
    * A CLI handler for \Symfony\Component\VarDumper\VarDumper.
+   *
+   * @param mixed $var
+   *   The variable to be dumped.
    */
-  public static function cliHandler($var) {
+  public static function cliHandler(mixed $var): void {
     if (!self::isEnabled()) {
       return;
     }
@@ -91,6 +101,21 @@ final class DebugDump implements Extension {
     );
   }
 
+  /**
+   * Encodes the dump for storing.
+   *
+   * @param string $testId
+   *   The id of the test from where the dump was called.
+   * @param string|null $file
+   *   The path of the file from where the dump was called.
+   * @param int|null $line
+   *   The line number from where the dump was called.
+   * @param array $dump
+   *   The dump as an array of lines.
+   *
+   * @return string
+   *   An encoded string.
+   */
   private static function encodeDump(string $testId, ?string $file, ?int $line, array $dump): string {
     $data = [
       'test' => $testId,
@@ -102,24 +127,49 @@ final class DebugDump implements Extension {
     return base64_encode($jsonData);
   }
 
+  /**
+   * Decodes a dump retrieved from storage.
+   *
+   * @param string $encodedData
+   *   An encoded string.
+   *
+   * @return array{test: string, file: string|null, line: int|null, dump: string[]}
+   *   An encoded string.
+   */
   private static function decodeDump(string $encodedData): array {
     $jsonData = base64_decode($encodedData);
     return (array) json_decode($jsonData);
   }
 
+  /**
+   * Returns information about the caller of dump().
+   *
+   * @return array{test: \PHPUnit\Framework\Event\Code\TestMethod, file: string|null, line: int|null}
+   *   Caller information.
+   */
   private static function getCaller(): array {
     $backtrace = debug_backtrace();
+
     while (!isset($backtrace[0]['function']) || $backtrace[0]['function'] !== 'dump') {
       array_shift($backtrace);
     }
-    $call['file'] = $backtrace[1]['file'];
-    $call['line'] = $backtrace[1]['line'];
+    $call['file'] = $backtrace[1]['file'] ?? NULL;
+    $call['line'] = $backtrace[1]['line'] ?? NULL;
 
-    $call['test'] = $backtrace[2]['object']->valueObjectForEvents();
+    while (!isset($backtrace[0]['object']) || !($backtrace[0]['object'] instanceof TestCase)) {
+      array_shift($backtrace);
+    }
+    $call['test'] = $backtrace[0]['object']->valueObjectForEvents();
 
     return $call;
   }
 
+  /**
+   * Retrieves dumps from storage.
+   *
+   * @return array{string, array{file: string|null, line: int|null, dump: string[]}}
+   *   Caller information.
+   */
   public static function getDumps(): array {
     if (!self::isEnabled()) {
       return [];
