@@ -200,7 +200,7 @@ final class DebugDump implements Extension {
     unlink(self::$stagingFilePath);
     putenv('DRUPAL_PHPUNIT_DUMPER_CONFIG');
 
-    if (empty($dumps)) {
+    if ($dumps === []) {
       return;
     }
 
