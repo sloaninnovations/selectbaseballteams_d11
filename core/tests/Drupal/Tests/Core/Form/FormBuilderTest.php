@@ -940,10 +940,11 @@ class FormBuilderTest extends FormTestBase {
     $form_state = new FormState();
     $built_form = $this->formBuilder->buildForm($form_arg, $form_state);
 
-    // FormBuilder does not even consider to set a form token when:
-    // - #token = FALSE (opting out explicitly)
-    // - #method = GET and #token is not set to a string (GET forms don't get a
-    //   form token by default, and this form did not explicitly opt in)
+    // FormBuilder does not set a form token when:
+    // - #token is set to FALSE.
+    // - #method is set to 'GET' and #token is not a string. This means the GET
+    //   form did not get a form token by default, and the form did not
+    //   explicitly opt in.
     if ($token === FALSE || ($method == 'get' && !is_string($token))) {
       $this->assertEquals($built_form['#cache'], ['tags' => ['CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form']]);
       $this->assertFalse(isset($built_form['form_token']));
