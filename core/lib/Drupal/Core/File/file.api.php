@@ -134,7 +134,7 @@ function hook_file_mimetype_mapping_alter(&$mapping) {
  * Alter archiver information declared by other modules.
  *
  * @param array $info
- *   An associative array of archivers keyed but archiver ID. Each value
+ *   An associative array of archivers, keyed but archiver ID. Each value
  *   consists of the plugin definition and meta information. The meta
  *   information such as 'class' and 'provider' are added during the discovery
  *   phase.
