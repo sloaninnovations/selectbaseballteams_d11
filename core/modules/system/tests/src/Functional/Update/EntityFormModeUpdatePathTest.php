@@ -38,6 +38,7 @@ class EntityFormModeUpdatePathTest extends UpdatePathTestBase {
     $this->assertInstanceOf(EntityFormMode::class, $form_mode);
 
     $this->assertNull($form_mode->get('description'));
+    // Assert backward compatibility of EntityFormMode::getDescription().
     $this->assertSame('', $form_mode->getDescription());
   }
 
