@@ -33,7 +33,7 @@ class SequenceKeysConstraintValidator extends ConstraintValidator implements Con
   /**
    * {@inheritdoc}
    */
-  public function validate(mixed $value, Constraint $constraint) {
+  public function validate(mixed $value, Constraint $constraint): void {
     assert($constraint instanceof SequenceKeysConstraint);
 
     if (!is_array($value)) {
