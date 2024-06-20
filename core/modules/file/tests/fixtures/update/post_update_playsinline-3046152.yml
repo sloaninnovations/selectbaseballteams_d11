@@ -1,3 +1,4 @@
+uuid: 5aca7d95-2e2f-4a39-a540-a7c7c3b72519
 langcode: en
 status: true
 dependencies:
@@ -20,7 +21,6 @@ content:
       loop: false
       multiple_file_display_type: tags
       muted: false
-      playsinline: false
       width: 640
       height: 480
     third_party_settings: {  }
