@@ -24,7 +24,9 @@ core.extension:
           constraints:
             NotBlank: []
             ExtensionName: []
-            ExtensionExists: theme
+            ExtensionExists:
+              type: theme
+              mustBeInstalled: false
       sequence:
         type: weight
         label: 'Weight'
