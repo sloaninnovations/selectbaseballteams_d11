@@ -43,7 +43,7 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
    * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    *   The module extension list.
    * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
-   *    The theme extension list.
+   *   The theme extension list.
    * @param \Drupal\Core\Extension\ProfileExtensionList $profileExtensionList
    *   The profile extension list.
    */
@@ -90,13 +90,13 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
         if ($extension_name === 'core') {
           return;
         }
-        if($must_be_installed) {
+        if ($must_be_installed) {
           if (!$this->moduleHandler->moduleExists($extension_name)) {
             $this->context->addViolation($constraint->moduleNotInstalledMessage, $variables);
           }
         }
         else {
-          if(!$this->moduleExtensionList->exists($extension_name)) {
+          if (!$this->moduleExtensionList->exists($extension_name)) {
             $this->context->addViolation($constraint->moduleNotExistsMessage, $variables);
           }
         }
@@ -107,7 +107,7 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
         if ($extension_name === NULL) {
           return;
         }
-        if($must_be_installed) {
+        if ($must_be_installed) {
           if (!$this->themeHandler->themeExists($extension_name)) {
             $this->context->addViolation($constraint->themeNotInstalledMessage, $variables);
           }
