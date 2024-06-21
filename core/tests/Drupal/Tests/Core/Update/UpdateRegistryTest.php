@@ -13,11 +13,12 @@ use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 
 /**
- * @coversDefaultClass \Drupal\Core\Update\UpdateRegistry
- * @group Update
+ * Tests UpdateRegistry.
  *
  * Note we load code, so isolate the tests.
  *
+ * @coversDefaultClass \Drupal\Core\Update\UpdateRegistry
+ * @group Update
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
@@ -182,7 +183,7 @@ EOS;
   /**
    * @covers ::getPendingUpdateFunctions
    */
-  public function testGetPendingUpdateFunctionsNoExistingUpdates() {
+  public function testGetPendingUpdateFunctionsNoExistingUpdates(): void {
     $this->setupBasicExtensions();
 
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
@@ -213,6 +214,7 @@ EOS;
         ],
     ], $key_value, $theme_handler, 'post_update');
 
+    // Confirm the updates are sorted alphabetically.
     $this->assertEquals([
       'module_a_post_update_a',
       'module_a_post_update_b',
@@ -225,7 +227,7 @@ EOS;
   /**
    * @covers ::getPendingUpdateFunctions
    */
-  public function testGetPendingUpdateFunctionsWithLoadedModulesButNotEnabled() {
+  public function testGetPendingUpdateFunctionsWithLoadedModulesButNotEnabled(): void {
     $this->setupBasicExtensions();
 
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
@@ -250,6 +252,7 @@ EOS;
         ],
     ], $key_value, $theme_handler, 'post_update');
 
+    // Confirm the updates are sorted alphabetically.
     $this->assertEquals([
       'module_a_post_update_a',
       'module_a_post_update_b',
@@ -259,7 +262,7 @@ EOS;
   /**
    * @covers ::getPendingUpdateFunctions
    */
-  public function testGetPendingUpdateFunctionsExistingUpdates() {
+  public function testGetPendingUpdateFunctionsExistingUpdates(): void {
     $this->setupBasicExtensions();
 
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
@@ -294,6 +297,7 @@ EOS;
         ],
     ], $key_value, $theme_handler, 'post_update');
 
+    // Confirm the updates are sorted alphabetically.
     $this->assertEquals(array_values([
       'module_a_post_update_b',
       'module_b_post_update_a',
@@ -305,7 +309,7 @@ EOS;
   /**
    * @covers ::getPendingUpdateInformation
    */
-  public function testGetPendingUpdateInformation() {
+  public function testGetPendingUpdateInformation(): void {
     $this->setupBasicExtensions();
 
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
@@ -336,6 +340,7 @@ EOS;
         ],
     ], $key_value, $theme_handler, 'post_update');
 
+    // Confirm the updates are sorted alphabetically.
     $expected = [];
     $expected['module_a']['pending']['a'] = 'Module A update A.';
     $expected['module_a']['pending']['b'] = 'Module A update B.';
@@ -352,7 +357,7 @@ EOS;
   /**
    * @covers ::getPendingUpdateInformation
    */
-  public function testGetPendingUpdateInformationWithExistingUpdates() {
+  public function testGetPendingUpdateInformationWithExistingUpdates(): void {
     $this->setupBasicExtensions();
 
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
@@ -387,6 +392,7 @@ EOS;
         ],
     ], $key_value, $theme_handler, 'post_update');
 
+    // Confirm the updates are sorted alphabetically.
     $expected = [];
     $expected['module_a']['pending']['b'] = 'Module A update B.';
     $expected['module_a']['start'] = 'b';
@@ -401,7 +407,7 @@ EOS;
   /**
    * @covers ::getPendingUpdateInformation
    */
-  public function testGetPendingUpdateInformationWithRemovedUpdates() {
+  public function testGetPendingUpdateInformationWithRemovedUpdates(): void {
     $this->setupBasicExtensions();
 
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
@@ -428,7 +434,7 @@ EOS;
   /**
    * @covers ::getUpdateFunctions
    */
-  public function testGetUpdateFunctions() {
+  public function testGetUpdateFunctions(): void {
     $this->setupBasicExtensions();
     $key_value = $this->prophesize(KeyValueStoreInterface::class)->reveal();
 
@@ -464,7 +470,7 @@ EOS;
   /**
    * @covers ::registerInvokedUpdates
    */
-  public function testRegisterInvokedUpdatesWithoutExistingUpdates() {
+  public function testRegisterInvokedUpdatesWithoutExistingUpdates(): void {
     $this->setupBasicExtensions();
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])
@@ -504,7 +510,7 @@ EOS;
   /**
    * @covers ::registerInvokedUpdates
    */
-  public function testRegisterInvokedUpdatesWithMultiple() {
+  public function testRegisterInvokedUpdatesWithMultiple(): void {
     $this->setupBasicExtensions();
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])
@@ -544,7 +550,7 @@ EOS;
   /**
    * @covers ::registerInvokedUpdates
    */
-  public function testRegisterInvokedUpdatesWithExistingUpdates() {
+  public function testRegisterInvokedUpdatesWithExistingUpdates(): void {
     $this->setupBasicExtensions();
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])
@@ -579,7 +585,7 @@ EOS;
   /**
    * @covers ::filterOutInvokedUpdatesByExtension
    */
-  public function testFilterOutInvokedUpdatesByExtension() {
+  public function testFilterOutInvokedUpdatesByExtension(): void {
     $this->setupBasicExtensions();
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])
@@ -619,7 +625,7 @@ EOS;
   /**
    * @covers ::getPendingUpdateFunctions
    */
-  public function testGetPendingCustomUpdateFunctions() {
+  public function testGetPendingCustomUpdateFunctions(): void {
     // Set up a simplified module structure with custom update hooks.
     $info_a = <<<'EOS'
 type: module

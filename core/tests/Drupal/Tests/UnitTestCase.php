@@ -62,17 +62,7 @@ abstract class UnitTestCase extends TestCase {
     FileCacheFactory::setPrefix('prefix');
 
     $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __get(string $name) {
-    if ($name === 'randomGenerator') {
-      @trigger_error('Accessing the randomGenerator property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use getRandomGenerator() instead. See https://www.drupal.org/node/3358445', E_USER_DEPRECATED);
-
-      return $this->getRandomGenerator();
-    }
+    chdir($this->root);
   }
 
   /**

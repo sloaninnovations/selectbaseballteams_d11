@@ -47,7 +47,11 @@ body {
   position: absolute;
   inset-block-start: 0;
   inset-inline-start: 0;
-  width: var(--admin-toolbar-sidebar-width);
+}
+@media (min-width: 64rem) {
+  .admin-toolbar__displace-placeholder {
+    width: var(--admin-toolbar-sidebar-width);
+  }
 }
 /**
  * The Admin toolbar component.
@@ -230,13 +234,13 @@ body {
 }
 .admin-toolbar__logo img {
   display: block;
+  max-width: var(--admin-toolbar-space-40);
 }
 /**
  * Scroll wrapper for Mobile.
  */
 .admin-toolbar__scroll-wrapper {
   display: flex;
-  overflow-x: hidden;
   overflow-y: auto;
   flex-direction: column;
   height: 100%;
@@ -252,6 +256,7 @@ body {
 @media (min-width: 64rem) {
   .admin-toolbar__scroll-wrapper {
     display: contents;
+    overflow-y: unset;
     background: none;
   }
 }
