@@ -42,19 +42,13 @@ class FileVideoPosterFormatterTest extends FileFieldTestBase {
    */
   public function testPosterNoImageStyle() {
 
-    // Create content type.
-    $this->createContentType([
-      'name' => 'Article',
-      'type' => 'article',
-    ]);
-
     // Video field configuration.
     $video_fieldname = 'field_' . mb_strtolower($this->randomMachineName());
     $this->createFileField($video_fieldname, 'node', 'article', [], ['file_extensions' => 'mp4']);
 
     // Poster image field configuration.
     $poster_fieldname = 'field_' . mb_strtolower($this->randomMachineName());
-    $this->createImageField($poster_fieldname, 'article', [], ['file_extensions' => 'jpg']);
+    $this->createImageField($poster_fieldname, 'node', 'article', [], ['file_extensions' => 'jpg']);
 
     // Configure node display.
     $display = \Drupal::service('entity_display.repository')
@@ -119,7 +113,7 @@ class FileVideoPosterFormatterTest extends FileFieldTestBase {
 
     // Poster image field configuration.
     $poster_fieldname = 'field_' . mb_strtolower($this->randomMachineName());
-    $this->createImageField($poster_fieldname, 'article', [], ['file_extensions' => 'jpg']);
+    $this->createImageField($poster_fieldname, 'node', 'article', [], ['file_extensions' => 'jpg']);
 
     // Configure node display.
     $display = \Drupal::service('entity_display.repository')
