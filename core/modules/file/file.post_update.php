@@ -1,5 +1,8 @@
 <?php
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\user\RoleInterface;
+
 /**
  * @file
  * Post update functions for File.
