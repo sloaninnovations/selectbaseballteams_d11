@@ -131,6 +131,9 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
       if ($this->processEntityArgumentUpdate($view)) {
         $changed = TRUE;
       }
+      if ($this->addGroupingLabelElement($handler, $handler_type, $view)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }
@@ -256,6 +259,35 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
     if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
       @trigger_error(sprintf('The update to convert "numeric" arguments to "entity_target_id" for entity reference fields for view "%s" is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3441945', $view->id()), E_USER_DEPRECATED);
+    }
+
+    return $changed;
+  }
+
+  /**
+   * Add Grouping Label to views without one.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View being updated.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  public function addGroupingLabelElement(array &$handler, string $handler_type, ViewEntityInterface $view): bool {
+    $changed = FALSE;
+
+    // Add grouping label element to existing views.
+    if (($handler_type === 'style')
+      && isset($handler['plugin_id'], $handler['type'])
+      && $handler['plugin_id'] === 'style'
+      && $handler['type'] === 'Grid' || 'HtmlList' || 'GridResponsive' || 'DefaultStyle'
+      && !isset($handler['style']['grouping_label_element'])) {
+      $handler['style']= ['grouping_label_element' => NULL];
+      $changed = TRUE;
     }
 
     return $changed;
