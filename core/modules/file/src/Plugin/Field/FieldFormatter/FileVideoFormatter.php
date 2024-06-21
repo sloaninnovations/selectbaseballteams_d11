@@ -198,7 +198,6 @@ class FileVideoFormatter extends FileMediaFormatterBase {
   public function settingsSummary() {
     $summary = parent::settingsSummary();
     $summary[] = $this->t('Muted: %muted', ['%muted' => $this->getSetting('muted') ? $this->t('yes') : $this->t('no')]);
-<<<<<<< HEAD
     $summary[] = $this->t('Size: %width x %height pixels', [
       '%width' => $this->getSetting('width'),
       '%height' => $this->getSetting('height'),
@@ -207,7 +206,6 @@ class FileVideoFormatter extends FileMediaFormatterBase {
       $summary[] = $this->t('Poster field: %poster', ['%poster' => $this->getSetting('poster')]);
       $summary[] = $this->t('Poster image style: %poster_image_style', ['%poster_image_style' => $this->getSetting('poster_image_style') ?: $this->t('None (original image)')]);
     }
-=======
 
     if ($width = $this->getSetting('width')) {
       $summary[] = $this->t('Width: %width pixels', [
@@ -221,7 +219,6 @@ class FileVideoFormatter extends FileMediaFormatterBase {
       ]);
     }
 
->>>>>>> origin/11.x
     return $summary;
   }
 
