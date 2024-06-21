@@ -75,7 +75,7 @@ trait UiHelperTrait {
       $action = $form->getAttribute('action');
     }
     else {
-      $submit_button = $assert_session->buttonExists($submit);
+      $submit_button = $assert_session->elementExists('xpath', "//form //input[@value='$submit']");
       $form = $assert_session->elementExists('xpath', './ancestor::form', $submit_button);
       $action = $form->getAttribute('action');
     }
