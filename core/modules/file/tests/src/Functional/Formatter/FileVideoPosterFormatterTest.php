@@ -42,6 +42,12 @@ class FileVideoPosterFormatterTest extends FileFieldTestBase {
    */
   public function testPosterNoImageStyle() {
 
+    // Create content type.
+    $this->createContentType([
+      'name' => 'Article',
+      'type' => 'article',
+    ]);
+
     // Video field configuration.
     $video_fieldname = 'field_' . mb_strtolower($this->randomMachineName());
     $this->createFileField($video_fieldname, 'node', 'article', [], ['file_extensions' => 'mp4']);
