@@ -75,7 +75,7 @@ trait UiHelperTrait {
       $action = $form->getAttribute('action');
     }
     // Get the form.
-    else if (isset($form_html_id)) {
+    elseif (isset($form_html_id)) {
       $form = $assert_session->elementExists('xpath', "//form[@id='$form_html_id']");
       $submit_button = $assert_session->buttonExists($submit, $form);
       $action = $form->getAttribute('action');
