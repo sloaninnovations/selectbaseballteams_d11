@@ -57,7 +57,7 @@ class FileVideoPosterFormatterTest extends FileFieldTestBase {
       'type' => 'file_video',
       'settings' => [
         'poster' => $poster_fieldname,
-        'poster_image_style' => NULL,
+        'poster_image_style' => '',
       ],
     ];
     $display->setComponent($video_fieldname, $display_options)
