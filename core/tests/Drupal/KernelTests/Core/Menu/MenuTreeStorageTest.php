@@ -487,7 +487,7 @@ class MenuTreeStorageTest extends KernelTestBase {
    * @return array
    *   Test cases.
    */
-  public function providerBackwardsCompatibilityLayer(): array {
+  public static function providerBackwardsCompatibilityLayer(): array {
     return [
       'Without options' => [],
       'With options' => [TRUE],
