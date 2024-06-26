@@ -31,6 +31,11 @@ final class DebugDump implements Extension {
   private static bool $colors = FALSE;
 
   /**
+   * Whether the caller of dump should be included in the report.
+   */
+  private static bool $printCaller = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   public function bootstrap(
@@ -45,10 +50,15 @@ final class DebugDump implements Extension {
     $colors = $parameters->has('colors') ? $parameters->get('colors') : FALSE;
     self::$colors = filter_var($colors, \FILTER_VALIDATE_BOOLEAN);
 
+    // Print caller.
+    $printCaller = $parameters->has('printCaller') ? $parameters->get('printCaller') : FALSE;
+    self::$printCaller = filter_var($printCaller, \FILTER_VALIDATE_BOOLEAN);
+
     // Set the environment variable with the configuration.
     $config = json_encode([
       'stagingFilePath' => self::$stagingFilePath,
       'colors' => self::$colors,
+      'printCaller' => self::$printCaller,
     ]);
     putenv('DRUPAL_PHPUNIT_DUMPER_CONFIG=' . $config);
 
@@ -210,15 +220,23 @@ final class DebugDump implements Extension {
     print "-------------\n\n";
 
     foreach ($dumps as $testId => $testDumps) {
-      print $testId . "\n";
+      if (self::$printCaller) {
+        print $testId . "\n";
+      }
       foreach ($testDumps as $dump) {
-        print "in " . $dump['file'] . ", line " . $dump['line'] . ":\n";
+        if (self::$printCaller) {
+          print "in " . $dump['file'] . ", line " . $dump['line'] . ":\n";
+        }
         foreach ($dump['dump'] as $line) {
           print $line . "\n";
         }
+        if (self::$printCaller) {
+          print "\n";
+        }
+      }
+      if (self::$printCaller) {
         print "\n";
       }
-      print "\n";
     }
 
   }
