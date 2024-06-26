@@ -9,7 +9,7 @@
   if (oldEscapeAdminPath) {
     Drupal.deprecationError({
       message:
-        'escapeAdminPath is deprecated in drupal:11.x and will be removed from drupal:12.0.0.',
+        'escapeAdminPath is deprecated in drupal:10.4.x and will be removed from drupal:12.0.0.',
     });
   }
   const escapeAdminPath =
