@@ -16,7 +16,7 @@ class UnitTestCaseTest extends UnitTestCase {
   /**
    * Tests the dump() function in a test run in the same process.
    */
-  public function testVarDumpSameProcess() {
+  public function testVarDumpSameProcess(): void {
     // Dump some variables.
     $object = (object) [
       'Aldebaran' => 'Betelgeuse',
@@ -36,7 +36,7 @@ class UnitTestCaseTest extends UnitTestCase {
    *
    * @runInSeparateProcess
    */
-  public function testVarDumpSeparateProcess() {
+  public function testVarDumpSeparateProcess(): void {
     // Dump some variables.
     $object = (object) [
       'Denebola' => 'Aspidiske',

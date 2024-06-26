@@ -46,7 +46,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests that JavaScript Drupal settings can be read.
    */
-  public function testDrupalSettings() {
+  public function testDrupalSettings(): void {
     // Trigger a 403 because those pages have very little else going on.
     $this->drupalGet('admin');
     $this->assertSame([], $this->getDrupalSettings());
@@ -62,7 +62,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests basic page test.
    */
-  public function testGoTo() {
+  public function testGoTo(): void {
     $account = $this->drupalCreateUser();
     $this->drupalLogin($account);
 
@@ -112,7 +112,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests drupalGet().
    */
-  public function testDrupalGet() {
+  public function testDrupalGet(): void {
     $this->drupalGet('test-page');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->addressEquals('test-page');
@@ -140,7 +140,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests basic form functionality.
    */
-  public function testForm() {
+  public function testForm(): void {
     // Ensure the proper response code for a _form route.
     $this->drupalGet('form-test/object-builder');
     $this->assertSession()->statusCodeEquals(200);
@@ -208,7 +208,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests clickLink() functionality.
    */
-  public function testClickLink() {
+  public function testClickLink(): void {
     $this->drupalGet('test-page');
     $this->clickLink('Visually identical test links');
     $this->assertStringContainsString('user/login', $this->getSession()->getCurrentUrl());
@@ -220,7 +220,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
     $this->assertStringContainsString('user/register', $this->getSession()->getCurrentUrl());
   }
 
-  public function testError() {
+  public function testError(): void {
     $this->expectException('\Exception');
     $this->expectExceptionMessage('User notice: foo');
     $this->drupalGet('test-error');
@@ -229,7 +229,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests legacy field asserts which use xpath directly.
    */
-  public function testXpathAsserts() {
+  public function testXpathAsserts(): void {
     $this->drupalGet('test-field-xpath');
     $this->assertSession()->elementTextContains('xpath', '//table/tbody/tr[2]/td[1]', 'one');
 
@@ -260,7 +260,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests field asserts using textfields.
    */
-  public function testFieldAssertsForTextfields() {
+  public function testFieldAssertsForTextfields(): void {
     $this->drupalGet('test-field-xpath');
 
     // *** 1. fieldNotExists().
@@ -371,7 +371,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests legacy field asserts for checkbox field type.
    */
-  public function testFieldAssertsForCheckbox() {
+  public function testFieldAssertsForCheckbox(): void {
     $this->drupalGet('test-field-xpath');
 
     // Part 1 - Test by name.
@@ -463,7 +463,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests the ::cronRun() method.
    */
-  public function testCronRun() {
+  public function testCronRun(): void {
     $last_cron_time = \Drupal::state()->get('system.cron_last');
     $this->cronRun();
     $this->assertSession()->statusCodeEquals(204);
@@ -475,7 +475,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests the Drupal install done in \Drupal\Tests\BrowserTestBase::setUp().
    */
-  public function testInstall() {
+  public function testInstall(): void {
     $htaccess_filename = $this->tempFilesDirectory . '/.htaccess';
     $this->assertFileExists($htaccess_filename);
 
@@ -486,7 +486,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests the assumption that local time is in 'Australia/Sydney'.
    */
-  public function testLocalTimeZone() {
+  public function testLocalTimeZone(): void {
     $expected = 'Australia/Sydney';
     // The 'Australia/Sydney' time zone is set in core/tests/bootstrap.php
     $this->assertEquals($expected, date_default_timezone_get());
@@ -506,7 +506,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests the ::checkForMetaRefresh() method.
    */
-  public function testCheckForMetaRefresh() {
+  public function testCheckForMetaRefresh(): void {
     // Disable following redirects in the client.
     $this->getSession()->getDriver()->getClient()->followRedirects(FALSE);
     // Set the maximumMetaRefreshCount to zero to make sure the redirect doesn't
@@ -521,7 +521,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Test page text.');
   }
 
-  public function testGetDefaultDriveInstance() {
+  public function testGetDefaultDriveInstance(): void {
     putenv('MINK_DRIVER_ARGS=' . json_encode([NULL, ['key1' => ['key2' => ['key3' => 3, 'key3.1' => 3.1]]]]));
     $this->getDefaultDriverInstance();
     $this->assertEquals([NULL, ['key1' => ['key2' => ['key3' => 3, 'key3.1' => 3.1]]]], $this->minkDefaultDriverArgs);
@@ -530,7 +530,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Ensures we can't access modules we shouldn't be able to after install.
    */
-  public function testProfileModules() {
+  public function testProfileModules(): void {
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('The module demo_umami_content does not exist.');
     $this->assertFileExists('core/profiles/demo_umami/modules/demo_umami_content/demo_umami_content.info.yml');
@@ -540,7 +540,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests the protections provided by .htkey.
    */
-  public function testHtKey() {
+  public function testHtKey(): void {
     // Remove the Simpletest private key file so we can test the protection
     // against requests that forge a valid testing user agent to gain access
     // to the installer.
@@ -575,7 +575,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
    *
    * @see \Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware::__invoke()
    */
-  public function testDeprecationHeaders() {
+  public function testDeprecationHeaders(): void {
     $this->drupalGet('/test-deprecations');
 
     $deprecation_messages = [];
@@ -602,7 +602,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests the dump() function provided by the var-dumper Symfony component.
    */
-  public function testVarDump() {
+  public function testVarDump(): void {
     // Dump some variables.
     $object = (object) [
       'Aldebaran' => 'Betelgeuse',
@@ -639,7 +639,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Test if setting an invalid scheme in SIMPLETEST_BASE_URL throws an exception.
    */
-  public function testSimpleTestBaseUrlValidation() {
+  public function testSimpleTestBaseUrlValidation(): void {
     putenv('SIMPLETEST_BASE_URL=mysql://user:pass@localhost/database');
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage('You must provide valid scheme for the SIMPLETEST_BASE_URL environment variable. Valid schema are: http, https.');
