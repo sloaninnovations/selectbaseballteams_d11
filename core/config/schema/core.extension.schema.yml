@@ -12,7 +12,9 @@ core.extension:
           constraints:
             NotBlank: []
             ExtensionName: []
-            ExtensionExists: module
+            ExtensionExists:
+              type: module
+              mustBeInstalled: false
       sequence:
         type: weight
         label: 'Weight'
