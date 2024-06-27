@@ -33,6 +33,7 @@ class CommandsTest extends KernelTestBase {
    * Regression test: Settings command exists regardless of JS aggregation.
    */
   public function testAttachedSettings(): void {
+    $this->installConfig(['system']);
     $assert = function ($message) {
       $response = new AjaxResponse();
       $response->setAttachments([
@@ -54,10 +55,13 @@ class CommandsTest extends KernelTestBase {
       ];
       $this->assertCommand($response->getCommands(), $expected, $message);
     };
+
+    $config = $this->config('system.performance');
+
+    $config->set('js.preprocess', FALSE)->save();
     $assert('Settings command exists when JS aggregation is disabled.');
 
-    $this->installConfig(['system']);
-    $this->config('system.performance')->set('js.preprocess', TRUE)->save();
+    $config->set('js.preprocess', TRUE)->save();
     $assert('Settings command exists when JS aggregation is enabled.');
   }
 
