@@ -345,7 +345,7 @@ system.file:
       requiredKey: false
       constraints:
         Range:
-          min: 21600
+          min: 0
 
 system.image:
   type: config_object
