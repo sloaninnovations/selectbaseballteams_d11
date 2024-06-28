@@ -11,14 +11,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
  */
 #[Constraint(
   id: 'EntityTypeExists',
-  label: new TranslatableMarkup(
-    'EntityTypeExists',
-    [],
-    ['context' => 'Validation']
-  ),
+  label: new TranslatableMarkup('Entity type exists', [], ['context' => 'Validation']),
   type: FALSE
 )]
 class EntityTypeExistsConstraint extends SymfonyConstraint {
+
+  public string $requiredInterface;
 
   /**
    * The error message if validation fails.
@@ -26,5 +24,19 @@ class EntityTypeExistsConstraint extends SymfonyConstraint {
    * @var string
    */
   public $message = "The '@entity_type_id' entity type does not exist.";
+
+  /**
+   * The error message if validation of interface fails.
+   *
+   * @var string
+   */
+  public $interfaceMissingMessage = 'The @entity_type_id entity type does not implement the @interface interface.';
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultOption(): ?string {
+    return 'requiredInterface';
+  }
 
 }
