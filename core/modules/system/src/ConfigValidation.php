@@ -3,11 +3,11 @@
 namespace Drupal\system;
 
 /**
- * Provides a collection of validation callbacks for testing purposes.
+ * Provides validation methods for configuration values.
  */
 class ConfigValidation {
 
-    /**
+  /**
    * Validates whether a given scheme is valid.
    *
    * @param string $scheme
