@@ -121,6 +121,7 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
         if ($override && method_exists($handler, 'broken') && $handler->broken()) {
           $handler = $this->createInstance($definition['id'], $definition);
         }
+      }
       return $handler;
     }
 
