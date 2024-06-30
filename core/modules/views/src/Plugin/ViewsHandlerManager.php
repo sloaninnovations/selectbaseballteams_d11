@@ -86,36 +86,26 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
     $table = $item['table'];
     $field = $item['field'];
 
-    // If the plugin is passed in as part of the item, use that without
-    // consulting the runtime views data cache.
-    if (isset($item['plugin_id'])) {
-      $plugin_id = $override ?: $definition['id'];
-      $handler = $this->createInstance($plugin_id);
-      return $handler;
-    }
-    else {
-      // @todo: try to remove this code path so that we always get the
-      // configured plugin ID without having to reconsult view data on runtime.
-      $data = $table ? $this->viewsData->get($table) : $this->viewsData->getAll();
+    $data = $table ? $this->viewsData->get($table) : $this->viewsData->getAll();
 
-      if (isset($data[$field][$this->handlerType])) {
-        $definition = $data[$field][$this->handlerType];
-        foreach (['group', 'title', 'title short', 'label', 'help', 'real field', 'real table', 'entity type', 'entity field'] as $key) {
-          if (!isset($definition[$key])) {
-            // First check the field level.
-            if (!empty($data[$field][$key])) {
-              $definition[$key] = $data[$field][$key];
-            }
-            // Then if that doesn't work, check the table level.
-            elseif (!empty($data['table'][$key])) {
-              $definition_key = $key === 'entity type' ? 'entity_type' : $key;
-              $definition[$definition_key] = $data['table'][$key];
-            }
+    if (isset($data[$field][$this->handlerType])) {
+      $definition = $data[$field][$this->handlerType];
+      foreach (['group', 'title', 'title short', 'label', 'help', 'real field', 'real table', 'entity type', 'entity field'] as $key) {
+        if (!isset($definition[$key])) {
+          // First check the field level.
+          if (!empty($data[$field][$key])) {
+            $definition[$key] = $data[$field][$key];
+          }
+          // Then if that doesn't work, check the table level.
+          elseif (!empty($data['table'][$key])) {
+            $definition_key = $key === 'entity type' ? 'entity_type' : $key;
+            $definition[$definition_key] = $data['table'][$key];
           }
         }
 
         // @todo This is crazy. Find a way to remove the override functionality.
         $plugin_id = $override ?: $definition['id'];
+        $plugin_id = isset($item['plugin_id']) ?: $plugin_id;
         // Try to use the overridden handler.
         $handler = $this->createInstance($plugin_id, $definition);
         if ($override && method_exists($handler, 'broken') && $handler->broken()) {
