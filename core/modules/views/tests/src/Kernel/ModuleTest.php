@@ -117,7 +117,7 @@ class ModuleTest extends ViewsKernelTestBase {
     // by views data. Using assertSame() here to make the error more clearly
     // show what the result is when an error is caused.
     $test_view_config = $this->config('views.view.test_view');
-    $item  = $test_view_config->get('display.default.display_options.filter.status');
+    $item = $test_view_config->get('display.default.display_options.filters.status');
     $handler = $this->container->get('plugin.manager.views.filter')->getHandler($item);
     $this->assertSame(BooleanOperator::class, get_class($handler));
   }

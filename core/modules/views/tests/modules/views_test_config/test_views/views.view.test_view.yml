@@ -36,6 +36,18 @@ display:
           relationship: none
           table: views_test_data
           plugin_id: standard
+      filters:
+        status:
+          id: status
+          table: node_field_data
+          field: status
+          entity_type: node
+          entity_field: status
+          plugin_id: boolean
+          value: '1'
+          group: 1
+          expose:
+            operator: ''
       pager:
         options:
           offset: 0
