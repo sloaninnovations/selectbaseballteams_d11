@@ -32,12 +32,6 @@ function views_test_data_views_data() {
 function views_test_data_views_data_alter(array &$data) {
   \Drupal::state()->set('views_hook_test_views_data_alter', TRUE);
   \Drupal::state()->set('views_hook_test_views_data_alter_data', $data);
-
-  // Modify a filter to use a different filter handler plugin
-  // by default so that we can test that the handler used
-  // respects the handler plugin ID specified in the
-  // configuration.
-  $data['node_field_data']['status']['filter']['id'] = 'numeric';
 }
 
 /**

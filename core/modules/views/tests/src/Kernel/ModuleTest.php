@@ -26,14 +26,14 @@ class ModuleTest extends ViewsKernelTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_view_status', 'test_view', 'test_argument'];
+  public static $testViews = ['test_view_status', 'test_view', 'test_argument', 'test_redirect_view'];
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  protected static $modules = ['field', 'user', 'block', 'node', 'views_test_data'];
+  protected static $modules = ['field', 'user', 'block', 'node', 'views_test_data_alter'];
 
   /**
    * Stores the last triggered error.
@@ -116,7 +116,7 @@ class ModuleTest extends ViewsKernelTestBase {
     // Test that the configuration is respected rather than overridden
     // by views data. Using assertSame() here to make the error more clearly
     // show what the result is when an error is caused.
-    $test_view_config = $this->config('views.view.test_view');
+    $test_view_config = $this->config('views.view.test_redirect_view');
     $item = $test_view_config->get('display.default.display_options.filters.status');
     $handler = $this->container->get('plugin.manager.views.filter')->getHandler($item);
     $this->assertSame(BooleanOperator::class, get_class($handler));
