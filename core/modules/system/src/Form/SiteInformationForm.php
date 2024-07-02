@@ -111,7 +111,8 @@ class SiteInformationForm extends ConfigFormBase {
       '#config_target' => new ConfigTarget(
         'system.site',
         'slogan',
-        toConfig: fn(?string $value) => $value ?: NULL
+        static::class . '::transformSloganValue',
+        static::class . '::transformSloganValue',
       ),
       '#description' => $this->t("How this is used depends on your site's theme."),
       '#maxlength' => 255,
@@ -227,6 +228,19 @@ class SiteInformationForm extends ConfigFormBase {
    */
   public static function transformMailValue(?string $value): string {
     return $value ?: ini_get('sendmail_from');
+  }
+
+  /**
+   * Transforms the slogan ensure no empty string values.
+   *
+   * @param string|null $value
+   *   The site slogan value or NULL if no slogan is set.
+   *
+   * @return string|null
+   *   The site slogan string or NULL.
+   */
+  public static function transformSloganValue(?string $value): ?string {
+    return $value ?: NULL;
   }
 
 }
