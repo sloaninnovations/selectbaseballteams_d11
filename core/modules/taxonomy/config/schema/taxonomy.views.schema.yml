@@ -139,7 +139,7 @@ views.filter.taxonomy_index_tid:
       type: sequence
       label: 'Values'
       sequence:
-        type: integer
+        type: string
         label: 'Value'
 
 views.filter.taxonomy_index_tid_depth:

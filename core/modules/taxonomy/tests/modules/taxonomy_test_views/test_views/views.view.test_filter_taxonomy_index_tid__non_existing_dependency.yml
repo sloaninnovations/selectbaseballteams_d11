@@ -134,8 +134,8 @@ display:
           admin_label: ''
           operator: or
           value:
-            - 3
-            - 4
+            - '3'
+            - '4'
           group: 1
           exposed: false
           expose:
