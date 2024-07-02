@@ -215,19 +215,6 @@ class SiteInformationForm extends ConfigFormBase {
   }
 
   /**
-   * Transforms the slogan ensure no empty string values.
-   *
-   * @param string|null $value
-   *   The site slogan value or NULL if no slogan is set.
-   *
-   * @return string|null
-   *   The site slogan string or NULL.
-   */
-  public static function transformSloganValue(?string $value): ?string {
-    return $value ?: NULL;
-  }
-
-  /**
    * Transforms the email value either from what's stored in config or php.ini.
    *
    * @param string|null $value
