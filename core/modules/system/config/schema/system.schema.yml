@@ -72,6 +72,7 @@ system.site:
       label: 'Weight element maximum value'
       constraints:
         Range:
+          # @todo Update this to use PHP constants in https://www.drupal.org/project/drupal/issues/2951046
           # @see PHP_INT_MAX
           max: 2147483647
     default_langcode:
