@@ -426,6 +426,8 @@ function install_begin_request($class_loader, &$install_state) {
   $kernel::bootEnvironment();
   $kernel->setSitePath($site_path);
   $kernel->boot();
+  // Get the new version of the container from the kernel. This is now a
+  // complete container with all services.
   $container = $kernel->getContainer();
   // If Drupal is being installed behind a proxy, configure the request.
   ReverseProxyMiddleware::setSettingsOnRequest($request, Settings::getInstance());
@@ -1935,7 +1937,7 @@ function install_check_translations($langcode, $server_pattern) {
 
   $readable = FALSE;
   $writable = FALSE;
-  // @todo: Make this configurable.
+  // @todo Make this configurable.
   $site_path = \Drupal::getContainer()->getParameter('site.path');
   $files_directory = $site_path . '/files';
   $translations_directory = $site_path . '/files/translations';

@@ -73,6 +73,7 @@ class ManageDisplayTest extends BrowserTestBase {
       'administer node display',
       'administer taxonomy',
       'administer taxonomy_term fields',
+      'administer taxonomy_term form display',
       'administer taxonomy_term display',
       'administer users',
       'administer account settings',
@@ -103,7 +104,7 @@ class ManageDisplayTest extends BrowserTestBase {
   /**
    * Tests switching view modes to use custom or 'default' settings'.
    */
-  public function testViewModeCustom() {
+  public function testViewModeCustom(): void {
     // Create a field, and a node with some data for the field.
     $this->fieldUIAddNewField('admin/structure/types/manage/' . $this->type, 'test', 'Test field');
     \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
@@ -180,7 +181,7 @@ class ManageDisplayTest extends BrowserTestBase {
   /**
    * Tests the local tasks are displayed correctly for view modes.
    */
-  public function testViewModeLocalTasks() {
+  public function testViewModeLocalTasks(): void {
     $manage_display = 'admin/structure/types/manage/' . $this->type . '/display';
     $this->drupalGet($manage_display);
     $this->assertSession()->linkNotExists('Full content');
@@ -194,7 +195,7 @@ class ManageDisplayTest extends BrowserTestBase {
   /**
    * Tests that fields with no explicit display settings do not break.
    */
-  public function testNonInitializedFields() {
+  public function testNonInitializedFields(): void {
     // Create a test field.
     $this->fieldUIAddNewField('admin/structure/types/manage/' . $this->type, 'test', 'Test');
 
@@ -205,9 +206,16 @@ class ManageDisplayTest extends BrowserTestBase {
   }
 
   /**
-   * Tests hiding the view modes fieldset when there's only one available.
+   * Tests view mode management screens.
    */
-  public function testSingleViewMode() {
+  public function testViewModeUi(): void {
+    // Tests table headers on "Manage form" and "Manage display" screens.
+    $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary . '/overview/form-display');
+    $this->assertTableHeaderExistsByLabel('field-display-overview', 'Machine name');
+    $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary . '/overview/display');
+    $this->assertTableHeaderExistsByLabel('field-display-overview', 'Machine name');
+
+    // Tests hiding the view modes fieldset when there's only one available.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary . '/display');
     $this->assertSession()->pageTextNotContains('Use custom display settings for the following view modes');
 
@@ -219,7 +227,7 @@ class ManageDisplayTest extends BrowserTestBase {
   /**
    * Tests that a message is shown when there are no fields.
    */
-  public function testNoFieldsDisplayOverview() {
+  public function testNoFieldsDisplayOverview(): void {
     // Create a fresh content type without any fields.
     NodeType::create([
       'type' => 'no_fields',
@@ -234,7 +242,7 @@ class ManageDisplayTest extends BrowserTestBase {
   /**
    * Tests if display mode local tasks appear in alphabetical order by label.
    */
-  public function testViewModeLocalTasksOrder() {
+  public function testViewModeLocalTasksOrder(): void {
     $manage_display = 'admin/structure/types/manage/' . $this->type . '/display';
 
     // Specify the 'rss' mode, check that the field is displayed the same.
@@ -259,7 +267,7 @@ class ManageDisplayTest extends BrowserTestBase {
   /**
    * Tests if form mode local tasks appear in alphabetical order by label.
    */
-  public function testFormModeLocalTasksOrder() {
+  public function testFormModeLocalTasksOrder(): void {
     EntityFormMode::create([
       'id' => 'node.big',
       'label' => 'Big Form',

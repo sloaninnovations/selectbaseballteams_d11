@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\media\Functional;
+namespace Drupal\Tests\media\Kernel;
 
 use Drupal\media\OEmbed\ProviderException;
 use GuzzleHttp\Psr7\Utils;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Tests the oEmbed provider repository.
@@ -15,14 +14,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
  *
  * @group media
  */
-class ProviderRepositoryTest extends MediaFunctionalTestBase {
-
-  use ProphecyTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
+class ProviderRepositoryTest extends MediaKernelTestBase {
 
   /**
    * Tests that provider discovery fails if the provider database is empty.
@@ -32,7 +24,7 @@ class ProviderRepositoryTest extends MediaFunctionalTestBase {
    *
    * @dataProvider providerEmptyProviderList
    */
-  public function testEmptyProviderList($content) {
+  public function testEmptyProviderList($content): void {
     $response = $this->prophesize('\GuzzleHttp\Psr7\Response');
     $response->getBody()->willReturn(Utils::streamFor($content));
 
@@ -69,7 +61,7 @@ class ProviderRepositoryTest extends MediaFunctionalTestBase {
    *
    * @dataProvider providerNonExistingProviderDatabase
    */
-  public function testNonExistingProviderDatabase($providers_url, $exception_message) {
+  public function testNonExistingProviderDatabase($providers_url, $exception_message): void {
     $this->config('media.settings')
       ->set('oembed_providers_url', $providers_url)
       ->save();

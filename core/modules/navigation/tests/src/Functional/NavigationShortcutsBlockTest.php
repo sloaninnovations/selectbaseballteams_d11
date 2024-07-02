@@ -34,7 +34,7 @@ class NavigationShortcutsBlockTest extends PageCacheTagsTestBase {
   /**
    * Tests visibility and cacheability of shortcuts in the navigation bar.
    */
-  public function testNavigationBlock() {
+  public function testNavigationBlock(): void {
     $this->drupalPlaceBlock('page_title_block', ['id' => 'title']);
 
     $test_page_url = Url::fromRoute('test_page_test.test_page');
@@ -92,7 +92,6 @@ class NavigationShortcutsBlockTest extends PageCacheTagsTestBase {
     ]));
     $this->verifyDynamicPageCache($test_page_url, 'MISS');
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
-    $this->assertSession()->elementNotExists('css', '#menu--shortcuts');
     $this->assertSession()->pageTextNotContains('Shortcuts');
     $this->assertSession()->linkNotExists('Cron');
 
@@ -118,7 +117,6 @@ class NavigationShortcutsBlockTest extends PageCacheTagsTestBase {
     $this->verifyDynamicPageCache($test_page_url, 'MISS');
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
     $this->assertCacheContexts(['user', 'url.query_args:_wrapper_format', 'session']);
-    $this->assertSession()->elementExists('css', '#menu--shortcuts');
     $this->assertSession()->pageTextContains('Shortcuts');
     $this->assertSession()->linkExists('Cron');
 

@@ -30,7 +30,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests that `<drupal-media>` is converted into a block element.
    */
-  public function testConversion() {
+  public function testConversion(): void {
     // Wrap the `<drupal-media>` markup in a `<p>`.
     $original_value = $this->host->body->value;
     $this->host->body->value = '<p>foo' . $original_value . '</p>';
@@ -50,7 +50,7 @@ class MediaTest extends MediaTestBase {
    *
    * @see \Drupal\Tests\media\Kernel\MediaEmbedFilterTest::testOnlyDrupalMediaTagProcessed()
    */
-  public function testOnlyDrupalMediaTagProcessed() {
+  public function testOnlyDrupalMediaTagProcessed(): void {
     $original_value = $this->host->body->value;
     $this->host->body->value = str_replace('drupal-media', 'p', $original_value);
     $this->host->save();
@@ -75,7 +75,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests adding media to a list does not split the list.
    */
-  public function testMediaSplitList() {
+  public function testMediaSplitList(): void {
     $assert_session = $this->assertSession();
 
     $editor = Editor::load('test_format');
@@ -136,7 +136,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests that arbitrary attributes are allowed via GHS.
    */
-  public function testMediaArbitraryHtml() {
+  public function testMediaArbitraryHtml(): void {
     $assert_session = $this->assertSession();
 
     $editor = Editor::load('test_format');
@@ -193,7 +193,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests caption editing in the CKEditor widget.
    */
-  public function testEditableCaption() {
+  public function testEditableCaption(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
     // Test that setting caption to blank string doesn't break 'Edit media'
@@ -362,7 +362,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests the CKEditor 5 media plugin can override image media's alt attribute.
    */
-  public function testAlt() {
+  public function testAlt(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
     $this->drupalGet($this->host->toUrl('edit-form'));
@@ -383,7 +383,7 @@ class MediaTest extends MediaTestBase {
     $this->getBalloonButton('Override media image alternative text')->click();
     $this->assertVisibleBalloon('.ck-media-alternative-text-form');
     // Assert that the default alt text is visible in the UI.
-    $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form__default-alt-text-value', 'default alt');
+    $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form .ck-labeled-field-view__status', 'Leave blank to use the default alternative text: "default alt".');
     // Assert that the value is currently empty.
     $alt_override_input = $page->find('css', '.ck-balloon-panel .ck-media-alternative-text-form input[type=text]');
     $this->assertSame('', $alt_override_input->getValue());
@@ -413,7 +413,7 @@ class MediaTest extends MediaTestBase {
     $alt_override_input = $page->find('css', '.ck-balloon-panel .ck-media-alternative-text-form input[type=text]');
     $this->assertSame($who_is_zartan, $alt_override_input->getValue());
     // Assert that the default alt text is still visible in the UI.
-    $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form__default-alt-text-value', 'default alt');
+    $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form .ck-labeled-field-view__status', 'Leave blank to use the default alternative text: "default alt".');
 
     // Test the process again with a different alt text to make sure it works
     // the second time around.
@@ -456,6 +456,9 @@ class MediaTest extends MediaTestBase {
     // media item.
     $this->getBalloonButton('Override media image alternative text')->click();
     $this->assertVisibleBalloon('.ck-media-alternative-text-form');
+    // The 'decorative image' toggle is enabled because the alt was set to `""`.
+    // Set the toggle to "off" to override the alt text value.
+    $page->pressButton('Decorative image');
     $alt_override_input = $page->find('css', '.ck-balloon-panel .ck-media-alternative-text-form input[type=text]');
     $alt_override_input->setValue('');
     $this->getBalloonButton('Save')->click();
@@ -469,7 +472,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests the CKEditor 5 media plugin loads the translated alt attribute.
    */
-  public function testTranslationAlt() {
+  public function testTranslationAlt(): void {
     \Drupal::service('module_installer')->install(['language', 'content_translation']);
     $this->resetAll();
     ConfigurableLanguage::createFromLangcode('fr')->save();
@@ -545,7 +548,7 @@ class MediaTest extends MediaTestBase {
     // Assert that the default alt on the UI is the default alt text from the
     // media entity.
     // cSpell:disable-next-line
-    $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form__default-alt-text-value', 'texte alternatif par dÃ©faut');
+    $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form .ck-labeled-field-view__status', 'Leave blank to use the default alternative text: "texte alternatif par dÃ©faut".');
 
     // Fill in the alt field in the balloon form.
     // cSpell:disable-next-line
@@ -569,7 +572,7 @@ class MediaTest extends MediaTestBase {
    * the media style toolbar allows altering the alignment and that the changes
    * are reflected on the widget and downcast drupal-media tag.
    */
-  public function testAlignment() {
+  public function testAlignment(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->drupalGet($this->host->toUrl('edit-form'));
@@ -620,7 +623,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Ensures that Drupal Media Styles can be displayed in a dropdown.
    */
-  public function testDrupalMediaStyleInDropdown() {
+  public function testDrupalMediaStyleInDropdown(): void {
     \Drupal::service('module_installer')->install(['ckeditor5_drupalelementstyle_test']);
     $this->resetAll();
 
@@ -657,7 +660,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests Drupal Media Style with a CSS class.
    */
-  public function testDrupalMediaStyleWithClass() {
+  public function testDrupalMediaStyleWithClass(): void {
     $editor = Editor::load('test_format');
     $editor->setSettings([
       'toolbar' => [
@@ -744,7 +747,7 @@ class MediaTest extends MediaTestBase {
    *
    * @dataProvider providerTestViewMode
    */
-  public function testViewMode(bool $with_alignment) {
+  public function testViewMode(bool $with_alignment): void {
     EntityViewMode::create([
       'id' => 'media.view_mode_3',
       'targetEntityType' => 'media',

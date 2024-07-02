@@ -930,7 +930,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests GETting an individual resource, plus edge cases to ensure good DX.
    */
-  public function testGetIndividual() {
+  public function testGetIndividual(): void {
     // The URL and Guzzle request options that will be used in this test. The
     // request options will be modified/expanded throughout this test:
     // - to first test all mistakes a developer might make, and assert that the
@@ -1088,7 +1088,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests GETting a collection of resources.
    */
-  public function testCollection() {
+  public function testCollection(): void {
     $entity_collection = $this->getData();
     assert(count($entity_collection) > 1, 'A collection must have more that one entity in it.');
 
@@ -1318,7 +1318,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * single expected ResourceResponse. This is repeated for every relationship
    * field of the resource type under test.
    */
-  public function testRelated() {
+  public function testRelated(): void {
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
@@ -1337,7 +1337,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * targeted resource and the target resource IDs. These type+ID combos are
    * referred to as "resource identifiers."
    */
-  public function testRelationships() {
+  public function testRelationships(): void {
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('Configuration entities cannot have relationships.');
     }
@@ -1984,7 +1984,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests POSTing an individual resource, plus edge cases to ensure good DX.
    */
-  public function testPostIndividual() {
+  public function testPostIndividual(): void {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('POSTing config entities is not yet supported.');
@@ -2199,7 +2199,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests PATCHing an individual resource, plus edge cases to ensure good DX.
    */
-  public function testPatchIndividual() {
+  public function testPatchIndividual(): void {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('PATCHing config entities is not yet supported.');
@@ -2527,7 +2527,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests DELETEing an individual resource, plus edge cases to ensure good DX.
    */
-  public function testDeleteIndividual() {
+  public function testDeleteIndividual(): void {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('DELETEing config entities is not yet supported.');
@@ -2804,7 +2804,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests individual and collection revisions.
    */
-  public function testRevisions() {
+  public function testRevisions(): void {
     if (!$this->entity->getEntityType()->isRevisionable() || !$this->entity instanceof FieldableEntityInterface) {
       return;
     }
@@ -3035,7 +3035,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $actual_response = $this->request('GET', $rel_working_copy_collection_url, $request_options);
     $expected_collection_document['links']['self']['href'] = $rel_working_copy_collection_url->toString();
     $this->assertResourceResponse(200, $expected_collection_document, $actual_response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, 'MISS');
-    // @todo: remove the next assertion when Drupal core supports entity query access control on revisions.
+    // @todo Remove the next assertion when Drupal core supports entity query access control on revisions.
     $rel_working_copy_collection_url_filtered = clone $rel_working_copy_collection_url;
     $rel_working_copy_collection_url_filtered->setOption('query', ['filter[foo]' => 'bar'] + $rel_working_copy_collection_url->getOption('query'));
     $actual_response = $this->request('GET', $rel_working_copy_collection_url_filtered, $request_options);
@@ -3206,7 +3206,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertResourceResponse(403, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts());
       // Request the related route.
       $actual_response = $this->request('GET', $related_url, $request_options);
-      // @todo: refactor self::getExpectedRelatedResponses() into a function which returns a single response.
+      // @todo Refactor self::getExpectedRelatedResponses() into a function which returns a single response.
       $expected_response = $this->getExpectedRelatedResponses(['field_jsonapi_test_entity_ref'], $request_options, $revision)['field_jsonapi_test_entity_ref'];
       $expected_document = $expected_response->getResponseData();
       $expected_cacheability = $expected_response->getCacheableMetadata();

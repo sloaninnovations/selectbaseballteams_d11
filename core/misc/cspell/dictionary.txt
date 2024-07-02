@@ -20,11 +20,7 @@ arrowstop
 arrowthick
 arrowthickstop
 assertable
-autocompletefocus
-autocompleteselect
-autocompleting
 autoconfiguration
-autoconfigure
 autoconfigured
 autocreate
 autocreated
@@ -43,9 +39,6 @@ autoplace
 autoplay
 autoreply
 autosubmit
-autowire
-autowired
-autowiring
 backlink
 backlinks
 bakeware
@@ -73,11 +66,9 @@ blockbasic
 blockcontent
 blockfooter
 blocknodebundle
-blockpromoted
 blockquotes
 blockrecipe
 blockrelated
-blocktest
 bodyless
 boing
 bovigo
@@ -253,11 +244,9 @@ fdiv
 fieldable
 fieldapi
 fieldblock
-fieldbody
 fieldgroup
 fieldgroups
 fieldlayout
-fieldlinks
 fieldnames
 fieldsets
 filemime
@@ -298,11 +287,9 @@ hexcode
 hilited
 hmac
 hookname
-hosters
 hrefs
 htmlcorrector
 httpheader
-httplug
 httponly
 hwldf
 icann
@@ -332,7 +319,6 @@ jsonlint
 jssdk
 justinrainbow
 kangarookitten
-kernighan
 keyevent
 keypresses
 keyvalue
@@ -376,7 +362,6 @@ maximumred
 maxlifetime
 maynot
 mbytes
-mdhash
 mediaimagetextalternative
 mediaimagetextalternativeediting
 mediaimagetextalternativeui
@@ -492,7 +477,6 @@ persistable
 phpass
 phpcbf
 phpcodesniffer
-phpcs
 phpdocumentor
 phpserialize
 phpspec
@@ -587,7 +571,6 @@ revisioning
 revlog
 revpub
 ribisi
-ritchie
 rowspans
 rsyslog
 rtsp
@@ -617,9 +600,9 @@ sitename
 sitewide
 skiptags
 slatkin
-slevomat
 smacss
 smalldatetime
+smtps
 somecompany
 sortablejs
 specialchars
@@ -699,17 +682,10 @@ tappable
 taskless
 tcomment
 templating
-testajax
-testblock
-testbody
 testbot
 testbots
 testcase
-testcontent
-testcontextawareblock
-testdialog
 testgroups
-testkey
 testlogger
 testsuite
 testsuites
@@ -750,7 +726,6 @@ twistie
 twocol
 tzid
 uids
-ulwa
 unban
 uncacheable
 uncategorized
@@ -796,7 +771,6 @@ vfsstream
 viewports
 vocabs
 wcag
-wcprops
 webassert
 webcal
 webflo
