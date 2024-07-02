@@ -72,7 +72,8 @@ system.site:
       label: 'Weight element maximum value'
       constraints:
         Range:
-          max: !php/const:PHP_INT_MAX
+          # @see PHP_INT_MAX
+          max: 2147483647
     default_langcode:
       type: langcode
       label: 'Site default language code'
