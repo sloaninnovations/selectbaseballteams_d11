@@ -102,6 +102,7 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
             $definition[$definition_key] = $data['table'][$key];
           }
         }
+      }
 
       // First priority is to use the override.
       // @todo This is crazy. Find a way to remove the override functionality.
