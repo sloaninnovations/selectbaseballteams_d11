@@ -41,5 +41,3 @@ services:
 
   navigation.event_subscriber:
     class: Drupal\navigation\EventSubscriber\NavigationMenuLinkTreeSubscriber
-    tags:
-      - { name: event_subscriber }
