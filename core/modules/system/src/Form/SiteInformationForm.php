@@ -111,7 +111,7 @@ class SiteInformationForm extends ConfigFormBase {
       '#config_target' => new ConfigTarget(
         'system.site',
         'slogan',
-        toConfig: fn(?string $value) => $value ?: NULL),
+        toConfig: fn(?string $value) => $value ?: NULL
       ),
       '#description' => $this->t("How this is used depends on your site's theme."),
       '#maxlength' => 255,
