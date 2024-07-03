@@ -140,13 +140,13 @@ class ContactFormEditForm extends EntityForm implements ContainerInjectionInterf
     // cannot be empty strings. So, if they're empty, remove them from the
     // submitted values so they aren't copied to the entity.
     if ($form_state->hasValue('reply') && trim($form_state->getValue('reply')) === '') {
-      $form_state->unsetValue('reply');
+      $form_state->setValue('reply', NULL);
     }
     if ($form_state->hasValue('redirect') && trim($form_state->getValue('redirect')) === '') {
-      $form_state->unsetValue('redirect');
+      $form_state->setValue('redirect', NULL);
     }
     if ($form_state->hasValue('message') && trim($form_state->getValue('message')) === '') {
-      $form_state->unsetValue('message');
+      $form_state->setValue('message', NULL);
     }
     parent::copyFormValuesToEntity($entity, $form, $form_state);
   }
