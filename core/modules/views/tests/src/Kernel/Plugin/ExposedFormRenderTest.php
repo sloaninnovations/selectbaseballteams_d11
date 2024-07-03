@@ -12,7 +12,6 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\ExposedFormCache;
 use Drupal\views\Form\ViewsExposedForm;
 use Drupal\views\Views;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests the exposed form.
