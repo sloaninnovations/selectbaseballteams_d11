@@ -564,3 +564,10 @@ form_test.incorrect_config_target:
     _admin_route: TRUE
   requirements:
     _access: 'TRUE'
+
+form_test.button_attribute:
+  path: '/form-test/button-form-attribute'
+  defaults:
+    _controller: '\Drupal\form_test\Controller\FormTestController::buttonWithFormAttribute'
+  requirements:
+    _access: 'TRUE'
