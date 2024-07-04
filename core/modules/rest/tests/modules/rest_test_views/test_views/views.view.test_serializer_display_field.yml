@@ -3,14 +3,14 @@ status: true
 dependencies:
   module:
     - rest
-    - user
+    - node
 id: test_serializer_display_field
 label: 'Test serializer display field rows'
 module: rest
 description: ''
 tag: ''
-base_table: views_test_data
-base_field: id
+base_table: node_field_data
+base_field: nid
 display:
   default:
     display_plugin: default
@@ -33,42 +33,67 @@ display:
       row:
         type: data_field
       fields:
-        name:
-          id: name
-          table: views_test_data
-          field: name
+        title:
+          id: title
+          table: node_field_data
+          field: title
+          entity_type: node
+          entity_field: title
           label: ''
-          plugin_id: string
-        nothing:
-          id: nothing
-          table: views
-          field: nothing
+          alter:
+            alter_text: false
+            make_link: false
+            absolute: false
+            trim: false
+            word_boundary: false
+            ellipsis: false
+            strip_tags: false
+            html: false
+          hide_empty: false
+          empty_zero: false
+          plugin_id: field
           relationship: none
           group_type: group
           admin_label: ''
-          label: 'Custom text'
           exclude: false
-          alter:
-            alter_text: true
-            text: TEST
-          plugin_id: custom
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_alter_empty: true
         created:
-          id: created
-          table: views_test_data
           field: created
+          id: created
+          table: node_field_data
+          plugin_id: field
           type: timestamp
           settings:
             date_format: medium
             custom_date_format: ''
             timezone: ''
-          plugin_id: field
+          entity_type: node
+          entity_field: created
       sorts:
         created:
           id: created
-          table: views_test_data
+          table: node_field_data
           field: created
           order: DESC
+          entity_type: node
+          entity_field: created
           plugin_id: date
+          relationship: none
+          group_type: group
+          admin_label: ''
+          exposed: false
+          expose:
+            label: ''
+          granularity: second
       title: 'Test serialize'
       arguments: {  }
   rest_export_1:
