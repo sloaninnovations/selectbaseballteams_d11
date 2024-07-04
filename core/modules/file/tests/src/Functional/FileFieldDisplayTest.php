@@ -6,6 +6,7 @@ namespace Drupal\Tests\file\Functional;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\file\Entity\File;
+use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 
@@ -266,7 +267,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $display_options = [
       'type' => 'file_url_plain',
       'settings' => [
-        'absolute_url' => TRUE,
+        'show_link_as' => FileFormatterBase::ABSOLUTE_URL,
       ],
     ];
     $display = \Drupal::service('entity_display.repository')
@@ -289,7 +290,7 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $display_options = [
       'type' => 'file_url_plain',
       'settings' => [
-        'absolute_url' => FALSE,
+        'show_link_as' => FileFormatterBase::RELATIVE_URL,
       ],
     ];
     $display = \Drupal::service('entity_display.repository')
