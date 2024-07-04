@@ -43,7 +43,11 @@ abstract class FileTestBase extends KernelTestBase {
     // file_default_scheme(). As we are creating the configuration here remove
     // the global override.
     unset($GLOBALS['config']['system.file']);
-    \Drupal::configFactory()->getEditable('system.file')->set('default_scheme', 'public')->save();
+    \Drupal::configFactory()->getEditable('system.file')
+      ->set('default_scheme', 'public')
+      ->set('allow_insecure_uploads', TRUE)
+      ->set('temporary_maximum_age', 21600)
+      ->save();
   }
 
   /**
