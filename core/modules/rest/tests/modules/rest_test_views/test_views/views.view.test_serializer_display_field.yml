@@ -56,6 +56,9 @@ display:
           group_type: group
           admin_label: ''
           exclude: false
+          type: string
+          settings:
+            link_to_entity: false
           element_type: ''
           element_class: ''
           element_label_type: ''
@@ -73,9 +76,12 @@ display:
           plugin_id: field
           type: timestamp
           settings:
-            date_format: medium
-            custom_date_format: ''
+            date_format: custom
+            custom_date_format: U
             timezone: ''
+          alter:
+            strip_tags: true
+            trim_whitespace: true
           entity_type: node
           entity_field: created
       sorts:

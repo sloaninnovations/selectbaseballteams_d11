@@ -8,6 +8,7 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\node\Entity\Node;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Entity\View;
@@ -44,6 +45,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     'field',
     'language',
     'basic_auth',
+    'node',
   ];
 
   /**
@@ -85,7 +87,11 @@ class StyleSerializerEntityTest extends ViewTestBase {
 
     // Save some entity_test entities.
     for ($i = 1; $i <= 10; $i++) {
-      EntityTest::create(['name' => 'test_' . $i, 'user_id' => $this->adminUser->id()])->save();
+      Node::create([
+        'title' => 'test_' . $i,
+        'uid' => $this->adminUser->id(),
+        'type' => 'article',
+      ])->save();
     }
 
     $this->enableViewsTestModule();
@@ -104,7 +110,14 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $actual_json = $this->drupalGet('test/serialize/field', ['query' => ['_format' => 'json']]);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertCacheTags($view->getCacheTags());
-    $this->assertCacheContexts(['languages:language_interface', 'theme', 'request_format']);
+    $this->assertCacheContexts([
+      'languages:language_content',
+      'languages:language_interface',
+      'request_format',
+      'theme',
+      'user.node_grants:view',
+      'user.permissions',
+    ]);
     // @todo Due to https://www.drupal.org/node/2352009 we can't yet test the
     // propagation of cache max-age.
 
@@ -154,13 +167,18 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSame($expected, $actual_json, 'The expected JSON output was found.');
     $expected_cache_tags = $view->getCacheTags();
-    $expected_cache_tags[] = 'entity_test_list';
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     foreach ($entities as $entity) {
       $expected_cache_tags = Cache::mergeTags($expected_cache_tags, $entity->getCacheTags());
     }
     $this->assertCacheTags($expected_cache_tags);
-    $this->assertCacheContexts(['languages:language_interface', 'theme', 'entity_test_view_grants', 'request_format']);
+    $this->assertCacheContexts([
+      'languages:language_interface',
+      'theme',
+      'request_format',
+      'user.node_grants:view',
+      'user.permissions',
+    ]);
 
     // Change the format to xml.
     $view->setDisplay('rest_export_1');
@@ -177,7 +195,13 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $expected = $serializer->serialize($entities, 'xml');
     $actual_xml = $this->drupalGet('test/serialize/entity', ['query' => ['_format' => 'xml']]);
     $this->assertSame(trim($expected), $actual_xml);
-    $this->assertCacheContexts(['languages:language_interface', 'theme', 'entity_test_view_grants', 'request_format']);
+    $this->assertCacheContexts([
+      'languages:language_interface',
+      'theme',
+      'request_format',
+      'user.node_grants:view',
+      'user.permissions',
+    ]);
 
     // Allow multiple formats.
     $view->setDisplay('rest_export_1');
@@ -239,23 +263,24 @@ class StyleSerializerEntityTest extends ViewTestBase {
 
     $cache_tags = [
       'config:views.view.test_serializer_display_entity',
-      'entity_test:1',
-      'entity_test:10',
-      'entity_test:2',
-      'entity_test:3',
-      'entity_test:4',
-      'entity_test:5',
-      'entity_test:6',
-      'entity_test:7',
-      'entity_test:8',
-      'entity_test:9',
-      'entity_test_list',
+      'node:1',
+      'node:10',
+      'node:2',
+      'node:3',
+      'node:4',
+      'node:5',
+      'node:6',
+      'node:7',
+      'node:8',
+      'node:9',
+      'node_list',
     ];
     $cache_contexts = [
-      'entity_test_view_grants',
       'languages:language_interface',
-      'theme',
       'request_format',
+      'theme',
+      'user.node_grants:view',
+      'user.permissions',
     ];
 
     $this->assertFalse($render_cache->get($original));
@@ -289,7 +314,11 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $this->assertNotEmpty($render_cache->get($original));
 
     // Create a new entity and ensure that the cache tags are taken over.
-    EntityTest::create(['name' => 'test_11', 'user_id' => $this->adminUser->id()])->save();
+    Node::create([
+      'title' => 'test_11',
+      'uid' => $this->adminUser->id(),
+      'type' => 'article',
+    ])->save();
     $result3 = Json::decode($this->drupalGet('test/serialize/entity', ['query' => ['_format' => 'json']]));
     $this->addRequestWithFormat('json');
     $this->assertSession()->responseHeaderEquals('content-type', 'application/json');
@@ -297,8 +326,8 @@ class StyleSerializerEntityTest extends ViewTestBase {
 
     // Add the new entity cache tag and remove the first one, because we just
     // show 10 items in total.
-    $cache_tags[] = 'entity_test:11';
-    unset($cache_tags[array_search('entity_test:1', $cache_tags)]);
+    $cache_tags[] = 'node:11';
+    unset($cache_tags[array_search('node:1', $cache_tags)]);
 
     $this->assertCacheContexts($cache_contexts);
     $this->assertCacheTags($cache_tags);
@@ -394,7 +423,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     // Test an empty string for an alias, this should not be used. This also
     // tests that the form can be submitted with no aliases.
     $this->drupalGet($row_options);
-    $this->submitForm(['row_options[field_options][name][alias]' => ''], 'Apply');
+    $this->submitForm(['row_options[field_options][title][alias]' => ''], 'Apply');
     $this->submitForm([], 'Save');
 
     $view = Views::getView('test_serializer_display_field');
@@ -414,21 +443,20 @@ class StyleSerializerEntityTest extends ViewTestBase {
 
     // Test a random aliases for fields, they should be replaced.
     $alias_map = [
-      'name' => $this->randomMachineName(),
       // Use # to produce an invalid character for the validation.
-      'nothing' => '#' . $this->randomMachineName(),
+      'title' => '#' . $this->randomMachineName(),
       'created' => 'created',
     ];
 
-    $edit = ['row_options[field_options][name][alias]' => $alias_map['name'], 'row_options[field_options][nothing][alias]' => $alias_map['nothing']];
+    $edit = ['row_options[field_options][title][alias]' => $alias_map['title']];
     $this->drupalGet($row_options);
     $this->submitForm($edit, 'Apply');
     $this->assertSession()->pageTextContains('The machine-readable name must contain only letters, numbers, dashes and underscores.');
 
     // Change the map alias value to a valid one.
-    $alias_map['nothing'] = $this->randomMachineName();
+    $alias_map['title'] = $this->randomMachineName();
 
-    $edit = ['row_options[field_options][name][alias]' => $alias_map['name'], 'row_options[field_options][nothing][alias]' => $alias_map['nothing']];
+    $edit = ['row_options[field_options][title][alias]' => $alias_map['title']];
     $this->drupalGet($row_options);
     $this->submitForm($edit, 'Apply');
 
@@ -465,7 +493,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     // tests that the form can be submitted with no aliases.
     $values = [
       'row_options[field_options][created][raw_output]' => '1',
-      'row_options[field_options][name][raw_output]' => '1',
+      'row_options[field_options][title][raw_output]' => '1',
     ];
     $this->drupalGet($row_options);
     $this->submitForm($values, 'Apply');
@@ -475,34 +503,34 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $view->setDisplay('rest_export_1');
     $this->executeView($view);
 
-    $storage = $this->container->get('entity_type.manager')->getStorage('entity_test');
+    $storage = $this->container->get('entity_type.manager')->getStorage('node');
 
     // Update the name for each to include a script tag.
-    foreach ($storage->loadMultiple() as $entity_test) {
-      $name = $entity_test->name->value;
-      $entity_test->set('name', "<script>$name</script>");
-      $entity_test->save();
+    foreach ($storage->loadMultiple() as $node) {
+      $name = $node->label();
+      $node->set('title', "<script>$name</script>");
+      $node->save();
     }
 
     // Just test the raw 'created' value against each row.
     foreach (Json::decode($this->drupalGet('test/serialize/field', ['query' => ['_format' => 'json']])) as $index => $values) {
-      $this->assertSame($view->result[$index]->views_test_data_created, $values['created'], 'Expected raw created value found.');
-      $this->assertSame($view->result[$index]->views_test_data_name, $values['name'], 'Expected raw name value found.');
+      $this->assertSame($view->result[$index]->_entity->getCreatedTime(), $values['created'], 'Expected raw created value found.');
+      $this->assertSame($view->result[$index]->_entity->label(), strip_tags($values['title']), 'Expected raw name value found.');
     }
 
     // Test result with an excluded field.
     $view->setDisplay('rest_export_1');
     $view->displayHandlers->get('rest_export_1')->overrideOption('fields', [
-      'name' => [
-        'id' => 'name',
-        'table' => 'views_test_data',
-        'field' => 'name',
+      'title' => [
+        'id' => 'title',
+        'table' => 'node_field_date',
+        'field' => 'title',
         'relationship' => 'none',
       ],
       'created' => [
         'id' => 'created',
         'exclude' => TRUE,
-        'table' => 'views_test_data',
+        'table' => 'node_field_date',
         'field' => 'created',
         'relationship' => 'none',
       ],
