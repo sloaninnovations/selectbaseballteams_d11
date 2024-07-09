@@ -14,6 +14,7 @@ use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory;
@@ -1218,5 +1219,23 @@ function system_archiver_info_alter(&$info) {
   if (!class_exists(\ZipArchive::class)) {
     // PHP Zip extension is missing.
     unset($info['Zip']);
+  }
+}
+
+/**
+ * Implements hook_entity_view_mode_presave().
+ *
+ * Transforms empty description into null.
+ *
+ * @deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. Use NULL
+ *  instead.
+ *
+ * @see https://www.drupal.org/node/3452614
+ * @see system_post_update_convert_empty_string_entity_view_modes_to_null()
+ */
+function system_entity_view_mode_presave(EntityInterface $entity): void {
+  if ($entity->get('description') !== NULL && trim($entity->get('description')) === '') {
+    @trigger_error("Setting description to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3452614", E_USER_DEPRECATED);
+    $entity->set('description', NULL);
   }
 }
