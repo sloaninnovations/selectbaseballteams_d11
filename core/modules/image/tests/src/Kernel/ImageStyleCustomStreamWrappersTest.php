@@ -50,7 +50,7 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
     $this->fileSystem = $this->container->get('file_system');
     $this->config('system.file')
       ->set('default_scheme', 'public')
-      ->set('allow_insecure_uploads', TRUE)
+      ->set('allow_insecure_uploads', FALSE)
       ->set('temporary_maximum_age', 21600)
       ->save();
     $this->imageStyle = ImageStyle::create([

@@ -45,7 +45,7 @@ abstract class FileTestBase extends KernelTestBase {
     unset($GLOBALS['config']['system.file']);
     \Drupal::configFactory()->getEditable('system.file')
       ->set('default_scheme', 'public')
-      ->set('allow_insecure_uploads', TRUE)
+      ->set('allow_insecure_uploads', FALSE)
       ->set('temporary_maximum_age', 21600)
       ->save();
   }
