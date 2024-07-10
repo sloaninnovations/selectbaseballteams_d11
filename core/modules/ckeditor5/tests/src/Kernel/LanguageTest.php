@@ -44,6 +44,8 @@ class LanguageTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->container->get('theme_installer')->install(['stark']);
+    $this->installConfig(['system']);
     $this->ckeditor5 = $this->container->get('plugin.manager.editor')->createInstance('ckeditor5');
 
     FilterFormat::create(

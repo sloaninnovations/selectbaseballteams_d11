@@ -27,6 +27,7 @@ class EmailActionTest extends KernelTestBase {
     parent::setUp();
     $this->installEntitySchema('user');
     $this->installSchema('dblog', ['watchdog']);
+    $this->installConfig(['system']);
   }
 
   /**

@@ -82,7 +82,7 @@ class UserMailNotifyTest extends EntityKernelTestBase {
    * @dataProvider userMailsProvider
    */
   public function testUserMailsSent($op, array $mail_keys): void {
-    $this->installConfig('user');
+    $this->installConfig(['user', 'system']);
     $this->config('system.site')->set('mail', 'test@example.com')->save();
     $this->config('user.settings')->set('notify.' . $op, TRUE)->save();
     $return = _user_mail_notify($op, $this->createUser());
@@ -114,7 +114,7 @@ class UserMailNotifyTest extends EntityKernelTestBase {
    * Tests recovery email content and token langcode is aligned.
    */
   public function testUserRecoveryMailLanguage(): void {
-
+    $this->installConfig(['system']);
     // Install locale schema.
     $this->installSchema('locale', [
       'locales_source',

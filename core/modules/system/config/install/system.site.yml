@@ -1,11 +1,11 @@
 langcode: en
-uuid: ''
-name: ''
-mail: ''
-slogan: ''
+uuid: null
+name: null
+mail: null
+slogan: null
 page:
-  403: ''
-  404: ''
+  403: null
+  404: null
   front: /user/login
 admin_compact_mode: false
 weight_select_max: 100

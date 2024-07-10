@@ -21,6 +21,7 @@ class ConfigModuleOverridesTest extends KernelTestBase {
   protected static $modules = ['system', 'config', 'config_override_test'];
 
   public function testSimpleModuleOverrides(): void {
+    $this->installConfig(['system']);
     $GLOBALS['config_test_run_module_overrides'] = TRUE;
     $name = 'system.site';
     $overridden_name = 'Wow overridden site name';

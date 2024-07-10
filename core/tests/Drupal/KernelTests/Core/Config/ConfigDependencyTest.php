@@ -30,6 +30,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
    */
   public function testNonEntity(): void {
     $this->installConfig(['system']);
+    \Drupal::configFactory()->getEditable('system.site')->set('uuid', \Drupal::service('uuid')->generate())->save();
     $config_manager = \Drupal::service('config.manager');
     $dependents = $config_manager->findConfigEntityDependencies('module', ['system']);
     $this->assertTrue(isset($dependents['system.site']), 'Simple configuration system.site has a UUID key even though it is not a configuration entity and therefore is found when looking for dependencies of the System module.');

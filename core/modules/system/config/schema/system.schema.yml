@@ -3,22 +3,37 @@
 system.site:
   type: config_object
   label: 'Site information'
+  constraints:
+    FullyValidatable: ~
   mapping:
     uuid:
       type: uuid
       label: 'Site UUID'
+      nullable: true
       constraints:
-        Uuid: []
-        NotNull: []
+        NotBlank:
+          allowNull: true
     name:
       type: label
       label: 'Site name'
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     mail:
       type: email
       label: 'Email address'
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     slogan:
       type: label
       label: 'Slogan'
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     page:
       type: mapping
       label: 'Pages'
@@ -26,24 +41,47 @@ system.site:
         403:
           type: path
           label: 'Default 403 (access denied) page'
+          nullable: true
+          constraints:
+            Regex:
+              # @see \Drupal\system\Form\SiteInformationForm::validateForm()
+              pattern: '/^\//'
+              message: "The path %value has to start with a slash."
         404:
           type: path
           label: 'Default 404 (not found) page'
+          nullable: true
+          constraints:
+            Regex:
+              # @see \Drupal\system\Form\SiteInformationForm::validateForm()
+              pattern: '/^\//'
+              message: "The path %value has to start with a slash."
         front:
           type: path
           label: 'Default front page'
+          constraints:
+            Regex:
+              # @see \Drupal\system\Form\SiteInformationForm::validateForm()
+              pattern: '/^\//'
+              message: "The path %value has to start with a slash."
     admin_compact_mode:
       type: boolean
       label: 'Compact mode'
     weight_select_max:
       type: integer
       label: 'Weight element maximum value'
+      constraints:
+        Range:
+          # @todo Update this to use PHP constants in https://www.drupal.org/project/drupal/issues/2951046
+          # @see PHP_INT_MAX
+          max: 2147483647
     default_langcode:
       type: langcode
       label: 'Site default language code'
     mail_notification:
-      type: string
+      type: email
       label: 'Notification email address'
+      nullable: true
 
 system.maintenance:
   type: config_object

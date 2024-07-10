@@ -61,7 +61,7 @@ class TransformedConfigExportImportUITest extends BrowserTestBase {
 
     // Add a slogan.
     $originalSlogan = $this->config('system.site')->get('slogan');
-    $this->assertEmpty($originalSlogan);
+    $this->assertNull($originalSlogan);
     $newSlogan = $this->randomMachineName(16);
     $this->assertNotEquals($originalSlogan, $newSlogan);
     $this->config('system.site')
@@ -71,7 +71,7 @@ class TransformedConfigExportImportUITest extends BrowserTestBase {
 
     // Tests changes of system.site.
     $this->drupalGet('admin/config/development/configuration/sync/diff/system.site');
-    $this->assertSession()->pageTextContains("slogan: ''");
+    $this->assertSession()->pageTextContains("slogan: NULL");
     $this->assertSession()->pageTextContains("slogan: $newSlogan");
 
     // Export the configuration.

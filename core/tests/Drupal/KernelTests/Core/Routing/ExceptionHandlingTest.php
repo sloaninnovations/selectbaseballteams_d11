@@ -126,6 +126,7 @@ class ExceptionHandlingTest extends KernelTestBase {
    * Tests that the exception response is executed in the original context.
    */
   public function testExceptionResponseGeneratedForOriginalRequest(): void {
+    $this->installConfig(['system']);
     // Test with 404 path pointing to a route that uses '_controller'.
     $response = $this->doTest404Route('/router_test/test25');
     $this->assertStringContainsString('/not-found', $response->getContent());
