@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Migrate\d6;
 
 use Drupal\system\Entity\Action;
@@ -25,7 +27,7 @@ class MigrateActionsTest extends MigrateDrupal6TestBase {
   /**
    * Tests Drupal 6 action migration to Drupal 8.
    */
-  public function testActions() {
+  public function testActions(): void {
     // Test default actions.
     $this->assertEntity('node_publish_action', 'Publish post', 'node', []);
     $this->assertEntity('node_make_sticky_action', 'Make post sticky', 'node', []);

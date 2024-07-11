@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workspaces\Kernel;
 
 use Drupal\workspaces\Entity\Handler\IgnoredWorkspaceHandler;
@@ -69,6 +71,13 @@ trait WorkspaceTestTrait {
     // Switch the test runner's context to the specified workspace.
     $workspace = $this->entityTypeManager->getStorage('workspace')->load($workspace_id);
     \Drupal::service('workspaces.manager')->setActiveWorkspace($workspace);
+  }
+
+  /**
+   * Switches the test runner's context to Live.
+   */
+  protected function switchToLive(): void {
+    \Drupal::service('workspaces.manager')->switchToLive();
   }
 
   /**

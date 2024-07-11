@@ -62,6 +62,9 @@ class AddedStylesheetsTest extends BrowserTestBase {
     $this->editor = Editor::create([
       'format' => 'llama',
       'editor' => 'ckeditor5',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
       'settings' => [
         'toolbar' => [
           'items' => [],
@@ -94,7 +97,7 @@ class AddedStylesheetsTest extends BrowserTestBase {
   /**
    * Test the ckeditor5-stylesheets theme config.
    */
-  public function testCkeditorStylesheets() {
+  public function testCkeditorStylesheets(): void {
     $assert_session = $this->assertSession();
 
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */

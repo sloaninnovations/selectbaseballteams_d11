@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_discovery\Kernel;
 
 use Drupal\Core\Form\FormState;
@@ -37,7 +39,7 @@ class LayoutTest extends KernelTestBase {
   /**
    * Tests that a layout provided by a theme has the preprocess function set.
    */
-  public function testThemeProvidedLayout() {
+  public function testThemeProvidedLayout(): void {
     $this->container->get('theme_installer')->install(['test_layout_theme']);
     $this->config('system.theme')->set('default', 'test_layout_theme')->save();
 
@@ -50,7 +52,7 @@ class LayoutTest extends KernelTestBase {
    *
    * @dataProvider renderLayoutData
    */
-  public function testRenderLayout($layout_id, $config, $regions, array $html) {
+  public function testRenderLayout($layout_id, $config, $regions, array $html): void {
     $layout = $this->layoutPluginManager->createInstance($layout_id, $config);
     $built['layout'] = $layout->build($regions);
     $built['layout']['#prefix'] = 'Test prefix' . "\n";

@@ -69,7 +69,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
   /**
    * Check that non-installed languages are not considered.
    */
-  public function testUrlRewritingEdgeCases() {
+  public function testUrlRewritingEdgeCases(): void {
     // Check URL rewriting with a non-installed language.
     $non_existing = new Language(['id' => $this->randomMachineName()]);
     $this->checkUrl($non_existing, 'Path language is ignored if language is not installed.');
@@ -102,7 +102,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
     // If the rewritten URL has not a language prefix we pick a random prefix so
     // we can always check the prefixed URL.
     $prefixes = $this->config('language.negotiation')->get('url.prefixes');
-    $stored_prefix = isset($prefixes[$language->getId()]) ? $prefixes[$language->getId()] : $this->randomMachineName();
+    $stored_prefix = $prefixes[$language->getId()] ?? $this->randomMachineName();
     $this->assertNotEquals($prefix, $stored_prefix, $message);
     $prefix = $stored_prefix;
 
@@ -113,7 +113,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
   /**
    * Check URL rewriting when using a domain name and a non-standard port.
    */
-  public function testDomainNameNegotiationPort() {
+  public function testDomainNameNegotiationPort(): void {
     global $base_url;
     $language_domain = 'example.fr';
     // Get the current host URI we're running on.

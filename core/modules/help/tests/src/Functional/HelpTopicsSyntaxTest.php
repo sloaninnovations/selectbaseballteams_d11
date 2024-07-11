@@ -37,8 +37,11 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
   /**
    * Tests that all Core help topics can be rendered and have good syntax.
    */
-  public function testHelpTopics() {
-    $this->drupalLogin($this->rootUser);
+  public function testHelpTopics(): void {
+    $this->drupalLogin($this->createUser([
+      'administer modules',
+      'access help pages',
+    ]));
 
     // Enable all modules and themes, so that all routes mentioned in topics
     // will be defined.

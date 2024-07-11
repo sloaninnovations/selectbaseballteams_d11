@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\datetime\Kernel\Views;
 
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
@@ -71,7 +73,7 @@ class FilterDateTimeTest extends DateTimeHandlerTestBase {
   /**
    * Tests filter operations.
    */
-  public function testDatetimeFilter() {
+  public function testDatetimeFilter(): void {
     $this->_testOffset();
     $this->_testBetween();
     $this->_testExact();

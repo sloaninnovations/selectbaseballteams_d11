@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\history\Kernel\Views;
 
 use Drupal\Core\Database\Database;
@@ -49,7 +51,7 @@ class HistoryTimestampTest extends ViewsKernelTestBase {
   /**
    * Tests the handlers.
    */
-  public function testHandlers() {
+  public function testHandlers(): void {
     $nodes = [];
     $node = Node::create([
       'title' => 'n1',

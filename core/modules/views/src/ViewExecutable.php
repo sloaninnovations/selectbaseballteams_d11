@@ -2,9 +2,9 @@
 
 namespace Drupal\views;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Tags;
+use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\views\Plugin\views\display\DisplayRouterInterface;
@@ -27,6 +27,8 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  */
 #[\AllowDynamicProperties]
 class ViewExecutable {
+
+  use LoggerChannelTrait;
 
   /**
    * The config entity in which the view is stored.
@@ -65,6 +67,7 @@ class ViewExecutable {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $build_info = [];
 
   /**
@@ -77,11 +80,13 @@ class ViewExecutable {
   /**
    * The plugin name.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public ?string $plugin_name;
 
   /**
    * The build execution time.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string|float $build_time;
 
   /**
@@ -100,6 +105,7 @@ class ViewExecutable {
    *
    * @var int
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $current_page = NULL;
 
   /**
@@ -107,6 +113,7 @@ class ViewExecutable {
    *
    * @var int
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $items_per_page = NULL;
 
   /**
@@ -114,6 +121,7 @@ class ViewExecutable {
    *
    * @var int
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $offset = NULL;
 
   /**
@@ -121,6 +129,7 @@ class ViewExecutable {
    *
    * @var int
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $total_rows = NULL;
 
   /**
@@ -128,6 +137,7 @@ class ViewExecutable {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $attachment_before = [];
 
   /**
@@ -135,6 +145,7 @@ class ViewExecutable {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $attachment_after = [];
 
   /**
@@ -142,6 +153,7 @@ class ViewExecutable {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $feedIcons = [];
 
   // Exposed widget input
@@ -151,6 +163,7 @@ class ViewExecutable {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $exposed_data = [];
 
   /**
@@ -158,6 +171,7 @@ class ViewExecutable {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $exposed_input = [];
 
   /**
@@ -165,6 +179,7 @@ class ViewExecutable {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $exposed_raw_input = [];
 
   /**
@@ -172,6 +187,7 @@ class ViewExecutable {
    *
    * @var \Drupal\views\ViewExecutable[]
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $old_view = [];
 
   /**
@@ -179,6 +195,7 @@ class ViewExecutable {
    *
    * @var \Drupal\views\ViewExecutable[]
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $parent_views = [];
 
   /**
@@ -186,6 +203,7 @@ class ViewExecutable {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $is_attachment = NULL;
 
   /**
@@ -193,6 +211,7 @@ class ViewExecutable {
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $current_display;
 
   /**
@@ -207,6 +226,7 @@ class ViewExecutable {
    *
    * @var \Drupal\views\Plugin\views\pager\PagerPluginBase
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $pager = NULL;
 
   /**
@@ -214,6 +234,7 @@ class ViewExecutable {
    *
    * @var \Drupal\views\Plugin\views\display\DisplayPluginBase
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $display_handler;
 
   /**
@@ -231,6 +252,7 @@ class ViewExecutable {
    *
    * @var \Drupal\views\Plugin\views\style\StylePluginBase
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $style_plugin;
 
   /**
@@ -245,6 +267,7 @@ class ViewExecutable {
    *
    * @var int
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $row_index;
 
   /**
@@ -252,13 +275,16 @@ class ViewExecutable {
    *
    * @var \Drupal\Core\Url
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $override_url;
+
 
   /**
    * Allow to override the path used for generated URLs.
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $override_path = NULL;
 
   /**
@@ -266,6 +292,7 @@ class ViewExecutable {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $base_database = NULL;
 
   // Handlers which are active on this view.
@@ -359,6 +386,7 @@ class ViewExecutable {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $exposed_widgets;
 
   /**
@@ -375,6 +403,7 @@ class ViewExecutable {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $get_total_rows;
 
   /**
@@ -384,6 +413,7 @@ class ViewExecutable {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $build_sort;
 
   /**
@@ -391,6 +421,7 @@ class ViewExecutable {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $many_to_one_tables;
 
   /**
@@ -398,6 +429,7 @@ class ViewExecutable {
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $dom_id;
 
   /**
@@ -720,7 +752,7 @@ class ViewExecutable {
       }
 
       // If we have no input at all, check for remembered input via session.
-      if (empty($this->exposed_input) && $this->request->hasSession()) {
+      if (empty($this->exposed_input)) {
         $session = $this->request->getSession();
         // If filters are not overridden, store the 'remember' settings on the
         // default display. If they are, store them on this display. This way,
@@ -821,7 +853,12 @@ class ViewExecutable {
 
     // Ensure the requested display exists.
     if (!$this->displayHandlers->has($display_id)) {
-      trigger_error(new FormattableMarkup('setDisplay() called with invalid display ID "@display".', ['@display' => $display_id]), E_USER_WARNING);
+      $this->getLogger('views')->warning(
+        'setDisplay() called with invalid display ID "@display_id".',
+        [
+          '@display_id' => $display_id,
+        ],
+      );
       return FALSE;
     }
 
@@ -1246,7 +1283,7 @@ class ViewExecutable {
     // Call a module hook and see if it wants to present us with a
     // pre-built query or instruct us not to build the query for
     // some reason.
-    // @todo: Implement this. Use the same mechanism Panels uses.
+    // @todo Implement this. Use the same mechanism Panels uses.
 
     // Run through our handlers and ensure they have necessary information.
     $this->initHandlers();
@@ -1921,12 +1958,11 @@ class ViewExecutable {
       return FALSE;
     }
 
-    // Look up the route name to make sure it exists.  The name may exist, but
+    // Look up the route name to make sure it exists. The name may exist, but
     // not be available yet in some instances when editing a view and doing
     // a live preview.
-    $provider = \Drupal::service('router.route_provider');
     try {
-      $provider->getRouteByName($display_handler->getRouteName());
+      $this->routeProvider->getRouteByName($display_handler->getRouteName());
     }
     catch (RouteNotFoundException $e) {
       return FALSE;
@@ -1963,17 +1999,6 @@ class ViewExecutable {
 
     if (!isset($args)) {
       $args = $this->args;
-
-      // Exclude arguments that were computed, not passed on the URL.
-      $position = 0;
-      if (!empty($this->argument)) {
-        foreach ($this->argument as $argument) {
-          if (!empty($argument->is_default)) {
-            unset($args[$position]);
-          }
-          $position++;
-        }
-      }
     }
 
     $path = $this->getPath();
@@ -2510,7 +2535,7 @@ class ViewExecutable {
    * @return array
    *   The names of all variables that should be serialized.
    */
-  public function __sleep() {
+  public function __sleep(): array {
     // Limit to only the required data which is needed to properly restore the
     // state during unserialization.
     $this->serializationData = [
@@ -2530,7 +2555,7 @@ class ViewExecutable {
   /**
    * Magic method implementation to unserialize the view executable.
    */
-  public function __wakeup() {
+  public function __wakeup(): void {
     // There are cases, like in testing where we don't have a container
     // available.
     if (\Drupal::hasContainer() && !empty($this->serializationData)) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Kernel\Migrate\d7;
 
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
@@ -57,7 +59,7 @@ class MigrateBlockContentTranslationTest extends MigrateDrupal7TestBase {
   /**
    * Tests the migration of block title translation.
    */
-  public function testBlockContentTranslation() {
+  public function testBlockContentTranslation(): void {
     // @todo Skipped due to frequent random test failures.
     // See https://www.drupal.org/project/drupal/issues/3389365
     $this->markTestSkipped();

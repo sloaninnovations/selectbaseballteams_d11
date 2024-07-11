@@ -76,8 +76,7 @@ trait PerformanceTestTrait {
       'performanceTimeline' => 'ALL',
     ];
     // Support legacy key.
-    $chrome_options_key = isset($driver_args[1]['chromeOptions']) ? 'chromeOptions' : 'goog:chromeOptions';
-    $driver_args[1][$chrome_options_key]['perfLoggingPrefs'] = [
+    $driver_args[1]['goog:chromeOptions']['perfLoggingPrefs'] = [
       'traceCategories' => 'timeline,devtools.timeline,browser',
     ];
 
@@ -159,9 +158,9 @@ trait PerformanceTestTrait {
       }
       foreach ($performance_test_data['cache_tag_operations'] as $operation) {
         match($operation['operation']) {
-          CacheTagOperation::getCurrentChecksum => $cache_tag_checksum_count++,
-          CacheTagOperation::isValid => $cache_tag_is_valid_count++,
-          CacheTagOperation::invalidateTags => $cache_tag_invalidation_count++,
+          CacheTagOperation::GetCurrentChecksum => $cache_tag_checksum_count++,
+          CacheTagOperation::IsValid => $cache_tag_is_valid_count++,
+          CacheTagOperation::InvalidateTags => $cache_tag_invalidation_count++,
         };
       }
       $performance_data->setCacheGetCount($cache_get_count);
@@ -242,6 +241,10 @@ trait PerformanceTestTrait {
       if (str_contains($args[':db_condition_placeholder_1'], 'files/css')) {
         $args[':db_condition_placeholder_1'] = 'CSS_FILE';
       }
+    }
+    elseif (str_starts_with($query, 'SELECT "name", "value" FROM "key_value_expire" WHERE "expire" >')) {
+      $args[':now'] = 'NOW';
+      $args[':keys__0'] = 'KEY';
     }
 
     // Inline query arguments and log the query.
@@ -348,18 +351,62 @@ trait PerformanceTestTrait {
   private function collectNetworkData(array $messages, PerformanceData $performance_data): void {
     $stylesheet_count = 0;
     $script_count = 0;
+    $stylesheet_bytes = 0;
+    $script_bytes = 0;
+    $stylesheet_urls = [];
+    $script_urls = [];
+    // Collect the CSS and JavaScript responses from the network log build an
+    // associative array so that if multiple page or AJAX requests have
+    // requested styles and scripts, only unique files will be counted.
     foreach ($messages as $message) {
       if ($message['method'] === 'Network.responseReceived') {
         if ($message['params']['type'] === 'Stylesheet') {
-          $stylesheet_count++;
+          $url = $message['params']['response']['url'];
+          $stylesheet_urls[$url] = $url;
+
         }
         if ($message['params']['type'] === 'Script') {
-          $script_count++;
+          $url = $message['params']['response']['url'];
+          $script_urls[$url] = $url;
         }
       }
     }
+    // Get the actual files from disk when calculating filesize, to ensure
+    // consistency between testing environments. The performance log has
+    // 'encodedDataLength' for network requests, however in the case that the
+    // file has already been requested by the browser, this will be the length
+    // of a HEAD response for 304 not modified or similar. Additionally, core's
+    // aggregation adds the basepath to CSS aggregates, resulting in slightly
+    // different file sizes depending on whether tests run in a subdirectory or
+    // not.
+    foreach ($stylesheet_urls as $url) {
+      $stylesheet_count++;
+      if ($GLOBALS['base_path'] === '/') {
+        $filename = ltrim(parse_url($url, PHP_URL_PATH), '/');
+        $stylesheet_bytes += strlen(file_get_contents($filename));
+      }
+      else {
+        $filename = str_replace($GLOBALS['base_path'], '', parse_url($url, PHP_URL_PATH));
+        // Strip the basepath from the contents of the file so that tests
+        // running in a subdirectory get the same results.
+        $stylesheet_bytes += strlen(str_replace($GLOBALS['base_path'], '/', file_get_contents($filename)));
+      }
+    }
+    foreach ($script_urls as $url) {
+      $script_count++;
+      if ($GLOBALS['base_path'] === '/') {
+        $filename = ltrim(parse_url($url, PHP_URL_PATH), '/');
+      }
+      else {
+        $filename = str_replace($GLOBALS['base_path'], '', parse_url($url, PHP_URL_PATH));
+      }
+      $script_bytes += strlen(file_get_contents($filename));
+    }
+
     $performance_data->setStylesheetCount($stylesheet_count);
+    $performance_data->setStylesheetBytes($stylesheet_bytes);
     $performance_data->setScriptCount($script_count);
+    $performance_data->setScriptBytes($script_bytes);
   }
 
   /**
@@ -374,7 +421,7 @@ trait PerformanceTestTrait {
    */
   private function openTelemetryTracing(array $messages, string $service_name): void {
     // Open telemetry timestamps are always in nanoseconds.
-    // @todo: consider moving these to trait constants once we require PHP 8.2.
+    // @todo Consider moving these to trait constants once we require PHP 8.2.
     $nanoseconds_per_second = 1000_000_000;
     $nanoseconds_per_millisecond = 1000_000;
     $nanoseconds_per_microsecond = 1000;
@@ -416,9 +463,9 @@ trait PerformanceTestTrait {
       $this->markTestSkipped('Incomplete log from chromedriver, giving up.');
     }
 
-    // @todo: get commit hash from an environment variable and add this as an
-    // additional attribute.
-    // @see https://www.drupal.org/project/drupal/issues/3379761
+    // @todo Get commit hash from an environment variable and add this as an
+    //   additional attribute.
+    //   @see https://www.drupal.org/project/drupal/issues/3379761
     $resource = ResourceInfoFactory::defaultResource();
     $resource = $resource->merge(ResourceInfo::create(Attributes::create([
       ResourceAttributes::SERVICE_NAMESPACE => 'Drupal',
@@ -567,8 +614,12 @@ trait PerformanceTestTrait {
    *   Whether the event was triggered by the database cache implementation.
    */
   protected static function isDatabaseCache(DatabaseEvent $event): bool {
-    $class = str_replace('\\\\', '\\', $event->caller['class']);
-    return is_a($class, '\Drupal\Core\Cache\DatabaseBackend', TRUE) || is_a($class, '\Drupal\Core\Cache\DatabaseCacheTagsChecksum', TRUE);
+    // If there is no class, then this is called from a procedural function.
+    if (isset($event->caller['class'])) {
+      $class = str_replace('\\\\', '\\', $event->caller['class']);
+      return is_a($class, '\Drupal\Core\Cache\DatabaseBackend', TRUE) || is_a($class, '\Drupal\Core\Cache\DatabaseCacheTagsChecksum', TRUE);
+    }
+    return FALSE;
   }
 
 }

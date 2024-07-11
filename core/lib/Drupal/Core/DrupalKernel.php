@@ -17,6 +17,7 @@ use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\YamlFileLoader;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
+use Drupal\Core\File\MimeType\MimeTypeGuesser;
 use Drupal\Core\Http\TrustedHostsRequestFactory;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Installer\InstallerRedirectTrait;
@@ -263,16 +264,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $root;
 
   /**
-   * A mapping from service classes to service IDs.
-   *
-   * @deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the
-   *   'Drupal\Component\DependencyInjection\ReverseContainer' service instead.
-   *
-   * @see https://www.drupal.org/node/3327942
-   */
-  protected $serviceIdMapping = [];
-
-  /**
    * Create a DrupalKernel object from a request.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -369,9 +360,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * directory alias for https://www.drupal.org:8080/my-site/test whose
    * configuration file is in sites/example.com, the array should be defined as:
    * @code
-   * $sites = array(
+   * $sites = [
    *   '8080.www.drupal.org.my-site.test' => 'example.com',
-   * );
+   * ];
    * @endcode
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -606,6 +597,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Set the allowed protocols.
     UrlHelper::setAllowedProtocols($this->container->getParameter('filter_protocols'));
 
+    // Override of Symfony's MIME type guesser singleton.
+    MimeTypeGuesser::registerWithSymfonyGuesser($this->container);
+
     $this->prepared = TRUE;
   }
 
@@ -829,39 +823,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Generate a unique hash for a service object.
-   *
-   * @param object $object
-   *   A service object.
-   *
-   * @return string
-   *   A unique hash value.
-   *
-   * @deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the
-   *   'Drupal\Component\DependencyInjection\ReverseContainer' service instead.
-   *
-   * @see https://www.drupal.org/node/3327942
-   */
-  public static function generateServiceIdHash($object) {
-    @trigger_error(__METHOD__ . "() is deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the 'Drupal\Component\DependencyInjection\ReverseContainer' service instead. See https://www.drupal.org/node/3327942", E_USER_DEPRECATED);
-    // Include class name as an additional namespace for the hash since
-    // spl_object_hash's return can be recycled. This still is not a 100%
-    // guarantee to be unique but makes collisions incredibly difficult and even
-    // then the interface would be preserved.
-    // @see https://php.net/spl_object_hash#refsect1-function.spl-object-hash-notes
-    return hash('sha256', get_class($object) . spl_object_hash($object));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getServiceIdMapping() {
-    @trigger_error(__METHOD__ . "() is deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the 'Drupal\Component\DependencyInjection\ReverseContainer' service instead. See https://www.drupal.org/node/3327942", E_USER_DEPRECATED);
-    $this->collectServiceIdMapping();
-    return $this->serviceIdMapping;
-  }
-
-  /**
    * Returns the container cache key based on the environment.
    *
    * The 'environment' consists of:
@@ -971,9 +932,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
       if ($request = $request_stack->getMainRequest()) {
         $subrequest = TRUE;
-        if ($request->hasSession()) {
-          $request->setSession($this->container->get('session'));
-        }
+        $request->setSession($this->container->get('session'));
       }
     }
 
@@ -1046,7 +1005,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Set sane locale settings, to ensure consistent string, dates, times and
     // numbers handling.
-    setlocale(LC_ALL, 'C');
+    setlocale(LC_ALL, 'C.UTF-8', 'C');
 
     // Set appropriate configuration for multi-byte strings.
     mb_internal_encoding('utf-8');
@@ -1243,9 +1202,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
       if ($request = $request_stack->getMainRequest()) {
         $subrequest = TRUE;
-        if ($request->hasSession()) {
-          $request->setSession($this->container->get('session'));
-        }
+        $request->setSession($this->container->get('session'));
       }
     }
 
@@ -1645,10 +1602,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * requests. For example,
    *
    * @code
-   * $settings['trusted_host_patterns'] = array(
+   * $settings['trusted_host_patterns'] = [
    *   '^example\.com$',
    *   '^*.example\.com$',
-   * );
+   * ];
    * @endcode
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -1676,7 +1633,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // TrustedHostsRequestFactory makes sure to pass in the server variables
       // from the main request.
       $request_factory = new TrustedHostsRequestFactory($host);
-      Request::setFactory([$request_factory, 'createRequest']);
+      Request::setFactory([$request_factory, 'createRequest'](...));
 
     }
     catch (\UnexpectedValueException $e) {
@@ -1697,32 +1654,17 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Collect a mapping between service to ids.
-   *
-   * @deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the
-   *   'Drupal\Component\DependencyInjection\ReverseContainer' service instead.
-   *
-   * @see https://www.drupal.org/node/3327942
-   */
-  protected function collectServiceIdMapping() {
-    @trigger_error(__METHOD__ . "() is deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the 'Drupal\Component\DependencyInjection\ReverseContainer' service instead. See https://www.drupal.org/node/3327942", E_USER_DEPRECATED);
-    if (isset($this->container)) {
-      foreach ($this->container->getServiceIdMappings() as $hash => $service_id) {
-        $this->serviceIdMapping[$hash] = $service_id;
-      }
-    }
-  }
-
-  /**
    * Gets the active install profile.
    *
-   * @return string|null
-   *   The name of the any active install profile or distribution.
+   * @return string|false|null
+   *   The name of the active install profile or distribution, FALSE if there is
+   *   no install profile or NULL if Drupal is being installed.
    */
   protected function getInstallProfile() {
     $config = $this->getConfigStorage()->read('core.extension');
-
-    // Normalize an empty string to a NULL value.
+    if (is_array($config) && !array_key_exists('profile', $config)) {
+      return FALSE;
+    }
     return $config['profile'] ?? NULL;
   }
 

@@ -2,7 +2,9 @@
 
 namespace Drupal\performance_test;
 
+use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\Core\Database\Event\StatementExecutionEndEvent;
+use Drupal\Core\Database\Event\StatementExecutionFailureEvent;
 use Drupal\Core\DestructableInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -11,7 +13,7 @@ class PerformanceDataCollector implements EventSubscriberInterface, Destructable
   /**
    * Database events collected during the request.
    *
-   * @var Drupal\Core\Database\Event\StatementExecutionEndEvent[]
+   * @var \Drupal\Core\Database\Event\DatabaseEvent[]
    */
   protected array $databaseEvents = [];
 
@@ -30,14 +32,15 @@ class PerformanceDataCollector implements EventSubscriberInterface, Destructable
    */
   public static function getSubscribedEvents(): array {
     return [
-      StatementExecutionEndEvent::class => 'onStatementExecutionEnd',
+      StatementExecutionEndEvent::class => 'onDatabaseEvent',
+      StatementExecutionFailureEvent::class => 'onDatabaseEvent',
     ];
   }
 
   /**
    * Logs database statements.
    */
-  public function onStatementExecutionEnd(StatementExecutionEndEvent $event): void {
+  public function onDatabaseEvent(DatabaseEvent $event): void {
     // Use the event object as a value object.
     $this->databaseEvents[] = $event;
   }
@@ -68,10 +71,10 @@ class PerformanceDataCollector implements EventSubscriberInterface, Destructable
     // any overhead up until this point.
     $lock = \Drupal::lock();
 
-    // This loop should be safe because we know a very finite number of requests
-    // will be trying to acquire a lock at any one time.
-    while (!$lock->acquire('performance_test')) {
-      $lock->wait();
+    // There are a finite number of requests, so if we don't get the lock just
+    // wait for up to ten seconds then record the data anyway.
+    if (!$lock->acquire('performance_test')) {
+      $lock->wait('performance_test', 10);
     }
     $collection = \Drupal::keyValue('performance_test');
     $existing_data = $collection->get('performance_test_data') ?? [

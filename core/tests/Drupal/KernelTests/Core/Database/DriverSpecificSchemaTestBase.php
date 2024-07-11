@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Connection;
@@ -51,7 +53,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * @param string|null $column
    *   Optional column to test.
    */
-  abstract public function checkSchemaComment(string $description, string $table, string $column = NULL): void;
+  abstract public function checkSchemaComment(string $description, string $table, ?string $column = NULL): void;
 
   /**
    * Tests inserting data into an existing table.

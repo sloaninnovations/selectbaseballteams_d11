@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Render;
 
 use Drupal\Component\Datetime\Time;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\VariationCache;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Lock\NullLockBackend;
 use Drupal\Core\State\State;
 use Drupal\Core\Cache\Cache;
 
@@ -33,7 +35,7 @@ class RendererBubblingTest extends RendererTestBase {
   /**
    * Tests bubbling of assets when NOT using #pre_render callbacks.
    */
-  public function testBubblingWithoutPreRender() {
+  public function testBubblingWithoutPreRender(): void {
     $this->setUpRequest();
     $this->setUpMemoryCache();
 
@@ -77,7 +79,7 @@ class RendererBubblingTest extends RendererTestBase {
   /**
    * Tests cache context bubbling with a custom cache bin.
    */
-  public function testContextBubblingCustomCacheBin() {
+  public function testContextBubblingCustomCacheBin(): void {
     $bin = $this->randomMachineName();
 
     $this->setUpRequest();
@@ -133,7 +135,7 @@ class RendererBubblingTest extends RendererTestBase {
    *
    * @dataProvider providerTestContextBubblingEdgeCases
    */
-  public function testContextBubblingEdgeCases(array $element, array $expected_top_level_contexts, $expected_cache_item) {
+  public function testContextBubblingEdgeCases(array $element, array $expected_top_level_contexts, $expected_cache_item): void {
     $this->setUpRequest();
     $this->setUpMemoryCache();
     $this->cacheContextsManager->expects($this->any())
@@ -312,7 +314,7 @@ class RendererBubblingTest extends RendererTestBase {
    * @todo Revisit now that we have self-healing tests for VariationCache. This
    * is essentially a clone of the other bubbling tests now.
    */
-  public function testConditionalCacheContextBubblingSelfHealing() {
+  public function testConditionalCacheContextBubblingSelfHealing(): void {
     $current_user_role = &$this->currentUserRole;
 
     $this->setUpRequest();
@@ -443,12 +445,13 @@ class RendererBubblingTest extends RendererTestBase {
    *
    * @dataProvider providerTestBubblingWithPrerender
    */
-  public function testBubblingWithPrerender($test_element) {
+  public function testBubblingWithPrerender($test_element): void {
     $this->setUpRequest();
     $this->setUpMemoryCache();
 
     // Mock the State service.
-    $memory_state = new State(new KeyValueMemoryFactory());
+    $time = $this->prophesize(TimeInterface::class)->reveal();
+    $memory_state = new State(new KeyValueMemoryFactory(), new MemoryBackend($time), new NullLockBackend());
     \Drupal::getContainer()->set('state', $memory_state);
 
     // Simulate the theme system/Twig: a recursive call to Renderer::render(),
@@ -526,7 +529,7 @@ class RendererBubblingTest extends RendererTestBase {
   /**
    * Tests that an element's cache keys cannot be changed during its rendering.
    */
-  public function testOverWriteCacheKeys() {
+  public function testOverWriteCacheKeys(): void {
     $this->setUpRequest();
     $this->setUpMemoryCache();
 

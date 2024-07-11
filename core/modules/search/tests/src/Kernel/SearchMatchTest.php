@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Kernel;
 
 use Drupal\Core\Database\Database;
@@ -42,7 +44,7 @@ class SearchMatchTest extends KernelTestBase {
   /**
    * Tests search indexing.
    */
-  public function testMatching() {
+  public function testMatching(): void {
     $this->_setup();
     $this->_testQueries();
   }

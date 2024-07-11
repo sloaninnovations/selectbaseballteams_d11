@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Config;
 
 use Drupal\Core\Config\Entity\ConfigEntityDependency;
@@ -58,7 +60,7 @@ class DefaultConfigTest extends KernelTestBase {
    *
    * @dataProvider themeListDataProvider
    */
-  public function testThemeConfig($theme) {
+  public function testThemeConfig($theme): void {
     $this->assertExtensionConfig($theme, 'theme');
   }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
@@ -111,7 +113,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
   /**
    * Tests the default rendered entity output.
    */
-  public function testRenderedEntityWithoutAndWithField() {
+  public function testRenderedEntityWithoutAndWithField(): void {
     // First test without test_field displayed.
     \Drupal::currentUser()->setAccount($this->user);
 

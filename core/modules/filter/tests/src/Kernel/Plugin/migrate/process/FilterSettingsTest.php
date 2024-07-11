@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\filter\Kernel\Plugin\migrate\process;
 
 use Drupal\filter\Plugin\migrate\process\FilterSettings;
@@ -22,7 +24,7 @@ class FilterSettingsTest extends MigrateTestCase {
    * @dataProvider dataProvider
    * @covers ::transform
    */
-  public function testTransform($value, $destination_id, $expected_value) {
+  public function testTransform($value, $destination_id, $expected_value): void {
     $migration = $this->createMock(MigrationInterface::class);
     $plugin = new FilterSettings([], 'filter_settings', []);
 

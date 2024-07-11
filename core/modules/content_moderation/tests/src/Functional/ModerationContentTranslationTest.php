@@ -38,6 +38,14 @@ class ModerationContentTranslationTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
+
+  /**
+   * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
 
@@ -60,7 +68,7 @@ class ModerationContentTranslationTest extends BrowserTestBase {
   /**
    * Tests existing translations being edited after enabling content moderation.
    */
-  public function testModerationWithExistingContent() {
+  public function testModerationWithExistingContent(): void {
     // Create a published article in English.
     $edit = [
       'title[0][value]' => 'Published English node',

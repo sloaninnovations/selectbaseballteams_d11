@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Kernel;
 
 use Drupal\block\Entity\Block;
@@ -57,7 +59,7 @@ class BlockTemplateSuggestionsTest extends KernelTestBase {
   /**
    * Tests template suggestions from block_content_theme_suggestions_block().
    */
-  public function testBlockThemeHookSuggestions() {
+  public function testBlockThemeHookSuggestions(): void {
     // Create a block using a block_content plugin.
     $block = Block::create([
       'plugin' => 'block_content:' . $this->blockContent->uuid(),

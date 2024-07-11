@@ -31,6 +31,14 @@ class ModerationLocaleTest extends ModerationStateTestBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
+
+  /**
+   * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
 
@@ -60,7 +68,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
   /**
    * Tests article translations can be moderated separately.
    */
-  public function testTranslateModeratedContent() {
+  public function testTranslateModeratedContent(): void {
     // Create a published article in English.
     $edit = [
       'title[0][value]' => 'Published English node',
@@ -210,7 +218,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
   /**
    * Tests that individual translations can be moderated independently.
    */
-  public function testLanguageIndependentContentModeration() {
+  public function testLanguageIndependentContentModeration(): void {
     // Create a published article in English (revision 1).
     $this->drupalGet('node/add/article');
     $node = $this->submitNodeForm('Test 1.1 EN', 'published');
@@ -407,7 +415,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
   /**
    * Checks that new translation values are populated properly.
    */
-  public function testNewTranslationSourceValues() {
+  public function testNewTranslationSourceValues(): void {
     // Create a published article in Italian (revision 1).
     $this->drupalGet('node/add/article');
     $node = $this->submitNodeForm('Test 1.1 IT', 'published', TRUE, 'it');
@@ -444,7 +452,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
   /**
    * Tests article revision history shows revisions for the correct translation.
    */
-  public function testTranslationRevisionsHistory() {
+  public function testTranslationRevisionsHistory(): void {
     // Create a published article in English.
     $edit = [
       'title[0][value]' => 'English node',

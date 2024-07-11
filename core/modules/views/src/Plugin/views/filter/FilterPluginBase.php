@@ -81,6 +81,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
   /**
    * Contains the information of the selected item in a grouped filter.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $group_info = NULL;
 
   /**
@@ -93,12 +94,14 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @var bool
    * Disable the possibility to use operators.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $no_operator = FALSE;
 
   /**
    * @var bool
    * Disable the possibility to allow an exposed input to be optional.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $always_required = FALSE;
 
   /**
@@ -116,7 +119,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * This likely has to be overridden by filters which are more complex
    * than simple operator/value.
    */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
     $this->operator = $this->options['operator'];
@@ -793,7 +796,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    *
    * @return string
    */
-  protected function validateIdentifier($identifier, FormStateInterface $form_state = NULL, &$form_group = []) {
+  protected function validateIdentifier($identifier, ?FormStateInterface $form_state = NULL, &$form_group = []) {
     $error = '';
     if (empty($identifier)) {
       $error = $this->t('The identifier is required if the filter is exposed.');

@@ -18,17 +18,16 @@ use Symfony\Component\Process\Process;
 /**
  * Tests core/scripts/test-site.php.
  *
- * @group Setup
- *
  * This test uses the Drupal\Core\Database\Database class which has a static.
  * Therefore run in a separate process to avoid side effects.
- *
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
  *
  * @see \Drupal\TestSite\TestSiteApplication
  * @see \Drupal\TestSite\Commands\TestSiteInstallCommand
  * @see \Drupal\TestSite\Commands\TestSiteTearDownCommand
+ *
+ * @group Setup
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class TestSiteApplicationTest extends UnitTestCase {
 
@@ -51,7 +50,7 @@ class TestSiteApplicationTest extends UnitTestCase {
   /**
    * @coversNothing
    */
-  public function testInstallWithNonExistingFile() {
+  public function testInstallWithNonExistingFile(): void {
     $command_line = $this->php . ' core/scripts/test-site.php install --setup-file "this-class-does-not-exist" --db-url "' . getenv('SIMPLETEST_DB') . '"';
     $process = Process::fromShellCommandline($command_line, $this->root);
     $process->run();
@@ -62,7 +61,7 @@ class TestSiteApplicationTest extends UnitTestCase {
   /**
    * @coversNothing
    */
-  public function testInstallWithFileWithNoClass() {
+  public function testInstallWithFileWithNoClass(): void {
     $command_line = $this->php . ' core/scripts/test-site.php install --setup-file core/tests/fixtures/empty_file.php.module --db-url "' . getenv('SIMPLETEST_DB') . '"';
     $process = Process::fromShellCommandline($command_line, $this->root);
     $process->run();
@@ -73,7 +72,7 @@ class TestSiteApplicationTest extends UnitTestCase {
   /**
    * @coversNothing
    */
-  public function testInstallWithNonSetupClass() {
+  public function testInstallWithNonSetupClass(): void {
     $this->markTestIncomplete('Fix this test in https://www.drupal.org/project/drupal/issues/2962157.');
 
     // Use __FILE__ to test absolute paths.
@@ -88,7 +87,7 @@ class TestSiteApplicationTest extends UnitTestCase {
   /**
    * @coversNothing
    */
-  public function testInstallScript() {
+  public function testInstallScript(): void {
     $simpletest_path = $this->root . DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'simpletest';
     if (!is_writable($simpletest_path)) {
       $this->markTestSkipped("Requires the directory $simpletest_path to exist and be writable");
@@ -188,7 +187,7 @@ class TestSiteApplicationTest extends UnitTestCase {
   /**
    * @coversNothing
    */
-  public function testInstallInDifferentLanguage() {
+  public function testInstallInDifferentLanguage(): void {
     $simpletest_path = $this->root . DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'simpletest';
     if (!is_writable($simpletest_path)) {
       $this->markTestSkipped("Requires the directory $simpletest_path to exist and be writable");
@@ -225,7 +224,7 @@ class TestSiteApplicationTest extends UnitTestCase {
   /**
    * @coversNothing
    */
-  public function testTearDownDbPrefixValidation() {
+  public function testTearDownDbPrefixValidation(): void {
     $command_line = $this->php . ' core/scripts/test-site.php tear-down not-a-valid-prefix';
     $process = Process::fromShellCommandline($command_line, $this->root);
     $process->setTimeout(500);
@@ -237,7 +236,7 @@ class TestSiteApplicationTest extends UnitTestCase {
   /**
    * @coversNothing
    */
-  public function testUserLogin() {
+  public function testUserLogin(): void {
     $this->markTestIncomplete('Fix this test in https://www.drupal.org/project/drupal/issues/2962157.');
     $simpletest_path = $this->root . DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'simpletest';
     if (!is_writable($simpletest_path)) {

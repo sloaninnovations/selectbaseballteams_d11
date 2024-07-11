@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\migrate\MigrateException;
@@ -97,7 +99,7 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
   /**
    * Tests format of map messages saved from plugin exceptions.
    */
-  public function testProcessErrorMessage() {
+  public function testProcessErrorMessage(): void {
     $this->definition['process']['error']['plugin'] = 'test_error';
 
     $this->idMap->saveMessage(['id' => 1], "process_errors_migration:error:test_error: Process exception.", MigrationInterface::MESSAGE_ERROR)->shouldBeCalled();
@@ -117,7 +119,7 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
    * plugins while being executed inside a sub_process pipeline as they
    * bubble up to the main migration.
    */
-  public function testSubProcessErrorMessage() {
+  public function testSubProcessErrorMessage(): void {
     $this->definition['process']['subprocess_error'] = [
       'plugin' => 'sub_process',
       'source' => 'my_property',

@@ -66,10 +66,13 @@ class HelpTest extends BrowserTestBase {
   /**
    * Logs in users, tests help pages.
    */
-  public function testHelp() {
+  public function testHelp(): void {
     // Log in the root user to ensure as many admin links appear as possible on
     // the module overview pages.
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser([
+      'access help pages',
+      'access administration pages',
+    ]));
     $this->verifyHelp();
 
     // Log in the regular user.

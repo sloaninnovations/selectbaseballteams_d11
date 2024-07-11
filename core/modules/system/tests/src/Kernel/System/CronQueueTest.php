@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\System;
 
 use Drupal\Core\Database\Database;
@@ -96,7 +98,7 @@ class CronQueueTest extends KernelTestBase {
   /**
    * Tests that DelayedRequeueException behaves as expected when running cron.
    */
-  public function testDelayException() {
+  public function testDelayException(): void {
     $database = $this->container->get('queue')->get('cron_queue_test_database_delay_exception');
     $memory = $this->container->get('queue')->get('cron_queue_test_memory_delay_exception');
 
@@ -140,7 +142,7 @@ class CronQueueTest extends KernelTestBase {
   /**
    * Tests that leases are expiring correctly, also within the same request.
    */
-  public function testLeaseTime() {
+  public function testLeaseTime(): void {
     $queue = $this->container->get('queue')->get('cron_queue_test_lease_time');
     $queue->createItem([$this->randomMachineName() => $this->randomMachineName()]);
     // Run initial queue job and ensure lease time variable is initialized.
@@ -172,7 +174,7 @@ class CronQueueTest extends KernelTestBase {
    *
    * @see \Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestException
    */
-  public function testUncaughtExceptions() {
+  public function testUncaughtExceptions(): void {
     $this->logger->log(
       RfcLogLevel::ERROR,
       '%type: @message in %function (line %line of %file).',

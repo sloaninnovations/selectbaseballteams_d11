@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -48,7 +50,7 @@ class UserAccountFormPasswordResetTest extends KernelTestBase {
   /**
    * Tests the reset token used only from query string.
    */
-  public function testPasswordResetToken() {
+  public function testPasswordResetToken(): void {
     /** @var \Symfony\Component\HttpFoundation\Request $request */
     $request = $this->container->get('request_stack')->getCurrentRequest();
 

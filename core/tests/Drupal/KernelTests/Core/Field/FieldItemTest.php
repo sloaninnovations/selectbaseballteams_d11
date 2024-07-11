@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Field;
 
 use Drupal\entity_test\Entity\EntityTest;
@@ -57,7 +59,7 @@ class FieldItemTest extends EntityKernelTestBase {
   /**
    * Tests the field item save workflow.
    */
-  public function testSaveWorkflow() {
+  public function testSaveWorkflow(): void {
     $entity = EntityTestMulRev::create([
       'name' => $this->randomString(),
       'field_test_item' => $this->randomString(),

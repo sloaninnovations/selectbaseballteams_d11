@@ -138,7 +138,7 @@ trait UiHelperTrait {
    * For example:
    * @code
    *   // Create a user.
-   *   $account = $this->drupalCreateUser(array());
+   *   $account = $this->drupalCreateUser([]);
    *   $this->drupalLogin($account);
    *   // Load real user object.
    *   $pass_raw = $account->passRaw;
@@ -181,10 +181,20 @@ trait UiHelperTrait {
     // screen.
     $assert_session = $this->assertSession();
     $destination = Url::fromRoute('user.page')->toString();
-    $this->drupalGet(Url::fromRoute('user.logout', [], ['query' => ['destination' => $destination]]));
+    $this->drupalGet(Url::fromRoute('user.logout.confirm', options: ['query' => ['destination' => $destination]]));
+    // Target the submit button using the name rather than the value to work
+    // regardless of the user interface language.
+    $this->submitForm([], 'op', 'user-logout-confirm');
     $assert_session->fieldExists('name');
     $assert_session->fieldExists('pass');
 
+    $this->drupalResetSession();
+  }
+
+  /**
+   * Resets the current active session back to Anonymous session.
+   */
+  protected function drupalResetSession(): void {
     // @see BrowserTestBase::drupalUserIsLoggedIn()
     unset($this->loggedInUser->sessionId);
     $this->loggedInUser = FALSE;
@@ -235,13 +245,11 @@ trait UiHelperTrait {
     $this->prepareRequest();
     foreach ($headers as $header_name => $header_value) {
       if (is_int($header_name)) {
-        // @todo Trigger deprecation in
-        //   https://www.drupal.org/project/drupal/issues/3421105.
+        @trigger_error('Passing an integer as header name to ' . __METHOD__ . '() is deprecated in drupal:11.1.0 and will be removed from drupal:12.0.0. Update the calling code to pass the header name as a key. See https://www.drupal.org/node/3456178', E_USER_DEPRECATED);
         [$header_name, $header_value] = explode(':', $header_value);
       }
       if (is_null($header_value)) {
-        // @todo Trigger deprecation in
-        //   https://www.drupal.org/project/drupal/issues/3421105.
+        @trigger_error('Using null as a header value to ' . __METHOD__ . '() is deprecated in drupal:11.1.0 and will be removed from drupal:12.0.0. Use an empty string instead. See https://www.drupal.org/node/3456233', E_USER_DEPRECATED);
         $header_value = '';
       }
       $session->setRequestHeader($header_name, $header_value);
@@ -300,6 +308,10 @@ trait UiHelperTrait {
       $length = strlen($base_path);
       if (substr($path, 0, $length) === $base_path) {
         $path = substr($path, $length);
+      }
+      // Additionally strip any forward slashes.
+      if (strlen($path) > 1) {
+        $path = ltrim($path, '/');
       }
 
       $force_internal = isset($options['external']) && $options['external'] == FALSE;

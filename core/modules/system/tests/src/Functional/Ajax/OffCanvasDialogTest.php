@@ -33,7 +33,7 @@ class OffCanvasDialogTest extends BrowserTestBase {
    *
    * @dataProvider dialogPosition
    */
-  public function testDialog($position) {
+  public function testDialog($position): void {
     // Ensure the elements render without notices or exceptions.
     $this->drupalGet('ajax-test/dialog');
 
@@ -47,6 +47,10 @@ class OffCanvasDialogTest extends BrowserTestBase {
       'data' => (string) $dialog_contents,
       'dialogOptions' =>
         [
+          'classes' => [
+            'ui-dialog' => 'ui-dialog-off-canvas ui-dialog-position-' . ($position ?: 'side'),
+            'ui-dialog-content' => 'drupal-off-canvas-reset',
+          ],
           'title' => 'AJAX Dialog & contents',
           'modal' => FALSE,
           'autoResize' => FALSE,
@@ -54,8 +58,6 @@ class OffCanvasDialogTest extends BrowserTestBase {
           'draggable' => FALSE,
           'drupalAutoButtons' => FALSE,
           'drupalOffCanvasPosition' => $position ?: 'side',
-          'dialogClass' => 'ui-dialog-off-canvas ui-dialog-position-' . ($position ?: 'side'),
-          'classes' => ['ui-dialog-content' => 'drupal-off-canvas-reset'],
           'width' => 300,
         ],
       'effect' => 'fade',

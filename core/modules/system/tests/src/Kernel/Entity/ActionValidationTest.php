@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Entity;
 
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
@@ -11,6 +13,11 @@ use Drupal\system\Entity\Action;
  * @group system
  */
 class ActionValidationTest extends ConfigEntityValidationTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static array $propertiesWithOptionalValues = ['type'];
 
   /**
    * {@inheritdoc}
@@ -49,6 +56,22 @@ class ActionValidationTest extends ConfigEntityValidationTestBase {
     $this->assertValidationErrors([
       'plugin' => "The 'non_existent' plugin does not exist.",
     ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testImmutableProperties(array $valid_values = []): void {
+    $valid_values['id'] = 'test_changed';
+    parent::testImmutableProperties($valid_values);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testLabelValidation(): void {
+    static::setLabel($this->entity, "Multi\nLine");
+    $this->assertValidationErrors(['label' => "Labels are not allowed to span multiple lines or contain control characters."]);
   }
 
 }

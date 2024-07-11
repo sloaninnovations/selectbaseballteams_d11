@@ -61,6 +61,15 @@ trait FunctionalTestSetupTrait {
   protected $apcuEnsureUniquePrefix = FALSE;
 
   /**
+   * Set to TRUE to make user 1 a super user.
+   *
+   * @see \Drupal\Core\Session\SuperUserAccessPolicy
+   *
+   * @var bool
+   */
+  protected bool $usesSuperUserAccessPolicy;
+
+  /**
    * Prepares site settings and services before installation.
    */
   protected function prepareSettings() {
@@ -69,7 +78,7 @@ trait FunctionalTestSetupTrait {
     // installation.
     // Not using File API; a potential error must trigger a PHP warning.
     $directory = DRUPAL_ROOT . '/' . $this->siteDirectory;
-    copy(DRUPAL_ROOT . '/sites/default/default.settings.php', $directory . '/settings.php');
+    copy(DRUPAL_ROOT . '/core/assets/scaffold/files/default.settings.php', $directory . '/settings.php');
 
     // The public file system path is created during installation. Additionally,
     // during tests:
@@ -127,7 +136,7 @@ trait FunctionalTestSetupTrait {
     $settings_services_file = DRUPAL_ROOT . '/' . $this->originalSite . '/testing.services.yml';
     if (!file_exists($settings_services_file)) {
       // Otherwise, use the default services as a starting point for overrides.
-      $settings_services_file = DRUPAL_ROOT . '/sites/default/default.services.yml';
+      $settings_services_file = DRUPAL_ROOT . '/core/assets/scaffold/files/default.services.yml';
     }
 
     // Put the testing-specific service overrides in place.
@@ -138,6 +147,15 @@ trait FunctionalTestSetupTrait {
     // from running during tests.
     $services = $yaml->parse($content);
     $services['parameters']['session.storage.options']['gc_probability'] = 0;
+    // Disable the super user access policy so that we are sure our tests check
+    // for the right permissions.
+    if (!isset($this->usesSuperUserAccessPolicy)) {
+      $test_file_name = (new \ReflectionClass($this))->getFileName();
+      // @todo Decide in https://www.drupal.org/project/drupal/issues/3437926
+      //   how to remove this fallback behavior.
+      $this->usesSuperUserAccessPolicy = !str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
+    }
+    $services['parameters']['security.enable_super_user'] = $this->usesSuperUserAccessPolicy;
     if ($this->strictConfigSchema) {
       // Add a listener to validate configuration schema on save.
       $test_file_name = (new \ReflectionClass($this))->getFileName();
@@ -425,16 +443,18 @@ trait FunctionalTestSetupTrait {
     // not already specified.
     $profile = $container->getParameter('install_profile');
 
-    $default_sync_path = $container->get('extension.list.profile')->getPath($profile) . '/config/sync';
-    $profile_config_storage = new FileStorage($default_sync_path, StorageInterface::DEFAULT_COLLECTION);
-    if (!isset($this->defaultTheme) && $profile_config_storage->exists('system.theme')) {
-      $this->defaultTheme = $profile_config_storage->read('system.theme')['default'];
-    }
+    if (!empty($profile)) {
+      $default_sync_path = $container->get('extension.list.profile')->getPath($profile) . '/config/sync';
+      $profile_config_storage = new FileStorage($default_sync_path, StorageInterface::DEFAULT_COLLECTION);
+      if (!isset($this->defaultTheme) && $profile_config_storage->exists('system.theme')) {
+        $this->defaultTheme = $profile_config_storage->read('system.theme')['default'];
+      }
 
-    $default_install_path = $container->get('extension.list.profile')->getPath($profile) . '/' . InstallStorage::CONFIG_INSTALL_DIRECTORY;
-    $profile_config_storage = new FileStorage($default_install_path, StorageInterface::DEFAULT_COLLECTION);
-    if (!isset($this->defaultTheme) && $profile_config_storage->exists('system.theme')) {
-      $this->defaultTheme = $profile_config_storage->read('system.theme')['default'];
+      $default_install_path = $container->get('extension.list.profile')->getPath($profile) . '/' . InstallStorage::CONFIG_INSTALL_DIRECTORY;
+      $profile_config_storage = new FileStorage($default_install_path, StorageInterface::DEFAULT_COLLECTION);
+      if (!isset($this->defaultTheme) && $profile_config_storage->exists('system.theme')) {
+        $this->defaultTheme = $profile_config_storage->read('system.theme')['default'];
+      }
     }
 
     // Require a default theme to be specified at this point.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Kernel\EntityResource;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -65,7 +67,7 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
   /**
    * Tests that all core content/config entity types have REST test coverage.
    */
-  public function testEntityTypeRestTestCoverage() {
+  public function testEntityTypeRestTestCoverage(): void {
     $tests = [
       // Test coverage for formats provided by the 'serialization' module.
       'serialization' => [

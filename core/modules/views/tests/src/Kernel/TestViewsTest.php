@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel;
 
 use Drupal\Core\Entity\Entity\EntityViewMode;
@@ -108,9 +110,6 @@ class TestViewsTest extends KernelTestBase {
     // `rest_test_views` is a module dependency.
     // @see core/modules/rest/tests/modules/rest_test_views/test_views/views.view.test_serializer_node_display_field.yml
     'rest_test_views',
-    // `tracker` is a module dependency.
-    // @see core/modules/tracker/tests/modules/tracker_test_views/test_views/views.view.test_tracker_user_uid.yml
-    'tracker',
     // `search` is a module dependency.
     // @see core/modules/views/tests/modules/views_test_config/test_views/views.view.test_argument_dependency.yml
     'search',
@@ -198,7 +197,7 @@ class TestViewsTest extends KernelTestBase {
   /**
    * Tests default configuration data type.
    */
-  public function testDefaultConfig() {
+  public function testDefaultConfig(): void {
     // Create a typed config manager with access to configuration schema in
     // every module, profile and theme.
     $typed_config = new TypedConfigManager(

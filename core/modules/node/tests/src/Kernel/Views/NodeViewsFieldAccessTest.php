@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel\Views;
 
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -22,6 +24,14 @@ class NodeViewsFieldAccessTest extends FieldFieldAccessTestBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
+
+  /**
+   * {@inheritdoc}
    */
   protected function setUp($import_test_views = TRUE): void {
     parent::setUp($import_test_views);
@@ -34,7 +44,7 @@ class NodeViewsFieldAccessTest extends FieldFieldAccessTestBase {
   /**
    * Check access for node fields.
    */
-  public function testNodeFields() {
+  public function testNodeFields(): void {
     $user = User::create([
       'name' => 'test user',
     ]);

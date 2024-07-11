@@ -12,13 +12,6 @@ namespace Drupal\Tests\update\Functional;
 class FileTransferAuthorizeFormTest extends UpdateUploaderTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  protected static $modules = ['update', 'update_test'];
-
-  /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
@@ -50,7 +43,7 @@ class FileTransferAuthorizeFormTest extends UpdateUploaderTestBase {
    *
    * @dataProvider archiveFileUrlProvider
    */
-  public function testViaAuthorize($url) {
+  public function testViaAuthorize($url): void {
     // Ensure the that we can select which file transfer backend to use.
     \Drupal::state()->set('test_uploaders_via_prompt', TRUE);
 

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\KernelTests\Config\Schema;
 
@@ -183,9 +183,6 @@ class MappingTest extends KernelTestBase {
       'block.settings.extra_field_block:*:*:*' => [
         'formatter',
       ],
-      'block.settings.page_title_block' => [
-        'base_route_title',
-      ],
       'block.settings.system_branding_block' => [
         'use_site_logo',
         'use_site_name',
@@ -217,7 +214,11 @@ class MappingTest extends KernelTestBase {
         'theme',
         'profile',
       ],
-      ['_core'],
+      [
+        '_core',
+        'langcode',
+        'profile',
+      ],
       [],
     ];
 
@@ -237,7 +238,7 @@ class MappingTest extends KernelTestBase {
         // @see core/modules/config/tests/config_schema_deprecated_test/config/schema/config_schema_deprecated_test.schema.yml
         'complex_structure_deprecated',
       ],
-      ['_core', 'complex_structure_deprecated'],
+      ['_core', 'langcode', 'complex_structure_deprecated'],
       [],
     ];
     yield 'No dynamic type: config_schema_deprecated_test.settings:complex_structure_deprecated' => [

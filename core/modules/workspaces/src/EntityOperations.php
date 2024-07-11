@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\workspaces\Plugin\Validation\Constraint\EntityWorkspaceConflictConstraint;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -147,6 +146,16 @@ class EntityOperations implements ContainerInjectionInterface {
       $entity->isDefaultRevision(FALSE);
     }
 
+    // In ::entityFormEntityBuild() we mark the entity as a non-default revision
+    // so that validation constraints can rely on $entity->isDefaultRevision()
+    // always returning FALSE when an entity form is submitted in a workspace.
+    // However, after validation has run, we need to revert that flag so the
+    // first revision of a new entity is correctly seen by the system as the
+    // default revision.
+    if ($entity->isNew()) {
+      $entity->isDefaultRevision(TRUE);
+    }
+
     // Track the workspaces in which the new revision was saved.
     if (!$entity->isSyncing()) {
       $field_name = $entity->getEntityType()->getRevisionMetadataKey('workspace');
@@ -182,20 +191,18 @@ class EntityOperations implements ContainerInjectionInterface {
 
     $this->workspaceAssociation->trackEntity($entity, $this->workspaceManager->getActiveWorkspace());
 
-    // When an entity is newly created in a workspace, it should be published in
-    // that workspace, but not yet published on the live workspace. It is first
-    // saved as unpublished for the default revision, then immediately a second
-    // revision is created which is published and attached to the workspace.
-    // This ensures that the published version of the entity does not 'leak'
-    // into the live site. This differs from edits to existing entities where
-    // there is already a valid default revision for the live workspace.
+    // When a published entity is created in a workspace, it should remain
+    // published only in that workspace, and unpublished in the live workspace.
+    // It is first saved as unpublished for the default revision, then
+    // immediately a second revision is created which is published and attached
+    // to the workspace. This ensures that the initial version of the entity
+    // does not 'leak' into the live site. This differs from edits to existing
+    // entities where there is already a valid default revision for the live
+    // workspace.
     if (isset($entity->_initialPublished)) {
-      // Operate on a clone to avoid changing the entity prior to subsequent
-      // hook_entity_insert() implementations.
-      $pending_revision = clone $entity;
-      $pending_revision->setPublished();
-      $pending_revision->isDefaultRevision(FALSE);
-      $pending_revision->save();
+      $entity->setPublished();
+      $entity->isDefaultRevision(FALSE);
+      $entity->save();
     }
   }
 
@@ -217,6 +224,40 @@ class EntityOperations implements ContainerInjectionInterface {
     if ($entity->getLoadedRevisionId() != $entity->getRevisionId()) {
       $this->workspaceAssociation->trackEntity($entity, $this->workspaceManager->getActiveWorkspace());
     }
+  }
+
+  /**
+   * Acts after an entity translation has been added.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $translation
+   *   The translation that was added.
+   *
+   * @see hook_entity_translation_insert()
+   */
+  public function entityTranslationInsert(EntityInterface $translation): void {
+    if ($this->shouldSkipOperations($translation)
+      || !$this->workspaceInfo->isEntitySupported($translation)
+      || $translation->isSyncing()
+    ) {
+      return;
+    }
+
+    // When a new translation is added to an existing entity, we need to add
+    // that translation to the default revision as well, otherwise the new
+    // translation wouldn't show up in entity queries or views which use the
+    // field data table as the base table.
+    $this->workspaceManager->executeOutsideWorkspace(function () use ($translation) {
+      $storage = $this->entityTypeManager->getStorage($translation->getEntityTypeId());
+      $default_revision = $storage->load($translation->id());
+
+      $langcode = $translation->language()->getId();
+      if (!$default_revision->hasTranslation($langcode)) {
+        $default_revision_translation = $default_revision->addTranslation($langcode, $translation->toArray());
+        $default_revision_translation->setUnpublished();
+        $default_revision_translation->setSyncing(TRUE);
+        $default_revision_translation->save();
+      }
+    });
   }
 
   /**
@@ -277,23 +318,16 @@ class EntityOperations implements ContainerInjectionInterface {
     if ($this->workspaceManager->hasActiveWorkspace()) {
       $form['#entity_builders'][] = [static::class, 'entityFormEntityBuild'];
     }
-
-    // Run the workspace conflict validation constraint when the entity form is
-    // being built so we can "disable" it early and display a message to the
-    // user, instead of allowing them to enter data that can never be saved.
-    foreach ($entity->validate()->getEntityViolations() as $violation) {
-      if ($violation->getConstraint() instanceof EntityWorkspaceConflictConstraint) {
-        $form['#markup'] = $violation->getMessage();
-        $form['#access'] = FALSE;
-        continue;
-      }
-    }
   }
 
   /**
    * Entity builder that marks all supported entities as pending revisions.
    */
   public static function entityFormEntityBuild($entity_type_id, RevisionableInterface $entity, &$form, FormStateInterface &$form_state) {
+    // Ensure that all entity forms are signaling that a new revision will be
+    // created.
+    $entity->setNewRevision(TRUE);
+
     // Set the non-default revision flag so that validation constraints are also
     // aware that a pending revision is about to be created.
     $entity->isDefaultRevision(FALSE);

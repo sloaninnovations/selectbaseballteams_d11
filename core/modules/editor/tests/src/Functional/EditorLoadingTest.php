@@ -132,17 +132,13 @@ class EditorLoadingTest extends BrowserTestBase {
   /**
    * Tests loading of text editors.
    */
-  public function testLoading() {
+  public function testLoading(): void {
     // Only associate a text editor with the "Full HTML" text format.
     $editor = Editor::create([
       'format' => 'full_html',
       'editor' => 'unicorn',
       'image_upload' => [
         'status' => FALSE,
-        'scheme' => 'public',
-        'directory' => 'inline-images',
-        'max_size' => '',
-        'max_dimensions' => ['width' => '', 'height' => ''],
       ],
     ]);
     $editor->save();
@@ -190,6 +186,9 @@ class EditorLoadingTest extends BrowserTestBase {
     $editor = Editor::create([
       'format' => 'plain_text',
       'editor' => 'unicorn',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
     ]);
     $editor->save();
 
@@ -248,17 +247,13 @@ class EditorLoadingTest extends BrowserTestBase {
   /**
    * Tests supported element types.
    */
-  public function testSupportedElementTypes() {
+  public function testSupportedElementTypes(): void {
     // Associate the unicorn text editor with the "Full HTML" text format.
     $editor = Editor::create([
       'format' => 'full_html',
       'editor' => 'unicorn',
       'image_upload' => [
         'status' => FALSE,
-        'scheme' => 'public',
-        'directory' => 'inline-images',
-        'max_size' => '',
-        'max_dimensions' => ['width' => '', 'height' => ''],
       ],
     ]);
     $editor->save();
@@ -290,6 +285,9 @@ class EditorLoadingTest extends BrowserTestBase {
     Editor::create([
       'format' => 'full_html',
       'editor' => 'trex',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
     ])->save();
 
     $this->drupalGet('node/1/edit');

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
@@ -46,7 +48,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testSetGet() {
+  public function testSetGet(): void {
     parent::testSetGet();
     $backend = $this->getCacheBackend();
 
@@ -75,7 +77,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   /**
    * Tests the row count limiting of cache bin database tables.
    */
-  public function testGarbageCollection() {
+  public function testGarbageCollection(): void {
     $backend = $this->getCacheBackend();
     $max_rows = static::$maxRows;
 
@@ -123,7 +125,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   /**
    * Test that the service "cache_tags.invalidator.checksum" is backend overridable.
    */
-  public function testCacheTagsInvalidatorChecksumIsBackendOverridable() {
+  public function testCacheTagsInvalidatorChecksumIsBackendOverridable(): void {
     $definition = $this->container->getDefinition('cache_tags.invalidator.checksum');
     $this->assertTrue($definition->hasTag('backend_overridable'));
   }
@@ -131,7 +133,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   /**
    * Test that the service "cache.backend.database" is backend overridable.
    */
-  public function testCacheBackendDatabaseIsBackendOverridable() {
+  public function testCacheBackendDatabaseIsBackendOverridable(): void {
     $definition = $this->container->getDefinition('cache.backend.database');
     $this->assertTrue($definition->hasTag('backend_overridable'));
   }

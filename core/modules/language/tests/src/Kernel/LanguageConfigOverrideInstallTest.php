@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\language\Kernel;
 
 use Drupal\Core\Config\ConfigCollectionEvents;
@@ -26,7 +28,7 @@ class LanguageConfigOverrideInstallTest extends KernelTestBase {
   /**
    * Tests the configuration events are not fired during install of overrides.
    */
-  public function testLanguageConfigOverrideInstall() {
+  public function testLanguageConfigOverrideInstall(): void {
     $this->installConfig(['language']);
     ConfigurableLanguage::createFromLangcode('de')->save();
     // Need to enable test module after creating the language otherwise saving

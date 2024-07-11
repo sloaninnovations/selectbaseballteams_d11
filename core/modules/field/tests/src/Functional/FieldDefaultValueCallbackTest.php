@@ -24,6 +24,14 @@ class FieldDefaultValueCallbackTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
+
+  /**
+   * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
 
@@ -52,7 +60,7 @@ class FieldDefaultValueCallbackTest extends BrowserTestBase {
 
   }
 
-  public function testDefaultValueCallbackForm() {
+  public function testDefaultValueCallbackForm(): void {
     // Create a field and storage for checking.
     /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
     FieldStorageConfig::create([

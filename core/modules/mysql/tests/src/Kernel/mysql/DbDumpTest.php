@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\mysql\Kernel\mysql;
 
 use Drupal\Component\Datetime\TimeInterface;
@@ -26,6 +28,8 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    // @todo system can be removed from this test once
+    //   https://www.drupal.org/project/drupal/issues/2851705 is committed.
     'system',
     'config',
     'dblog',
@@ -87,7 +91,6 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
     parent::setUp();
 
     // Create some schemas so our export contains tables.
-    $this->installSchema('system', ['sessions']);
     $this->installSchema('dblog', ['watchdog']);
     $this->installEntitySchema('block_content');
     $this->installEntitySchema('user');
@@ -131,7 +134,6 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
       'menu_link_content_data',
       'menu_link_content_revision',
       'menu_link_content_field_revision',
-      'sessions',
       'path_alias',
       'path_alias_revision',
       'user__roles',
@@ -144,7 +146,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
   /**
    * Tests the command directly.
    */
-  public function testDbDumpCommand() {
+  public function testDbDumpCommand(): void {
     $application = new DbDumpApplication();
     $command = $application->find('dump-database-d8-mysql');
     $command_tester = new CommandTester($command);
@@ -173,7 +175,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
   /**
    * Tests loading the script back into the database.
    */
-  public function testScriptLoad() {
+  public function testScriptLoad(): void {
     // Generate the script.
     $application = new DbDumpApplication();
     $command = $application->find('dump-database-d8-mysql');

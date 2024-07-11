@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Element;
 
@@ -15,15 +16,14 @@ use Drupal\Core\Render\Element;
  *
  * Usage example:
  * @code
- * $form['actions'] = array('#type' => 'actions');
- * $form['actions']['submit'] = array(
+ * $form['actions'] = ['#type' => 'actions'];
+ * $form['actions']['submit'] = [
  *   '#type' => 'submit',
  *   '#value' => $this->t('Save'),
- * );
+ * ];
  * @endcode
- *
- * @RenderElement("actions")
  */
+#[RenderElement('actions')]
 class Actions extends Container {
 
   /**

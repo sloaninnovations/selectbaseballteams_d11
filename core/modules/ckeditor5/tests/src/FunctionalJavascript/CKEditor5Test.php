@@ -40,7 +40,7 @@ class CKEditor5Test extends CKEditor5TestBase {
   /**
    * Tests configuring CKEditor 5 for existing content.
    */
-  public function testExistingContent() {
+  public function testExistingContent(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -72,7 +72,7 @@ class CKEditor5Test extends CKEditor5TestBase {
   /**
    * Ensures that attribute values are encoded.
    */
-  public function testAttributeEncoding() {
+  public function testAttributeEncoding(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -94,7 +94,7 @@ class CKEditor5Test extends CKEditor5TestBase {
         'status' => TRUE,
         'scheme' => 'public',
         'directory' => 'inline-images',
-        'max_size' => '',
+        'max_size' => NULL,
         'max_dimensions' => [
           'width' => NULL,
           'height' => NULL,
@@ -147,7 +147,7 @@ class CKEditor5Test extends CKEditor5TestBase {
   /**
    * Test headings configuration.
    */
-  public function testHeadingsPlugin() {
+  public function testHeadingsPlugin(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -222,7 +222,7 @@ class CKEditor5Test extends CKEditor5TestBase {
   /**
    * Test for Language of Parts plugin.
    */
-  public function testLanguageOfPartsPlugin() {
+  public function testLanguageOfPartsPlugin(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -404,7 +404,7 @@ JS;
   /**
    * Confirms active tab status is intact after AJAX refresh.
    */
-  public function testActiveTabsMaintained() {
+  public function testActiveTabsMaintained(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -543,7 +543,7 @@ JS;
   /**
    * Ensures that CKEditor 5 integrates with file reference filter.
    */
-  public function testEditorFileReferenceIntegration() {
+  public function testEditorFileReferenceIntegration(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -601,7 +601,7 @@ JS;
   /**
    * Ensures that CKEditor italic model is converted to em.
    */
-  public function testEmphasis() {
+  public function testEmphasis(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -628,7 +628,7 @@ JS;
   /**
    * Tests list plugin.
    */
-  public function testListPlugin() {
+  public function testListPlugin(): void {
     FilterFormat::create([
       'format' => 'test_format',
       'name' => 'CKEditor 5 with list',
@@ -637,6 +637,9 @@ JS;
     Editor::create([
       'format' => 'test_format',
       'editor' => 'ckeditor5',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
       'settings' => [
         'toolbar' => [
           'items' => ['sourceEditing', 'numberedList'],
@@ -775,6 +778,9 @@ JS;
     Editor::create([
       'format' => 'ckeditor5',
       'editor' => 'ckeditor5',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
     ])->save();
     $this->assertSame([], array_map(
       function (ConstraintViolation $v) {
@@ -798,6 +804,155 @@ JS;
   }
 
   /**
+   * Ensures that HTML scripts and styles are properly preserved in CKEditor 5.
+   */
+  public function testStylesAndScripts(): void {
+    $test_cases = [
+      // Test cases taken from the HTML documentation.
+      // @see https://html.spec.whatwg.org/multipage/scripting.html#restrictions-for-contents-of-script-elements
+      'script' => [
+        '<script>(function() { let x = 10, y = 5; if( y <--x ) { console.log("run me!"); }})()</script>',
+        '<script>(function() { let x = 10, y = 5; if( y <--x ) { console.log("run me!"); }})()</script>',
+      ],
+      'script like tag' => [
+        '<script>(function() { let player = 5, script = 10; if (player<script) { console.log("run me!"); }})()</script>',
+        '<script>(function() { let player = 5, script = 10; if (player<script) { console.log("run me!"); }})()</script>',
+      ],
+      'script to escape' => [
+        "<script>const example = 'Consider this string: <!-- <script>';</script>",
+        "<script>const example = 'Consider this string: <!-- <script>';</script>",
+      ],
+      'unescaped script tag' => [
+        <<<HTML
+        <script>
+          const example = 'Consider this string: <!-- <script>';
+          console.log(example);
+        </script>
+        <!-- despite appearances, this is actually part of the script still! -->
+        <script>
+          let a = 1 + 2; // this is the same script block still...
+        </script>
+        HTML,
+        <<<HTML
+        <script>
+          const example = 'Consider this string: <!-- <script>';
+          console.log(example);
+        </script>
+        <!-- despite appearances, this is actually part of the script still! -->
+        <script>
+          let a = 1 + 2; // this is the same script block still...
+        </script>
+        HTML,
+      ],
+      'style' => [
+        <<<HTML
+        <style>
+        a > span {
+          /* Important comment. */
+          color: red !important;
+        }
+        </style>
+        HTML,
+        <<<HTML
+        <style>
+        a > span {
+          /* Important comment. */
+          color: red !important;
+        }
+        </style>
+        HTML,
+      ],
+      'script and style' => [
+        <<<HTML
+        <script type="text/javascript">
+        let x = 10;
+        let y = 5;
+        if(y < x){
+        console.log('is smaller')
+        }
+        </script>
+        <style type="text/css">
+        :root {
+          --main-bg-color: brown;
+        }
+        .sections > .section {
+          background: var(--main-bg-color);
+        }
+        </style>
+        HTML,
+        <<<HTML
+        <script type="text/javascript">
+        let x = 10;
+        let y = 5;
+        if(y < x){
+        console.log('is smaller')
+        }
+        </script><style type="text/css">
+        :root {
+          --main-bg-color: brown;
+        }
+        .sections > .section {
+          background: var(--main-bg-color);
+        }
+        </style>
+        HTML,
+      ],
+    ];
+
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+
+    // Create filter.
+    FilterFormat::create([
+      'format' => 'ckeditor5',
+      'name' => 'CKEditor 5 HTML',
+      'roles' => [RoleInterface::AUTHENTICATED_ID],
+    ])->save();
+    Editor::create([
+      'format' => 'ckeditor5',
+      'editor' => 'ckeditor5',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
+      'settings' => [
+        'toolbar' => [
+          'items' => [
+            'sourceEditing',
+          ],
+        ],
+        'plugins' => [
+          'ckeditor5_sourceEditing' => [
+            'allowed_tags' => [],
+          ],
+        ],
+      ],
+    ])->save();
+    $this->assertSame([], array_map(
+      function (ConstraintViolation $v) {
+        return (string) $v->getMessage();
+      },
+      iterator_to_array(CKEditor5::validatePair(
+        Editor::load('ckeditor5'),
+        FilterFormat::load('ckeditor5')
+      ))
+    ));
+
+    // Add a node with text rendered via the CKEditor 5 HTML format.
+    foreach ($test_cases as $test_case_name => $test_case) {
+      [$markup, $expected_content] = $test_case;
+      $this->drupalGet('node/add');
+      $page->fillField('title[0][value]', "Style and script test - $test_case_name");
+      $this->waitForEditor();
+      $this->pressEditorButton('Source');
+      $editor = $page->find('css', '.ck-source-editing-area textarea');
+      $editor->setValue($markup);
+      $page->pressButton('Save');
+
+      $assert_session->responseContains($expected_content);
+    }
+  }
+
+  /**
    * Ensures that changes are saved in CKEditor 5.
    */
   public function testSave(): void {
@@ -811,6 +966,9 @@ JS;
     Editor::create([
       'format' => 'ckeditor5',
       'editor' => 'ckeditor5',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
       'settings' => [
         'toolbar' => [
           'items' => [
@@ -841,6 +999,9 @@ JS;
     Editor::create([
       'format' => 'ckeditor5_2',
       'editor' => 'ckeditor5',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
     ])->save();
     $this->assertSame([], array_map(
       function (ConstraintViolation $v) {

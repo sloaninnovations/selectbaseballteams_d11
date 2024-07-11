@@ -334,6 +334,13 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * {@inheritdoc}
    */
+  public function destruct() {
+    $this->writeCache();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function resetImplementations() {
     $this->implementations = NULL;
     $this->hookInfo = NULL;

@@ -45,19 +45,19 @@ class UrlResolverTest extends MediaFunctionalTestBase {
     return [
       'match by endpoint: Twitter' => [
         'https://twitter.com/Dries/status/999985431595880448',
-        'https://publish.twitter.com/oembed?url=https://twitter.com/Dries/status/999985431595880448',
+        'https://publish.twitter.com/oembed?url=https%3A//twitter.com/Dries/status/999985431595880448',
       ],
       'match by endpoint: Vimeo' => [
         'https://vimeo.com/14782834',
-        'https://vimeo.com/api/oembed.json?url=https://vimeo.com/14782834',
+        'https://vimeo.com/api/oembed.json?url=https%3A//vimeo.com/14782834',
       ],
       'match by endpoint: Dailymotion' => [
         'https://www.dailymotion.com/video/x2vzluh',
-        'https://www.dailymotion.com/services/oembed?url=https://www.dailymotion.com/video/x2vzluh',
+        'https://www.dailymotion.com/services/oembed?url=https%3A//www.dailymotion.com/video/x2vzluh',
       ],
       'match by endpoint: Facebook' => [
         'https://www.facebook.com/facebook/videos/10153231379946729/',
-        'https://www.facebook.com/plugins/video/oembed.json?url=https://www.facebook.com/facebook/videos/10153231379946729/',
+        'https://www.facebook.com/plugins/video/oembed.json?url=https%3A//www.facebook.com/facebook/videos/10153231379946729/',
       ],
     ];
   }
@@ -75,7 +75,7 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    *
    * @dataProvider providerEndpointMatching
    */
-  public function testEndpointMatching($url, $resource_url) {
+  public function testEndpointMatching($url, $resource_url): void {
     $this->assertSame(
       $resource_url,
       $this->container->get('media.oembed.url_resolver')->getResourceUrl($url)
@@ -87,7 +87,7 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    *
    * @depends testEndpointMatching
    */
-  public function testResourceUrlAlterHook() {
+  public function testResourceUrlAlterHook(): void {
     $this->container->get('module_installer')->install(['media_test_oembed']);
 
     $resource_url = $this->container->get('media.oembed.url_resolver')
@@ -130,7 +130,7 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    *
    * @dataProvider providerUrlDiscovery
    */
-  public function testUrlDiscovery($url, $resource_url) {
+  public function testUrlDiscovery($url, $resource_url): void {
     $this->assertSame(
       $this->container->get('media.oembed.url_resolver')->getResourceUrl($url),
       $resource_url

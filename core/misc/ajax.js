@@ -554,7 +554,7 @@
         // Sanity check for browser support (object expected).
         // When using iFrame uploads, responses must be returned as a string.
         if (typeof response === 'string') {
-          response = $.parseJSON(response);
+          response = JSON.parse(response);
         }
 
         // Prior to invoking the response's commands, verify that they can be
@@ -1333,7 +1333,20 @@
       const settings = response.settings || ajax.settings || drupalSettings;
 
       // Parse response.data into an element collection.
-      let $newContent = $($.parseHTML(response.data, document, true));
+      const parseHTML = (htmlString) => {
+        const fragment = document.createDocumentFragment();
+        // Create a temporary div element
+        const tempDiv = fragment.appendChild(document.createElement('div'));
+
+        // Set the innerHTML of the div to the provided HTML string
+        tempDiv.innerHTML = htmlString;
+
+        // Return the contents of the temporary div
+        return tempDiv.childNodes;
+      };
+
+      let $newContent = $(parseHTML(response.data));
+
       // For backward compatibility, in some cases a wrapper will be added. This
       // behavior will be removed before Drupal 9.0.0. If different behavior is
       // needed, the theme functions can be overridden.
@@ -1377,17 +1390,18 @@
         $newContent[effect.showEffect](effect.showSpeed);
       }
 
-      // Attach all JavaScript behaviors to the new content, if it was
-      // successfully added to the page, this if statement allows
-      // `#ajax['wrapper']` to be optional.
-      if ($newContent.parents('html').length) {
-        // Attach behaviors to all element nodes.
-        $newContent.each((index, element) => {
-          if (element.nodeType === Node.ELEMENT_NODE) {
-            Drupal.attachBehaviors(element, settings);
-          }
-        });
-      }
+      // Attach behaviors to all element nodes.
+      $newContent.each((index, element) => {
+        if (
+          element.nodeType === Node.ELEMENT_NODE &&
+          // Attach all JavaScript behaviors to the new content, if it was
+          // successfully added to the page, this condition allows
+          // `#ajax['wrapper']` to be optional.
+          document.documentElement.contains(element)
+        ) {
+          Drupal.attachBehaviors(element, settings);
+        }
+      });
     },
 
     /**
@@ -1422,7 +1436,7 @@
      *   The JSON response object from the Ajax request.
      * @param {string} response.selector
      *   A jQuery selector string.
-     * @param {boolean} [response.asterisk]
+     * @param {string} [response.asterisk]
      *   An optional CSS selector. If specified, an asterisk will be
      *   appended to the HTML inside the provided selector.
      * @param {number} [status]
@@ -1852,9 +1866,13 @@
       while ($(scrollTarget).scrollTop() === 0 && $(scrollTarget).parent()) {
         scrollTarget = $(scrollTarget).parent();
       }
+
       // Only scroll upward.
       if (offset.top - 10 < $(scrollTarget).scrollTop()) {
-        $(scrollTarget).animate({ scrollTop: offset.top - 10 }, 500);
+        scrollTarget.get(0).scrollTo({
+          top: offset.top - 10,
+          behavior: 'smooth',
+        });
       }
     },
   };
