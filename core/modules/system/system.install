@@ -16,7 +16,6 @@ use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Link;
-use Drupal\Core\Utility\PhpRequirements;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PrivateStream;
@@ -26,6 +25,7 @@ use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\Error;
+use Drupal\Core\Utility\PhpRequirements;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -1710,4 +1710,27 @@ function _system_advisories_requirements(array &$requirements): void {
       )->toRenderable();
     }
   }
+}
+
+
+/**
+ * Update length of menu_tree fields url and route_param_key from 255 to 2048.
+ */
+function system_update_11001() {
+  $schema = \Drupal::database()->schema();
+  $spec = [
+    'description' => 'The external path this link points to (when not using a route).',
+    'type' => 'varchar',
+    'length' => 2048,
+    'not null' => TRUE,
+    'default' => '',
+  ];
+  $schema->changeField('menu_tree', 'url', 'url', $spec);
+
+  $spec = [
+    'description' => 'An encoded string of route parameters for loading by route.',
+    'type' => 'varchar',
+    'length' => 2048,
+  ];
+  $schema->changeField('menu_tree', 'route_param_key', 'route_param_key', $spec);
 }
