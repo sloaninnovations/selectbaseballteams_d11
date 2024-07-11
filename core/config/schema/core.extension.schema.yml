@@ -42,6 +42,7 @@ core.extension:
       requiredKey: false
       label: 'Install profile'
       constraints:
-        NotBlank: []
+        NotBlank:
+          allowNull: true
         ExtensionName: []
         ExtensionExists: profile
