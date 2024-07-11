@@ -10,6 +10,8 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * Test class for Html constraint.
+ *
+ * @group Validation
  */
 class HtmlConstraintTest extends KernelTestBase {
 
