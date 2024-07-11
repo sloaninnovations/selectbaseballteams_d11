@@ -52,7 +52,7 @@ class ResultTest extends UnitTestCase {
   }
 
   /**
-   * Tests that a result containing a complext object returns the object.
+   * Tests that a result containing a complex object returns the object.
    */
   public function testThatErrorResultWithComplexObjectReturnsComplexObject(): void {
     $complexObject = new \stdClass();
