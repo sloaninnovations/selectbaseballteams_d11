@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
@@ -17,7 +19,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   /**
    * {@inheritdoc}
    */
-  public function checkSchemaComment(string $description, string $table, string $column = NULL): void {
+  public function checkSchemaComment(string $description, string $table, ?string $column = NULL): void {
     $this->assertSame($description, $this->schema->getComment($table, $column), 'The comment matches the schema description.');
   }
 
@@ -234,7 +236,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   }
 
   /**
-   * @covers \Drupal\Core\Database\Driver\pgsql\Schema::extensionExists
+   * @covers \Drupal\pgsql\Driver\Database\pgsql\Schema::extensionExists
    */
   public function testPgsqlExtensionExists(): void {
     // Test the method for a non existing extension.
@@ -310,7 +312,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   /**
    * Tests the method tableExists().
    */
-  public function testTableExists() {
+  public function testTableExists(): void {
     $table_name = 'test_table';
     $table_specification = [
       'fields' => [
@@ -339,7 +341,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   /**
    * Tests renaming a table where the new index name is equal to the table name.
    */
-  public function testRenameTableWithNewIndexNameEqualsTableName() {
+  public function testRenameTableWithNewIndexNameEqualsTableName(): void {
     // Special table names for colliding with the PostgreSQL new index name.
     $table_name_old = 'some_new_table_name__id__idx';
     $table_name_new = 'some_new_table_name';

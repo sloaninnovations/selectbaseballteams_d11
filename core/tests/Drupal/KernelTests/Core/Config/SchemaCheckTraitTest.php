@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Core\Config\Schema\SchemaCheckTrait;
@@ -42,7 +44,7 @@ class SchemaCheckTraitTest extends KernelTestBase {
    *
    * @dataProvider providerCheckConfigSchema
    */
-  public function testCheckConfigSchema(string $type_to_validate_against, bool $validate_constraints, array|bool $nulled_expectations, array|bool $no_data_expectations, array $expectations) {
+  public function testCheckConfigSchema(string $type_to_validate_against, bool $validate_constraints, array|bool $nulled_expectations, array|bool $no_data_expectations, array $expectations): void {
     // Test a non existing schema.
     $ret = $this->checkConfigSchema($this->typedConfig, 'config_schema_test.no_schema', $this->config('config_schema_test.no_schema')->get());
     $this->assertFalse($ret);
@@ -72,7 +74,7 @@ class SchemaCheckTraitTest extends KernelTestBase {
     $this->assertEquals($no_data_expectations, $ret);
   }
 
-  public function providerCheckConfigSchema(): array {
+  public static function providerCheckConfigSchema(): array {
     // Storage type check errors.
     // @see \Drupal\Core\Config\Schema\SchemaCheckTrait::checkValue()
     $expected_storage_null_check_errors = [

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Cache;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\DatabaseBackendFactory;
 use Drupal\Core\Database\Database;
@@ -54,7 +57,8 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
       ->addArgument(new Reference('database'))
       ->addArgument(new Reference('cache_tags.invalidator.checksum'))
       ->addArgument(new Reference('settings'))
-      ->addArgument(new Reference('serializer'));
+      ->addArgument(new Reference('serializer'))
+      ->addArgument(new Reference(TimeInterface::class));
   }
 
   /**

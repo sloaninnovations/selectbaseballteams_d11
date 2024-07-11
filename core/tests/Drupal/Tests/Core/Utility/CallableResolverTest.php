@@ -9,8 +9,6 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -35,26 +33,16 @@ class CallableResolverTest extends UnitTestCase {
     $container = new ContainerBuilder();
     $container->set('test_service', $this);
 
-    $class_resolver = new ClassResolver();
-    $class_resolver->setContainer($container);
+    $class_resolver = new ClassResolver($container);
 
     $this->resolver = new CallableResolver($class_resolver);
   }
 
   /**
-   * @dataProvider callableResolverTestCases
    * @covers ::getCallableFromDefinition
    */
-  public function testCallbackResolver($definition, $result) {
-    $argument = 'bar';
-    $this->assertEquals($result . '+' . $argument, $this->resolver->getCallableFromDefinition($definition)($argument));
-  }
-
-  /**
-   * Test cases for ::testCallbackResolver.
-   */
-  public function callableResolverTestCases() {
-    return [
+  public function testCallbackResolver(): void {
+    $cases = [
       'Inline function' => [
         function ($suffix) {
           return __METHOD__ . '+' . $suffix;
@@ -90,16 +78,12 @@ class CallableResolverTest extends UnitTestCase {
         __CLASS__ . '::method',
       ],
       'Non-static function, instantiated by class resolver' => [
-        static::class . '::method',
-        __CLASS__ . '::method',
+        MethodCallable::class . '::method',
+        MethodCallable::class . '::method',
       ],
       'Non-static function, instantiated by class resolver, container injection' => [
         '\Drupal\Tests\Core\Utility\MockContainerInjection::getResult',
         'Drupal\Tests\Core\Utility\MockContainerInjection::getResult-foo',
-      ],
-      'Non-static function, instantiated by class resolver, container aware' => [
-        '\Drupal\Tests\Core\Utility\MockContainerAware::getResult',
-        'Drupal\Tests\Core\Utility\MockContainerAware::getResult',
       ],
       'Service notation' => [
         'test_service:method',
@@ -110,17 +94,22 @@ class CallableResolverTest extends UnitTestCase {
         __CLASS__ . '::staticMethod',
       ],
       'Class with invoke method' => [
-        static::class,
-        __CLASS__ . '::__invoke',
+        MethodCallable::class,
+        MethodCallable::class . '::__invoke',
       ],
     ];
+
+    $argument = 'bar';
+    foreach ($cases as $label => [$definition, $result]) {
+      $this->assertEquals($result . '+' . $argument, $this->resolver->getCallableFromDefinition($definition)($argument), $label);
+    }
   }
 
   /**
    * @dataProvider callableResolverExceptionHandlingTestCases
    * @covers ::getCallableFromDefinition
    */
-  public function testCallbackResolverExceptionHandling($definition, $exception_class, $exception_message) {
+  public function testCallbackResolverExceptionHandling($definition, $exception_class, $exception_message): void {
     $this->expectException($exception_class);
     $this->expectExceptionMessage($exception_message);
     $this->resolver->getCallableFromDefinition($definition);
@@ -129,7 +118,7 @@ class CallableResolverTest extends UnitTestCase {
   /**
    * Test cases for ::testCallbackResolverExceptionHandling.
    */
-  public function callableResolverExceptionHandlingTestCases() {
+  public static function callableResolverExceptionHandlingTestCases() {
     return [
       'String function' => [
         'not_a_callable',
@@ -142,14 +131,14 @@ class CallableResolverTest extends UnitTestCase {
         'The callable definition provided "[not_a_callable,not_a_callable]" is not a valid callable.',
       ],
       'Missing method on class, array notation' => [
-        [static::class, 'method_not_exists'],
+        [\stdClass::class, 'method_not_exists'],
         \InvalidArgumentException::class,
-        'The callable definition provided "[Drupal\Tests\Core\Utility\CallableResolverTest,method_not_exists]" is not a valid callable.',
+        'The callable definition provided "[stdClass,method_not_exists]" is not a valid callable.',
       ],
       'Missing method on class, static notation' => [
-        static::class . '::method_not_exists',
+        \stdClass::class . '::method_not_exists',
         \InvalidArgumentException::class,
-        'The callable definition provided was invalid. Either class "Drupal\Tests\Core\Utility\CallableResolverTest" does not have a method "method_not_exists", or it is not callable.',
+        'The callable definition provided was invalid. Either class "stdClass" does not have a method "method_not_exists", or it is not callable.',
       ],
       'Missing class, static notation' => [
         '\NotARealClass::method',
@@ -248,18 +237,38 @@ class NoInstantiationMockStaticCallable {
 
 }
 
-class NoMethodCallable {
-}
+class MethodCallable {
 
-class MockContainerAware implements ContainerAwareInterface {
-
-  use ContainerAwareTrait;
-
-  public function getResult($suffix) {
-    if (empty($this->container)) {
-      throw new \Exception('Container was not injected.');
-    }
+  /**
+   * A test __invoke method.
+   *
+   * @param string $suffix
+   *   A suffix to append.
+   *
+   * @return string
+   *   A test string.
+   */
+  public function __invoke($suffix) {
     return __METHOD__ . '+' . $suffix;
   }
 
+  /**
+   * A test method that returns "foo".
+   *
+   * @param string $suffix
+   *   A suffix to append.
+   *
+   * @return string
+   *   A test string.
+   *
+   * @throws \Exception
+   *   Throws an exception when called statically.
+   */
+  public function method($suffix) {
+    return __METHOD__ . '+' . $suffix;
+  }
+
+}
+
+class NoMethodCallable {
 }

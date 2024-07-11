@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Tests\BrowserTestBase;
@@ -45,7 +47,7 @@ class ThemeUiTest extends BrowserTestBase {
   /**
    * Tests permissions for enabling themes depending on disabled modules.
    */
-  public function testModulePermissions() {
+  public function testModulePermissions(): void {
     // Log in as a user without permission to enable modules.
     $this->drupalLogin($this->drupalCreateUser([
       'administer themes',
@@ -54,7 +56,7 @@ class ThemeUiTest extends BrowserTestBase {
 
     // The links to install a theme that would enable modules should be replaced
     // by this message.
-    $this->assertSession()->pageTextContains('This theme requires the listed modules to operate correctly. They must first be enabled by a user with permissions to do so.');
+    $this->assertSession()->pageTextContains('This theme requires the listed modules to operate correctly. They must first be installed by a user with permissions to do so.');
 
     // The install page should not be reachable.
     $this->drupalGet('admin/appearance/install?theme=test_theme_depending_on_modules');
@@ -65,7 +67,7 @@ class ThemeUiTest extends BrowserTestBase {
       'administer modules',
     ]));
     $this->drupalGet('admin/appearance');
-    $this->assertSession()->pageTextNotContains('This theme requires the listed modules to operate correctly. They must first be enabled by a user with permissions to do so.');
+    $this->assertSession()->pageTextNotContains('This theme requires the listed modules to operate correctly. They must first be installed by a user with permissions to do so.');
   }
 
   /**
@@ -86,7 +88,7 @@ class ThemeUiTest extends BrowserTestBase {
    *
    * @dataProvider providerTestThemeInstallWithModuleDependencies
    */
-  public function testThemeInstallWithModuleDependencies($theme_name, array $first_modules, array $second_modules, array $required_by_messages, $base_theme_to_uninstall, array $base_theme_module_names) {
+  public function testThemeInstallWithModuleDependencies($theme_name, array $first_modules, array $second_modules, array $required_by_messages, $base_theme_to_uninstall, array $base_theme_module_names): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $all_dependent_modules = array_merge($first_modules, $second_modules);
@@ -211,7 +213,7 @@ class ThemeUiTest extends BrowserTestBase {
    *   An array of arrays. Details on the specific elements can be found in the
    *   function body.
    */
-  public function providerTestThemeInstallWithModuleDependencies() {
+  public static function providerTestThemeInstallWithModuleDependencies() {
     // Data provider values with the following keys:
     // -'theme_name': The name of the theme being tested.
     // -'first_modules': Array of module machine names to enable first.
@@ -300,7 +302,7 @@ class ThemeUiTest extends BrowserTestBase {
     }
 
     $incompatible = $theme_container->find('css', '.incompatible');
-    $expected_incompatible_text = 'This theme requires the listed modules to operate correctly. They must first be enabled via the Extend page.';
+    $expected_incompatible_text = 'This theme requires the listed modules to operate correctly. They must first be installed via the Extend page.';
     $this->assertSame($expected_incompatible_text, $incompatible->getText());
     $this->assertFalse($theme_container->hasLink('Install Test Theme Depending on Modules theme'));
   }
@@ -308,7 +310,7 @@ class ThemeUiTest extends BrowserTestBase {
   /**
    * Tests installing a theme with missing module dependencies.
    */
-  public function testInstallModuleWithMissingDependencies() {
+  public function testInstallModuleWithMissingDependencies(): void {
     $this->drupalGet('admin/appearance');
     $theme_container = $this->getSession()->getPage()->find('css', 'h3:contains("Test Theme Depending on Nonexisting Module")')->getParent();
     $this->assertStringContainsString('Requires: test_module_non_existing (missing)', $theme_container->getText());
@@ -318,7 +320,7 @@ class ThemeUiTest extends BrowserTestBase {
   /**
    * Tests installing a theme with incompatible module dependencies.
    */
-  public function testInstallModuleWithIncompatibleDependencies() {
+  public function testInstallModuleWithIncompatibleDependencies(): void {
     $this->container->get('module_installer')->install(['test_module_compatible_constraint', 'test_module_incompatible_constraint']);
     $this->drupalGet('admin/appearance');
     $theme_container = $this->getSession()->getPage()->find('css', 'h3:contains("Test Theme Depending on Version Constrained Modules")')->getParent();
@@ -329,7 +331,7 @@ class ThemeUiTest extends BrowserTestBase {
   /**
    * Tests that incompatible themes message is shown.
    */
-  public function testInstalledIncompatibleTheme() {
+  public function testInstalledIncompatibleTheme(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
     $incompatible_themes_message = 'There are errors with some installed themes. Visit the status report page for more information.';

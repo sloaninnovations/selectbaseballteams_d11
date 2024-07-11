@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Form;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -26,7 +27,7 @@ class CheckboxTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  public function testFormCheckbox() {
+  public function testFormCheckbox(): void {
     // Ensure that the checked state is determined and rendered correctly for
     // tricky combinations of default and return values.
     foreach ([FALSE, NULL, TRUE, 0, '0', '', 1, '1', 'foobar', '1foobar'] as $default_value) {
@@ -55,7 +56,7 @@ class CheckboxTest extends BrowserTestBase {
           $checked = ($default_value === '1foobar');
         }
         $checked_in_html = str_contains($form, 'checked');
-        $message = new FormattableMarkup('#default_value is %default_value #return_value is %return_value.', ['%default_value' => var_export($default_value, TRUE), '%return_value' => var_export($return_value, TRUE)]);
+        $message = '#default_value is ' . var_export($default_value, TRUE) . ' #return_value is ' . var_export($return_value, TRUE) . '.';
         $this->assertSame($checked, $checked_in_html, $message);
       }
     }

@@ -148,11 +148,6 @@ function editor_form_filter_format_form_alter(&$form, FormStateInterface $form_s
     '#weight' => -8,
     '#type' => 'container',
     '#id' => 'editor-settings-wrapper',
-    '#attached' => [
-      'library' => [
-        'editor/drupal.editor.admin',
-      ],
-    ],
   ];
 
   // Add editor-specific validation and submit handlers.
@@ -186,6 +181,9 @@ function editor_form_filter_admin_format_editor_configure($form, FormStateInterf
       $editor = Editor::create([
         'format' => $format->isNew() ? NULL : $format->id(),
         'editor' => $editor_value,
+        'image_upload' => [
+          'status' => FALSE,
+        ],
       ]);
       $form_state->set('editor', $editor);
     }
@@ -252,6 +250,15 @@ function editor_form_filter_admin_format_submit($form, FormStateInterface $form_
     if ($settings = $form_state->getValue(['editor', 'settings'])) {
       $editor->setSettings($settings);
     }
+    // When image uploads are disabled (status = FALSE), the schema for image
+    // upload settings does not allow other keys to be present.
+    // @see editor.image_upload_settings.*
+    // @see editor.image_upload_settings.1
+    // @see editor.schema.yml
+    $image_upload_settings = $editor->getImageUploadSettings();
+    if (!$image_upload_settings['status']) {
+      $editor->setImageUploadSettings(['status' => FALSE]);
+    }
     $editor->save();
   }
 }
@@ -298,7 +305,7 @@ function editor_load($format_id) {
  *
  * @see https://www.drupal.org/node/2099741
  */
-function editor_filter_xss($html, FilterFormatInterface $format = NULL, FilterFormatInterface $original_format = NULL) {
+function editor_filter_xss($html, ?FilterFormatInterface $format = NULL, ?FilterFormatInterface $original_format = NULL) {
   $editor = $format ? editor_load($format->id()) : NULL;
 
   // If no text editor is associated with this text format or the previously
@@ -586,7 +593,7 @@ function _editor_get_formatted_text_fields(FieldableEntityInterface $entity) {
   }
 
   // Only return formatted text fields.
-  // @todo: improve as part of https://www.drupal.org/node/2732429
+  // @todo improve as part of https://www.drupal.org/node/2732429
   $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
   return array_keys(array_filter($field_definitions, function (FieldDefinitionInterface $definition) use ($field_type_manager) {
     $type = $definition->getType();
@@ -619,6 +626,8 @@ function _editor_parse_file_uuids($text) {
  * Implements hook_ENTITY_TYPE_presave().
  *
  * Synchronizes the editor status to its paired text format status.
+ *
+ * @todo remove in https://www.drupal.org/project/drupal/issues/3231354.
  */
 function editor_filter_format_presave(FilterFormatInterface $format) {
   // The text format being created cannot have a text editor yet.

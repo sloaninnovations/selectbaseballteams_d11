@@ -90,10 +90,10 @@ abstract class ImageTestBase extends CKEditor5TestBase {
     $src = $this->imageAttributes()['src'];
     $this->waitForEditor();
     $this->pressEditorButton('Insert image via URL');
-    $panel = $page->find('css', '.ck-dropdown__panel  .ck-image-insert-url');
-    $src_input = $panel->find('css', 'input[type=text]');
+    $dialog = $page->find('css', '.ck-dialog');
+    $src_input = $dialog->find('css', '.ck-image-insert-url input[type=text]');
     $src_input->setValue($src);
-    $panel->find('xpath', "//button[span[text()='Insert']]")->click();
+    $dialog->find('xpath', "//button[span[text()='Accept']]")->click();
     // Wait for the image to be uploaded and rendered by CKEditor 5.
     $this->assertNotEmpty($this->assertSession()->waitForElementVisible('css', '.ck-widget.image > img[src="' . $src . '"]'));
   }
@@ -101,7 +101,7 @@ abstract class ImageTestBase extends CKEditor5TestBase {
   /**
    * Ensures that attributes are retained on conversion.
    */
-  public function testAttributeRetentionDuringUpcasting() {
+  public function testAttributeRetentionDuringUpcasting(): void {
     // Run test cases in a single test to make the test run faster.
     $attributes_to_retain = [
       '-none-' => 'inline',
@@ -163,7 +163,7 @@ abstract class ImageTestBase extends CKEditor5TestBase {
    *
    * @dataProvider providerLinkability
    */
-  public function testImageArbitraryHtml(string $image_type, bool $unrestricted) {
+  public function testImageArbitraryHtml(string $image_type, bool $unrestricted): void {
     $editor = Editor::load('test_format');
     $settings = $editor->getSettings();
 
@@ -210,7 +210,7 @@ abstract class ImageTestBase extends CKEditor5TestBase {
    *
    * @dataProvider providerLinkability
    */
-  public function testLinkability(string $image_type, bool $unrestricted) {
+  public function testLinkability(string $image_type, bool $unrestricted): void {
     assert($image_type === 'inline' || $image_type === 'block');
 
     // Disable filter_html.
@@ -361,7 +361,7 @@ abstract class ImageTestBase extends CKEditor5TestBase {
    *
    * @dataProvider providerAltTextRequired
    */
-  public function testAltTextRequired(bool $unrestricted) {
+  public function testAltTextRequired(bool $unrestricted): void {
     // Disable filter_html.
     if ($unrestricted) {
       FilterFormat::load('test_format')
@@ -450,14 +450,14 @@ abstract class ImageTestBase extends CKEditor5TestBase {
     $this->assertVisibleBalloon('.ck-text-alternative-form');
   }
 
-  public function providerAltTextRequired(): array {
+  public static function providerAltTextRequired(): array {
     return [
       'Restricted' => [FALSE],
       'Unrestricted' => [TRUE],
     ];
   }
 
-  public function providerLinkability(): array {
+  public static function providerLinkability(): array {
     return [
       'BLOCK image, restricted' => ['block', FALSE],
       'BLOCK image, unrestricted' => ['block', TRUE],
@@ -528,7 +528,7 @@ abstract class ImageTestBase extends CKEditor5TestBase {
     $this->assertFalse($drupal_media_element->hasAttribute('data-align'));
   }
 
-  public function providerAlignment() {
+  public static function providerAlignment() {
     return [
       'Block image' => ['block'],
       'Inline image' => ['inline'],
@@ -584,7 +584,7 @@ abstract class ImageTestBase extends CKEditor5TestBase {
   /**
    * Ensures that images can have caption set.
    */
-  public function testImageCaption() {
+  public function testImageCaption(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -620,7 +620,7 @@ abstract class ImageTestBase extends CKEditor5TestBase {
    *
    * @return string[][]
    */
-  public function providerWidth(): array {
+  public static function providerWidth(): array {
     return [
       'Image resize with percent unit (only allowed in HTML 4)' => [
         'width' => '33%',
@@ -674,7 +674,7 @@ abstract class ImageTestBase extends CKEditor5TestBase {
    * @return array
    *   The test cases.
    */
-  public function providerResize(): array {
+  public static function providerResize(): array {
     return [
       'Image resize is enabled' => [
         'is_resize_enabled' => TRUE,

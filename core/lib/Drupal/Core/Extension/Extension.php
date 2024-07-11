@@ -157,21 +157,6 @@ class Extension {
   }
 
   /**
-   * Re-routes method calls to SplFileInfo.
-   *
-   * Offers all SplFileInfo methods to consumers; e.g., $extension->getMTime().
-   *
-   * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
-   *   \Drupal\Core\Extension\Extension::getFileInfo() instead.
-   *
-   * @see https://www.drupal.org/node/2959989
-   */
-  public function __call($method, array $args) {
-    @trigger_error(__METHOD__ . "('$method')" . ' is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Extension\Extension::getFileInfo() instead. See https://www.drupal.org/node/3322608', E_USER_DEPRECATED);
-    return call_user_func_array([$this->getFileInfo(), $method], $args);
-  }
-
-  /**
    * Returns SplFileInfo instance for the extension's info file.
    *
    * @return \SplFileInfo
@@ -192,7 +177,7 @@ class Extension {
    * @return array
    *   The names of all variables that should be serialized.
    */
-  public function __sleep() {
+  public function __sleep(): array {
     // @todo \Drupal\Core\Extension\ThemeExtensionList is adding custom
     //   properties to the Extension object.
     $properties = get_object_vars($this);
@@ -205,7 +190,7 @@ class Extension {
   /**
    * Magic method implementation to unserialize the extension object.
    */
-  public function __wakeup() {
+  public function __wakeup(): void {
     // Get the app root from the container. While compiling the container we
     // have to discover all the extension service files in
     // \Drupal\Core\DrupalKernel::initializeServiceProviders(). This results in
@@ -223,15 +208,6 @@ class Extension {
    *   TRUE if an extension is marked as experimental, FALSE otherwise.
    */
   public function isExperimental(): bool {
-    // Currently, this function checks for both the key/value pairs
-    // 'experimental: true' and 'lifecycle: experimental' to determine if an
-    // extension is marked as experimental.
-    // @todo Remove the deprecation check for 'experimental: true' as part of
-    // https://www.drupal.org/node/3321634
-    if (isset($this->info['experimental']) && $this->info['experimental']) {
-      @trigger_error('The key-value pair "experimental: true" is deprecated in drupal:10.1.0 and will be removed before drupal:11.0.0. Use the key-value pair "lifecycle: experimental" instead. See https://www.drupal.org/node/3263585', E_USER_DEPRECATED);
-      return TRUE;
-    }
     return (isset($this->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER])
         && $this->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::EXPERIMENTAL);
   }

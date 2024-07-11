@@ -3,6 +3,7 @@
 namespace Drupal\Core\Cache;
 
 use Drupal\Component\Assertion\Inspector;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\PhpStorage\PhpStorageInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\PhpStorage\PhpStorageFactory;
@@ -51,8 +52,10 @@ class PhpBackend implements CacheBackendInterface {
    *   The cache bin for which the object is created.
    * @param \Drupal\Core\Cache\CacheTagsChecksumInterface $checksum_provider
    *   The cache tags checksum provider.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
    */
-  public function __construct($bin, CacheTagsChecksumInterface $checksum_provider) {
+  public function __construct($bin, CacheTagsChecksumInterface $checksum_provider, protected TimeInterface $time) {
     $this->bin = 'cache_' . $bin;
     $this->checksumProvider = $checksum_provider;
   }
@@ -132,7 +135,7 @@ class PhpBackend implements CacheBackendInterface {
     }
 
     // Check expire time.
-    $cache->valid = $cache->expire == Cache::PERMANENT || $cache->expire >= REQUEST_TIME;
+    $cache->valid = $cache->expire == Cache::PERMANENT || $cache->expire >= $this->time->getRequestTime();
 
     // Check if invalidateTags() has been called with any of the item's tags.
     if (!$this->checksumProvider->isValid($cache->checksum, $cache->tags)) {
@@ -201,7 +204,7 @@ class PhpBackend implements CacheBackendInterface {
    */
   protected function invalidateByHash($cidhash) {
     if ($item = $this->getByHash($cidhash)) {
-      $item->expire = REQUEST_TIME - 1;
+      $item->expire = $this->time->getRequestTime() - 1;
       $this->writeItem($cidhash, $item);
     }
   }

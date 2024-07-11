@@ -32,7 +32,7 @@ interface EntityStorageInterface {
    *   (optional) If specified, the cache is reset for the entities with the
    *   given ids only.
    */
-  public function resetCache(array $ids = NULL);
+  public function resetCache(?array $ids = NULL);
 
   /**
    * Loads one or more entities.
@@ -44,7 +44,7 @@ interface EntityStorageInterface {
    *   An array of entity objects indexed by their IDs. Returns an empty array
    *   if no matching entities are found.
    */
-  public function loadMultiple(array $ids = NULL);
+  public function loadMultiple(?array $ids = NULL);
 
   /**
    * Loads one entity.
@@ -70,41 +70,6 @@ interface EntityStorageInterface {
    *   unchanged entity from the entity object.
    */
   public function loadUnchanged($id);
-
-  /**
-   * Load a specific entity revision.
-   *
-   * @param int|string $revision_id
-   *   The revision id.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface|null
-   *   The specified entity revision or NULL if not found.
-   *
-   * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
-   * \Drupal\Core\Entity\RevisionableStorageInterface::loadRevision instead.
-   *
-   * @see https://www.drupal.org/node/2926958
-   * @see https://www.drupal.org/node/2927226
-   * @see https://www.drupal.org/node/3294237
-   */
-  public function loadRevision($revision_id);
-
-  /**
-   * Delete a specific entity revision.
-   *
-   * A revision can only be deleted if it's not the currently active one.
-   *
-   * @param int $revision_id
-   *   The revision id.
-   *
-   * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
-   * \Drupal\Core\Entity\RevisionableStorageInterface::deleteRevision instead.
-   *
-   * @see https://www.drupal.org/node/2926958
-   * @see https://www.drupal.org/node/2927226
-   * @see https://www.drupal.org/node/3294237
-   */
-  public function deleteRevision($revision_id);
 
   /**
    * Load entities by their property values without any access checks.

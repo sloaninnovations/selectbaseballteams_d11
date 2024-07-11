@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
@@ -47,10 +49,8 @@ class RssFieldsTest extends ViewsKernelTestBase {
    * ensure that root-relative links also work in a scenario without
    * subdirectory.
    */
-  public function testRssFields() {
-    // Set up the current user as uid 1 so the test doesn't need to deal with
-    // permission.
-    $this->setUpCurrentUser(['uid' => 1]);
+  public function testRssFields(): void {
+    $this->setUpCurrentUser([], ['access content']);
 
     $date = '1975-05-18';
 

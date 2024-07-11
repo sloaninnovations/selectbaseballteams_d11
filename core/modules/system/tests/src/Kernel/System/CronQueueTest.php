@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\System;
 
 use Drupal\Core\Database\Database;
@@ -96,7 +98,7 @@ class CronQueueTest extends KernelTestBase {
   /**
    * Tests that DelayedRequeueException behaves as expected when running cron.
    */
-  public function testDelayException() {
+  public function testDelayException(): void {
     $database = $this->container->get('queue')->get('cron_queue_test_database_delay_exception');
     $memory = $this->container->get('queue')->get('cron_queue_test_memory_delay_exception');
 
@@ -140,7 +142,7 @@ class CronQueueTest extends KernelTestBase {
   /**
    * Tests that leases are expiring correctly, also within the same request.
    */
-  public function testLeaseTime() {
+  public function testLeaseTime(): void {
     $queue = $this->container->get('queue')->get('cron_queue_test_lease_time');
     $queue->createItem([$this->randomMachineName() => $this->randomMachineName()]);
     // Run initial queue job and ensure lease time variable is initialized.
@@ -172,7 +174,7 @@ class CronQueueTest extends KernelTestBase {
    *
    * @see \Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestException
    */
-  public function testUncaughtExceptions() {
+  public function testUncaughtExceptions(): void {
     $this->logger->log(
       RfcLogLevel::ERROR,
       '%type: @message in %function (line %line of %file).',
@@ -202,9 +204,10 @@ class CronQueueTest extends KernelTestBase {
     // The item should be left in the queue.
     $this->assertEquals(1, $queue->numberOfItems(), 'Failing item still in the queue after throwing an exception.');
 
-    // Expire the queue item manually. system_cron() relies in REQUEST_TIME to
-    // find queue items whose expire field needs to be reset to 0. This is a
-    // Kernel test, so REQUEST_TIME won't change when cron runs.
+    // Expire the queue item manually. system_cron() relies in
+    // \Drupal::time()->getRequestTime() to find queue items whose expire field needs to be
+    // reset to 0. This is a Kernel test, so \Drupal::time()->getRequestTime() won't change
+    // when cron runs.
     // @see system_cron()
     // @see \Drupal\Core\Cron::processQueues()
     $this->connection->update('queue')

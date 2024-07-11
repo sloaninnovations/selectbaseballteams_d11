@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
@@ -54,7 +56,7 @@ abstract class RoleResourceTestBase extends ConfigEntityResourceTestBase {
       'dependencies' => [],
       'id' => 'llama',
       'label' => 'Llama',
-      'is_admin' => NULL,
+      'is_admin' => FALSE,
       'permissions' => [],
     ];
   }

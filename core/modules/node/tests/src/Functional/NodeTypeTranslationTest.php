@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -102,7 +104,7 @@ class NodeTypeTranslationTest extends BrowserTestBase {
   /**
    * Tests the node type translation.
    */
-  public function testNodeTypeTranslation() {
+  public function testNodeTypeTranslation(): void {
     $type = $this->randomMachineName(16);
     $name = $this->randomString();
     $this->drupalLogin($this->adminUser);
@@ -139,7 +141,7 @@ class NodeTypeTranslationTest extends BrowserTestBase {
   /**
    * Tests the node type title label translation.
    */
-  public function testNodeTypeTitleLabelTranslation() {
+  public function testNodeTypeTitleLabelTranslation(): void {
     $type = $this->randomMachineName(16);
     $name = $this->randomString();
     $this->drupalLogin($this->adminUser);

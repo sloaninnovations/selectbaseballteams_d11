@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Component\Render\FormattableMarkup;
@@ -69,7 +71,7 @@ class DisplayTest extends ViewTestBase {
    *
    * @see \Drupal\views_test_data\Plugin\views\display\DisplayTest
    */
-  public function testDisplayPlugin() {
+  public function testDisplayPlugin(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_view');
@@ -165,7 +167,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests the overriding of filter_groups.
    */
-  public function testFilterGroupsOverriding() {
+  public function testFilterGroupsOverriding(): void {
     $view = Views::getView('test_filter_groups');
     $view->initDisplay();
 
@@ -178,7 +180,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests the getAttachedDisplays method.
    */
-  public function testGetAttachedDisplays() {
+  public function testGetAttachedDisplays(): void {
     $view = Views::getView('test_get_attach_displays');
 
     // Both the feed_1 and the feed_2 display are attached to the page display.
@@ -192,7 +194,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests the readmore validation.
    */
-  public function testReadMoreNoDisplay() {
+  public function testReadMoreNoDisplay(): void {
     $view = Views::getView('test_display_more');
     // Confirm that the view validates when there is a page display.
     $errors = $view->validate();
@@ -218,7 +220,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests the readmore with custom URL.
    */
-  public function testReadMoreCustomURL() {
+  public function testReadMoreCustomURL(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
 
@@ -313,7 +315,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests invalid display plugins.
    */
-  public function testInvalidDisplayPlugins() {
+  public function testInvalidDisplayPlugins(): void {
     $this->drupalGet('test_display_invalid');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -362,7 +364,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests display validation when a required relationship is missing.
    */
-  public function testMissingRelationship() {
+  public function testMissingRelationship(): void {
     $view = Views::getView('test_exposed_relationship_admin_ui');
 
     // Remove the relationship that is not used by other handlers.
@@ -387,7 +389,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests the outputIsEmpty method on the display.
    */
-  public function testOutputIsEmpty() {
+  public function testOutputIsEmpty(): void {
     $view = Views::getView('test_display_empty');
     $this->executeView($view);
     $this->assertNotEmpty($view->result);
@@ -430,7 +432,7 @@ class DisplayTest extends ViewTestBase {
   /**
    * Tests translation rendering settings based on entity translatability.
    */
-  public function testTranslationSetting() {
+  public function testTranslationSetting(): void {
     \Drupal::service('module_installer')->install(['file']);
 
     // By default there should be no language settings.

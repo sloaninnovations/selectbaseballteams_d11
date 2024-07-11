@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
@@ -111,7 +113,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
   /**
    * Tests the default rendered entity output.
    */
-  public function testRenderedEntityWithoutAndWithField() {
+  public function testRenderedEntityWithoutAndWithField(): void {
     // First test without test_field displayed.
     \Drupal::currentUser()->setAccount($this->user);
 
@@ -127,7 +129,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
       '#display_id' => 'default',
     ];
     $renderer = \Drupal::service('renderer');
-    $renderer->renderPlain($build);
+    $renderer->renderInIsolation($build);
     for ($i = 1; $i <= 3; $i++) {
       $view_field = (string) $view->style_plugin->getField($i - 1, 'rendered_entity');
       $search_result = str_contains($view_field, "Test $i");
@@ -150,7 +152,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
       '#display_id' => 'default',
     ];
 
-    $renderer->renderPlain($build);
+    $renderer->renderInIsolation($build);
     for ($i = 1; $i <= 3; $i++) {
       $view_field = (string) $view->style_plugin->getField($i - 1, 'rendered_entity');
       $search_result = str_contains($view_field, "Test $i");

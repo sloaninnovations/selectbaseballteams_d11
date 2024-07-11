@@ -69,7 +69,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    *
    * @dataProvider providerTestPathPrefix
    */
-  public function testPathPrefix($prefix, $prefixes, $expected_langcode) {
+  public function testPathPrefix($prefix, $prefixes, $expected_langcode): void {
     $this->languageManager->expects($this->any())
       ->method('getCurrentLanguage')
       ->willReturn($this->languages[(in_array($expected_langcode, [
@@ -113,7 +113,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    * @return array
    *   An array of data for checking path prefix negotiation.
    */
-  public function providerTestPathPrefix() {
+  public static function providerTestPathPrefix() {
     $path_prefix_configuration[] = [
       'prefix' => 'de',
       'prefixes' => [
@@ -161,7 +161,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    *
    * @dataProvider providerNeutralLanguages
    */
-  public function testNeutralLanguages($langcode, $expected_langcode) {
+  public function testNeutralLanguages($langcode, $expected_langcode): void {
     if ($expected_langcode) {
       $this->languageManager->expects($this->once())
         ->method('getCurrentLanguage')
@@ -214,7 +214,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    *   An array of data for checking path prefix negotiation for neutral
    *   languages.
    */
-  public function providerNeutralLanguages() {
+  public static function providerNeutralLanguages() {
     return [
       [LanguageInterface::LANGCODE_NOT_APPLICABLE, NULL],
       [LanguageInterface::LANGCODE_NOT_SPECIFIED, 'en'],
@@ -226,7 +226,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    *
    * @dataProvider providerTestDomain
    */
-  public function testDomain($http_host, $domains, $expected_langcode) {
+  public function testDomain($http_host, $domains, $expected_langcode): void {
     $this->languageManager->expects($this->any())
       ->method('getCurrentLanguage')
       ->willReturn($this->languages['en']);
@@ -263,7 +263,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    * @return array
    *   An array of data for checking domain negotiation.
    */
-  public function providerTestDomain() {
+  public static function providerTestDomain() {
 
     $domain_configuration[] = [
       'http_host' => 'example.de',

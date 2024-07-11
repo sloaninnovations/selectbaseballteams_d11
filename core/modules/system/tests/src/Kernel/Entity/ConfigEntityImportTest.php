@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Entity;
 
 use Drupal\Component\Uuid\Php;
@@ -36,7 +38,7 @@ class ConfigEntityImportTest extends KernelTestBase {
   /**
    * Runs test methods for each module within a single test run.
    */
-  public function testConfigUpdateImport() {
+  public function testConfigUpdateImport(): void {
     $this->installConfig(['block', 'filter', 'image']);
     $this->container->get('theme_installer')->install(['olivero']);
     $config_storage = $this->container->get('config.storage');
@@ -170,6 +172,8 @@ class ConfigEntityImportTest extends KernelTestBase {
     $name = 'search.page.apple';
     $entity = SearchPage::create([
       'id' => 'apple',
+      'label' => 'Apple search',
+      'path' => 'apple',
       'plugin' => 'search_extra_type_search',
     ]);
     $entity->save();

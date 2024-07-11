@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
@@ -47,7 +49,7 @@ class MainContentFallbackTest extends BrowserTestBase {
   /**
    * Tests availability of main content: Drupal falls back to SimplePageVariant.
    */
-  public function testMainContentFallback() {
+  public function testMainContentFallback(): void {
     $edit = [];
     // Uninstall the block module.
     $edit['uninstall[block]'] = 'block';

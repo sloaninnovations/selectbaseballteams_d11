@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -95,7 +97,7 @@ class TokenReplaceTest extends KernelTestBase {
   /**
    * Creates some terms and a node, then tests the tokens generated from them.
    */
-  public function testTaxonomyTokenReplacement() {
+  public function testTaxonomyTokenReplacement(): void {
     $token_service = \Drupal::token();
     $language_interface = \Drupal::languageManager()->getCurrentLanguage();
 

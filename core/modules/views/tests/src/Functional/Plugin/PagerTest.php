@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
@@ -49,7 +51,7 @@ class PagerTest extends ViewTestBase {
    *
    * @see https://www.drupal.org/node/652712
    */
-  public function testStorePagerSettings() {
+  public function testStorePagerSettings(): void {
     // Show the default display so the override selection is shown.
     \Drupal::configFactory()->getEditable('views.settings')->set('ui.show.default_display', TRUE)->save();
 
@@ -221,7 +223,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests the none-pager-query.
    */
-  public function testNoLimit() {
+  public function testNoLimit(): void {
     // Create 11 nodes and make sure that everyone is returned.
     // We create 11 nodes, because the default pager plugin had 10 items per page.
     $this->drupalCreateContentType(['type' => 'page']);
@@ -252,7 +254,7 @@ class PagerTest extends ViewTestBase {
     $this->assertEquals(0, $view->pager->getItemsPerPage());
   }
 
-  public function testViewTotalRowsWithoutPager() {
+  public function testViewTotalRowsWithoutPager(): void {
     $this->drupalCreateContentType(['type' => 'page']);
     for ($i = 0; $i < 23; $i++) {
       $this->drupalCreateNode();
@@ -268,7 +270,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests the some pager plugin.
    */
-  public function testLimit() {
+  public function testLimit(): void {
     // Create 11 nodes and make sure that everyone is returned.
     // We create 11 nodes, because the default pager plugin had 10 items per page.
     $this->drupalCreateContentType(['type' => 'page']);
@@ -302,7 +304,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests the normal pager.
    */
-  public function testNormalPager() {
+  public function testNormalPager(): void {
     // Create 11 nodes and make sure that everyone is returned.
     // We create 11 nodes, because the default pager plugin had 10 items per page.
     $this->drupalCreateContentType(['type' => 'page']);
@@ -334,7 +336,7 @@ class PagerTest extends ViewTestBase {
 
     $this->assertCount(11, $view->result, 'All items are return');
 
-    // TODO test number of pages.
+    // @todo Test number of pages.
 
     // Test items per page = 0.
     // Setup and test an offset.
@@ -371,13 +373,16 @@ class PagerTest extends ViewTestBase {
     $view->display_handler->setOption('pager', $pager);
     $view->save();
     $this->drupalGet('test_pager_full', ['query' => ['page' => 2]]);
-    $this->assertEquals('Current page 3', $this->assertSession()->elementExists('css', '.pager__items li.is-active')->getText());
+    $this->assertEquals('Page 3', $this->assertSession()->elementExists('css', '.pager__items li.is-active')->getText());
+    $link = $this->assertSession()->elementExists('css', '.pager__items li.is-active a');
+    $this->assertSame('page', $link->getAttribute('aria-current'));
+    $this->assertSame('Current page', $link->getAttribute('title'));
   }
 
   /**
    * Tests changing the heading level.
    */
-  public function testPagerHeadingLevel() {
+  public function testPagerHeadingLevel(): void {
     // Create 2 nodes and make sure that everyone is returned.
     $this->drupalCreateContentType(['type' => 'page']);
     for ($i = 0; $i < 2; $i++) {
@@ -398,8 +403,7 @@ class PagerTest extends ViewTestBase {
     $view->display_handler->setOption('pager', $pager);
     $view->save();
 
-    // Stable9 will be addressed in https://www.drupal.org/project/drupal/issues/3333418
-    $themes = ['stark', 'olivero', 'claro', 'starterkit_theme'];
+    $themes = ['stark', 'olivero', 'claro', 'starterkit_theme', 'stable9'];
     $this->container->get('theme_installer')->install($themes);
 
     foreach ($themes as $theme) {
@@ -412,7 +416,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests rendering with NULL pager.
    */
-  public function testRenderNullPager() {
+  public function testRenderNullPager(): void {
     // Create 11 nodes and make sure that everyone is returned.
     // We create 11 nodes, because the default pager plugin had 10 items per page.
     $this->drupalCreateContentType(['type' => 'page']);
@@ -426,13 +430,13 @@ class PagerTest extends ViewTestBase {
     $view->pager = NULL;
     $output = $view->render();
     $output = (string) \Drupal::service('renderer')->renderRoot($output);
-    $this->assertEquals(0, preg_match('/<ul class="pager">/', $output), 'The pager is not rendered.');
+    $this->assertStringNotContainsString('<ul class="pager">', $output);
   }
 
   /**
    * Tests the api functions on the view object.
    */
-  public function testPagerApi() {
+  public function testPagerApi(): void {
     $view = Views::getView('test_pager_full');
     $view->setDisplay();
     // On the first round don't initialize the pager.
@@ -488,7 +492,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests translating the pager using config_translation.
    */
-  public function testPagerConfigTranslation() {
+  public function testPagerConfigTranslation(): void {
     $view = Views::getView('content');
     $display = &$view->storage->getDisplay('default');
     $display['display_options']['pager']['options']['items_per_page'] = 5;
@@ -547,7 +551,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests translating the pager using locale.
    */
-  public function testPagerLocale() {
+  public function testPagerLocale(): void {
     // Enable locale and language module.
     $this->container->get('module_installer')->install(['locale', 'language']);
     $this->resetAll();

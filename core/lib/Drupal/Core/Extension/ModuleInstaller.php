@@ -14,6 +14,8 @@ use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Update\UpdateHookRegistry;
 use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
  * Default implementation of the module installer.
@@ -64,13 +66,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
   protected $updateRegistry;
 
   /**
-   * The uninstall validators.
-   *
-   * @var \Drupal\Core\Extension\ModuleUninstallValidatorInterface[]
-   */
-  protected $uninstallValidators;
-
-  /**
    * Constructs a new ModuleInstaller instance.
    *
    * @param string $root
@@ -85,19 +80,31 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   The update registry service.
    * @param \Psr\Log\LoggerInterface|null $logger
    *   The logger.
+   * @param \Traversable|null $uninstallValidators
+   *   The uninstall validator services.
    *
    * @see \Drupal\Core\DrupalKernel
    * @see \Drupal\Core\CoreServiceProvider
    */
-  public function __construct($root, ModuleHandlerInterface $module_handler, DrupalKernelInterface $kernel, Connection $connection, UpdateHookRegistry $update_registry, protected ?LoggerInterface $logger = NULL) {
+  public function __construct(
+    #[Autowire(param: 'app.root')]
+    string $root,
+    ModuleHandlerInterface $module_handler,
+    DrupalKernelInterface $kernel,
+    Connection $connection,
+    UpdateHookRegistry $update_registry,
+    #[Autowire(service: 'logger.channel.default')]
+    protected LoggerInterface $logger,
+    #[AutowireIterator(tag: 'module_install.uninstall_validator')]
+    protected ?\Traversable $uninstallValidators = NULL,
+  ) {
     $this->root = $root;
     $this->moduleHandler = $module_handler;
     $this->kernel = $kernel;
     $this->connection = $connection;
     $this->updateRegistry = $update_registry;
-    if ($this->logger === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $logger argument is deprecated in drupal:10.1.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/2932520', E_USER_DEPRECATED);
-      $this->logger = \Drupal::service('logger.channel.system');
+    if ($this->uninstallValidators === NULL) {
+      $this->uninstallValidators = \Drupal::service('module_installer.uninstall_validators');
     }
   }
 
@@ -105,7 +112,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * {@inheritdoc}
    */
   public function addUninstallValidator(ModuleUninstallValidatorInterface $uninstall_validator) {
-    $this->uninstallValidators[] = $uninstall_validator;
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject the uninstall validators into the constructor instead. See https://www.drupal.org/node/3432595', E_USER_DEPRECATED);
   }
 
   /**
@@ -500,7 +507,15 @@ class ModuleInstaller implements ModuleInstallerInterface {
 
       // Remove the module's entry from the config. Don't check schema when
       // uninstalling a module since we are only clearing a key.
-      \Drupal::configFactory()->getEditable('core.extension')->clear("module.$module")->save(TRUE);
+      $core_extension = \Drupal::configFactory()->getEditable('core.extension');
+      $core_extension->clear("module.$module");
+      // If the install profile is being uninstalled then remove the site's
+      // profile key to indicate that the site no longer has an installation
+      // profile.
+      if ($core_extension->get('profile') === $module) {
+        $core_extension->clear('profile');
+      }
+      $core_extension->save(TRUE);
 
       // Update the module handler to remove the module.
       // The current ModuleHandler instance is obsolete with the kernel rebuild

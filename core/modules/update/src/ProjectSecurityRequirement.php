@@ -232,7 +232,7 @@ final class ProjectSecurityRequirement {
     }
     else {
       $security_coverage_end_timestamp = \DateTime::createFromFormat('Y-m-d', $full_security_coverage_end_date)->getTimestamp();
-      $output_date_format = $date_format === 'Y-m-d' ? 'Y-M-d' : 'Y-M';
+      $output_date_format = $date_format === 'Y-m-d' ? 'Y-M-d' : 'F Y';
       $formatted_end_date = $date_formatter
         ->format($security_coverage_end_timestamp, 'custom', $output_date_format);
       $translation_arguments = ['@date' => $formatted_end_date];
@@ -243,7 +243,7 @@ final class ProjectSecurityRequirement {
       $request_date = $date_formatter->format($time->getRequestTime(), 'custom', 'Y-m-d');
       if (!empty($this->securityCoverageInfo['security_coverage_ending_warn_date']) && $this->securityCoverageInfo['security_coverage_ending_warn_date'] <= $request_date) {
         $requirement['description']['coverage_message'] = [
-          '#markup' => $this->t('Update to a supported minor version soon to continue receiving security updates.'),
+          '#markup' => $this->t('Update to a supported version soon to continue receiving security updates.'),
           '#suffix' => ' ',
         ];
         $requirement['severity'] = REQUIREMENT_WARNING;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\StringTranslation;
 
 use Drupal\Core\Site\Settings;
@@ -33,7 +35,7 @@ class TranslationStringTest extends KernelTestBase {
   /**
    * Tests that TranslatableMarkup objects can be compared.
    */
-  public function testComparison() {
+  public function testComparison(): void {
     $this->rebootAndPrepareSettings();
     $a = \Drupal::service('string_translation')->translate('Example @number', ['@number' => 42], ['langcode' => 'de']);
 

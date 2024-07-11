@@ -8,11 +8,12 @@ use Drupal\Core\Batch\Percentage;
 use Drupal\Tests\UnitTestCase;
 
 /**
+ * Tests the Batch helper object.
+ *
+ * Make sure that the rounding works properly in all cases.
+ *
  * @coversDefaultClass \Drupal\Core\Batch\Percentage
  * @group Batch
- *
- * Tests the Batch helper object to make sure that the rounding works properly
- * in all cases.
  */
 class PercentagesTest extends UnitTestCase {
   protected $testCases = [];
@@ -21,7 +22,7 @@ class PercentagesTest extends UnitTestCase {
    * @dataProvider providerTestPercentages
    * @covers ::format
    */
-  public function testPercentages($total, $current, $expected_result) {
+  public function testPercentages($total, $current, $expected_result): void {
     $actual_result = Percentage::format($total, $current);
     $this->assertEquals($actual_result, $expected_result, sprintf('The expected the batch api percentage at the state %s/%s is %s%% and got %s%%.', $current, $total, $expected_result, $actual_result));
   }
@@ -32,7 +33,7 @@ class PercentagesTest extends UnitTestCase {
    * @return array
    *   An array of data used by the test.
    */
-  public function providerTestPercentages() {
+  public static function providerTestPercentages() {
     // Set up an array of test cases.
     return [
       // array(total, current, expected).

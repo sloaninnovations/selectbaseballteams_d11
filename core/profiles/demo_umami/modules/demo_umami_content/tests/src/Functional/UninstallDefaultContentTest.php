@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\demo_umami_content\Functional;
 
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -114,7 +116,7 @@ class UninstallDefaultContentTest extends BrowserTestBase {
     $nodes = $node_storage->loadByProperties(['title' => 'The umami guide to our favorite mushrooms']);
     $this->assertCount(1, $nodes);
     $node = reset($nodes);
-    $this->assertStringContainsString('One of the best things about mushrooms is their versatility', $node->body->value);
+    $this->assertStringContainsString('One of the best things about mushrooms is their versatility', $node->get('field_body')->value);
   }
 
   /**

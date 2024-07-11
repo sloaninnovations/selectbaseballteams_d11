@@ -11,8 +11,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Manages entity type plugin definitions.
@@ -33,9 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
  * @see hook_entity_type_alter()
  * @see hook_entity_type_build()
  */
-class EntityTypeManager extends DefaultPluginManager implements EntityTypeManagerInterface, ContainerAwareInterface {
-
-  use ContainerAwareTrait;
+class EntityTypeManager extends DefaultPluginManager implements EntityTypeManagerInterface {
 
   /**
    * Contains instantiated handlers keyed by handler type and entity type.
@@ -81,8 +78,10 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
    *   The class resolver.
    * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
    *   The entity last installed schema repository.
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The service container.
    */
-  public function __construct(\Traversable $namespaces, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, TranslationInterface $string_translation, ClassResolverInterface $class_resolver, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository) {
+  public function __construct(\Traversable $namespaces, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, TranslationInterface $string_translation, ClassResolverInterface $class_resolver, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, protected ContainerInterface $container) {
     parent::__construct('Entity', $namespaces, $module_handler, 'Drupal\Core\Entity\EntityInterface');
 
     $this->setCacheBackend($cache, 'entity_type', ['entity_types']);
@@ -204,7 +203,11 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
    */
   public function getFormObject($entity_type_id, $operation) {
     if (!$class = $this->getDefinition($entity_type_id, TRUE)->getFormClass($operation)) {
-      throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" entity type did not specify a "%s" form class.', $entity_type_id, $operation));
+      $handlers = $this->getDefinition($entity_type_id, TRUE)->getHandlerClasses();
+      if (!isset($handlers['form'][$operation])) {
+        throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" entity type did not specify a "%s" form class.', $entity_type_id, $operation));
+      }
+      throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" form handler of the "%s" entity type specifies a non-existent class "%s".', $operation, $entity_type_id, $handlers['form'][$operation]));
     }
 
     $form_object = $this->classResolver->getInstanceFromDefinition($class);
@@ -268,7 +271,7 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
   /**
    * {@inheritdoc}
    */
-  public function createHandlerInstance($class, EntityTypeInterface $definition = NULL) {
+  public function createHandlerInstance($class, ?EntityTypeInterface $definition = NULL) {
     if (is_subclass_of($class, 'Drupal\Core\Entity\EntityHandlerInterface')) {
       $handler = $class::createInstance($this->container, $definition);
     }

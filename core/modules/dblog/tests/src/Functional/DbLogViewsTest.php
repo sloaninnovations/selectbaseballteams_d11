@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\dblog\Functional;
 
 use Drupal\views\Views;
@@ -57,7 +59,7 @@ class DbLogViewsTest extends DbLogTest {
   /**
    * Tests the empty text for the watchdog view is not using an input format.
    */
-  public function testEmptyText() {
+  public function testEmptyText(): void {
     $view = Views::getView('watchdog');
     $data = $view->storage->toArray();
     $area = $data['display']['default']['display_options']['empty']['area'];

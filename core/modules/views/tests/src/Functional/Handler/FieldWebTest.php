@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Handler;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Render\RenderContext;
@@ -69,7 +70,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests the click sorting functionality.
    */
-  public function testClickSorting() {
+  public function testClickSorting(): void {
     $this->drupalGet('test_click_sort');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -105,7 +106,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests the default click sorting functionality with distinct.
    */
-  public function testClickSortingDistinct() {
+  public function testClickSortingDistinct(): void {
     ConfigurableLanguage::createFromLangcode('es')->save();
     $node = $this->drupalCreateNode();
     $this->drupalGet('test_distinct_click_sorting');
@@ -217,7 +218,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests rewriting the output to a link.
    */
-  public function testAlterUrl() {
+  public function testAlterUrl(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -407,7 +408,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests the field/label/wrapper classes.
    */
-  public function testFieldClasses() {
+  public function testFieldClasses(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_field_classes');
@@ -518,7 +519,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests trimming/read-more/ellipses.
    */
-  public function testTextRendering() {
+  public function testTextRendering(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -637,10 +638,10 @@ class FieldWebTest extends ViewTestBase {
       });
 
       if ($tuple['trimmed']) {
-        $this->assertNotSubString($output, $tuple['value'], new FormattableMarkup('The untrimmed value (@untrimmed) should not appear in the trimmed output (@output).', ['@untrimmed' => $tuple['value'], '@output' => $output]));
+        $this->assertNotSubString($output, $tuple['value'], "The untrimmed value ({$tuple['value']}) should not appear in the trimmed output ($output).");
       }
       if (!empty($tuple['trimmed_value'])) {
-        $this->assertSubString($output, $tuple['trimmed_value'], new FormattableMarkup('The trimmed value (@trimmed) should appear in the trimmed output (@output).', ['@trimmed' => $tuple['trimmed_value'], '@output' => $output]));
+        $this->assertSubString($output, $tuple['trimmed_value'], "The trimmed value ({$tuple['trimmed_value']}) should appear in the trimmed output ($output).");
       }
     }
 

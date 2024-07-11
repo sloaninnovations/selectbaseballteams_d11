@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional\d6;
 
 use Drupal\Tests\migrate_drupal_ui\Functional\NoMultilingualReviewPageTestBase;
@@ -105,8 +107,6 @@ class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
       'Taxonomy',
       'Text',
       'Throttle',
-      // @todo Remove tracker in https://www.drupal.org/project/drupal/issues/3261452
-      'Tracker',
       'Trigger',
       'Update status',
       'Upload',
@@ -155,6 +155,7 @@ class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
       'String translation',
       'Synchronize translations',
       'Taxonomy translation',
+      'Tracker',
       'Views',
       'Views translation',
     ];

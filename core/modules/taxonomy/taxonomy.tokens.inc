@@ -112,6 +112,7 @@ function taxonomy_tokens($type, $tokens, array $data, array $options, Bubbleable
   $replacements = [];
   if ($type == 'term' && !empty($data['term'])) {
     $term = $data['term'];
+    $term = \Drupal::service('entity.repository')->getTranslationFromContext($term, $options['langcode'] ?? NULL);
 
     foreach ($tokens as $name => $original) {
       switch ($name) {
@@ -120,7 +121,7 @@ function taxonomy_tokens($type, $tokens, array $data, array $options, Bubbleable
           break;
 
         case 'name':
-          $replacements[$original] = $term->getName();
+          $replacements[$original] = $term->label();
           break;
 
         case 'description':
@@ -198,7 +199,7 @@ function taxonomy_tokens($type, $tokens, array $data, array $options, Bubbleable
         case 'description':
           $build = ['#markup' => $vocabulary->getDescription()];
           // @todo Fix in https://www.drupal.org/node/2577827
-          $replacements[$original] = \Drupal::service('renderer')->renderPlain($build);
+          $replacements[$original] = \Drupal::service('renderer')->renderInIsolation($build);
           break;
 
         case 'term-count':
