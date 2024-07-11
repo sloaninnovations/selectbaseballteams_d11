@@ -40,7 +40,7 @@ class ValidRegexConstraintTest extends KernelTestBase {
    * @param string|null $message
    *   The expected error message, if any.
    *
-   * @dataProvider validRegexConstraintProvider
+   * @dataProvider validRegexConstraintDataProvider
    */
   public function testValidRegexConstraint(string $regex, ?string $message = NULL): void {
     $this->testString->setValue($regex);
@@ -60,7 +60,7 @@ class ValidRegexConstraintTest extends KernelTestBase {
    * @return array[]
    *   The test cases.
    */
-  public static function validRegexConstraintProvider(): array {
+  public static function validRegexConstraintDataProvider(): array {
     return [
       'invalid no ending delimiter' => [
         'regex' => '/test',

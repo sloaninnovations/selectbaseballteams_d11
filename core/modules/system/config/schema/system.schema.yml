@@ -247,7 +247,7 @@ system.performance.fast_404.1:
       label: 'Regular expression to not match'
     html:
       # @see \Drupal\Core\EventSubscriber\Fast404ExceptionHtmlSubscriber
-      type: html
+      type: html_document
       label: 'Fast 404 page html'
 
 system.rss:

@@ -109,11 +109,20 @@ text:
       message: 'Text is not allowed to contain control characters, only visible characters.'
 
 # An arbitrary string of HTML.
-html:
+html_fragment:
   type: string
   label: 'HTML'
   constraints:
-    Callback: ['\Drupal\Component\Utility\Html', validate]
+    Html5:
+      mode: fragment
+
+# A full html document.
+html_document:
+  type: string
+  label: 'HTML'
+  constraints:
+    Html5:
+      mode: document
 
 # A UUID.
 uuid:
