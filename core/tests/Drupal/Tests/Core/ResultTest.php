@@ -45,7 +45,7 @@ class ResultTest extends UnitTestCase {
   }
 
   /**
-   * Test that a result of type Error is of type Error.
+   * Tests that a result of type Error is of type Error.
    */
   public function testThatErrorResultIsError(): void {
     $this->assertTrue(Result::error("Foo")->isError());
