@@ -7,11 +7,13 @@ namespace Drupal\Tests\Core;
 use Drupal\Core\Result;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Result type.
  */
 #[CoversClass(Result::class)]
+#[Group('ResultTest')]
 class ResultTest extends UnitTestCase {
 
   /**
