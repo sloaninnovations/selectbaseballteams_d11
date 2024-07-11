@@ -7,6 +7,8 @@ namespace Drupal\Tests\system\Functional\Update;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 
+// cspell:ignore mlid
+
 /**
  * Tests update of menu tree storage fields.
  *
