@@ -79,6 +79,8 @@ class HandlerTest extends ViewTestBase {
   public function testBreakString(): void {
     // Check defaults.
     $this->assertEquals((object) ['value' => [], 'operator' => NULL], HandlerBase::breakString(''));
+    $long_string_or = implode('+', array_fill(0, 4000, 'word'));
+    $long_string_and = implode(',', array_fill(0, 4000, 'word'));
 
     // Test ors
     $handler = HandlerBase::breakString('word1 word2+word');
@@ -96,6 +98,10 @@ class HandlerTest extends ViewTestBase {
     $handler = HandlerBase::breakString('wõrd1+wõrd2+wõrd');
     $this->assertEquals(['wõrd1', 'wõrd2', 'wõrd'], $handler->value);
     $this->assertEquals('or', $handler->operator);
+    $handler = HandlerBase::breakString($long_string_or);
+    $this->assertEquals(explode('+', $long_string_or), $handler->value);
+    $this->assertEquals('or', $handler->operator);
+
 
     // Test ands.
     $handler = HandlerBase::breakString('word1,word2,word');
@@ -112,6 +118,9 @@ class HandlerTest extends ViewTestBase {
     $this->assertEquals('and', $handler->operator);
     $handler = HandlerBase::breakString('wõrd1,wõrd2,wõrd');
     $this->assertEquals(['wõrd1', 'wõrd2', 'wõrd'], $handler->value);
+    $this->assertEquals('and', $handler->operator);
+    $handler = HandlerBase::breakString($long_string_and);
+    $this->assertEquals(explode(',', $long_string_and), $handler->value);
     $this->assertEquals('and', $handler->operator);
 
     // Test a single word
