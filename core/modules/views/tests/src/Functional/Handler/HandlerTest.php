@@ -102,7 +102,6 @@ class HandlerTest extends ViewTestBase {
     $this->assertEquals(explode('+', $long_string_or), $handler->value);
     $this->assertEquals('or', $handler->operator);
 
-
     // Test ands.
     $handler = HandlerBase::breakString('word1,word2,word');
     $this->assertEquals(['word1', 'word2', 'word'], $handler->value);
