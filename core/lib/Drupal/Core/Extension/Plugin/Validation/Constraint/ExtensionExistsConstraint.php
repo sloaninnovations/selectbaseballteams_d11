@@ -39,6 +39,13 @@ class ExtensionExistsConstraint extends SymfonyConstraint {
   public string $themeNotExistsMessage = "Theme '@name' does not exists.";
 
   /**
+   * The error message for a non-existent profile.
+   *
+   * @var string
+   */
+  public string $profileNotExistsMessage = "Profile '@name' does not exists.";
+
+  /**
    * The error message for a existent but not installed theme.
    *
    * @var string

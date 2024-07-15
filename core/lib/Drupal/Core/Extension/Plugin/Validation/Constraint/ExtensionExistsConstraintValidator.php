@@ -125,7 +125,7 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
           return;
         }
         if (!$this->profileExtensionList->exists($extension_name)) {
-          $this->context->addViolation($constraint->themeMessage, $variables);
+          $this->context->addViolation($constraint->profileNotExistsMessage, $variables);
         }
         break;
 
