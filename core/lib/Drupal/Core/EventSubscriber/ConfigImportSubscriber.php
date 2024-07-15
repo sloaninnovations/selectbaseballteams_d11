@@ -2,11 +2,15 @@
 
 namespace Drupal\Core\EventSubscriber;
 
+use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\ConfigImporterEvent;
 use Drupal\Core\Config\ConfigImportValidateEventSubscriberBase;
 use Drupal\Core\Config\ConfigNameException;
+use Drupal\Core\Config\Schema\SchemaCheckTrait;
+use Drupal\Core\Config\TypedConfigManager;
+use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Extension\ConfigImportModuleUninstallValidatorInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
@@ -17,6 +21,22 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
  * Config import subscriber for config import events.
  */
 class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
+
+  use SchemaCheckTrait;
+
+  /**
+   * The typed config manager.
+   *
+   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   */
+  protected $typedConfig;
+
+  /**
+   * The config importer.
+   *
+   * @var \Drupal\Core\Config\ConfigImporter
+   */
+  protected $configImporter;
 
   /**
    * Theme data.
@@ -68,14 +88,15 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
    * @throws \Drupal\Core\Config\ConfigNameException
    */
   public function onConfigImporterValidate(ConfigImporterEvent $event) {
+    $this->typedConfig = NULL;
+    $this->configImporter = $event->getConfigImporter();
     foreach (['delete', 'create', 'update'] as $op) {
       foreach ($event->getConfigImporter()->getUnprocessedConfiguration($op) as $name) {
-        try {
-          Config::validateName($name);
-        }
-        catch (ConfigNameException $e) {
-          $message = $this->t('The config name @config_name is invalid.', ['@config_name' => $name]);
-          $event->getConfigImporter()->logError($message);
+        foreach ($this->configImporter->getUnprocessedConfiguration($op) as $name) {
+          $this->validateName($name);
+          if ($op != 'delete') {
+            $this->validateSchema($name);
+          }
         }
       }
     }
@@ -367,6 +388,65 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
       }
       return $name;
     }, $names);
+  }
+
+  /**
+   * Validates configuration object names.
+   *
+   * @param string $name
+   *   The configuration name.
+   */
+  protected function validateName($name) {
+    try {
+      Config::validateName($name);
+    }
+    catch (ConfigNameException $e) {
+      $message = $this->t('The config name @config_name is invalid.', ['@config_name' => $name]);
+      $this->configImporter->logError($message);
+    }
+  }
+
+  /**
+   * Validates configuration data using its schema.
+   *
+   * @param string $name
+   *   The configuration name.
+   */
+  protected function validateSchema($name) {
+    $config_data = $this->configImporter
+      ->getStorageComparer()
+      ->getSourceStorage()
+      ->read($name);
+    $errors = $this->checkConfigSchema($this->getTypedConfig(), $name, $config_data);
+    if (is_array($errors)) {
+      foreach ($errors as $key => $error) {
+        $this->configImporter->logError($this->t('Schema key @key failed with: @error', [
+          '@key' => $key,
+          '@error' => $error,
+        ]));
+      }
+    }
+  }
+
+  /**
+   * Creates a typed config manager that reads all available schema.
+   *
+   * @return \Drupal\Core\Config\TypedConfigManagerInterface
+   *   The typed config manager.
+   */
+  protected function getTypedConfig() {
+    if (!isset($this->typedConfig)) {
+      // Construct a TypedConfigManager will access to all schema even if the
+      // module or theme that provides it is uninstalled.
+      $schema_storage = new InstallStorage(InstallStorage::CONFIG_SCHEMA_DIRECTORY);
+      $this->typedConfig = new TypedConfigManager(
+        $this->configImporter->getStorageComparer()->getSourceStorage(),
+        $schema_storage,
+        new MemoryBackend('ConfigImportSubscriber'),
+        $this->moduleHandler
+      );
+    }
+    return $this->typedConfig;
   }
 
 }
