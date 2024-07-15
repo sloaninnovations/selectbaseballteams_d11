@@ -13,6 +13,7 @@ use Drupal\Core\Config\TypedConfigManager;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Extension\ConfigImportModuleUninstallValidatorInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Installer\InstallerKernel;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -60,6 +61,13 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
   protected ThemeExtensionList $themeList;
 
   /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * Constructs the ConfigImportSubscriber.
    *
    * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
@@ -68,15 +76,19 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
    *   The module extension list.
    * @param \Traversable $uninstallValidators
    *   The uninstall validator services.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * *   The module handler
    */
   public function __construct(
     ThemeExtensionList $theme_extension_list,
     ModuleExtensionList $extension_list_module,
     #[AutowireIterator(tag: 'module_install.uninstall_validator')]
     protected \Traversable $uninstallValidators,
+    ModuleHandlerInterface $module_handler,
   ) {
     $this->themeList = $theme_extension_list;
     $this->moduleExtensionList = $extension_list_module;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
