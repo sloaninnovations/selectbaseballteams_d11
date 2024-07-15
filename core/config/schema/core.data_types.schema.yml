@@ -116,10 +116,10 @@ html_fragment:
     Html5:
       mode: fragment
 
-# A full html document.
+# A full HTML document.
 html_document:
   type: string
-  label: 'HTML'
+  label: 'HTML document'
   constraints:
     Html5:
       mode: document
@@ -170,7 +170,7 @@ machine_name:
 # A valid regular expression.
 regex:
   type: string
-  label: 'Regular Expression'
+  label: 'Regular expression'
   constraints:
     ValidRegex: ~
 

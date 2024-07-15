@@ -241,14 +241,14 @@ system.performance.fast_404.1:
   mapping:
     paths:
       type: regex
-      label: 'Regular expression to match'
+      label: 'Regular expression of paths to match'
     exclude_paths:
       type: regex
-      label: 'Regular expression to not match'
+      label: 'Regular expression of paths to NOT match'
     html:
       # @see \Drupal\Core\EventSubscriber\Fast404ExceptionHtmlSubscriber
       type: html_document
-      label: 'Fast 404 page html'
+      label: 'Fast 404 page HTML'
 
 system.rss:
   type: config_object

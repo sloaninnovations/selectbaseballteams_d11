@@ -20,19 +20,19 @@ class HtmlConstraintValidator extends ConstraintValidator {
    */
   public function validate(mixed $value, Constraint $constraint): void {
     if (!$constraint instanceof HtmlConstraint) {
-      throw new UnexpectedTypeException($constraint, ValidRegexConstraint::class);
+      throw new UnexpectedTypeException($constraint, HtmlConstraint::class);
     }
     if ($value === NULL) {
       return;
     }
     if (!is_string($value) && !$value instanceof \Stringable) {
-      throw new UnexpectedValueException($value, 'string');
+      throw new UnexpectedValueException($value, 'string|\Stringable');
     }
 
     $value = (string) $value;
     $parser = new HTML5(['disable_html_ns' => TRUE, 'encoding' => 'UTF-8']);
 
-    match($constraint->mode) {
+    match ($constraint->mode) {
       'fragment' => $parser->loadHTMLFragment($value),
       'document' => $parser->loadHTML($value),
     };

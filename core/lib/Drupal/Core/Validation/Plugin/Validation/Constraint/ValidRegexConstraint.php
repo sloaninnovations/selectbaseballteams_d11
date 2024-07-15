@@ -9,13 +9,12 @@ use Drupal\Core\Validation\Attribute\Constraint;
 use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
- * Valid Regex constraint.
  *
  * Determines if a string is a valid regular expression.
  */
 #[Constraint(
   id: 'ValidRegex',
-  label: new TranslatableMarkup('Valid Regex', [], ['context' => 'Validation'])
+  label: new TranslatableMarkup('Valid regular expression', [], ['context' => 'Validation'])
 )]
 class ValidRegexConstraint extends SymfonyConstraint {
 
@@ -24,6 +23,6 @@ class ValidRegexConstraint extends SymfonyConstraint {
    *
    * @var string
    */
-  public string $message = 'The value "@regex" is not valid: @message.';
+  public string $message = 'The value "@regex" is not a valid regular expression: @message.';
 
 }

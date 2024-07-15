@@ -26,7 +26,7 @@ class ValidRegexConstraintValidator extends ConstraintValidator {
     }
 
     if (!is_string($value) && !$value instanceof \Stringable) {
-      throw new UnexpectedValueException($value, 'string');
+      throw new UnexpectedValueException($value, 'string|\Stringable');
     }
 
     $value = (string) $value;
