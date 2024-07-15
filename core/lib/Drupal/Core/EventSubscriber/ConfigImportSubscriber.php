@@ -77,7 +77,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
    * @param \Traversable $uninstallValidators
    *   The uninstall validator services.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   * *   The module handler
+   *   The module handler.
    */
   public function __construct(
     ThemeExtensionList $theme_extension_list,
