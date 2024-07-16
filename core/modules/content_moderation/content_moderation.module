@@ -355,7 +355,7 @@ function content_moderation_workflow_insert(WorkflowInterface $entity) {
   }
 
   // Create actions for changing the moderation state.
-  if ($entity->getTypePlugin()->getId() === 'content_moderation') {
+  if ($entity->getTypePlugin()->getPluginId() === 'content_moderation') {
     content_moderation_save_workflow_actions($entity);
   }
 }
@@ -375,7 +375,7 @@ function content_moderation_workflow_update(WorkflowInterface $entity) {
   }
 
   // Create/update actions for changing the moderation state.
-  if ($entity->getTypePlugin()->getId() === 'content_moderation') {
+  if ($entity->getTypePlugin()->getPluginId() === 'content_moderation') {
     content_moderation_save_workflow_actions($entity);
   }
 }
