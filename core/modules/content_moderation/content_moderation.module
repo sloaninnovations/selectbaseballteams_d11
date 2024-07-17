@@ -402,7 +402,8 @@ function content_moderation_workflow_delete(WorkflowInterface $entity) {
  */
 function content_moderation_save_workflow_actions(WorkflowInterface $workflow) {
   $workflow_base_action_id = 'content_moderation_' . $workflow->id();
-  $entity_types = $workflow->getTypePlugin()->getEntityTypes();
+  // Omit unsupported entity types.
+  $entity_types = array_filter($workflow->getTypePlugin()->getEntityTypes(), [\Drupal::service('content_moderation.moderation_information'), 'canModerateEntitiesOfEntityType']);
   foreach ($entity_types as $entity_type_id) {
     foreach ($workflow->getTypePlugin()->getStates() as $state_id => $state) {
       $action_id = $workflow_base_action_id . '_' . $entity_type_id . '_change_to_' . $state_id;
@@ -418,6 +419,9 @@ function content_moderation_save_workflow_actions(WorkflowInterface $workflow) {
             'revision_log_message' => t('Change moderation state to @state', ['@state' => $state->label()]),
           ],
           'plugin' => 'moderation_state_change:' . $entity_type_id,
+          'dependencies' => [
+            'config' => ['workflows.workflow.' . $workflow->id()],
+          ],
         ]);
       }
       else {
@@ -426,6 +430,9 @@ function content_moderation_save_workflow_actions(WorkflowInterface $workflow) {
           'workflow' => $workflow->id(),
           'state' => $state_id,
           'revision_log_message' => t('Change moderation state to @state', ['@state' => $state->label()]),
+        ]);
+        $action->set('dependencies', [
+          'config' => ['workflows.workflow.' . $workflow->id()],
         ]);
       }
       $action->save();
