@@ -57,7 +57,7 @@ class ContentTestTranslationUITest extends ContentTranslationUITestBase {
    * {@inheritdoc}
    */
   protected function getTranslatorPermissions() {
-    return array_merge(parent::getTranslatorPermissions(), ['administer entity_test content', 'view test entity']);
+    return array_merge(parent::getTranslatorPermissions(), ['administer entity_test content', 'view test entity', 'view test entity translations']);
   }
 
 }
