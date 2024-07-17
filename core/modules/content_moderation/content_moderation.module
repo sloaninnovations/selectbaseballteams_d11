@@ -30,7 +30,6 @@ use Drupal\Core\Action\Plugin\Action\PublishAction;
 use Drupal\Core\Action\Plugin\Action\UnpublishAction;
 use Drupal\workflows\Entity\Workflow;
 use Drupal\views\Entity\View;
-use Drupal\system\Entity\Action;
 
 /**
  * Implements hook_help().
@@ -390,7 +389,7 @@ function content_moderation_workflow_delete(WorkflowInterface $entity) {
   foreach ($entity_types as $entity_type_id) {
     foreach ($entity->getTypePlugin()->getStates() as $state_id => $state) {
       $action_id = $workflow_base_action_id . $entity_type_id . '_change_to_' . $state_id;
-      $action = Action::load($action_id);
+      $action = \Drupal::entityTypeManager()->getStorage('action')->load($action_id);
       if ($action) {
         $action->delete();
       }
@@ -407,9 +406,9 @@ function content_moderation_save_workflow_actions(WorkflowInterface $workflow) {
   foreach ($entity_types as $entity_type_id) {
     foreach ($workflow->getTypePlugin()->getStates() as $state_id => $state) {
       $action_id = $workflow_base_action_id . $entity_type_id . '_change_to_' . $state_id;
-      $action = Action::load($action_id);
+      $action = \Drupal::entityTypeManager()->getStorage('action')->load($action_id);
       if (!$action) {
-        $action = Action::create([
+        $action = \Drupal::entityTypeManager()->getStorage('action')->create([
           'id' => $action_id,
           'type' => $entity_type_id,
           'label' => t('Change moderation state to @state', ['@state' => $state->label()]),
