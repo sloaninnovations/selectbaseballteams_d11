@@ -28,6 +28,7 @@ class ModerationInformationTest extends KernelTestBase {
     'workflows',
     'language',
     'content_translation',
+    'system',
   ];
 
   /**
