@@ -90,7 +90,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatters on node display for public files.
    */
-  public function testResponsiveImageFieldFormattersPublic() {
+  public function testResponsiveImageFieldFormattersPublic(): void {
     $this->addTestImageStyleMappings();
     $this->doTestResponsiveImageFieldFormatters('public');
   }
@@ -98,7 +98,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatters on node display for private files.
    */
-  public function testResponsiveImageFieldFormattersPrivate() {
+  public function testResponsiveImageFieldFormattersPrivate(): void {
     $this->addTestImageStyleMappings();
     // Remove access content permission from anonymous users.
     user_role_change_permissions(RoleInterface::ANONYMOUS_ID, ['access content' => FALSE]);
@@ -108,7 +108,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatters when image style is empty.
    */
-  public function testResponsiveImageFieldFormattersEmptyStyle() {
+  public function testResponsiveImageFieldFormattersEmptyStyle(): void {
     $this->addTestImageStyleMappings(TRUE);
     $this->doTestResponsiveImageFieldFormatters('public', TRUE);
   }
@@ -358,7 +358,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatters on node display linked to the file.
    */
-  public function testResponsiveImageFieldFormattersLinkToFile() {
+  public function testResponsiveImageFieldFormattersLinkToFile(): void {
     $this->addTestImageStyleMappings();
     $this->assertResponsiveImageFieldFormattersLink('file');
   }
@@ -366,7 +366,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatters on node display linked to the node.
    */
-  public function testResponsiveImageFieldFormattersLinkToNode() {
+  public function testResponsiveImageFieldFormattersLinkToNode(): void {
     $this->addTestImageStyleMappings();
     $this->assertResponsiveImageFieldFormattersLink('content');
   }
@@ -374,7 +374,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatter on node display with an empty media query.
    */
-  public function testResponsiveImageFieldFormattersEmptyMediaQuery() {
+  public function testResponsiveImageFieldFormattersEmptyMediaQuery(): void {
     $this->responsiveImgStyle
       // Test the output of an empty media query.
       ->addImageStyleMapping('responsive_image_test_module.empty', '1x', [
@@ -424,12 +424,13 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests responsive image formatter on node display with one and two sources.
    */
-  public function testResponsiveImageFieldFormattersMultipleSources() {
+  public function testResponsiveImageFieldFormattersMultipleSources(): void {
     // Setup known image style sizes so the test can assert on known sizes.
     $large_style = ImageStyle::load('large');
     assert($large_style instanceof ImageStyleInterface);
     $large_style->addImageEffect([
       'id' => 'image_resize',
+      'weight' => 0,
       'data' => [
         'width' => '480',
         'height' => '480',
@@ -440,6 +441,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
     assert($medium_style instanceof ImageStyleInterface);
     $medium_style->addImageEffect([
       'id' => 'image_resize',
+      'weight' => 0,
       'data' => [
         'width' => '220',
         'height' => '220',
@@ -496,7 +498,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
     $image_uri = File::load($node->{$field_name}->target_id)->getFileUri();
     $medium_transform_url = $this->fileUrlGenerator->transformRelative($medium_style->buildUrl($image_uri));
     $large_transform_url = $this->fileUrlGenerator->transformRelative($large_style->buildUrl($image_uri));
-    $this->assertSession()->responseMatches('/<img loading="eager" srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" width="220" height="220" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>/');
+    $this->assertSession()->responseMatches('/<img loading="eager" srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" width="480" height="480" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>/');
 
     $this->responsiveImgStyle
       // Test the output of an empty media query.
@@ -508,7 +510,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Assert the picture tag has source tags that include dimensions.
     $this->drupalGet('node/' . $nid);
-    $this->assertSession()->responseMatches('/<picture>\s+<source srcset="' . \preg_quote($large_transform_url, '/') . ' 1x" media="\(min-width: 851px\)" type="image\/webp" width="480" height="480"\/>\s+<source srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" type="image\/webp" width="220" height="220"\/>\s+<img loading="eager" src="' . \preg_quote($large_transform_url, '/') . '" width="480" height="480" alt="\w+" \/>\s+<\/picture>/');
+    $this->assertSession()->responseMatches('/<picture>\s+<source srcset="' . \preg_quote($large_transform_url, '/') . ' 1x" media="\(min-width: 851px\)" type="image\/webp" width="480" height="480"\/>\s+<source srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" type="image\/webp" width="220" height="220"\/>\s+<img loading="eager" width="480" height="480" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>\s+<\/picture>/');
   }
 
   /**

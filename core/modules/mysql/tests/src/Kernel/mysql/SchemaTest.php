@@ -23,7 +23,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   /**
    * {@inheritdoc}
    */
-  public function checkSchemaComment(string $description, string $table, string $column = NULL): void {
+  public function checkSchemaComment(string $description, string $table, ?string $column = NULL): void {
     $comment = $this->schema->getComment($table, $column);
     $max_length = $column ? 255 : 60;
     $description = Unicode::truncate($description, $max_length, TRUE, TRUE);
@@ -142,7 +142,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       $this->schema->addIndex('test_table_index_length', 'test_separate', [['test_field_text', 200]], $table_specification);
       $this->fail('\Drupal\Core\Database\SchemaObjectExistsException exception missed.');
     }
-    catch (SchemaObjectExistsException $e) {
+    catch (SchemaObjectExistsException) {
       // Expected exception; just continue testing.
     }
 
@@ -150,7 +150,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       $this->schema->addIndex('test_table_non_existing', 'test_separate', [['test_field_text', 200]], $table_specification);
       $this->fail('\Drupal\Core\Database\SchemaObjectDoesNotExistException exception missed.');
     }
-    catch (SchemaObjectDoesNotExistException $e) {
+    catch (SchemaObjectDoesNotExistException) {
       // Expected exception; just continue testing.
     }
 
@@ -325,7 +325,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     try {
       $this->connection->query("SET sql_generate_invisible_primary_key = 1;")->execute();
     }
-    catch (DatabaseExceptionWrapper $e) {
+    catch (DatabaseExceptionWrapper) {
       $this->markTestSkipped('This test requires the SESSION_VARIABLES_ADMIN privilege.');
     }
     $this->schema->createTable('test_primary_key', [

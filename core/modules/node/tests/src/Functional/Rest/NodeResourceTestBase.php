@@ -15,7 +15,7 @@ abstract class NodeResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'path'];
+  protected static $modules = ['content_translation', 'node', 'path'];
 
   /**
    * {@inheritdoc}
@@ -223,13 +223,24 @@ abstract class NodeResourceTestBase extends EntityResourceTestBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function getExpectedCacheContexts() {
+    return [
+      'languages:language_interface',
+      'url.site',
+      'user.permissions',
+    ];
+  }
+
+  /**
    * Tests PATCHing a node's path with and without 'create url aliases'.
    *
    * For a positive test, see the similar test coverage for Term.
    *
    * @see \Drupal\Tests\rest\Functional\EntityResource\Term\TermResourceTestBase::testPatchPath()
    */
-  public function testPatchPath() {
+  public function testPatchPath(): void {
     $this->initAuthentication();
     $this->provisionEntityResource();
     $this->setUpAuthorization('GET');

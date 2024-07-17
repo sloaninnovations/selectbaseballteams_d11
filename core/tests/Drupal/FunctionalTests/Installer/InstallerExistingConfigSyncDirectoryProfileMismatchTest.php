@@ -9,7 +9,7 @@ namespace Drupal\FunctionalTests\Installer;
  *
  * @group Installer
  */
-class InstallerExistingConfigSyncDirectoryProfileMismatchTest extends InstallerExistingConfigTestBase {
+class InstallerExistingConfigSyncDirectoryProfileMismatchTest extends InstallerConfigDirectoryTestBase {
 
   /**
    * {@inheritdoc}
@@ -29,8 +29,8 @@ class InstallerExistingConfigSyncDirectoryProfileMismatchTest extends InstallerE
   /**
    * {@inheritdoc}
    */
-  protected function getConfigTarball() {
-    return __DIR__ . '/../../../fixtures/config_install/multilingual.tar.gz';
+  protected function getConfigLocation() {
+    return __DIR__ . '/../../../fixtures/config_install/multilingual';
   }
 
   /**
@@ -49,7 +49,7 @@ class InstallerExistingConfigSyncDirectoryProfileMismatchTest extends InstallerE
   /**
    * Tests that profile mismatch fails to install.
    */
-  public function testConfigSync() {
+  public function testConfigSync(): void {
     $this->htmlOutput(NULL);
     $this->assertSession()->titleEquals('Configuration validation | Drupal');
     $this->assertSession()->pageTextContains('The configuration synchronization failed validation.');

@@ -495,7 +495,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected function getExpectedUnauthorizedAccessCacheability() {
     return (new CacheableMetadata())
       ->setCacheTags(['4xx-response', 'http_response'])
-      ->setCacheContexts(['url.site', 'user.permissions'])
+      ->setCacheContexts(['url.query_args', 'url.site', 'user.permissions'])
       ->addCacheContexts($this->entity->getEntityType()->isRevisionable()
         ? ['url.query_args:resourceVersion']
         : []
@@ -514,7 +514,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @see ::testGetIndividual()
    */
-  protected function getExpectedCacheTags(array $sparse_fieldset = NULL) {
+  protected function getExpectedCacheTags(?array $sparse_fieldset = NULL) {
     $expected_cache_tags = [
       'http_response',
     ];
@@ -543,11 +543,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @see ::testGetIndividual()
    */
-  protected function getExpectedCacheContexts(array $sparse_fieldset = NULL) {
+  protected function getExpectedCacheContexts(?array $sparse_fieldset = NULL) {
     $cache_contexts = [
       // Cache contexts for JSON:API URL query parameters.
-      'url.query_args:fields',
-      'url.query_args:include',
+      'url.query_args',
       // Drupal defaults.
       'url.site',
       'user.permissions',
@@ -574,7 +573,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @return \Drupal\Core\Cache\CacheableMetadata
    *   The expected cacheability for the given entity collection.
    */
-  protected static function getExpectedCollectionCacheability(AccountInterface $account, array $collection, array $sparse_fieldset = NULL, $filtered = FALSE) {
+  protected static function getExpectedCollectionCacheability(AccountInterface $account, array $collection, ?array $sparse_fieldset = NULL, $filtered = FALSE) {
     $cacheability = array_reduce($collection, function (CacheableMetadata $cacheability, EntityInterface $entity) use ($sparse_fieldset, $account) {
       $access_result = static::entityAccess($entity, 'view', $account);
       if (!$access_result->isAllowed()) {
@@ -608,11 +607,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $cacheability->addCacheTags($entity_type->getListCacheTags());
     $cache_contexts = [
       // Cache contexts for JSON:API URL query parameters.
-      'url.query_args:fields',
-      'url.query_args:filter',
-      'url.query_args:include',
-      'url.query_args:page',
-      'url.query_args:sort',
+      'url.query_args',
       // Drupal defaults.
       'url.site',
     ];
@@ -930,7 +925,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests GETting an individual resource, plus edge cases to ensure good DX.
    */
-  public function testGetIndividual() {
+  public function testGetIndividual(): void {
     // The URL and Guzzle request options that will be used in this test. The
     // request options will be modified/expanded throughout this test:
     // - to first test all mistakes a developer might make, and assert that the
@@ -1077,18 +1072,18 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $message_url = clone $url;
     $path = str_replace($random_uuid, '{entity}', $message_url->setAbsolute()->setOptions(['base_url' => '', 'query' => []])->toString());
     $message = 'The "entity" parameter was not converted for the path "' . $path . '" (route name: "jsonapi.' . static::$resourceTypeName . '.individual")';
-    $this->assertResourceErrorResponse(404, $message, $url, $response, FALSE, ['4xx-response', 'http_response'], ['url.site'], FALSE, 'UNCACHEABLE');
+    $this->assertResourceErrorResponse(404, $message, $url, $response, FALSE, ['4xx-response', 'http_response'], ['url.query_args', 'url.site'], FALSE, 'UNCACHEABLE');
 
     // DX: when Accept request header is missing, still 404, same response.
     unset($request_options[RequestOptions::HEADERS]['Accept']);
     $response = $this->request('GET', $url, $request_options);
-    $this->assertResourceErrorResponse(404, $message, $url, $response, FALSE, ['4xx-response', 'http_response'], ['url.site'], FALSE, 'UNCACHEABLE');
+    $this->assertResourceErrorResponse(404, $message, $url, $response, FALSE, ['4xx-response', 'http_response'], ['url.query_args', 'url.site'], FALSE, 'UNCACHEABLE');
   }
 
   /**
    * Tests GETting a collection of resources.
    */
-  public function testCollection() {
+  public function testCollection(): void {
     $entity_collection = $this->getData();
     assert(count($entity_collection) > 1, 'A collection must have more that one entity in it.');
 
@@ -1157,8 +1152,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $expected_error_message = "The current user is not authorized to filter by the `field_jsonapi_test_entity_ref` field, given in the path `field_jsonapi_test_entity_ref`. The 'field_jsonapi_test_entity_ref view access' permission is required.";
       $expected_cache_tags = ['4xx-response', 'http_response'];
       $expected_cache_contexts = [
-        'url.query_args:filter',
-        'url.query_args:sort',
+        'url.query_args',
         'url.site',
         'user.permissions',
       ];
@@ -1271,7 +1265,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @see \GuzzleHttp\ClientInterface::request()
    */
-  protected function getExpectedCollectionResponse(array $collection, $self_link, array $request_options, array $included_paths = NULL, $filtered = FALSE) {
+  protected function getExpectedCollectionResponse(array $collection, $self_link, array $request_options, ?array $included_paths = NULL, $filtered = FALSE) {
     $resource_identifiers = array_map([static::class, 'toResourceIdentifier'], $collection);
     $individual_responses = static::toResourceResponses($this->getResponses(static::getResourceLinks($resource_identifiers), $request_options));
     $merged_response = static::toCollectionResourceResponse($individual_responses, $self_link, TRUE);
@@ -1318,7 +1312,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * single expected ResourceResponse. This is repeated for every relationship
    * field of the resource type under test.
    */
-  public function testRelated() {
+  public function testRelated(): void {
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
@@ -1337,7 +1331,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * targeted resource and the target resource IDs. These type+ID combos are
    * referred to as "resource identifiers."
    */
-  public function testRelationships() {
+  public function testRelationships(): void {
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('Configuration entities cannot have relationships.');
     }
@@ -1708,9 +1702,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @return \Drupal\jsonapi\CacheableResourceResponse
    *   The expected ResourceResponse.
    */
-  protected function getExpectedGetRelationshipResponse($relationship_field_name, EntityInterface $entity = NULL) {
+  protected function getExpectedGetRelationshipResponse($relationship_field_name, ?EntityInterface $entity = NULL) {
     $entity = $entity ?: $this->entity;
-    $access = AccessResult::neutral()->addCacheContexts($entity->getEntityType()->isRevisionable() ? ['url.query_args:resourceVersion'] : []);
+    $access = AccessResult::neutral()->addCacheContexts($entity->getEntityType()->isRevisionable() ? ['url.query_args'] : []);
     $access = $access->orIf(static::entityFieldAccess($entity, $this->resourceType->getInternalName($relationship_field_name), 'view', $this->account));
     if (!$access->isAllowed()) {
       $via_link = Url::fromRoute(
@@ -1724,8 +1718,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       ->addCacheTags(['http_response'])
       ->addCacheContexts([
         'url.site',
-        'url.query_args:include',
-        'url.query_args:fields',
+        'url.query_args',
       ])
       ->addCacheableDependency($entity)
       ->addCacheableDependency($access);
@@ -1746,7 +1739,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @return array
    *   The expected document array.
    */
-  protected function getExpectedGetRelationshipDocument($relationship_field_name, EntityInterface $entity = NULL) {
+  protected function getExpectedGetRelationshipDocument($relationship_field_name, ?EntityInterface $entity = NULL) {
     $entity = $entity ?: $this->entity;
     $entity_type_id = $entity->getEntityTypeId();
     $bundle = $entity->bundle();
@@ -1780,7 +1773,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @return mixed
    *   The expected document data.
    */
-  protected function getExpectedGetRelationshipDocumentData($relationship_field_name, EntityInterface $entity = NULL) {
+  protected function getExpectedGetRelationshipDocumentData($relationship_field_name, ?EntityInterface $entity = NULL) {
     $entity = $entity ?: $this->entity;
     $internal_field_name = $this->resourceType->getInternalName($relationship_field_name);
     /** @var \Drupal\Core\Field\FieldItemListInterface $field */
@@ -1894,7 +1887,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @see \GuzzleHttp\ClientInterface::request()
    */
-  protected function getExpectedRelatedResponses(array $relationship_field_names, array $request_options, EntityInterface $entity = NULL) {
+  protected function getExpectedRelatedResponses(array $relationship_field_names, array $request_options, ?EntityInterface $entity = NULL) {
     $entity = $entity ?: $this->entity;
     return array_map(function ($relationship_field_name) use ($entity, $request_options) {
       return $this->getExpectedRelatedResponse($relationship_field_name, $request_options, $entity);
@@ -1922,7 +1915,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // every related resource.
     $base_resource_identifier = static::toResourceIdentifier($entity);
     $internal_name = $this->resourceType->getInternalName($relationship_field_name);
-    $access = AccessResult::neutral()->addCacheContexts($entity->getEntityType()->isRevisionable() ? ['url.query_args:resourceVersion'] : []);
+    $access = AccessResult::neutral()->addCacheContexts($entity->getEntityType()->isRevisionable() ? ['url.query_args'] : []);
     $access = $access->orIf(static::entityFieldAccess($entity, $internal_name, 'view', $this->account));
     if (!$access->isAllowed()) {
       $detail = 'The current user is not allowed to view this relationship.';
@@ -1944,8 +1937,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       if (empty($relationship_document['data'])) {
         $cache_contexts = Cache::mergeContexts([
           // Cache contexts for JSON:API URL query parameters.
-          'url.query_args:fields',
-          'url.query_args:include',
+          'url.query_args',
           // Drupal defaults.
           'url.site',
         ], $this->entity->getEntityType()->isRevisionable() ? ['url.query_args:resourceVersion'] : []);
@@ -1984,7 +1976,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests POSTing an individual resource, plus edge cases to ensure good DX.
    */
-  public function testPostIndividual() {
+  public function testPostIndividual(): void {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('POSTing config entities is not yet supported.');
@@ -2199,7 +2191,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests PATCHing an individual resource, plus edge cases to ensure good DX.
    */
-  public function testPatchIndividual() {
+  public function testPatchIndividual(): void {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('PATCHing config entities is not yet supported.');
@@ -2527,7 +2519,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests DELETEing an individual resource, plus edge cases to ensure good DX.
    */
-  public function testDeleteIndividual() {
+  public function testDeleteIndividual(): void {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('DELETEing config entities is not yet supported.');
@@ -2804,7 +2796,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests individual and collection revisions.
    */
-  public function testRevisions() {
+  public function testRevisions(): void {
     if (!$this->entity->getEntityType()->isRevisionable() || !$this->entity instanceof FieldableEntityInterface) {
       return;
     }
@@ -3035,14 +3027,13 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $actual_response = $this->request('GET', $rel_working_copy_collection_url, $request_options);
     $expected_collection_document['links']['self']['href'] = $rel_working_copy_collection_url->toString();
     $this->assertResourceResponse(200, $expected_collection_document, $actual_response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, 'MISS');
-    // @todo: remove the next assertion when Drupal core supports entity query access control on revisions.
+    // @todo Remove the next assertion when Drupal core supports entity query access control on revisions.
     $rel_working_copy_collection_url_filtered = clone $rel_working_copy_collection_url;
     $rel_working_copy_collection_url_filtered->setOption('query', ['filter[foo]' => 'bar'] + $rel_working_copy_collection_url->getOption('query'));
     $actual_response = $this->request('GET', $rel_working_copy_collection_url_filtered, $request_options);
     $filtered_collection_expected_cache_contexts = [
       'url.path',
-      'url.query_args:filter',
-      'url.query_args:resourceVersion',
+      'url.query_args',
       'url.site',
     ];
     $this->assertResourceErrorResponse(501, 'JSON:API does not support filtering on revisions other than the latest version because a secure Drupal core API does not yet exist to do so.', $rel_working_copy_collection_url_filtered, $actual_response, FALSE, ['http_response'], $filtered_collection_expected_cache_contexts);
@@ -3050,7 +3041,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $actual_response = $this->request('GET', $rel_invalid_collection_url, $request_options);
     $invalid_version_expected_cache_contexts = [
       'url.path',
-      'url.query_args:resourceVersion',
+      'url.query_args',
       'url.site',
     ];
     $this->assertResourceErrorResponse(400, 'Collection resources only support the following resource version identifiers: rel:latest-version, rel:working-copy', $rel_invalid_collection_url, $actual_response, FALSE, ['4xx-response', 'http_response'], $invalid_version_expected_cache_contexts);
@@ -3206,7 +3197,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertResourceResponse(403, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts());
       // Request the related route.
       $actual_response = $this->request('GET', $related_url, $request_options);
-      // @todo: refactor self::getExpectedRelatedResponses() into a function which returns a single response.
+      // @todo Refactor self::getExpectedRelatedResponses() into a function which returns a single response.
       $expected_response = $this->getExpectedRelatedResponses(['field_jsonapi_test_entity_ref'], $request_options, $revision)['field_jsonapi_test_entity_ref'];
       $expected_document = $expected_response->getResponseData();
       $expected_cacheability = $expected_response->getCacheableMetadata();
@@ -3384,7 +3375,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @return array
    *   An array of relationship field names.
    */
-  protected function getRelationshipFieldNames(EntityInterface $entity = NULL) {
+  protected function getRelationshipFieldNames(?EntityInterface $entity = NULL) {
     $entity = $entity ?: $this->entity;
     // Only content entity types can have relationships.
     $fields = $entity instanceof ContentEntityInterface

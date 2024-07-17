@@ -81,7 +81,7 @@ class NodeQueryAlterTest extends NodeTestBase {
    * Verifies that a non-standard table alias can be used, and that a user with
    * node access can view the nodes.
    */
-  public function testNodeQueryAlterLowLevelWithAccess() {
+  public function testNodeQueryAlterLowLevelWithAccess(): void {
     // User with access should be able to view 4 nodes.
     try {
       $query = Database::getConnection()->select('node', 'n')
@@ -93,7 +93,7 @@ class NodeQueryAlterTest extends NodeTestBase {
       $result = $query->execute()->fetchAll();
       $this->assertCount(4, $result, 'User with access can see correct nodes');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       $this->fail('Altered query is malformed');
     }
   }
@@ -101,7 +101,7 @@ class NodeQueryAlterTest extends NodeTestBase {
   /**
    * Tests 'node_access' query alter with revision-enabled nodes.
    */
-  public function testNodeQueryAlterWithRevisions() {
+  public function testNodeQueryAlterWithRevisions(): void {
     // Execute a query that only deals with the 'node_revision' table.
     try {
       $query = \Drupal::entityTypeManager()->getStorage('node')->getQuery();
@@ -112,7 +112,7 @@ class NodeQueryAlterTest extends NodeTestBase {
 
       $this->assertCount(4, $result, 'User with access can see correct nodes');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       $this->fail('Altered query is malformed');
     }
   }
@@ -123,7 +123,7 @@ class NodeQueryAlterTest extends NodeTestBase {
    * Verifies that a non-standard table alias can be used, and that a user
    * without node access cannot view the nodes.
    */
-  public function testNodeQueryAlterLowLevelNoAccess() {
+  public function testNodeQueryAlterLowLevelNoAccess(): void {
     // User without access should be able to view 0 nodes.
     try {
       $query = Database::getConnection()->select('node', 'n')
@@ -135,7 +135,7 @@ class NodeQueryAlterTest extends NodeTestBase {
       $result = $query->execute()->fetchAll();
       $this->assertCount(0, $result, 'User with no access cannot see nodes');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       $this->fail('Altered query is malformed');
     }
   }
@@ -146,7 +146,7 @@ class NodeQueryAlterTest extends NodeTestBase {
    * Verifies that a non-standard table alias can be used, and that a user with
    * view-only node access cannot edit the nodes.
    */
-  public function testNodeQueryAlterLowLevelEditAccess() {
+  public function testNodeQueryAlterLowLevelEditAccess(): void {
     // User with view-only access should not be able to edit nodes.
     try {
       $query = Database::getConnection()->select('node', 'n')
@@ -174,7 +174,7 @@ class NodeQueryAlterTest extends NodeTestBase {
    * add a record to {node_access} paired with a corresponding privilege in
    * hook_node_grants().
    */
-  public function testNodeQueryAlterOverride() {
+  public function testNodeQueryAlterOverride(): void {
     $record = [
       'nid' => 0,
       'gid' => 0,
@@ -199,7 +199,7 @@ class NodeQueryAlterTest extends NodeTestBase {
       $result = $query->execute()->fetchAll();
       $this->assertCount(0, $result, 'User view privileges are not overridden');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       $this->fail('Altered query is malformed');
     }
 
@@ -221,7 +221,7 @@ class NodeQueryAlterTest extends NodeTestBase {
       $result = $query->execute()->fetchAll();
       $this->assertCount(4, $result, 'User view privileges are overridden');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       $this->fail('Altered query is malformed');
     }
     \Drupal::state()->delete('node_access_test.no_access_uid');

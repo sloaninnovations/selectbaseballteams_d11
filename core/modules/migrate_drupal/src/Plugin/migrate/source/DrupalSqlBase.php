@@ -77,7 +77,7 @@ abstract class DrupalSqlBase extends SqlBase implements DependentPluginInterface
           $this->systemData[$result['type']][$result['name']] = $result;
         }
       }
-      catch (\Exception $e) {
+      catch (\Exception) {
         // The table might not exist for example in tests.
       }
     }
@@ -87,7 +87,7 @@ abstract class DrupalSqlBase extends SqlBase implements DependentPluginInterface
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,
@@ -169,7 +169,7 @@ abstract class DrupalSqlBase extends SqlBase implements DependentPluginInterface
         ->fetchField();
     }
     // The table might not exist.
-    catch (\Exception $e) {
+    catch (\Exception) {
       $result = FALSE;
     }
     return $result !== FALSE ? unserialize($result) : $default;

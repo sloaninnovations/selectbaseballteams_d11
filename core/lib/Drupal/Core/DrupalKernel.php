@@ -17,6 +17,7 @@ use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\YamlFileLoader;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
+use Drupal\Core\File\MimeType\MimeTypeGuesser;
 use Drupal\Core\Http\TrustedHostsRequestFactory;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Installer\InstallerRedirectTrait;
@@ -359,9 +360,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * directory alias for https://www.drupal.org:8080/my-site/test whose
    * configuration file is in sites/example.com, the array should be defined as:
    * @code
-   * $sites = array(
+   * $sites = [
    *   '8080.www.drupal.org.my-site.test' => 'example.com',
-   * );
+   * ];
    * @endcode
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -595,6 +596,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Set the allowed protocols.
     UrlHelper::setAllowedProtocols($this->container->getParameter('filter_protocols'));
+
+    // Override of Symfony's MIME type guesser singleton.
+    MimeTypeGuesser::registerWithSymfonyGuesser($this->container);
 
     $this->prepared = TRUE;
   }
@@ -1418,7 +1422,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     try {
       $this->bootstrapContainer->get('cache.container')->set($this->getContainerCacheKey(), $container_definition);
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // There is no way to get from the Cache API if the cache set was
       // successful or not, hence an Exception is caught and the caller informed
       // about the error condition.
@@ -1449,7 +1453,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       try {
         $this->configStorage = BootstrapConfigStorageFactory::get($this->classLoader);
       }
-      catch (\Exception $e) {
+      catch (\Exception) {
         $this->configStorage = new NullStorage();
       }
     }
@@ -1574,7 +1578,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     try {
       $http_host = $request->getHost();
     }
-    catch (\UnexpectedValueException $e) {
+    catch (\UnexpectedValueException) {
       return FALSE;
     }
 
@@ -1598,10 +1602,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * requests. For example,
    *
    * @code
-   * $settings['trusted_host_patterns'] = array(
+   * $settings['trusted_host_patterns'] = [
    *   '^example\.com$',
    *   '^*.example\.com$',
-   * );
+   * ];
    * @endcode
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -1632,7 +1636,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       Request::setFactory([$request_factory, 'createRequest'](...));
 
     }
-    catch (\UnexpectedValueException $e) {
+    catch (\UnexpectedValueException) {
       return FALSE;
     }
 

@@ -62,6 +62,7 @@
     <exclude name="Drupal.Commenting.DocComment.SpacingBeforeTags"/>
   </rule>
   <rule ref="Drupal.Commenting.DocCommentAlignment"/>
+  <rule ref="Drupal.Commenting.DocCommentLongArraySyntax"/>
   <rule ref="Drupal.Commenting.DocCommentStar"/>
   <rule ref="Drupal.Commenting.FileComment"/>
   <rule ref="Drupal.Commenting.FunctionComment">
@@ -83,6 +84,7 @@
   </rule>
   <rule ref="Drupal.Commenting.InlineVariableComment"/>
   <rule ref="Drupal.Commenting.PostStatementComment"/>
+  <rule ref="Drupal.Commenting.TodoComment" />
   <rule ref="Drupal.Commenting.VariableComment">
     <!-- Sniff for: DuplicateVar, EmptyVar, InlineVariableName, WrongStyle -->
     <exclude name="Drupal.Commenting.VariableComment.IncorrectVarType"/>
@@ -263,6 +265,7 @@
     </properties>
   </rule>
   <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceOperator"/>
+  <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch" />
   <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
     <properties>
       <property name="spacesCountAroundEqualsSign" value="0" />
@@ -278,6 +281,7 @@
     <!-- @todo remove this in https://www.drupal.org/project/drupal/issues/3402707 -->
     <exclude-pattern>./tests/Drupal/KernelTests/AssertContentTrait.php</exclude-pattern>
   </rule>
+  <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
 
   <!-- Squiz sniffs -->
   <rule ref="Squiz.Arrays.ArrayBracketSpacing"/>

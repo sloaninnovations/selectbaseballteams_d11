@@ -70,7 +70,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests the click sorting functionality.
    */
-  public function testClickSorting() {
+  public function testClickSorting(): void {
     $this->drupalGet('test_click_sort');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -106,7 +106,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests the default click sorting functionality with distinct.
    */
-  public function testClickSortingDistinct() {
+  public function testClickSortingDistinct(): void {
     ConfigurableLanguage::createFromLangcode('es')->save();
     $node = $this->drupalCreateNode();
     $this->drupalGet('test_distinct_click_sorting');
@@ -206,7 +206,7 @@ class FieldWebTest extends ViewTestBase {
       $xpath = $this->assertSession()->buildXPathQuery($xpath, $arguments);
       $result = $elements->xpath($xpath);
       // Some combinations of PHP / libxml versions return an empty array
-      // instead of the documented FALSE. Forcefully convert any falsish values
+      // instead of the documented FALSE. Forcefully convert any falsy values
       // to an empty array to allow foreach(...) constructions.
       return $result ? $result : [];
     }
@@ -218,7 +218,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests rewriting the output to a link.
    */
-  public function testAlterUrl() {
+  public function testAlterUrl(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -408,7 +408,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests the field/label/wrapper classes.
    */
-  public function testFieldClasses() {
+  public function testFieldClasses(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_field_classes');
@@ -519,7 +519,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests trimming/read-more/ellipses.
    */
-  public function testTextRendering() {
+  public function testTextRendering(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
