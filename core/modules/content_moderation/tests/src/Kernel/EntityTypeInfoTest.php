@@ -29,6 +29,7 @@ class EntityTypeInfoTest extends KernelTestBase {
     'workflows',
     'entity_test',
     'system',
+    'user',
   ];
 
   /**
@@ -65,6 +66,7 @@ class EntityTypeInfoTest extends KernelTestBase {
     $this->installEntitySchema('action');
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('entity_test_with_bundle');
+    $this->installEnitiySchema('user');
 
     $this->installConfig(['content_moderation']);
   }
