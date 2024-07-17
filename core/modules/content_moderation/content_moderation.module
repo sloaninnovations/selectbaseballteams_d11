@@ -428,8 +428,7 @@ function content_moderation_save_workflow_actions(WorkflowInterface $workflow) {
           'revision_log_message' => t('Change moderation state to @state', ['@state' => $state->label()]),
         ]);
       }
-      $action->addDependency('config', 'workflows.workflow.' . $workflow->id());
-      $action->trustData()->save();
+      $action->save();
     }
   }
 }

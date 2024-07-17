@@ -61,6 +61,7 @@ class Upgrade6TestWithContentModeration extends Upgrade6Test {
     ];
     $entity_counts['field_config'] = $entity_counts['field_config'] + 1;
     $entity_counts['view'] = $entity_counts['view'] + 1;
+    $entity_counts['actions'] = $entity_counts['actions'] + 3;
     return $entity_counts;
   }
 
@@ -69,7 +70,6 @@ class Upgrade6TestWithContentModeration extends Upgrade6Test {
    */
   protected function getEntityCountsIncremental() {
     $entity_counts_incremental = parent::getEntityCountsIncremental();
-    $entity_counts_incremental['actions'] = $entity_counts_incremental['actions'] + 3;
     $entity_counts_incremental['content_moderation_state'] = $entity_counts_incremental['content_moderation_state'] + 1;
     return $entity_counts_incremental;
   }
