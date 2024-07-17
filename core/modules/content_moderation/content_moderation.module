@@ -405,7 +405,7 @@ function content_moderation_save_workflow_actions(WorkflowInterface $workflow) {
   $entity_types = $workflow->getTypePlugin()->getEntityTypes();
   foreach ($entity_types as $entity_type_id) {
     foreach ($workflow->getTypePlugin()->getStates() as $state_id => $state) {
-      $action_id = $workflow_base_action_id . $entity_type_id . '_change_to_' . $state_id;
+      $action_id = $workflow_base_action_id . '_' . $entity_type_id . '_change_to_' . $state_id;
       $action = \Drupal::entityTypeManager()->getStorage('action')->load($action_id);
       if (!$action) {
         $action = \Drupal::entityTypeManager()->getStorage('action')->create([
@@ -428,6 +428,7 @@ function content_moderation_save_workflow_actions(WorkflowInterface $workflow) {
           'revision_log_message' => t('Change moderation state to @state', ['@state' => $state->label()]),
         ]);
       }
+      $action->addDependency('config', 'workflows.workflow.' . $workflow->id());
       $action->trustData()->save();
     }
   }

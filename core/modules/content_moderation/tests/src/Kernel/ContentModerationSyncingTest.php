@@ -35,6 +35,7 @@ class ContentModerationSyncingTest extends KernelTestBase {
     $this->installEntitySchema('workflow');
     $this->installEntitySchema('content_moderation_state');
     $this->installEntitySchema('entity_test_mulrevpub');
+    $this->installEntitySchema('action');
 
     $workflow = $this->createEditorialWorkflow();
     $workflow->getTypePlugin()->addEntityTypeAndBundle('entity_test_mulrevpub', 'entity_test_mulrevpub');
