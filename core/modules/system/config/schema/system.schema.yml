@@ -9,10 +9,11 @@ system.site:
     uuid:
       type: uuid
       label: 'Site UUID'
-      nullable: true
       constraints:
-        NotBlank:
-          allowNull: true
+        # The `uuid` key:
+        # - Can be blank at the time of site install.
+        # - Can not be blank after site is installed.
+        NotBlankAfterInstall: ~
     name:
       type: label
       label: 'Site name'
