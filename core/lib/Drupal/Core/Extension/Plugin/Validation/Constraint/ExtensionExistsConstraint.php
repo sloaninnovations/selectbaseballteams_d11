@@ -22,7 +22,7 @@ class ExtensionExistsConstraint extends SymfonyConstraint {
    *
    * @var string
    */
-  public string $moduleNotExistsMessage = "Module '@name' was not found.";
+  public string $moduleNotFoundMessage = "Module '@name' was not found.";
 
   /**
    * The error message for a existent but not installed module.
@@ -36,7 +36,7 @@ class ExtensionExistsConstraint extends SymfonyConstraint {
    *
    * @var string
    */
-  public string $themeNotExistsMessage = "Theme '@name' was not found.";
+  public string $themeNotFoundMessage = "Theme '@name' was not found.";
 
   /**
    * The error message for a existent but not installed theme.
@@ -53,7 +53,7 @@ class ExtensionExistsConstraint extends SymfonyConstraint {
   public string $type;
 
   /**
-   * The extension must be installed or not.
+   * Whether the extension must be installed.
    *
    * @var bool
    */
