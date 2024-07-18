@@ -53,7 +53,7 @@ class ExtensionExistsConstraint extends SymfonyConstraint {
   public string $type;
 
   /**
-   * Whether the extension must be installed.
+   * (Optional) Whether the extension must be installed.
    *
    * @var bool
    */
