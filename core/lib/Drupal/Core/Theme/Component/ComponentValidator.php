@@ -186,7 +186,7 @@ class ComponentValidator {
       return TRUE;
     }
     $message_parts = array_map(
-      static function (array $error): string {
+      static function (array $error) use ($component_id): string {
         // We check the error message instead of values and definitions here
         // because it's hard to access both given the possible complexity of a
         // schema. Since this is a small non critical DX improvement error
@@ -195,7 +195,7 @@ class ComponentValidator {
           $error['message'] .= '. This may be because the property is empty instead of having data present. If possible fix the source data, use the |default() twig filter, or update the schema to allow multiple types.';
         }
 
-        return sprintf("[%s] %s", $error['property'], $error['message']);
+        return sprintf("[%s] [%s] %s", $component_id, $error['property'], $error['message']);
       },
       $errors
     );
