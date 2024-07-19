@@ -3,133 +3,102 @@ status: true
 dependencies:
   module:
     - rest
-    - node
+    - serialization
+    - user
+    - views_test_data
 id: test_serializer_display_field
 label: 'Test serializer display field rows'
 module: rest
 description: ''
 tag: ''
-base_table: node_field_data
-base_field: nid
+base_table: views_test_data
+base_field: id
 display:
   default:
-    display_plugin: default
     id: default
     display_title: Default
+    display_plugin: default
     position: null
     display_options:
+      title: 'Test serialize'
+      fields:
+        name:
+          id: name
+          table: views_test_data
+          field: name
+          plugin_id: string
+          label: ''
+        created:
+          id: created
+          table: views_test_data
+          field: created
+          plugin_id: standard
+          type: timestamp
+          settings:
+            date_format: medium
+            custom_date_format: ''
+            timezone: ''
+      exposed_form:
+        type: basic
       access:
         type: perm
         options:
           perm: 'access content'
       cache:
         type: tag
-      query:
-        type: views_query
-      exposed_form:
-        type: basic
+      sorts:
+        created:
+          id: created
+          table: views_test_data
+          field: created
+          plugin_id: date
+          order: DESC
+      arguments: {  }
       style:
         type: serializer
       row:
         type: data_field
-      fields:
-        title:
-          id: title
-          table: node_field_data
-          field: title
-          entity_type: node
-          entity_field: title
-          label: ''
-          alter:
-            alter_text: false
-            make_link: false
-            absolute: false
-            trim: false
-            word_boundary: false
-            ellipsis: false
-            strip_tags: false
-            html: false
-          hide_empty: false
-          empty_zero: false
-          plugin_id: field
-          relationship: none
-          group_type: group
-          admin_label: ''
-          exclude: false
-          type: string
-          settings:
-            link_to_entity: false
-          element_type: ''
-          element_class: ''
-          element_label_type: ''
-          element_label_class: ''
-          element_label_colon: true
-          element_wrapper_type: ''
-          element_wrapper_class: ''
-          element_default_classes: true
-          empty: ''
-          hide_alter_empty: true
-        created:
-          field: created
-          id: created
-          table: node_field_data
-          plugin_id: field
-          type: timestamp
-          settings:
-            date_format: custom
-            custom_date_format: U
-            timezone: ''
-          alter:
-            strip_tags: true
-            trim_whitespace: true
-          entity_type: node
-          entity_field: created
-      sorts:
-        created:
-          id: created
-          table: node_field_data
-          field: created
-          order: DESC
-          entity_type: node
-          entity_field: created
-          plugin_id: date
-          relationship: none
-          group_type: group
-          admin_label: ''
-          exposed: false
-          expose:
-            label: ''
-          granularity: second
-      title: 'Test serialize'
-      arguments: {  }
+      query:
+        type: views_query
+      display_extenders: {  }
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_interface'
+        - request_format
+        - url.query_args
+        - user.permissions
+      tags: {  }
   rest_export_1:
-    display_plugin: rest_export
     id: rest_export_1
     display_title: serializer
+    display_plugin: rest_export
     position: null
     display_options:
-      defaults:
-        access: false
-        style: false
-        row: false
-      path: test/serialize/field
       access:
         type: none
       style:
         type: serializer
       row:
         type: data_field
-  rest_export_2:
-    display_plugin: rest_export
-    id: rest_export_2
-    display_title: 'serialize - access denied'
-    position: null
-    display_options:
       defaults:
         access: false
         style: false
         row: false
-      path: test/serialize/denied
+      display_extenders: {  }
+      path: test/serialize/field
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_interface'
+        - request_format
+      tags: {  }
+  rest_export_2:
+    id: rest_export_2
+    display_title: 'serialize - access denied'
+    display_plugin: rest_export
+    position: null
+    display_options:
       access:
         type: perm
         options:
@@ -138,3 +107,16 @@ display:
         type: serializer
       row:
         type: data_field
+      defaults:
+        access: false
+        style: false
+        row: false
+      display_extenders: {  }
+      path: test/serialize/denied
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_interface'
+        - request_format
+        - user.permissions
+      tags: {  }
