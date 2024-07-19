@@ -44,6 +44,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     'field',
     'language',
     'basic_auth',
+    'views_test_data',
   ];
 
   /**

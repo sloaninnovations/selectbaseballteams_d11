@@ -5,11 +5,17 @@
  * Install, update, and uninstall functions for the Views Test module.
  */
 
+use \Drupal\views\Tests\ViewTestData;
+
 /**
  * Implements hook_schema().
  */
 function views_test_data_schema() {
-  return \Drupal::state()->get('views_test_data_schema');
+  $schema = \Drupal::state()->get('views_test_data_schema');
+  if (empty($schema)) {
+    $schema = ViewTestData::schemaDefinition();
+  }
+  return $schema;
 }
 
 /**
@@ -32,4 +38,9 @@ function views_test_data_install() {
     'marquee' => 'MARQUEE',
   ];
   \Drupal::configFactory()->getEditable('views.settings')->set('field_rewrite_elements', $values)->save();
+
+  // Install the state and schema by default.
+  \Drupal::state()->set('views_test_data_schema', ViewTestData::schemaDefinition());
+  \Drupal::state()->set('views_test_data_views_data', ViewTestData::viewsData());
+  drupal_flush_all_caches();
 }
