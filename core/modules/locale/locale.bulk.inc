@@ -33,10 +33,9 @@ use Drupal\locale\Gettext;
  * @return array|bool
  *   The batch structure, or FALSE if no files are used to build the batch.
  *
- * @todo
- *   Integrate with update status to identify projects needed and integrate
+ * @todo Integrate with update status to identify projects needed and integrate
  *   l10n_update functionality to feed in translation files alike.
- *   See https://www.drupal.org/node/1191488.
+ *   https://www.drupal.org/node/1191488
  */
 function locale_translate_batch_import_files(array $options, $force = FALSE) {
   $options += [
@@ -256,7 +255,7 @@ function locale_translate_batch_import($file, array $options, &$context) {
         }
       }
     }
-    catch (Exception $exception) {
+    catch (Exception) {
       // Import failed. Store the data of the failing file.
       $context['results']['failed_files'][] = $file;
       \Drupal::logger('locale')->notice('Unable to import translations file: @file', ['@file' => $file->uri]);
@@ -519,7 +518,7 @@ function locale_translate_delete_translation_files(array $projects = [], array $
       try {
         \Drupal::service('file_system')->delete($file->uri);
       }
-      catch (FileException $e) {
+      catch (FileException) {
         $fail = TRUE;
       }
     }

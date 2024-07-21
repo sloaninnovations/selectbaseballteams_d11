@@ -68,7 +68,7 @@ class ConfigurableLanguageTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $self_url = Url::fromUri('base:/jsonapi/configurable_language/configurable_language/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
     return [
       'jsonapi' => [
@@ -105,7 +105,7 @@ class ConfigurableLanguageTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     // @todo Update in https://www.drupal.org/node/2300677.
     return [];
   }
@@ -113,7 +113,7 @@ class ConfigurableLanguageTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedCacheContexts(array $sparse_fieldset = NULL) {
+  protected function getExpectedCacheContexts(?array $sparse_fieldset = NULL) {
     return Cache::mergeContexts(parent::getExpectedCacheContexts(), ['languages:language_interface']);
   }
 
@@ -122,7 +122,7 @@ class ConfigurableLanguageTest extends ConfigEntityResourceTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/2915539
    */
-  public function testGetIndividualDefaultConfig() {
+  public function testGetIndividualDefaultConfig(): void {
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/drupal/issues/2878463.
     $url = Url::fromRoute('jsonapi.configurable_language--configurable_language.individual', ['entity' => ConfigurableLanguage::load('en')->uuid()]);
     /* $url = ConfigurableLanguage::load('en')->toUrl('jsonapi'); */

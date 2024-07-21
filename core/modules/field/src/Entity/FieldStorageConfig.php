@@ -688,7 +688,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
       try {
         $items = $entity->get($this->getName());
       }
-      catch (\InvalidArgumentException $e) {
+      catch (\InvalidArgumentException) {
         // When a field doesn't exist, create a new field item list using a
         // temporary base field definition. This step is necessary since there
         // may not be a field configuration for the storage when creating a new
@@ -700,8 +700,8 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
       }
       return \Drupal::service('plugin.manager.field.field_type')->createFieldItem($items, 0);
     }
-    // @todo: Allow setting custom options provider, see
-    // https://www.drupal.org/node/2002138.
+    // @todo Allow setting custom options provider.
+    //   https://www.drupal.org/node/2002138.
   }
 
   /**

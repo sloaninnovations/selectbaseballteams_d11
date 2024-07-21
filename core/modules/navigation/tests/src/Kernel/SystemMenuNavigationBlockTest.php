@@ -160,7 +160,7 @@ class SystemMenuNavigationBlockTest extends KernelTestBase {
   /**
    * Tests calculation of a system navigation menu block's config dependencies.
    */
-  public function testSystemMenuBlockConfigDependencies() {
+  public function testSystemMenuBlockConfigDependencies(): void {
     $block = Block::create([
       'plugin' => 'navigation_menu:' . $this->menu->id(),
       'region' => 'content',
@@ -187,7 +187,7 @@ class SystemMenuNavigationBlockTest extends KernelTestBase {
   /**
    * Tests the config start level and depth.
    */
-  public function testConfigLevelDepth() {
+  public function testConfigLevelDepth(): void {
     // Helper function to generate a configured navigation block instance.
     $place_block = function ($level, $depth) {
       return $this->blockManager->createInstance('navigation_menu:' . $this->menu->id(), [
@@ -290,7 +290,7 @@ class SystemMenuNavigationBlockTest extends KernelTestBase {
    * @return array
    *   The "menu link ID tree" representation of the given render array.
    */
-  protected function convertBuiltMenuToIdTree(array $build) {
+  protected function convertBuiltMenuToIdTree(array $build): array {
     $level = [];
     foreach (Element::children($build) as $id) {
       $level[$id] = [];

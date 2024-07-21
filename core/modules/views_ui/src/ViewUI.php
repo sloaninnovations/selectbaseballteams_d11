@@ -286,8 +286,8 @@ class ViewUI implements ViewEntityInterface {
    * This will also provide a hidden op operator because the forms plugin
    * doesn't seem to properly provide which button was clicked.
    *
-   * TODO: Is the hidden op operator still here somewhere, or is that part of the
-   * docblock outdated?
+   * @todo Is the hidden op operator still here somewhere, or is that part of
+   *   the docblock outdated?
    */
   public function getStandardButtons(&$form, FormStateInterface $form_state, $form_id, $name = NULL) {
     $form['actions'] = [
@@ -471,7 +471,7 @@ class ViewUI implements ViewEntityInterface {
         }
         $id = $this->getExecutable()->addHandler($display_id, $type, $table, $field);
 
-        // check to see if we have group by settings
+        // Check to see if we have group by settings
         $key = $type;
         // Footer,header and empty text have a different internal handler type(area).
         if (isset($types[$type]['type'])) {
@@ -486,7 +486,7 @@ class ViewUI implements ViewEntityInterface {
           $this->addFormToStack('handler-group', $display_id, $type, $id);
         }
 
-        // check to see if this type has settings, if so add the settings form first
+        // Check to see if this type has settings, if so add the settings form first
         if ($handler && $handler->hasExtraOptions()) {
           $this->addFormToStack('handler-extra', $display_id, $type, $id);
         }
@@ -982,7 +982,7 @@ class ViewUI implements ViewEntityInterface {
   /**
    * {@inheritdoc}
    */
-  public static function loadMultiple(array $ids = NULL) {
+  public static function loadMultiple(?array $ids = NULL) {
     return View::loadMultiple($ids);
   }
 
@@ -1052,7 +1052,7 @@ class ViewUI implements ViewEntityInterface {
   /**
    * {@inheritdoc}
    */
-  public function access($operation = 'view', AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($operation = 'view', ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     return $this->storage->access($operation, $account, $return_as_object);
   }
 

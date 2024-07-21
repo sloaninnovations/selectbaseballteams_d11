@@ -65,7 +65,7 @@ class EntityLabel extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
     $this->additional_fields[$this->definition['entity type field']] = $this->definition['entity type field'];
   }
@@ -111,10 +111,10 @@ class EntityLabel extends FieldPluginBase {
         $this->options['alter']['url'] = $entity->toUrl();
         $this->options['alter']['make_link'] = TRUE;
       }
-      catch (UndefinedLinkTemplateException $e) {
+      catch (UndefinedLinkTemplateException) {
         $this->options['alter']['make_link'] = FALSE;
       }
-      catch (EntityMalformedException $e) {
+      catch (EntityMalformedException) {
         $this->options['alter']['make_link'] = FALSE;
       }
     }

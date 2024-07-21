@@ -39,7 +39,7 @@ class SerializationTest extends KernelTestBase {
   /**
    * Confirms that modules can register normalizers and encoders.
    */
-  public function testSerializerComponentRegistration() {
+  public function testSerializerComponentRegistration(): void {
     $object = new \stdClass();
     $format = 'serialization_test';
     $expected = 'Normalized by SerializationTestNormalizer, Encoded by SerializationTestEncoder';
@@ -52,7 +52,7 @@ class SerializationTest extends KernelTestBase {
       $this->serializer->serialize($object, 'unsupported_format');
       $this->fail('The serializer was expected to throw an exception for an unsupported format, but did not.');
     }
-    catch (UnexpectedValueException $e) {
+    catch (UnexpectedValueException) {
       // Expected exception; just continue testing.
     }
   }

@@ -126,7 +126,7 @@ class TermTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $base_url = Url::fromUri('base:/jsonapi/taxonomy_term/camelids/' . $this->entity->uuid())->setAbsolute();
     $self_url = clone $base_url;
     $version_identifier = 'id:' . $this->entity->getRevisionId();
@@ -321,7 +321,7 @@ class TermTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedGetRelationshipDocumentData($relationship_field_name, EntityInterface $entity = NULL) {
+  protected function getExpectedGetRelationshipDocumentData($relationship_field_name, ?EntityInterface $entity = NULL) {
     $data = parent::getExpectedGetRelationshipDocumentData($relationship_field_name, $entity);
     if ($relationship_field_name === 'parent') {
       $data = [
@@ -347,7 +347,7 @@ class TermTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     return [
       'data' => [
         'type' => 'taxonomy_term--camelids',
@@ -401,7 +401,7 @@ class TermTest extends ResourceTestBase {
    * @see \Drupal\Tests\jsonapi\Functional\NodeTest::testPatchPath()
    * @see \Drupal\Tests\rest\Functional\EntityResource\Node\NodeResourceTestBase::testPatchPath()
    */
-  public function testPatchPath() {
+  public function testPatchPath(): void {
     $this->setUpAuthorization('GET');
     $this->setUpAuthorization('PATCH');
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
@@ -434,7 +434,7 @@ class TermTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedCacheTags(array $sparse_fieldset = NULL) {
+  protected function getExpectedCacheTags(?array $sparse_fieldset = NULL) {
     $tags = parent::getExpectedCacheTags($sparse_fieldset);
     if ($sparse_fieldset === NULL || in_array('description', $sparse_fieldset)) {
       $tags = Cache::mergeTags($tags, ['config:filter.format.plain_text', 'config:filter.settings']);
@@ -445,7 +445,7 @@ class TermTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedCacheContexts(array $sparse_fieldset = NULL) {
+  protected function getExpectedCacheContexts(?array $sparse_fieldset = NULL) {
     $contexts = parent::getExpectedCacheContexts($sparse_fieldset);
     if ($sparse_fieldset === NULL || in_array('description', $sparse_fieldset)) {
       $contexts = Cache::mergeContexts($contexts, ['languages:language_interface', 'theme']);
@@ -460,7 +460,7 @@ class TermTest extends ResourceTestBase {
    *
    * @dataProvider providerTestGetIndividualTermWithParent
    */
-  public function testGetIndividualTermWithParent(array $parent_term_ids) {
+  public function testGetIndividualTermWithParent(array $parent_term_ids): void {
     // Create all possible parent terms.
     Term::create(['vid' => Vocabulary::load('camelids')->id()])
       ->setName('Lamoids')
@@ -506,7 +506,7 @@ class TermTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testCollectionFilterAccess() {
+  public function testCollectionFilterAccess(): void {
     $this->doTestCollectionFilterAccessBasedOnPermissions('name', 'access content');
   }
 

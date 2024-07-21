@@ -41,12 +41,4 @@ class TermXmlBasicAuthTest extends TermResourceTestBase {
    */
   protected static $auth = 'basic_auth';
 
-  /**
-   * {@inheritdoc}
-   */
-  public function testPatchPath() {
-    // Deserialization of the XML format is not supported.
-    $this->markTestSkipped();
-  }
-
 }

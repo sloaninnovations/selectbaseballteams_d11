@@ -21,7 +21,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['media'];
+  protected static $modules = ['content_translation', 'media'];
 
   /**
    * {@inheritdoc}
@@ -312,7 +312,18 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testPost() {
+  protected function getExpectedCacheContexts() {
+    return [
+      'languages:language_interface',
+      'url.site',
+      'user.permissions',
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testPost(): void {
     $file_storage = $this->container->get('entity_type.manager')->getStorage('file');
 
     // Step 1: upload file, results in File entity marked temporary.

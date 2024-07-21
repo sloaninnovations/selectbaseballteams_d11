@@ -48,7 +48,6 @@ class NavigationUserBlockTest extends PageCacheTagsTestBase {
 
     // Create an admin user, log in and enable test navigation blocks.
     $this->adminUser = $this->drupalCreateUser([
-      'administer navigation_block',
       'access administration pages',
       'access navigation',
     ]);
@@ -65,7 +64,7 @@ class NavigationUserBlockTest extends PageCacheTagsTestBase {
   /**
    * Test output of user navigation block with regards to caching and contents.
    */
-  public function testNavigationUserBlock() {
+  public function testNavigationUserBlock(): void {
     // Verify some basic cacheability metadata. Ensures that we're not doing
     // anything so egregious as to upset expected caching behavior. In this
     // case, as an anonymous user, we should have zero effect on the page.

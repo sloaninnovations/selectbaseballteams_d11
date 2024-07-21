@@ -32,7 +32,7 @@ class ManyToOne extends InOperator {
   /**
    * {@inheritdoc}
    */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
     $this->helper = new ManyToOneHelper($this);
@@ -85,7 +85,7 @@ class ManyToOne extends InOperator {
         'ensure_my_table' => 'helper',
       ],
     ];
-    // if the definition allows for the empty operator, add it.
+    // If the definition allows for the empty operator, add it.
     if (!empty($this->definition['allow empty'])) {
       $operators += [
         'empty' => [

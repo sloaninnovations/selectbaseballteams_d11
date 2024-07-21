@@ -114,7 +114,7 @@ class ImageTest extends ImageTestBase {
    *
    * @return string[]
    */
-  protected function imageAttributes() {
+  protected function imageAttributes(): array {
     return [
       'data-entity-type' => 'file',
       'data-entity-uuid' => $this->file->uuid(),
@@ -136,7 +136,7 @@ class ImageTest extends ImageTestBase {
   /**
    * Tests the ckeditor5_imageResize and ckeditor5_imageUpload settings forms.
    */
-  public function testImageSettingsForm() {
+  public function testImageSettingsForm(): void {
     $assert_session = $this->assertSession();
 
     $this->drupalGet('admin/config/content/formats/manage/test_format');

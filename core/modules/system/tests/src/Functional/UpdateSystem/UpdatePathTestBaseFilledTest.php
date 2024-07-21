@@ -9,7 +9,7 @@ use Drupal\node\Entity\Node;
 use Drupal\system\Entity\Action;
 use Drupal\user\Entity\User;
 
-// cspell:ignore hola usuario
+// cspell:ignore hola testblock usuario
 
 /**
  * Runs UpdatePathTestBase with a dump filled with content.
@@ -36,7 +36,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
   /**
    * Tests that the content and configuration were properly updated.
    */
-  public function testUpdatedSite() {
+  public function testUpdatedSite(): void {
     $assert_session = $this->assertSession();
 
     $this->runUpdates();
@@ -408,7 +408,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
   /**
    * Tests that the database was properly loaded.
    */
-  public function testDatabaseProperlyLoaded() {
+  public function testDatabaseProperlyLoaded(): void {
     $this->testDatabaseLoaded();
   }
 

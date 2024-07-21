@@ -22,7 +22,7 @@ class PathFieldDefinitionTest extends BaseFieldDefinitionTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getModuleAndPath() {
+  protected function getModuleAndPath(): array {
     return ['path', dirname(__DIR__, 4)];
   }
 
@@ -30,7 +30,7 @@ class PathFieldDefinitionTest extends BaseFieldDefinitionTestBase {
    * @covers ::getColumns
    * @covers ::getSchema
    */
-  public function testGetColumns() {
+  public function testGetColumns(): void {
     $this->assertSame([], $this->definition->getColumns());
   }
 

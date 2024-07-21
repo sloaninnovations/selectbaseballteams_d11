@@ -183,7 +183,7 @@ abstract class BuildTestBase extends TestCase {
         ->directories()
         ->ignoreVCS(FALSE)
         ->ignoreDotFiles(FALSE)
-        // composer script is a symlink and fails chmod. Ignore it.
+        // Composer script is a symlink and fails chmod. Ignore it.
         ->notPath('/^vendor\/bin\/composer$/');
       $fs->chmod($finder->getIterator(), 0775, 0000);
       $fs->remove($ws);
@@ -547,7 +547,7 @@ abstract class BuildTestBase extends TestCase {
    *   (optional) Relative path within the test workspace file system that will
    *   contain the copy of the codebase. Defaults to the workspace directory.
    */
-  public function copyCodebase(\Iterator $iterator = NULL, $working_dir = NULL) {
+  public function copyCodebase(?\Iterator $iterator = NULL, $working_dir = NULL) {
     $working_path = $this->getWorkingPath($working_dir);
 
     if ($iterator === NULL) {

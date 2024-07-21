@@ -106,7 +106,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
     // Check to see if this handler type is defaulted. Note that
@@ -605,7 +605,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    * {@inheritdoc}
    */
   public function getJoin() {
-    // get the join from this table that links back to the base table.
+    // Get the join from this table that links back to the base table.
     // Determine the primary table to seek
     if (empty($this->query->relationships[$this->relationship])) {
       $base_table = $this->view->storage->get('base_table');
@@ -772,7 +772,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    */
   public function displayExposedForm($form, FormStateInterface $form_state) {
     $item = &$this->options;
-    // flip
+    // Flip
     $item['exposed'] = empty($item['exposed']);
 
     // If necessary, set new defaults:

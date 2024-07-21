@@ -49,14 +49,14 @@ class MenuLinkContentTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getTranslatorPermissions() {
+  protected function getTranslatorPermissions(): array {
     return array_merge(parent::getTranslatorPermissions(), ['administer menu']);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getAdministratorPermissions() {
+  protected function getAdministratorPermissions(): array {
     return array_merge(parent::getAdministratorPermissions(), ['administer themes', 'view the administration theme']);
   }
 
@@ -74,7 +74,7 @@ class MenuLinkContentTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Ensure that a translate link can be found on the menu edit form.
    */
-  public function testTranslationLinkOnMenuEditForm() {
+  public function testTranslationLinkOnMenuEditForm(): void {
     $this->drupalGet('admin/structure/menu/manage/tools');
     $this->assertSession()->linkNotExists('Translate');
 
@@ -91,7 +91,7 @@ class MenuLinkContentTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests that translation page inherits admin status of edit page.
    */
-  public function testTranslationLinkTheme() {
+  public function testTranslationLinkTheme(): void {
     $this->drupalLogin($this->administrator);
     $entityId = $this->createEntity([], 'en');
 

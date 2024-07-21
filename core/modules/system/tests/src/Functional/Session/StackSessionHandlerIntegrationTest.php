@@ -27,9 +27,9 @@ class StackSessionHandlerIntegrationTest extends BrowserTestBase {
   /**
    * Tests a request.
    */
-  public function testRequest() {
+  public function testRequest(): void {
     $options['query'][MainContentViewSubscriber::WRAPPER_FORMAT] = 'drupal_ajax';
-    $headers[] = 'X-Requested-With: XMLHttpRequest';
+    $headers = ['X-Requested-With' => 'XMLHttpRequest'];
     $actual_trace = json_decode($this->drupalGet('session-test/trace-handler', $options, $headers));
     $sessionId = $this->getSessionCookies()->getCookieByName($this->getSessionName())->getValue();
     $expect_trace = [

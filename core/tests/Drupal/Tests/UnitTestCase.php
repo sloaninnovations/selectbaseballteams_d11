@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\VarDumper;
 /**
  * Provides a base class and helpers for Drupal unit tests.
  *
- * Using Symfony's dump() function() in Unit tests will produce output on the
+ * Using Symfony's dump() function in Unit tests will produce output on the
  * command line.
  *
  * @ingroup testing
@@ -62,6 +62,7 @@ abstract class UnitTestCase extends TestCase {
     FileCacheFactory::setPrefix('prefix');
 
     $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
+    chdir($this->root);
   }
 
   /**

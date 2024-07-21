@@ -35,7 +35,7 @@ class BigPipePlaceholderTestCases {
    *
    * @return \Drupal\big_pipe_test\BigPipePlaceholderTestCase[]
    */
-  public static function cases(ContainerInterface $container = NULL, AccountInterface $user = NULL) {
+  public static function cases(?ContainerInterface $container = NULL, ?AccountInterface $user = NULL) {
     // Define the two types of cacheability that we expect to see. These will be
     // used in the expectations.
     $cacheability_depends_on_session_only = [
@@ -330,6 +330,7 @@ class BigPipePlaceholderTestCases {
     // cspell:disable-next-line
     $exception->bigPipePlaceholderId = 'callback=%5CDrupal%5Cbig_pipe_test%5CBigPipeTestController%3A%3Aexception&amp;args%5B0%5D=llamas&amp;args%5B1%5D=suck&amp;token=uhKFNfT4eF449_W-kDQX8E5z4yHyt0-nSHUlwaGAQeU';
     $exception->bigPipePlaceholderRenderArray = [
+      // cspell:disable-next-line
       '#prefix' => '<span data-big-pipe-placeholder-id="callback=%5CDrupal%5Cbig_pipe_test%5CBigPipeTestController%3A%3Aexception&amp;args%5B0%5D=llamas&amp;args%5B1%5D=suck&amp;token=uhKFNfT4eF449_W-kDQX8E5z4yHyt0-nSHUlwaGAQeU">',
       'interface_preview' => [
         '#theme' => 'big_pipe_interface_preview',

@@ -242,6 +242,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->registerComparator(new MarkupInterfaceComparator());
 
     $this->root = static::getDrupalRoot();
+    chdir($this->root);
     $this->initFileCache();
     $this->bootEnvironment();
     $this->bootKernel();
@@ -508,7 +509,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * @see \Drupal\Tests\KernelTestBase::enableModules()
    * @see \Drupal\Core\Extension\ModuleHandler::add()
    */
-  private function getExtensionsForModules(array $modules) {
+  private function getExtensionsForModules(array $modules): array {
     $extensions = [];
     $discovery = new ExtensionDiscovery($this->root);
     $discovery->setProfileDirectories([]);

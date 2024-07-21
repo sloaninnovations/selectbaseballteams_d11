@@ -170,7 +170,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EventDispatcherInterface $event_dispatcher, MigrationPluginManagerInterface $migration_plugin_manager = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EventDispatcherInterface $event_dispatcher, ?MigrationPluginManagerInterface $migration_plugin_manager = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;
     $this->eventDispatcher = $event_dispatcher;
@@ -193,7 +193,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,
@@ -657,7 +657,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
     try {
       return $query->execute()->fetchAll(\PDO::FETCH_NUM);
     }
-    catch (DatabaseExceptionWrapper $e) {
+    catch (DatabaseExceptionWrapper) {
       // It's possible that the query will cause an exception to be thrown. For
       // example, the URL alias migration uses a dummy node ID of 'INVALID_NID'
       // to cause the lookup to return no results. On PostgreSQL this causes an
@@ -824,7 +824,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
     try {
       $count = (int) $query->countQuery()->execute()->fetchField();
     }
-    catch (DatabaseException $e) {
+    catch (DatabaseException) {
       // The table does not exist, therefore there are no records.
       $count = 0;
     }

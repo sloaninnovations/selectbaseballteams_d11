@@ -423,7 +423,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
               try {
                 return $url instanceof Url && $url->access();
               }
-              catch (\Exception $e) {
+              catch (\Exception) {
                 return FALSE;
               }
             });
@@ -447,7 +447,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    *
    * @return $this
    */
-  public function setConfigOverrideLanguage(LanguageInterface $language = NULL) {
+  public function setConfigOverrideLanguage(?LanguageInterface $language = NULL) {
     $this->configFactoryOverride->setLanguage($language);
     return $this;
   }

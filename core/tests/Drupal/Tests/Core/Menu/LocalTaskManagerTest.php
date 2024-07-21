@@ -120,7 +120,7 @@ class LocalTaskManagerTest extends UnitTestCase {
    *
    * @see \Drupal\system\Plugin\Type\MenuLocalTaskManager::getLocalTasksForRoute()
    */
-  public function testGetLocalTasksForRouteSingleLevelTitle() {
+  public function testGetLocalTasksForRouteSingleLevelTitle(): void {
     $definitions = $this->getLocalTaskFixtures();
 
     $this->pluginDiscovery->expects($this->once())
@@ -144,7 +144,7 @@ class LocalTaskManagerTest extends UnitTestCase {
    *
    * @see \Drupal\system\Plugin\Type\MenuLocalTaskManager::getLocalTasksForRoute()
    */
-  public function testGetLocalTasksForRouteForChild() {
+  public function testGetLocalTasksForRouteForChild(): void {
     $definitions = $this->getLocalTaskFixtures();
 
     $this->pluginDiscovery->expects($this->once())
@@ -166,7 +166,7 @@ class LocalTaskManagerTest extends UnitTestCase {
   /**
    * Tests the cache of the local task manager with an empty initial cache.
    */
-  public function testGetLocalTaskForRouteWithEmptyCache() {
+  public function testGetLocalTaskForRouteWithEmptyCache(): void {
     $definitions = $this->getLocalTaskFixtures();
 
     $this->pluginDiscovery->expects($this->once())
@@ -197,7 +197,7 @@ class LocalTaskManagerTest extends UnitTestCase {
   /**
    * Tests the cache of the local task manager with a filled initial cache.
    */
-  public function testGetLocalTaskForRouteWithFilledCache() {
+  public function testGetLocalTaskForRouteWithFilledCache(): void {
     $this->pluginDiscovery->expects($this->never())
       ->method('getDefinitions');
 
@@ -224,7 +224,7 @@ class LocalTaskManagerTest extends UnitTestCase {
    *
    * @see \Drupal\system\Plugin\Type\MenuLocalTaskManager::getTitle()
    */
-  public function testGetTitle() {
+  public function testGetTitle(): void {
     $menu_local_task = $this->createMock('Drupal\Core\Menu\LocalTaskInterface');
     $menu_local_task->expects($this->once())
       ->method('getTitle');
@@ -268,7 +268,7 @@ class LocalTaskManagerTest extends UnitTestCase {
    * @return array
    *   An array of plugin definition keyed by plugin ID.
    */
-  protected function getLocalTaskFixtures() {
+  protected function getLocalTaskFixtures(): array {
     $definitions = [];
     $definitions['menu_local_task_test_tasks_settings'] = [
       'route_name' => 'menu_local_task_test_tasks_settings',
@@ -343,7 +343,7 @@ class LocalTaskManagerTest extends UnitTestCase {
    * @return array
    *   The expected result, keyed by local task level.
    */
-  protected function getLocalTasksForRouteResult($mock_plugin) {
+  protected function getLocalTasksForRouteResult($mock_plugin): array {
     $result = [
       0 => [
         'menu_local_task_test_tasks_settings' => $mock_plugin,
@@ -363,7 +363,7 @@ class LocalTaskManagerTest extends UnitTestCase {
    *
    * @return array
    */
-  protected function getLocalTasksCache() {
+  protected function getLocalTasksCache(): array {
     $local_task_fixtures = $this->getLocalTaskFixtures();
     $local_tasks = [
       'base_routes' => [
@@ -396,7 +396,7 @@ class LocalTaskManagerTest extends UnitTestCase {
   /**
    * @covers ::getTasksBuild
    */
-  public function testGetTasksBuildWithCacheabilityMetadata() {
+  public function testGetTasksBuildWithCacheabilityMetadata(): void {
     $definitions = $this->getLocalTaskFixtures();
 
     $this->pluginDiscovery->expects($this->once())

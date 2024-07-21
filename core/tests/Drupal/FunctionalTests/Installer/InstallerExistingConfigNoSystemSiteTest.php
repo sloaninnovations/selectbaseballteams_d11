@@ -9,7 +9,7 @@ namespace Drupal\FunctionalTests\Installer;
  *
  * @group Installer
  */
-class InstallerExistingConfigNoSystemSiteTest extends InstallerExistingConfigTestBase {
+class InstallerExistingConfigNoSystemSiteTest extends InstallerConfigDirectoryTestBase {
 
   /**
    * {@inheritdoc}
@@ -30,7 +30,7 @@ class InstallerExistingConfigNoSystemSiteTest extends InstallerExistingConfigTes
   /**
    * Tests that profiles with no system.site do not work.
    */
-  public function testConfigSync() {
+  public function testConfigSync(): void {
     $this->htmlOutput(NULL);
     $this->assertSession()->titleEquals('Configuration validation | Drupal');
     $this->assertSession()->pageTextContains('The configuration synchronization failed validation.');
@@ -44,8 +44,8 @@ class InstallerExistingConfigNoSystemSiteTest extends InstallerExistingConfigTes
   /**
    * {@inheritdoc}
    */
-  protected function getConfigTarball() {
-    return __DIR__ . '/../../../fixtures/config_install/testing_config_install.tar.gz';
+  protected function getConfigLocation() {
+    return __DIR__ . '/../../../fixtures/config_install/testing_config_install';
   }
 
 }

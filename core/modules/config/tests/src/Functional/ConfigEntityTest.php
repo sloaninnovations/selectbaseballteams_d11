@@ -40,7 +40,7 @@ class ConfigEntityTest extends BrowserTestBase {
   /**
    * Tests CRUD operations.
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $default_langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
     // Verify default properties on a newly created empty entity.
     $storage = \Drupal::entityTypeManager()->getStorage('config_test');
@@ -179,7 +179,7 @@ class ConfigEntityTest extends BrowserTestBase {
         '@max' => static::MAX_ID_LENGTH,
       ]));
     }
-    catch (ConfigEntityIdLengthException $e) {
+    catch (ConfigEntityIdLengthException) {
       // Expected exception; just continue testing.
     }
 
@@ -193,7 +193,7 @@ class ConfigEntityTest extends BrowserTestBase {
       $same_id->save();
       $this->fail('Not possible to overwrite an entity.');
     }
-    catch (EntityStorageException $e) {
+    catch (EntityStorageException) {
       // Expected exception; just continue testing.
     }
 
@@ -227,7 +227,7 @@ class ConfigEntityTest extends BrowserTestBase {
   /**
    * Tests CRUD operations through the UI.
    */
-  public function testCrudUi() {
+  public function testCrudUi(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer site configuration',
     ]));

@@ -38,7 +38,7 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests CRUD operations.
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $event_dispatcher = $this->container->get('event_dispatcher');
     $typed_config_manager = $this->container->get('config.typed');
 
@@ -190,7 +190,7 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests the validation of configuration object names.
    */
-  public function testNameValidation() {
+  public function testNameValidation(): void {
     // Verify that an object name without namespace causes an exception.
     $name = 'no_namespace';
     try {
@@ -219,7 +219,7 @@ class ConfigCRUDTest extends KernelTestBase {
         $config = $this->config($name);
         $config->save();
       }
-      catch (ConfigNameException $e) {
+      catch (ConfigNameException) {
         unset($test_characters[$i]);
       }
     }
@@ -231,7 +231,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $config = $this->config($name);
       $config->save();
     }
-    catch (ConfigNameException $e) {
+    catch (ConfigNameException) {
       $this->fail('ConfigNameException was not thrown for a valid object name.');
     }
 
@@ -240,7 +240,7 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests the validation of configuration object values.
    */
-  public function testValueValidation() {
+  public function testValueValidation(): void {
     // Verify that setData() will catch dotted keys.
     try {
       $this->config('namespace.object')->setData(['key.value' => 12])->save();
@@ -263,7 +263,7 @@ class ConfigCRUDTest extends KernelTestBase {
   /**
    * Tests data type handling.
    */
-  public function testDataTypes() {
+  public function testDataTypes(): void {
     \Drupal::service('module_installer')->install(['config_test']);
     $storage = new DatabaseStorage($this->container->get('database'), 'config');
     $name = 'config_test.types';
@@ -281,9 +281,9 @@ class ConfigCRUDTest extends KernelTestBase {
       // Symfony 5.1's YAML parser issues a deprecation when reading octal with
       // a leading zero, to comply with YAML 1.2. However PECL YAML is still
       // YAML 1.1 compliant.
-      // @todo: revisit parsing of octal once PECL YAML supports YAML 1.2.
-      // See https://www.drupal.org/project/drupal/issues/3205480
-      // 'octal' => 0775,
+      // @todo Revisit parsing of octal once PECL YAML supports YAML 1.2.
+      //   https://www.drupal.org/project/drupal/issues/3205480
+      //   'octal' => 0775,
       'string' => 'string',
       'string_int' => '1',
       'nullable_array' => NULL,
@@ -331,7 +331,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $config->set('stream', fopen(__FILE__, 'r'))->save();
       $this->fail('No Exception thrown upon saving invalid data type.');
     }
-    catch (UnsupportedDataTypeConfigException $e) {
+    catch (UnsupportedDataTypeConfigException) {
       // Expected exception; just continue testing.
     }
 
@@ -346,7 +346,7 @@ class ConfigCRUDTest extends KernelTestBase {
       $config->set('stream', fopen(__FILE__, 'r'))->save();
       $this->fail('No Exception thrown upon saving invalid data type.');
     }
-    catch (UnsupportedDataTypeConfigException $e) {
+    catch (UnsupportedDataTypeConfigException) {
       // Expected exception; just continue testing.
     }
   }

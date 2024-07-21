@@ -186,7 +186,7 @@ class Sql extends QueryPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
     $base_table = $this->view->storage->get('base_table');
@@ -198,7 +198,7 @@ class Sql extends QueryPluginBase {
       'base' => $base_table,
     ];
 
-    // init the table queue with our primary table.
+    // Initialize the table queue with our primary table.
     $this->tableQueue[$base_table] = [
       'alias' => $base_table,
       'table' => $base_table,
@@ -206,7 +206,7 @@ class Sql extends QueryPluginBase {
       'join' => NULL,
     ];
 
-    // init the tables with our primary table
+    // Init the tables with our primary table
     $this->tables[$base_table][$base_table] = [
       'count' => 1,
       'alias' => $base_table,
@@ -449,7 +449,7 @@ class Sql extends QueryPluginBase {
    *   adding parts to the query. Or FALSE if the table was not able to be
    *   added.
    */
-  public function addTable($table, $relationship = NULL, JoinPluginBase $join = NULL, $alias = NULL) {
+  public function addTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL, $alias = NULL) {
     if (!$this->ensurePath($table, $relationship, $join)) {
       return FALSE;
     }
@@ -488,7 +488,7 @@ class Sql extends QueryPluginBase {
    *   adding parts to the query. Or FALSE if the table was not able to be
    *   added.
    */
-  public function queueTable($table, $relationship = NULL, JoinPluginBase $join = NULL, $alias = NULL) {
+  public function queueTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL, $alias = NULL) {
     // If the alias is set, make sure it doesn't already exist.
     if (isset($this->tableQueue[$alias])) {
       return $alias;
@@ -557,7 +557,7 @@ class Sql extends QueryPluginBase {
       if (!isset($alias)) {
         $alias = '';
         if ($relationship != $this->view->storage->get('base_table')) {
-          // double underscore will help prevent accidental name
+          // Double underscore will help prevent accidental name
           // space collisions.
           $alias = $relationship . '__';
         }
@@ -595,8 +595,8 @@ class Sql extends QueryPluginBase {
    *   The alias used to refer to this specific table, or NULL if the table
    *   cannot be ensured.
    */
-  public function ensureTable($table, $relationship = NULL, JoinPluginBase $join = NULL) {
-    // ensure a relationship
+  public function ensureTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL) {
+    // Ensure a relationship
     if (empty($relationship)) {
       $relationship = $this->view->storage->get('base_table');
     }
@@ -646,14 +646,14 @@ class Sql extends QueryPluginBase {
       // example, a view that filters on 3 taxonomy terms using AND
       // needs to join taxonomy_term_data 3 times with the same join.
 
-      // scan through the table queue to see if a matching join and
+      // Scan through the table queue to see if a matching join and
       // relationship exists.  If so, use it instead of this join.
 
-      // TODO: Scanning through $this->tableQueue results in an
-      // O(N^2) algorithm, and this code runs every time the view is
-      // instantiated (Views 2 does not currently cache queries).
-      // There are a couple possible "improvements" but we should do
-      // some performance testing before picking one.
+      // @todo Scanning through $this->tableQueue results in an
+      //   O(N^2) algorithm, and this code runs every time the view is
+      //   instantiated (Views 2 does not currently cache queries).
+      //   There are a couple possible "improvements" but we should do
+      //   some performance testing before picking one.
       foreach ($this->tableQueue as $queued_table) {
         // In PHP 4 and 5, the == operation returns TRUE for two objects
         // if they are instances of the same class and have the same
@@ -1049,7 +1049,7 @@ class Sql extends QueryPluginBase {
    */
   public function addOrderBy($table, $field = NULL, $order = 'ASC', $alias = '', $params = []) {
     // Only ensure the table if it's not the special random key.
-    // @todo: Maybe it would make sense to just add an addOrderByRand or something similar.
+    // @todo Maybe it would make sense to just add an addOrderByRand or something similar.
     if ($table && $table != 'rand') {
       $this->ensureTable($table);
     }
@@ -1402,7 +1402,7 @@ class Sql extends QueryPluginBase {
     }
 
     if (!$this->getCountOptimized) {
-      // we only add the orderby if we're not counting.
+      // We only add the orderby if we're not counting.
       if ($this->orderby) {
         foreach ($this->orderby as $order) {
           if ($order['field'] == 'rand_') {
@@ -1740,8 +1740,8 @@ class Sql extends QueryPluginBase {
   }
 
   public function getAggregationInfo() {
-    // @todo -- need a way to get database specific and customized aggregation
-    // functions into here.
+    // @todo Need a way to get database specific and customized aggregation
+    //   functions into here.
     return [
       'group' => [
         'title' => $this->t('Group results together'),

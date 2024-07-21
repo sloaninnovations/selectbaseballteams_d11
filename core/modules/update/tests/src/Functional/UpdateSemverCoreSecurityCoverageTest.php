@@ -29,7 +29,7 @@ class UpdateSemverCoreSecurityCoverageTest extends UpdateSemverCoreTestBase {
    *
    * @dataProvider securityCoverageMessageProvider
    */
-  public function testSecurityCoverageMessage($installed_version, $fixture, $requirements_section_heading, $message, $mock_date) {
+  public function testSecurityCoverageMessage($installed_version, $fixture, $requirements_section_heading, $message, $mock_date): void {
     \Drupal::state()->set('update_test.mock_date', $mock_date);
     $this->setProjectInstalledVersion($installed_version);
     $this->refreshUpdateStatus(['drupal' => $fixture]);
@@ -80,7 +80,7 @@ class UpdateSemverCoreSecurityCoverageTest extends UpdateSemverCoreTestBase {
     $release_coverage_message = 'Visit the release cycle overview for more information on supported releases.';
     $coverage_ended_message = 'Coverage has ended';
     $update_asap_message = 'Update to a supported minor as soon as possible to continue receiving security updates.';
-    $update_soon_message = 'Update to a supported minor version soon to continue receiving security updates.';
+    $update_soon_message = 'Update to a supported version soon to continue receiving security updates.';
     $test_cases = [
       '8.0.0, unsupported' => [
         'installed_version' => '8.0.0',

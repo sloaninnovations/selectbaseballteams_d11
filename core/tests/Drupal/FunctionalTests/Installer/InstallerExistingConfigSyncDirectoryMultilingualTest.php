@@ -13,7 +13,7 @@ use Drupal\Component\Serialization\Yaml;
  *
  * @group Installer
  */
-class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerExistingConfigTestBase {
+class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConfigDirectoryTestBase {
 
   /**
    * {@inheritdoc}
@@ -43,8 +43,8 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerExis
   /**
    * {@inheritdoc}
    */
-  protected function getConfigTarball() {
-    return __DIR__ . '/../../../fixtures/config_install/multilingual.tar.gz';
+  protected function getConfigLocation() {
+    return __DIR__ . '/../../../fixtures/config_install/multilingual';
   }
 
   /**
@@ -65,7 +65,7 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerExis
   /**
    * Confirms that the installation installed the configuration correctly.
    */
-  public function testConfigSync() {
+  public function testConfigSync(): void {
     $comparer = $this->configImporter()->getStorageComparer();
     $expected_changelist_default_collection = [
       'create' => [],
