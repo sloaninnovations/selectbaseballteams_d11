@@ -195,7 +195,13 @@ class ComponentValidator {
           $error['message'] .= '. This may be because the property is empty instead of having data present. If possible fix the source data, use the |default() twig filter, or update the schema to allow multiple types.';
         }
 
-        return sprintf('[%s] [%s] %s. "%s" provided.', $component_id, $error['property'], $error['message'], $context[$error['property']]);
+        // If the property value has been set, print it out for easier
+        // investigation.
+        if (isset($context[$error['property']])) {
+          $error['message'] .= \sprintf('. The provided value is: "%s"', $context[$error['property']]);
+        }
+
+        return sprintf('[%s] [%s] %s.', $component_id, $error['property'], $error['message']);
       },
       $errors
     );
