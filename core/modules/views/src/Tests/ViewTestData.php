@@ -15,6 +15,29 @@ use Drupal\Core\Config\FileStorage;
 class ViewTestData {
 
   /**
+   * Installs the default schema and state.
+   */
+  public static function install() {
+
+    // Install the default schema.
+    $connection = \Drupal::database();
+    foreach (ViewTestData::schemaDefinition() as $table => $definition) {
+      if ($connection->schema()->tableExists($table)) {
+        $connection->schema()->dropTable($table);
+      }
+      $connection->schema()->createTable($table, $definition);
+    }
+    foreach (ViewTestData::dataSet() as $row) {
+      $connection->insert('views_test_data')->fields($row)->execute();
+    }
+
+    // Install the state and schema by for views test data.
+    \Drupal::state()->set('views_test_data_schema', ViewTestData::schemaDefinition());
+    \Drupal::state()->set('views_test_data_views_data', ViewTestData::viewsData());
+    drupal_flush_all_caches();
+  }
+
+  /**
    * Create test views from config.
    *
    * @param string $class
