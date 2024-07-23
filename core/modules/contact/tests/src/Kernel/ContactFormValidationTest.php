@@ -24,6 +24,15 @@ class ContactFormValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static array $propertiesWithOptionalValues = [
+    'message',
+    'redirect',
+    'reply',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 

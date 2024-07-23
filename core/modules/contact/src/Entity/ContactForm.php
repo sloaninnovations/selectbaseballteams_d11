@@ -4,6 +4,7 @@ namespace Drupal\contact\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\contact\ContactFormInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Url;
 
 /**
@@ -75,9 +76,9 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
   /**
    * The message displayed to user on form submission.
    *
-   * @var string
+   * @var string|null
    */
-  protected $message;
+  protected ?string $message = NULL;
 
   /**
    * List of recipient email addresses.
@@ -89,16 +90,16 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
   /**
    * The path to redirect to on form submission.
    *
-   * @var string
+   * @var string|null
    */
-  protected $redirect;
+  protected ?string $redirect = NULL;
 
   /**
    * An auto-reply message.
    *
-   * @var string
+   * @var string|null
    */
-  protected $reply = '';
+  protected ?string $reply = NULL;
 
   /**
    * The weight of the category.
@@ -111,7 +112,7 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
    * {@inheritdoc}
    */
   public function getMessage() {
-    return $this->message;
+    return $this->message ?? '';
   }
 
   /**
@@ -141,7 +142,7 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
    * {@inheritdoc}
    */
   public function getRedirectPath() {
-    return $this->redirect;
+    return $this->redirect ?? '';
   }
 
   /**
@@ -169,7 +170,7 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
    * {@inheritdoc}
    */
   public function getReply() {
-    return $this->reply;
+    return $this->reply ?? '';
   }
 
   /**
@@ -193,6 +194,26 @@ class ContactForm extends ConfigEntityBundleBase implements ContactFormInterface
   public function setWeight($weight) {
     $this->weight = $weight;
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    if ($this->reply !== NULL && trim($this->reply) === '') {
+      @trigger_error('Setting reply to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3452650', E_USER_DEPRECATED);
+      $this->reply = NULL;
+    }
+    if ($this->message !== NULL && trim($this->message) === '') {
+      @trigger_error('Setting message to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3452650', E_USER_DEPRECATED);
+      $this->message = NULL;
+    }
+    if ($this->redirect !== NULL && trim($this->redirect) === '') {
+      @trigger_error('Setting redirect to an empty string is deprecated in drupal:10.4.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3452650', E_USER_DEPRECATED);
+      $this->redirect = NULL;
+    }
   }
 
 }
