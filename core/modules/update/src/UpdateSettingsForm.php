@@ -127,7 +127,7 @@ class UpdateSettingsForm extends ConfigFormBase {
    */
   public static function multiLineStringToArray(string $value): array {
     $value = trim($value);
-    return $value ? array_map('trim', explode("\n", $value)) : [];
+    return trim($value) ? array_map('trim', explode("\n", $value)) : [];
   }
 
   /**
