@@ -68,7 +68,7 @@ class Datelist extends DateElementBase {
         try {
           $date = DrupalDateTime::createFromArray($input, $element['#date_timezone']);
         }
-        catch (\Exception $e) {
+        catch (\Exception) {
           $form_state->setError($element, t('Selected combination of day and month is not valid.'));
         }
         if ($date instanceof DrupalDateTime && !$date->hasErrors()) {
@@ -253,7 +253,6 @@ class Datelist extends DateElementBase {
       $element[$part] = [
         '#type' => in_array($part, $text_parts) ? 'textfield' : 'select',
         '#title' => $title,
-        '#title_display' => 'invisible',
         '#value' => $value,
         '#attributes' => $element['#attributes'],
         '#options' => $options,

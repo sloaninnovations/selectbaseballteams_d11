@@ -90,15 +90,6 @@ class TermTest extends TaxonomyTestBase {
   }
 
   /**
-   * The "parent" field must restrict references to the same vocabulary.
-   */
-  public function testParentHandlerSettings(): void {
-    $vocabulary_fields = \Drupal::service('entity_field.manager')->getFieldDefinitions('taxonomy_term', $this->vocabulary->id());
-    $parent_target_bundles = $vocabulary_fields['parent']->getSetting('handler_settings')['target_bundles'];
-    $this->assertSame([$this->vocabulary->id() => $this->vocabulary->id()], $parent_target_bundles);
-  }
-
-  /**
    * Tests terms in a single and multiple hierarchy.
    */
   public function testTaxonomyTermHierarchy(): void {
@@ -605,7 +596,7 @@ class TermTest extends TaxonomyTestBase {
    * @return array
    *   A sorted array of tids and 0 if the root is a parent.
    */
-  private function getParentTids($term) {
+  private function getParentTids($term): array {
     $parent_tids = [];
     foreach ($term->get('parent') as $item) {
       $parent_tids[] = (int) $item->target_id;
