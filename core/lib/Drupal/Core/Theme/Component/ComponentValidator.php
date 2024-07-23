@@ -196,8 +196,8 @@ class ComponentValidator {
         }
 
         // If the property value has been set, print it out for easier
-        // investigation.
-        if (isset($context[$error['property']])) {
+        // debugging.
+        if (isset($context[$error['property']]) && \is_scalar($context[$error['property']])) {
           $error['message'] .= \sprintf('. The provided value is: "%s"', $context[$error['property']]);
         }
 
