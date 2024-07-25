@@ -31,7 +31,7 @@ config:
   # mapped to the \Drupal\user\Entity\Role::grantPermission() method.
   actions:
     text.settings:
-      simple_config_update:
+      simpleConfigUpdate:
         default_summary_length: 700
 # A Drupal recipe can have a content directory. All content in this directory
 # will be created after the configuration is installed.
