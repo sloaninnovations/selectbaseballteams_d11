@@ -251,12 +251,6 @@ trait UserCreationTrait {
       $name = trim($this->randomString(8));
     }
 
-    // Check the all the permissions strings are valid.
-    if (!$this->checkPermissions($permissions)) {
-      // checkPermissions() added fail assertions already, so just end.
-      throw new \InvalidArgumentException('Invalid user permissions.');
-    }
-
     // Create new role.
     $role = Role::create([
       'id' => $rid,
@@ -291,18 +285,16 @@ trait UserCreationTrait {
    *   The permission names to check.
    *
    * @return bool
-   *   TRUE if the permissions are valid, FALSE otherwise.
+   *   TRUE if the permissions are valid, fails a test otherwise.
    */
   protected function checkPermissions(array $permissions) {
     $available = array_keys(\Drupal::service('user.permissions')->getPermissions());
-    $valid = TRUE;
     foreach ($permissions as $permission) {
       if (!in_array($permission, $available)) {
         $this->fail("Invalid permission $permission.");
-        $valid = FALSE;
       }
     }
-    return $valid;
+    return TRUE;
   }
 
   /**
