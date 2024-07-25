@@ -154,9 +154,6 @@ trait UserCreationTrait {
     $rid = FALSE;
     if ($permissions) {
       $rid = $this->createRole($permissions);
-      if (!$rid) {
-        return FALSE;
-      }
     }
 
     // Create a user assigned to that role.
@@ -236,6 +233,11 @@ trait UserCreationTrait {
    *
    * @return string
    *   Role ID of newly created role, or FALSE if role creation failed.
+   *
+   * @throws \InvalidArgumentException
+   *   If one or more of the specified permissions do not exist.
+   * @throws \RuntimeException
+   *   If the user role could not be created.
    */
   protected function createRole(array $permissions, $rid = NULL, $name = NULL, $weight = NULL) {
     // Generate a random, lowercase machine name if none was passed.
@@ -251,7 +253,8 @@ trait UserCreationTrait {
 
     // Check the all the permissions strings are valid.
     if (!$this->checkPermissions($permissions)) {
-      return FALSE;
+      // checkPermissions() added fail assertions already, so just end.
+      throw new \InvalidArgumentException('Invalid user permissions.');
     }
 
     // Create new role.
@@ -277,7 +280,7 @@ trait UserCreationTrait {
       return $role->id();
     }
     else {
-      return FALSE;
+      throw new \RuntimeException('Unable to create new user role.');
     }
   }
 
