@@ -254,10 +254,10 @@ class UpdateMiscTest extends UpdateTestBase {
       ->set('interface.default', 'test_php_mail_failure')
       ->save();
 
-    // Execute the cron to try to send the e-mails.
+    // Execute cron to try to send the update email.
     $this->cronRun();
 
-    // No emails log should exist since an empty email list should not send e-mails.
+    // No log message should exist since an empty email list should not send email.
     $logs = \Drupal::database()->query("SELECT * FROM {watchdog} WHERE type = 'mail'")->fetchAll();
     $this->assertEmpty($logs);
   }
