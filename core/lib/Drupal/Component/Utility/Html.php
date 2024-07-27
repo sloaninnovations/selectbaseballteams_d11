@@ -95,6 +95,8 @@ class Html {
    *
    * @return string
    *   The cleaned identifier.
+   *
+   * @see http://www.w3.org/TR/CSS21/syndata.html#characters
    */
   public static function cleanCssIdentifier(
     $identifier,

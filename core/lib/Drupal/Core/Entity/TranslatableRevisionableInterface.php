@@ -24,13 +24,13 @@ interface TranslatableRevisionableInterface extends TranslatableInterface, Revis
    * the entity storage to determine if the flag should be recomputed or the set
    * value should be used instead.
    *
-   * @see \Drupal\Core\Entity\ContentEntityStorageBase::populateAffectedRevisionTranslations()
-   *
    * @param bool|null $affected
    *   The flag value. A NULL value can be specified to reset the current value
    *   and make sure a new value will be computed by the system.
    *
    * @return $this
+   *
+   * @see \Drupal\Core\Entity\ContentEntityStorageBase::populateAffectedRevisionTranslations()
    */
   public function setRevisionTranslationAffected($affected);
 

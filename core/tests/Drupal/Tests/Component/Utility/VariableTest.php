@@ -166,13 +166,14 @@ class VariableTest extends TestCase {
   /**
    * Tests exporting variables.
    *
-   * @dataProvider providerTestExport
    * @covers ::export
    *
    * @param string $expected
    *   The expected exported variable.
    * @param mixed $variable
    *   The variable to be exported.
+   *
+   * @dataProvider providerTestExport
    */
   public function testExport($expected, $variable): void {
     $this->assertEquals($expected, Variable::export($variable));

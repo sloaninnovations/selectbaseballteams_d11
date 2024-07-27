@@ -19,7 +19,6 @@ class SortArrayTest extends TestCase {
   /**
    * Tests SortArray::sortByWeightElement() input against expected output.
    *
-   * @dataProvider providerSortByWeightElement
    * @covers ::sortByWeightElement
    * @covers ::sortByKeyInt
    *
@@ -29,6 +28,8 @@ class SortArrayTest extends TestCase {
    *   The second input array for the SortArray::sortByWeightElement().
    * @param int $expected
    *   The expected output from calling the method.
+   *
+   * @dataProvider providerSortByWeightElement
    */
   public function testSortByWeightElement($a, $b, $expected): void {
     $result = SortArray::sortByWeightElement($a, $b);
