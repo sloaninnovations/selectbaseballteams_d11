@@ -623,6 +623,28 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   /**
    * {@inheritdoc}
    */
+  public function addRequiredDependencies(array $required_dependencies): MigrationInterface {
+    // @todo Remove check for 'required' key. https://www.drupal.org/node/3332807
+    $this->migration_dependencies['required'] = isset($this->migration_dependencies['required'])
+      ? array_unique(array_merge($this->migration_dependencies['required'], $required_dependencies))
+      : $required_dependencies;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addOptionalDependencies(array $optional_dependencies): MigrationInterface {
+    // @todo Remove check for 'optional' key. https://www.drupal.org/node/3332807
+    $this->migration_dependencies['optional'] = isset($this->migration_dependencies['optional'])
+      ? array_unique(array_merge($this->migration_dependencies['optional'], $optional_dependencies))
+      : $optional_dependencies;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function mergeProcessOfProperty($property, array $process_of_property) {
     // If we already have a process value then merge the incoming process array
     // otherwise simply set it.
