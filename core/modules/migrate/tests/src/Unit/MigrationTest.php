@@ -269,7 +269,7 @@ class MigrationTest extends UnitTestCase {
     $migration->setMigrationPluginManager($this->getMockPluginManager());
 
     $migration->addRequiredDependencies($addition);
-    $this->assertSame($expected, $migration->getMigrationDependencies(TRUE));
+    $this->assertSame($expected, $migration->getMigrationDependencies());
   }
 
   /**
@@ -354,7 +354,7 @@ class MigrationTest extends UnitTestCase {
     $migration->setMigrationPluginManager($this->getMockPluginManager());
 
     $migration->addOptionalDependencies($addition);
-    $this->assertSame($expected, $migration->getMigrationDependencies(TRUE));
+    $this->assertSame($expected, $migration->getMigrationDependencies());
   }
 
   /**
