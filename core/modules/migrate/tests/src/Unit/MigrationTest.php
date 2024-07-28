@@ -275,7 +275,7 @@ class MigrationTest extends UnitTestCase {
   /**
    * Provides data for testAddRequiredDependencies.
    */
-  public function providerTestAddRequiredDependencies() {
+  public static function providerTestAddRequiredDependencies() {
     return [
       'NULL' => [
         NULL,
@@ -360,7 +360,7 @@ class MigrationTest extends UnitTestCase {
   /**
    * Provides data for testAddOptionalDependencies.
    */
-  public function providerTestAddOptionalDependencies() {
+  public static function providerTestAddOptionalDependencies() {
     return [
       'NULL' => [
         NULL,
@@ -447,11 +447,11 @@ class TestMigration extends Migration {
   /**
    * Constructs an instance of TestMigration object.
    *
-   * @param string[] $initial_dependency
+   * @param string[]|null $initial_dependency
    *   An associative array of required and optional migrations IDs, keyed by
    *   'required' and 'optional'.
    */
-  public function __construct(array $initial_dependency = NULL) {
+  public function __construct(?array $initial_dependency = NULL) {
     $this->migration_dependencies = ($this->migration_dependencies ?: []) + ['required' => [], 'optional' => []];
     if ($initial_dependency) {
       $this->migration_dependencies = $initial_dependency;
