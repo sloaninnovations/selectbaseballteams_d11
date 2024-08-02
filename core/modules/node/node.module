@@ -342,7 +342,7 @@ function template_preprocess_node(&$variables): void {
   // - The view mode is 'full' and we are on the 'node.view' route.
   // - The node is in preview and view mode is either 'full' or 'default'.
   $variables['page'] = ($variables['view_mode'] == 'full' && (node_is_page($node)) || (isset($node->in_preview) && in_array($node->preview_view_mode, ['full', 'default'])));
-  
+
   $skip_custom_preprocessing = $node->getEntityType()->get('enable_base_field_custom_preprocess_skipping');
 
   // Make created, uid and title fields available separately. Skip this custom
