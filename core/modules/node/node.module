@@ -327,6 +327,12 @@ function template_preprocess_node(&$variables): void {
   $variables['deprecations']['teaser'] = "'teaser' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. Use 'view_mode' instead. See https://www.drupal.org/node/3458185";
   $variables['teaser'] = $variables['view_mode'] == 'teaser';
 
+  // The page variable is deprecated.
+  $variables['deprecations']['page'] = "'page' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. Use 'view_mode' instead. See https://www.drupal.org/node/3465400";
+  // The 'page' variable is set to TRUE in two occasions:
+  // - The view mode is 'full' and we are on the 'node.view' route.
+  // - The node is in preview and view mode is either 'full' or 'default'.
+  $variables['page'] = ($variables['view_mode'] == 'full' && (node_is_page($node)) || (isset($node->in_preview) && in_array($node->preview_view_mode, ['full', 'default'])));
   // The 'metadata' variable was originally added to support RDF, which has now
   // been moved to contrib. It was needed because it is not possible to
   // extend the markup of the 'submitted' variable generically.
