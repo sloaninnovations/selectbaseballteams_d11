@@ -323,39 +323,6 @@ class ManageFieldsFunctionalTest extends ManageFieldsFunctionalTestBase {
   }
 
   /**
-   * Tests that the field list administration page operates correctly.
-   */
-  public function fieldListAdminPage() {
-    $assert_session = $this->assertSession();
-    $this->drupalGet('admin/reports/fields');
-    $assert_session->pageTextContains($this->fieldName);
-    // Check that select list options with test type of field and entity are exist.
-    $assert_session->optionExists('edit-entity-type', 'entity_test');
-    $assert_session->optionExists('edit-entity-type', 'node');
-    $assert_session->optionExists('edit-field-type', 'test_field');
-    // Check filtering with out results.
-    $edit = ['field_type' => 'test_field', 'entity_type' => 'entity_test'];
-    $this->drupalGet('admin/reports/fields');
-    $this->submitForm($edit, 'Filter');
-    $assert_session->pageTextNotContains($this->fieldName);
-    $assert_session->pageTextContains('There are no field storages yet.');
-    // Check filtering by field type select list form filter.
-    $edit = ['field_type' => 'test_field', 'entity_type' => ''];
-    $this->drupalGet('admin/reports/fields');
-    $this->submitForm($edit, 'Filter');
-    // Test field exist on page.
-    $assert_session->pageTextContains($this->fieldName);
-    // Check filtering by both select list form filters.
-    $edit = ['field_type' => 'test_field', 'entity_type' => 'node'];
-    $this->drupalGet('admin/reports/fields');
-    $this->submitForm($edit, 'Filter');
-    // Test field exist on page.
-    $assert_session->pageTextContains($this->fieldName);
-
-    $assert_session->linkByHrefExists('admin/structure/types/manage/' . $this->contentType . '/fields');
-  }
-
-  /**
    * Tests the "preconfigured field" functionality.
    *
    * @see \Drupal\Core\Field\PreconfiguredFieldUiOptionsInterface

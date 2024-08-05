@@ -316,10 +316,6 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
     return $fieldTypeOptions;
   }
 
-  public function render() {
-    return $this->formBuilder()->getForm($this);
-  }
-
   /**
    * {@inheritdoc}
    */
