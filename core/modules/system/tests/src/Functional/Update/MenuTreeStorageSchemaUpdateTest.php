@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Update;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 
