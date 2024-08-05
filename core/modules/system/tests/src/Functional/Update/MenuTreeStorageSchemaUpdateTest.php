@@ -21,7 +21,7 @@ class MenuTreeStorageSchemaUpdateTest extends UpdatePathTestBase {
    *
    * @var \Drupal\Core\Database\Connection
    */
-  protected $connection;
+  protected Connection $connection;
 
   /**
    * {@inheritdoc}

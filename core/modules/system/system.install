@@ -1715,7 +1715,7 @@ function _system_advisories_requirements(array &$requirements): void {
 /**
  * Update length of menu_tree fields url and route_param_key from 255 to 2048.
  */
-function system_update_11001() {
+function system_update_11001(): void {
   $schema = \Drupal::database()->schema();
   $spec = [
     'description' => 'The external path this link points to (when not using a route).',
