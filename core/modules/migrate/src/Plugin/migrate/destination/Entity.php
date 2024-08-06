@@ -147,10 +147,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
   }
 
   /**
-   * Fields function.
-   *
-   * @return array
-   *   will return array.
+   * {@inheritdoc}
    */
   public function fields() {
     return [];
