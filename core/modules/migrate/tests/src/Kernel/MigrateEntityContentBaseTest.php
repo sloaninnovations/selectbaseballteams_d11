@@ -32,11 +32,11 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'migrate',
     'user',
-    'language',
-    'entity_test',
     'field',
+    'language',
+    'migrate',
+    'entity_test',
   ];
 
   /**
