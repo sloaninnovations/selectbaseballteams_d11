@@ -436,11 +436,9 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
         throw new MigrateException(sprintf("The default_bundle value '%s' is not a valid bundle for the destination entity type '%s'.", $bundle, $entity_type->id()));
       }
     }
-    else {
+    elseif (count($bundle_info) == 1) {
       // If the destination entity type has only one bundle, use that.
-      if (count($bundle_info) == 1) {
-        $bundle = array_key_first($bundle_info);
-      }
+      $bundle = array_key_first($bundle_info);
     }
 
     if (isset($bundle)) {
