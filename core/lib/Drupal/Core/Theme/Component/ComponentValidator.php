@@ -201,7 +201,7 @@ class ComponentValidator {
           $error['message'] .= \sprintf('. The provided value is: "%s"', $context[$error['property']]);
         }
 
-        return sprintf('[%s] [%s] %s.', $component_id, $error['property'], $error['message']);
+        return sprintf('[%s/%s] %s.', $component_id, $error['property'], $error['message']);
       },
       $errors
     );
