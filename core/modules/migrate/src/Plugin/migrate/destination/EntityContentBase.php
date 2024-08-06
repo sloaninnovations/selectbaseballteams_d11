@@ -168,7 +168,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
       $container->get('entity_field.manager'),
       $container->get('plugin.manager.field.field_type'),
       $container->get('account_switcher'),
-      $container->get('entity_type.bundle.info')
+      $container->get('entity_type.bundle.info'),
     );
   }
 

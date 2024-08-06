@@ -81,7 +81,7 @@ class EntityComment extends EntityContentBase {
       $container->get('plugin.manager.field.field_type'),
       $container->get('state'),
       $container->get('account_switcher'),
-      $container->get('entity_type.bundle.info')
+      $container->get('entity_type.bundle.info'),
     );
   }
 
