@@ -13,6 +13,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\layout_builder\Section;
+use Drupal\layout_builder\SectionComponent;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\ViewExecutable;
 use Drupal\workspaces\EntityAccess;
@@ -305,4 +307,43 @@ function workspaces_toolbar() {
   $items['workspace']['#pre_render'][] = 'workspaces.lazy_builders:removeTabAttributes';
 
   return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function workspaces_theme(): array {
+  $items['navigation_workspaces'] = [
+    'variables' => [
+      'title' => NULL,
+      'attributes' => NULL,
+    ],
+  ];
+
+  return $items;
+}
+
+/**
+ * Implements hook_navigation_alter().
+ */
+function workspaces_navigation_alter(Section $section): void {
+  $component = (new SectionComponent(
+    \Drupal::service('uuid')->generate(),
+    'content',
+    [
+      'id' => 'navigation_workspaces',
+      'label' => t('Workspaces'),
+      'label_display' => '0',
+    ]
+  ));
+  $section->insertComponent(0, $component);
+}
+
+/**
+ * Implements hook_block_alter().
+ */
+function workspaces_block_alter(&$definitions): void {
+  if (isset($definitions['navigation_workspaces'])) {
+    $definitions['navigation_workspaces']['_block_ui_hidden'] = TRUE;
+  }
 }

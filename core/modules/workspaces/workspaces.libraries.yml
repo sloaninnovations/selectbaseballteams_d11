@@ -4,6 +4,12 @@ drupal.workspaces.toolbar:
     theme:
       css/workspaces.off-canvas.css: {}
       css/workspaces.toolbar.css: {}
+drupal.workspaces.navigation:
+  version: VERSION
+  css:
+    theme:
+      css/workspaces.off-canvas.css: {}
+      css/workspaces.navigation.css: {}
 drupal.workspaces.overview:
   version: VERSION
   css:

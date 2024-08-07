@@ -1,0 +1,34 @@
+/**
+ * @file
+ * Styling for the Workspaces navigation item.
+ */
+
+.toolbar-button--icon--workspaces {
+  --icon: url(../assets/icons/workspaces.svg);
+}
+
+.toolbar-button--workspaces {
+  color: white;
+  background-color: var(--admin-toolbar-color-orange-300);
+
+  &:hover,
+  &:focus,
+  &:hover:focus,
+  &.current {
+    color: white;
+    background-color: var(--admin-toolbar-color-orange-300);
+  }
+}
+
+.toolbar-button--workspaces--live {
+  color: white;
+  background-color: var(--admin-toolbar-color-green-500);
+
+  &:hover,
+  &:focus,
+  &:hover:focus,
+  &.current {
+    color: white;
+    background-color: var(--admin-toolbar-color-green-500);
+  }
+}
