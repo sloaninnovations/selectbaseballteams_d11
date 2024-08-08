@@ -433,7 +433,7 @@ class GDToolkit extends ImageToolkitBase {
       IMG_AVIF => 'AVIF',
     ];
     $supported_formats = array_filter($check_formats, fn($type) => imagetypes() & $type, ARRAY_FILTER_USE_KEY);
-    if (!$this->checkAvifSupport()) {
+    if (isset($supported_formats[IMG_AVIF]) && !$this->checkAvifSupport()) {
       unset($supported_formats[IMG_AVIF]);
     }
     $unsupported_formats = array_diff_key($check_formats, $supported_formats);
@@ -540,7 +540,7 @@ class GDToolkit extends ImageToolkitBase {
   }
 
   /**
-   * Checks if AVIF is fully supported.
+   * Checks if AVIF is can encode image.
    *
    * This method tries to create an AVIF image and save it to disk via
    * imageavif(). If that fails, it's likely a codec missing, or the function
@@ -548,28 +548,28 @@ class GDToolkit extends ImageToolkitBase {
    * result.
    *
    * @return bool
-   *   TRUE if AVIF is fully supported.
+   *   TRUE if AVIF is fully supported, FALSE otherwise.
    */
   protected function checkAvifSupport(): bool {
     if ($cache = $this->cacheDefault->get('gd_toolkit_avif_support')) {
       return $cache->data;
     }
 
-    $supported = TRUE;
-    $previous_error_handler = set_error_handler(function ($severity, $message, $file, $line) use (&$previous_error_handler, &$supported) {
-      if (str_starts_with($message, 'imageavif()')) {
-        $supported = FALSE;
-      }
-      if ($previous_error_handler) {
-        return $previous_error_handler($severity, $message, $file, $line);
-      }
-    });
-
     $tempFile = $this->fileSystem->tempnam('temporary://', 'avif');
-    imageavif(imagecreatetruecolor(1, 1), $tempFile);
-    $this->fileSystem->unlink($tempFile);
-
-    restore_error_handler();
+    try {
+      imageavif(imagecreatetruecolor(1, 1), $tempFile);
+      $supported = file_exists($tempFile) && filesize($tempFile) > 0;
+    }
+    catch (\Throwable $t) {
+      $this->logger->error("The image toolkit '@toolkit' failed creating image '@image'. Reported error: @class - @message", [
+        '@toolkit' => $this->getPluginId(),
+        '@image' => $tempFile,
+        '@class' => get_class($t),
+        '@message' => $t->getMessage(),
+      ]);
+      $supported = FALSE;
+    }
+    $this->fileSystem->delete($tempFile);
 
     $this->cacheDefault->set('gd_toolkit_avif_support', $supported);
 
