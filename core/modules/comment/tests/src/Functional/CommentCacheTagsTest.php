@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentInterface;
@@ -13,6 +15,8 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\system\Functional\Entity\EntityWithUriCacheTagsTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+
+// cspell:ignore amphibius Hippopotamidae
 
 /**
  * Tests the Comment entity's cache tags.
@@ -99,7 +103,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
   /**
    * Tests that comments invalidate the cache tag of their host entity.
    */
-  public function testCommentEntity() {
+  public function testCommentEntity(): void {
     $this->verifyPageCache($this->entityTestCamelid->toUrl(), 'MISS');
     $this->verifyPageCache($this->entityTestCamelid->toUrl(), 'HIT');
 
@@ -141,7 +145,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getAdditionalCacheContextsForEntity(EntityInterface $entity) {
+  protected function getAdditionalCacheContextsForEntity(EntityInterface $entity): array {
     return [];
   }
 
@@ -150,7 +154,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
    *
    * Each comment must have a comment body, which always has a text format.
    */
-  protected function getAdditionalCacheTagsForEntity(EntityInterface $entity) {
+  protected function getAdditionalCacheTagsForEntity(EntityInterface $entity): array {
     /** @var \Drupal\comment\CommentInterface $entity */
     return [
       'config:filter.format.plain_text',
@@ -162,7 +166,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultCacheContexts() {
+  protected function getDefaultCacheContexts(): array {
     return [
       'languages:' . LanguageInterface::TYPE_INTERFACE,
       'theme',

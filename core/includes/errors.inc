@@ -67,7 +67,7 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line) {
     // As __toString() methods must not throw exceptions (recoverable errors)
     // in PHP, we allow them to trigger a fatal error by emitting a user error
     // using trigger_error().
-    $to_string = $error_level == E_USER_ERROR && substr($caller['function'], -strlen('__toString()')) == '__toString()';
+    $to_string = $error_level == E_USER_ERROR && str_ends_with($caller['function'], '__toString()');
     _drupal_log_error([
       '%type' => isset($types[$error_level]) ? $severity_msg : 'Unknown error',
       // The standard PHP error handler considers that the error messages
@@ -174,7 +174,7 @@ function _drupal_log_error($error, $fatal = FALSE) {
       // implementations to use it.
       \Drupal::logger('php')->log($severity, '%type: @message in %function (line %line of %file) @backtrace_string.', $error + ['backtrace' => $backtrace, 'exception' => $exception, 'severity_level' => $severity]);
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // We can't log, for example because the database connection is not
       // available. At least try to log to PHP error log.
       error_log(strtr('Failed to log error: ' . Error::DEFAULT_ERROR_MESSAGE . ' @backtrace_string', $error));
@@ -322,7 +322,7 @@ function _drupal_get_error_level() {
   try {
     $error_level = \Drupal::config('system.logging')->get('error_level');
   }
-  catch (\Exception $e) {
+  catch (\Exception) {
     $error_level = $GLOBALS['config']['system.logging']['error_level'] ?? ERROR_REPORTING_HIDE;
   }
 

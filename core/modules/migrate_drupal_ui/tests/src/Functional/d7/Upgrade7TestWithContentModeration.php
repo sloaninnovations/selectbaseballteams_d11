@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional\d7;
 
 use Drupal\workflows\Entity\Workflow;
@@ -52,7 +54,7 @@ class Upgrade7TestWithContentModeration extends Upgrade7Test {
   /**
    * {@inheritdoc}
    */
-  protected function getEntityCounts() {
+  protected function getEntityCounts(): array {
     $entity_counts = parent::getEntityCounts() + [
       'content_moderation_state' => 5,
       'workflow' => 1,

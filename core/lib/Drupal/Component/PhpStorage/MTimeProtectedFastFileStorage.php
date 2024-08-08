@@ -158,7 +158,7 @@ class MTimeProtectedFastFileStorage extends FileStorage {
       try {
         $dir_iterator = new \FilesystemIterator($directory, $flags);
       }
-      catch (\UnexpectedValueException $e) {
+      catch (\UnexpectedValueException) {
         // FilesystemIterator throws an UnexpectedValueException if the
         // specified path is not a directory, or if it is not accessible.
         continue;
@@ -200,7 +200,7 @@ class MTimeProtectedFastFileStorage extends FileStorage {
     // file. Thus, when switching between MTimeProtectedFastFileStorage and
     // FileStorage, the subdirectory or the file cannot be created in case the
     // other file type exists already.
-    if (substr($name, -4) === '.php') {
+    if (str_ends_with($name, '.php')) {
       $name = substr($name, 0, -4);
     }
     return $this->directory . '/' . str_replace('/', '#', $name);

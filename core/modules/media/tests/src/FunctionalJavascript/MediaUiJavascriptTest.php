@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\FunctionalJavascript;
 
 use Drupal\field\FieldConfigInterface;
@@ -48,7 +50,7 @@ class MediaUiJavascriptTest extends MediaJavascriptTestBase {
   /**
    * Tests a media type administration.
    */
-  public function testMediaTypes() {
+  public function testMediaTypes(): void {
     $session = $this->getSession();
     $page = $session->getPage();
     $assert_session = $this->assertSession();

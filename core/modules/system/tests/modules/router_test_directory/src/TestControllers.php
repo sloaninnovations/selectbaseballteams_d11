@@ -61,7 +61,7 @@ class TestControllers {
         $text = sprintf('User route "%s" was matched.', $match[RouteObjectInterface::ROUTE_NAME]);
       }
     }
-    catch (ParamNotConvertedException $e) {
+    catch (ParamNotConvertedException) {
     }
     return new Response($text);
   }
@@ -116,6 +116,19 @@ class TestControllers {
     return [
       '#markup' => $request->attributes->get(RouteObjectInterface::ROUTE_NAME),
     ];
+  }
+
+  /**
+   * Rejects requests with query keys.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The given request.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The response.
+   */
+  public function rejectsQueryStrings(Request $request) {
+    return new Response('', $request->query->keys() ? Response::HTTP_BAD_REQUEST : Response::HTTP_OK);
   }
 
   /**

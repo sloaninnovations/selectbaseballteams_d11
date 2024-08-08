@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field_ui\Traits;
 
 use Behat\Mink\Exception\ElementNotFoundException;
@@ -36,7 +38,13 @@ trait FieldUiTestTrait {
     // test failure.
     // See https://www.drupal.org/project/drupal/issues/3030902
     $label = $label ?: $this->randomMachineName();
-    $initial_edit = [];
+    $initial_edit = [
+      'new_storage_type' => $field_type,
+    ];
+    $second_edit = [
+      'label' => $label,
+      'field_name' => $field_name,
+    ];
 
     // Allow the caller to set a NULL path in case they navigated to the right
     // page before calling this method.
@@ -52,12 +60,6 @@ trait FieldUiTestTrait {
     try {
       // First check if the passed in field type is not part of a group.
       $this->assertSession()->elementExists('css', "[name='new_storage_type'][value='$field_type']");
-      // If the element exists then we can add it to our object.
-      $initial_edit = [
-        'new_storage_type' => $field_type,
-        'label' => $label,
-        'field_name' => $field_name,
-      ];
     }
     // If the element could not be found then it is probably in a group.
     catch (ElementNotFoundException) {
@@ -65,18 +67,13 @@ trait FieldUiTestTrait {
       $field_group = $this->getFieldFromGroup($field_type);
       if ($field_group) {
         // Pass in the group name as the new storage type.
-        $selected_group = [
-          'new_storage_type' => $field_group,
-        ];
-        $this->submitForm($selected_group, 'Change field group');
-        $initial_edit = [
-          'group_field_options_wrapper' => $field_type,
-          'label' => $label,
-          'field_name' => $field_name,
-        ];
+        $initial_edit['new_storage_type'] = $field_group;
+        $second_edit['group_field_options_wrapper'] = $field_type;
+        $this->drupalGet($bundle_path);
       }
     }
     $this->submitForm($initial_edit, 'Continue');
+    $this->submitForm($second_edit, 'Continue');
     // Assert that the field is not created.
     $this->assertFieldDoesNotExist($bundle_path, $label);
     if ($save_settings) {
@@ -206,12 +203,14 @@ trait FieldUiTestTrait {
       $test = [
         'new_storage_type' => $group,
       ];
-      $this->submitForm($test, 'Change field group');
+      $this->submitForm($test, 'Continue');
       try {
         $this->assertSession()->elementExists('css', "[name='group_field_options_wrapper'][value='$field_type']");
+        $this->submitForm([], 'Back');
         return $group;
       }
       catch (ElementNotFoundException) {
+        $this->submitForm([], 'Back');
         continue;
       }
     }
@@ -265,6 +264,24 @@ trait FieldUiTestTrait {
       ]);
     $element = $this->getSession()->getPage()->find('xpath', $xpath);
     $this->assertSession()->assert($element === NULL, sprintf('A field "%s" appears on this page, but it should not.', $label));
+  }
+
+  /**
+   * Asserts that a header cell appears on a table.
+   *
+   * @param string $table_id
+   *   The HTML attribute value to target a given table.
+   * @param string $label
+   *   The cell label.
+   */
+  protected function assertTableHeaderExistsByLabel(string $table_id, string $label): void {
+    $expression = '//table[@id=:id]//tr//th[1 and text() = :label]';
+    $xpath = $this->assertSession()->buildXPathQuery($expression, [
+      ':id' => $table_id,
+      ':label' => $label,
+    ]);
+    $element = $this->getSession()->getPage()->find('xpath', $xpath);
+    $this->assertSession()->assert($element !== NULL, sprintf('Table header not found by label: "%s".', $label));
   }
 
 }

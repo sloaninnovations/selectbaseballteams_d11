@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\options\FunctionalJavascript;
 
 use Drupal\field\Entity\FieldConfig;
@@ -11,6 +13,7 @@ use Drupal\Tests\field_ui\Traits\FieldUiJSTestTrait;
  * Tests the Options field UI functionality.
  *
  * @group options
+ * @group #slow
  */
 class OptionsFieldUITest extends WebDriverTestBase {
 
@@ -82,7 +85,7 @@ class OptionsFieldUITest extends WebDriverTestBase {
    *
    * @dataProvider providerTestOptionsAllowedValues
    */
-  public function testOptionsAllowedValues($option_type, $options, $is_string_option, string $add_row_method) {
+  public function testOptionsAllowedValues($option_type, $options, $is_string_option, string $add_row_method): void {
     $assert = $this->assertSession();
     $this->fieldName = 'field_options_text';
     $this->createOptionsField($option_type);
@@ -210,7 +213,7 @@ class OptionsFieldUITest extends WebDriverTestBase {
   /**
    * Tests that the allowed options are available to the default value widget.
    */
-  public function testDefaultValueOptions() {
+  public function testDefaultValueOptions(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
     $bundle_path = 'admin/structure/types/manage/' . $this->type;
@@ -337,7 +340,7 @@ JS;
    *   - The method which should be used to add another row to the table. The
    *     possible values are 'Press button', 'Enter button' or 'Enter element'.
    */
-  public function providerTestOptionsAllowedValues() {
+  public static function providerTestOptionsAllowedValues() {
     $type_cases = [
       'List integer' => [
         'list_integer',
@@ -373,6 +376,37 @@ JS;
   }
 
   /**
+   * Tests `list_string` machine name with special characters.
+   */
+  public function testMachineNameSpecialCharacters(): void {
+    $this->fieldName = 'field_options_text';
+    $this->createOptionsField('list_string');
+    $this->drupalGet($this->adminPath);
+
+    $label_element_name = "field_storage[subform][settings][allowed_values][table][0][item][label]";
+    $this->getSession()->getPage()->fillField($label_element_name, 'Hello world');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->exposeOptionMachineName(1);
+
+    $key_element_name = "field_storage[subform][settings][allowed_values][table][0][item][key]";
+
+    // Ensure that the machine name was generated correctly.
+    $this->assertSession()->fieldValueEquals($key_element_name, 'hello_world');
+
+    // Ensure that the machine name can be overridden with a value that includes
+    // special characters.
+    $this->getSession()->getPage()->fillField($key_element_name, '.hello #world');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->getSession()->getPage()->pressButton('Save settings');
+    $this->assertSession()->statusMessageContains("Saved {$this->fieldName} configuration.");
+
+    // Ensure that the machine name was saved correctly.
+    $allowed_values = FieldStorageConfig::loadByName('node', $this->fieldName)
+      ->getSetting('allowed_values');
+    $this->assertSame(['.hello #world'], array_keys($allowed_values));
+  }
+
+  /**
    * Assert the count of the allowed values rows.
    *
    * @param int $expected_count
@@ -397,7 +431,7 @@ JS;
    */
   private function assertHasFocusByAttribute(string $name, string $value): void {
     $active_element = $this->getSession()->evaluateScript('document.activeElement');
-    $this->assertSame($value, $active_element->getAttribute($name));
+    $this->assertSame($value, $active_element->attribute($name));
   }
 
   /**

@@ -340,6 +340,10 @@ ckeditor5_link:
   ckeditor5:
     plugins:
       - link.Link
+    config:
+      link:
+        # @see https://ckeditor.com/docs/ckeditor5/latest/features/link.html#adding-default-link-protocol-to-external-links
+        defaultProtocol: 'https://'
   drupal:
     label: Link
     library: core/ckeditor5.link
@@ -388,8 +392,8 @@ ckeditor5_linkMedia:
 ckeditor5_list:
   ckeditor5:
     plugins:
-      - list.DocumentList
-      - list.DocumentListProperties
+      - list.List
+      - list.ListProperties
     config:
       list:
         properties:
@@ -561,6 +565,7 @@ ckeditor5_image:
         insert:
           # Determine image type (inline or block) by insertion context.
           type: auto
+          integrations: []
   drupal:
     label: Image
     class: \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Image
@@ -583,6 +588,8 @@ ckeditor5_imageUpload:
     config:
       image:
         upload:
+          # The strings in this array should be IANA media type Names, without the "image/" prefix. So: image subtypes.
+          # https://www.iana.org/assignments/media-types/media-types.xhtml#image
           types: ["jpeg", "png", "gif"]
   drupal:
     label: Image Upload
@@ -595,7 +602,7 @@ ckeditor5_imageUpload:
 ckeditor5_imageUrl:
   ckeditor5:
     plugins:
-      - image.ImageInsertUI
+      - image.ImageInsertViaUrl
   drupal:
     label: Image URL
     elements: false
@@ -813,8 +820,9 @@ media_library_mediaLibrary:
             name: Drupal.ckeditor5.openDialog
             invoke: false
         dialogSettings:
+          classes:
+            ui-dialog: media-library-widget-modal
           height: 75%
-          dialogClass: media-library-widget-modal
   drupal:
     label: Media Library
     elements: false

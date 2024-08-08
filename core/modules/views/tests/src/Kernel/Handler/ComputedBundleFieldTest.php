@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\entity_test\Entity\EntityTestComputedBundleField;
@@ -74,7 +76,7 @@ class ComputedBundleFieldTest extends ViewsKernelTestBase {
   /**
    * Tests the computed field handler.
    */
-  public function testComputedFieldHandler() {
+  public function testComputedFieldHandler(): void {
     \Drupal::state()->set('entity_test_computed_field_item_list_value', ['computed string']);
     \Drupal::state()->set('entity_test_comp_bund_fld_item_list_value', ['some other string that is also computed']);
 
@@ -84,9 +86,9 @@ class ComputedBundleFieldTest extends ViewsKernelTestBase {
 
     // Entities 1 and 2 should have the computed bundle field. But entity 3
     // should not.
-    $this->assertStringContainsString('some other string that is also computed', $view->field['computed_bundle_field']->render($view->result[0]));
-    $this->assertStringContainsString('some other string that is also computed', $view->field['computed_bundle_field']->render($view->result[1]));
-    $this->assertStringNotContainsString('some other string that is also computed', $view->field['computed_bundle_field']->render($view->result[2]));
+    $this->assertStringContainsString('some other string that is also computed', (string) $view->field['computed_bundle_field']->render($view->result[0]));
+    $this->assertStringContainsString('some other string that is also computed', (string) $view->field['computed_bundle_field']->render($view->result[1]));
+    $this->assertStringNotContainsString('some other string that is also computed', (string) $view->field['computed_bundle_field']->render($view->result[2]));
 
     $view->destroy();
   }

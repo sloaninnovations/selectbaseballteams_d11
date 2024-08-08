@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -56,7 +58,7 @@ class MultiFormTest extends WebDriverTestBase {
   /**
    * Tests that pages with the 'node_page_form' included twice work correctly.
    */
-  public function testMultiForm() {
+  public function testMultiForm(): void {
     // HTML IDs for elements within the field are potentially modified with
     // each Ajax submission, but these variables are stable and help target the
     // desired elements.

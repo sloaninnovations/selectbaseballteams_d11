@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\KernelTests\Config\Schema;
 
@@ -54,10 +54,7 @@ class MappingTest extends KernelTestBase {
             'use_site_name' => TRUE,
             'use_site_slogan' => TRUE,
             'label_display' => FALSE,
-            // TRICKY: these 4 are inherited from `type: block_settings`.
-            'status' => TRUE,
-            'info' => '',
-            'view_mode' => 'full',
+            // This is inherited from `type: block_settings`.
             'context_mapping' => [],
           ],
         ])->save();
@@ -76,10 +73,7 @@ class MappingTest extends KernelTestBase {
           'settings' => [
             'primary' => TRUE,
             'secondary' => FALSE,
-            // TRICKY: these 4 are inherited from `type: block_settings`.
-            'status' => TRUE,
-            'info' => '',
-            'view_mode' => 'full',
+            // This is inherited from `type: block_settings`.
             'context_mapping' => [],
           ],
         ])->save();
@@ -100,10 +94,7 @@ class MappingTest extends KernelTestBase {
           'status' => TRUE,
           'settings' => [
             'label_display' => FALSE,
-            // TRICKY: these 4 are inherited from `type: block_settings`.
-            'status' => TRUE,
-            'info' => '',
-            'view_mode' => 'full',
+            // This is inherited from `type: block_settings`.
             'context_mapping' => [],
           ],
           // Avoid showing "Powered by Drupal" on 404 responses.
@@ -133,17 +124,23 @@ class MappingTest extends KernelTestBase {
       case 'editor.editor.funky':
         $this->enableModules(['filter', 'editor', 'ckeditor5']);
         FilterFormat::create(['format' => 'funky', 'name' => 'Funky'])->save();
-        Editor::create(['format' => 'funky', 'editor' => 'ckeditor5'])->save();
+        Editor::create([
+          'format' => 'funky',
+          'editor' => 'ckeditor5',
+          'image_upload' => [
+            'status' => FALSE,
+          ],
+        ])->save();
         break;
 
-      case 'field.field.node.forum.comment_forum':
-        $this->enableModules(['field', 'node', 'comment', 'taxonomy', 'forum']);
-        $this->assertNull(FieldConfig::load('node.forum.comment_forum'));
-        // TRICKY: \Drupal\node\Entity\NodeType::$preview_mode uses
-        // DRUPAL_OPTIONAL, which is defined in system.module.
+      case 'field.field.node.config_mapping_test.comment_config_mapping_test':
+        $this->enableModules(['field', 'node', 'comment', 'taxonomy', 'config_mapping_test']);
+        $this->assertNull(FieldConfig::load('node.config_mapping_test.comment_config_mapping_test'));
+        // \Drupal\node\Entity\NodeType::$preview_mode uses DRUPAL_OPTIONAL,
+        // which is defined in system.module.
         require_once 'core/modules/system/system.module';
-        $this->installConfig(['forum']);
-        $this->assertNotNull(FieldConfig::load('node.forum.comment_forum'));
+        $this->installConfig(['config_mapping_test']);
+        $this->assertNotNull(FieldConfig::load('node.config_mapping_test.comment_config_mapping_test'));
         break;
     }
 
@@ -169,7 +166,7 @@ class MappingTest extends KernelTestBase {
    *
    * @return \Generator
    */
-  public function providerMappingInterpretation(): \Generator {
+  public static function providerMappingInterpretation(): \Generator {
     $available_block_settings_types = [
       'block.settings.field_block:*:*:*' => [
         'formatter',
@@ -208,7 +205,11 @@ class MappingTest extends KernelTestBase {
         'theme',
         'profile',
       ],
-      ['_core'],
+      [
+        '_core',
+        'langcode',
+        'profile',
+      ],
       [],
     ];
 
@@ -228,7 +229,7 @@ class MappingTest extends KernelTestBase {
         // @see core/modules/config/tests/config_schema_deprecated_test/config/schema/config_schema_deprecated_test.schema.yml
         'complex_structure_deprecated',
       ],
-      ['_core', 'complex_structure_deprecated'],
+      ['_core', 'langcode', 'complex_structure_deprecated'],
       [],
     ];
     yield 'No dynamic type: config_schema_deprecated_test.settings:complex_structure_deprecated' => [
@@ -312,15 +313,14 @@ class MappingTest extends KernelTestBase {
         'label',
         'label_display',
         'provider',
-        'status',
-        'info',
-        'view_mode',
         'context_mapping',
         // Keys defined locally, in `type: block.settings.system_branding_block`.
         // @see core/modules/block/config/schema/block.schema.yml
         ...$available_block_settings_types['block.settings.system_branding_block'],
       ],
-      [],
+      // This key is optional, see `type: block_settings`.
+      // @see core.data_types.schema.yml
+      ['context_mapping'],
       $available_block_settings_types,
     ];
     yield 'Dynamic type with [%parent]: block.block.local_tasks:settings' => [
@@ -334,19 +334,18 @@ class MappingTest extends KernelTestBase {
         'label',
         'label_display',
         'provider',
-        'status',
-        'info',
-        'view_mode',
         'context_mapping',
         // Keys defined locally, in `type: block.settings.local_tasks_block`.
         // @see core/modules/system/config/schema/system.schema.yml
         ...$available_block_settings_types['block.settings.local_tasks_block'],
       ],
-      [],
+      // This key is optional, see `type: block_settings`.
+      // @see core.data_types.schema.yml
+      ['context_mapping'],
       $available_block_settings_types,
     ];
-    yield 'Dynamic type with [%parent.%parent]: field.field.node.forum.comment_forum:default_value.0' => [
-      'field.field.node.forum.comment_forum',
+    yield 'Dynamic type with [%parent.%parent]: field.field.node.config_mapping_test.comment_config_mapping_test:default_value.0' => [
+      'field.field.node.config_mapping_test.comment_config_mapping_test',
       'default_value.0',
       [
         // Keys defined locally, in `type: field.value.comment`.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\ckeditor5\Functional;
 
 use Drupal\Core\Url;
@@ -58,16 +60,16 @@ class ImageUploadTest extends BrowserTestBase {
   /**
    * Tests using the file upload route with a disallowed extension.
    */
-  public function testUploadFileExtension() {
+  public function testUploadFileExtension(): void {
     $this->createBasicFormat();
     $this->createEditorWithUpload([
       'status' => TRUE,
       'scheme' => 'public',
       'directory' => 'inline-images',
-      'max_size' => '',
+      'max_size' => NULL,
       'max_dimensions' => [
-        'width' => 0,
-        'height' => 0,
+        'width' => NULL,
+        'height' => NULL,
       ],
     ]);
 
@@ -84,7 +86,7 @@ class ImageUploadTest extends BrowserTestBase {
   /**
    * Tests using the file upload route with a file size larger than allowed.
    */
-  public function testFileUploadLargerFileSize() {
+  public function testFileUploadLargerFileSize(): void {
     $this->createBasicFormat();
     $this->createEditorWithUpload([
       'status' => TRUE,
@@ -92,8 +94,8 @@ class ImageUploadTest extends BrowserTestBase {
       'directory' => 'inline-images',
       'max_size' => 30000,
       'max_dimensions' => [
-        'width' => 0,
-        'height' => 0,
+        'width' => NULL,
+        'height' => NULL,
       ],
     ]);
 
@@ -118,7 +120,7 @@ class ImageUploadTest extends BrowserTestBase {
    *
    * @see https://www.drupal.org/project/drupal/issues/3184974
    */
-  public function testLockAfterFailedValidation() {
+  public function testLockAfterFailedValidation(): void {
     $this->createBasicFormat();
     $this->createEditorWithUpload([
       'status' => TRUE,
@@ -126,8 +128,8 @@ class ImageUploadTest extends BrowserTestBase {
       'directory' => 'inline-images',
       'max_size' => 30000,
       'max_dimensions' => [
-        'width' => 0,
-        'height' => 0,
+        'width' => NULL,
+        'height' => NULL,
       ],
     ]);
 

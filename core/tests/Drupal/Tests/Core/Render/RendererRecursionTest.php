@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Render;
 
 /**
@@ -8,7 +10,7 @@ namespace Drupal\Tests\Core\Render;
  */
 class RendererRecursionTest extends RendererTestBase {
 
-  protected function setUpRenderRecursionComplexElements() {
+  protected function setUpRenderRecursionComplexElements(): array {
     $complex_child_markup = '<p>Imagine this is a render array for an entity.</p>';
     $parent_markup = '<p>Rendered!</p>';
 
@@ -32,7 +34,7 @@ class RendererRecursionTest extends RendererTestBase {
    * @covers ::render
    * @covers ::doRender
    */
-  public function testRenderRecursionWithNestedRenderRoot() {
+  public function testRenderRecursionWithNestedRenderRoot(): void {
     [$complex_child_markup, $parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
     $renderer = $this->renderer;
     $this->setUpRequest();
@@ -64,7 +66,7 @@ class RendererRecursionTest extends RendererTestBase {
    * @covers ::render
    * @covers ::doRender
    */
-  public function testRenderRecursionWithNestedRender() {
+  public function testRenderRecursionWithNestedRender(): void {
     [$complex_child_markup, $parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
     $renderer = $this->renderer;
     $this->setUpRequest();
@@ -91,14 +93,14 @@ class RendererRecursionTest extends RendererTestBase {
   }
 
   /**
-   * ::renderPlain() may be called from anywhere.
+   * ::renderInIsolation() may be called from anywhere.
    *
    * Including from inside of another ::renderRoot() call.
    *
    * @covers ::renderRoot
-   * @covers ::renderPlain
+   * @covers ::renderInIsolation
    */
-  public function testRenderRecursionWithNestedRenderPlain() {
+  public function testRenderRecursionWithNestedRenderInIsolation(): void {
     [$complex_child_markup, $parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
     $renderer = $this->renderer;
     $this->setUpRequest();
@@ -106,7 +108,7 @@ class RendererRecursionTest extends RendererTestBase {
     $complex_child = $complex_child_template;
 
     $callable = function ($elements) use ($renderer, $complex_child) {
-      $elements['#markup'] = $renderer->renderPlain($complex_child);
+      $elements['#markup'] = $renderer->renderInIsolation($complex_child);
       $this->assertEquals('<p>This is a rendered placeholder!</p>', $elements['#markup'], 'Rendered complex child output as expected, with the placeholder replaced.');
       return $elements;
     };

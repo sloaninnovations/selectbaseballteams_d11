@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\FunctionalJavascript\Plugin\views\Handler;
 
 use Drupal\field\Entity\FieldConfig;
@@ -57,7 +59,7 @@ class FilterTest extends WebDriverTestBase {
   /**
    * Tests adding a filter handler.
    */
-  public function testAddingFilter() {
+  public function testAddingFilter(): void {
     $web_assert = $this->assertSession();
 
     $url = '/admin/structure/views/view/content';
@@ -101,7 +103,7 @@ class FilterTest extends WebDriverTestBase {
    * @return \Behat\Mink\Element\NodeElement[]
    *   The filtered elements.
    */
-  protected function filterVisibleElements($elements) {
+  protected function filterVisibleElements($elements): array {
     $elements = array_filter($elements, function ($element) {
       return $element->isVisible();
     });

@@ -11,16 +11,9 @@ use Symfony\Component\Validator\ConstraintValidator;
 class EntityTestCompositeConstraintValidator extends ConstraintValidator {
 
   /**
-   * Validator 2.5 and upwards compatible execution context.
-   *
-   * @var \Symfony\Component\Validator\Context\ExecutionContextInterface
-   */
-  protected $context;
-
-  /**
    * {@inheritdoc}
    */
-  public function validate($entity, Constraint $constraint) {
+  public function validate($entity, Constraint $constraint): void {
 
     if ($entity->name->value === 'test' && $entity->type->value === 'test2') {
       $this->context->buildViolation($constraint->message)

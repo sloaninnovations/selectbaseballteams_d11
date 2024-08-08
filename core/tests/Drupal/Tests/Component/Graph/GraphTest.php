@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Graph;
 
 use Drupal\Component\Graph\Graph;
@@ -14,7 +16,7 @@ class GraphTest extends TestCase {
   /**
    * Tests depth-first-search features.
    */
-  public function testDepthFirstSearch() {
+  public function testDepthFirstSearch(): void {
     // The sample graph used is:
     // @code
     // 1 --> 2 --> 3     5 ---> 6
@@ -88,7 +90,7 @@ class GraphTest extends TestCase {
    * @return array
    *   The normalized version of a graph.
    */
-  protected function normalizeGraph($graph) {
+  protected function normalizeGraph($graph): array {
     $normalized_graph = [];
     foreach ($graph as $vertex => $edges) {
       // Create vertex even if it hasn't any edges.

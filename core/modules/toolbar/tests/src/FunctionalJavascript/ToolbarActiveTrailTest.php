@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\toolbar\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -15,6 +17,14 @@ class ToolbarActiveTrailTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected static $modules = ['toolbar', 'node', 'field_ui'];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -41,7 +51,7 @@ class ToolbarActiveTrailTest extends WebDriverTestBase {
    *
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
-  public function testToolbarActiveTrail(string $orientation) {
+  public function testToolbarActiveTrail(string $orientation): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 

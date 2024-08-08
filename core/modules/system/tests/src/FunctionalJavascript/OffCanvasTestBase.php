@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -105,7 +107,7 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
    * @return string[]
    *   Theme names to test.
    */
-  protected function getTestThemes() {
+  protected static function getTestThemes() {
     return ['claro', 'olivero', 'stable9', 'stark'];
   }
 
@@ -128,8 +130,8 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
   /**
    * Data provider that returns theme name as the sole argument.
    */
-  public function themeDataProvider() {
-    $themes = $this->getTestThemes();
+  public static function themeDataProvider() {
+    $themes = static::getTestThemes();
     $data = [];
     foreach ($themes as $theme) {
       $data[$theme] = [

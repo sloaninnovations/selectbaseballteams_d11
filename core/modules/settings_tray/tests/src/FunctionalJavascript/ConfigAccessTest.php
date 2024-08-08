@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\settings_tray\FunctionalJavascript;
 
 use Drupal\menu_link_content\Entity\MenuLinkContent;
@@ -42,7 +44,7 @@ class ConfigAccessTest extends SettingsTrayTestBase {
   /**
    * Tests access to block forms with related configuration is correct.
    */
-  public function testBlockConfigAccess() {
+  public function testBlockConfigAccess(): void {
     $page = $this->getSession()->getPage();
     $web_assert = $this->assertSession();
 

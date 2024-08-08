@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_translation\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
@@ -74,6 +76,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->doSetup();
 
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_reference',
@@ -125,7 +128,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
   /**
    * Returns an array of permissions needed for the entity owner.
    */
-  protected function getEntityOwnerPermissions() {
+  protected function getEntityOwnerPermissions(): array {
     return ['edit own entity_test content', 'translate editable entities', 'view test entity', 'view test entity translations', 'view unpublished test entity translations'];
   }
 
@@ -144,7 +147,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getEditorPermissions() {
+  protected function getEditorPermissions(): array {
     return ['administer entity_test content', 'view test entity', 'view test entity translations'];
   }
 
@@ -154,7 +157,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
    * @param \Drupal\User\UserInterface|null $user
    *   (optional) The entity owner.
    */
-  protected function setupEntity(UserInterface $user = NULL) {
+  protected function setupEntity(?UserInterface $user = NULL) {
     $default_langcode = $this->langcodes[0];
 
     // Create a test entity.
@@ -187,7 +190,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
   /**
    * Tests simple and editorial translation workflows.
    */
-  public function testWorkflows() {
+  public function testWorkflows(): void {
     // Test workflows for the editor.
     $expected_status = [
       'edit' => 200,

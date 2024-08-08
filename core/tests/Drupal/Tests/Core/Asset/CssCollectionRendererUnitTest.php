@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Asset;
 
 use Drupal\Core\Asset\AssetQueryStringInterface;
@@ -78,7 +80,7 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
    *
    * @see testRender
    */
-  public function providerTestRender() {
+  public static function providerTestRender() {
     $create_link_element = function ($href, $media = 'all', $custom_attributes = []) {
       $attributes = [
         'rel' => 'stylesheet',
@@ -278,14 +280,14 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
    *
    * @dataProvider providerTestRender
    */
-  public function testRender(array $css_assets, array $render_elements) {
+  public function testRender(array $css_assets, array $render_elements): void {
     $this->assertSame($render_elements, $this->renderer->render($css_assets));
   }
 
   /**
    * Tests a CSS asset group with the invalid 'type' => 'internal'.
    */
-  public function testRenderInvalidType() {
+  public function testRenderInvalidType(): void {
     $this->expectException('Exception');
     $this->expectExceptionMessage('Invalid CSS asset type.');
 

@@ -2,6 +2,7 @@
 
 namespace Drupal\toolbar\Controller;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Cache\CacheableMetadata;
@@ -15,6 +16,17 @@ use Drupal\toolbar\Ajax\SetSubtreesCommand;
  * Defines a controller for the toolbar module.
  */
 class ToolbarController extends ControllerBase implements TrustedCallbackInterface {
+
+  /**
+   * Constructs a ToolbarController object.
+   *
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
+   */
+  public function __construct(
+    protected ?TimeInterface $time = NULL,
+  ) {
+  }
 
   /**
    * Returns an AJAX response to render the toolbar subtrees.
@@ -35,7 +47,7 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
     $response->setMaxAge($max_age);
 
     $expires = new \DateTime();
-    $expires->setTimestamp(REQUEST_TIME + $max_age);
+    $expires->setTimestamp($this->time->getRequestTime() + $max_age);
     $response->setExpires($expires);
 
     return $response;

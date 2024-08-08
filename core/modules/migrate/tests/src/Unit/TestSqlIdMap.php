@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit;
 
 use Drupal\Core\Database\Connection;
@@ -89,13 +91,6 @@ class TestSqlIdMap extends Sql implements \Iterator {
    */
   public function ensureTables() {
     parent::ensureTables();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getMigrationPluginManager() {
-    return parent::getMigrationPluginManager();
   }
 
 }

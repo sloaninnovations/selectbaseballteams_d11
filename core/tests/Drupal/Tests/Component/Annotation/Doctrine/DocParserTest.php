@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Annotation\Doctrine;
 
 use Drupal\Component\Annotation\Doctrine\DocParser;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Annotation\Target;
+use Drupal\Tests\Component\Annotation\Doctrine\Fixtures\Annotation\Autoload;
 use Drupal\Tests\Component\Annotation\Doctrine\Fixtures\AnnotationWithConstants;
 use Drupal\Tests\Component\Annotation\Doctrine\Fixtures\ClassWithConstants;
 use Drupal\Tests\Component\Annotation\Doctrine\Fixtures\IntefaceWithConstants;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Component\Annotation\Doctrine\DocParser
- *
  * This class is a near-copy of
  * Doctrine\Tests\Common\Annotations\DocParserTest, which is part of the
  * Doctrine project: <http://www.doctrine-project.org>.  It was copied from
@@ -22,6 +23,7 @@ use PHPUnit\Framework\TestCase;
  * core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures were also
  * copied from version 1.2.7.
  *
+ * @coversDefaultClass \Drupal\Component\Annotation\Doctrine\DocParser
  * @group Annotation
  */
 class DocParserTest extends TestCase
@@ -396,7 +398,7 @@ DOCBLOCK;
 
     }
 
-    public function getAnnotationVarTypeProviderValid()
+    public static function getAnnotationVarTypeProviderValid()
     {
         //({attribute name}, {attribute value})
          return array(
@@ -449,7 +451,7 @@ DOCBLOCK;
         );
     }
 
-    public function getAnnotationVarTypeProviderInvalid()
+    public static function getAnnotationVarTypeProviderInvalid()
     {
          //({attribute name}, {type declared type}, {attribute value} , {given type or class})
          return array(
@@ -502,7 +504,7 @@ DOCBLOCK;
         );
     }
 
-    public function getAnnotationVarTypeArrayProviderInvalid()
+    public static function getAnnotationVarTypeArrayProviderInvalid()
     {
          //({attribute name}, {type declared type}, {attribute value} , {given type or class})
          return array(
@@ -758,11 +760,15 @@ DOCBLOCK;
         $parser->parse($docblock);
     }
 
-    public function getConstantsProvider()
+    public static function getConstantsProvider()
     {
         $provider[] = array(
             '@AnnotationWithConstants(PHP_EOL)',
             PHP_EOL
+        );
+        $provider[] = array(
+            '@AnnotationWithConstants(\SimpleXMLElement::class)',
+            \SimpleXMLElement::class
         );
         $provider[] = array(
             '@AnnotationWithConstants(AnnotationWithConstants::INTEGER)',
@@ -833,7 +839,7 @@ DOCBLOCK;
                 // Since this class is a near-copy of
                 // Doctrine\Tests\Common\Annotations\DocParserTest, we don't fix
                 // PHPStan errors here.
-                // @phpstan-ignore-next-line
+                // @phpstan-ignore array.duplicateKey
                 ClassWithConstants::SOME_KEY    => ClassWithConstants::SOME_VALUE,
                 ClassWithConstants::SOME_KEY    => IntefaceWithConstants::SOME_VALUE
             )
@@ -1052,19 +1058,20 @@ DOCBLOCK;
      */
     public function testAutoloadAnnotation()
     {
-        $this->assertFalse(class_exists('Drupal\Tests\Component\Annotation\Doctrine\Fixture\Annotation\Autoload', false), 'Pre-condition: Drupal\Tests\Component\Annotation\Doctrine\Fixture\Annotation\Autoload not allowed to be loaded.');
+        self::assertFalse(
+          class_exists('Drupal\Tests\Component\Annotation\Doctrine\Fixture\Annotation\Autoload', false),
+          'Pre-condition: Drupal\Tests\Component\Annotation\Doctrine\Fixture\Annotation\Autoload not allowed to be loaded.'
+        );
 
         $parser = new DocParser();
 
-        AnnotationRegistry::registerAutoloadNamespace('Drupal\Tests\Component\Annotation\Doctrine\Fixtures\Annotation', __DIR__ . '/../../../../');
-
-        $parser->setImports(array(
-            'autoload' => 'Drupal\Tests\Component\Annotation\Doctrine\Fixtures\Annotation\Autoload',
-        ));
+        $parser->setImports([
+          'autoload' => Autoload::class,
+        ]);
         $annotations = $parser->parse('@Autoload');
 
-        $this->assertCount(1, $annotations);
-        $this->assertInstanceOf('Drupal\Tests\Component\Annotation\Doctrine\Fixtures\Annotation\Autoload', $annotations[0]);
+        self::assertCount(1, $annotations);
+        self::assertInstanceOf(Autoload::class, $annotations[0]);
     }
 
     public function createTestParser()

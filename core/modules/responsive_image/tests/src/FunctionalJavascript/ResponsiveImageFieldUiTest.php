@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\responsive_image\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -70,7 +72,7 @@ class ResponsiveImageFieldUiTest extends WebDriverTestBase {
   /**
    * Tests formatter settings.
    */
-  public function testResponsiveImageFormatterUi() {
+  public function testResponsiveImageFormatterUi(): void {
     $manage = 'admin/structure/types/manage/' . $this->type;
     $manage_display = $manage . '/display';
     /** @var \Drupal\FunctionalJavascriptTests\JSWebAssert $assert_session */

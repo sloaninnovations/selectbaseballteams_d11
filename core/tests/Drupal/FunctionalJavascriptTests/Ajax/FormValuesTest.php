@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
@@ -34,7 +36,7 @@ class FormValuesTest extends WebDriverTestBase {
    *
    * @dataProvider formModeProvider
    */
-  public function testSimpleAjaxFormValue($form_mode) {
+  public function testSimpleAjaxFormValue($form_mode): void {
     $this->drupalGet('ajax_forms_test_get_form');
 
     $session = $this->getSession();
@@ -76,7 +78,7 @@ class FormValuesTest extends WebDriverTestBase {
   /**
    * Tests that AJAX elements with invalid callbacks return error code 500.
    */
-  public function testSimpleInvalidCallbacksAjaxFormValue() {
+  public function testSimpleInvalidCallbacksAjaxFormValue(): void {
     $this->drupalGet('ajax_forms_test_get_form');
 
     $session = $this->getSession();
@@ -115,7 +117,7 @@ class FormValuesTest extends WebDriverTestBase {
   /**
    * Data provider for testSimpleAjaxFormValue.
    */
-  public function formModeProvider() {
+  public static function formModeProvider() {
     return [
       ['direct'],
       ['dialog'],

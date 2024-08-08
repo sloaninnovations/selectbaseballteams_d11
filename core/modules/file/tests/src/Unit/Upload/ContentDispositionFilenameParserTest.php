@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Unit\Upload;
 
 use Drupal\file\Upload\ContentDispositionFilenameParser;
@@ -60,7 +62,7 @@ class ContentDispositionFilenameParserTest extends UnitTestCase {
   /**
    * A data provider for invalid headers.
    */
-  public function invalidHeaderProvider(): array {
+  public static function invalidHeaderProvider(): array {
     return [
       'multiple' => ['file; filename=""'],
       'empty' => ['filename=""'],

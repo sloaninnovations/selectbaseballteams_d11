@@ -25,7 +25,7 @@ class VariationCache implements VariationCacheInterface {
   public function __construct(
     protected RequestStack $requestStack,
     protected CacheBackendInterface $cacheBackend,
-    protected CacheContextsManager $cacheContextsManager
+    protected CacheContextsManager $cacheContextsManager,
   ) {}
 
   /**
@@ -129,7 +129,7 @@ class VariationCache implements VariationCacheInterface {
       // need to be cleared. If they ever end up leading to a stale cache item
       // that now uses different contexts then said item will either follow an
       // existing path of redirects or carve its own over the old one.
-      /** @phpstan-ignore-next-line */
+      /** @phpstan-ignore variable.undefined */
       $this->cacheBackend->set($chain_cid, new CacheRedirect($cacheability));
     }
 
@@ -141,8 +141,7 @@ class VariationCache implements VariationCacheInterface {
    */
   public function delete(array $keys, CacheableDependencyInterface $initial_cacheability): void {
     $chain = $this->getRedirectChain($keys, $initial_cacheability);
-    end($chain);
-    $this->cacheBackend->delete(key($chain));
+    $this->cacheBackend->delete(array_key_last($chain));
   }
 
   /**
@@ -150,8 +149,7 @@ class VariationCache implements VariationCacheInterface {
    */
   public function invalidate(array $keys, CacheableDependencyInterface $initial_cacheability): void {
     $chain = $this->getRedirectChain($keys, $initial_cacheability);
-    end($chain);
-    $this->cacheBackend->invalidate(key($chain));
+    $this->cacheBackend->invalidate(array_key_last($chain));
   }
 
   /**

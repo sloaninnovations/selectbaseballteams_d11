@@ -161,9 +161,9 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    * are no remaining fields using them. If multiple modules provide bundles
    * which need to use the same field storage then setting this to TRUE will
    * preserve the field storage regardless of what happens to the bundles. The
-   * classic use case for this is node body field storage since Book, Forum, the
-   * Standard profile and bundle (node type) creation through the UI all use
-   * same field storage.
+   * classic use case for this is node body field storage, since the Standard
+   * profile and bundle (node type) creation through the UI both use same field
+   * storage.
    *
    * @var bool
    */
@@ -307,7 +307,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\Entity::preSave().
+   * Overrides \Drupal\Core\Entity\EntityBase::preSave().
    *
    * @throws \Drupal\Core\Field\FieldException
    *   If the field definition is invalid.
@@ -688,7 +688,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
       try {
         $items = $entity->get($this->getName());
       }
-      catch (\InvalidArgumentException $e) {
+      catch (\InvalidArgumentException) {
         // When a field doesn't exist, create a new field item list using a
         // temporary base field definition. This step is necessary since there
         // may not be a field configuration for the storage when creating a new
@@ -700,8 +700,8 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
       }
       return \Drupal::service('plugin.manager.field.field_type')->createFieldItem($items, 0);
     }
-    // @todo: Allow setting custom options provider, see
-    // https://www.drupal.org/node/2002138.
+    // @todo Allow setting custom options provider.
+    //   https://www.drupal.org/node/2002138.
   }
 
   /**
@@ -751,7 +751,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    * breaks entity forms in PHP 5.4.
    * @todo Investigate in https://www.drupal.org/node/1977206.
    */
-  public function __sleep() {
+  public function __sleep(): array {
     // Only serialize necessary properties, excluding those that can be
     // recalculated.
     $properties = get_object_vars($this);

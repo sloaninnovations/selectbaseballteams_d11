@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Traits;
 
 /**
@@ -12,7 +14,7 @@ trait CreateTestContentEntitiesTrait {
    *
    * @return array
    */
-  protected function getRequiredModules() {
+  protected function getRequiredModules(): array {
     return [
       'block_content',
       'comment',

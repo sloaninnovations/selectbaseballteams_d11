@@ -8,14 +8,6 @@ drupal.filter.admin:
     - core/once
     - core/drupal.form
 
-drupal.filter.filter_html.admin:
-  version: VERSION
-  js:
-    filter.filter_html.admin.js: {}
-  dependencies:
-    - core/jquery
-    - core/once
-
 drupal.filter:
   version: VERSION
   js:

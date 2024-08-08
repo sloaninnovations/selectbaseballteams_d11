@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Core\Url;
@@ -9,7 +11,7 @@ use Drupal\user\RoleInterface;
 /**
  * JSON:API integration test for the "Action" config entity type.
  *
- * @group jsonapi
+ * @group Action
  * @group #slow
  */
 class ActionTest extends ConfigEntityResourceTestBase {
@@ -17,7 +19,7 @@ class ActionTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['action'];
+  protected static $modules = [];
 
   /**
    * {@inheritdoc}
@@ -69,7 +71,7 @@ class ActionTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $self_url = Url::fromUri('base:/jsonapi/action/action/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
     return [
       'jsonapi' => [
@@ -111,7 +113,7 @@ class ActionTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     // @todo Update in https://www.drupal.org/node/2300677.
     return [];
   }

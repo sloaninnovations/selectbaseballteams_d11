@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Plugin\Attribute;
 
 use Drupal\Component\Plugin\Attribute\PluginID;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Component\Plugin\Attribute\PluginId
+ * @coversDefaultClass \Drupal\Component\Plugin\Attribute\PluginID
  * @group Attribute
  */
 class PluginIdTest extends TestCase {
@@ -14,7 +16,7 @@ class PluginIdTest extends TestCase {
   /**
    * @covers ::get
    */
-  public function testGet() {
+  public function testGet(): void {
     // Assert plugin starts with only an ID.
     $plugin = new PluginID(id: 'test');
     // Plugin's always have a class set by discovery.

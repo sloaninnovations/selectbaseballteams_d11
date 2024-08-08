@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\update\Unit;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -74,7 +76,7 @@ class UpdateMailTest extends UnitTestCase {
    *
    * @dataProvider providerTestUpdateEmail
    */
-  public function testUpdateEmail($notification_threshold, $params, $authorized, array $expected_body) {
+  public function testUpdateEmail($notification_threshold, $params, $authorized, array $expected_body): void {
     $langcode = 'en';
     $available_updates_url = 'https://example.com/admin/reports/updates';
     $update_settings_url = 'https://example.com/admin/reports/updates/settings';
@@ -112,10 +114,10 @@ class UpdateMailTest extends UnitTestCase {
     $this->configFactory
       ->expects($this->exactly(2))
       ->method('get')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['system.site', $config_site_name],
         ['update.settings', $config_notification],
-      ]));
+      ]);
 
     // The calls to generateFromRoute differ if authorized.
     $count = 2;
@@ -131,11 +133,11 @@ class UpdateMailTest extends UnitTestCase {
     $this->urlGenerator
       ->expects($this->exactly($count))
       ->method('generateFromRoute')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['update.status', [], ['absolute' => TRUE, 'language' => $langcode], FALSE, $update_settings_url],
         ['update.settings', [], ['absolute' => TRUE], FALSE, $available_updates_url],
         ['update.report_update', [], ['absolute' => TRUE, 'language' => $langcode], FALSE, $available_updates_url],
-      ]));
+      ]);
 
     // Set the container.
     $this->container->set('language_manager', $this->languageManager);
@@ -179,7 +181,7 @@ class UpdateMailTest extends UnitTestCase {
    *   - TRUE if the user is authorized.
    *   - An array of message body strings.
    */
-  public function providerTestUpdateEmail(): array {
+  public static function providerTestUpdateEmail(): array {
     return [
       'all' => [
         'all',

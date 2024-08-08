@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\DependencyInjection;
 
 use Drupal\autowire_test\TestInjection;
@@ -68,7 +70,6 @@ class AutowireTest extends KernelTestBase {
                 'cache.context',
                 'context_provider',
                 'event_subscriber',
-                'module_install.uninstall_validator',
               ])) {
                 continue 2;
               }

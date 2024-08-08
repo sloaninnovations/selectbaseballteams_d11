@@ -5,7 +5,6 @@ namespace Drupal\Core\Entity\Sql;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -343,7 +342,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * {@inheritdoc}
    */
-  public function getTableMapping(array $storage_definitions = NULL) {
+  public function getTableMapping(?array $storage_definitions = NULL) {
     // If a new set of field storage definitions is passed, for instance when
     // comparing old and new storage schema, we compute the table mapping
     // without caching.
@@ -385,7 +384,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * {@inheritdoc}
    */
-  protected function doLoadMultiple(array $ids = NULL) {
+  protected function doLoadMultiple(?array $ids = NULL) {
     // Attempt to load entities from the persistent cache. This will remove IDs
     // that were loaded from $ids.
     $entities_from_cache = $this->getFromPersistentCache($ids);
@@ -409,7 +408,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @return \Drupal\Core\Entity\ContentEntityInterface[]
    *   Array of entities from the storage.
    */
-  protected function getFromStorage(array $ids = NULL) {
+  protected function getFromStorage(?array $ids = NULL) {
     $entities = [];
 
     if (!empty($ids)) {
@@ -940,10 +939,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         }
       }
       else {
-        // @todo Remove the 'return' option in Drupal 11.
-        // @see https://www.drupal.org/project/drupal/issues/3256524
         $insert_id = $this->database
-          ->insert($this->baseTable, ['return' => Database::RETURN_INSERT_ID])
+          ->insert($this->baseTable)
           ->fields((array) $record)
           ->execute();
         // Even if this is a new entity the ID key might have been set, in which
@@ -1145,10 +1142,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $entity->preSaveRevision($this, $record);
 
     if ($entity->isNewRevision()) {
-      // @todo Remove the 'return' option in Drupal 11.
-      // @see https://www.drupal.org/project/drupal/issues/3256524
       $insert_id = $this->database
-        ->insert($this->revisionTable, ['return' => Database::RETURN_INSERT_ID])
+        ->insert($this->revisionTable)
         ->fields((array) $record)
         ->execute();
       // Even if this is a new revision, the revision ID key might have been
@@ -1527,7 +1522,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * {@inheritdoc}
    */
-  public function onFieldableEntityTypeUpdate(EntityTypeInterface $entity_type, EntityTypeInterface $original, array $field_storage_definitions, array $original_field_storage_definitions, array &$sandbox = NULL) {
+  public function onFieldableEntityTypeUpdate(EntityTypeInterface $entity_type, EntityTypeInterface $original, array $field_storage_definitions, array $original_field_storage_definitions, ?array &$sandbox = NULL) {
     $this->wrapSchemaException(function () use ($entity_type, $original, $field_storage_definitions, $original_field_storage_definitions, &$sandbox) {
       $this->getStorageSchema()->onFieldableEntityTypeUpdate($entity_type, $original, $field_storage_definitions, $original_field_storage_definitions, $sandbox);
     });
@@ -1680,8 +1675,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         if (!isset($entities[$item_row['revision_id']])) {
           // Create entity with the right revision id and entity id combination.
           $item_row['entity_type'] = $this->entityTypeId;
-          // @todo: Replace this by an entity object created via an entity
-          // factory, see https://www.drupal.org/node/1867228.
+          // @todo Replace this by an entity object created via an entity
+          //   factory. https://www.drupal.org/node/1867228.
           $entities[$item_row['revision_id']] = _field_create_entity_from_ids((object) $item_row);
         }
         $item = [];

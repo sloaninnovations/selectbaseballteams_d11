@@ -2,10 +2,11 @@
 
 namespace Drupal\taxonomy\Plugin\views\argument;
 
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\taxonomy\TaxonomyIndexDepthQueryTrait;
+use Drupal\views\Attribute\ViewsArgument;
 use Drupal\views\Plugin\views\argument\ArgumentPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -16,24 +17,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * because it uses a subquery to find nodes with.
  *
  * @ingroup views_argument_handlers
- *
- * @ViewsArgument("taxonomy_index_tid_depth")
  */
+#[ViewsArgument(
+  id: 'taxonomy_index_tid_depth',
+)]
 class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPluginInterface {
   use TaxonomyIndexDepthQueryTrait;
 
   /**
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $termStorage;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $termStorage) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityRepositoryInterface $entityRepository) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->termStorage = $termStorage;
   }
 
   /**
@@ -44,7 +39,7 @@ class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPlugin
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')->getStorage('taxonomy_term')
+      $container->get('entity.repository')
     );
   }
 
@@ -112,11 +107,11 @@ class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPlugin
   }
 
   public function title() {
-    $term = $this->termStorage->load($this->argument);
+    $term = $this->entityRepository->getCanonical('taxonomy_term', $this->argument);
     if (!empty($term)) {
-      return $term->getName();
+      return $term->label();
     }
-    // TODO review text
+    // @todo Review text.
     return $this->t('No name');
   }
 

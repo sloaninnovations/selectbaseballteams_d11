@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Behat\Mink\Element\NodeElement;
@@ -10,6 +12,8 @@ use Drupal\FunctionalJavascriptTests\JSWebAssert;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
+
+// cspell:ignore fieldbody
 
 /**
  * Tests the Layout Builder disables interactions of rendered blocks.
@@ -91,7 +95,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
   /**
    * Tests that forms and links are disabled in the Layout Builder preview.
    */
-  public function testFormsLinksDisabled() {
+  public function testFormsLinksDisabled(): void {
     // Resize window due to bug in Chromedriver when clicking on overlays over
     // iFrames.
     // @see https://bugs.chromium.org/p/chromedriver/issues/detail?id=2758
@@ -174,14 +178,14 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
   }
 
   /**
-   * Checks if element is unclickable.
+   * Checks if element is not clickable.
    *
    * @param \Behat\Mink\Element\NodeElement $element
    *   Element being checked for.
    *
    * @internal
    */
-  protected function assertElementUnclickable(NodeElement $element): void {
+  protected function assertElementNotClickable(NodeElement $element): void {
     try {
       $element->click();
       $tag_name = $element->getTagName();
@@ -203,11 +207,11 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
 
     $this->assertNotEmpty($assert_session->waitForElement('css', '.block-search'));
     $searchButton = $assert_session->buttonExists('Search');
-    $this->assertElementUnclickable($searchButton);
+    $this->assertElementNotClickable($searchButton);
     $assert_session->linkExists('Take me away');
-    $this->assertElementUnclickable($page->findLink('Take me away'));
+    $this->assertElementNotClickable($page->findLink('Take me away'));
     $iframe = $assert_session->elementExists('css', '#iframe-that-should-be-disabled');
-    $this->assertElementUnclickable($iframe);
+    $this->assertElementNotClickable($iframe);
   }
 
   /**
@@ -280,7 +284,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     // After the contextual link opens the dialog, move the mouse pointer
     // elsewhere on the page. If mouse up were not working correctly this would
     // actually drag the body field too.
-    $this->movePointerTo('#iframe-that-should-be-disabled');
+    $this->getSession()->getDriver()->mouseOver('.//*[@id="iframe-that-should-be-disabled"]');
 
     $new_body_block_bottom_position = $this->getElementVerticalPosition($body_field_selector, 'bottom');
     $iframe_top_position = $this->getElementVerticalPosition('#iframe-that-should-be-disabled', 'top');
@@ -320,8 +324,14 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
    *
    * @param string $selector
    *   CSS selector.
+   *
+   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
+   *   $this->getSession()->getDriver()->mouseOver() instead.
+   *
+   * @see https://www.drupal.org/node/3460567
    */
   protected function movePointerTo($selector) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use $this->getSession()->getDriver()->mouseOver() instead. See https://www.drupal.org/node/3460567', E_USER_DEPRECATED);
     $driver_session = $this->getSession()->getDriver()->getWebDriverSession();
     $element = $driver_session->element('css selector', $selector);
     $driver_session->moveto(['element' => $element->getID()]);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests;
 
 use Behat\Mink\Driver\BrowserKitDriver;
@@ -60,7 +62,7 @@ trait ApiRequestTrait {
    * @return array
    *   Request options updated with the Xdebug cookie if present.
    */
-  protected function decorateWithXdebugCookie(array $request_options) {
+  protected function decorateWithXdebugCookie(array $request_options): array {
     $session = $this->getSession();
     $driver = $session->getDriver();
     if ($driver instanceof BrowserKitDriver) {

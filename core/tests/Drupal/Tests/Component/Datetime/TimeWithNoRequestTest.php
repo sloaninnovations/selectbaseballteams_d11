@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Datetime;
 
 use Drupal\Component\Datetime\Time;
@@ -50,7 +52,7 @@ class TimeWithNoRequestTest extends TestCase {
    *
    * @covers ::getRequestMicroTime
    */
-  public function testGetRequestMicroTimeImmutable() {
+  public function testGetRequestMicroTimeImmutable(): void {
     $requestTime = $this->time->getRequestMicroTime();
     usleep(20000);
     $this->assertSame($requestTime, $this->time->getRequestMicroTime());

@@ -63,7 +63,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
   /**
    * The name of the currently active installation profile.
    *
-   * @var string
+   * @var string|false|null
    */
   protected $installProfile;
 
@@ -177,7 +177,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
   /**
    * {@inheritdoc}
    */
-  public function installOptionalConfig(StorageInterface $storage = NULL, $dependency = []) {
+  public function installOptionalConfig(?StorageInterface $storage = NULL, $dependency = []) {
     $profile = $this->drupalGetProfile();
     $enabled_extensions = $this->getEnabledExtensions();
     $existing_config = $this->getActiveStorages()->listAll();
@@ -388,7 +388,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
         if ($entity->isInstallable()) {
           $entity->trustData()->save();
           if ($id !== $entity->id()) {
-            trigger_error(sprintf('The configuration name "%s" does not match the ID "%s"', $name, $entity->id()), E_USER_WARNING);
+            throw new \LogicException(sprintf('The configuration name "%s" does not match the ID "%s"', $name, $entity->id()));
           }
         }
       }

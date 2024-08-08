@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\Functional;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -13,6 +15,7 @@ use Drupal\user\RoleInterface;
  * Tests the revisions of media entities.
  *
  * @group media
+ * @group #slow
  */
 class MediaRevisionTest extends MediaFunctionalTestBase {
 
@@ -51,7 +54,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
   /**
    * Checks media revision operations.
    */
-  public function testRevisions() {
+  public function testRevisions(): void {
     $assert = $this->assertSession();
 
     $media = $this->createMedia('Sample media');
@@ -83,7 +86,6 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
     // Test 'view all media revisions' permission ('view media' permission is
     // needed as well).
     user_role_revoke_permissions($role->id(), [
-      'view media',
       'view all media revisions',
     ]);
     $this->drupalGet($media->toUrl('revision'));
@@ -103,7 +105,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
   /**
    * Tests creating revisions of a File media item.
    */
-  public function testFileMediaRevision() {
+  public function testFileMediaRevision(): void {
     $assert = $this->assertSession();
 
     $uri = 'temporary://foo.txt';
@@ -145,7 +147,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
   /**
    * Tests creating revisions of an Image media item.
    */
-  public function testImageMediaRevision() {
+  public function testImageMediaRevision(): void {
     $assert = $this->assertSession();
 
     $this->createMediaType('image', ['id' => 'image', 'new_revision' => TRUE]);

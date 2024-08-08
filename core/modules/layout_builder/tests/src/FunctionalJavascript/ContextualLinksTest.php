@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+
+// cspell:ignore blocktest
 
 /**
  * Test contextual links compatibility with the Layout Builder.
@@ -69,7 +73,7 @@ class ContextualLinksTest extends WebDriverTestBase {
   /**
    * Tests that the contextual links inside Layout Builder are removed.
    */
-  public function testContextualLinks() {
+  public function testContextualLinks(): void {
     $page = $this->getSession()->getPage();
 
     $this->drupalGet('node/1/layout');
@@ -97,7 +101,7 @@ class ContextualLinksTest extends WebDriverTestBase {
   /**
    * Tests that contextual links outside the layout are removed.
    */
-  public function testContextualLinksOutsideLayout() {
+  public function testContextualLinksOutsideLayout(): void {
     $assert_session = $this->assertSession();
     $this->drupalPlaceBlock('system_powered_by_block', ['id' => 'global_block']);
 

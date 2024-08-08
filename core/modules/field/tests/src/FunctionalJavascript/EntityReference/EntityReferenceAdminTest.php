@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\FunctionalJavascript\EntityReference;
 
 use Behat\Mink\Element\NodeElement;
@@ -111,7 +113,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
   /**
    * Tests the Entity Reference Admin UI.
    */
-  public function testFieldAdminHandler() {
+  public function testFieldAdminHandler(): void {
     $bundle_path = 'admin/structure/types/manage/' . $this->type;
 
     $page = $this->getSession()->getPage();
@@ -123,10 +125,12 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
 
     // Check if the commonly referenced entity types appear in the list.
     $page->find('css', "[name='new_storage_type'][value='reference']")->getParent()->click();
-    $assert_session->waitForText('Choose an option below');
+    $page->pressButton('Continue');
+    $assert_session->pageTextContains('Choose an option below');
     $this->assertSession()->elementExists('css', "[name='group_field_options_wrapper'][value='field_ui:entity_reference:node']");
     $this->assertSession()->elementExists('css', "[name='group_field_options_wrapper'][value='field_ui:entity_reference:user']");
 
+    $page->pressButton('Back');
     $this->fieldUIAddNewFieldJS(NULL, 'test', 'Test', 'entity_reference', FALSE);
 
     // Node should be selected by default.

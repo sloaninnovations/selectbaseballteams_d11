@@ -53,12 +53,12 @@ abstract class ImageEffectFormBase extends FormBase {
    *
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */
-  public function buildForm(array $form, FormStateInterface $form_state, ImageStyleInterface $image_style = NULL, $image_effect = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?ImageStyleInterface $image_style = NULL, $image_effect = NULL) {
     $this->imageStyle = $image_style;
     try {
       $this->imageEffect = $this->prepareImageEffect($image_effect);
     }
-    catch (PluginNotFoundException $e) {
+    catch (PluginNotFoundException) {
       throw new NotFoundHttpException("Invalid effect id: '$image_effect'.");
     }
     $request = $this->getRequest();

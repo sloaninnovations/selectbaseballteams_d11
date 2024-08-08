@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit\destination;
 
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -72,7 +74,7 @@ class EntityRevisionTest extends UnitTestCase {
    *
    * @covers ::getEntity
    */
-  public function testGetEntityDestinationValues() {
+  public function testGetEntityDestinationValues(): void {
     $destination = $this->getEntityRevisionDestination([]);
     // Return a dummy because we don't care what gets called.
     $entity = $this->prophesize('\Drupal\Core\Entity\RevisionableInterface');
@@ -90,7 +92,7 @@ class EntityRevisionTest extends UnitTestCase {
    *
    * @covers ::getEntity
    */
-  public function testGetEntityUpdateRevision() {
+  public function testGetEntityUpdateRevision(): void {
     $destination = $this->getEntityRevisionDestination([]);
     $entity = $this->prophesize('\Drupal\Core\Entity\RevisionableInterface');
 
@@ -117,7 +119,7 @@ class EntityRevisionTest extends UnitTestCase {
    *
    * @covers ::getEntity
    */
-  public function testGetEntityNewRevision() {
+  public function testGetEntityNewRevision(): void {
     $destination = $this->getEntityRevisionDestination([]);
     $entity = $this->prophesize('\Drupal\Core\Entity\RevisionableInterface');
 
@@ -147,7 +149,7 @@ class EntityRevisionTest extends UnitTestCase {
    *
    * @covers ::getEntity
    */
-  public function testGetEntityLoadFailure() {
+  public function testGetEntityLoadFailure(): void {
     $destination = $this->getEntityRevisionDestination([]);
 
     $entity_type = $this->prophesize('\Drupal\Core\Entity\EntityTypeInterface');
@@ -170,7 +172,7 @@ class EntityRevisionTest extends UnitTestCase {
    *
    * @covers ::save
    */
-  public function testSave() {
+  public function testSave(): void {
     $entity = $this->prophesize('\Drupal\Core\Entity\ContentEntityInterface');
     $entity->save()
       ->shouldBeCalled();

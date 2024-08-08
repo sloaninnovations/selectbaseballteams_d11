@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Session;
 
 use Drupal\Core\Cache\CacheableMetadata;
@@ -13,7 +15,6 @@ use Drupal\Core\Session\AccessPolicyBase;
 use Drupal\Core\Session\AccessPolicyProcessor;
 use Drupal\Core\Session\AccessPolicyScopeException;
 use Drupal\Core\Session\CalculatedPermissions;
-use Drupal\Core\Session\CalculatedPermissionsInterface;
 use Drupal\Core\Session\CalculatedPermissionsItem;
 use Drupal\Core\Session\RefinableCalculatedPermissions;
 use Drupal\Core\Session\RefinableCalculatedPermissionsInterface;
@@ -47,7 +48,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
   /**
    * Tests that access policies are properly processed.
    */
-  public function testCalculatePermissions() {
+  public function testCalculatePermissions(): void {
     $account = $this->prophesize(AccountInterface::class)->reveal();
     $access_policy = new BarAccessPolicy();
 
@@ -62,7 +63,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
   /**
    * Tests that access policies that do not apply are not processed.
    */
-  public function testCalculatePermissionsNoApply() {
+  public function testCalculatePermissionsNoApply(): void {
     $account = $this->prophesize(AccountInterface::class)->reveal();
     $access_policy = new BarAccessPolicy();
 
@@ -78,7 +79,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
   /**
    * Tests that access policies can alter the final result.
    */
-  public function testAlterPermissions() {
+  public function testAlterPermissions(): void {
     $account = $this->prophesize(AccountInterface::class)->reveal();
 
     $processor = $this->setUpAccessPolicyProcessor();
@@ -96,7 +97,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
   /**
    * Tests that alters that do not apply are not processed.
    */
-  public function testAlterPermissionsNoApply() {
+  public function testAlterPermissionsNoApply(): void {
     $account = $this->prophesize(AccountInterface::class)->reveal();
 
     $processor = $this->setUpAccessPolicyProcessor();
@@ -111,7 +112,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
   /**
    * Tests that access policies which do nothing are properly processed.
    */
-  public function testEmptyCalculator() {
+  public function testEmptyCalculator(): void {
     $account = $this->prophesize(AccountInterface::class)->reveal();
     $access_policy = new EmptyAccessPolicy();
 
@@ -127,7 +128,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
   /**
    * Tests that everything works if no access policies are present.
    */
-  public function testNoCalculators() {
+  public function testNoCalculators(): void {
     $account = $this->prophesize(AccountInterface::class)->reveal();
     $processor = $this->setUpAccessPolicyProcessor();
 
@@ -140,7 +141,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
   /**
    * Tests the wrong scope exception.
    */
-  public function testWrongScopeException() {
+  public function testWrongScopeException(): void {
     $processor = $this->setUpAccessPolicyProcessor();
     $processor->addAccessPolicy(new AlwaysAddsAccessPolicy());
 
@@ -152,7 +153,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
   /**
    * Tests the multiple scopes exception.
    */
-  public function testMultipleScopeException() {
+  public function testMultipleScopeException(): void {
     $processor = $this->setUpAccessPolicyProcessor();
     $processor->addAccessPolicy(new FooAccessPolicy());
     $processor->addAccessPolicy(new AlwaysAddsAccessPolicy());
@@ -165,7 +166,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
   /**
    * Tests the multiple scopes exception.
    */
-  public function testMultipleScopeAlterException() {
+  public function testMultipleScopeAlterException(): void {
     $processor = $this->setUpAccessPolicyProcessor();
     $processor->addAccessPolicy(new FooAccessPolicy());
     $processor->addAccessPolicy(new AlwaysAltersAccessPolicy());
@@ -187,7 +188,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
    *
    * @dataProvider accountSwitcherProvider
    */
-  public function testAccountSwitcher(bool $has_user_context, bool $is_current_user, bool $should_call_switcher) {
+  public function testAccountSwitcher(bool $has_user_context, bool $is_current_user, bool $should_call_switcher): void {
     $account = $this->prophesize(AccountInterface::class);
     $account->id()->willReturn(2);
     $account = $account->reveal();
@@ -219,7 +220,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
    * @return array
    *   A list of testAccountSwitcher method arguments.
    */
-  public function accountSwitcherProvider() {
+  public static function accountSwitcherProvider() {
     $cases['no-user-context-no-current-user'] = [
       'has_user_context' => FALSE,
       'is_current_user' => FALSE,
@@ -252,7 +253,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
    *
    * @dataProvider cachingProvider
    */
-  public function testCaching(bool $db_cache_hit, bool $static_cache_hit) {
+  public function testCaching(bool $db_cache_hit, bool $static_cache_hit): void {
     if ($static_cache_hit) {
       $this->assertFalse($db_cache_hit, 'DB cache should never be checked when there is a static hit.');
     }
@@ -300,7 +301,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
    * @return array
    *   A list of testAccountSwitcher method arguments.
    */
-  public function cachingProvider() {
+  public static function cachingProvider() {
     $cases = [
       'no-cache' => [FALSE, FALSE],
       'static-cache-hit' => [FALSE, TRUE],
@@ -312,7 +313,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
   /**
    * Tests that only the cache contexts for policies that apply are added.
    */
-  public function testCacheContexts() {
+  public function testCacheContexts(): void {
     // BazAccessPolicy and BarAlterAccessPolicy shouldn't add any contexts.
     $initial_cacheability = (new CacheableMetadata())->addCacheContexts(['foo', 'bar']);
     $final_cacheability = (new CacheableMetadata())->addCacheContexts(['foo', 'bar'])->addCacheTags(['access_policies']);
@@ -335,7 +336,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
   /**
    * Tests that the persistent cache contexts are added properly.
    */
-  public function testCacheContextCaching() {
+  public function testCacheContextCaching(): void {
     $cache_entry = new \stdClass();
     $cache_entry->data = ['baz'];
 
@@ -368,11 +369,11 @@ class AccessPolicyProcessorTest extends UnitTestCase {
    * @return \Drupal\Core\Session\AccessPolicyProcessorInterface
    */
   protected function setUpAccessPolicyProcessor(
-    VariationCacheInterface $variation_cache = NULL,
-    VariationCacheInterface $variation_cache_static = NULL,
-    CacheBackendInterface $cache_static = NULL,
-    AccountProxyInterface $current_user = NULL,
-    AccountSwitcherInterface $account_switcher = NULL
+    ?VariationCacheInterface $variation_cache = NULL,
+    ?VariationCacheInterface $variation_cache_static = NULL,
+    ?CacheBackendInterface $cache_static = NULL,
+    ?AccountProxyInterface $current_user = NULL,
+    ?AccountSwitcherInterface $account_switcher = NULL,
   ) {
     // Prophecy does not accept a willReturn call on a mocked method if said
     // method has a return type of void. However, without willReturn() or any
@@ -425,7 +426,7 @@ class FooAccessPolicy extends AccessPolicyBase {
     return $scope === 'foo' || $scope === 'anything';
   }
 
-  public function calculatePermissions(AccountInterface $account, string $scope): CalculatedPermissionsInterface {
+  public function calculatePermissions(AccountInterface $account, string $scope): RefinableCalculatedPermissionsInterface {
     $calculated_permissions = parent::calculatePermissions($account, $scope);
     return $calculated_permissions->addItem(new CalculatedPermissionsItem(['foo', 'bar'], TRUE, $scope, 1));
   }
@@ -442,7 +443,7 @@ class BarAccessPolicy extends AccessPolicyBase {
     return $scope === 'bar' || $scope === 'anything';
   }
 
-  public function calculatePermissions(AccountInterface $account, string $scope): CalculatedPermissionsInterface {
+  public function calculatePermissions(AccountInterface $account, string $scope): RefinableCalculatedPermissionsInterface {
     $calculated_permissions = parent::calculatePermissions($account, $scope);
     return $calculated_permissions->addItem(new CalculatedPermissionsItem(['foo', 'bar'], FALSE, $scope, 1));
   }
@@ -459,7 +460,7 @@ class BazAccessPolicy extends AccessPolicyBase {
     return $scope === 'baz';
   }
 
-  public function calculatePermissions(AccountInterface $account, string $scope): CalculatedPermissionsInterface {
+  public function calculatePermissions(AccountInterface $account, string $scope): RefinableCalculatedPermissionsInterface {
     $calculated_permissions = parent::calculatePermissions($account, $scope);
     return $calculated_permissions->addItem(new CalculatedPermissionsItem(['baz'], FALSE, 'baz', 1));
   }
@@ -505,7 +506,7 @@ class AlwaysAddsAccessPolicy extends AccessPolicyBase {
     return TRUE;
   }
 
-  public function calculatePermissions(AccountInterface $account, string $scope): CalculatedPermissionsInterface {
+  public function calculatePermissions(AccountInterface $account, string $scope): RefinableCalculatedPermissionsInterface {
     $calculated_permissions = parent::calculatePermissions($account, $scope);
     return $calculated_permissions->addItem(new CalculatedPermissionsItem(['always'], FALSE, 'always', 1));
   }

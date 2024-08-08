@@ -7,14 +7,14 @@ use Drupal\Component\Utility\Variable;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Datetime\Entity\DateFormat;
+use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Security\StaticTrustedCallbackHelper;
 
 /**
  * Provides a datetime element.
- *
- * @FormElement("datetime")
  */
+#[FormElement('datetime')]
 class Datetime extends DateElementBase {
 
   use DoTrustedCallbackTrait;
@@ -94,7 +94,7 @@ class Datetime extends DateElementBase {
         $date_time_input = trim($date_input . ' ' . $time_input);
         $date = DrupalDateTime::createFromFormat($date_time_format, $date_time_input, $element['#date_timezone']);
       }
-      catch (\Exception $e) {
+      catch (\Exception) {
         $date = NULL;
       }
       $input = [
@@ -201,14 +201,14 @@ class Datetime extends DateElementBase {
    *
    * Example usage:
    * @code
-   *   $form = array(
+   *   $form = [
    *     '#type' => 'datetime',
    *     '#default_value' => new DrupalDateTime('2000-01-01 00:00:00'),
    *     '#date_date_element' => 'date',
    *     '#date_time_element' => 'none',
    *     '#date_year_range' => '2010:+3',
    *     '#date_timezone' => 'Asia/Kolkata',
-   *   );
+   *   ];
    * @endcode
    *
    * @param array $element
@@ -373,29 +373,6 @@ class Datetime extends DateElementBase {
         }
       }
     }
-  }
-
-  /**
-   * Creates an example for a date format.
-   *
-   * This is centralized for a consistent method of creating these examples.
-   *
-   * @param string $format
-   *   The date format.
-   *
-   * @return string
-   *
-   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0.
-   *   There is no replacement.
-   *
-   * @see https://www.drupal.org/node/3385058
-   */
-  public static function formatExample($format) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3385058', E_USER_DEPRECATED);
-    if (!static::$dateExample) {
-      static::$dateExample = new DrupalDateTime();
-    }
-    return static::$dateExample->format($format);
   }
 
   /**

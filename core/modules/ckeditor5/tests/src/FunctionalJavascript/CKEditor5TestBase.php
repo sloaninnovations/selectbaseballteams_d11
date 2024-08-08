@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
 use Behat\Mink\Element\TraversableElement;
@@ -124,7 +126,7 @@ JS;
    *
    * @see \Behat\Mink\WebAssert::fieldValueEquals()
    */
-  protected function assertHtmlEsqueFieldValueEquals($field, $value, TraversableElement $container = NULL) {
+  protected function assertHtmlEsqueFieldValueEquals($field, $value, ?TraversableElement $container = NULL) {
     $assert_session = $this->assertSession();
 
     $node = $assert_session->fieldExists($field, $container);

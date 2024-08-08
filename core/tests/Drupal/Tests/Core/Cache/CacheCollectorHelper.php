@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Cache;
 
 use Drupal\Core\Cache\CacheCollector;
@@ -62,6 +64,16 @@ class CacheCollectorHelper extends CacheCollector {
    */
   public function getCacheMisses() {
     return $this->cacheMisses;
+  }
+
+  /**
+   * Setter for the cacheCreated property for use in unit tests.
+   *
+   * @param int $cache_created
+   *   A unix timestamp.
+   */
+  public function setCacheCreated(int $cache_created):void {
+    $this->cacheCreated = $cache_created;
   }
 
 }
