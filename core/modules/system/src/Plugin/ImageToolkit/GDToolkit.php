@@ -308,15 +308,8 @@ class GDToolkit extends ImageToolkitBase {
   public function parseFile() {
     $data = @getimagesize($this->getSource());
     if ($data && in_array($data[2], static::supportedTypes())) {
-      $type = $data[2];
-      $this->setType($type);
+      $this->setType($data[2]);
       $this->preLoadInfo = $data;
-      // Before PHP 8.2, getimagesize() returns 0 for AVIF images width and
-      // height. In this case, we need to load the image to GD straight away.
-      // @todo remove in https://www.drupal.org/i/3325219
-      if ($type === IMAGETYPE_AVIF && PHP_VERSION_ID < 80200) {
-        return $this->load();
-      }
       return TRUE;
     }
     return FALSE;
@@ -592,9 +585,9 @@ class GDToolkit extends ImageToolkitBase {
    */
   protected static function supportedTypes() {
     return [
-      IMAGETYPE_GIF,
-      IMAGETYPE_JPEG,
       IMAGETYPE_PNG,
+      IMAGETYPE_JPEG,
+      IMAGETYPE_GIF,
       IMAGETYPE_WEBP,
       IMAGETYPE_AVIF,
     ];
