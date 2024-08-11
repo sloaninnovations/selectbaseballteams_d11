@@ -426,7 +426,6 @@ internal.jquery_ui:
     assets/vendor/jquery.ui/ui/data-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/disable-selection-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/focusable-min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/form-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/jquery-patch-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/keycode-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/plugin-min.js: { minified: true }
