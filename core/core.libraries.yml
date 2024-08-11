@@ -514,11 +514,10 @@ drupal.dialog:
     # @todo replace with solution in https://drupal.org/node/2158943
     assets/vendor/tua-body-scroll-lock/tua-bsl.umd.min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widgets/controlgroup-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/form-reset-mixin-min.js: { minified: true }
+    assets/vendor/jquery.ui/ui/widgets/mouse-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widgets/draggable-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widgets/resizable-min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/form-reset-mixin-min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/labels-min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/widgets/mouse-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widgets/checkboxradio-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widgets/button-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widgets/dialog-min.js: { minified: true }
