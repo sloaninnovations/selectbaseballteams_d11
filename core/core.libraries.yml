@@ -429,7 +429,6 @@ internal.jquery_ui:
     assets/vendor/jquery.ui/ui/jquery-patch-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/keycode-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/plugin-min.js: { minified: true }
-    assets/vendor/jquery.ui/ui/safe-active-element-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/scroll-parent-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/widget-min.js: { minified: true }
     assets/vendor/jquery.ui/ui/unique-id-min.js: { minified: true }
