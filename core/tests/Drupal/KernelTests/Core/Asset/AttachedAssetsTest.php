@@ -381,7 +381,7 @@ class AttachedAssetsTest extends KernelTestBase {
 
     $js = $this->assetResolver->getJsAssets($assets, FALSE)[1];
     $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
-    $rendered_js = $this->renderer->renderPlain($js_render_array);
+    $rendered_js = $this->renderer->renderInIsolation($js_render_array);
     $this->assertLessThan(strpos($rendered_js, 'common_test/main.js'), strpos($rendered_js, 'common_test/before_main.js'));
   }
 
@@ -395,7 +395,7 @@ class AttachedAssetsTest extends KernelTestBase {
 
     $js = $this->assetResolver->getJsAssets($assets, FALSE)[1];
     $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
-    $rendered_js = $this->renderer->renderPlain($js_render_array);
+    $rendered_js = $this->renderer->renderInIsolation($js_render_array);
     $this->assertGreaterThan(strpos($rendered_js, 'common_test/main.js'), strpos($rendered_js, 'common_test/after_main.js'));
   }
 

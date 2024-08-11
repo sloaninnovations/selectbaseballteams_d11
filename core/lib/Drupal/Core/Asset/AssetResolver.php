@@ -181,14 +181,14 @@ class AssetResolver implements AssetResolverInterface {
       [$extension, $name] = explode('/', $library, 2);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       foreach ($definition['css'] as $options) {
-          // Libraries are being loaded based on dependencies, then their
-          // attaching order. Individual asset files are ordered how they
-          // are defined within the library itself.
-          // Re-adding an asset file will rewrite the resulting array leading
-          // to the incorrect asset files order, i.e. the last occurrence of
-          // the particular asset will win, but the desired behavior is
-          // opposite - the first occurrence must win.
-          // So, let's skip processing of already added asset files.
+        // Libraries are being loaded based on dependencies, then their
+        // attaching order. Individual asset files are ordered how they
+        // are defined within the library itself.
+        // Re-adding an asset file will rewrite the resulting array leading
+        // to the incorrect asset files order, i.e. the last occurrence of
+        // the particular asset will win, but the desired behavior is
+        // opposite - the first occurrence must win.
+        // So, let's skip processing of already added asset files.
         if (array_key_exists($options['data'], $css)) {
           continue;
         }
@@ -314,14 +314,14 @@ class AssetResolver implements AssetResolverInterface {
         [$extension, $name] = explode('/', $library, 2);
         $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
         foreach ($definition['js'] as $options) {
-            // Libraries are being loaded based on dependencies, then their
-            // attaching order. Individual asset files are ordered how they
-            // are defined within the library itself.
-            // Re-adding an asset file will rewrite the resulting array leading
-            // to the incorrect asset files order, i.e. the last occurrence of
-            // the particular asset will win, but the desired behavior is
-            // opposite - the first occurrence must win.
-            // So, let's skip processing of already added asset files.
+          // Libraries are being loaded based on dependencies, then their
+          // attaching order. Individual asset files are ordered how they
+          // are defined within the library itself.
+          // Re-adding an asset file will rewrite the resulting array leading
+          // to the incorrect asset files order, i.e. the last occurrence of
+          // the particular asset will win, but the desired behavior is
+          // opposite - the first occurrence must win.
+          // So, let's skip processing of already added asset files.
           if (array_key_exists($options['data'], $javascript)) {
             continue;
           }
