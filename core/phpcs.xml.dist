@@ -79,7 +79,6 @@
     <!-- Sniff for: NoSpaceBefore, SpacingBefore, WrongStyle -->
     <exclude name="Drupal.Commenting.InlineComment.DocBlock"/>
     <exclude name="Drupal.Commenting.InlineComment.InvalidEndChar"/>
-    <exclude name="Drupal.Commenting.InlineComment.NotCapital"/>
     <exclude name="Drupal.Commenting.InlineComment.SpacingAfter"/>
   </rule>
   <rule ref="Drupal.Commenting.InlineVariableComment"/>
@@ -265,6 +264,7 @@
     </properties>
   </rule>
   <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceOperator"/>
+  <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch" />
   <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
     <properties>
       <property name="spacesCountAroundEqualsSign" value="0" />
@@ -277,8 +277,6 @@
     <include-pattern>./modules/system/src/Tests/Routing/*</include-pattern>
     <exclude-pattern>./tests/Drupal/Tests/*/Fixture/*</exclude-pattern>
     <exclude-pattern>./tests/Drupal/Tests/*/fixtures/*</exclude-pattern>
-    <!-- @todo remove this in https://www.drupal.org/project/drupal/issues/3402707 -->
-    <exclude-pattern>./tests/Drupal/KernelTests/AssertContentTrait.php</exclude-pattern>
   </rule>
   <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
 

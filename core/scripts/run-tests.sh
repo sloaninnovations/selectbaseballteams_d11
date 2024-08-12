@@ -30,6 +30,8 @@ use PHPUnit\Runner\Version;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpFoundation\Request;
 
+// cspell:ignore exitcode wwwrun
+
 // Define some colors for display.
 // A nice calming green.
 const SIMPLETEST_SCRIPT_COLOR_PASS = 32;
@@ -362,7 +364,8 @@ sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$args['script']}
   --url http://example.com/ --class Drupal\block\Tests\BlockTest
 
 Without a preinstalled Drupal site, specify a SQLite database pathname to create
-and the default database connection info to use in tests:
+(for the test runner) and the default database connection info (for Drupal) to
+use in tests:
 
 sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$args['script']}
   --sqlite /tmpfs/drupal/test.sqlite
@@ -1023,8 +1026,8 @@ function simpletest_script_get_test_list() {
   }
 
   if ((int) $args['ci-parallel-node-total'] > 1) {
-    $slow_tests_per_job = ceil(count($slow_tests) / $args['ci-parallel-node-total']);
-    $tests_per_job = ceil(count($test_list) / $args['ci-parallel-node-total']);
+    $slow_tests_per_job = (int) ceil(count($slow_tests) / $args['ci-parallel-node-total']);
+    $tests_per_job = (int) ceil(count($test_list) / $args['ci-parallel-node-total']);
     $test_list = array_merge(array_slice($slow_tests, ($args['ci-parallel-node-index'] -1) * $slow_tests_per_job, $slow_tests_per_job), array_slice($test_list, ($args['ci-parallel-node-index'] - 1) * $tests_per_job, $tests_per_job));
   }
 

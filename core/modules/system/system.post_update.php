@@ -53,7 +53,6 @@ function system_removed_post_updates() {
     'system_post_update_amend_config_sync_readme_url' => '11.0.0',
     'system_post_update_mail_notification_setting' => '11.0.0',
     'system_post_update_set_cron_logging_setting_to_boolean' => '11.0.0',
-    'system_post_update_sdc_uninstall' => '11.0.0',
     'system_post_update_move_development_settings_to_keyvalue' => '11.0.0',
     'system_post_update_add_langcode_to_all_translatable_config' => '11.0.0',
   ];
@@ -88,4 +87,13 @@ function system_post_update_convert_empty_country_and_timezone_settings_to_null(
  */
 function system_post_update_set_theme_admin_to_null() {
   \Drupal::configFactory()->getEditable('system.theme')->save();
+}
+
+/**
+ * Uninstall the sdc module if installed.
+ */
+function system_post_update_sdc_uninstall() {
+  if (\Drupal::moduleHandler()->moduleExists('sdc')) {
+    \Drupal::service('module_installer')->uninstall(['sdc'], FALSE);
+  }
 }

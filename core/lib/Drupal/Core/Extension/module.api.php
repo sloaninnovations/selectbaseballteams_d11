@@ -542,8 +542,6 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
  *
  * The number (N) must be higher than hook_update_last_removed().
  *
- * @see hook_update_last_removed()
- *
  * The numbers are normally composed of three parts:
  * - 1 or 2 digits for Drupal core compatibility (Drupal 8, 9, 10, etc.). This
  *   convention must be followed. If your module is compatible with multiple
@@ -741,7 +739,7 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
  *
  *   // The rest of the update function.
  * }
- * @encode
+ * @endcode
  *
  * @param array $sandbox
  *   Stores information for batch updates. See above for more information.
@@ -988,7 +986,7 @@ function hook_update_last_removed() {
  *
  * Drupal\Core\Updater\Updater is a class that knows how to update various parts
  * of the Drupal file system, for example to update modules that have newer
- * releases, or to install a new theme.
+ * releases.
  *
  * @return array
  *   An associative array of information about the updater(s) being provided.
@@ -1028,8 +1026,7 @@ function hook_updater_info() {
  * Alter the Updater information array.
  *
  * An Updater is a class that knows how to update various parts of the Drupal
- * file system, for example to update modules that have newer releases, or to
- * install a new theme.
+ * file system, for example to update modules that have newer releases.
  *
  * @param array $updaters
  *   Associative array of updaters as defined through hook_updater_info().
