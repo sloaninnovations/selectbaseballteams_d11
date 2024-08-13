@@ -219,6 +219,7 @@ class TaxonomyIndexTid extends ManyToOne {
         '#type' => 'textfield',
         '#default_value' => EntityAutocomplete::getEntityLabels($terms),
       ];
+
       if ($this->options['limit']) {
         $form['value']['#type'] = 'entity_autocomplete';
         $form['value']['#target_type'] = 'taxonomy_term';
@@ -258,7 +259,6 @@ class TaxonomyIndexTid extends ManyToOne {
         if ($this->options['limit']) {
           $query->condition('vid', $vocabulary->id());
         }
-
         $terms = Term::loadMultiple($query->execute());
         foreach ($terms as $term) {
           $options[$term->id()] = \Drupal::service('entity.repository')->getTranslationFromContext($term)->label();
@@ -432,7 +432,7 @@ class TaxonomyIndexTid extends ManyToOne {
   }
 
   public function adminSummary() {
-    // set up $this->valueOptions for the parent summary
+    // Set up $this->valueOptions for the parent summary
     $this->valueOptions = [];
 
     if ($this->value) {
