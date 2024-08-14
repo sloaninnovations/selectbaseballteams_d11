@@ -242,7 +242,6 @@ introspectable
 invalidators
 invokable
 isam
-itok
 javascripts
 jessebeach
 jqueryui
