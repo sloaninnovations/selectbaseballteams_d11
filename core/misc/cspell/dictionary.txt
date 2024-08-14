@@ -212,7 +212,6 @@ gloop
 greeking
 gripsmall
 groupable
-groupby
 groupwise
 guzzlehttp
 hande
