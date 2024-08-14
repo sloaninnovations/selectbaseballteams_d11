@@ -10,7 +10,7 @@ use Drupal\Core\Url;
 /**
  * Implements hook_language_switch_links_alter().
  */
-function language_switcher_test_language_switch_links_alter(&$links, $type, Url $url) {
+function language_switcher_test_language_switch_links_alter(&$links, string $type, Url $url): void {
   // Return NULL to hide block at all.
   $links = NULL;
 }

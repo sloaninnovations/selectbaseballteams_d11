@@ -123,7 +123,7 @@ function hook_language_fallback_candidates_OPERATION_alter(array &$candidates, a
  *
  * @see \Drupal\language\ConfigurableLanguageManager::getLanguageSwitchLinks()
  */
-function hook_language_switch_links_alter(array &$links, $type, Url $url) {
+function hook_language_switch_links_alter(array &$links, string $type, Url $url) {
   // Change links here.
 }
 
