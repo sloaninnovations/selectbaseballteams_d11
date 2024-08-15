@@ -473,7 +473,7 @@ function file_tokens($type, $tokens, array $data, array $options, BubbleableMeta
           $replacements[$original] = $file->id();
           break;
 
-        // Essential file data
+        // Essential file data.
         case 'name':
           $replacements[$original] = $file->getFilename();
           break;

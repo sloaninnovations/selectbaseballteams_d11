@@ -93,7 +93,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
     $this->drupalGet($layout_url);
     $page = $this->getSession()->getPage();
 
-    // Add section should not be present
+    // Add section should not be present.
     $this->assertSession()->linkNotExists('Add section');
     // Configure section should not be present.
     $this->assertSession()->linkNotExists('Configure Section 1');

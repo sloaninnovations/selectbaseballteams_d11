@@ -12,7 +12,7 @@ use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 
-// cSpell:ignore ilike nextval
+// cSpell:ignore ilike nextval.
 
 /**
  * @addtogroup database
@@ -148,8 +148,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // http://bugs.php.net/bug.php?id=53217
     // so backslashes in the password need to be doubled up.
     // The bug was reported against pdo_pgsql 1.0.2, backslashes in passwords
-    // will break on this doubling up when the bug is fixed, so check the version
-    // elseif (phpversion('pdo_pgsql') < 'version_this_was_fixed_in') {
+    // will break on this doubling up when the bug is fixed, so check the version.
     else {
       $connection_options['password'] = str_replace('\\', '\\\\', $connection_options['password']);
     }

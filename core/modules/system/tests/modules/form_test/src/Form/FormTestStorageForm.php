@@ -32,7 +32,7 @@ class FormTestStorageForm extends FormBase {
     if ($form_state->isRebuilding()) {
       $form_state->setUserInput([]);
     }
-    // Initialize
+    // Initialize.
     $storage = $form_state->getStorage();
     $session = $this->getRequest()->getSession();
     if (empty($storage)) {
@@ -40,7 +40,7 @@ class FormTestStorageForm extends FormBase {
       if (empty($user_input)) {
         $session->set('constructions', 0);
       }
-      // Put the initial thing into the storage
+      // Put the initial thing into the storage.
       $storage = [
         'thing' => [
           'title' => 'none',

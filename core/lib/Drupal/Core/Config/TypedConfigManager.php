@@ -165,7 +165,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       // consider its schema-defined keys to require values:
       // - use_site_logo
       // - use_site_name
-      // - use_site_slogan
+      // - use_site_slogan.
       $static_type_root = TypedConfigManager::getStaticTypeRoot($parent);
       $static_type_root_type = $static_type_root->getDataDefinition()->getDataType();
       if ($root_type !== $static_type_root_type) {
@@ -376,14 +376,14 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       else {
         // No definition for this level. Collapse multiple wildcards to a single
         // wildcard to see if there is a greedy match. For example,
-        // breakpoint.breakpoint.*.* becomes
-        // breakpoint.breakpoint.*
+        // "breakpoint.breakpoint.*.*" becomes
+        // "breakpoint.breakpoint.*".
         $one_star = preg_replace('/\.([:\.\*]*)$/', '.*', $replaced);
         if ($one_star != $replaced && isset($this->definitions[$one_star])) {
           return $one_star;
         }
-        // Check for next level. For example, if breakpoint.breakpoint.* has
-        // been checked and no match found then check breakpoint.*.*
+        // Check for next level. For example, if "breakpoint.breakpoint.*" has
+        // been checked and no match found then check "breakpoint.*.*".
         return $this->getFallbackName($replaced);
       }
     }

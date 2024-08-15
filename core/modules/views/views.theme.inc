@@ -160,7 +160,7 @@ function template_preprocess_views_view_fields(&$variables) {
         $object->wrapper_attributes = new Attribute($attributes);
       }
 
-      // Set up field label
+      // Set up field label.
       $object->label = $view->field[$id]->label();
 
       // Set up field label wrapper and its attributes.
@@ -304,7 +304,7 @@ function template_preprocess_views_view_summary(&$variables) {
         $url->setRouteParameters($parameters);
       }
       catch (Exception) {
-        // If the given route doesn't exist, default to <front>
+        // If the given route doesn't exist, default to <front>.
         $url = Url::fromRoute('<front>');
       }
     }
@@ -390,7 +390,7 @@ function template_preprocess_views_view_summary_unformatted(&$variables) {
         $url->setRouteParameters($parameters);
       }
       catch (Exception) {
-        // If the given route doesn't exist, default to <front>
+        // If the given route doesn't exist, default to <front>.
         $url = Url::fromRoute('<front>');
       }
     }

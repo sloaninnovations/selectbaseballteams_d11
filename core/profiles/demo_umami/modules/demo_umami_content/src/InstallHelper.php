@@ -12,7 +12,7 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\State\StateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-// cSpell:ignore María García Gregorio Sánchez
+// cSpell:ignore María García Gregorio Sánchez.
 
 /**
  * Defines a helper class for importing default content.
@@ -426,7 +426,7 @@ class InstallHelper implements ContainerInjectionInterface {
     if (!empty($data['slug'])) {
       $values['path'] = [['alias' => '/' . $data['slug']]];
     }
-    // Save node alias
+    // Save node alias.
     $this->saveNodePath($langcode, 'page', $data['id'], $data['slug']);
 
     // Set article author.
@@ -463,7 +463,7 @@ class InstallHelper implements ContainerInjectionInterface {
     if (!empty($data['slug'])) {
       $values['path'] = [['alias' => '/' . $data['slug']]];
     }
-    // Save node alias
+    // Save node alias.
     $this->saveNodePath($langcode, 'recipe', $data['id'], $data['slug']);
     // Set field_media_image field.
     if (!empty($data['image_reference'])) {
@@ -563,7 +563,7 @@ class InstallHelper implements ContainerInjectionInterface {
     if (!empty($data['slug'])) {
       $values['path'] = [['alias' => '/' . $data['slug']]];
     }
-    // Save node alias
+    // Save node alias.
     $this->saveNodePath($langcode, 'article', $data['id'], $data['slug']);
     // Set article author.
     if (!empty($data['author'])) {

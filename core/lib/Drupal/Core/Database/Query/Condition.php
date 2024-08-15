@@ -219,14 +219,14 @@ class Condition implements ConditionInterface, \Countable {
             $field_fragment = '(' . $field_fragment . ')';
           }
           $arguments += $condition['field']->arguments();
-          // If the operator and value were not passed in to the
+          // If the operator and value were not passed in to the.
           // @see ConditionInterface::condition() method (and thus have the
           // default value as defined over there) it is assumed to be a valid
           // condition on its own: ignore the operator and value parts.
           $ignore_operator = $condition['operator'] === '=' && $condition['value'] === NULL;
         }
         elseif (!isset($condition['operator'])) {
-          // Left hand part is a literal string added with the
+          // Left hand part is a literal string added with the.
           // @see ConditionInterface::where() method. Put brackets around
           // the snippet and collect the arguments from the value part.
           // Also ignore the operator and value parts.

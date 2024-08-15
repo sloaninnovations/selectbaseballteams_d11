@@ -110,7 +110,7 @@ class Name extends InOperator {
   }
 
   public function adminSummary() {
-    // Set up $this->valueOptions for the parent summary
+    // Set up $this->valueOptions for the parent summary.
     $this->valueOptions = [];
 
     if ($this->value) {

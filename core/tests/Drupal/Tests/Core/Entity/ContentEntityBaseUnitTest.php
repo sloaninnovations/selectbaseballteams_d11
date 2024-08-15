@@ -661,7 +661,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    * @covers ::set
    */
   public function testSet(): void {
-    // Exercise set(), check if it returns $this
+    // Exercise set(), check if it returns $this.
     $this->assertSame(
       $this->entity,
       $this->entity->set('id', 0)

@@ -138,7 +138,7 @@ class LocaleLookupTest extends UnitTestCase {
    */
   public function testResolveCacheMissWithFallback($langcode, $string, $context, $expected): void {
     // These are fake words!
-    // cSpell:disable
+    // cSpell:disable.
     $translations = [
       'en' => [
         'test' => 'test',
@@ -158,7 +158,7 @@ class LocaleLookupTest extends UnitTestCase {
         'missing pl' => 'chybějící pl',
       ],
     ];
-    // cSpell:enable
+    // cSpell:enable.
     $this->storage->expects($this->any())
       ->method('findTranslation')
       ->willReturnCallback(function ($argument) use ($translations) {
@@ -196,7 +196,7 @@ class LocaleLookupTest extends UnitTestCase {
    * Provides test data for testResolveCacheMissWithFallback().
    */
   public static function resolveCacheMissWithFallbackProvider() {
-    // cSpell:disable
+    // cSpell:disable.
     return [
       ['cs', 'test', 'irrelevant', 'test v české'],
       ['cs', 'fake', 'irrelevant', 'falešný'],
@@ -211,7 +211,7 @@ class LocaleLookupTest extends UnitTestCase {
       ['pl', 'missing cs', 'irrelevant', 'zaginiony czech'],
       ['pl', 'missing both', 'irrelevant', 'missing both'],
     ];
-    // cSpell:enable
+    // cSpell:enable.
   }
 
   /**

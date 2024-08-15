@@ -210,7 +210,7 @@ class RouteProviderTest extends KernelTestBase {
    * Data provider for testMixedCasePaths()
    */
   public static function providerMixedCaseRoutePaths() {
-    // cSpell:disable
+    // cSpell:disable.
     return [
       ['/path/one', 'route_a'],
       ['/path/two', NULL],
@@ -225,7 +225,7 @@ class RouteProviderTest extends KernelTestBase {
       ['/place/meΦω', 'route_e', 'HEAD'],
       ['/place/meφΩ', 'route_e', 'HEAD'],
     ];
-    // cSpell:enable
+    // cSpell:enable.
   }
 
   /**
@@ -707,7 +707,7 @@ class RouteProviderTest extends KernelTestBase {
     $this->assertEquals(0, $result->count());
     $candidates = $provider->getCandidateOutlines(explode('/', trim($shortest, '/')));
     $this->assertCount(7, $candidates);
-    // A longer patten is not found and returns no candidates
+    // A longer patten is not found and returns no candidates.
     $path_to_test = '/test/1/test2/2/test3/3/4/5/6/test4';
     $result = $provider->getRoutesByPattern($path_to_test);
     $this->assertEquals(0, $result->count());

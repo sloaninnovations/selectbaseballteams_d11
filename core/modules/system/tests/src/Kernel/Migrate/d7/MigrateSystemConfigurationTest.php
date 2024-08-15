@@ -20,7 +20,7 @@ class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
     'system.cron' => [
       'threshold' => [
         // Auto-run is not handled by the migration.
-        // 'autorun' => 0,
+        // 'autorun' => 0,.
         'requirements_warning' => 172800,
         'requirements_error' => 1209600,
       ],

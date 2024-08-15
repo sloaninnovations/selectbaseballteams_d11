@@ -58,7 +58,7 @@ class UserNameValidatorTest extends KernelTestBase {
    * Provides valid user names.
    */
   public static function validUsernameProvider(): array {
-    // cSpell:disable
+    // cSpell:disable.
     return [
       'lowercase' => ['foo'],
       'uppercase' => ['FOO'],
@@ -70,7 +70,7 @@ class UserNameValidatorTest extends KernelTestBase {
       'allow plus' => ['foo+bar'],
       'utf8 runes' => ['ᚠᛇᚻ᛫ᛒᛦᚦ'],
     ];
-    // cSpell:enable
+    // cSpell:enable.
   }
 
   /**

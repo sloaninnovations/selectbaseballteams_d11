@@ -766,7 +766,7 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
  */
 function hook_update_N(&$sandbox) {
   // For non-batch updates, the signature can simply be:
-  // function hook_update_N() {
+  // function hook_update_N() {.
 
   // Example function body for adding a field to a database table, which does
   // not require a batch operation:
@@ -1103,7 +1103,7 @@ function hook_updater_info_alter(&$updaters) {
 function hook_requirements($phase) {
   $requirements = [];
 
-  // Report Drupal version
+  // Report Drupal version.
   if ($phase == 'runtime') {
     $requirements['drupal'] = [
       'title' => t('Drupal'),
@@ -1112,7 +1112,7 @@ function hook_requirements($phase) {
     ];
   }
 
-  // Test PHP version
+  // Test PHP version.
   $requirements['php'] = [
     'title' => t('PHP'),
     'value' => ($phase == 'runtime') ? Link::fromTextAndUrl(phpversion(), Url::fromRoute('system.php'))->toString() : phpversion(),
@@ -1122,7 +1122,7 @@ function hook_requirements($phase) {
     $requirements['php']['severity'] = REQUIREMENT_ERROR;
   }
 
-  // Report cron status
+  // Report cron status.
   if ($phase == 'runtime') {
     $cron_last = \Drupal::state()->get('system.cron_last');
 
