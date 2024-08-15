@@ -1,4 +1,3 @@
-autoplay
 bartik
 bubbleable
 buytaert
