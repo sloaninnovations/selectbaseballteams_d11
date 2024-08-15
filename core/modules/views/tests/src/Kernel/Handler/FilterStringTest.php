@@ -425,7 +425,7 @@ class FilterStringTest extends ViewsKernelTestBase {
     $filters = $this->getGroupedExposedFilters();
     $view = $this->getBasicPageView();
 
-    // Filter: Name, Operator: not_regular_expression, Value: ^Rin
+    // Filter: Name, Operator: not_regular_expression, Value: ^Rin.
     $filters['name']['group_info']['default_group'] = 6;
     $view->setDisplay('page_1');
     $view->displayHandlers->get('page_1')->overrideOption('filters', $filters);

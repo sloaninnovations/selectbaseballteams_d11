@@ -43,11 +43,11 @@ class YamlTest extends YamlTestBase {
    * @covers ::encode
    */
   public function testEncode(): void {
-    // cSpell:disable
+    // cSpell:disable.
     $this->assertSame('foo:
   bar: \'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sapien ex, venenatis vitae nisi eu, posuere luctus dolor. Nullam convallis\'
 ', Yaml::encode(['foo' => ['bar' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sapien ex, venenatis vitae nisi eu, posuere luctus dolor. Nullam convallis']]));
-    // cSpell:enable
+    // cSpell:enable.
   }
 
   /**

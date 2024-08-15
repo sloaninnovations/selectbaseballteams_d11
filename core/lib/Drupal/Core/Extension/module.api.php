@@ -766,7 +766,7 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
  */
 function hook_update_N(&$sandbox) {
   // For non-batch updates, the signature can simply be:
-  // function hook_update_N() {
+  // function hook_update_N() {.
 
   // Example function body for adding a field to a database table, which does
   // not require a batch operation:

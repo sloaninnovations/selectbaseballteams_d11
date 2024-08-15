@@ -72,7 +72,7 @@ class MachineNameTransliterationTest extends WebDriverTestBase {
    */
   public static function machineNameInputOutput(): array {
     return [
-      // cSpell:disable
+      // cSpell:disable.
       ['en', 'Bob', 'bob'],
       ['en', 'Äwesome', 'awesome'],
       ['de', 'Äwesome', 'aewesome'],
@@ -81,14 +81,14 @@ class MachineNameTransliterationTest extends WebDriverTestBase {
       // These tests are not working with chromedriver as
       // 'ᐑ','𐌰𐌸' chars are not accepted.
       // ['fr', 'ᐑ', 'wii'],
-      // ['en', '𐌰𐌸', '__'],
+      // ['en', '𐌰𐌸', '__'],.
       ['en', 'Ä Ö Ü Å Ø äöüåøhello', 'a_o_u_a_o_aouaohello'],
       ['de', 'Ä Ö Ü Å Ø äöüåøhello', 'ae_oe_ue_a_o_aeoeueaohello'],
       ['de', ']URY&m_G^;', ' ury_m_g'],
       ['da', 'Ä Ö Ü Å Ø äöüåøhello', 'a_o_u_aa_oe_aouaaoehello'],
       ['kg', 'ц', 'ts'],
       ['en', ' Hello Abventor! ', 'hello_abventor'],
-      // cSpell:enable
+      // cSpell:enable.
     ];
   }
 

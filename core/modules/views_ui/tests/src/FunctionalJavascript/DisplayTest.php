@@ -11,7 +11,7 @@ use Drupal\views\Entity\View;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 
-// cSpell:ignore Blokk hozzáadása
+// cSpell:ignore Blokk hozzáadása.
 
 /**
  * Tests the display UI.

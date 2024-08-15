@@ -79,9 +79,9 @@ class ReadOnlyStreamWrapperTest extends FileTestBase {
     $this->assertFalse(@fflush($handle), 'Unable to flush output to file using the read-only stream wrapper.');
     // Attempt to close the stream.  (Suppress errors, as fclose triggers fflush.)
     $this->assertTrue(fclose($handle), 'Able to close file using the read_only stream wrapper.');
-    // Test the rename() function
+    // Test the rename() function.
     $this->assertFalse(@rename($uri, $this->scheme . '://new_name.txt'), 'Unable to rename files using the read-only stream wrapper.');
-    // Test the unlink() function
+    // Test the unlink() function.
     $this->assertTrue(@$file_system->unlink($uri), 'Able to unlink file using read-only stream wrapper.');
     $this->assertFileExists($filepath);
 
@@ -92,7 +92,7 @@ class ReadOnlyStreamWrapperTest extends FileTestBase {
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     $this->assertFalse(@$file_system->mkdir($read_only_dir, 0775, 0), 'Unable to create directory with read-only stream wrapper.');
-    // Create a temporary directory for testing purposes
+    // Create a temporary directory for testing purposes.
     $this->assertTrue($file_system->mkdir($dir), 'Test directory created.');
     // Test the rmdir() function by attempting to remove the directory.
     $this->assertFalse(@$file_system->rmdir($read_only_dir), 'Unable to delete directory with read-only stream wrapper.');

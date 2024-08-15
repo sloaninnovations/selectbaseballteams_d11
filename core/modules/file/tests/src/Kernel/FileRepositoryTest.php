@@ -53,7 +53,7 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
     $contents = $this->randomMachineName();
 
     // Using filename with non-latin characters.
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $filename = 'Текстовый файл.txt';
 
     $result = $this->fileRepository->writeData($contents, 'public://' . $filename);

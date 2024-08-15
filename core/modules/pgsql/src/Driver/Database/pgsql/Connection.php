@@ -12,7 +12,7 @@ use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 
-// cSpell:ignore ilike nextval
+// cSpell:ignore ilike nextval.
 
 /**
  * @addtogroup database

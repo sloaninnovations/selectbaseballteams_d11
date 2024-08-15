@@ -361,7 +361,7 @@ class FilterNumericTest extends ViewsKernelTestBase {
     $view = Views::getView('test_view');
     $view->newDisplay('page', 'Page', 'page_1');
 
-    // Filter: Age, Operator: not_regular_expression, Value: 2[7-8]
+    // Filter: Age, Operator: not_regular_expression, Value: 2[7-8].
     $filters['age']['group_info']['default_group'] = 7;
     $view->setDisplay('page_1');
     $view->displayHandlers->get('page_1')->overrideOption('filters', $filters);

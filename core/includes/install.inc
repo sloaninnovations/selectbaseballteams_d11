@@ -666,7 +666,7 @@ function drupal_check_module($module) {
   if (is_file($file)) {
     require_once $file;
   }
-  // Check requirements
+  // Check requirements.
   $requirements = \Drupal::moduleHandler()->invoke($module, 'requirements', ['install']);
   if (is_array($requirements) && drupal_requirements_severity($requirements) == REQUIREMENT_ERROR) {
     // Print any error messages.

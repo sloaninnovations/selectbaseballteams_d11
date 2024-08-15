@@ -10,7 +10,7 @@ use Drupal\KernelTests\Core\Database\DatabaseTestSchemaDataTrait;
 use Drupal\KernelTests\Core\Database\DatabaseTestSchemaInstallTrait;
 use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
 
-// cSpell:ignore nspname schemaname upserting indexdef
+// cSpell:ignore nspname schemaname upserting indexdef.
 
 /**
  * Tests schema API for non-public schema for the PostgreSQL driver.

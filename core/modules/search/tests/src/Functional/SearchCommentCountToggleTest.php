@@ -81,7 +81,7 @@ class SearchCommentCountToggleTest extends BrowserTestBase {
     $edit_comment['subject[0][value]'] = $this->randomMachineName();
     $edit_comment['comment_body[0][value]'] = $this->randomMachineName();
 
-    // Post comment to the test node with comment
+    // Post comment to the test node with comment.
     $this->drupalGet('comment/reply/node/' . $this->searchableNodes['1 comment']->id() . '/comment');
     $this->submitForm($edit_comment, 'Save');
 

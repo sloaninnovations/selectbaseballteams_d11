@@ -10,7 +10,7 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\user\Entity\User;
 
-// cSpell:ignore downlander
+// cSpell:ignore downlander.
 
 /**
  * Tests the Manage Display page of a fieldable entity type.

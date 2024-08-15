@@ -169,7 +169,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->assertEquals($this->timestampMedium, $history['contrib_module_three']['de']->last_checked, 'Translation of contrib_module_three is not updated');
 
     // Check whether existing translations have (not) been overwritten.
-    // cSpell:disable
+    // cSpell:disable.
     $this->assertEquals('Januar_1', t('January', [], ['langcode' => 'de']), 'Translation of January');
     $this->assertEquals('Februar_2', t('February', [], ['langcode' => 'de']), 'Translation of February');
     $this->assertEquals('Marz_2', t('March', [], ['langcode' => 'de']), 'Translation of March');
@@ -177,7 +177,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->assertEquals('Mai_customized', t('May', [], ['langcode' => 'de']), 'Translation of May');
     $this->assertEquals('Juni', t('June', [], ['langcode' => 'de']), 'Translation of June');
     $this->assertEquals('Montag', t('Monday', [], ['langcode' => 'de']), 'Translation of Monday');
-    // cSpell:enable
+    // cSpell:enable.
   }
 
   /**
@@ -229,7 +229,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->assertEquals($this->timestampMedium, $history['contrib_module_three']['de']->last_checked, 'Translation of contrib_module_three is not updated');
 
     // Check whether existing translations have (not) been overwritten.
-    // cSpell:disable
+    // cSpell:disable.
     $this->assertEquals('Januar_customized', t('January', [], ['langcode' => 'de']), 'Translation of January');
     $this->assertEquals('Februar_2', t('February', [], ['langcode' => 'de']), 'Translation of February');
     $this->assertEquals('Marz_2', t('March', [], ['langcode' => 'de']), 'Translation of March');
@@ -237,7 +237,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->assertEquals('Mai_customized', t('May', [], ['langcode' => 'de']), 'Translation of May');
     $this->assertEquals('Juni', t('June', [], ['langcode' => 'de']), 'Translation of June');
     $this->assertEquals('Montag', t('Monday', [], ['langcode' => 'de']), 'Translation of Monday');
-    // cSpell:enable
+    // cSpell:enable.
   }
 
   /**
@@ -269,7 +269,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->submitForm([], 'Update translations');
 
     // Check whether existing translations have (not) been overwritten.
-    // cSpell:disable
+    // cSpell:disable.
     $this->assertEquals('Januar_customized', t('January', [], ['langcode' => 'de']), 'Translation of January');
     $this->assertEquals('Februar_customized', t('February', [], ['langcode' => 'de']), 'Translation of February');
     $this->assertEquals('Marz_2', t('March', [], ['langcode' => 'de']), 'Translation of March');
@@ -277,7 +277,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->assertEquals('Mai_customized', t('May', [], ['langcode' => 'de']), 'Translation of May');
     $this->assertEquals('Juni', t('June', [], ['langcode' => 'de']), 'Translation of June');
     $this->assertEquals('Montag', t('Monday', [], ['langcode' => 'de']), 'Translation of Monday');
-    // cSpell:enable
+    // cSpell:enable.
   }
 
   /**
@@ -309,7 +309,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->submitForm([], 'Update translations');
 
     // Check whether existing translations have (not) been overwritten.
-    // cSpell:disable
+    // cSpell:disable.
     $this->assertTranslation('January', 'Januar_customized', 'de');
     $this->assertTranslation('February', 'Februar_customized', 'de');
     $this->assertTranslation('March', 'Marz', 'de');
@@ -317,7 +317,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->assertTranslation('May', 'Mai_customized', 'de');
     $this->assertTranslation('June', 'Juni', 'de');
     $this->assertTranslation('Monday', 'Montag', 'de');
-    // cSpell:enable
+    // cSpell:enable.
   }
 
   /**
@@ -339,7 +339,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
 
     // Check if translations have been imported.
     $this->assertSession()->pageTextContains("One translation file imported. 7 translations were added, 0 translations were updated and 0 translations were removed.");
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $this->assertTranslation('Tuesday', 'Dienstag', 'de');
 
     $edit = [
@@ -376,7 +376,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
 
     // Check if there is no Dutch translation yet.
     $this->assertTranslation('Extraday', '', 'nl');
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $this->assertTranslation('Tuesday', 'Dienstag', 'de');
 
     // Add a language.
@@ -388,7 +388,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
 
     // Check if the right number of translations are added.
     $this->assertSession()->pageTextContains("One translation file imported. 8 translations were added, 0 translations were updated and 0 translations were removed.");
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $this->assertTranslation('Extra day', 'extra dag', 'nl');
 
     // Check if the language data is added to the database.
@@ -414,7 +414,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
 
     // Check that the Dutch translation is gone.
     $this->assertTranslation('Extra day', '', 'nl');
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $this->assertTranslation('Tuesday', 'Dienstag', 'de');
   }
 

@@ -12,7 +12,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\file\EventSubscriber\FileEventSubscriber;
 use Drupal\Tests\UnitTestCase;
 
-// cSpell:ignore TÉXT äöüåøhello aouaohello aeoeueaohello Pácê
+// cSpell:ignore TÉXT äöüåøhello aouaohello aeoeueaohello Pácê.
 
 /**
  * Filename sanitization tests.

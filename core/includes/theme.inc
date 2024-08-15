@@ -1291,7 +1291,7 @@ function theme_get_suggestions($args, $base, $delimiter = '__') {
   // page__node
   // page__node__%
   // page__node__1
-  // page__node__edit
+  // page__node__edit.
 
   $suggestions = [];
   $prefix = $base;

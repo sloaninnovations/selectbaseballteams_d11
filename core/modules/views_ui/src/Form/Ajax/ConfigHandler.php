@@ -264,7 +264,7 @@ class ConfigHandler extends ViewsFormBase {
     $display_id = $form_state->get('display_id');
     $type = $form_state->get('type');
     $id = $form_state->get('id');
-    // Store the item back on the view
+    // Store the item back on the view.
     [$was_defaulted, $is_defaulted] = $view->getOverrideValues($form, $form_state);
     $executable = $view->getExecutable();
     // If the display selection was changed toggle the override value.

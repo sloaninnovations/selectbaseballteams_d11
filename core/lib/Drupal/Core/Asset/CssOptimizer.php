@@ -125,7 +125,7 @@ class CssOptimizer implements AssetOptimizerInterface {
     if ($reset_basepath) {
       $basepath = '';
     }
-    // Store the value of $optimize for preg_replace_callback with nested
+    // Store the value of $optimize for preg_replace_callback with nested.
     // @import loops.
     if (isset($optimize)) {
       $_optimize = $optimize;

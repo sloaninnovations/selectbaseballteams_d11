@@ -738,7 +738,7 @@ JS;
     // Add a node with text rendered via the Plain Text format.
     $this->drupalGet('node/add/page');
     $page->fillField('title[0][value]', 'Multilingual Hello World');
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $page->fillField('body[0][value]', '<p dir="ltr" lang="en">Hello World</p><p dir="rtl" lang="ar">مرحبا بالعالم</p>');
     $page->pressButton('Save');
 
@@ -752,7 +752,7 @@ JS;
     $this->waitForEditor();
     $page->pressButton('Save');
 
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $assert_session->responseContains('<p dir="ltr" lang="en">Hello World</p><p dir="rtl" lang="ar">مرحبا بالعالم</p>');
   }
 

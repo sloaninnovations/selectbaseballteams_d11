@@ -153,7 +153,7 @@ class Mapping extends ArrayElement {
     // the original mapping type. To continue the previous example:
     // - `editor.settings.unicorn`
     // - `editor.image_upload_settings.*`
-    // - `editor.image_upload_settings.1`
+    // - `editor.image_upload_settings.1`.
     $possible_types = $this->getPossibleTypes($original_mapping_type);
 
     // TRICKY: it is tempting to not consider this a dynamic type if only one
@@ -166,7 +166,7 @@ class Mapping extends ArrayElement {
     $all_type_definitions = $typed_data_manager->getDefinitions();
     $possible_type_definitions = array_intersect_key($all_type_definitions, array_fill_keys($possible_types, TRUE));
     // TRICKY: \Drupal\Core\Config\TypedConfigManager::getDefinition() does the
-    // necessary resolving, but TypedConfigManager::getDefinitions() does not! 🤷‍♂️
+    // necessary resolving, but TypedConfigManager::getDefinitions() does not! 🤷‍♂️.
     // @see \Drupal\Core\Config\TypedConfigManager::getDefinitionWithReplacements()
     // @see ::getValidKeys()
     $valid_keys_per_type = [];
@@ -274,7 +274,7 @@ class Mapping extends ArrayElement {
     // use in a regex. So:
     // `module\.something\.foo_.*`
     // or
-    // `.*\.third_party\..*`
+    // `.*\.third_party\..*`.
     $regex = str_replace(['.', '[]'], ['\.', '.*'], $name);
     // Now find all possible types:
     // 1. `module.something.foo_foo`, `module.something.foo_bar`, etc.

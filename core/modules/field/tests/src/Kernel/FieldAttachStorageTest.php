@@ -331,7 +331,7 @@ class FieldAttachStorageTest extends FieldKernelTestBase {
     $this->fieldTestData->field_definition['bundle'] = $new_bundle;
     FieldConfig::create($this->fieldTestData->field_definition)->save();
 
-    // Create a second field for the test bundle
+    // Create a second field for the test bundle.
     $field_name = $this->randomMachineName() . '_field_name';
     $field_storage = [
       'field_name' => $field_name,

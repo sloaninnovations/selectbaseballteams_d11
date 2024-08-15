@@ -125,7 +125,7 @@ class StandardRecipeTest extends StandardTest {
 
     // Ensure we have truly rebuilt the standard profile using recipes.
     // Uncomment the code below to see the differences in a single file.
-    // $this->assertSame($sync->read('node.settings'), $active->read('node.settings'));
+    // $this->assertSame($sync->read('node.settings'), $active->read('node.settings'));.
     $comparer = $this->configImporter()->getStorageComparer();
     $expected_list = $comparer->getEmptyChangelist();
     // We expect core.extension to be different because standard is no longer

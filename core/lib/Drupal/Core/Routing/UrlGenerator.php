@@ -175,7 +175,7 @@ class UrlGenerator implements UrlGeneratorInterface {
     $variables = array_flip($variables);
     $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
 
-    // All params must be given
+    // All params must be given.
     if ($diff = array_diff_key($variables, $mergedParams)) {
       throw new MissingMandatoryParametersException($name, array_keys($diff));
     }
@@ -192,11 +192,11 @@ class UrlGenerator implements UrlGeneratorInterface {
     //
     // For a simple fixed path, there is just one token.
     // If the path is /admin/config
-    // [ [ 0 => 'text', 1 => '/admin/config' ] ]
+    // [ [ 0 => 'text', 1 => '/admin/config' ] ].
     foreach ($tokens as $token) {
       if ('variable' === $token[0]) {
         if (!$optional || !array_key_exists($token[3], $defaults) || (isset($mergedParams[$token[3]]) && (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]])) {
-          // Check requirement
+          // Check requirement.
           if (!preg_match('#^' . $token[2] . '$#', $mergedParams[$token[3]])) {
             $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
             throw new InvalidParameterException($message);
