@@ -438,7 +438,6 @@ shorterthan
 shortlink
 singlebyte
 sirbrillig
-sitename
 sitewide
 slatkin
 smacss

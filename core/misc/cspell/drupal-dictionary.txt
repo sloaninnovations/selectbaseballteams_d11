@@ -32,6 +32,7 @@ revlog
 revpub
 prerender
 simpletest
+sitename_title
 tempstore
 umami
 unpromote
