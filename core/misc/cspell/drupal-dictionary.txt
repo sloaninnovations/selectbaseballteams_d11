@@ -33,6 +33,7 @@ revpub
 prerender
 simpletest
 sitename_title
+subquery
 tempstore
 umami
 unpromote
