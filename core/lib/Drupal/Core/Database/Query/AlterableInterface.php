@@ -40,7 +40,7 @@ interface AlterableInterface {
    *
    * Each tag to check should be supplied as a separate argument.
    *
-   * @param string ...
+   * @param string ...$args
    *   A variable number of arguments, one for each tag to check.
    *
    * @return bool
@@ -54,7 +54,7 @@ interface AlterableInterface {
    *
    * Each tag to check should be supplied as a separate argument.
    *
-   * @param string ...
+   * @param string ...$args
    *   A variable number of arguments, one for each tag to check.
    *
    * @return bool
