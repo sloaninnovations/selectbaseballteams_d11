@@ -420,7 +420,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
   /**
    * {@inheritdoc}
    */
-  public function fields(MigrationInterface $migration = NULL): array {
+  public function fields(): array {
     $entity_type = $this->storage->getEntityType();
     // Retrieving fields from a non-fieldable content entity will return a
     // LogicException. Return an empty list of fields instead.
