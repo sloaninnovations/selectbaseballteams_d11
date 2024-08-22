@@ -230,16 +230,17 @@ class PreviewTest extends WebDriverTestBase {
    * Tests the link to sort in the preview form.
    */
   public function testPreviewSortLink(): void {
-    ViewTestData::install();
-
     // Get the preview.
     $this->getPreviewAJAX('test_click_sort_ajax', 'page_1', 0);
+
+    // Test that the header label is present.
+    $element = $this->assertSession()->elementExists('xpath', '//th[contains(@class, "views-field views-field-name")]/a');
 
     // Verify link.
     $this->assertSession()->linkByHrefExists('preview/page_1?_wrapper_format=drupal_ajax&order=name&sort=desc', 0, 'The output URL is as expected.');
 
-    // Test that the header label is present and click that link to sort.
-    $this->getSession()->getPage()->find('css', '.views-field.views-field-name a')->click();
+    // Click link to sort.
+    $element->click();
     $sort_link = $this->assertSession()->waitForElement('xpath', '//th[contains(@class, \'views-field views-field-name is-active\')]/a');
 
     $this->assertNotEmpty($sort_link);
