@@ -270,4 +270,10 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
     \Drupal::setContainer($this->container);
   }
 
+  /**
+   * Allows altering the database dump file.
+   */
+  public static function migrateDumpAlter(MigrateTestBase $test) {
+  }
+
 }
