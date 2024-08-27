@@ -19,7 +19,6 @@ use Drupal\user\RoleInterface;
  * Tests responsive image display formatter.
  *
  * @group responsive_image
- * @group #slow
  */
 class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
 
@@ -45,9 +44,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   protected $fileUrlGenerator;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'field_ui',

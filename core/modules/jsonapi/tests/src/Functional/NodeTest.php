@@ -22,7 +22,6 @@ use GuzzleHttp\RequestOptions;
  * JSON:API integration test for the "Node" content entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class NodeTest extends ResourceTestBase {
 
@@ -262,7 +261,7 @@ class NodeTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessMessage($method) {
+  protected function getExpectedUnauthorizedAccessMessage($method): string {
     switch ($method) {
       case 'GET':
       case 'POST':
