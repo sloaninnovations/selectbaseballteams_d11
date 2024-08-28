@@ -21,10 +21,10 @@ Drupal.AjaxCommands.prototype.tabledragChanged = function (
     return;
   }
 
-  const tableDrag = Drupal.tableDrag[response.tabledrag_instance];
+  const tableDrag = Drupal.TableDrag.instances[response.tabledrag_instance];
 
   // eslint-disable-next-line new-cap
-  const rowObject = new tableDrag.row(
+  const rowObject = tableDrag.row(
     document.getElementById(response.id),
     '',
     tableDrag.indentEnabled,
@@ -32,5 +32,5 @@ Drupal.AjaxCommands.prototype.tabledragChanged = function (
     true,
   );
   rowObject.markChanged();
-  rowObject.addChangedWarning();
+  tableDrag.addChangedWarning();
 };

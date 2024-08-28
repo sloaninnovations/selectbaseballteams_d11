@@ -45,6 +45,7 @@ basepath
 basetheme
 beatle
 bebebe
+beforebegin
 beforeclose
 beforecreate
 behat
@@ -459,6 +460,7 @@ prerendered
 presave
 pretransaction
 preuninstall
+prevall
 processlist
 proname
 prophesize
