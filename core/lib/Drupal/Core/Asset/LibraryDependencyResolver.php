@@ -17,13 +17,6 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
   protected $libraryDiscovery;
 
   /**
-   * The libraries graph.
-   *
-   * @var array
-   */
-  protected $librariesGraph = [];
-
-  /**
    * Constructs a new LibraryDependencyResolver instance.
    *
    * @param \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery
@@ -37,10 +30,10 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
    * {@inheritdoc}
    */
   public function getLibrariesWithDependencies(array $libraries) {
-    $this->librariesGraph = $this->doGetDependencies($libraries);
-    $this->doProcessBeforeAfter();
+    $libraries_graph = $this->doGetDependencies($libraries);
+    $libraries_graph = $this->doProcessBeforeAfter($libraries_graph);
 
-    $graph_object = new Graph($this->librariesGraph);
+    $graph_object = new Graph($libraries_graph);
     $graph = $graph_object->searchAndSort();
 
     uasort($graph, function ($a, $b) {
@@ -89,12 +82,16 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
   }
 
   /**
-   * Processed before/after settings for the libraries graph.
+   * Processes before/after settings for the libraries graph.
    *
-   * Helper method for ::getLibrariesWithDependencies().
+   * @param array $graph
+   *   The libraries graph array.
+   *
+   * @return array
+   *   The libraries graph with before and after processed.
    */
-  protected function doProcessBeforeAfter(): void {
-    foreach ($this->librariesGraph as $library => $data) {
+  protected function doProcessBeforeAfter($graph): array {
+    foreach ($graph as $library => $data) {
       [$extension, $name] = explode('/', $library, 2);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name) + [
         'after' => [],
@@ -102,17 +99,19 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
       ];
 
       foreach ($definition['after'] as $after) {
-        if (isset($this->librariesGraph[$after])) {
-          $this->librariesGraph[$library]['edges'][$after] = $after;
+        if (isset($graph[$after])) {
+          $graph[$library]['edges'][$after] = $after;
         }
       }
 
       foreach ($definition['before'] as $before) {
-        if (isset($this->librariesGraph[$before])) {
-          $this->librariesGraph[$before]['edges'][$library] = $library;
+        if (isset($graph[$before])) {
+          $graph[$before]['edges'][$library] = $library;
         }
       }
     }
+
+    return $graph;
   }
 
   /**
