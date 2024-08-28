@@ -4,8 +4,9 @@ namespace Drupal\syslog\Logger;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Logger\LogMessageParserInterface;
-use Drupal\Core\Logger\RfcLoggerTrait;
+use Drupal\Core\Logger\RfcLogLevel;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 
 // cspell:ignore ndelay
 
@@ -13,7 +14,7 @@ use Psr\Log\LoggerInterface;
  * Redirects logging messages to syslog.
  */
 class SysLog implements LoggerInterface {
-  use RfcLoggerTrait;
+  use LoggerTrait;
 
   /**
    * A configuration object containing syslog settings.
@@ -88,6 +89,7 @@ class SysLog implements LoggerInterface {
     $message_placeholders = $this->parser->parseMessagePlaceholders($message, $context);
     $message = empty($message_placeholders) ? $message : strtr($message, $message_placeholders);
 
+    $priority = RfcLogLevel::fromPsr3($level);
     $entry = strtr($format, [
       '!base_url' => $base_url,
       '!timestamp' => $context['timestamp'],
@@ -95,13 +97,13 @@ class SysLog implements LoggerInterface {
       '!ip' => $context['ip'],
       '!request_uri' => $context['request_uri'],
       '!referer' => $context['referer'],
-      '!severity' => $level,
+      '!severity' => $priority,
       '!uid' => $context['uid'],
       '!link' => strip_tags($context['link']),
       '!message' => strip_tags($message),
     ]);
 
-    $this->syslogWrapper($level, $entry);
+    $this->syslogWrapper($priority, $entry);
   }
 
   /**

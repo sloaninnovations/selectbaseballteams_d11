@@ -6,8 +6,6 @@ namespace Drupal\Tests\system\Kernel\SecurityAdvisories;
 
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Logger\RfcLoggerTrait;
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\KernelTests\KernelTestBase;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -17,6 +15,8 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
+use Psr\Log\LogLevel;
 
 /**
  * @coversDefaultClass \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher
@@ -25,7 +25,7 @@ use Psr\Log\LoggerInterface;
  */
 class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInterface {
 
-  use RfcLoggerTrait;
+  use LoggerTrait;
 
   /**
    * The error messages.
@@ -749,7 +749,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
     if (isset($context['@message'])) {
       $this->errorMessages[] = $context['@message'];
     }
-    if ($level === RfcLogLevel::ERROR) {
+    if ($level === LogLevel::ERROR) {
       $this->logErrorMessages[] = $message;
     }
   }

@@ -7,13 +7,14 @@ namespace Drupal\Tests\dblog\Functional;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Link;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Url;
 use Drupal\dblog\Controller\DbLogController;
 use Drupal\error_test\Controller\ErrorTestController;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
+use Psr\Log\LogLevel;
 
 /**
  * Verifies log entries and user access based on permissions.
@@ -128,7 +129,7 @@ class DbLogTest extends BrowserTestBase {
       'ip' => '0.0.1.0',
       'timestamp' => \Drupal::time()->getRequestTime(),
     ];
-    \Drupal::service('logger.dblog')->log(RfcLogLevel::NOTICE, 'Test message', $context);
+    \Drupal::service('logger.dblog')->log(LogLevel::NOTICE, 'Test message', $context);
     $query = Database::getConnection()->select('watchdog');
     $query->addExpression('MAX([wid])');
     $wid = $query->execute()->fetchField();
@@ -631,7 +632,7 @@ class DbLogTest extends BrowserTestBase {
       'channel'     => 'system',
       'message'     => 'Log entry added to test the doClearTest clear down.',
       'variables'   => [],
-      'severity'    => RfcLogLevel::NOTICE,
+      'severity'    => LogLevel::NOTICE,
       'link'        => NULL,
       'uid'         => $this->adminUser->id(),
       'request_uri' => $base_root . \Drupal::request()->getRequestUri(),
@@ -677,7 +678,7 @@ class DbLogTest extends BrowserTestBase {
         ];
         $this->generateLogEntries($type['count'], [
           'channel' => $type['type'],
-          'severity' => $type['severity'],
+          'severity' => RfcLogLevel::toPsr3($type['severity']),
         ]);
       }
     }

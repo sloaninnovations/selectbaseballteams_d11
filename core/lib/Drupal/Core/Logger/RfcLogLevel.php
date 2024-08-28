@@ -3,6 +3,8 @@
 namespace Drupal\Core\Logger;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Psr\Log\InvalidArgumentException;
+use Psr\Log\LogLevel;
 
 /**
  * @defgroup logging_severity_levels Logging severity levels
@@ -103,6 +105,59 @@ class RfcLogLevel {
     }
 
     return static::$levels;
+  }
+
+  /**
+   * Returns the RFC 5424 severity level for a given PSR-3 log level.
+   *
+   * @param string $level
+   *   A PSR-3 log level.
+   *
+   * @return int
+   *   The RFC 5424 severity level.
+   *
+   * @throws \Psr\Log\InvalidArgumentException
+   *   If the log level is not recognized.
+   */
+  public static function fromPsr3(string $level): int {
+    return match ($level) {
+      LogLevel::EMERGENCY => static::EMERGENCY,
+      LogLevel::ALERT => static::ALERT,
+      LogLevel::CRITICAL => static::CRITICAL,
+      LogLevel::ERROR => static::ERROR,
+      LogLevel::WARNING => static::WARNING,
+      LogLevel::NOTICE => static::NOTICE,
+      LogLevel::INFO => static::INFO,
+      LogLevel::DEBUG => static::DEBUG,
+      default => throw new InvalidArgumentException("Invalid log level: $level"),
+    };
+
+  }
+
+  /**
+   * Returns the PSR-3 log level for a given RFC 5424 severity level.
+   *
+   * @param int $level
+   *   The RFC 5424 severity level.
+   *
+   * @return string
+   *   A PSR-3 log level.
+   *
+   * @throws \Psr\Log\InvalidArgumentException
+   *   If the severity level is not recognized.
+   */
+  public static function toPsr3(int $level): string {
+    return match ($level) {
+      static::EMERGENCY => LogLevel::EMERGENCY,
+      static::ALERT => LogLevel::ALERT,
+      static::CRITICAL => LogLevel::CRITICAL,
+      static::ERROR => LogLevel::ERROR,
+      static::WARNING => LogLevel::WARNING,
+      static::NOTICE => LogLevel::NOTICE,
+      static::INFO => LogLevel::INFO,
+      static::DEBUG => LogLevel::DEBUG,
+      default => throw new InvalidArgumentException("Invalid log level: $level"),
+    };
   }
 
 }

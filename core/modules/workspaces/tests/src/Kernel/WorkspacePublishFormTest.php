@@ -6,7 +6,6 @@ namespace Drupal\Tests\workspaces\Kernel;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormState;
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\workspaces\Entity\Workspace;
@@ -14,6 +13,7 @@ use Drupal\workspaces\Form\WorkspacePublishForm;
 use Drupal\workspaces\WorkspaceOperationFactory;
 use Drupal\workspaces\WorkspacePublisherInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * @coversDefaultClass \Drupal\workspaces\Form\WorkspacePublishForm
@@ -69,7 +69,7 @@ class WorkspacePublishFormTest extends KernelTestBase {
     $logger
       ->expects($this->once())
       ->method('log')
-      ->with(RfcLogLevel::ERROR, 'Unexpected error');
+      ->with(LogLevel::ERROR, 'Unexpected error');
 
     $publishForm->submitForm($form, $formState);
 

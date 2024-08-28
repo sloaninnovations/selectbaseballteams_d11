@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\dblog\Functional;
 
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Session\AnonymousUserSession;
+use Psr\Log\LogLevel;
 
 /**
  * Provides methods to generate log entries.
@@ -46,7 +46,7 @@ trait FakeLogEntries {
       'channel'     => 'custom',
       'message'     => 'Dblog test log message',
       'variables'   => [],
-      'severity'    => RfcLogLevel::NOTICE,
+      'severity'    => LogLevel::NOTICE,
       'link'        => NULL,
       'uid'         => $user->id(),
       'request_uri' => $base_root . \Drupal::request()->getRequestUri(),

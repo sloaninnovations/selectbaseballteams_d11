@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Kernel\Views;
 
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\user\Entity\Role;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * Tests the roles filter handler.
@@ -127,7 +127,7 @@ class HandlerFilterRolesTest extends UserKernelTestBase {
 
     // Recalculate after role deletion.
     $logger->log(
-      RfcLogLevel::WARNING,
+      LogLevel::WARNING,
       'View %view depends on role %role, but the role does not exist.',
       Argument::allOf(
         Argument::withEntry('%view', 'test_user_name'),
