@@ -58,9 +58,8 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
    *
    * Helper method for ::getLibrariesWithDependencies().
    *
-   * @param string[] $libraries_with_unresolved_dependencies
-   *   A list of libraries, with unresolved dependencies, in the order they
-   *   should be loaded.
+   * @param string[] $libraries
+   *   A list of libraries in the order they should be loaded.
    * @param array $graph
    *   The graph of libraries that is being built recursively.
    *
@@ -68,8 +67,8 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
    *   A list of libraries, in the order they should be loaded, including their
    *   dependencies.
    */
-  protected function doGetDependencies(array $libraries_with_unresolved_dependencies, array $graph = []) {
-    foreach ($libraries_with_unresolved_dependencies as $library) {
+  protected function doGetDependencies(array $libraries, array $graph = []) {
+    foreach ($libraries as $library) {
       if (!isset($graph[$library])) {
         [$extension, $name] = explode('/', $library, 2);
         $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
