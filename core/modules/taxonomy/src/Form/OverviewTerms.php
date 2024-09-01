@@ -373,6 +373,11 @@ class OverviewTerms extends FormBase {
       '#value' => t('Filter'),
       '#id' => 'filter-submit',
     ];
+    $form['filter']['reset'] = [
+      '#type' => 'submit',
+      '#value' => t('Reset'),
+      '#id' => 'filter-reset',
+    ];
 
     $errors = $form_state->getErrors();
     $row_position = 0;
@@ -590,6 +595,14 @@ class OverviewTerms extends FormBase {
     if ('filter-submit' === $form_state->getTriggeringElement()['#id']) {
       $this->getRequest()->query->remove('page');
       return $form_state->setRebuild(TRUE);
+    }
+
+    // Reset filter.
+    if ('filter-reset' === $form_state->getTriggeringElement()['#id']) {
+      $this->getRequest()->query->remove('page');
+      $form_state->setValue('filter', NULL);
+      $this->termFilter = NULL;
+      return $form_state->setRebuild(FALSE);
     }
 
     // Sort term order based on weight.
