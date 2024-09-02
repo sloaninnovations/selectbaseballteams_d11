@@ -45,11 +45,16 @@ class UserLogoutTest extends BrowserTestBase {
     $this->drupalGet($logoutUrl);
     $this->assertTrue($this->drupalUserIsLoggedIn($account));
     $this->assertSession()->addressEquals($confirmUrl);
+    $confirmationDescription = 'You’ll need to log in again to access your account.';
+    // Check that the confirmation page contains the description.
+    $this->assertSession()->pageTextContains($confirmationDescription);
 
     // Test invalid csrf token does not log the user out.
     $this->drupalGet($logoutUrl, ['query' => ['token' => '123']]);
     $this->assertTrue($this->drupalUserIsLoggedIn($account));
     $this->assertSession()->addressEquals($confirmUrl);
+    // Check that the confirmation page contains the description.
+    $this->assertSession()->pageTextContains($confirmationDescription);
     // Submitting the confirmation form correctly logs the user out.
     $this->submitForm([], 'Log out');
     $this->assertFalse($this->drupalUserIsLoggedIn($account));
