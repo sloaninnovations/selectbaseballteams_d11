@@ -367,6 +367,7 @@ class OverviewTerms extends FormBase {
     $form['filter']['filter'] = [
       '#type' => 'textfield',
       '#size' => 30,
+      '#placeholder' => $this->t('Filter by name...'),
     ];
     $form['filter']['submit'] = [
       '#type' => 'submit',
