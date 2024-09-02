@@ -212,11 +212,11 @@
         (element) => {
           const $autocomplete = $(element);
           // Allow options to be overridden per instance.
-          const DenyList = $autocomplete.attr(
+          const denyList = $autocomplete.attr(
             'data-autocomplete-first-character-DenyList',
           );
           $.extend(autocomplete.options, {
-            firstCharacterDenyList: DenyList || '',
+            firstCharacterDenyList: denyList || '',
           });
           // Use jQuery UI Autocomplete on the textfield.
           $autocomplete.autocomplete(autocomplete.options).each(function () {
