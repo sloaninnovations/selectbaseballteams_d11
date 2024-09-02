@@ -213,7 +213,7 @@
           const $autocomplete = $(element);
           // Allow options to be overridden per instance.
           const denyList = $autocomplete.attr(
-            'data-autocomplete-first-character-denyList',
+            'data-autocomplete-first-character-denylist',
           );
           $.extend(autocomplete.options, {
             firstCharacterDenyList: denyList || '',
