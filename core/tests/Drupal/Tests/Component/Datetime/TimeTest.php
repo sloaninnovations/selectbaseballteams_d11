@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Datetime;
 
 use Drupal\Component\Datetime\Time;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -13,11 +14,12 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * Isolate the tests to prevent side effects from altering system time.
  *
- * @coversDefaultClass \Drupal\Component\Datetime\Time
  * @group Datetime
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(Time::class)]
+#[\PHPUnit\Framework\Attributes\Group('Datetime')]
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(FALSE)]
+#[RunTestsInSeparateProcesses]
 class TimeTest extends TestCase {
 
   /**
@@ -47,7 +49,7 @@ class TimeTest extends TestCase {
   /**
    * Tests the getRequestTime method.
    *
-   * @covers ::getRequestTime
+   * @legacy-covers ::getRequestTime
    */
   public function testGetRequestTime(): void {
     $expected = 12345678;
@@ -66,7 +68,7 @@ class TimeTest extends TestCase {
   /**
    * Tests the getRequestMicroTime method.
    *
-   * @covers ::getRequestMicroTime
+   * @legacy-covers ::getRequestMicroTime
    */
   public function testGetRequestMicroTime(): void {
     $expected = 1234567.89;
@@ -83,7 +85,7 @@ class TimeTest extends TestCase {
   }
 
   /**
-   * @covers ::getRequestTime
+   * @legacy-covers ::getRequestTime
    */
   public function testGetRequestTimeNoRequest(): void {
     // With no request, and no global variable, we expect to get the int part
@@ -96,7 +98,7 @@ class TimeTest extends TestCase {
   }
 
   /**
-   * @covers ::getRequestMicroTime
+   * @legacy-covers ::getRequestMicroTime
    */
   public function testGetRequestMicroTimeNoRequest(): void {
     $expected = 1234567.89;
@@ -109,7 +111,7 @@ class TimeTest extends TestCase {
   /**
    * Tests the getCurrentTime method.
    *
-   * @covers ::getCurrentTime
+   * @legacy-covers ::getCurrentTime
    */
   public function testGetCurrentTime(): void {
     $expected = 12345678;
@@ -119,7 +121,7 @@ class TimeTest extends TestCase {
   /**
    * Tests the getCurrentMicroTime method.
    *
-   * @covers ::getCurrentMicroTime
+   * @legacy-covers ::getCurrentMicroTime
    */
   public function testGetCurrentMicroTime(): void {
     $expected = 1234567.89;

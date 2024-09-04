@@ -10,6 +10,7 @@ use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamWrapper;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,6 +18,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @group Discovery
  */
+#[Group('Discovery')]
 class YamlDiscoveryTest extends TestCase {
 
   /**

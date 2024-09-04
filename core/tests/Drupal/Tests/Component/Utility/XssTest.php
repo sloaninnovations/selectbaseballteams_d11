@@ -7,12 +7,15 @@ namespace Drupal\Tests\Component\Utility;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Component\Utility\Xss;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 
 // cspell:ignore ascript barbaz ckers cript CVEs dynsrc fooÿñ msgbox ncript
 // cspell:ignore nfocus nmedi nosuchscheme nosuchtag onmediaerror scrscriptipt
 // cspell:ignore tascript vbscript
-
 /**
  * XSS Filtering tests.
  *
@@ -24,9 +27,11 @@ use PHPUnit\Framework\TestCase;
  *
  * @group Utility
  * @group #slow
- * @coversDefaultClass \Drupal\Component\Utility\Xss
- * @runTestsInSeparateProcesses
  */
+#[CoversClass(Xss::class)]
+#[Group('Utility')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class XssTest extends TestCase {
 
   /**
@@ -66,9 +71,8 @@ class XssTest extends TestCase {
    *   The assertion message to display upon failure.
    * @param array $allowed_tags
    *   (optional) The allowed HTML tags to be passed to \Drupal\Component\Utility\Xss::filter().
-   *
-   * @dataProvider providerTestFilterXssNormalized
    */
+  #[DataProvider('providerTestFilterXssNormalized')]
   public function testFilterXssNormalized($value, $expected, $message, ?array $allowed_tags = NULL): void {
     if ($allowed_tags === NULL) {
       $value = Xss::filter($value);
@@ -133,9 +137,8 @@ class XssTest extends TestCase {
    *   The assertion message to display upon failure.
    * @param array $allowed_tags
    *   (optional) The allowed HTML tags to be passed to \Drupal\Component\Utility\Xss::filter().
-   *
-   * @dataProvider providerTestFilterXssNotNormalized
    */
+  #[DataProvider('providerTestFilterXssNotNormalized')]
   public function testFilterXssNotNormalized($value, $expected, $message, ?array $allowed_tags = NULL): void {
     if ($allowed_tags === NULL) {
       $value = Xss::filter($value);
@@ -446,9 +449,8 @@ class XssTest extends TestCase {
    *   The expected result.
    * @param string $message
    *   The assertion message to display upon failure.
-   *
-   * @dataProvider providerTestInvalidMultiByte
    */
+  #[DataProvider('providerTestInvalidMultiByte')]
   public function testInvalidMultiByte($value, $expected, $message): void {
     $this->assertEquals(Xss::filter($value), $expected, $message);
   }
@@ -483,9 +485,9 @@ class XssTest extends TestCase {
   /**
    * Check that strings in HTML attributes are correctly processed.
    *
-   * @covers ::attributes
-   * @dataProvider providerTestAttributes
+   * @legacy-covers ::attributes
    */
+  #[DataProvider('providerTestAttributes')]
   public function testAttribute($value, $expected, $message, $allowed_tags = NULL): void {
     $value = Xss::filter($value, $allowed_tags);
     $this->assertEquals($expected, $value, $message);
@@ -582,9 +584,8 @@ class XssTest extends TestCase {
    *   The expected result.
    * @param string $message
    *   The assertion message to display upon failure.
-   *
-   * @dataProvider providerTestFilterXssAdminNotNormalized
    */
+  #[DataProvider('providerTestFilterXssAdminNotNormalized')]
   public function testFilterXssAdminNotNormalized($value, $expected, $message): void {
     $this->assertNotNormalized(Xss::filterAdmin($value), $expected, $message);
   }
