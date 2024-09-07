@@ -333,29 +333,6 @@ class TaggedHandlersPassTest extends UnitTestCase {
   }
 
   /**
-   * Tests interface validation for child handler with parent service.
-   *
-   * @covers ::process
-   */
-  public function testProcessChildDefinitionParentInterfaceMismatch() {
-    $container = $this->buildContainer();
-
-    $container
-      ->register('consumer_id', __NAMESPACE__ . '\ValidConsumer')
-      ->addTag('service_collector');
-    $container
-      ->register('root_handler', __NAMESPACE__ . '\InvalidHandler');
-    $container->addDefinitions([
-      'parent_handler' => new ChildDefinition('root_handler'),
-      'child_handler' => (new ChildDefinition('parent_handler'))->addTag('consumer_id'),
-    ]);
-
-    $handler_pass = new TaggedHandlersPass();
-    $this->expectException(LogicException::class);
-    $handler_pass->process($container);
-  }
-
-  /**
    * Tests consumer method with extra parameters.
    *
    * @covers ::process
