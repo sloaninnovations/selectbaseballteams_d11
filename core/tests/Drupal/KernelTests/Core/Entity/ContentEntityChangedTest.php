@@ -12,13 +12,12 @@ use Drupal\language\Entity\ConfigurableLanguage;
  * Tests basic EntityChangedInterface functionality.
  *
  * @group Entity
+ * @group #slow
  */
 class ContentEntityChangedTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -504,7 +503,7 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
    * @return bool
    *   The flag value.
    */
-  protected function getRevisionTranslationAffectedFlag(EntityTestMulRevChanged $entity) {
+  protected function getRevisionTranslationAffectedFlag(EntityTestMulRevChanged $entity): bool {
     $query = $this->mulRevChangedStorage->getQuery()->accessCheck(FALSE);
     $ids = $query->condition('revision_translation_affected', 1, '=', $entity->language()->getId())->execute();
     $id = reset($ids);

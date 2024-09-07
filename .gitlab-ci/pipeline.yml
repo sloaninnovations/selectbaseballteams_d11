@@ -1,4 +1,4 @@
-# cspell:ignore cobertura drupaltestbot drupaltestbotpw Dwebdriver logfile XVFB
+# cspell:ignore cobertura drupaltestbot drupaltestbotpw Dwebdriver logfile testdox XVFB
 
 stages:
   - 🗜️ Test
@@ -87,12 +87,14 @@ variables:
     - "--allowed-origins=*"
 
 .with-selenium-chrome: &with-selenium-chrome
-  name: selenium/standalone-chrome:latest
+  name: selenium/standalone-chrome:127.0
   alias: selenium
   variables:
     JAVA_OPTS: "-Dwebdriver.chrome.logfile=/builds/chromedriver.log"
     SE_NODE_OVERRIDE_MAX_SESSIONS: "true"
-    SE_NODE_MAX_SESSIONS: "5"
+    SE_NODE_MAX_SESSIONS: "16"
+    SE_SESSION_RETRY_INTERVAL: "1"
+    SE_SESSION_REQUEST_TIMEOUT: "10"
     SE_START_XVFB: "false"
     SE_START_VNC: "false"
 
@@ -136,10 +138,10 @@ variables:
 
 '🖱️️️ PHPUnit Functional Javascript':
   <<: [ *with-composer, *run-tests, *default-job-settings ]
-  parallel: 4
+  parallel: 2
   variables:
     TESTSUITE: PHPUnit-FunctionalJavascript
-    CONCURRENCY: 15
+    CONCURRENCY: 8
     KUBERNETES_CPU_REQUEST: "24"
   services:
     - <<: *with-database
@@ -179,10 +181,10 @@ variables:
 
 '⚙️️ PHPUnit Kernel':
   <<: [ *with-composer, *run-tests, *default-job-settings ]
-  parallel: 3
+  parallel: 4
   variables:
     TESTSUITE: PHPUnit-Kernel
-    KUBERNETES_CPU_REQUEST: "16"
+    KUBERNETES_CPU_REQUEST: "8"
   services:
     - <<: *with-database
 
@@ -191,6 +193,7 @@ variables:
   variables:
     TESTSUITE: PHPUnit-Build
     KUBERNETES_CPU_REQUEST: "2"
+    CONCURRENCY: "4"
   services:
     - <<: *with-database
 
@@ -202,7 +205,8 @@ variables:
     - <<: *with-database
   variables:
     TESTSUITE: PHPUnit-Unit
-    KUBERNETES_CPU_REQUEST: "16"
+    KUBERNETES_CPU_REQUEST: "1"
+    CONCURRENCY: 6
 
 '✅️ PHPStan Tests':
   <<: [ *default-job-settings ]
@@ -222,7 +226,7 @@ variables:
     - docker-php-ext-enable pcov
     - cd core/tests/PHPStan
     - composer install
-    - vendor/bin/phpunit tests --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml --log-junit junit.xml
+    - vendor/bin/phpunit tests --testdox --coverage-text --colors=never --coverage-cobertura=coverage.cobertura.xml --log-junit junit.xml
   # Default job settings runs a script that junit files in a specific location..
   after_script: []
   artifacts:
@@ -236,7 +240,7 @@ variables:
 '🦉️️️ Nightwatch':
   <<: [ *with-composer-and-yarn, *default-job-settings ]
   variables:
-    KUBERNETES_CPU_REQUEST: "24"
+    KUBERNETES_CPU_REQUEST: "16"
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome

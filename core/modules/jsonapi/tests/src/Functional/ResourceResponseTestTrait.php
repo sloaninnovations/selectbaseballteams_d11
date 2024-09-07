@@ -276,7 +276,7 @@ trait ResourceResponseTestTrait {
    * @return bool
    *   TRUE if the array has a type and ID, FALSE otherwise.
    */
-  protected static function isResourceIdentifier(array $data) {
+  protected static function isResourceIdentifier(array $data): bool {
     return array_key_exists('type', $data) && array_key_exists('id', $data);
   }
 
@@ -398,7 +398,7 @@ trait ResourceResponseTestTrait {
    * @return string
    *   The relationship link.
    */
-  protected static function getRelationshipLink(array $resource_identifier, $relationship_field_name) {
+  protected static function getRelationshipLink(array $resource_identifier, $relationship_field_name): string {
     return static::getResourceLink($resource_identifier) . "/relationships/$relationship_field_name";
   }
 
@@ -413,7 +413,7 @@ trait ResourceResponseTestTrait {
    * @return string
    *   The related resource link.
    */
-  protected static function getRelatedLink(array $resource_identifier, $relationship_field_name) {
+  protected static function getRelatedLink(array $resource_identifier, $relationship_field_name): string {
     return static::getResourceLink($resource_identifier) . "/$relationship_field_name";
   }
 

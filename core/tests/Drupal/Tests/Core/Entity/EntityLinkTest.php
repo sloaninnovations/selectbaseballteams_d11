@@ -56,7 +56,7 @@ class EntityLinkTest extends UnitTestCase {
   }
 
   /**
-   * Tests for the Entity::toLink() method.
+   * Tests for the EntityBase::toLink() method.
    *
    * @covers ::toLink
    *
@@ -149,7 +149,7 @@ class EntityLinkTest extends UnitTestCase {
       'link text',
       'link text',
       'edit-form',
-      ['foo' => 'qwer'],
+      ['foo' => 'bar'],
     ];
     return $data;
   }

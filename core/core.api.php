@@ -559,8 +559,8 @@
  * the ability to override any of the default behavior if needed.
  * See \Drupal\Core\Cache\CacheableDependencyInterface::getCacheTags(),
  * \Drupal\Core\Entity\EntityTypeInterface::getListCacheTags(),
- * \Drupal\Core\Entity\Entity::invalidateTagsOnSave() and
- * \Drupal\Core\Entity\Entity::invalidateTagsOnDelete().
+ * \Drupal\Core\Entity\EntityBase::invalidateTagsOnSave() and
+ * \Drupal\Core\Entity\EntityBase::invalidateTagsOnDelete().
  *
  * @section context Cache contexts
  *
@@ -764,7 +764,7 @@
  * @code
  * path_alias.manager:
  *   class: Drupal\path_alias\AliasManager
- *   arguments: ['@path_alias.repository', '@path_alias.whitelist', '@language_manager']
+ *   arguments: ['@path_alias.repository', '@path_alias.prefix_list', '@language_manager']
  * @endcode
  * Some services use other services as factories; a typical service definition
  * is:
