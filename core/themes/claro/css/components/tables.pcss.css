@@ -159,7 +159,7 @@ td {
   & > .form-item > .claro-autocomplete > .form-element,
   & > .ajax-new-content > .form-item > .claro-autocomplete,
   & > .ajax-new-content > .form-item > .claro-autocomplete > .form-element {
-    width: 100%;
+    width: auto;
   }
 
   & > .form-item > .form-element--type-select,
