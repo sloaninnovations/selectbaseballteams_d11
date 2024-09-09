@@ -56,9 +56,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
   protected $notEntityOwner;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -128,7 +126,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
   /**
    * Returns an array of permissions needed for the entity owner.
    */
-  protected function getEntityOwnerPermissions() {
+  protected function getEntityOwnerPermissions(): array {
     return ['edit own entity_test content', 'translate editable entities', 'view test entity', 'view test entity translations', 'view unpublished test entity translations'];
   }
 
@@ -147,7 +145,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getEditorPermissions() {
+  protected function getEditorPermissions(): array {
     return ['administer entity_test content', 'view test entity', 'view test entity translations'];
   }
 

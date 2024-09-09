@@ -14,7 +14,6 @@ use Drupal\node\Entity\NodeType;
  * JSON:API integration test for "ContentLanguageSettings" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class ContentLanguageSettingsTest extends ConfigEntityResourceTestBase {
 
@@ -76,7 +75,7 @@ class ContentLanguageSettingsTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $self_url = Url::fromUri('base:/jsonapi/language_content_settings/language_content_settings/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
     return [
       'jsonapi' => [
@@ -117,7 +116,7 @@ class ContentLanguageSettingsTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     // @todo Update in https://www.drupal.org/node/2300677.
     return [];
   }

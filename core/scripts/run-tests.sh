@@ -30,6 +30,8 @@ use PHPUnit\Runner\Version;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpFoundation\Request;
 
+// cspell:ignore exitcode wwwrun
+
 // Define some colors for display.
 // A nice calming green.
 const SIMPLETEST_SCRIPT_COLOR_PASS = 32;
@@ -362,7 +364,8 @@ sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$args['script']}
   --url http://example.com/ --class Drupal\block\Tests\BlockTest
 
 Without a preinstalled Drupal site, specify a SQLite database pathname to create
-and the default database connection info to use in tests:
+(for the test runner) and the default database connection info (for Drupal) to
+use in tests:
 
 sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$args['script']}
   --sqlite /tmpfs/drupal/test.sqlite
@@ -816,12 +819,15 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
  */
 function simpletest_script_run_phpunit(TestRun $test_run, $class) {
   $runner = PhpUnitTestRunner::create(\Drupal::getContainer());
+  $start = microtime(TRUE);
   $results = $runner->execute($test_run, $class, $status);
+  $time = microtime(TRUE) - $start;
+
   $runner->processPhpUnitResults($test_run, $results);
 
   $summaries = $runner->summarizeResults($results);
   foreach ($summaries as $class => $summary) {
-    simpletest_script_reporter_display_summary($class, $summary);
+    simpletest_script_reporter_display_summary($class, $summary, $time);
   }
   return $status;
 }
@@ -1023,12 +1029,77 @@ function simpletest_script_get_test_list() {
   }
 
   if ((int) $args['ci-parallel-node-total'] > 1) {
-    $slow_tests_per_job = (int) ceil(count($slow_tests) / $args['ci-parallel-node-total']);
-    $tests_per_job = (int) ceil(count($test_list) / $args['ci-parallel-node-total']);
-    $test_list = array_merge(array_slice($slow_tests, ($args['ci-parallel-node-index'] -1) * $slow_tests_per_job, $slow_tests_per_job), array_slice($test_list, ($args['ci-parallel-node-index'] - 1) * $tests_per_job, $tests_per_job));
+    // Sort all tests by the number of public methods on the test class.
+    // This is a proxy for the approximate time taken to run the test,
+    // which is used in combination with @group #slow to start the slowest tests
+    // first and distribute tests between test runners.
+    sort_tests_by_public_method_count($slow_tests);
+    sort_tests_by_public_method_count($test_list);
+
+    // Now set up a bin per test runner.
+    $bin_count = (int) $args['ci-parallel-node-total'];
+
+    // Now loop over the slow tests and add them to a bin one by one, this
+    // distributes the tests evenly across the bins.
+    $binned_slow_tests = place_tests_into_bins($slow_tests, $bin_count);
+    $slow_tests_for_job = $binned_slow_tests[$args['ci-parallel-node-index'] - 1];
+
+    // And the same for the rest of the tests.
+    $binned_other_tests = place_tests_into_bins($test_list, $bin_count);
+    $other_tests_for_job = $binned_other_tests[$args['ci-parallel-node-index'] - 1];
+
+    $test_list = array_merge($slow_tests_for_job, $other_tests_for_job);
   }
 
   return $test_list;
+}
+
+/**
+ * Sort tests by the number of public methods in the test class.
+ *
+ * Tests with several methods take longer to run than tests with a single
+ * method all else being equal, so this allows tests runs to be sorted by
+ * approximately the slowest to fastest tests. Tests that are exceptionally
+ * slow can be added to the '#slow' group so they are placed first in each
+ * test run regardless of the number of methods.
+ *
+ * @param string[] $tests
+ *   An array of test class names.
+ */
+function sort_tests_by_public_method_count(array &$tests): void {
+  usort($tests, function ($a, $b) {
+    $method_count = function ($class) {
+      $reflection = new \ReflectionClass($class);
+      return count($reflection->getMethods(\ReflectionMethod::IS_PUBLIC));
+    };
+    return $method_count($b) <=> $method_count($a);
+  });
+}
+
+/**
+ * Distribute tests into bins.
+ *
+ * The given array of tests is split into the available bins. The distribution
+ * starts with the first test, placing the first test in the first bin, the
+ * second test in the second bin and so on. This results each bin having a
+ * similar number of test methods to run in total.
+ *
+ * @param string[] $tests
+ *   An array of test class names.
+ * @param int $bin_count
+ *   The number of bins available.
+ *
+ * @return array
+ *   An associative array of bins and the test class names in each bin.
+ */
+ function place_tests_into_bins(array $tests, int $bin_count) {
+  // Create a bin corresponding to each parallel test job.
+  $bins = array_fill(0, $bin_count, []);
+  // Go through each test and add them to one bin at a time.
+  foreach ($tests as $key => $test) {
+    $bins[($key % $bin_count)][] = $test;
+  }
+  return $bins;
 }
 
 /**
@@ -1077,14 +1148,17 @@ function simpletest_script_reporter_init() {
  *   The test class name that was run.
  * @param array $results
  *   The assertion results using #pass, #fail, #exception, #debug array keys.
+ * @param int|null $duration
+ *   The time taken for the test to complete.
  */
-function simpletest_script_reporter_display_summary($class, $results) {
+function simpletest_script_reporter_display_summary($class, $results, $duration = NULL) {
   // Output all test results vertically aligned.
   // Cut off the class name after 60 chars, and pad each group with 3 digits
   // by default (more than 999 assertions are rare).
-  $output = vsprintf('%-60.60s %10s %9s %14s %12s', [
+  $output = vsprintf('%-60.60s %10s %5s %9s %14s %12s', [
     $class,
     $results['#pass'] . ' passes',
+    isset($duration) ? ceil($duration) . 's' : '',
     !$results['#fail'] ? '' : $results['#fail'] . ' fails',
     !$results['#exception'] ? '' : $results['#exception'] . ' exceptions',
     !$results['#debug'] ? '' : $results['#debug'] . ' messages',

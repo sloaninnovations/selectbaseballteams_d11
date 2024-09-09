@@ -22,9 +22,7 @@ use Drupal\KernelTests\KernelTestBase;
 class ThemeInstallerTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 
@@ -478,7 +476,7 @@ class ThemeInstallerTest extends KernelTestBase {
    *
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected function moduleHandler() {
+  protected function moduleHandler(): ?object {
     return $this->container->get('module_handler');
   }
 
@@ -487,7 +485,7 @@ class ThemeInstallerTest extends KernelTestBase {
    *
    * @return \Drupal\Core\Extension\ModuleInstallerInterface
    */
-  protected function moduleInstaller() {
+  protected function moduleInstaller(): ?object {
     return $this->container->get('module_installer');
   }
 

@@ -22,7 +22,6 @@ use GuzzleHttp\RequestOptions;
  * JSON:API integration test for the "Node" content entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class NodeTest extends ResourceTestBase {
 
@@ -143,7 +142,7 @@ class NodeTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $author = User::load($this->entity->getOwnerId());
     $base_url = Url::fromUri('base:/jsonapi/node/camelids/' . $this->entity->uuid())->setAbsolute();
     $self_url = clone $base_url;
@@ -248,7 +247,7 @@ class NodeTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     return [
       'data' => [
         'type' => 'node--camelids',
@@ -262,7 +261,7 @@ class NodeTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessMessage($method) {
+  protected function getExpectedUnauthorizedAccessMessage($method): string {
     switch ($method) {
       case 'GET':
       case 'POST':
@@ -417,7 +416,7 @@ class NodeTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static function getIncludePermissions() {
+  protected static function getIncludePermissions(): array {
     return [
       'uid.node_type' => ['administer users'],
       'uid.roles' => ['administer permissions'],

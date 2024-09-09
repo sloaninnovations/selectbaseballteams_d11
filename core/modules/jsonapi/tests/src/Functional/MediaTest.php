@@ -16,7 +16,6 @@ use Drupal\user\Entity\User;
  * JSON:API integration test for the "Media" content entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class MediaTest extends ResourceTestBase {
 
@@ -153,7 +152,7 @@ class MediaTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $file = File::load(1);
     $thumbnail = File::load(3);
     $author = User::load($this->entity->getOwnerId());
@@ -294,7 +293,7 @@ class MediaTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     $file = File::load(2);
     return [
       'data' => [
@@ -344,7 +343,7 @@ class MediaTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getEditorialPermissions() {
+  protected function getEditorialPermissions(): array {
     return array_merge(parent::getEditorialPermissions(), ['view any unpublished content']);
   }
 
@@ -360,10 +359,10 @@ class MediaTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testPostIndividual(): void {
+  protected function doTestPostIndividual(): void {
     // @todo Mimic \Drupal\Tests\rest\Functional\EntityResource\Media\MediaResourceTestBase::testPost()
     // @todo Later, use https://www.drupal.org/project/drupal/issues/2958554 to upload files rather than the REST module.
-    parent::testPostIndividual();
+    parent::doTestPostIndividual();
   }
 
   /**

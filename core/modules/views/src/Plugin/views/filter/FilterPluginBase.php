@@ -68,6 +68,8 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    *
    * Contains the actual value of the field,either configured in the views ui
    * or entered in the exposed filters.
+   *
+   * @var mixed
    */
   public $value = NULL;
 
@@ -80,26 +82,31 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
 
   /**
    * Contains the information of the selected item in a grouped filter.
+   *
+   * @var array
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $group_info = NULL;
 
   /**
-   * @var bool
    * Disable the possibility to force a single value.
+   *
+   * @var bool
    */
   protected $alwaysMultiple = FALSE;
 
   /**
-   * @var bool
    * Disable the possibility to use operators.
+   *
+   * @var bool
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $no_operator = FALSE;
 
   /**
-   * @var bool
    * Disable the possibility to allow an exposed input to be optional.
+   *
+   * @var bool
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $always_required = FALSE;
@@ -1567,7 +1574,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
     // know where to look for session stored values.
     $display_id = ($this->view->display_handler->isDefaulted('filters')) ? 'default' : $this->view->current_display;
 
-    // shortcut test.
+    // Shortcut test.
     $operator = !empty($this->options['expose']['use_operator']) && !empty($this->options['expose']['operator_id']);
 
     // False means that we got a setting that means to recurse ourselves,

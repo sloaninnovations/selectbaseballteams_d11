@@ -6,7 +6,9 @@ dependee's
 dependees
 drupalci
 druplicon
+drupalimage
 drush
+jswebassert
 langcode
 langcodes
 lullabot
