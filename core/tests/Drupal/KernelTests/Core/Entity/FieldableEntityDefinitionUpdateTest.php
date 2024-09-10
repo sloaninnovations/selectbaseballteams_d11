@@ -16,7 +16,6 @@ use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
  * @coversDefaultClass \Drupal\Core\Entity\EntityDefinitionUpdateManager
  *
  * @group Entity
- * @group #slow
  */
 class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
 
@@ -79,9 +78,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
   protected $testEntities = [];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'content_translation',
