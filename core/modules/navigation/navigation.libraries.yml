@@ -16,6 +16,7 @@ internal.navigation:
       css/components/top-bar.css: {}
       css/components/admin-toolbar-control-bar.css: {}
       css/components/toolbar-menu.css: {}
+      css/components/toolbar-message.css: {}
       css/components/toolbar-block.css: {}
   dependencies:
     - core/drupal.displace

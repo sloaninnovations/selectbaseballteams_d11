@@ -1,0 +1,20 @@
+{%
+  set classes = [
+    'toolbar-message',
+    'toolbar-message--type--' ~ type,
+  ]
+%}
+
+{% if url is not empty %}
+  <a {{ attributes.addClass(classes).setAttribute('href', url) }}>
+    <div class="toolbar-message__label">
+      {{ content }}
+    </div>
+  </a>
+{% else %}
+  <div {{ attributes.addClass(classes) }}>
+    <div class="toolbar-message__label">
+      {{ content }}
+    </div>
+  </div>
+{% endif %}

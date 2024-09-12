@@ -104,3 +104,59 @@ function demo_umami_toolbar() {
   }
   return $items;
 }
+
+/**
+ * Implements hook_preprocess_HOOK() for layouts.
+ */
+function demo_umami_preprocess_layout(&$variables) {
+  // Add a warning about using an experimental profile.
+  // Show warning only on administration pages.
+  $admin_context = \Drupal::service('router.admin_context');
+  if ($admin_context->isAdminRoute()) {
+
+    $layout_id = $variables['layout']->get('id');
+    if ($layout_id === 'navigation_layout') {
+      $url = 'https://www.drupal.org/node/2941833';
+      $link_to_help_page = \Drupal::moduleHandler()->moduleExists('help') && \Drupal::currentUser()->hasPermission('access help pages');
+      if ($link_to_help_page) {
+        $url = Url::fromRoute('help.page', ['name' => 'demo_umami'])->toString();
+      }
+
+      $block_render_array = [
+        '#theme' => 'block__navigation',
+        'content' => [
+          '#theme' => 'navigation__messages',
+          '#message_list' => [
+            [
+              '#theme' => 'navigation__message',
+              '#content' => [
+                '#markup' => t('This site is intended for demonstration purposes.'),
+              ],
+              '#url' => $url,
+            ],
+            [
+              '#theme' => 'navigation__message',
+              '#content' => [
+                '#markup' => t('This site is intended for demonstration purposes.'),
+              ],
+              '#url' => $url,
+              '#type' => 'error',
+            ],
+            [
+              '#theme' => 'navigation__message',
+              '#content' => [
+                '#markup' => t('This site is intended for demonstration purposes.'),
+              ],
+              '#url' => $url,
+              '#type' => 'warning',
+            ],
+          ],
+        ],
+      ];
+
+      if (isset($variables['content']['content'])) {
+        $variables['content']['content'][] = $block_render_array;
+      }
+    }
+  }
+}
