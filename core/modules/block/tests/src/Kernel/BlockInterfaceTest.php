@@ -69,6 +69,7 @@ class BlockInterfaceTest extends KernelTestBase {
       'label' => [
         '#type' => 'textfield',
         '#title' => 'Title',
+        '#description' => 'The title of the block as shown to the user.',
         '#maxlength' => 255,
         '#default_value' => 'Custom Display Message',
         '#required' => TRUE,
