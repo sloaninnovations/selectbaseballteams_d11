@@ -41,6 +41,7 @@ class Button extends FormElementBase {
       '#input' => TRUE,
       '#name' => 'op',
       '#is_button' => TRUE,
+      '#submit_button' => TRUE,
       '#executes_submit_callback' => FALSE,
       '#limit_validation_errors' => FALSE,
       '#process' => [
@@ -80,8 +81,10 @@ class Button extends FormElementBase {
    *   The $element with prepared variables ready for input.html.twig.
    */
   public static function preRenderButton($element) {
-    if (!isset($element['#attributes']['type'])) {
+    if($element['#submit_button']) {
       $element['#attributes']['type'] = 'submit';
+    } else {
+      $element['#attributes']['type'] = 'button';
     }
     Element::setAttributes($element, ['id', 'name', 'value']);
 
