@@ -30,11 +30,11 @@ mulrevpub
 olivero
 olivero's
 renderable
+prerender
 revlog
 revpub
-prerender
 simpletest
-sitename_title
+sitename
 subquery
 tempstore
 umami
