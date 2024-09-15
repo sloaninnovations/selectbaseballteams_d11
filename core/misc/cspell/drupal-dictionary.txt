@@ -34,7 +34,7 @@ prerender
 revlog
 revpub
 simpletest
-sitename
+sitename_title
 subquery
 tempstore
 umami
