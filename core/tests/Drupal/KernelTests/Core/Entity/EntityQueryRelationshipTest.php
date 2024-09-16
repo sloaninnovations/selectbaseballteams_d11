@@ -226,20 +226,31 @@ class EntityQueryRelationshipTest extends EntityKernelTestBase {
 
   /**
    * Tests a non-existent field name in a complex query relationship.
+   *
+   * @dataProvider providerTestInvalidFieldName
    */
-  public function testInvalidFieldName() {
+  public function testInvalidFieldName(string $field_name): void {
     $this->expectException(QueryException::class);
+    $this->expectExceptionMessage("Invalid specifier 'non_existent_field_name'");
 
     // Check that non-existent field names in a complex relationship query
     // throws a meaningful exception.
-    $non_existent_field_name = $this->randomMachineName();
-    $this->factory->get('entity_test')
-      ->condition("$non_existent_field_name.entity:user.name.value", $this->randomString(), '=')
+    $this->container->get('entity_type.manager')
+      ->getStorage('entity_test')
+      ->getQuery()
+      ->accessCheck()
+      ->condition($field_name, $this->randomString(), '=')
       ->execute();
+  }
 
-    $this->factory->get('entity_test')
-      ->condition("user_id.entity:user.$non_existent_field_name.value", $this->randomString(), '=')
-      ->execute();
+  /**
+   * Data provider for testInvalidFieldName().
+   */
+  public static function providerTestInvalidFieldName() {
+    return [
+      ['non_existent_field_name.entity:user.name.value'],
+      ['user_id.entity:user.non_existent_field_name.value'],
+    ];
   }
 
   /**
