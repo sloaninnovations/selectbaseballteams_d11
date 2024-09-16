@@ -231,7 +231,7 @@ class EntityQueryRelationshipTest extends EntityKernelTestBase {
    */
   public function testInvalidFieldName(string $field_name): void {
     $this->expectException(QueryException::class);
-    $this->expectExceptionMessage("Invalid specifier 'non_existent_field_name'");
+    $this->expectExceptionMessage("'non_existent_field_name' not found");
 
     // Check that non-existent field names in a complex relationship query
     // throws a meaningful exception.

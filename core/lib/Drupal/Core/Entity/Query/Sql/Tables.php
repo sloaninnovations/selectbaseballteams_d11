@@ -247,17 +247,15 @@ class Tables implements TablesInterface {
             $key++;
             $next = $specifiers[$key + 1];
           }
-          if (!$field_storage) {
-            // The specifier is neither a valid field name nor a relationship.
-            throw new QueryException("Invalid specifier '$specifier'");
-          }
           // Is this a field column?
-          $columns = $field_storage->getColumns();
-          if (isset($columns[$next]) || in_array($next, $table_mapping->getReservedColumns())) {
-            // Use it.
-            $sql_column = $table_mapping->getFieldColumnName($field_storage, $next);
-            // Do not process it again.
-            $key++;
+          if ($field_storage) {
+            $columns = $field_storage->getColumns();
+            if (isset($columns[$next]) || in_array($next, $table_mapping->getReservedColumns())) {
+              // Use it.
+              $sql_column = $table_mapping->getFieldColumnName($field_storage, $next);
+              // Do not process it again.
+              $key++;
+            }
           }
         }
         // If there are no additional specifiers but the field has a main
