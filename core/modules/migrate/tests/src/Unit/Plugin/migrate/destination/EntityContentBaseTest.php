@@ -71,7 +71,7 @@ class EntityContentBaseTest extends EntityTestBase {
       $this->entityFieldManager->reveal(),
       $this->prophesize(FieldTypePluginManagerInterface::class)->reveal(),
       $this->prophesize(AccountSwitcherInterface::class)->reveal(),
-      $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal()
+      $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal(),
     );
     $destination->setEntity(FALSE);
     $this->expectException(MigrateException::class);
