@@ -9,7 +9,8 @@ use Drupal\Core\Render\Element;
 /**
  * Provides an action button form element.
  *
- * When the button is pressed, the form will be submitted to Drupal, where it is
+ * When the button is pressed, unless #submit_button is set to
+ * FALSE, the form will be submitted to Drupal, where it is
  * validated and rebuilt. The submit handler is not invoked.
  *
  * Properties:
@@ -17,6 +18,8 @@ use Drupal\Core\Render\Element;
  *   form submission when validation for these elements or any child elements
  *   fails. Specify an empty array to suppress all form validation errors.
  * - #value: The text to be shown on the button.
+ * - #submit_button: This has default value TRUE. If set to FALSE the 'type'
+ *   attribute is set to 'button.'
  *
  *
  * Usage Example:
@@ -73,7 +76,7 @@ class Button extends FormElementBase {
    *
    * @param array $element
    *   An associative array containing the properties of the element.
-   *   Properties used: #attributes, #button_type, #name, #value. The
+   *   Properties used: #attributes, #button_type, #name, #submit_button, #value. The
    *   #button_type property accepts any value, though core themes have CSS that
    *   styles the following button_types appropriately: 'primary', 'danger'.
    *
