@@ -193,7 +193,7 @@ class Tables implements TablesInterface {
         $sql_column = $table_mapping->getFieldColumnName($field_storage, $column);
       }
       // The field is stored in a shared table.
-      else {
+      elseif ($field_storage) {
         // ensureEntityTable() determines whether an entity property will be
         // queried from the data table or the base table depending on where it
         // first finds the property. The data table is preferred, which is why
@@ -311,6 +311,12 @@ class Tables implements TablesInterface {
         else {
           throw new QueryException("Invalid specifier '$relationship_specifier'");
         }
+      }
+
+      // If the specifier is neither a valid field name nor a relationship,
+      // throw an exception.
+      if (!$field_storage) {
+        throw new QueryException("Invalid specifier '$specifier'");
       }
     }
     return "$table.$sql_column";
