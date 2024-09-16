@@ -107,9 +107,8 @@ class Tables implements TablesInterface {
         $column = $field_storage->getMainPropertyName();
       }
       else {
-        // If the specifier is neither a valid field name nor a relationship,
-        // throw an exception.
-        throw new QueryException("Invalid specifier '$specifier'");
+        $field_storage = FALSE;
+        $column = NULL;
       }
 
       // If there is revision support, all the revisions are being queried, and
@@ -247,6 +246,10 @@ class Tables implements TablesInterface {
             }
             $key++;
             $next = $specifiers[$key + 1];
+          }
+          if (!$field_storage) {
+            // The specifier is neither a valid field name nor a relationship.
+            throw new QueryException("Invalid specifier '$specifier'");
           }
           // Is this a field column?
           $columns = $field_storage->getColumns();
