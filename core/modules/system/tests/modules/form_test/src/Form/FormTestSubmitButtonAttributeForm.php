@@ -12,22 +12,19 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @internal
  */
-class FormTestSubmitButtonAttributeForm extends FormBase
-{
+class FormTestSubmitButtonAttributeForm extends FormBase {
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId()
-  {
+  public function getFormId() {
     return 'form_test_submit_button_attribute';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $customize = FALSE)
-  {
+  public function buildForm(array $form, FormStateInterface $form_state, $customize = FALSE) {
     $form['submit-button-attr'] = [
       '#type' => 'submit',
       '#submit_button' => TRUE,
@@ -47,8 +44,7 @@ class FormTestSubmitButtonAttributeForm extends FormBase
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state)
-  {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
   }
 
 }

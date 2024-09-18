@@ -84,9 +84,10 @@ class Button extends FormElementBase {
    *   The $element with prepared variables ready for input.html.twig.
    */
   public static function preRenderButton($element) {
-    if($element['#submit_button']) {
+    if ($element['#submit_button']) {
       $element['#attributes']['type'] = 'submit';
-    } else {
+    }
+    else {
       $element['#attributes']['type'] = 'button';
     }
     Element::setAttributes($element, ['id', 'name', 'value']);

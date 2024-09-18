@@ -149,7 +149,7 @@ class ElementTest extends BrowserTestBase {
   }
 
   /**
-   * Tests the submit_button attribute
+   * Tests the submit_button attribute.
    */
   protected function testSubmitButtonAttribute(): void {
     // Set the submit_button attribute to true
