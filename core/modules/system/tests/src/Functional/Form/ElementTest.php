@@ -152,12 +152,12 @@ class ElementTest extends BrowserTestBase {
    * Tests the submit_button attribute
    */
   protected function testSubmitButtonAttribute(): void {
-    // Set the attribute to false
+    // Set the submit_button attribute to true
     $this->drupalGet('form-test/submit-button-attribute');
-    $this->assertSession()->elementsCount('xpath', '//input[@type="button"]', 1);
-
-    $this->drupalGet('form-test/submit-button-attribute/customize');
     $this->assertSession()->elementsCount('xpath', '//input[@type="submit"]', 1);
+    // Set the submit_button attribute to false
+    $this->drupalGet('form-test/submit-button-attribute/customize');
+    $this->assertSession()->elementsCount('xpath', '//input[@type="button"]', 1);
   }
 
   /**
