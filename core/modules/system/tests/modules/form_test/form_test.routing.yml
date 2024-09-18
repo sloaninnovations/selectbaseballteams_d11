@@ -425,7 +425,7 @@ form_test.button_class:
   requirements:
     _access: 'TRUE'
 
-form_test.button_class:
+form_test.submit_button_attribute:
   path: '/form-test/submit-button-attribute/{customize}'
   defaults:
     _form: '\Drupal\form_test\Form\FormTestSubmitButtonAttributeForm'
