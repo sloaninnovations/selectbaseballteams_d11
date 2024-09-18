@@ -37,8 +37,9 @@ class FormTestSubmitButtonAttributeForm extends FormBase {
         '#submit_button' => FALSE,
         '#value' => $this->t('Submit if you can'),
       ];
-      return $form;
     }
+
+    return $form;
   }
 
   /**
