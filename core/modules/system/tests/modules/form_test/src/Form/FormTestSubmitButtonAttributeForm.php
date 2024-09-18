@@ -26,7 +26,7 @@ class FormTestSubmitButtonAttributeForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, $customize = FALSE) {
     $form['submit-button-attr'] = [
-      '#type' => 'submit',
+      '#type' => 'button',
       '#submit_button' => TRUE,
       '#value' => $this->t('Try to Submit'),
     ];
