@@ -32,6 +32,7 @@ class ElementTest extends BrowserTestBase {
     $this->testRadiosChecked();
     $this->testWrapperIds();
     $this->testButtonClasses();
+    $this->testSubmitButtonAttribute();
     $this->testGroupElements();
     $this->testRequiredFieldsetsAndDetails();
     $this->testFormAutocomplete();
