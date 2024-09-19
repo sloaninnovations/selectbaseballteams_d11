@@ -435,7 +435,7 @@ form_test.submit_button_attribute:
     _access: 'TRUE'
 
 form_test.details_form:
-  path: '/form-test/details-form'
+  path: '/form_test/details-form'
   defaults:
     _form: '\Drupal\form_test\Form\FormTestDetailsForm'
     _title: 'Form details form test'
