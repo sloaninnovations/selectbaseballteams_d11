@@ -24,7 +24,7 @@ class FormTestSubmitButtonAttributeForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $customize = FALSE) {
+  public function buildForm(array $form, FormStateInterface $form_state, $customize = FALSE): array {
     $form['submit-button-attr'] = [
       '#type' => 'button',
       '#submit_button' => TRUE,
