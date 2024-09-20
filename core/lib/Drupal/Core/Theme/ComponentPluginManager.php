@@ -11,6 +11,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
 use Drupal\Core\Theme\Component\ComponentValidator;
@@ -58,6 +59,8 @@ class ComponentPluginManager extends DefaultPluginManager {
    *   The compatibility checker.
    * @param \Drupal\Core\Theme\Component\ComponentValidator $componentValidator
    *   The component validator.
+   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $keyValueFactory
+   *   The key value factory.
    * @param string $appRoot
    *   The application root.
    */
@@ -71,6 +74,7 @@ class ComponentPluginManager extends DefaultPluginManager {
     protected FileSystemInterface $fileSystem,
     protected SchemaCompatibilityChecker $compatibilityChecker,
     protected ComponentValidator $componentValidator,
+    protected KeyValueFactoryInterface $keyValueFactory,
     protected string $appRoot,
   ) {
     // We are skipping the call to the parent constructor to avoid initializing
@@ -117,6 +121,22 @@ class ComponentPluginManager extends DefaultPluginManager {
       );
       throw new ComponentNotFoundException($message, $e->getCode(), $e);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinitions() {
+    $definitions = parent::getDefinitions();
+
+    $development_settings = $this->keyValueFactory->get('development_settings');
+    $twig_debug = $development_settings->get('twig_debug', FALSE);
+    $twig_cache_disable = $development_settings->get('twig_cache_disable', FALSE);
+    if ($twig_debug || $twig_cache_disable) {
+      return $this->findDefinitions();
+    }
+
+    return $definitions;
   }
 
   /**
