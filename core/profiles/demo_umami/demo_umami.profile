@@ -108,7 +108,7 @@ function demo_umami_toolbar() {
 /**
  * Implements hook_preprocess_HOOK() for layouts.
  */
-function demo_umami_preprocess_layout(&$variables) {
+function demo_umami_preprocess_layout(&$variables): void {
   // Add a warning about using an experimental profile.
   // Show warning only on administration pages.
   $admin_context = \Drupal::service('router.admin_context');
