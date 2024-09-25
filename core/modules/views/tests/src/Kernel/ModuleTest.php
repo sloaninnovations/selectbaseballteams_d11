@@ -29,9 +29,7 @@ class ModuleTest extends ViewsKernelTestBase {
   public static $testViews = ['test_view_status', 'test_view', 'test_argument', 'test_redirect_view'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field', 'user', 'block', 'node', 'views_test_data_alter'];
 

@@ -35,7 +35,7 @@ class RouteProviderTest extends KernelTestBase {
   use PathAliasTestTrait;
 
   /**
-   * Modules to enable.
+   * {@inheritdoc}
    */
   protected static $modules = [
     'url_alter_test',
@@ -536,7 +536,7 @@ class RouteProviderTest extends KernelTestBase {
       $this->assertCount(1, $routes, 'The correct number of routes was found.');
     }
     catch (ResourceNotFoundException) {
-      $this->fail('No matchout route found with 0 as argument value');
+      $this->fail('No matching route found with 0 as argument value');
     }
   }
 

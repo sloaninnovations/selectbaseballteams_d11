@@ -19,7 +19,6 @@ use GuzzleHttp\RequestOptions;
  * JSON:API integration test for the "User" content entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class UserTest extends ResourceTestBase {
 
@@ -128,10 +127,10 @@ class UserTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testDeleteIndividual(): void {
+  protected function doTestDeleteIndividual(): void {
     $this->config('user.settings')->set('cancel_method', 'user_cancel_delete')->save(TRUE);
 
-    parent::testDeleteIndividual();
+    parent::doTestDeleteIndividual();
   }
 
   /**
@@ -190,6 +189,21 @@ class UserTest extends ResourceTestBase {
         'type' => 'user--user',
         'attributes' => [
           'name' => 'Drama llama',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getPatchDocument() {
+    return [
+      'data' => [
+        'id' => $this->entity->uuid(),
+        'type' => 'user--user',
+        'attributes' => [
+          'name' => 'Drama llama 2',
         ],
       ],
     ];

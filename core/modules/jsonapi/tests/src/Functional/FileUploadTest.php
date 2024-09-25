@@ -24,7 +24,6 @@ use Psr\Http\Message\ResponseInterface;
  * Tests binary data file upload route.
  *
  * @group jsonapi
- * @group #slow
  */
 class FileUploadTest extends ResourceTestBase {
 
@@ -113,7 +112,7 @@ class FileUploadTest extends ResourceTestBase {
    *
    * @var array
    */
-  const SKIP_METHODS = ['testGetIndividual', 'testPostIndividual', 'testPatchIndividual', 'testDeleteIndividual', 'testCollection', 'testRelationships'];
+  const SKIP_METHODS = ['testGetIndividual', 'testIndividual', 'testCollection', 'testRelationships'];
 
   /**
    * {@inheritdoc}
@@ -288,7 +287,7 @@ class FileUploadTest extends ResourceTestBase {
     // This request fails despite the upload succeeding, because we're not
     // allowed to view the entity we're uploading to.
     $response = $this->fileRequest($uri, $this->testFileData);
-    $this->assertResourceErrorResponse(403, $this->getExpectedUnauthorizedAccessMessage('GET'), $uri, $response, FALSE, ['4xx-response', 'http_response'], ['url.query_args', 'url.site', 'user.permissions']);
+    $this->assertResourceErrorResponse(403, $this->getExpectedUnauthorizedAccessMessage('GET'), $uri, $response, FALSE, ['4xx-response', 'http_response'], ['url.query_args', 'url.site', 'user.permissions'], FALSE, 'UNCACHEABLE');
 
     $this->setUpAuthorization('GET');
 
@@ -722,7 +721,7 @@ class FileUploadTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessMessage($method) {
+  protected function getExpectedUnauthorizedAccessMessage($method): string {
     switch ($method) {
       case 'GET':
         return "The current user is not allowed to view this relationship. The 'view test entity' permission is required.";

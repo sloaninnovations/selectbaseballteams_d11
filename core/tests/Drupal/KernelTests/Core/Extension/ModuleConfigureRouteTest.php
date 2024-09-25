@@ -11,7 +11,6 @@ use Drupal\KernelTests\KernelTestBase;
 /**
  * Tests the configure route for core modules.
  *
- * @group #slow
  * @group Module
  */
 class ModuleConfigureRouteTest extends KernelTestBase {
@@ -47,17 +46,24 @@ class ModuleConfigureRouteTest extends KernelTestBase {
 
   /**
    * Tests if the module configure routes exists.
-   *
-   * @dataProvider coreModuleListDataProvider
    */
-  public function testModuleConfigureRoutes(string $module_name): void {
+  public function testModuleConfigureRoutes(): void {
+    foreach (static::coreModuleListDataProvider() as $module_name => $info) {
+      $this->doTestModuleConfigureRoutes($module_name);
+    }
+  }
+
+  /**
+   * Checks the configure route for a single module.
+   */
+  protected function doTestModuleConfigureRoutes(string $module_name): void {
     $module_info = $this->moduleInfo[$module_name]->info;
     if (!isset($module_info['configure'])) {
-      $this->markTestSkipped("$module_name has no configure route");
+      return;
     }
     $module_lifecycle = $module_info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
     if (isset($module_lifecycle) && $module_lifecycle === ExtensionLifecycle::DEPRECATED) {
-      $this->markTestSkipped("$module_name is $module_lifecycle");
+      return;
     }
     $this->container->get('module_installer')->install([$module_name]);
     $this->assertModuleConfigureRoutesExist($module_name, $module_info);
@@ -70,17 +76,24 @@ class ModuleConfigureRouteTest extends KernelTestBase {
    * deprecated module doesn't trigger a deprecation notice.
    *
    * @group legacy
-   *
-   * @dataProvider coreModuleListDataProvider
    */
-  public function testDeprecatedModuleConfigureRoutes(string $module_name): void {
+  public function testDeprecatedModuleConfigureRoutes(): void {
+    foreach (static::coreModuleListDataProvider() as $module_name => $info) {
+      $this->doTestDeprecatedModuleConfigureRoutes($module_name);
+    }
+  }
+
+  /**
+   * Check the configure route for a single module.
+   */
+  protected function doTestDeprecatedModuleConfigureRoutes(string $module_name): void {
     $module_info = $this->moduleInfo[$module_name]->info;
     if (!isset($module_info['configure'])) {
-      $this->markTestSkipped("$module_name has no configure route");
+      return;
     }
     $module_lifecycle = $module_info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
     if (isset($module_lifecycle) && $module_lifecycle !== ExtensionLifecycle::DEPRECATED) {
-      $this->markTestSkipped("$module_name is not $module_lifecycle");
+      return;
     }
     $this->container->get('module_installer')->install([$module_name]);
     $this->assertModuleConfigureRoutesExist($module_name, $module_info);
