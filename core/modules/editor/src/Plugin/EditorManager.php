@@ -18,6 +18,13 @@ use Drupal\editor\Attribute\Editor;
 class EditorManager extends DefaultPluginManager {
 
   /**
+   * Static cache of attachments.
+   *
+   * @var array
+   */
+  protected array $attachments = ['library' => []];
+
+  /**
    * Constructs an EditorManager object.
    *
    * @param \Traversable $namespaces
@@ -60,10 +67,12 @@ class EditorManager extends DefaultPluginManager {
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()
    */
   public function getAttachments(array $format_ids) {
-    $attachments = ['library' => []];
-
-    $settings = [];
+    $settings = $this->attachments['drupalSettings'] ?? [];
     foreach ($format_ids as $format_id) {
+      if (isset($settings['editor']['formats'][$format_id])) {
+        continue;
+      }
+
       $editor = editor_load($format_id);
       if (!$editor) {
         continue;
@@ -73,7 +82,7 @@ class EditorManager extends DefaultPluginManager {
       $plugin_definition = $plugin->getPluginDefinition();
 
       // Libraries.
-      $attachments['library'] = array_merge($attachments['library'], $plugin->getLibraries($editor));
+      $this->attachments['library'] = array_merge($this->attachments['library'], $plugin->getLibraries($editor));
 
       // Format-specific JavaScript settings.
       $settings['editor']['formats'][$format_id] = [
@@ -88,13 +97,13 @@ class EditorManager extends DefaultPluginManager {
     // Allow other modules to alter all JavaScript settings.
     $this->moduleHandler->alter('editor_js_settings', $settings);
 
-    if (empty($attachments['library']) && empty($settings)) {
+    if (empty($this->attachments['library']) && empty($settings)) {
       return [];
     }
 
-    $attachments['drupalSettings'] = $settings;
+    $this->attachments['drupalSettings'] = $settings;
 
-    return $attachments;
+    return $this->attachments;
   }
 
 }
