@@ -89,7 +89,7 @@ class EntityRevisionTest extends EntityTestBase {
       $this->entityFieldManager->reveal(),
       $this->prophesize(FieldTypePluginManagerInterface::class)->reveal(),
       $this->prophesize(AccountSwitcherInterface::class)->reveal(),
-      $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal()
+      $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal(),
     );
     $this->expectException(MigrateException::class);
     $this->expectExceptionMessage('The "foo" entity type does not support translations.');
