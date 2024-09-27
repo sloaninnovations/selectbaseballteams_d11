@@ -39,7 +39,7 @@ class DrupalPinnedDevDependenciesBuilder extends DrupalPackageBuilder {
    * Returns the initial package metadata that describes the metapackage.
    *
    * @return array
-   *   Initail metapackage which are core-recommended and have dependencies.
+   *   Initial metapackage which are core-recommended and have dependencies.
    */
   protected function initialPackageMetadata() {
     return [
