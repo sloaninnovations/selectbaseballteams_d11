@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\migrate_source_annotation_bc_test\Plugin\migrate\source;
 
 use Drupal\migrate_drupal\Plugin\migrate\source\EmptySource;
