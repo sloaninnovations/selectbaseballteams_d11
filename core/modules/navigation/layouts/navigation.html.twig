@@ -89,3 +89,14 @@
     document.documentElement.setAttribute('data-admin-toolbar', 'expanded');
   }
 </script>
+
+<div {{ control_bar_attributes.addClass('admin-toolbar-control-bar').setAttribute('data-drupal-admin-styles', '').setAttribute('data-offset-top', '') }}>
+  <div class="admin-toolbar-control-bar__content">
+    {% include '@navigation/toolbar-button.html.twig' with {
+      attributes: create_attribute({'aria-expanded': 'false', 'aria-controls': 'admin-toolbar', 'type': 'button'}),
+      icon: 'burger',
+      text: 'Expand sidebar'|t,
+      extra_classes: 'admin-toolbar-control-bar__burger',
+    } only %}
+  </div>
+</div>
