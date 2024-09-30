@@ -656,6 +656,11 @@ class EntityBaseTest extends EntityBase {
    */
   public $label;
 
+  /**
+   * The original, or NULL if the entity cannot be loaded.
+   */
+  public $original;
+
 }
 
 namespace Drupal\Core\Entity\KeyValueStore;
