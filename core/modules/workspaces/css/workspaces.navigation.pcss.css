@@ -3,6 +3,12 @@
  * Styling for the Workspaces navigation item.
  */
 
+/* Custom properties specifically for Workspaces when Navigation is enabled. */
+[data-drupal-admin-styles] {
+  --admin-toolbar-indicator-live: #87cc5f;
+}
+
+
 .toolbar-button--icon--workspaces {
   --icon: url(../assets/icons/workspaces.svg);
 }
@@ -21,14 +27,13 @@
 }
 
 .toolbar-button--workspaces--live {
-  color: white;
-  background-color: var(--admin-toolbar-color-green-500);
+  color: var(--admin-toolbar-color-gray-990);
+  background-color: var(--admin-toolbar-indicator-live);
 
   &:hover,
   &:focus,
   &:hover:focus,
   &.current {
-    color: white;
-    background-color: var(--admin-toolbar-color-green-500);
+    background-color: var(--admin-toolbar-indicator-live);
   }
 }
