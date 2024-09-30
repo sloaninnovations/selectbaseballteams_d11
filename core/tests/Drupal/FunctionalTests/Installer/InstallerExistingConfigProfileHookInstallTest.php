@@ -11,6 +11,9 @@ namespace Drupal\FunctionalTests\Installer;
  */
 class InstallerExistingConfigProfileHookInstallTest extends InstallerConfigDirectoryTestBase {
 
+  /**
+   * The profile to use.
+   */
   protected $profile = 'config_profile_with_hook_install';
 
   /**

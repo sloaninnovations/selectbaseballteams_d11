@@ -16,6 +16,9 @@ class InstallerExistingConfigNoConfigTest extends InstallerConfigDirectoryTestBa
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The profile to use.
+   */
   protected $profile = 'no_config_profile';
 
   /**

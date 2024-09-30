@@ -50,7 +50,7 @@ class ContentImportTest extends BrowserTestBase {
   use TaxonomyTestTrait;
 
   /**
-   * {@inheritdoc}
+   * The default theme.
    */
   protected $defaultTheme = 'stark';
 
@@ -72,6 +72,9 @@ class ContentImportTest extends BrowserTestBase {
     'user',
   ];
 
+  /**
+   * The directory with the source data.
+   */
   private readonly string $contentDir;
 
   /**
