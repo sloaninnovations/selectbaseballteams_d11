@@ -23,9 +23,10 @@ use PHPUnit\Framework\TestCase;
  * core/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures were also
  * copied from version 1.2.7.
  *
- * @coversDefaultClass \Drupal\Component\Annotation\Doctrine\DocParser
  * @group Annotation
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Drupal\Component\Annotation\Doctrine\DocParser::class)]
+#[\PHPUnit\Framework\Attributes\Group('Annotation')]
 class DocParserTest extends TestCase
 {
     public function testNestedArraysWithNestedAnnotation()
@@ -163,6 +164,7 @@ DOCBLOCK;
     /**
      * @group debug
      */
+    #[\PHPUnit\Framework\Attributes\Group('debug')]
     public function testTypicalMethodDocBlock()
     {
         $parser = $this->createTestParser();
@@ -531,9 +533,7 @@ DOCBLOCK;
         );
     }
 
-    /**
-     * @dataProvider getAnnotationVarTypeProviderValid
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getAnnotationVarTypeProviderValid')]
     public function testAnnotationWithVarType($attribute, $value)
     {
         $parser     = $this->createTestParser();
@@ -548,9 +548,7 @@ DOCBLOCK;
         $this->assertNotNull($result[0]->$attribute);
     }
 
-    /**
-     * @dataProvider getAnnotationVarTypeProviderInvalid
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getAnnotationVarTypeProviderInvalid')]
     public function testAnnotationWithVarTypeError($attribute,$type,$value,$given)
     {
         $parser     = $this->createTestParser();
@@ -567,9 +565,7 @@ DOCBLOCK;
     }
 
 
-    /**
-     * @dataProvider getAnnotationVarTypeArrayProviderInvalid
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getAnnotationVarTypeArrayProviderInvalid')]
     public function testAnnotationWithVarTypeArrayError($attribute,$type,$value,$given)
     {
         $parser     = $this->createTestParser();
@@ -585,9 +581,7 @@ DOCBLOCK;
         }
     }
 
-    /**
-     * @dataProvider getAnnotationVarTypeProviderValid
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getAnnotationVarTypeProviderValid')]
     public function testAnnotationWithAttributes($attribute, $value)
     {
         $parser     = $this->createTestParser();
@@ -603,9 +597,7 @@ DOCBLOCK;
         $this->assertNotNull($result[0]->$getter());
     }
 
-   /**
-     * @dataProvider getAnnotationVarTypeProviderInvalid
-     */
+   #[\PHPUnit\Framework\Attributes\DataProvider('getAnnotationVarTypeProviderInvalid')]
     public function testAnnotationWithAttributesError($attribute,$type,$value,$given)
     {
         $parser     = $this->createTestParser();
@@ -622,9 +614,7 @@ DOCBLOCK;
     }
 
 
-   /**
-     * @dataProvider getAnnotationVarTypeArrayProviderInvalid
-     */
+   #[\PHPUnit\Framework\Attributes\DataProvider('getAnnotationVarTypeArrayProviderInvalid')]
     public function testAnnotationWithAttributesWithVarTypeArrayError($attribute,$type,$value,$given)
     {
         $parser     = $this->createTestParser();
@@ -863,9 +853,7 @@ DOCBLOCK;
         return $provider;
     }
 
-    /**
-     * @dataProvider getConstantsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getConstantsProvider')]
     public function testSupportClassConstants($docblock, $expected)
     {
         $parser = $this->createTestParser();
@@ -967,6 +955,7 @@ DOCBLOCK;
     /**
      * @group DDC-575
      */
+    #[\PHPUnit\Framework\Attributes\Group('DDC-575')]
     public function testRegressionDDC575()
     {
         $parser = $this->createTestParser();
@@ -1000,6 +989,7 @@ DOCBLOCK;
     /**
      * @group DDC-77
      */
+    #[\PHPUnit\Framework\Attributes\Group('DDC-77')]
     public function testAnnotationWithoutClassIsIgnoredWithoutWarning()
     {
         $parser = new DocParser();
@@ -1012,6 +1002,7 @@ DOCBLOCK;
     /**
      * @group DCOM-168
      */
+    #[\PHPUnit\Framework\Attributes\Group('DCOM-168')]
     public function testNotAnAnnotationClassIsIgnoredWithoutWarning()
     {
         $parser = new DocParser();
@@ -1034,6 +1025,7 @@ DOCBLOCK;
     /**
      * @group DCOM-41
      */
+    #[\PHPUnit\Framework\Attributes\Group('DCOM-41')]
     public function testAnnotationDoesNotThrowExceptionWhenAtSignIsNotFollowedByIdentifier()
     {
         $parser = new DocParser();
@@ -1045,6 +1037,7 @@ DOCBLOCK;
     /**
      * @group DCOM-41
      */
+    #[\PHPUnit\Framework\Attributes\Group('DCOM-41')]
     public function testAnnotationThrowsExceptionWhenAtSignIsNotFollowedByIdentifierInNestedAnnotation()
     {
         $this->expectException('\Doctrine\Common\Annotations\AnnotationException');
@@ -1056,6 +1049,7 @@ DOCBLOCK;
     /**
      * @group DCOM-56
      */
+    #[\PHPUnit\Framework\Attributes\Group('DCOM-56')]
     public function testAutoloadAnnotation()
     {
         self::assertFalse(
@@ -1089,6 +1083,7 @@ DOCBLOCK;
     /**
      * @group DDC-78
      */
+    #[\PHPUnit\Framework\Attributes\Group('DDC-78')]
     public function testSyntaxErrorWithContextDescription()
     {
         $this->expectException('\Doctrine\Common\Annotations\AnnotationException');
@@ -1101,6 +1096,7 @@ DOCBLOCK;
     /**
      * @group DDC-183
      */
+    #[\PHPUnit\Framework\Attributes\Group('DDC-183')]
     public function   testSyntaxErrorWithUnknownCharacters()
     {
         $docblock = <<<DOCBLOCK
@@ -1128,6 +1124,7 @@ DOCBLOCK;
     /**
      * @group DCOM-14
      */
+    #[\PHPUnit\Framework\Attributes\Group('DCOM-14')]
     public function testIgnorePHPDocThrowTag()
     {
         $docblock = <<<DOCBLOCK
@@ -1151,6 +1148,7 @@ DOCBLOCK;
     /**
      * @group DCOM-38
      */
+    #[\PHPUnit\Framework\Attributes\Group('DCOM-38')]
     public function testCastInt()
     {
         $parser = $this->createTestParser();
@@ -1163,6 +1161,7 @@ DOCBLOCK;
     /**
      * @group DCOM-38
      */
+    #[\PHPUnit\Framework\Attributes\Group('DCOM-38')]
     public function testCastNegativeInt()
     {
         $parser = $this->createTestParser();
@@ -1175,6 +1174,7 @@ DOCBLOCK;
     /**
      * @group DCOM-38
      */
+    #[\PHPUnit\Framework\Attributes\Group('DCOM-38')]
     public function testCastFloat()
     {
         $parser = $this->createTestParser();
@@ -1187,6 +1187,7 @@ DOCBLOCK;
     /**
      * @group DCOM-38
      */
+    #[\PHPUnit\Framework\Attributes\Group('DCOM-38')]
     public function testCastNegativeFloat()
     {
         $parser = $this->createTestParser();
@@ -1286,6 +1287,7 @@ DOCBLOCK;
     /**
      * @group 44
      */
+    #[\PHPUnit\Framework\Attributes\Group('44')]
     public function testSupportsEscapedQuotedValues()
     {
         $result = $this->createTestParser()->parse('@Drupal\Tests\Component\Annotation\Doctrine\Name(foo="""bar""")');

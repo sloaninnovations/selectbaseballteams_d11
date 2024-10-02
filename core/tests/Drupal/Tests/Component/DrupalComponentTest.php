@@ -6,6 +6,8 @@ namespace Drupal\Tests\Component;
 
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,6 +15,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @group Component
  */
+#[Group('Component')]
 class DrupalComponentTest extends TestCase {
 
   /**
@@ -40,9 +43,8 @@ class DrupalComponentTest extends TestCase {
    *
    * @param string $component_path
    *   The path to the component.
-   *
-   * @dataProvider getComponents
    */
+  #[DataProvider('getComponents')]
   public function testComponentLicense(string $component_path): void {
     $this->assertFileExists($component_path . DIRECTORY_SEPARATOR . 'LICENSE.txt');
     $this->assertSame('e84dac1d9fbb5a4a69e38654ce644cea769aa76b', hash_file('sha1', $component_path . DIRECTORY_SEPARATOR . 'LICENSE.txt'));
@@ -137,9 +139,9 @@ class DrupalComponentTest extends TestCase {
   }
 
   /**
-   * @covers \Drupal\Tests\Component\DrupalComponentTest::assertNoCoreUsage
-   * @dataProvider providerAssertNoCoreUsage
+   * @legacy-covers \Drupal\Tests\Component\DrupalComponentTest::assertNoCoreUsage
    */
+  #[DataProvider('providerAssertNoCoreUsage')]
   public function testAssertNoCoreUsage($expected_pass, $file_data): void {
     // Set up a virtual file to read.
     $vfs_root = vfsStream::setup('root');

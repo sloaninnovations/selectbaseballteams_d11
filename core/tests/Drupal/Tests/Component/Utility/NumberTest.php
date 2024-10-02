@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\Number;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -12,17 +15,14 @@ use PHPUnit\Framework\TestCase;
  *
  * @group Utility
  *
- * @coversDefaultClass \Drupal\Component\Utility\Number
- *
  * @see \Drupal\Component\Utility\Number
  */
+#[CoversClass(Number::class)]
+#[Group('Utility')]
 class NumberTest extends TestCase {
 
   /**
    * Tests Number::validStep() without offset.
-   *
-   * @dataProvider providerTestValidStep
-   * @covers ::validStep
    *
    * @param numeric $value
    *   The value argument for Number::validStep().
@@ -30,7 +30,10 @@ class NumberTest extends TestCase {
    *   The step argument for Number::validStep().
    * @param bool $expected
    *   Expected return value from Number::validStep().
+   *
+   * @legacy-covers ::validStep
    */
+  #[DataProvider('providerTestValidStep')]
   public function testValidStep($value, $step, $expected): void {
     $return = Number::validStep($value, $step);
     $this->assertEquals($expected, $return);
@@ -38,9 +41,6 @@ class NumberTest extends TestCase {
 
   /**
    * Tests Number::validStep() with offset.
-   *
-   * @dataProvider providerTestValidStepOffset
-   * @covers ::validStep
    *
    * @param numeric $value
    *   The value argument for Number::validStep().
@@ -50,7 +50,10 @@ class NumberTest extends TestCase {
    *   The offset argument for Number::validStep().
    * @param bool $expected
    *   Expected return value from Number::validStep().
+   *
+   * @legacy-covers ::validStep
    */
+  #[DataProvider('providerTestValidStepOffset')]
   public function testValidStepOffset($value, $step, $offset, $expected): void {
     $return = Number::validStep($value, $step, $offset);
     $this->assertEquals($expected, $return);
@@ -121,15 +124,15 @@ class NumberTest extends TestCase {
   /**
    * Tests the alphadecimal conversion functions.
    *
-   * @dataProvider providerTestConversions
-   * @covers ::intToAlphadecimal
-   * @covers ::alphadecimalToInt
-   *
    * @param int $value
    *   The integer value.
    * @param string $expected
    *   The expected alphadecimal value.
+   *
+   * @legacy-covers ::intToAlphadecimal
+   * @legacy-covers ::alphadecimalToInt
    */
+  #[DataProvider('providerTestConversions')]
   public function testConversions($value, $expected): void {
     $this->assertSame(Number::intToAlphadecimal($value), $expected);
     $this->assertSame($value, Number::alphadecimalToInt($expected));
