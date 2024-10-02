@@ -490,7 +490,8 @@ class TwigExtension extends AbstractExtension {
   /**
    * Removes whitespaces between HTML tags.
    *
-   * @param string|null $content The content to remove whitespaces from.
+   * @param string|null $content
+   *   The content to remove whitespaces from.
    *
    * @return string
    */
