@@ -235,31 +235,18 @@ class UpdateMiscTest extends UpdateTestBase {
    * Checks for any errors when the email list is empty.
    */
   public function testEmptyEmailListNotification(): void {
-    $this->drupalLogin($this->drupalCreateUser([
-      'administer site configuration',
-    ]));
+    // Set the email list to an array with an empty string.
+    $this->config('update.settings')->set('notification.emails', [''])->save();
 
-    // Submit the configuration form with an empty email list.
-    $url = Url::fromRoute('update.settings');
-    $this->drupalGet($url);
-    $this->assertSession()->fieldExists('update_notify_emails')->setValue('');
-    $this->submitForm([], 'Save configuration');
-
-    // Install dblog and system_mail_failure_test modules in order to log the
-    // error message and to replace the mail service with a malfunctioning one.
-    $this->container->get('module_installer')->install(['dblog', 'system_mail_failure_test']);
-
-    // Change the default email interface.
-    $this->container->get('config.factory')->getEditable('system.mail')
-      ->set('interface.default', 'test_php_mail_failure')
-      ->save();
-
-    // Execute cron to try to send the update email.
+    // Execute the cron to in order to send update e-mails.
     $this->cronRun();
 
-    // No log message should exist since an empty email list should not send email.
-    $logs = \Drupal::database()->query("SELECT * FROM {watchdog} WHERE type = 'mail'")->fetchAll();
-    $this->assertEmpty($logs);
+    $captured_emails = \Drupal::state()->get('system.test_mail_collector');
+    $sent_message = end($captured_emails);
+
+    // Check no e-mails were sent.
+    $this->assertFalse($sent_message);
+
   }
 
 }
