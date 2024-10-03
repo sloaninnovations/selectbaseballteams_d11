@@ -175,7 +175,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
       $this->migration = $migration;
     }
     if ($this instanceof MigrateDumpAlterInterface) {
-      static::migrateDumpAlter($this);
+      $this::migrateDumpAlter($this);
     }
 
     $this->prepareMigration($this->migration);
@@ -268,12 +268,6 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
     $this->logger = $this->prophesize(LoggerChannelInterface::class);
     $this->container->set('logger.channel.migrate', $this->logger->reveal());
     \Drupal::setContainer($this->container);
-  }
-
-  /**
-   * Allows altering the database dump file.
-   */
-  public static function migrateDumpAlter(MigrateTestBase $test) {
   }
 
 }
