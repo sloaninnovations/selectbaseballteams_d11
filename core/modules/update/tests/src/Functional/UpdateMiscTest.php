@@ -235,6 +235,9 @@ class UpdateMiscTest extends UpdateTestBase {
    * Checks for any errors when the email list is empty.
    */
   public function testEmptyEmailListNotification(): void {
+    // Reset the mail collector.
+    \Drupal::state()->set('system.test_mail_collector', []);
+
     // Set the email list to an array with an empty string.
     $this->config('update.settings')->set('notification.emails', [''])->save();
 
