@@ -260,25 +260,6 @@ class FilePathTest extends MigrateUpgradeTestBase {
   }
 
   /**
-   * Checks public and private files are copied but not temporary files.
-   */
-  protected function assertFileMigrations() {
-    $fs = \Drupal::service('file_system');
-    $files = $this->getManagedFiles();
-    foreach ($files as $file) {
-      preg_match('/^(private|public|temporary):/', $file['uri'], $matches);
-      $scheme = $matches[1];
-      $filepath = $fs->realpath($file['uri']);
-      if ($scheme === 'temporary') {
-        $this->assertFileDoesNotExist($filepath);
-      }
-      else {
-        $this->assertFileExists($filepath);
-      }
-    }
-  }
-
-  /**
    * Gets the file data.
    *
    * @return string[][]
