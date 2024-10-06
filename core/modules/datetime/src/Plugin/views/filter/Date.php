@@ -142,7 +142,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
           $field = &$form[$identifier . '_wrapper'];
         }
         // Set the form error message.
-        $form_state->setError($field, $this->t('Invalid date format.'));
+        $form_state->setError($field ?? '', $this->t('Invalid date format.'));
         break;
       }
     }
