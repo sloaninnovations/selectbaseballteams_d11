@@ -141,11 +141,9 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
         elseif (isset($form[$identifier . '_wrapper'])) {
           $field = &$form[$identifier . '_wrapper'];
         }
-        else  {
-          if (isset($field)) {
-            // Set the form error message.
-            $form_state->setError($field, $this->t('Invalid date format.'));
-          }
+        if (isset($field)) {
+          // Set the form error message.
+          $form_state->setError($field, $this->t('Invalid date format.'));
         }
       }
     }
