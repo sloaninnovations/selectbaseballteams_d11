@@ -92,8 +92,7 @@ class DateFilterTest extends ViewTestBase {
     $this->submitForm($edit, 'Apply');
     $this->assertSession()->pageTextContains('Invalid date format.');
     $this->assertSession()->pageTextNotContains('Exception: DateTime object not set.');
-
-
+    
     $this->assertSession()->optionExists('edit-field-date-value-op', '=');
     $this->assertSession()->optionNotExists('edit-field-date-value-op', '>');
     $this->assertSession()->optionNotExists('edit-field-date-value-op', '>=');
