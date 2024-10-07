@@ -9,9 +9,9 @@ use Drupal\Core\Render\Element;
 /**
  * Provides an action button form element.
  *
- * When the button is pressed, unless #submit_button is set to
- * FALSE, the form will be submitted to Drupal, where it is
- * validated and rebuilt. The submit handler is not invoked.
+ * When the button is pressed, unless #submit_button is set to FALSE, the form
+ * will be submitted to Drupal, where it is validated and rebuilt. The submit
+ * handler is not invoked.
  *
  * Properties:
  * - #limit_validation_errors: An array of form element keys that will block
@@ -75,10 +75,10 @@ class Button extends FormElementBase {
    * Prepares a #type 'button' render element for input.html.twig.
    *
    * @param array $element
-   *   An associative array containing the properties of the element.
-   *   Properties used: #attributes, #button_type, #name, #submit_button, #value. The
-   *   #button_type property accepts any value, though core themes have CSS that
-   *   styles the following button_types appropriately: 'primary', 'danger'.
+   * An associative array containing the properties of the element. Properties
+   * used: #attributes, #button_type, #name, #submit_button, #value. The 
+   * #button_type property accepts any value, though core themes have CSS that
+   * styles the following button_types appropriately: 'primary', 'danger'.
    *
    * @return array
    *   The $element with prepared variables ready for input.html.twig.
