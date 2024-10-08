@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Update;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
-
-// cspell:ignore mlid
 
 /**
  * Tests update of menu tree storage fields.
@@ -38,27 +35,9 @@ class MenuTreeStorageSchemaUpdateTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
-      // Start with a bare install of Drupal 10.3.0.
+      // Start with a bare installation of Drupal 10.3.0.
       DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz',
     ];
-  }
-
-  /**
-   * Tests DB behavior in initial state.
-   */
-  public function testSchemaLength(): void {
-    if (\Drupal::service('database')->databaseType() == 'sqlite') {
-      $this->markTestSkipped("This test does not support the SQLite database driver.");
-    }
-
-    $this->expectException(DatabaseExceptionWrapper::class);
-    $this->connection->update('menu_tree')
-      ->fields([
-        'url' => $this->randomMachineName(300),
-        'route_param_key' => $this->randomMachineName(300),
-      ])
-      ->condition('mlid', 1)
-      ->execute();
   }
 
   /**
@@ -69,14 +48,25 @@ class MenuTreeStorageSchemaUpdateTest extends UpdatePathTestBase {
       $this->markTestSkipped("This test does not support the SQLite database driver.");
     }
 
+    $results = $this->connection->query('SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = :menu AND COLUMN_NAME IN ( :column_names[] )', [
+      ':menu' => $this->connection->schema()->prefixNonTable('menu_tree'),
+      ':column_names[]' => ['route_param_key', 'url']
+    ])->fetchCol();
+    $this->assertNotEmpty($results);
+    foreach ($results as $result) {
+      self::assertEquals(255, $result);
+    }
+
     $this->runUpdates();
-    $this->connection->update('menu_tree')
-      ->fields([
-        'url' => $this->randomMachineName(300),
-        'route_param_key' => $this->randomMachineName(300),
-      ])
-      ->condition('mlid', 1)
-      ->execute();
+
+    $results = $this->connection->query('SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = :menu AND COLUMN_NAME IN ( :column_names[] )', [
+      ':menu' => $this->connection->schema()->prefixNonTable('menu_tree'),
+      ':column_names[]' => ['route_param_key', 'url']
+    ])->fetchCol();
+    $this->assertNotEmpty($results);
+    foreach ($results as $result) {
+      self::assertEquals(2048, $result);
+    }
   }
 
 }
