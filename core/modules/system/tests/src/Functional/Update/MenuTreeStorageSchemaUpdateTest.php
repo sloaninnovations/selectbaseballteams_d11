@@ -50,7 +50,7 @@ class MenuTreeStorageSchemaUpdateTest extends UpdatePathTestBase {
 
     $results = $this->connection->query('SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = :menu AND COLUMN_NAME IN ( :column_names[] )', [
       ':menu' => $this->connection->schema()->prefixNonTable('menu_tree'),
-      ':column_names[]' => ['route_param_key', 'url']
+      ':column_names[]' => ['route_param_key', 'url'],
     ])->fetchCol();
     $this->assertNotEmpty($results);
     foreach ($results as $result) {
@@ -61,7 +61,7 @@ class MenuTreeStorageSchemaUpdateTest extends UpdatePathTestBase {
 
     $results = $this->connection->query('SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = :menu AND COLUMN_NAME IN ( :column_names[] )', [
       ':menu' => $this->connection->schema()->prefixNonTable('menu_tree'),
-      ':column_names[]' => ['route_param_key', 'url']
+      ':column_names[]' => ['route_param_key', 'url'],
     ])->fetchCol();
     $this->assertNotEmpty($results);
     foreach ($results as $result) {
