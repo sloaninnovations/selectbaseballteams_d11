@@ -27,7 +27,7 @@ const dialogDeprecationsTest = {
           }, 100);
         })
         .assert.deprecationErrorExists(
-          'jQuery event dialogButtonsChange is deprecated in 10.4.0 and is removed from Drupal:12.0.0. See https://www.drupal.org/node/3464202',
+          'jQuery event dialogButtonsChange is deprecated in 11.2.0 and is removed from Drupal:12.0.0. See https://www.drupal.org/node/3464202',
         );
     });
   },

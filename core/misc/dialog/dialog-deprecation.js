@@ -43,7 +43,7 @@
         // If triggered by jQuery.
         if (!e?.originalEvent) {
           Drupal.deprecationError({
-            message: `jQuery event dialogButtonsChange is deprecated in 10.4.0 and is removed from Drupal:12.0.0. See https://www.drupal.org/node/3464202`,
+            message: `jQuery event dialogButtonsChange is deprecated in 11.2.0 and is removed from Drupal:12.0.0. See https://www.drupal.org/node/3464202`,
           });
           dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
         }

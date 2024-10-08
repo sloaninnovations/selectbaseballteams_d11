@@ -17,16 +17,14 @@
       // Provide a known 'drupal-modal' DOM element for Drupal-based modal
       // dialogs. Non-modal dialogs are responsible for creating their own
       // elements, since there can be multiple non-modal dialogs at a time.
-      const existingModal = document.getElementById('drupal-modal');
-      if (!existingModal) {
+      if (!document.querySelector('#drupal-modal')) {
         // Add 'ui-front' jQuery UI class so jQuery UI widgets like autocomplete
         // sit on top of dialogs. For more information see
         // http://api.jqueryui.com/theming/stacking-elements/.
-        const newModal = document.createElement('div');
-        newModal.id = 'drupal-modal';
-        newModal.classList.add('ui-front');
-        newModal.style.display = 'none';
-        document.body.appendChild(newModal);
+        document.body.insertAdjacentHTML(
+          'beforeend',
+          '<div id="drupal-modal" class="ui-front" style="display:none"></div>',
+        );
       }
 
       // Special behaviors specific when attaching content within a dialog.
@@ -93,11 +91,11 @@
      * @return {Array}
      *   An array of buttons that need to be added to the button area.
      */
-    prepareDialogButtons(dialog) {
+    prepareDialogButtons($dialog) {
       const buttons = [];
       const buttonSelectors =
         '.form-actions input[type=submit], .form-actions a.button, .form-actions a.action-link';
-      const buttonElements = dialog.querySelectorAll(buttonSelectors);
+      const buttonElements = $dialog[0].querySelectorAll(buttonSelectors);
 
       buttonElements.forEach((button) => {
         button.style.display = 'none';
@@ -171,26 +169,26 @@
       response.dialogOptions.drupalAutoButtons
     ) {
       response.dialogOptions.buttons =
-        Drupal.behaviors.dialog.prepareDialogButtons(dialog);
+        Drupal.behaviors.dialog.prepareDialogButtons($(dialog));
     }
 
     const dialogButtonsChange = () => {
-      const buttons = Drupal.behaviors.dialog.prepareDialogButtons(dialog);
+      const buttons = Drupal.behaviors.dialog.prepareDialogButtons($(dialog));
       $(dialog).dialog('option', 'buttons', buttons);
     };
 
     // Bind dialogButtonsChange.
     dialog.addEventListener('dialogButtonsChange', dialogButtonsChange);
-    dialog.addEventListener('removeDialogButtonsChange', () => {
+    dialog.addEventListener('dialog:beforeclose', (event) => {
       dialog.removeEventListener('dialogButtonsChange', dialogButtonsChange);
     });
 
     // Open the dialog itself.
-    response.dialogOptions = response.dialogOptions || {};
+    const createdDialog = Drupal.dialog(dialog, response.dialogOptions);
     if (response.dialogOptions.modal) {
-      Drupal.dialog(dialog, response.dialogOptions).showModal();
+      createdDialog.showModal();
     } else {
-      Drupal.dialog(dialog, response.dialogOptions).show();
+      createdDialog.show();
     }
 
     // Add the standard Drupal class for buttons for style consistency.
@@ -227,9 +225,6 @@
         dialog.remove();
       }
     }
-
-    // Unbind dialogButtonsChange.
-    dialog?.dispatchEvent(new CustomEvent('removeDialogButtonsChange'));
   };
 
   /**
@@ -279,23 +274,8 @@
       e.preventDefault();
       e.stopPropagation();
     };
+    cancelButton?.removeEventListener('click', cancelClick);
     cancelButton?.addEventListener('click', cancelClick);
-    cancelButton?.addEventListener('removeClick', () => {
-      cancelButton.removeEventListener('click', cancelClick);
-    });
-  });
-
-  /**
-   * Removes all 'dialog' listeners.
-   *
-   * @param {DrupalDialogEvent} e
-   *   The event triggered.
-   * @param {Drupal.dialog~dialogDefinition} dialog
-   *   The dialog instance.
-   */
-  window.addEventListener('dialog:beforeclose', (e) => {
-    const cancelButton = e.target.querySelector('.dialog-cancel');
-    cancelButton?.dispatchEvent(new CustomEvent('removeClick'));
   });
 
   /**
