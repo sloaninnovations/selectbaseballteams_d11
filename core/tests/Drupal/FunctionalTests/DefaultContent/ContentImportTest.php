@@ -49,7 +49,7 @@ class ContentImportTest extends BrowserTestBase {
   use RecipeTestTrait;
   use TaxonomyTestTrait;
 
-   /**
+  /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
