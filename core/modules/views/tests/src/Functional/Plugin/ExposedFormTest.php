@@ -213,6 +213,8 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertSession()->statusCodeEquals(200);
     // Test the type has been reset.
     $this->assertSession()->fieldValueEquals('edit-type', 'All');
+    // Test that the reset button didn't start a session.
+    $this->assertSessionCookieOnClient(FALSE);
 
     // Test the button is hidden after reset.
     $this->assertSession()->fieldNotExists('edit-reset');
@@ -564,6 +566,15 @@ class ExposedFormTest extends ViewTestBase {
     // Reload the page and ensure the filter is selected.
     $this->drupalGet('test_remember_selected');
     $this->assertTrue($this->assertSession()->optionExists('type', 'page')->isSelected());
+  }
+
+  /**
+   * Asserts whether a session cookie is present on the client or not.
+   *
+   * @internal
+   */
+  public function assertSessionCookieOnClient(bool $expected_present): void {
+    $this->assertEquals($expected_present, (bool) $this->getSession()->getCookie($this->getSessionName()));
   }
 
 }
