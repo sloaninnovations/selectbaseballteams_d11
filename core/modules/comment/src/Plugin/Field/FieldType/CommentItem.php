@@ -106,7 +106,11 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
 
     $settings = $this->getSettings();
 
+    // Check access for anonymous user.
     $anonymous_user = new AnonymousUserSession();
+    $anonymous_user_access = \Drupal::entityTypeManager()
+      ->getAccessControlHandler('comment')
+      ->createAccess($this->getSetting('comment_type'), $anonymous_user);
 
     $element['default_mode'] = [
       '#type' => 'checkbox',
@@ -132,7 +136,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
         CommentInterface::ANONYMOUS_MAY_CONTACT => $this->t('Anonymous posters may leave their contact information'),
         CommentInterface::ANONYMOUS_MUST_CONTACT => $this->t('Anonymous posters must leave their contact information'),
       ],
-      '#access' => $anonymous_user->hasPermission('post comments'),
+      '#access' => $anonymous_user_access,
     ];
     $element['form_location'] = [
       '#type' => 'checkbox',
