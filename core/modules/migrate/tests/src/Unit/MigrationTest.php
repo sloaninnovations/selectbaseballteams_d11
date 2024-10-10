@@ -264,7 +264,7 @@ class MigrationTest extends UnitTestCase {
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  public function testAddRequiredDependencies(?array $initial_dependency, array $addition, array $expected) {
+  public function testAddRequiredDependencies(?array $initial_dependency, array $addition, array $expected): void {
     $migration = new TestMigration($initial_dependency);
     $migration->setMigrationPluginManager($this->getMockPluginManager());
 
@@ -275,7 +275,7 @@ class MigrationTest extends UnitTestCase {
   /**
    * Provides data for testAddRequiredDependencies.
    */
-  public static function providerTestAddRequiredDependencies() {
+  public static function providerTestAddRequiredDependencies(): array {
     return [
       'NULL' => [
         NULL,
@@ -349,7 +349,7 @@ class MigrationTest extends UnitTestCase {
    * @covers ::addOptionalDependencies
    * @dataProvider providerTestAddOptionalDependencies
    */
-  public function testAddOptionalDependencies(?array $initial_dependency, array $addition, array $expected) {
+  public function testAddOptionalDependencies(?array $initial_dependency, array $addition, array $expected): void {
     $migration = new TestMigration($initial_dependency);
     $migration->setMigrationPluginManager($this->getMockPluginManager());
 
@@ -360,7 +360,7 @@ class MigrationTest extends UnitTestCase {
   /**
    * Provides data for testAddOptionalDependencies.
    */
-  public static function providerTestAddOptionalDependencies() {
+  public static function providerTestAddOptionalDependencies(): array {
     return [
       'NULL' => [
         NULL,
