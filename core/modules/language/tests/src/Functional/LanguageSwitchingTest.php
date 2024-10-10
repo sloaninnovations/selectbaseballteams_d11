@@ -97,7 +97,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     // @todo This is testing the current behavior with the big_pipe module
     //   enabled. This behavior is a bug will be fixed in
     //   https://www.drupal.org/project/drupal/issues/3349201.
-    $this->doTestLanguageBlock404($block->label(), '<front>');
+    $this->doTestLanguageBlock404($block->label(), 'system/404');
   }
 
   /**

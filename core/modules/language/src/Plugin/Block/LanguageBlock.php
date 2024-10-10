@@ -113,16 +113,11 @@ class LanguageBlock extends BlockBase implements ContainerFactoryPluginInterface
         '#set_active_class' => TRUE,
       ];
     }
-    return $build;
-  }
 
-  /**
-   * {@inheritdoc}
-   *
-   * @todo Make cacheable in https://www.drupal.org/node/2232375.
-   */
-  public function getCacheMaxAge() {
-    return 0;
+    // Add cache contexts for things that might cause links to change.
+    $build['#cache']['contexts'] = ['user.permissions', 'url.path', 'url.query_args', 'languages:' . $this->getDerivativeId()];
+
+    return $build;
   }
 
 }
