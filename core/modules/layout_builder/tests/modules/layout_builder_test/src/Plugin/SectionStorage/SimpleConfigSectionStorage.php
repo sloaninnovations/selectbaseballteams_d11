@@ -16,6 +16,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\layout_builder\Attribute\SectionStorage;
+use Drupal\layout_builder\ConfigSectionListTrait;
 use Drupal\layout_builder\Plugin\SectionStorage\SectionStorageLocalTaskProviderInterface;
 use Drupal\layout_builder\Routing\LayoutBuilderRoutesTrait;
 use Drupal\layout_builder\Section;
@@ -38,6 +39,7 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
   use ContextAwarePluginTrait;
   use LayoutBuilderRoutesTrait;
   use SectionListTrait;
+  use ConfigSectionListTrait;
 
   /**
    * The config factory.
@@ -208,6 +210,15 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
    */
   public function isApplicable(RefinableCacheableDependencyInterface $cacheability) {
     return TRUE;
+  }
+
+  /**
+   * Gets the UUID generator.
+   *
+   * @return \Drupal\Component\Uuid\UuidInterface
+   */
+  protected function uuidGenerator() {
+    return \Drupal::service('uuid');
   }
 
 }

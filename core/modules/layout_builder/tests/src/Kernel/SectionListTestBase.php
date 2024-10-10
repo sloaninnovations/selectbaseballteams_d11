@@ -191,28 +191,6 @@ abstract class SectionListTestBase extends EntityKernelTestBase {
   }
 
   /**
-   * Tests adding a new component (as in config actions).
-   * @return void
-   */
-  public function testAddComponent(): void {
-    $this->assertCount(1, $this->sectionList->getSection(0)->getComponents());
-    $this->sectionList->addComponent(0, 1, [
-      'uuid' => '30000000-0000-1000-a000-000000000000',
-      'region' => [
-        'layout_test_plugin' => 'content',
-        'layout_2' => 'region_2',
-      ],
-      'default_region' => 'content',
-      'id' => 'my_plugin_id',
-    ]);
-    $this->assertCount(2, $this->sectionList->getSection(0)->getComponents());
-    $this->assertSame('content', $this->sectionList
-      ->getSection(0)->getComponent('30000000-0000-1000-a000-000000000000')->getRegion());
-    $this->assertSame('my_plugin_id', $this->sectionList
-      ->getSection(0)->getComponent('30000000-0000-1000-a000-000000000000')->getPluginId());
-  }
-
-  /**
    * Asserts that the field list has the expected sections.
    *
    * @param \Drupal\layout_builder\Section[] $expected
