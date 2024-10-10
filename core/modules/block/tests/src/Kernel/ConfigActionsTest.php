@@ -73,7 +73,7 @@ class ConfigActionsTest extends KernelTestBase {
    */
   public function testPlaceBlockActionOnlyWorksOnBlocks(string $action): void {
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage("The \"$action\" plugin does not exist.");
+    $this->expectExceptionMessage("The \"user_role\" entity does not support the \"$action\" config action.");
     $this->configActionManager->applyAction($action, 'user.role.anonymous', []);
   }
 
@@ -95,7 +95,7 @@ class ConfigActionsTest extends KernelTestBase {
    * @testWith ["placeBlockInDefaultTheme", "olivero", "header"]
    *           ["placeBlockInAdminTheme", "claro", "page_bottom"]
    */
-  public function testPlaceBlockInTheme(string $action, string $expected_theme, string $expected_region): void {
+  public function testPlaceBlockInDynamicRegion(string $action, string $expected_theme, string $expected_region): void {
     $this->configActionManager->applyAction($action, 'block.block.test_block', [
       'plugin' => 'system_powered_by_block',
       'region' => [
@@ -119,9 +119,26 @@ class ConfigActionsTest extends KernelTestBase {
     ]);
   }
 
+  /**
+   * @testWith ["placeBlockInDefaultTheme", "olivero"]
+   *           ["placeBlockInAdminTheme", "claro"]
+   */
+  public function testPlaceBlockInStaticRegion(string $action, string $expected_theme): void {
+    $this->configActionManager->applyAction($action, 'block.block.test_block', [
+      'plugin' => 'system_powered_by_block',
+      'region' => 'content',
+    ]);
+
+    $block = Block::load('test_block');
+    $this->assertInstanceOf(Block::class, $block);
+    $this->assertSame('system_powered_by_block', $block->getPluginId());
+    $this->assertSame($expected_theme, $block->getTheme());
+    $this->assertSame('content', $block->getRegion());
+  }
+
   public function testPlaceBlockInDefaultRegion(): void {
     $this->config('system.theme')->set('default', 'umami')->save();
-    $this->testPlaceBlockInTheme('placeBlockInDefaultTheme', 'umami', 'content');
+    $this->testPlaceBlockInDynamicRegion('placeBlockInDefaultTheme', 'umami', 'content');
   }
 
   public function testPlaceBlockAtPosition(): void {

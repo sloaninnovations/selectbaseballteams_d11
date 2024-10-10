@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views;
 
+use Drupal\Component\Utility\FilterArray;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
@@ -94,7 +95,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    */
@@ -758,7 +759,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
     // Filter any empty matches (Like from '++' in a string) and reset the
     // array keys. 'strlen' is used as the filter callback so we do not lose
     // 0 values (would otherwise evaluate == FALSE).
-    $value = array_values(array_filter($value, 'strlen'));
+    $value = array_values(FilterArray::removeEmptyStrings($value));
 
     if ($force_int) {
       $value = array_map('intval', $value);
