@@ -103,7 +103,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateExposed(&$form, FormStateInterface $form_state) {
+  public function validateExposed(&$form, FormStateInterface $form_state): void {
     // Do not validate value if filter is not exposed or grouped.
     if (empty($this->options['exposed']) || $this->options['is_grouped']) {
       return;
