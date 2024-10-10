@@ -26,7 +26,7 @@ trait ConfigSectionListTrait {
   /**
    * Adds a component to a given section.
    *
-   * @param (int) $section
+   * @param int $section
    *   The section delta.
    * @param int $position
    *   The position index inside that section.
