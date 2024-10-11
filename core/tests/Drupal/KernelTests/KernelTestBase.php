@@ -43,6 +43,8 @@ use Symfony\Component\HttpFoundation\Request;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamPrintVisitor;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\Tests\HiddenFieldSelector;
+use Drupal\Tests\WebAssert;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -214,7 +216,17 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected bool $usesSuperUserAccessPolicy;
 
   /**
+   * Mink session manager.
+   *
+   * This is lazily initialized by the first call to self::drupalGet().
+   *
+   * @var \Behat\Mink\Mink|null
+   */
+  protected ?Mink $mink;
+
+  /**
    * The Mink session.
+   * KILL
    *
    * This is lazily initialised.
    *
@@ -934,14 +946,17 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * @see \Drupal\Tests\BrowserTestBase::getHttpClient()
    */
   protected function drupalGet($path, array $options = [], array $headers = []) {
-    if (!isset($this->minkSession)) {
-      // Initialise the Mink session if this is the first request.
-      $http_kernel = $this->container->get('http_kernel');
-      $browserkit_client = new KernelTestHttpKernelBrowser($http_kernel);
-      $driver = new BrowserKitDriver($browserkit_client);
-      $session = new Session($driver);
-      $session->start();
-    }
+    $session = $this->getSession();
+
+    // // todo convert to using initMink
+    // if (!isset($this->minkSession)) {
+    //   // Initialise the Mink session if this is the first request.
+    //   $http_kernel = $this->container->get('http_kernel');
+    //   $browserkit_client = new KernelTestHttpKernelBrowser($http_kernel);
+    //   $driver = new BrowserKitDriver($browserkit_client);
+    //   $session = new Session($driver);
+    //   $session->start();
+    // }
 
     $session->visit($path);
 
@@ -951,6 +966,26 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     //   $html_output .= $this->formatHtmlOutputHeaders($response->headers->all());
     //   $this->htmlOutput($html_output);
     // }
+  }
+
+  /**
+   * Returns Mink session.
+   *
+   * @param string $name
+   *   (optional) Name of the session. Defaults to the active session.
+   *
+   * @return \Behat\Mink\Session
+   *   The active Mink session object.
+   */
+  public function getSession($name = NULL) {
+    // Lazily initialize the Mink session. We do this because unlike Browser
+    // tests where there should definitely be requests made, this is not
+    // necessarily the case with Kernel tests.
+    if (!isset($this->mink)) {
+      $this->initMink();
+    }
+
+    return $this->mink->getSession($name);
   }
 
   /**
@@ -986,19 +1021,21 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->mink = new Mink();
     $this->mink->registerSession('default', $session);
     $this->mink->setDefaultSessionName('default');
-    $this->registerSessions();
+    // Don't need this.
+    // $this->registerSessions();
 
-    $this->initFrontPage();
+    // TODO: do we need this?
+    // $this->initFrontPage();
 
     // Copies cookies from the current environment, for example, XDEBUG_SESSION
     // in order to support Xdebug.
     // @see BrowserTestBase::initFrontPage()
-    $cookies = $this->extractCookiesFromRequest(\Drupal::request());
-    foreach ($cookies as $cookie_name => $values) {
-      foreach ($values as $value) {
-        $session->setCookie($cookie_name, $value);
-      }
-    }
+    // $cookies = $this->extractCookiesFromRequest(\Drupal::request());
+    // foreach ($cookies as $cookie_name => $values) {
+    //   foreach ($values as $value) {
+    //     $session->setCookie($cookie_name, $value);
+    //   }
+    // }
 
     return $session;
   }
@@ -1017,6 +1054,20 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $browserkit_client = new KernelTestHttpKernelBrowser($http_kernel);
     $driver = new BrowserKitDriver($browserkit_client);
     return $driver;
+  }
+
+  /**
+   * Returns WebAssert object.
+   *
+   * @param string $name
+   *   (optional) Name of the session. Defaults to the active session.
+   *
+   * @return \Drupal\Tests\WebAssert
+   *   A new web-assert option for asserting the presence of elements with.
+   */
+  public function assertSession($name = NULL) {
+    $this->addToAssertionCount(1);
+    return new WebAssert($this->getSession($name));
   }
 
   /**
