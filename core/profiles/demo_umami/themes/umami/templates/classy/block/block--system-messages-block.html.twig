@@ -1,0 +1,48 @@
+{#
+/**
+ * @file
+ * Default theme implementation for the messages block.
+ *
+ * Removes wrapper elements from block so that empty block does not appear when
+ * there are no messages.
+ *
+ * Available variables:
+ * - content: The content of this block.
+ *
+ * @ingroup themeable
+ */
+#}
+{{ content }}
+
+<template id="umami-messages-template">
+  <style>
+    .content {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .heading {
+      position: absolute !important;
+      overflow: hidden;
+      clip: rect(1px, 1px, 1px, 1px);
+      width: 1px;
+      height: 1px;
+      word-wrap: normal;
+    }
+
+    .icon {
+      flex: 0 0 1rem;
+      width: 1rem;
+      height: 1rem;
+      background-image: var(--umami-message-icon);
+    }
+  </style>
+  <h2 class="heading">
+    <slot name="title"></slot>
+  </h2>
+  <div class="content">
+    <div class="icon"></div>
+    <slot name="content"></slot>
+  </div>
+</template>

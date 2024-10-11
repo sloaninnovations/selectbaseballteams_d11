@@ -9,16 +9,6 @@
   color: inherit;
   overflow-wrap: break-word;
 }
-.messages__content {
-  padding-inline-start: 24px;
-  background-image: var(--umami-message-icon);
-  background-repeat: no-repeat;
-  background-position-x: left;
-  background-position-y: center;
-}
-[dir="rtl"] .messages__content {
-  background-position-x: right;
-}
 .messages--status {
   --umami-message-icon: url(/core/misc/icons/73b355/check.svg);
 
@@ -44,12 +34,11 @@
   color: #cc2a00;
 }
 .messages__list {
+  display: grid;
+  gap: 0.769em;
   margin: 0;
   padding: 0;
   list-style: none;
-}
-.messages__item + .messages__item {
-  margin-top: 0.769em;
 }
 .messages__wrapper {
   display: grid;
