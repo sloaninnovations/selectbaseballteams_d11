@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests;
 
+use Behat\Mink\Session;
 use Drupal\Component\FileCache\ApcuFileCacheBackend;
 use Drupal\Component\FileCache\FileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
@@ -207,6 +208,15 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * @see \Drupal\Core\Session\SuperUserAccessPolicy
    */
   protected bool $usesSuperUserAccessPolicy;
+
+  /**
+   * The Mink session.
+   *
+   * This is lazily initialised.
+   *
+   * @var \Behat\Mink\Session|null
+   */
+  protected ?Session $minkSession;
 
   /**
    * {@inheritdoc}
