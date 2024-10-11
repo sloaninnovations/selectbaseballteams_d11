@@ -930,6 +930,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    *
    * @todo say this doesn't handle redirects -- in BTB it does.
    *
+   * @todo mention how to log in using UserCreationTrait.
+   *
    * @param string|\Drupal\Core\Url $path
    *   Drupal path or URL to load into Mink controlled browser.
    * @param array $options
