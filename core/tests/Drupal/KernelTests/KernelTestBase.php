@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Drupal\KernelTests;
 
 use Behat\Mink\Session;
+use Behat\Mink\Driver\BrowserKitDriver;
+use Behat\Mink\Mink;
+use Behat\Mink\Selector\SelectorsHandler;
 use Drupal\Component\FileCache\ApcuFileCacheBackend;
 use Drupal\Component\FileCache\FileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
@@ -28,6 +31,7 @@ use Drupal\Tests\TestRequirementsTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use Drupal\TestTools\Extension\SchemaInspector;
+use Drupal\TestTools\HttpKernel\KernelTestHttpKernelBrowser;
 use Drupal\TestTools\TestVarDumper;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Exception;
@@ -907,6 +911,112 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
         throw new \RuntimeException("$module module is not uninstalled after uninstalling it.");
       }
     }
+  }
+
+  /**
+   * Retrieves a Drupal path or an absolute path.
+   *
+   * @todo say this doesn't handle redirects -- in BTB it does.
+   *
+   * @param string|\Drupal\Core\Url $path
+   *   Drupal path or URL to load into Mink controlled browser.
+   * @param array $options
+   *   (optional) Options to be forwarded to the URL generator.
+   * @param string[] $headers
+   *   An array containing additional HTTP request headers, the array keys are
+   *   the header names and the array values the header values. This is useful
+   *   to set for example the "Accept-Language" header for requesting the page
+   *   in a different language. Note that not all headers are supported, for
+   *   example the "Accept" header is always overridden by the browser. For
+   *   testing REST APIs it is recommended to obtain a separate HTTP client
+   *   using getHttpClient() and performing requests that way.
+   *
+   * @see \Drupal\Tests\BrowserTestBase::getHttpClient()
+   */
+  protected function drupalGet($path, array $options = [], array $headers = []) {
+    if (!isset($this->minkSession)) {
+      // Initialise the Mink session if this is the first request.
+      $http_kernel = $this->container->get('http_kernel');
+      $browserkit_client = new KernelTestHttpKernelBrowser($http_kernel);
+      $driver = new BrowserKitDriver($browserkit_client);
+      $session = new Session($driver);
+      $session->start();
+    }
+
+    $session->visit($path);
+
+    // if ($this->htmlOutputEnabled) {
+    //   $html_output = 'GET request to: ' . $url;
+    //   $html_output .= '<hr />' . $content;
+    //   $html_output .= $this->formatHtmlOutputHeaders($response->headers->all());
+    //   $this->htmlOutput($html_output);
+    // }
+  }
+
+  /**
+   * Initializes Mink sessions.
+   */
+  protected function initMink() {
+    $driver = $this->getDefaultDriverInstance();
+
+    // TODO: won't work, there is no guzzle!
+    // if ($driver instanceof BrowserKitDriver) {
+    // this bit not needed
+    //   // Turn off curl timeout. Having a timeout is not a problem in a normal
+    //   // test running, but it is a problem when debugging. Also, disable SSL
+    //   // peer verification so that testing under HTTPS always works.
+    //   /** @var \GuzzleHttp\Client $client */
+    //   $client = $this->container->get('http_client_factory')->fromOptions([
+    //     'timeout' => NULL,
+    //     'verify' => FALSE,
+    //   ]);
+
+    //   // Inject a Guzzle middleware to generate debug output for every request
+    //   // performed in the test.
+    //   $handler_stack = $client->getConfig('handler');
+    //   $handler_stack->push($this->getResponseLogHandler());
+
+    //   $driver->getClient()->setClient($client);
+    // }
+
+    $selectors_handler = new SelectorsHandler([
+      'hidden_field_selector' => new HiddenFieldSelector(),
+    ]);
+    $session = new Session($driver, $selectors_handler);
+    $this->mink = new Mink();
+    $this->mink->registerSession('default', $session);
+    $this->mink->setDefaultSessionName('default');
+    $this->registerSessions();
+
+    $this->initFrontPage();
+
+    // Copies cookies from the current environment, for example, XDEBUG_SESSION
+    // in order to support Xdebug.
+    // @see BrowserTestBase::initFrontPage()
+    $cookies = $this->extractCookiesFromRequest(\Drupal::request());
+    foreach ($cookies as $cookie_name => $values) {
+      foreach ($values as $value) {
+        $session->setCookie($cookie_name, $value);
+      }
+    }
+
+    return $session;
+  }
+
+  /**
+   * Gets an instance of the default Mink driver.
+   *
+   * @return \Behat\Mink\Driver\DriverInterface
+   *   Instance of default Mink driver.
+   *
+   * @throws \InvalidArgumentException
+   *   When provided default Mink driver class can't be instantiated.
+   */
+  protected function getDefaultDriverInstance() {
+    $http_kernel = $this->container->get('http_kernel');
+    $browserkit_client = new KernelTestHttpKernelBrowser($http_kernel);
+    $driver = new BrowserKitDriver($browserkit_client);
+    return $driver;
   }
 
   /**
