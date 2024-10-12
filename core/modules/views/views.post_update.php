@@ -68,7 +68,7 @@ function views_post_update_views_data_argument_plugin_id(?array &$sandbox = NULL
 /**
  * Clean-up empty remember_roles display settings for views filters.
  */
-function views_post_update_update_remember_role_empty(&$sandbox) {
+function views_post_update_update_remember_role_empty(array &$sandbox): void {
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function ($view) {
     $display_settings = $view->get('display');
     $save = FALSE;
