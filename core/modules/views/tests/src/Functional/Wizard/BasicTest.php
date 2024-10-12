@@ -257,6 +257,8 @@ class BasicTest extends WizardTestBase {
     $expose_settings = [
       'options[expose][remember]' => 1,
       "options[expose][remember_roles][$role_id]" => $role_id,
+      "options[expose][remember_roles][anonymous]" => '0',
+      "options[expose][remember_roles][authenticated]" => '0',
     ];
     $this->drupalGet('admin/structure/views/nojs/handler/user_list_view/page_1/filter/roles_target_id');
     $this->submitForm($expose_settings, 'Apply');
