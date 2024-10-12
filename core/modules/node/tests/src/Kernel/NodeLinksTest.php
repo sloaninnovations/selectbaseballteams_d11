@@ -76,7 +76,6 @@ class NodeLinksTest extends KernelTestBase {
 
     // Links are displayed by default.
     $this->drupalGet('node');
-    return;
     $this->assertSession()->pageTextContains($node->getTitle());
     $this->assertSession()->linkExists('Read more');
 
