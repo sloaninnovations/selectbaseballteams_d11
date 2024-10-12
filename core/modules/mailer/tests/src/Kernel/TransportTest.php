@@ -10,6 +10,7 @@ use Drupal\mailer_transport_factory_kernel_test\Transport\CanaryTransport;
 use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
  * Tests the transport factory service.
@@ -70,7 +71,7 @@ class TransportTest extends KernelTestBase {
    * @covers ::createTransport
    */
   public function testDefaultTestMailFactory(): void {
-    $actual = $this->container->get('mailer.transport');
+    $actual = $this->container->get(TransportInterface::class);
     $this->assertInstanceOf(NullTransport::class, $actual);
   }
 
@@ -81,7 +82,7 @@ class TransportTest extends KernelTestBase {
   public function testBuiltinFactory(string $schema, string $host, string $expected): void {
     $this->setUpMailerDsnConfigOverride($schema, $host);
 
-    $actual = $this->container->get('mailer.transport');
+    $actual = $this->container->get(TransportInterface::class);
     $this->assertInstanceOf($expected, $actual);
   }
 
@@ -108,7 +109,7 @@ class TransportTest extends KernelTestBase {
     $this->setUpMailerDsnConfigOverride('sendmail', 'default', options: [
       'command' => '/usr/local/bin/sendmail -bs',
     ]);
-    $actual = $this->container->get('mailer.transport');
+    $actual = $this->container->get(TransportInterface::class);
     $this->assertInstanceOf(SendmailTransport::class, $actual);
   }
 
@@ -127,7 +128,7 @@ class TransportTest extends KernelTestBase {
       'command' => '/usr/bin/bc',
     ]);
     $this->expectExceptionMessage('Unsafe sendmail command /usr/bin/bc');
-    $this->container->get('mailer.transport');
+    $this->container->get(TransportInterface::class);
   }
 
   /**
@@ -137,7 +138,7 @@ class TransportTest extends KernelTestBase {
     $this->setUpMailerDsnConfigOverride('drupal.no-transport', 'default');
 
     $this->expectExceptionMessage('The "drupal.no-transport" scheme is not supported');
-    $this->container->get('mailer.transport');
+    $this->container->get(TransportInterface::class);
   }
 
   /**
@@ -148,7 +149,7 @@ class TransportTest extends KernelTestBase {
 
     $this->setUpMailerDsnConfigOverride('drupal.test-canary', 'default');
 
-    $actual = $this->container->get('mailer.transport');
+    $actual = $this->container->get(TransportInterface::class);
     $this->assertInstanceOf(CanaryTransport::class, $actual);
   }
 
