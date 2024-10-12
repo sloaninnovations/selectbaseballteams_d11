@@ -233,20 +233,20 @@ class BasicTest extends WizardTestBase {
    */
   public function testUserRolesFilter(): void {
     // Create a view for user entity and add a role filter settings.
-    $leading_slash_view = [];
-    $leading_slash_view['label'] = $this->randomMachineName(16);
-    $leading_slash_view['id'] = 'user_list_view';
-    $leading_slash_view['description'] = $this->randomMachineName(16);
-    $leading_slash_view['show[wizard_key]'] = 'users';
-    $leading_slash_view['page[create]'] = 1;
-    $leading_slash_view['page[title]'] = $this->randomMachineName(16);
-    $leading_slash_view['page[path]'] = '/user_list_view';
+    $post_data = [];
+    $post_data['label'] = $this->randomMachineName(16);
+    $post_data['id'] = 'user_list_view';
+    $post_data['description'] = $this->randomMachineName(16);
+    $post_data['show[wizard_key]'] = 'users';
+    $post_data['page[create]'] = 1;
+    $post_data['page[title]'] = $this->randomMachineName(16);
+    $post_data['page[path]'] = '/user_list_view';
     $role = Role::create(['label' => $this->randomMachineName(10)]);
     $role->save();
     $role_id = $role->id();
     $this->drupalGet('admin/structure/views/add');
-    $this->submitForm($leading_slash_view, 'Save and edit');
-    $this->assertEquals($leading_slash_view['page[path]'], $this->cssSelect('#views-page-1-path')[0]->getText());
+    $this->submitForm($post_data, 'Save and edit');
+    $this->assertEquals($post_data['page[path]'], $this->cssSelect('#views-page-1-path')[0]->getText());
 
     // Add Role exposed filter.
     $this->drupalGet('admin/structure/views/nojs/add-handler/user_list_view/page_1/filter');
@@ -271,7 +271,7 @@ class BasicTest extends WizardTestBase {
     $view->setDisplay('page_1');
     $result = $view->display_handler->getOption('filters')['roles_target_id']['expose']['remember_roles'];
     $expected = [
-      $role_id => $role_id
+      $role_id => $role_id,
     ];
     $this->assertEquals($expected, $result);
   }
