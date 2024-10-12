@@ -271,7 +271,7 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
    *   TRUE if the view has any disable role.
    */
   public function needsRememberRolesExposedFilterUpdate(ViewEntityInterface $view): bool {
-    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) use ($view) {
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) {
       return $this->processRememberRolesExposedFilterUpdate($handler_type, $handler);
     });
   }
@@ -298,4 +298,5 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
     }
     return FALSE;
   }
+
 }
