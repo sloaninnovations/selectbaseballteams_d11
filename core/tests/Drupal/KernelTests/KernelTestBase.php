@@ -944,16 +944,13 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
 
     $session->visit($path);
 
-    // TODO: This doesn't work yet because $this->siteDirectory is in the VFS
-    // by this point, which means that initBrowserOutputFile() sets up
-    // $this->htmlOutputTestId incorrectly.
-    // if ($this->htmlOutputEnabled) {
-    //   $html_output = 'GET request to: ' . $path;
-    //   $out = $session->getPage()->getContent();
-    //   $html_output .= '<hr />' . $out;
-    //   $html_output .= $this->getHtmlOutputHeaders();
-    //   $this->htmlOutput($html_output);
-    // }
+    if ($this->htmlOutputEnabled) {
+      $html_output = 'GET request to: ' . $path;
+      $out = $session->getPage()->getContent();
+      $html_output .= '<hr />' . $out;
+      $html_output .= $this->getHtmlOutputHeaders();
+      $this->htmlOutput($html_output);
+    }
   }
 
   /**
