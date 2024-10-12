@@ -227,4 +227,51 @@ class BasicTest extends WizardTestBase {
     }
   }
 
+  /**
+   * Tests user role exposed filter options.
+   */
+  public function testUserRolesFilter() {
+    // Create a view for user entity and add a role filter settings.
+    $leading_slash_view = [];
+    $leading_slash_view['label'] = $this->randomMachineName(16);
+    $leading_slash_view['id'] = 'user_list_view';
+    $leading_slash_view['description'] = $this->randomMachineName(16);
+    $leading_slash_view['show[wizard_key]'] = 'users';
+    $leading_slash_view['page[create]'] = 1;
+    $leading_slash_view['page[title]'] = $this->randomMachineName(16);
+    $leading_slash_view['page[path]'] = '/user_list_view';
+    $this->drupalGet('admin/structure/views/add');
+    $this->submitForm($leading_slash_view, 'Save and edit');
+    $this->assertEquals($leading_slash_view['page[path]'], $this->cssSelect('#views-page-1-path')[0]->getText());
+
+    // Add Role exposed filter.
+    $this->drupalGet('admin/structure/views/nojs/add-handler/user_list_view/page_1/filter');
+    $this->submitForm(['name[user__roles.roles_target_id]' => TRUE], 'Add and configure filter criteria');
+    $edit = ['options[expose_button][checkbox][checkbox]' => TRUE];
+    $this->drupalGet('admin/structure/views/nojs/handler/user_list_view/page_1/filter/roles_target_id');
+    $this->submitForm($edit, 'Expose filter');
+    $this->submitForm($edit, 'Apply');
+    $this->clickLink('User: Roles (exposed)');
+    $this->assertSession()->checkboxChecked('options[expose_button][checkbox][checkbox]');
+    $expose_settings = [
+      'options[expose][remember]' => 1,
+      'options[expose][remember_roles][anonymous]' => 'anonymous',
+      'options[expose][remember_roles][authenticated]' => 'authenticated',
+    ];
+    $this->drupalGet('admin/structure/views/nojs/handler/user_list_view/page_1/filter/roles_target_id');
+    $this->submitForm($expose_settings, 'Apply');
+    $this->drupalGet('admin/structure/views/view/user_list_view/edit/page_1');
+    $this->submitForm([], 'Save');
+
+    // Load view and check settings.
+    $view = Views::getView('user_list_view');
+    $view->setDisplay('page_1');
+    $result = $view->display_handler->getOption('filters')['roles_target_id']['expose']['remember_roles'];
+    $expected = [
+      "anonymous" => "anonymous",
+      "authenticated" => "authenticated",
+    ];
+    $this->assertEquals($expected, $result);
+  }
+
 }
