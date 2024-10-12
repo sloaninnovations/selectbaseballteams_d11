@@ -241,9 +241,12 @@ class BasicTest extends WizardTestBase {
     $post_data['page[create]'] = 1;
     $post_data['page[title]'] = $this->randomMachineName(16);
     $post_data['page[path]'] = '/user_list_view';
-    $role = Role::create(['label' => $this->randomMachineName(10)]);
+    $role_id = $this->randomMachineName(10);
+    $role = Role::create([
+      'id' => $role_id,
+      'label' => $this->randomString(10),
+    ]);
     $role->save();
-    $role_id = $role->id();
     $this->drupalGet('admin/structure/views/add');
     $this->submitForm($post_data, 'Save and edit');
     $this->assertEquals($post_data['page[path]'], $this->cssSelect('#views-page-1-path')[0]->getText());

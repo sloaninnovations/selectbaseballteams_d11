@@ -68,32 +68,10 @@ function views_post_update_views_data_argument_plugin_id(?array &$sandbox = NULL
 /**
  * Clean-up empty remember_roles display settings for views filters.
  */
-function views_post_update_update_remember_role_empty(array &$sandbox): void {
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function ($view) {
-    $display_settings = $view->get('display');
-    $save = FALSE;
-
-    foreach ($display_settings as &$display) {
-
-      if (empty($display['display_options']['filters'])) {
-        continue;
-      }
-
-      foreach ($display['display_options']['filters'] as &$filter_value) {
-
-        if (empty($filter_value['expose']['remember_roles'])) {
-          continue;
-        }
-
-        foreach (array_keys($filter_value['expose']['remember_roles'], '0', TRUE) as $role_key) {
-          unset($filter_value['expose']['remember_roles'][$role_key]);
-          $save = TRUE;
-        }
-      }
-    }
-    if ($save) {
-      $view->set('display', $display_settings);
-    }
-    return $save;
+function views_post_update_update_remember_role_empty(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsRememberRolesExposedFilterUpdate($view);
   });
 }
