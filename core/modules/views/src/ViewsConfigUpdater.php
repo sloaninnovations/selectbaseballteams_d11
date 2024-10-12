@@ -272,7 +272,7 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
    */
   public function needsRememberRolesExposedFilterUpdate(ViewEntityInterface $view): bool {
     return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) {
-      return $this->processRememberRolesExposedFilterUpdate($handler_type, $handler);
+      return $this->processRememberRolesExposedFilterUpdate($handler, $handler_type);
     });
   }
 
