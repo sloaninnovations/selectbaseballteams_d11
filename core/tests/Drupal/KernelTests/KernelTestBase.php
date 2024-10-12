@@ -943,7 +943,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    *
    * @see \Drupal\Tests\BrowserTestBase::getHttpClient()
    */
-  protected function drupalGet($path, array $options = [], array $headers = []) {
+  protected function drupalGet($path, array $options = [], array $headers = []): void {
     $session = $this->getSession();
 
     $session->visit($path);
@@ -982,7 +982,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   /**
    * Initializes Mink sessions.
    */
-  protected function initMink() {
+  protected function initMink(): void {
     $driver = $this->getDefaultDriverInstance();
 
     $selectors_handler = new SelectorsHandler([
