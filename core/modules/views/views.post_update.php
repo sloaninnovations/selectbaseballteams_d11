@@ -72,6 +72,6 @@ function views_post_update_update_remember_role_empty(?array &$sandbox = NULL): 
   /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
   $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
-    return $view_config_updater->needsRememberRolesExposedFilterUpdate($view);
+    return $view_config_updater->needsRememberRolesUpdate($view);
   });
 }
