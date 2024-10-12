@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Functional\Wizard;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Url;
+use Drupal\user\Entity\Role;
 use Drupal\views\Views;
 
 /**
@@ -240,6 +241,9 @@ class BasicTest extends WizardTestBase {
     $leading_slash_view['page[create]'] = 1;
     $leading_slash_view['page[title]'] = $this->randomMachineName(16);
     $leading_slash_view['page[path]'] = '/user_list_view';
+    $role = Role::create(['label' => $this->randomMachineName(10)]);
+    $role->save();
+    $role_id = $role->id();
     $this->drupalGet('admin/structure/views/add');
     $this->submitForm($leading_slash_view, 'Save and edit');
     $this->assertEquals($leading_slash_view['page[path]'], $this->cssSelect('#views-page-1-path')[0]->getText());
@@ -255,8 +259,7 @@ class BasicTest extends WizardTestBase {
     $this->assertSession()->checkboxChecked('options[expose_button][checkbox][checkbox]');
     $expose_settings = [
       'options[expose][remember]' => 1,
-      'options[expose][remember_roles][anonymous]' => 'anonymous',
-      'options[expose][remember_roles][authenticated]' => 'authenticated',
+      "options[expose][remember_roles][$role_id]" => $role_id,
     ];
     $this->drupalGet('admin/structure/views/nojs/handler/user_list_view/page_1/filter/roles_target_id');
     $this->submitForm($expose_settings, 'Apply');
@@ -268,8 +271,7 @@ class BasicTest extends WizardTestBase {
     $view->setDisplay('page_1');
     $result = $view->display_handler->getOption('filters')['roles_target_id']['expose']['remember_roles'];
     $expected = [
-      "anonymous" => "anonymous",
-      "authenticated" => "authenticated",
+      $role_id => $role_id
     ];
     $this->assertEquals($expected, $result);
   }
