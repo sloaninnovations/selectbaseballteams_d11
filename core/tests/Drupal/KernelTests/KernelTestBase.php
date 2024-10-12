@@ -920,9 +920,13 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   /**
    * Retrieves a Drupal path or an absolute path.
    *
-   * @todo say this doesn't handle redirects -- in BTB it does.
+   * Requests are sent to the HTTP kernel.
    *
-   * @todo mention how to log in using UserCreationTrait.
+   * There is no logged in user. Use \Drupal\Tests\user\Traits\UserCreationTrait
+   * to set a current user.
+   *
+   * There is no theme. To place blocks, a test must first install a theme and
+   * set it as active.
    *
    * @param string|\Drupal\Core\Url $path
    *   Drupal path or URL to load into Mink controlled browser.
