@@ -1,65 +1,49 @@
 services:
   _defaults:
     autoconfigure: true
-  mailer.transport_factory.abstract:
+  Symfony\Component\Mailer\Transport\AbstractTransportFactory:
     abstract: true
-    class: Symfony\Component\Mailer\Transport\AbstractTransportFactory
     arguments:
       - '@Psr\EventDispatcher\EventDispatcherInterface'
       - '@?Symfony\Contracts\HttpClient\HttpClientInterface'
       - '@logger.channel.mail'
-  mailer.transport_factory.native:
-    parent: mailer.transport_factory.abstract
-    class: Symfony\Component\Mailer\Transport\NativeTransportFactory
+  Symfony\Component\Mailer\Transport\NativeTransportFactory:
+    parent: Symfony\Component\Mailer\Transport\AbstractTransportFactory
     tags:
       - { name: mailer.transport_factory }
-  mailer.transport_factory.null:
-    parent: mailer.transport_factory.abstract
-    class: Symfony\Component\Mailer\Transport\NullTransportFactory
+  Symfony\Component\Mailer\Transport\NullTransportFactory:
+    parent: Symfony\Component\Mailer\Transport\AbstractTransportFactory
     tags:
       - { name: mailer.transport_factory }
-  mailer.transport_factory.sendmail:
-    parent: mailer.transport_factory.abstract
-    class: Symfony\Component\Mailer\Transport\SendmailTransportFactory
+  Symfony\Component\Mailer\Transport\SendmailTransportFactory:
+    parent: Symfony\Component\Mailer\Transport\AbstractTransportFactory
     tags:
       - { name: mailer.transport_factory }
-  mailer.transport_factory_decorator.sendmail_command_validation:
-    class: Drupal\Core\Mailer\Transport\SendmailCommandValidationTransportFactory
-    decorates: mailer.transport_factory.sendmail
+  Drupal\Core\Mailer\Transport\SendmailCommandValidationTransportFactory:
+    decorates: Symfony\Component\Mailer\Transport\SendmailTransportFactory
     arguments: ['@.inner']
     public: false
-  mailer.transport_factory.smtp:
-    parent: mailer.transport_factory.abstract
-    class: Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory
+  Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory:
+    parent: Symfony\Component\Mailer\Transport\AbstractTransportFactory
     tags:
       - { name: mailer.transport_factory, priority: -100 }
-  mailer.transport_factory_collection:
-    class: Drupal\Core\Mailer\TransportFactoryCollection
+  Drupal\Core\Mailer\TransportFactoryCollection:
     public: false
     tags:
       - { name: service_collector, tag: mailer.transport_factory, call: addTransportFactory }
-  Drupal\Core\Mailer\TransportFactoryCollection: '@mailer.transport_factory_collection'
-  mailer.transport_factory:
-    class: Symfony\Component\Mailer\Transport
+  Symfony\Component\Mailer\Transport:
     arguments: ['@Drupal\Core\Mailer\TransportFactoryCollection']
-  Symfony\Component\Mailer\Transport: '@mailer.transport_factory'
-  mailer.transport_factory_adapter:
-    class: Drupal\Core\Mailer\TransportFactoryAdapter
+  Drupal\Core\Mailer\TransportFactoryAdapter:
     autowire: true
     public: false
-  Drupal\Core\Mailer\Transport\ConfiguredTransportFactoryInterface: '@mailer.transport_factory_adapter'
-  mailer.transport:
-    class: Symfony\Component\Mailer\Transport\TransportInterface
+  Drupal\Core\Mailer\Transport\ConfiguredTransportFactoryInterface: '@Drupal\Core\Mailer\TransportFactoryAdapter'
+  Symfony\Component\Mailer\Transport\TransportInterface:
     factory: ['@Drupal\Core\Mailer\Transport\ConfiguredTransportFactoryInterface', 'createTransport']
-  Symfony\Component\Mailer\Transport\TransportInterface: '@mailer.transport'
-  mailer.messenger.message_handler:
-    class: Symfony\Component\Mailer\Messenger\MessageHandler
+  Symfony\Component\Mailer\Messenger\MessageHandler:
     autowire: true
     public: false
     tags:
       - { name: messenger.message_handler }
-  Symfony\Component\Mailer\Messenger\MessageHandler: '@mailer.messenger.message_handler'
-  mailer.mailer:
-    class: Symfony\Component\Mailer\Mailer
+  Symfony\Component\Mailer\Mailer:
     autowire: true
-  Symfony\Component\Mailer\MailerInterface: '@mailer.mailer'
+  Symfony\Component\Mailer\MailerInterface: '@Symfony\Component\Mailer\Mailer'
