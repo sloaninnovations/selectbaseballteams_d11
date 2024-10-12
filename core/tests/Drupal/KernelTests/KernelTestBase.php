@@ -992,8 +992,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->mink = new Mink();
     $this->mink->registerSession('default', $session);
     $this->mink->setDefaultSessionName('default');
-
-    return $session;
   }
 
   /**
