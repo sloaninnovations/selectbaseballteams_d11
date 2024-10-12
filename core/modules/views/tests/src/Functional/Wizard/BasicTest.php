@@ -230,7 +230,7 @@ class BasicTest extends WizardTestBase {
   /**
    * Tests user role exposed filter options.
    */
-  public function testUserRolesFilter() {
+  public function testUserRolesFilter(): void {
     // Create a view for user entity and add a role filter settings.
     $leading_slash_view = [];
     $leading_slash_view['label'] = $this->randomMachineName(16);
