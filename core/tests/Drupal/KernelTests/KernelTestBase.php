@@ -981,26 +981,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected function initMink() {
     $driver = $this->getDefaultDriverInstance();
 
-    // TODO: won't work, there is no guzzle!
-    // if ($driver instanceof BrowserKitDriver) {
-    // this bit not needed
-    //   // Turn off curl timeout. Having a timeout is not a problem in a normal
-    //   // test running, but it is a problem when debugging. Also, disable SSL
-    //   // peer verification so that testing under HTTPS always works.
-    //   /** @var \GuzzleHttp\Client $client */
-    //   $client = $this->container->get('http_client_factory')->fromOptions([
-    //     'timeout' => NULL,
-    //     'verify' => FALSE,
-    //   ]);
-
-    //   // Inject a Guzzle middleware to generate debug output for every request
-    //   // performed in the test.
-    //   $handler_stack = $client->getConfig('handler');
-    //   $handler_stack->push($this->getResponseLogHandler());
-
-    //   $driver->getClient()->setClient($client);
-    // }
-
     $selectors_handler = new SelectorsHandler([
       'hidden_field_selector' => new HiddenFieldSelector(),
     ]);
