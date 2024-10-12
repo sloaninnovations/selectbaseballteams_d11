@@ -6,7 +6,6 @@ namespace Drupal\Tests\views\Functional\Wizard;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Url;
-use Drupal\user\Entity\Role;
 use Drupal\views\Views;
 
 /**
@@ -241,12 +240,7 @@ class BasicTest extends WizardTestBase {
     $post_data['page[create]'] = 1;
     $post_data['page[title]'] = $this->randomMachineName(16);
     $post_data['page[path]'] = '/user_list_view';
-    $role_id = $this->randomMachineName(10);
-    $role = Role::create([
-      'id' => $role_id,
-      'label' => $this->randomString(10),
-    ]);
-    $role->save();
+    $role_id = $this->drupalCreateRole([]);
     $this->drupalGet('admin/structure/views/add');
     $this->submitForm($post_data, 'Save and edit');
     $this->assertEquals($post_data['page[path]'], $this->cssSelect('#views-page-1-path')[0]->getText());
