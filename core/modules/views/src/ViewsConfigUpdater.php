@@ -131,6 +131,9 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
       if ($this->processEntityArgumentUpdate($view)) {
         $changed = TRUE;
       }
+      if ($this->processRememberRolesUpdate($handler, $handler_type)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }
@@ -262,22 +265,22 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
   }
 
   /**
-   * Checks if 'remember_roles' exposed filter disabled roles cleanup.
+   * Checks if 'remember_roles' setting of an exposed filter has disabled roles.
    *
    * @param \Drupal\views\ViewEntityInterface $view
    *   The view entity.
    *
    * @return bool
-   *   TRUE if the view has any disable role.
+   *   TRUE if the view has any disabled role.
    */
-  public function needsRememberRolesExposedFilterUpdate(ViewEntityInterface $view): bool {
+  public function needsRememberRolesUpdate(ViewEntityInterface $view): bool {
     return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) {
-      return $this->processRememberRolesExposedFilterUpdate($handler, $handler_type);
+      return $this->processRememberRolesUpdate($handler, $handler_type);
     });
   }
 
   /**
-   * Processes filters and removes disabled exposed remember roles.
+   * Processes filters and removes disabled remember roles.
    *
    * @param array $handler
    *   A display handler.
@@ -287,7 +290,7 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
    * @return bool
    *   Whether the handler was updated.
    */
-  public function processRememberRolesExposedFilterUpdate(array &$handler, string $handler_type): bool {
+  public function processRememberRolesUpdate(array &$handler, string $handler_type): bool {
     if ($handler_type === 'filter' && !empty($handler['expose']['remember_roles'])) {
       $needsUpdate = FALSE;
       foreach (array_keys($handler['expose']['remember_roles'], '0', TRUE) as $role_key) {
