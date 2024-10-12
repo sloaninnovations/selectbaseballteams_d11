@@ -988,21 +988,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->mink = new Mink();
     $this->mink->registerSession('default', $session);
     $this->mink->setDefaultSessionName('default');
-    // Don't need this.
-    // $this->registerSessions();
-
-    // TODO: do we need this?
-    // $this->initFrontPage();
-
-    // Copies cookies from the current environment, for example, XDEBUG_SESSION
-    // in order to support Xdebug.
-    // @see BrowserTestBase::initFrontPage()
-    // $cookies = $this->extractCookiesFromRequest(\Drupal::request());
-    // foreach ($cookies as $cookie_name => $values) {
-    //   foreach ($values as $value) {
-    //     $session->setCookie($cookie_name, $value);
-    //   }
-    // }
 
     return $session;
   }
