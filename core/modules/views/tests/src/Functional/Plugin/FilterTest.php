@@ -226,11 +226,6 @@ class FilterTest extends ViewTestBase {
    * Tests that disabled user roles of the "Remember the last selection" functionality are removed on save.
    */
   public function testRememberUserRoles(): void {
-    // Create and log in a user with administer views permission.
-    $views_admin = $this->drupalCreateUser([
-      'administer views',
-    ]);
-    $this->drupalLogin($views_admin);
     // Create a view for user entity and add a role filter settings.
     $post_data = [];
     $post_data['label'] = $this->randomMachineName(16);
