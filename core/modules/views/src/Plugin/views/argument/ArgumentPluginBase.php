@@ -1416,8 +1416,11 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
     return '';
   }
 
-}
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormula(): string {
+    return '';
+  }
 
-/**
- * @}
- */
+}
