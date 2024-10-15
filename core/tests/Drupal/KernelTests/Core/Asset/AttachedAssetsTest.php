@@ -374,7 +374,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests using `before` in library definition.
    */
-  public function testLibraryBefore() {
+  public function testLibraryBefore(): void {
     $build['#attached']['library'][] = 'common_test/main';
     $build['#attached']['library'][] = 'common_test/before_main';
     $assets = AttachedAssets::createFromRenderArray($build);
@@ -388,7 +388,7 @@ class AttachedAssetsTest extends KernelTestBase {
   /**
    * Tests using `after` in library definition.
    */
-  public function testLibraryAfter() {
+  public function testLibraryAfter(): void {
     $build['#attached']['library'][] = 'common_test/after_main';
     $build['#attached']['library'][] = 'common_test/main';
     $assets = AttachedAssets::createFromRenderArray($build);
