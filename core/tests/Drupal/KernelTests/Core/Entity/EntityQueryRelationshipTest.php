@@ -246,7 +246,7 @@ class EntityQueryRelationshipTest extends EntityKernelTestBase {
   /**
    * Data provider for testInvalidFieldName().
    */
-  public static function providerTestInvalidFieldName() {
+  public static function providerTestInvalidFieldName(): void {
     return [
       ['non_existent_field_name.entity:user.name.value'],
       ['user_id.entity:user.non_existent_field_name.value'],
