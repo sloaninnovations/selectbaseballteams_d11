@@ -44,3 +44,22 @@
   display: grid;
   gap: 1.538em;
 }
+drupal-umami-messages::part(heading) {
+  position: absolute !important;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  width: 1px;
+  height: 1px;
+  word-wrap: normal;
+}
+drupal-umami-messages::part(content) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+drupal-umami-messages::part(icon) {
+  flex: 0 0 1rem;
+  width: 1rem;
+  height: 1rem;
+  background-image: var(--umami-message-icon);
+}

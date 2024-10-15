@@ -29,7 +29,7 @@
           'messages--' ~ type,
         ]
       %}
-      <umami-messages-component aria-label="{{ status_headings[type] }}" {{ attributes.addClass(classes)|without('aria-label') }} role={{ type == 'error' or type == 'warning' ? 'alert' : 'status' }}>
+      <drupal-umami-messages aria-label="{{ status_headings[type] }}" {{ attributes.addClass(classes)|without('aria-label') }} role={{ type == 'error' or type == 'warning' ? 'alert' : 'status' }}>
         {% if status_headings[type] %}
           <span slot="title">{{ status_headings[type] }}</span>
         {% endif %}
@@ -42,7 +42,7 @@
         {% else %}
           <span class="messages__item" slot="content">{{ messages|first }}</span>
         {% endif %}
-      </umami-messages-component>
+      </drupal-umami-messages>
       {# Remove type specific classes. #}
       {% set attributes = attributes.removeClass(classes) %}
     {% endfor %}

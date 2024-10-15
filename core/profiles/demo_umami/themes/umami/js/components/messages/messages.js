@@ -5,7 +5,7 @@
 
 ((Drupal) => {
   customElements.define(
-    'umami-messages-component',
+    'drupal-umami-messages',
     class extends HTMLElement {
       constructor() {
         super();
@@ -37,7 +37,7 @@
    */
   Drupal.theme.message = ({ text }, { type, id }) => {
     const messagesTypes = Drupal.Message.getMessageTypeLabels();
-    const messageWrapper = document.createElement('umami-messages-component');
+    const messageWrapper = document.createElement('drupal-umami-messages');
 
     messageWrapper.setAttribute('class', `messages messages--${type}`);
     messageWrapper.setAttribute(
