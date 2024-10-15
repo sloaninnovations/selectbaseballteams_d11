@@ -238,8 +238,8 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
       'langcode' => LanguageInterface::LANGCODE_DEFAULT,
     ];
 
-    $cid = $entity_bundle ? 'create:' . $entity_bundle : 'create';
-    if (($access = $this->getCache($cid, 'create', $context['langcode'], $account)) !== NULL) {
+    $cid = $this->buildCreateAccessCid($entity_bundle, $context);
+    if ($cid && ($access = $this->getCache($cid, 'create', $context['langcode'], $account)) !== NULL) {
       // Cache hit, no work necessary.
       return $return_as_object ? $access : $access->isAllowed();
     }
@@ -265,7 +265,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
     if (!$return->isForbidden()) {
       $return = $return->orIf($this->checkCreateAccess($account, $context, $entity_bundle));
     }
-    $result = $this->setCache($return, $cid, 'create', $context['langcode'], $account);
+    $result = $cid ? $this->setCache($return, $cid, 'create', $context['langcode'], $account) : $return;
     return $return_as_object ? $result : $result->isAllowed();
   }
 
@@ -401,6 +401,30 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
         ->orIf($entity->access('update', $account, TRUE));
     }
     return AccessResult::allowed();
+  }
+
+  /**
+   * Builds the create access result cache ID.
+   *
+   * @param string|null $entity_bundle
+   *   The entity bundle, if any.
+   * @param array $context
+   *   The create access context.
+   *
+   * @return string
+   *   The create access result cache ID.
+   */
+  protected function buildCreateAccessCid(?string $entity_bundle, array $context): ?string {
+    // If there is no context other than langcode and entity type id, then the
+    // cache id can be simply the bundle. Otherwise, a custom implementation is
+    // needed.
+    $extendedContext = array_filter($context, function ($key) {
+      return !(in_array($key, ['entity_type_id', 'langcode']));
+    }, ARRAY_FILTER_USE_KEY);
+    if (empty($extendedContext)) {
+      return $entity_bundle ? 'create:' . $entity_bundle : 'create';
+    }
+    return NULL;
   }
 
 }
