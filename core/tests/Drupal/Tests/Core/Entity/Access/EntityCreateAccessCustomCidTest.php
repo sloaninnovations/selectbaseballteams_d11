@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Entity\Access;
 
@@ -27,28 +27,28 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
   /**
    * A mock entity type.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface;
+   * @var \Drupal\Core\Entity\EntityTypeInterface
    */
   protected $entityType;
 
   /**
    * A mock account.
    *
-   * @var \Drupal\Core\Session\AccountInterface;
+   * @var \Drupal\Core\Session\AccountInterface
    */
   protected $account;
 
   /**
    * A language code.
    *
-   * @var string;
+   * @var string
    */
   protected $langcode;
 
   /**
    * A mock module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface;
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -56,6 +56,7 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
     $this->entityType = $this->getMockBuilder(EntityTypeInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -155,7 +156,7 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
    * @return array[]
    *   A list of test cases.
    */
-  public function providerTestDefaultCid(): array {
+  public static function providerTestDefaultCid(): array {
     return [
       'no context, cached' => [
         'context' => [],
@@ -246,7 +247,7 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
    * @return array[]
    *   A list of test cases.
    */
-  public function providerTestCustomCid(): array {
+  public static function providerTestCustomCid(): array {
     return [
       'no context var, in cache' => [
         'bundle' => 'bundle_1',
