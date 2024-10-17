@@ -30,42 +30,42 @@ trait ConfigSectionListTrait {
    *   The section delta.
    * @param int $position
    *   The position index inside that section.
-   * @param mixed $options
+   * @param mixed $value
    *   The component configuration data, including uuid, region, default_region and
    *   additional info if any.
    *
    * @return $this
    */
   #[ActionMethod(adminLabel: new TranslatableMarkup('Add component'))]
-  public function addComponent($section, int $position, array $options): static {
+  public function addComponent($section, int $position, array $value): static {
     if ($section >= $this->count()) {
       throw new ConfigActionException("Cannot use that section, as that delta can't be found.");
     }
     $sectionObject = $this->getSection($section);
-    $configuration = $options;
-    if (array_key_exists('region', $options) && is_array($options['region'])) {
+    $configuration = $value;
+    if (array_key_exists('region', $value) && is_array($value['region'])) {
       // Since the recipe author might not know ahead of time what layout the
       // section is using, they should supply a map whose keys are layout ids
       // and values are region names, so we know where to place this component.
       // If the section layout id is not in the map, they should supply the
       // name of a fallback region. If all that fails, give up with an
       // exception.
-      $options['region'] = $options['region'][$sectionObject->getLayoutId()] ??
-        $options['default_region'] ??
+      $value['region'] = $value['region'][$sectionObject->getLayoutId()] ??
+        $value['default_region'] ??
         throw new ConfigActionException("Cannot determine which region of the section to place this component into, because no default region was provided.");
     }
-    if (!array_key_exists('uuid', $options)) {
-      $options += ['uuid' => $this->uuidGenerator()->generate()];
+    if (!array_key_exists('uuid', $value)) {
+      $value += ['uuid' => $this->uuidGenerator()->generate()];
     }
-    $additional = $options['additional'] ?? [];
+    $additional = $value['additional'] ?? [];
     unset($configuration['uuid']);
     unset($configuration['default_region']);
     unset($configuration['region']);
     unset($configuration['additional']);
 
     $component = [
-      'uuid' => $options['uuid'],
-      'region' => $options['region'],
+      'uuid' => $value['uuid'],
+      'region' => $value['region'],
       // @todo calculate the weight.
       'weight' => $position,
       'configuration' => $configuration,
