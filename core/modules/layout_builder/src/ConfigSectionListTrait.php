@@ -103,6 +103,7 @@ trait ConfigSectionListTrait {
     $countComponentsInRegion = count($components);
     $isLast = FALSE;
     if ($position >= $countComponentsInRegion) {
+      // Section::getComponentsByRegion already sorts by weight.
       $nextComponent = end($components);
       $isLast =  TRUE;
     }
@@ -125,7 +126,6 @@ trait ConfigSectionListTrait {
         $nextComponent = $component;
       }
     }
-
     return $weight;
   }
 
