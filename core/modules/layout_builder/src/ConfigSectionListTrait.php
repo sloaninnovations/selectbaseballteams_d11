@@ -57,6 +57,12 @@ trait ConfigSectionListTrait {
     if (!array_key_exists('uuid', $value)) {
       $value += ['uuid' => $this->uuidGenerator()->generate()];
     }
+    // If no weight is given, there will be a warning.
+    // Set a default, this will be overridden in insertComponent anyway.
+    if (!array_key_exists('weight', $value)) {
+      $value += ['weight' => 0];
+    }
+
     // If the position is higher than the number of components, just put it last
     // instead of failing.
     $countComponentsInRegion = count($sectionObject->getComponentsByRegion($value['region']));
