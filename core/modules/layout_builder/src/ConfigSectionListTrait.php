@@ -78,6 +78,7 @@ trait ConfigSectionListTrait {
     $component = [
       'uuid' => $value['uuid'],
       'region' => $value['region'],
+      'weight' => $value['weight'],
       'configuration' => $configuration,
       'additional' => $additional,
     ];
