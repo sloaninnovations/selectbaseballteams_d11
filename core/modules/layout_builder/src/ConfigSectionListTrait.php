@@ -54,14 +54,10 @@ trait ConfigSectionListTrait {
         $value['default_region'] ??
         throw new ConfigActionException("Cannot determine which region of the section to place this component into, because no default region was provided.");
     }
-    if (!array_key_exists('uuid', $value)) {
-      $value += ['uuid' => $this->uuidGenerator()->generate()];
-    }
+    $value += ['uuid' => $this->uuidGenerator()->generate()];
     // If no weight is given, there will be a warning.
     // Set a default, this will be overridden in insertComponent anyway.
-    if (!array_key_exists('weight', $value)) {
-      $value += ['weight' => 0];
-    }
+    $value += ['weight' => 0];
 
     // If the position is higher than the number of components, just put it last
     // instead of failing.
