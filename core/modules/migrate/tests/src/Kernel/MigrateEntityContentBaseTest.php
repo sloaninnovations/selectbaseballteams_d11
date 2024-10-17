@@ -367,7 +367,7 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
   /**
    * Test destination fields() method.
    */
-  public function testFields() {
+  public function testFields(): void {
     $entity_type_manager = $this->container->get('entity_type.manager');
     // Create two bundles for the entity_test_with_bundle entity type.
     $bundle_storage = $entity_type_manager->getStorage('entity_test_bundle');
