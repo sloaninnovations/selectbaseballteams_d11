@@ -116,6 +116,8 @@ trait ConfigSectionListTrait {
       ++$weight;
     }
     else {
+      // We want to update the component weight of the next one, and all
+      // the following ones.
       $update = FALSE;
       foreach ($components as $component) {
         if ($component == $nextComponent || $update) {
