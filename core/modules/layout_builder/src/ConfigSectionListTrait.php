@@ -121,8 +121,8 @@ trait ConfigSectionListTrait {
           $newWeight = $component->getWeight() + 1;
           $component->setWeight($newWeight);
           $section->setComponent($component);
+          $nextComponent = $component;
         }
-        $nextComponent = $component;
       }
     }
     return $weight;
