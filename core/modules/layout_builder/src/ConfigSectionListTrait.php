@@ -69,12 +69,9 @@ trait ConfigSectionListTrait {
     unset($configuration['region']);
     unset($configuration['additional']);
 
-    $weight = $this->recalculateWeights($sectionObject, $value['region'], $position, $value);
-
     $component = [
       'uuid' => $value['uuid'],
       'region' => $value['region'],
-      'weight' => $weight,
       'configuration' => $configuration,
       'additional' => $additional,
     ];
@@ -82,53 +79,6 @@ trait ConfigSectionListTrait {
     $sectionObject->insertComponent($position, $sectionComponent);
     $this->setSection($section, $sectionObject);
     return $this;
-  }
-
-  /**
-   * Recalculate weights for components in section's region after a position.
-   *
-   * @param \Drupal\layout_builder\Section $section
-   *   The section.
-   * @param string $region
-   *   The region name.
-   * @param int $position
-   *   The position to start re-weighting.
-   *
-   * @return int
-   *   The weight of the new component at the given position.
-   */
-  protected function recalculateWeights(Section $section, string $region, int $position): int {
-    $components = $section->getComponentsByRegion($region);
-    $countComponentsInRegion = count($components);
-    $isLast = FALSE;
-    if ($position >= $countComponentsInRegion) {
-      // Section::getComponentsByRegion already sorts by weight.
-      $nextComponent = end($components);
-      $isLast = TRUE;
-    }
-    else {
-      $uuids = array_keys($components);
-      $uuid = $uuids[$position];
-      $nextComponent = $components[$uuid];
-    }
-    $weight = $nextComponent->getWeight();
-    if ($isLast) {
-      ++$weight;
-    }
-    else {
-      // We want to update the component weight of the next one, and all
-      // the following ones.
-      $update = FALSE;
-      foreach ($components as $component) {
-        if ($component == $nextComponent || $update) {
-          $newWeight = $component->getWeight() + 1;
-          $component->setWeight($newWeight);
-          $section->setComponent($component);
-          $update = TRUE;
-        }
-      }
-    }
-    return $weight;
   }
 
 }
