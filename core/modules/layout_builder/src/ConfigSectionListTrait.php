@@ -116,12 +116,13 @@ trait ConfigSectionListTrait {
       ++$weight;
     }
     else {
+      $update = FALSE;
       foreach ($components as $component) {
-        if ($component == $nextComponent) {
+        if ($component == $nextComponent || $update) {
           $newWeight = $component->getWeight() + 1;
           $component->setWeight($newWeight);
           $section->setComponent($component);
-          $nextComponent = $component;
+          $update = TRUE;
         }
       }
     }
