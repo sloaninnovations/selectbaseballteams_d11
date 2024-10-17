@@ -85,8 +85,7 @@ trait ConfigSectionListTrait {
   }
 
   /**
-   * Recalculate weights for components in a region of a section, given the
-   * position we want to insert a new component.
+   * Recalculate weights for components in section's region after a position.
    *
    * @param \Drupal\layout_builder\Section $section
    *   The section.
@@ -105,7 +104,7 @@ trait ConfigSectionListTrait {
     if ($position >= $countComponentsInRegion) {
       // Section::getComponentsByRegion already sorts by weight.
       $nextComponent = end($components);
-      $isLast =  TRUE;
+      $isLast = TRUE;
     }
     else {
       $uuids = array_keys($components);
