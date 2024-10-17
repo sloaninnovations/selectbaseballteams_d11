@@ -57,17 +57,24 @@ trait ConfigSectionListTrait {
     if (!array_key_exists('uuid', $value)) {
       $value += ['uuid' => $this->uuidGenerator()->generate()];
     }
+    // If the position is higher than the number of components, just put it last
+    // instead of failing.
+    $countComponentsInRegion = count($sectionObject->getComponentsByRegion($value['region']));
+    if ($position > $countComponentsInRegion) {
+      $position = $countComponentsInRegion;
+    }
     $additional = $value['additional'] ?? [];
     unset($configuration['uuid']);
     unset($configuration['default_region']);
     unset($configuration['region']);
     unset($configuration['additional']);
 
+    $weight = $this->recalculateWeights($sectionObject, $value['region'], $position, $value);
+
     $component = [
       'uuid' => $value['uuid'],
       'region' => $value['region'],
-      // @todo calculate the weight.
-      'weight' => $position,
+      'weight' => $weight,
       'configuration' => $configuration,
       'additional' => $additional,
     ];
@@ -75,6 +82,51 @@ trait ConfigSectionListTrait {
     $sectionObject->insertComponent($position, $sectionComponent);
     $this->setSection($section, $sectionObject);
     return $this;
+  }
+
+  /**
+   * Recalculate weights for components in a region of a section, given the
+   * position we want to insert a new component.
+   *
+   * @param \Drupal\layout_builder\Section $section
+   *   The section.
+   * @param string $region
+   *   The region name.
+   * @param int $position
+   *   The position to start re-weighting.
+   *
+   * @return int
+   *   The weight of the new component at the given position.
+   */
+  protected function recalculateWeights(Section $section, string $region, int $position): int {
+    $components = $section->getComponentsByRegion($region);
+    $countComponentsInRegion = count($components);
+    $isLast = FALSE;
+    if ($position >= $countComponentsInRegion) {
+      $nextComponent = end($components);
+      $isLast =  TRUE;
+    }
+    else {
+      $uuids = array_keys($components);
+      $uuid = $uuids[$position];
+      $nextComponent = $components[$uuid];
+    }
+    $weight = $nextComponent->getWeight();
+    if ($isLast) {
+      ++$weight;
+    }
+    else {
+      foreach ($components as $component) {
+        if ($component == $nextComponent) {
+          $newWeight = $component->getWeight() + 1;
+          $component->setWeight($newWeight);
+          $section->setComponent($component);
+        }
+        $nextComponent = $component;
+      }
+    }
+
+    return $weight;
   }
 
 }
