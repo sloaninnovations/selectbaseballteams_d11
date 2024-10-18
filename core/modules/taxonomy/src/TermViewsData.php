@@ -68,6 +68,7 @@ class TermViewsData extends EntityViewsData {
     $data['taxonomy_term_field_data']['vid']['help'] = $this->t('Filter the results of "Taxonomy: Term" to a particular vocabulary.');
     $data['taxonomy_term_field_data']['vid']['field']['help'] = t('The vocabulary name.');
     $data['taxonomy_term_field_data']['vid']['argument']['id'] = 'vocabulary_vid';
+    $data['taxonomy_term_field_data']['vid']['argument']['entity_type'] = 'taxonomy_vocabulary';
 
     $data['taxonomy_term_field_data']['vid']['sort']['title'] = t('Vocabulary ID');
     $data['taxonomy_term_field_data']['vid']['sort']['help'] = t('The raw vocabulary ID.');
