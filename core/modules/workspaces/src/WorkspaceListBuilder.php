@@ -194,6 +194,12 @@ class WorkspaceListBuilder extends EntityListBuilder {
       'url' => $entity->toUrl(),
     ];
 
+    foreach ($operations as $key => $operation) {
+      if (!$operation['url']->access(NULL, TRUE)->isAllowed()) {
+        unset($operations[$key]);
+      }
+    }
+
     return $operations;
   }
 
