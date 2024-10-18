@@ -11,7 +11,6 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Url;
 use Drupal\workspaces\WorkspaceManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -60,7 +59,6 @@ final class NavigationWorkspacesBlock extends BlockBase implements ContainerFact
    * {@inheritdoc}
    */
   public function build(): array {
-    $active_workspace = $this->workspaceManager->getActiveWorkspace();
     return [
       'workspaces' => [
         '#lazy_builder' => ['workspaces.lazy_builders:renderNavigationLinks', []],
