@@ -310,20 +310,6 @@ function workspaces_toolbar() {
 }
 
 /**
- * Implements hook_theme().
- */
-function workspaces_theme(): array {
-  $items['navigation_workspaces'] = [
-    'variables' => [
-      'title' => NULL,
-      'attributes' => NULL,
-    ],
-  ];
-
-  return $items;
-}
-
-/**
  * Implements hook_navigation_alter().
  */
 function workspaces_navigation_alter(Section $section): void {

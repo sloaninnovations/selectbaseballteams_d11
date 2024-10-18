@@ -94,26 +94,32 @@ final class WorkspacesLazyBuilders implements TrustedCallbackInterface {
   #[TrustedCallback]
   public function renderNavigationLinks(): array {
     $active_workspace = $this->workspaceManager->getActiveWorkspace();
+
     $url = Url::fromRoute('entity.workspace.collection', [], ['query' => \Drupal::destination()->getAsArray()]);
+    $url->setOption('attributes', [
+      'class' => [
+        $active_workspace ? 'toolbar-button--workspaces' : 'toolbar-button--workspaces--live',
+        'use-ajax',
+      ],
+      'data-dialog-type' => 'dialog',
+      'data-dialog-renderer' => 'off_canvas_top',
+      'data-dialog-options' => Json::encode([
+        'height' => 161,
+        'classes' => [
+          'ui-dialog' => 'workspaces-dialog',
+        ],
+      ]),
+    ]);
 
     return [
-      '#theme' => 'navigation_workspaces',
-      '#title' => $active_workspace ? $active_workspace->label() : 'Live',
-      '#attributes' => [
-        'href' => $url->toString(),
-        'class' => [
-          'toolbar-button--collapsible',
-          $active_workspace ? 'toolbar-button--workspaces' : 'toolbar-button--workspaces--live',
-          'use-ajax',
+      '#theme' => 'navigation_menu',
+      '#title' => $this->t('Workspace'),
+      '#items' => [
+        [
+          'title' => $active_workspace ? $active_workspace->label() : $this->t('Live'),
+          'url' => $url,
+          'class' => 'workspaces',
         ],
-        'data-dialog-type' => 'dialog',
-        'data-dialog-renderer' => 'off_canvas_top',
-        'data-dialog-options' => Json::encode([
-          'height' => 161,
-          'classes' => [
-            'ui-dialog' => 'workspaces-dialog',
-          ],
-        ]),
       ],
       '#attached' => [
         'library' => ['workspaces/drupal.workspaces.navigation'],

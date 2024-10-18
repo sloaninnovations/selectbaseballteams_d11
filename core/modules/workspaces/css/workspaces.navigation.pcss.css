@@ -14,14 +14,13 @@
 }
 
 .toolbar-button--workspaces {
-  color: white;
+  color: var(--admin-toolbar-color-gray-990);
   background-color: var(--admin-toolbar-color-orange-300);
 
   &:hover,
   &:focus,
   &:hover:focus,
   &.current {
-    color: white;
     background-color: var(--admin-toolbar-color-orange-300);
   }
 }

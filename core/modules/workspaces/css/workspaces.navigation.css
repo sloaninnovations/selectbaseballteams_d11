@@ -21,7 +21,7 @@
 }
 
 .toolbar-button--workspaces {
-  color: white;
+  color: var(--admin-toolbar-color-gray-990);
   background-color: var(--admin-toolbar-color-orange-300);
 }
 
@@ -29,7 +29,6 @@
 .toolbar-button--workspaces:focus,
 .toolbar-button--workspaces:hover:focus,
 .toolbar-button--workspaces.current {
-  color: white;
   background-color: var(--admin-toolbar-color-orange-300);
 }
 
