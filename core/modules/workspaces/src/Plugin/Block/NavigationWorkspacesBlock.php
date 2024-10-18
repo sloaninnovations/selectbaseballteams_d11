@@ -66,11 +66,11 @@ final class NavigationWorkspacesBlock extends BlockBase implements ContainerFact
         '#lazy_builder' => ['workspaces.lazy_builders:renderNavigationLinks', []],
         '#create_placeholder' => TRUE,
         '#lazy_builder_preview' => [
-          '#type' => 'link',
-          '#title' => $active_workspace ? $active_workspace->label() : $this->t('Live'),
-          '#url' => Url::fromRoute('entity.workspace.collection'),
-          '#attributes' => [
-            'class' => ['toolbar-tray-lazy-placeholder-link'],
+          '#type' => 'component',
+          '#component' => 'navigation:toolbar-button',
+          '#props' => [
+            'html_tag' => 'a',
+            'text' => $this->t('Workspace'),
           ],
         ],
         '#cache' => [
