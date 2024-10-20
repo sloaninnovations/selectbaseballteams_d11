@@ -6,7 +6,6 @@ services:
     arguments:
       - '@Psr\EventDispatcher\EventDispatcherInterface'
       - '@?Symfony\Contracts\HttpClient\HttpClientInterface'
-      - '@logger.channel.mail'
   Symfony\Component\Mailer\Transport\NativeTransportFactory:
     parent: Symfony\Component\Mailer\Transport\AbstractTransportFactory
     tags:
