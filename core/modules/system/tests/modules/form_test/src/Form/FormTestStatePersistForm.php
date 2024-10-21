@@ -7,14 +7,14 @@ namespace Drupal\form_test\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Security\Attribute\TrustedCallback;
 
 /**
  * Form constructor for testing form state persistence.
  *
  * @internal
  */
-class FormTestStatePersistForm extends FormBase implements TrustedCallbackInterface {
+class FormTestStatePersistForm extends FormBase {
 
   /**
    * {@inheritdoc}
@@ -53,10 +53,9 @@ class FormTestStatePersistForm extends FormBase implements TrustedCallbackInterf
   public function setStateRebuildValue(array $form, FormStateInterface $form_state): array {
     if (!$form_state->isRebuilding()) {
       $form_state->set('process_value', TRUE);
+      return $form;
     }
-    else {
-      $form_state->set('rebuild_value', TRUE);
-    }
+    $form_state->set('rebuild_value', TRUE);
     return $form;
   }
 
@@ -71,18 +70,12 @@ class FormTestStatePersistForm extends FormBase implements TrustedCallbackInterf
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function trustedCallbacks() {
-    return ['displayCachedState'];
-  }
-
-  /**
    * Render API #post_render callback.
    *
    * After form is rendered, add status messages displaying form state
    * 'processed_value' and 'rebuilt_value'.
    */
+  #[TrustedCallback]
   public static function displayCachedState(string $rendered_form, array $form): string {
     $form_state = new FormState();
     \Drupal::formBuilder()->getCache($form['#build_id'], $form_state);
