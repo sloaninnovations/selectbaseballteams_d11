@@ -8,6 +8,7 @@ use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
+use Drupal\Tests\HttpKernelUiHelperTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 
@@ -18,6 +19,7 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
  */
 class NodeLinksTest extends KernelTestBase {
 
+  use HttpKernelUiHelperTrait;
   use UserCreationTrait;
   use NodeCreationTrait;
 

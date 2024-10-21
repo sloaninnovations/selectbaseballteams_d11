@@ -7,6 +7,7 @@ namespace Drupal\Tests\taxonomy\Kernel;
 use Drupal\Core\Link;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use Drupal\Tests\HttpKernelUiHelperTrait;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 
@@ -17,6 +18,7 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
  */
 class TermHierarchyTest extends KernelTestBase {
 
+  use HttpKernelUiHelperTrait;
   use UserCreationTrait;
   use BlockCreationTrait;
   use TaxonomyTestTrait;
