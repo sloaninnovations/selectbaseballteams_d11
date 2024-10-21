@@ -348,7 +348,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
    * @return array
    *   The source base path.
    */
-  protected function getManagedFiles() {
+  protected function getManagedFiles(): array {
     return [];
   }
 
