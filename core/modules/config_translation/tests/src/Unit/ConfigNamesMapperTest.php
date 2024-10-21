@@ -30,9 +30,9 @@ class ConfigNamesMapperTest extends UnitTestCase {
   /**
    * The configuration names mapper to test.
    *
-   * @see \Drupal\config_translation\ConfigNamesMapper
-   *
    * @var \Drupal\Tests\config_translation\Unit\TestConfigNamesMapper
+   *
+   * @see \Drupal\config_translation\ConfigNamesMapper
    */
   protected $configNamesMapper;
 
@@ -453,7 +453,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
       $this->configNamesMapper->getLangcode();
       $this->fail();
     }
-    catch (\RuntimeException $e) {
+    catch (\RuntimeException) {
     }
   }
 

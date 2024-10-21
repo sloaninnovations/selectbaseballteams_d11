@@ -1,5 +1,5 @@
-const { execSync } = require('child_process');
-const { URL } = require('url');
+const { execSync } = require('node:child_process');
+const { URL } = require('node:url');
 const { commandAsWebserver } = require('../globals');
 
 /**
@@ -49,7 +49,6 @@ exports.command = function drupalInstall(
       // Colons need to be URL encoded to be valid.
       value: encodeURIComponent(installData.user_agent),
       path: url.pathname,
-      domain: url.host,
     });
   } catch (error) {
     this.assert.fail(error);

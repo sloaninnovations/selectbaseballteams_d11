@@ -183,7 +183,7 @@ abstract class BuildTestBase extends TestCase {
         ->directories()
         ->ignoreVCS(FALSE)
         ->ignoreDotFiles(FALSE)
-        // composer script is a symlink and fails chmod. Ignore it.
+        // Composer script is a symlink and fails chmod. Ignore it.
         ->notPath('/^vendor\/bin\/composer$/');
       $fs->chmod($finder->getIterator(), 0775, 0000);
       $fs->remove($ws);
@@ -503,7 +503,7 @@ abstract class BuildTestBase extends TestCase {
    *
    * @return bool
    */
-  protected function checkPortIsAvailable($port) {
+  protected function checkPortIsAvailable($port): bool {
     $fp = @fsockopen(self::$hostName, $port, $errno, $errstr, 1);
     // If fsockopen() fails to connect, probably nothing is listening.
     // It could be a firewall but that's impossible to detect, so as a

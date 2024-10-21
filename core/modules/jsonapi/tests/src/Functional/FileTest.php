@@ -16,7 +16,6 @@ use GuzzleHttp\RequestOptions;
  * JSON:API integration test for the "File" content entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class FileTest extends ResourceTestBase {
 
@@ -133,7 +132,7 @@ class FileTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $self_url = Url::fromUri('base:/jsonapi/file/file/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
     return [
       'jsonapi' => [
@@ -189,7 +188,7 @@ class FileTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     return [
       'data' => [
         'type' => 'file--file',
@@ -201,11 +200,16 @@ class FileTest extends ResourceTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Tests POST/PATCH/DELETE for an individual resource.
    */
-  public function testPostIndividual(): void {
+  public function testIndividual(): void {
     // @todo https://www.drupal.org/node/1927648
-    $this->markTestSkipped();
+    // Add doTestPostIndividual().
+    $this->doTestPatchIndividual();
+    $this->entity = $this->resaveEntity($this->entity, $this->account);
+    $this->revokePermissions();
+    $this->config('jsonapi.settings')->set('read_only', TRUE)->save(TRUE);
+    $this->doTestDeleteIndividual();
   }
 
   /**

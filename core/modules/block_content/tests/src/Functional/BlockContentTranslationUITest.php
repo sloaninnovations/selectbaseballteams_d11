@@ -15,9 +15,7 @@ use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
 class BlockContentTranslationUITest extends ContentTranslationUITestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -127,7 +125,7 @@ class BlockContentTranslationUITest extends ContentTranslationUITestBase {
     try {
       $entity->save();
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       $this->fail('Blocks can have translations with the same "info" value.');
     }
 

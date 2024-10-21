@@ -23,9 +23,7 @@ class ContactPersonalTest extends BrowserTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['contact', 'dblog', 'mail_html_test'];
 
@@ -345,7 +343,7 @@ class ContactPersonalTest extends BrowserTestBase {
    * @return array
    *   An array with the form fields being used.
    */
-  protected function submitPersonalContact(AccountInterface $account, array $message = [], bool $user_copy = FALSE) {
+  protected function submitPersonalContact(AccountInterface $account, array $message = [], bool $user_copy = FALSE): array {
     $message += [
       'subject[0][value]' => $this->randomMachineName(16) . '< " =+ >',
       'message[0][value]' => $this->randomMachineName(64) . '< " =+ >',

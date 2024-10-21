@@ -170,10 +170,21 @@ system.diff:
 system.logging:
   type: config_object
   label: 'Logging settings'
+  constraints:
+    FullyValidatable: ~
   mapping:
     error_level:
       type: string
       label: 'Error messages to display'
+      # @see core/includes/bootstrap.inc
+      # @todo Update this to use enum in https://www.drupal.org/project/drupal/issues/2951046
+      constraints:
+        Choice:
+          choices:
+            - 'hide'
+            - 'some'
+            - 'all'
+            - 'verbose'
 
 system.performance:
   type: config_object
@@ -286,6 +297,8 @@ system.menu.*:
 system.action.*:
   type: config_entity
   label: 'System action'
+  constraints:
+    FullyValidatable: ~
   mapping:
     id:
       type: machine_name
@@ -302,6 +315,12 @@ system.action.*:
     type:
       type: string
       label: 'Type'
+      # Action can be specified without type.
+      # @see \Drupal\action_test\Plugin\Action\NoType
+      nullable: true
+      constraints:
+        NotBlank:
+          allowNull: true
     plugin:
       type: string
       label: 'Plugin'

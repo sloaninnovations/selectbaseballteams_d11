@@ -51,7 +51,7 @@ class DrupalKernelTest extends KernelTestBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   A request object to use in booting the kernel.
    * @param array $modules_enabled
-   *   A list of modules to enable on the kernel.
+   *   A list of modules to install on the kernel.
    *
    * @return \Drupal\Core\DrupalKernel
    *   New kernel for testing.
@@ -190,7 +190,7 @@ class DrupalKernelTest extends KernelTestBase {
     try {
       $kernel->setSitePath('/dev/null');
     }
-    catch (\LogicException $e) {
+    catch (\LogicException) {
       $pass = TRUE;
     }
     $this->assertTrue($pass, 'Throws LogicException if DrupalKernel::setSitePath() is called after boot');

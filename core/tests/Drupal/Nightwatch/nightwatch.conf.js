@@ -1,5 +1,5 @@
 // cspell:ignore testcases
-const path = require('path');
+const path = require('node:path');
 const { globSync } = require('glob');
 
 // Find directories which have Nightwatch tests in them.
@@ -68,7 +68,7 @@ module.exports = {
         browserName: 'chrome',
         acceptSslCerts: true,
         'goog:chromeOptions': {
-          w3c: false,
+          w3c: !!process.env.DRUPAL_TEST_WEBDRIVER_W3C,
           args: process.env.DRUPAL_TEST_WEBDRIVER_CHROME_ARGS
             ? process.env.DRUPAL_TEST_WEBDRIVER_CHROME_ARGS.split(' ')
             : [],
@@ -95,7 +95,7 @@ module.exports = {
         browserName: 'chrome',
         acceptSslCerts: true,
         'goog:chromeOptions': {
-          w3c: false,
+          w3c: !!process.env.DRUPAL_TEST_WEBDRIVER_W3C,
           args: process.env.DRUPAL_TEST_WEBDRIVER_CHROME_ARGS
             ? process.env.DRUPAL_TEST_WEBDRIVER_CHROME_ARGS.split(' ')
             : [],
