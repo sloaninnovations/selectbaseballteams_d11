@@ -86,7 +86,6 @@ final class NavigationMenuBlock extends SystemMenuBlock implements ContainerFact
     $manipulators = [
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
-      ['callable' => 'navigation.navigation_tree_manipulators:manipulate'],
     ];
     $tree = $this->menuTree->transform($tree, $manipulators);
     $build = $this->menuTree->build($tree);

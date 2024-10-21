@@ -27,14 +27,10 @@ services:
         '@router.route_provider',
         '@menu.active_trail',
         '@callable_resolver',
+        '@module_handler',
       ]
 
   navigation.user_lazy_builder:
     class: Drupal\navigation\UserLazyBuilder
     arguments: ['@module_handler', '@current_user']
   Drupal\navigation\UserLazyBuilders: '@navigation.user_lazy_builder'
-
-  navigation.navigation_tree_manipulators:
-    class: Drupal\navigation\NavigationMenuLinkTreeManipulators
-    arguments: ['@module_handler']
-  Drupal\navigation\NavigationMenuLinkTreeManipulators: '@navigation.navigation_tree_manipulators'
