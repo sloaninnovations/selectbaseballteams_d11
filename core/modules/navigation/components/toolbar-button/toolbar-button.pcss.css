@@ -34,6 +34,14 @@
     background-color: var(--admin-toolbar-color-gray-050);
   }
 
+  &[class*="toolbar-button--icon"]:has(+ .ajax-progress--throbber) {
+    --icon: url(./assets/throbber.svg);
+
+    & + .ajax-progress--throbber {
+      display: none;
+    }
+  }
+
   &:hover {
     z-index: 20;
     color: var(--admin-toolbar-color-gray-990);
