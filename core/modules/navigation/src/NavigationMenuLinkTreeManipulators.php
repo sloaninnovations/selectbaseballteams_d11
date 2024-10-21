@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\navigation;
 
-use Drupal\navigation\Event\NavigationLinkTreeEvent;
-use Drupal\navigation\Event\NavigationLinkTreeEvents;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * Provides a menu link tree manipulators.
@@ -18,18 +16,21 @@ final class NavigationMenuLinkTreeManipulators {
 
   /**
    * Constructs a NavigationMenuLinkTreeManipulators object.
+   *
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
    */
   public function __construct(
-    private readonly EventDispatcherInterface $eventDispatcher,
+    private readonly ModuleHandlerInterface $moduleHandler,
   ) {}
 
   /**
    * @todo Add method description.
    */
   public function manipulate(array $tree): array {
-    $event = $this->eventDispatcher->dispatch(new NavigationLinkTreeEvent($tree), NavigationLinkTreeEvents::MANIPULATE);
+    $this->moduleHandler->alter('navigation_menu_link_tree_manipulators', $tree);
 
-    return $event->getMenuLinkTree();
+    return $tree;
   }
 
 }

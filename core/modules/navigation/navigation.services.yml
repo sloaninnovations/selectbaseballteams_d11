@@ -36,8 +36,5 @@ services:
 
   navigation.navigation_tree_manipulators:
     class: Drupal\navigation\NavigationMenuLinkTreeManipulators
-    arguments: ['@event_dispatcher']
+    arguments: ['@module_handler']
   Drupal\navigation\NavigationMenuLinkTreeManipulators: '@navigation.navigation_tree_manipulators'
-
-  navigation.event_subscriber:
-    class: Drupal\navigation\EventSubscriber\NavigationMenuLinkTreeSubscriber
