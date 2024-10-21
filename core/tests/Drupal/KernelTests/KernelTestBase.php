@@ -918,7 +918,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   }
 
   /**
-   * Retrieves a Drupal path or an absolute path.
+   * Retrieves a Drupal path.
    *
    * Requests are sent to the HTTP kernel.
    *
