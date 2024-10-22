@@ -349,6 +349,9 @@ class FileSystem implements FileSystemInterface {
     }
 
     if (is_dir($path)) {
+      if (is_link($path)) {
+        return $this->unlink($path);
+      }
       $dir = dir($path);
       while (($entry = $dir->read()) !== FALSE) {
         if ($entry == '.' || $entry == '..') {
