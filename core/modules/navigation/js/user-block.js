@@ -5,7 +5,6 @@
  */
 
 ((Drupal, drupalSettings, once) => {
-
   /**
    * Replaces the generic User with the actual username.
    *
@@ -18,16 +17,18 @@
     attach: (context) => {
       once('user-block', '[data-user-block]', context).forEach(
         (userBlock) => {
-          userBlock.querySelectorAll('li > button .toolbar-button__label')
+          userBlock
+            .querySelectorAll('li > button .toolbar-button__label')
             .forEach(function(div) {
               div.textContent = drupalSettings.navigation.user;
             });
 
-          userBlock.querySelectorAll('li > .toolbar-popover__wrapper .toolbar-popover__header .toolbar-button__label')
+          userBlock
+            .querySelectorAll('li > .toolbar-popover__wrapper .toolbar-popover__header .toolbar-button__label')
             .forEach(function(div) {
               div.textContent = drupalSettings.navigation.user;
             });
-        },
+        }
       );
     },
   };

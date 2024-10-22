@@ -34298,18 +34298,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\navigation\\\\UserLazyBuilder\\:\\:formatPlural\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/navigation/src/UserLazyBuilder.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\navigation\\\\UserLazyBuilder\\:\\:getNumberOfPlurals\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/navigation/src/UserLazyBuilder.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Function navigation_test_preprocess_block__navigation\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/navigation/tests/navigation_test/navigation_test.module',
