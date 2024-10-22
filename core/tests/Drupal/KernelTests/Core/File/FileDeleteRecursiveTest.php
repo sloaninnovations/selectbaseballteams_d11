@@ -88,8 +88,8 @@ class FileDeleteRecursiveTest extends FileTestBase {
     $this->assertFileExists($this->siteDirectory . '/dir2/subdir/test.txt');
 
     $this->container->get('file_system')->deleteRecursive($this->siteDirectory . '/dir2');
-    $this->assertDirectoryDoesNotExist($this->siteDirectory . '/dir2');
     $this->assertFileExists($this->siteDirectory . '/dir1/test.txt');
+    $this->assertDirectoryDoesNotExist($this->siteDirectory . '/dir2');
   }
 
   /**
