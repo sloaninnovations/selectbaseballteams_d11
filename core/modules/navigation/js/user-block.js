@@ -15,21 +15,21 @@
    */
   Drupal.behaviors.safeTriangleInit = {
     attach: (context) => {
-      once('user-block', '[data-user-block]', context).forEach(
-        (userBlock) => {
-          userBlock
-            .querySelectorAll('li > button .toolbar-button__label')
-            .forEach(function(div) {
-              div.textContent = drupalSettings.navigation.user;
-            });
+      once('user-block', '[data-user-block]', context).forEach((userBlock) => {
+        userBlock
+          .querySelectorAll('li > button .toolbar-button__label')
+          .forEach((button) => {
+            button.textContent = drupalSettings.navigation.user;
+          });
 
-          userBlock
-            .querySelectorAll('li > .toolbar-popover__wrapper .toolbar-popover__header .toolbar-button__label')
-            .forEach(function(div) {
-              div.textContent = drupalSettings.navigation.user;
-            });
-        }
-      );
+        userBlock
+          .querySelectorAll(
+            'li > .toolbar-popover__wrapper .toolbar-popover__header .toolbar-button__label',
+          )
+          .forEach((button) => {
+            button.textContent = drupalSettings.navigation.user;
+          });
+      });
     },
   };
 })(Drupal, drupalSettings, once);

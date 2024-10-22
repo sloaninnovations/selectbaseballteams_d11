@@ -213,7 +213,7 @@ function navigation_element_info_alter(array &$info) {
 /**
  * Implements hook_js_settings_alter().
  */
-function navigation_js_settings_alter(&$settings, AttachedAssetsInterface $assets) {
+function navigation_js_settings_alter(&$settings, AttachedAssetsInterface $assets): void {
   // Provide the user name in drupalSettings to allow JavaScript code to
   // customize the experience for the end user, rather than the server side,
   // which would break the render cache.
