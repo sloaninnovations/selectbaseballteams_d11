@@ -23,6 +23,16 @@ appear after main classes #}
 {% endif %}
 
 <{{ html_tag|default('button') }} {{ attributes.addClass(classes) }}>
+  
+  {% if icon is defined %}
+    {% set icon = icon('navigation', icon, {size: 24}) %}
+    {% if icon is empty %}
+      <span class="toolbar-button--icon--empty">{{ icon_text }}</span>
+    {% else %}
+      {{ icon }}
+    {% endif %}
+  {% endif %}
+
   {% if action %}
     <span data-toolbar-action class="visually-hidden">{{ action }}</span>
   {% endif %}
