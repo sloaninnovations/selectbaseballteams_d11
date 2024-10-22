@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: navigation-user-links
+label: 'Navigation User Links'
+description: 'User Links to be used in Navigation.'
+locked: true

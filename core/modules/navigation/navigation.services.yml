@@ -28,8 +28,3 @@ services:
         '@menu.active_trail',
         '@callable_resolver',
       ]
-
-  navigation.user_lazy_builder:
-    class: Drupal\navigation\UserLazyBuilder
-    arguments: ['@current_user']
-  Drupal\navigation\UserLazyBuilders: '@navigation.user_lazy_builder'
