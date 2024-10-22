@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\navigation\NavigationContentLinks;
@@ -207,4 +208,15 @@ function navigation_element_info_alter(array &$info) {
   if (array_key_exists('layout_builder', $info)) {
     $info['layout_builder']['#pre_render'][] = [RenderCallbacks::class, 'alterLayoutBuilder'];
   }
+}
+
+/**
+ * Implements hook_js_settings_alter().
+ */
+function navigation_js_settings_alter(&$settings, AttachedAssetsInterface $assets) {
+  // Provide the user name in drupalSettings to allow JavaScript code to
+  // customize the experience for the end user, rather than the server side,
+  // which would break the render cache.
+  $user = \Drupal::currentUser();
+  $settings['navigation']['user'] = $user->getAccountName();
 }

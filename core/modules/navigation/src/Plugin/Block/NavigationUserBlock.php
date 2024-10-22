@@ -88,9 +88,21 @@ final class NavigationUserBlock extends BlockBase implements ContainerFactoryPlu
     ];
     $tree = $this->menuTree->transform([$tree], $manipulators);
     $build = $this->menuTree->build($tree);
-    if (!empty($build)) {
-      $build['#title'] = $this->configuration['label'];
+    if (empty($build)) {
+      return $build;
     }
+
+    $build['#title'] = $this->configuration['label'];
+    $build += [
+      '#attached' => [
+        'library' => [
+          'navigation/internal.user-block',
+        ],
+      ],
+      '#attributes' => [
+        'data-user-block' => TRUE,
+      ],
+    ];
 
     return $build;
   }
