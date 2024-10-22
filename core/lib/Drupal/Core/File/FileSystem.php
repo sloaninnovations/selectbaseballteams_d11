@@ -314,6 +314,13 @@ class FileSystem implements FileSystemInterface {
    * {@inheritdoc}
    */
   public function delete($path) {
+    if (is_link($path)) {
+      // See https://bugs.php.net/52176.
+      if (!($this->unlink($path) || '\\' !== \DIRECTORY_SEPARATOR || $this->rmdir($path)) && file_exists($path)) {
+        throw new FileException("Failed to unlink symlink '$path'.");
+      }
+      return TRUE;
+    }
     if (is_file($path)) {
       if (!$this->unlink($path)) {
         throw new FileException("Failed to unlink file '$path'.");
@@ -348,10 +355,7 @@ class FileSystem implements FileSystemInterface {
       return TRUE;
     }
 
-    if (is_dir($path)) {
-      if (is_link($path)) {
-        return $this->unlink($path);
-      }
+    if (is_dir($path) && !is_link($path)) {
       $dir = dir($path);
       while (($entry = $dir->read()) !== FALSE) {
         if ($entry == '.' || $entry == '..') {
