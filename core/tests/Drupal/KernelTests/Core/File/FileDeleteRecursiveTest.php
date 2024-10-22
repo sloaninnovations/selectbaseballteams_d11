@@ -74,4 +74,34 @@ class FileDeleteRecursiveTest extends FileTestBase {
     $this->assertDirectoryDoesNotExist($directory);
   }
 
+  /**
+   * Tests symlinks to directories do not result in unexpected deletions.
+   */
+  public function testSymlinks(): void {
+    // Create files to link to.
+    mkdir($this->siteDirectory . '/dir1');
+    touch($this->siteDirectory . '/dir1/test.txt');
+
+    // Create directory to be deleted.
+    mkdir($this->siteDirectory . '/dir2');
+    symlink(realpath($this->siteDirectory . '/dir1'), $this->siteDirectory . '/dir2/subdir');
+    $this->assertFileExists($this->siteDirectory . '/dir2/subdir/test.txt');
+
+    $this->container->get('file_system')->deleteRecursive($this->siteDirectory . '/dir2');
+    $this->assertDirectoryDoesNotExist($this->siteDirectory . '/dir2');
+    $this->assertFileExists($this->siteDirectory . '/dir1/test.txt');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function tearDown(): void {
+    $this->assertDirectoryExists($this->siteDirectory);
+    parent::tearDown();
+
+    // Ensure \Drupal\KernelTests\KernelTestBase::tearDown() has cleaned up the
+    // file system.
+    $this->assertDirectoryDoesNotExist($this->siteDirectory);
+  }
+
 }
