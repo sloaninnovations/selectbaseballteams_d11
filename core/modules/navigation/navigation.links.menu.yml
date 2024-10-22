@@ -13,17 +13,17 @@ navigation_block.admin_display:
 
 # Navigation User default links.
 navigation.user_links.user.page:
-  title: 'View Profile'
+  title: 'View profile'
   weight: -10
   route_name: user.page
   menu_name: navigation-user-links
 navigation.user_links.user.edit:
-  title: 'Edit Profile'
+  title: 'Edit profile'
   weight: 0
   route_name: user.edit
   menu_name: navigation-user-links
 navigation.user_links.user.logout:
-  title: 'Logout'
+  title: 'Log out'
   weight: 10
   route_name: user.logout
   menu_name: navigation-user-links

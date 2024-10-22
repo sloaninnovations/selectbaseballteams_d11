@@ -29,6 +29,11 @@
           .forEach((button) => {
             button.textContent = drupalSettings.navigation.user;
           });
+        userBlock
+          .querySelectorAll('li > a .toolbar-button__label')
+          .forEach((button) => {
+            button.textContent = drupalSettings.navigation.user;
+          });
       });
     },
   };
