@@ -80,15 +80,21 @@ class FileDeleteRecursiveTest extends FileTestBase {
   public function testSymlinks(): void {
     // Create files to link to.
     mkdir($this->siteDirectory . '/dir1');
-    touch($this->siteDirectory . '/dir1/test.txt');
+    touch($this->siteDirectory . '/dir1/test1.txt');
+    touch($this->siteDirectory . '/test2.txt');
 
     // Create directory to be deleted.
     mkdir($this->siteDirectory . '/dir2');
+    // Symlink to a directory outside dir2.
     symlink(realpath($this->siteDirectory . '/dir1'), $this->siteDirectory . '/dir2/subdir');
-    $this->assertFileExists($this->siteDirectory . '/dir2/subdir/test.txt');
+    // Symlink to a file outside dir2.
+    symlink(realpath($this->siteDirectory . '/test2.txt'), $this->siteDirectory . '/dir2/test2.text');
+    $this->assertFileExists($this->siteDirectory . '/dir2/subdir/test1.txt');
+    $this->assertFileExists($this->siteDirectory . '/dir2/test2.text');
 
     $this->container->get('file_system')->deleteRecursive($this->siteDirectory . '/dir2');
-    $this->assertFileExists($this->siteDirectory . '/dir1/test.txt');
+    $this->assertFileExists($this->siteDirectory . '/dir1/test1.txt');
+    $this->assertFileExists($this->siteDirectory . '/test2.txt');
     $this->assertDirectoryDoesNotExist($this->siteDirectory . '/dir2');
   }
 
