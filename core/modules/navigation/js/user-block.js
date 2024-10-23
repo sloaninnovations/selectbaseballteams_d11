@@ -17,20 +17,9 @@
     attach: (context) => {
       once('user-block', '[data-user-block]', context).forEach((userBlock) => {
         userBlock
-          .querySelectorAll('li > button .toolbar-button__label')
-          .forEach((button) => {
-            button.textContent = drupalSettings.navigation.user;
-          });
-
-        userBlock
           .querySelectorAll(
-            'li > .toolbar-popover__wrapper .toolbar-popover__header .toolbar-button__label',
+            'li > button .toolbar-button__label, li > .toolbar-popover__wrapper .toolbar-popover__header .toolbar-button__label, li > a .toolbar-button__label',
           )
-          .forEach((button) => {
-            button.textContent = drupalSettings.navigation.user;
-          });
-        userBlock
-          .querySelectorAll('li > a .toolbar-button__label')
           .forEach((button) => {
             button.textContent = drupalSettings.navigation.user;
           });
