@@ -347,11 +347,17 @@ class FileSystem implements FileSystemInterface {
    * {@inheritdoc}
    */
   public function deleteRecursive($path, ?callable $callback = NULL) {
+    // Ensure paths are local paths when a recursive delete is started.
+    if ($this->streamWrapperManager->isValidUri($path)) {
+      $path = $this->realpath($path);
+    }
+
     if ($callback) {
       call_user_func($callback, $path);
     }
 
-    if (!file_exists($path)) {
+    // Allow broken links to be removed.
+    if (!file_exists($path) && !is_link($path)) {
       return TRUE;
     }
 
