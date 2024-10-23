@@ -8,10 +8,6 @@
   --admin-toolbar-indicator-live: #87cc5f;
 }
 
-.toolbar-button--icon--workspaces {
-  --icon: url(../assets/icons/workspaces.svg);
-}
-
 .toolbar-button--workspaces {
   color: var(--admin-toolbar-color-gray-990);
   background-color: var(--admin-toolbar-color-orange-300);

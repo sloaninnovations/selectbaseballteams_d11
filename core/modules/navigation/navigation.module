@@ -198,6 +198,7 @@ function navigation_block_alter(&$definitions): void {
   $hidden = [
     'navigation_user',
     'navigation_shortcuts',
+    'navigation_workspaces',
     'navigation_menu',
     'navigation_link',
   ];

@@ -109,9 +109,9 @@ final class NavigationRenderer {
 
     $build = [];
     if ($storage) {
-      $navigation_section = $storage->getSection(0);
-      $this->moduleHandler->alter('navigation', $navigation_section);
-      $build[0] = $navigation_section->toRenderArray();
+      foreach ($storage->getSections() as $delta => $section) {
+        $build[$delta] = $section->toRenderArray([]);
+      }
     }
     // The render array is built based on decisions made by SectionStorage
     // plugins and therefore it needs to depend on the accumulated

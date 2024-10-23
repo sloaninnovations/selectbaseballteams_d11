@@ -277,6 +277,10 @@
   --icon: url(./assets/user.svg);
 }
 
+.toolbar-button--icon--workspaces {
+  --icon: url(./assets/workspaces.svg);
+}
+
 .toolbar-button--collapsible {
   &::after {
     display: none;
