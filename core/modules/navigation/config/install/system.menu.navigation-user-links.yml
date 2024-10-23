@@ -1,6 +1,9 @@
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  enforced:
+    module:
+      - navigation
 id: navigation-user-links
 label: 'Navigation User Links'
 description: 'User Links to be used in Navigation.'
