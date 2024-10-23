@@ -20,7 +20,9 @@
         const nameElement = context.querySelector('.field--name-uid input');
         const name = nameElement && nameElement.value;
         const dateElement = context.querySelector('.field--name-created input');
-        const date = dateElement && dateElement.value;
+        const date = dateElement?.value && (
+          new Date(dateElement.value)
+        ).toLocaleDateString();
 
         if (name && date) {
           return Drupal.t('By @name on @date', {
