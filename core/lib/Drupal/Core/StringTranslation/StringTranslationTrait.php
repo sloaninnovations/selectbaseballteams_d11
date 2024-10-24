@@ -79,7 +79,7 @@ trait StringTranslationTrait {
    * @return \Drupal\Core\StringTranslation\PluralTranslatableMarkup
    *   An object that, when cast to a string, returns the translated string.
    */
-  protected function formatPlural($count, $singular, $plural, array $args = [], array $options = []) {
+  protected function formatPlural($count, $singular, $plural, array $args = [], array $options = []): object {
     return new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $this->getStringTranslation());
   }
 
@@ -91,7 +91,7 @@ trait StringTranslationTrait {
    * @return int
    *   The number of plural variants supported by the given language.
    */
-  protected function getNumberOfPlurals($langcode = NULL) {
+  protected function getNumberOfPlurals($langcode = NULL): int {
     if (\Drupal::hasService('locale.plural.formula')) {
       return \Drupal::service('locale.plural.formula')->getNumberOfPlurals($langcode);
     }

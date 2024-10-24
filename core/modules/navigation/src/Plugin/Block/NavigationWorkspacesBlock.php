@@ -64,6 +64,8 @@ final class NavigationWorkspacesBlock extends BlockBase implements ContainerFact
 
     return [
       'workspaces' => [
+        // We specifically test an invalid callback here. We need to let
+        // PHPStan ignore it.
         // @phpstan-ignore-next-line
         '#lazy_builder' => ['navigation.workspaces_lazy_builders:renderNavigationLinks', []],
         '#create_placeholder' => TRUE,
