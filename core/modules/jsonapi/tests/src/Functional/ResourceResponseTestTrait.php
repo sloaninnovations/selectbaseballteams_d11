@@ -244,7 +244,7 @@ trait ResourceResponseTestTrait {
       $cacheability->addCacheContexts(explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]));
     }
     if ($dynamic_cache = $response->getHeader('X-Drupal-Dynamic-Cache')) {
-      $cacheability->setCacheMaxAge(($dynamic_cache[0] === 'UNCACHEABLE' && $response->getStatusCode() < 400) ? 0 : Cache::PERMANENT);
+      $cacheability->setCacheMaxAge((str_contains($dynamic_cache[0], 'UNCACHEABLE') && $response->getStatusCode() < 400) ? 0 : Cache::PERMANENT);
     }
     $related_document = Json::decode($response->getBody());
     $resource_response = new CacheableResourceResponse($related_document, $response->getStatusCode());
@@ -306,7 +306,7 @@ trait ResourceResponseTestTrait {
    * @return bool
    *   TRUE if the needle exists is present in the haystack, FALSE otherwise.
    */
-  protected static function collectionHasResourceIdentifier(array $needle, array $haystack) {
+  protected static function collectionHasResourceIdentifier(array $needle, array $haystack): bool {
     foreach ($haystack as $resource) {
       if ($resource['type'] == $needle['type'] && $resource['id'] == $needle['id']) {
         return TRUE;
