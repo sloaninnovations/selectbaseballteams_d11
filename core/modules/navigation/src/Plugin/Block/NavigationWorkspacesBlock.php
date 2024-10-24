@@ -64,6 +64,7 @@ final class NavigationWorkspacesBlock extends BlockBase implements ContainerFact
 
     return [
       'workspaces' => [
+        // @phpstan-ignore-next-line
         '#lazy_builder' => ['navigation.workspaces_lazy_builders:renderNavigationLinks', []],
         '#create_placeholder' => TRUE,
         '#lazy_builder_preview' => [
