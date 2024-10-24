@@ -536,7 +536,6 @@ class ToolkitGdTest extends KernelTestBase {
     $warning_detected = FALSE;
     // @see https://github.com/sebastianbergmann/phpunit/issues/5062
     $error_handler = static function () use (&$warning_detected): void {
-      restore_error_handler();
       $warning_detected = TRUE;
     };
     // $error_level is intentionally set to 0. It's required for PHP '@'
@@ -552,6 +551,8 @@ class ToolkitGdTest extends KernelTestBase {
     $image->resize('100', '100');
 
     self::assertFalse($warning_detected);
+
+    restore_error_handler();
   }
 
   /**
