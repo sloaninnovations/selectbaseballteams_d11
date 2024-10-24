@@ -153,13 +153,29 @@ td {
  * This ignores the filter format select of the textarea editor.
  */
 td {
+  & > .form-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  & > .form-item > .form-item__prefix {
+    margin-inline-end: var(--space-xs);
+    white-space: nowrap;
+  }
+
+  & > .form-item > .form-item__suffix {
+    margin-inline-start: var(--space-xs);
+    white-space: nowrap;
+  }
+
   & > .form-item > .form-element,
   & > .ajax-new-content > .form-item > .form-element,
   & > .form-item > .claro-autocomplete,
   & > .form-item > .claro-autocomplete > .form-element,
   & > .ajax-new-content > .form-item > .claro-autocomplete,
   & > .ajax-new-content > .form-item > .claro-autocomplete > .form-element {
-    width: auto;
+    width: 100%;
   }
 
   & > .form-item > .form-element--type-select,
