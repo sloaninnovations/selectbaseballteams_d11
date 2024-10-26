@@ -63,7 +63,7 @@ class UrlConversionTest extends UnitTestCase {
         [
           'driver' => 'sqlite',
           'host' => 'localhost',
-          'database' => $root . '/test_database',
+          'database' => 'test_database',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
         ],
@@ -89,7 +89,7 @@ class UrlConversionTest extends UnitTestCase {
         [
           'driver' => 'sqlite',
           'host' => 'localhost',
-          'database' => $root . '/test_database',
+          'database' => 'test_database',
           'prefix' => 'foo',
           'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
           'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
