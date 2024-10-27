@@ -1,4 +1,5 @@
 # Schema for the configuration files of the node module.
+
 node.settings:
   type: config_object
   label: 'Node settings'
