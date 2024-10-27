@@ -6,8 +6,6 @@
 
 use Drupal\Core\Render\Element;
 
-// cspell:ignore itok
-
 /**
  * Prepares variables for image style preview templates.
  *

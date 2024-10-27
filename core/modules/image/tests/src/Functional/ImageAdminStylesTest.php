@@ -12,8 +12,6 @@ use Drupal\image\ImageStyleInterface;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\TestFileCreationTrait;
 
-// cspell:ignore itok
-
 /**
  * Tests creation, deletion, and editing of image styles and effects.
  *
