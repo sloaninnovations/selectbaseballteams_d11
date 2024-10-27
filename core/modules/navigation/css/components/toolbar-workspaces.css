@@ -10,32 +10,16 @@
  * Styling for the Workspaces navigation item.
  */
 
-/* Custom properties specifically for Workspaces when Navigation is enabled. */
-
-[data-drupal-admin-styles] {
-  --admin-toolbar-indicator-live: #87cc5f;
-}
-
 .toolbar-button--workspaces {
-  color: var(--admin-toolbar-color-gray-990);
-  background-color: var(--admin-toolbar-color-orange-300);
-}
-
-.toolbar-button--workspaces:hover,
-.toolbar-button--workspaces:focus,
-.toolbar-button--workspaces:hover:focus,
-.toolbar-button--workspaces.current {
-  background-color: var(--admin-toolbar-color-orange-300);
+  --toolbar-button-bg: var(--admin-toolbar-color-orange-300);
+  --toolbar-button-color: var(--admin-toolbar-color-gray-990);
+  --toolbar-button-hover-bg: var(--admin-toolbar-color-orange-300);
+  --toolbar-button-current-bg: var(--admin-toolbar-color-orange-300);
 }
 
 .toolbar-button--workspaces--live {
-  color: var(--admin-toolbar-color-gray-990);
-  background-color: var(--admin-toolbar-indicator-live);
-}
-
-.toolbar-button--workspaces--live:hover,
-.toolbar-button--workspaces--live:focus,
-.toolbar-button--workspaces--live:hover:focus,
-.toolbar-button--workspaces--live.current {
-  background-color: var(--admin-toolbar-indicator-live);
+  --toolbar-button-bg: #87cc5f;
+  --toolbar-button-color: var(--admin-toolbar-color-gray-990);
+  --toolbar-button-hover-bg: #87cc5f;
+  --toolbar-button-current-bg: #87cc5f;
 }

@@ -44,7 +44,7 @@
   [data-toolbar-popover-wrapper] {
     --admin-toolbar-z-index-popover: var(--drupal-admin-z-index-popover, -1);
 
-    block-size: calc(100vh - var(--drupal-displace-offset-top, 0));
+    block-size: calc(100vh - var(--drupal-displace-offset-top, 0px));
     padding-block-start: var(--admin-toolbar-space-16);
     transform: translateX(0);
     box-shadow:
