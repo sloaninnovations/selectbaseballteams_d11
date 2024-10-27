@@ -82,4 +82,5 @@ class AutomatedCron implements EventSubscriberInterface {
   protected function getCron(): CronInterface {
     return ($this->cronClosure)();
   }
+
 }
