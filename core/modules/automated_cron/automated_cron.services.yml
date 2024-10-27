@@ -3,4 +3,4 @@ services:
     autoconfigure: true
   automated_cron.subscriber:
     class: Drupal\automated_cron\EventSubscriber\AutomatedCron
-    arguments: ['@cron', '@config.factory', '@state']
+    arguments: [!service_closure '@cron', '@config.factory', '@state']
