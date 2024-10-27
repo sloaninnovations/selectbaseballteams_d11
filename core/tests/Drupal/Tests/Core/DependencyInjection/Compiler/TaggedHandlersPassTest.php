@@ -312,7 +312,7 @@ class TaggedHandlersPassTest extends UnitTestCase {
    *
    * @covers ::process
    */
-  public function testProcessChildDefinition() {
+  public function testProcessChildDefinition(): void {
     $container = $this->buildContainer();
 
     $container
