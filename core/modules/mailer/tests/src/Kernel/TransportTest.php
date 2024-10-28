@@ -142,7 +142,7 @@ class TransportTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\Core\Mailer\TransportFactoryCollection::addTransportFactory
+   * @covers ::createTransport
    */
   public function testThirdPartyFactory(): void {
     $this->enableModules(['mailer_transport_factory_kernel_test']);
