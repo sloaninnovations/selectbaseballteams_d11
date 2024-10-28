@@ -133,21 +133,6 @@ function demo_umami_preprocess_layout(&$variables): void {
                 '#markup' => t('This site is intended for demonstration purposes.'),
               ],
               '#url' => $url,
-            ],
-            [
-              '#theme' => 'navigation__message',
-              '#content' => [
-                '#markup' => t('This site is intended for demonstration purposes.'),
-              ],
-              '#url' => $url,
-              '#type' => 'error',
-            ],
-            [
-              '#theme' => 'navigation__message',
-              '#content' => [
-                '#markup' => t('This site is intended for demonstration purposes.'),
-              ],
-              '#url' => $url,
               '#type' => 'warning',
             ],
           ],

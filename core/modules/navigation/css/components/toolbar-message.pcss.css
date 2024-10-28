@@ -1,7 +1,7 @@
 /* cspell:ignore wght */
 
 .toolbar-message {
-  --icon: url(../../assets/icons/help.svg);
+  --icon: url(../../components/toolbar-button/assets/help.svg);
 
   z-index: 1;
   display: flex;

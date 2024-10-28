@@ -6,7 +6,7 @@
 %}
 
 {% if url is not empty %}
-  <a {{ attributes.addClass(classes).setAttribute('href', url) }}>
+  <a {{ attributes.addClass(classes).setAttribute('href', url).setAttribute('data-drupal-tooltip', content).setAttribute('data-drupal-tooltip-class', 'admin-toolbar__tooltip') }}>
     <div class="toolbar-message__label">
       {{ content }}
     </div>
