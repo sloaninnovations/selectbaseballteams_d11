@@ -88,10 +88,6 @@ final class NavigationUserBlock extends BlockBase implements ContainerFactoryPlu
     ];
     $tree = $this->menuTree->transform([$tree], $manipulators);
     $build = $this->menuTree->build($tree);
-    if (empty($build)) {
-      return $build;
-    }
-
     $build['#title'] = $this->configuration['label'];
     $build += [
       '#attached' => [
