@@ -8,11 +8,11 @@ use Drupal\Tests\BrowserTestBase;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
 /**
- * Tests the default transport in the child site of browser tests.
+ * Tests the transport service factory in the child site of browser tests.
  *
  * @group mailer
  */
-class TransportFactoryAdapterTest extends BrowserTestBase {
+class TransportServiceFactoryTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}

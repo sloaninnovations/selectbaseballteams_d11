@@ -31,18 +31,12 @@ services:
     parent: Symfony\Component\Mailer\Transport\AbstractTransportFactory
     tags:
       - { name: mailer.transport_factory, priority: -100 }
-  Drupal\Core\Mailer\TransportFactoryCollection:
-    public: false
-    tags:
-      - { name: service_collector, tag: mailer.transport_factory, call: addTransportFactory }
-  Symfony\Component\Mailer\Transport:
-    arguments: ['@Drupal\Core\Mailer\TransportFactoryCollection']
-  Drupal\Core\Mailer\TransportFactoryAdapter:
+  Drupal\Core\Mailer\TransportServiceFactory:
     autowire: true
     public: false
-  Drupal\Core\Mailer\Transport\ConfiguredTransportFactoryInterface: '@Drupal\Core\Mailer\TransportFactoryAdapter'
+  Drupal\Core\Mailer\TransportServiceFactoryInterface: '@Drupal\Core\Mailer\TransportServiceFactory'
   Symfony\Component\Mailer\Transport\TransportInterface:
-    factory: ['@Drupal\Core\Mailer\Transport\ConfiguredTransportFactoryInterface', 'createTransport']
+    factory: ['@Drupal\Core\Mailer\TransportServiceFactoryInterface', 'createTransport']
   Symfony\Component\Mailer\Messenger\MessageHandler:
     autowire: true
     public: false

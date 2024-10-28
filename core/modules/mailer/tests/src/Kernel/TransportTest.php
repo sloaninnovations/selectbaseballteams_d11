@@ -16,7 +16,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
  * Tests the transport factory service.
  *
  * @group mailer
- * @coversDefaultClass \Drupal\Core\Mailer\TransportFactoryAdapter
+ * @coversDefaultClass \Drupal\Core\Mailer\TransportServiceFactory
  */
 class TransportTest extends KernelTestBase {
 
