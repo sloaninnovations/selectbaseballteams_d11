@@ -34058,6 +34058,18 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
+	'message' => '#^Method Drupal\\\\navigation\\\\WorkspacesLazyBuilder\\:\\:formatPlural\\(\\) has no return type specified\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/navigation/src/WorkspacesLazyBuilder.php',
+];
+$ignoreErrors[] = [
+	// identifier: missingType.return
+	'message' => '#^Method Drupal\\\\navigation\\\\WorkspacesLazyBuilder\\:\\:getNumberOfPlurals\\(\\) has no return type specified\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/navigation/src/WorkspacesLazyBuilder.php',
+];
+$ignoreErrors[] = [
+	// identifier: missingType.return
 	'message' => '#^Function navigation_test_preprocess_block__navigation\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/navigation/tests/navigation_test/navigation_test.module',
