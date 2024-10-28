@@ -183,7 +183,7 @@ class BigPipe {
     protected MessengerInterface $messenger,
     protected RequestContext $requestContext,
     protected LoggerInterface $logger,
-    protected bool $http_response_debug_cacheability_headers = FALSE
+    protected bool $debugCacheabilityHeaders = FALSE
   ) {
   }
 
