@@ -16,15 +16,17 @@
   Drupal.behaviors.navigationUsername = {
     attach: (context, settings) => {
       if (settings?.navigation?.user) {
-        once('user-block', '[data-user-block]', context).forEach((userBlock) => {
-          userBlock
-            .querySelectorAll(
-              '.toolbar-button--icon--navigation-user-links-user-wrapper [data-toolbar-text], .toolbar-popover__header [data-toolbar-text]',
-            )
-            .forEach((button) => {
-              button.textContent = settings.navigation.user;
-            });
-        });
+        once('user-block', '[data-user-block]', context).forEach(
+          (userBlock) => {
+            userBlock
+              .querySelectorAll(
+                '.toolbar-button--icon--navigation-user-links-user-wrapper [data-toolbar-text], .toolbar-popover__header [data-toolbar-text]',
+              )
+              .forEach((button) => {
+                button.textContent = settings.navigation.user;
+              });
+          },
+        );
       }
     },
   };
