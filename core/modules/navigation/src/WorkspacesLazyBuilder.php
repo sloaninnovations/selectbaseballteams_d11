@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\navigation;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -17,6 +18,7 @@ use Drupal\workspaces\WorkspaceManagerInterface;
  */
 final class WorkspacesLazyBuilder {
 
+  use RedirectDestinationTrait;
   use StringTranslationTrait;
 
   public function __construct(
@@ -33,7 +35,7 @@ final class WorkspacesLazyBuilder {
   public function renderNavigationLinks(): array {
     $active_workspace = $this->workspaceManager->getActiveWorkspace();
 
-    $url = Url::fromRoute('entity.workspace.collection', [], ['query' => \Drupal::destination()->getAsArray()]);
+    $url = Url::fromRoute('entity.workspace.collection', [], ['query' => $this->getDestinationArray()]);
     $url->setOption('attributes', [
       'class' => [
         $active_workspace ? 'toolbar-button--workspaces' : 'toolbar-button--workspaces--live',
