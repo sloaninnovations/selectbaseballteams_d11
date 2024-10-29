@@ -30,6 +30,7 @@ class Select extends Query implements SelectInterface {
   /**
    * The tables against which to JOIN.
    *
+   * @var array
    * This property is a nested array. Each entry is an array representing
    * a single table against which to join. The structure of each entry is:
    *
@@ -49,8 +50,6 @@ class Select extends Query implements SelectInterface {
    * If $join_condition is a Condition object, any arguments should be
    * incorporated into the object; a separate array of arguments does not
    * need to be provided.
-   *
-   * @var array
    */
   protected $tables = [];
 
