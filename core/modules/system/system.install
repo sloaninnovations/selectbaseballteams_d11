@@ -573,7 +573,7 @@ function system_requirements($phase) {
       'title' => t('Database support for JSON'),
       'severity' => REQUIREMENT_OK,
       'value' => t('Available'),
-      'description' => t('Is required in Drupal 10.0.'),
+      'description' => t('Drupal requires databases that support JSON.'),
     ];
 
     if (!Database::getConnection()->hasJson()) {
