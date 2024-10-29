@@ -223,7 +223,7 @@ function navigation_element_info_alter(array &$info) {
 /**
  * Implements hook_menu_local_tasks_alter().
  */
-function navigation_menu_local_tasks_alter(&$data, $route_name, RefinableCacheableDependencyInterface &$cacheability) {
+function navigation_menu_local_tasks_alter(&$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
   if ($route_name === 'entity.node.canonical' && !empty($data['tabs'][0])) {
     $data['tabs'][0]['node.preview_editable_area'] = [
       '#theme' => 'menu_local_task',
