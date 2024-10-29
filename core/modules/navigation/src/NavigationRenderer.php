@@ -264,6 +264,7 @@ final class NavigationRenderer {
           '#title' => $link['title'],
           '#url' => $link['url'],
           '#options' => $link['localized_options'],
+          '#attributes' => $link['attributes'] ?? [],
         ],
         '#access' => $local_task['#access'],
       ];

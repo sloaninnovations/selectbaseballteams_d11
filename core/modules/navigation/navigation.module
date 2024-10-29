@@ -7,7 +7,9 @@
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
 use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
 use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
@@ -103,6 +105,7 @@ function navigation_theme($existing, $type, $theme, $path) {
   $items['top_bar_local_task'] = [
     'variables' => [
       'link' => [],
+      'attributes' => [],
     ],
   ];
 
@@ -214,5 +217,25 @@ function navigation_block_alter(&$definitions): void {
 function navigation_element_info_alter(array &$info) {
   if (array_key_exists('layout_builder', $info)) {
     $info['layout_builder']['#pre_render'][] = [RenderCallbacks::class, 'alterLayoutBuilder'];
+  }
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function navigation_menu_local_tasks_alter(&$data, $route_name, RefinableCacheableDependencyInterface &$cacheability) {
+  if ($route_name === 'entity.node.canonical' && !empty($data['tabs'][0])) {
+    $data['tabs'][0]['node.preview_editable_area'] = [
+      '#theme' => 'menu_local_task',
+      '#link' => [
+        'title' => t('Preview editable areas'),
+        'url' => Url::fromUri("internal:#editable-areas"),
+        'attributes' => [
+          'class' => ['navigation-contextual-link'],
+        ],
+        'localized_options' => [],
+      ],
+      '#access' => \Drupal::currentUser()->hasPermission('access contextual links'),
+    ];
   }
 }

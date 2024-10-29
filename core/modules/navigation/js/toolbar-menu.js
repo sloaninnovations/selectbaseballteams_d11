@@ -131,5 +131,27 @@
         });
       },
     };
+
+    /**
+     * Toggle contextual menu links.
+     *
+     * @type {Drupal~behavior}
+     *
+     * @prop {Drupal~behaviorAttach} attach
+     *  Attach event into the navigation contextual link.
+     */
+    Drupal.behaviors.toggleContextualLinks = {
+      attach: () => {
+        const toggleContextualItems = (el) => el.classList.toggle('visually-hidden');
+        const link = document.querySelector(".navigation-contextual-link");
+        if (link) {
+          link.addEventListener("click", () => {
+            document.querySelectorAll(".contextual button").forEach(toggleContextualItems)
+          });
+        }
+      }
+    };
   }
+
+
 )(Drupal, once);

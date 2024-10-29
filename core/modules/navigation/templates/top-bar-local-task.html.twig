@@ -7,6 +7,6 @@
  * - link: Link render element.
  */
 #}
-<li class="toolbar-dropdown__item">
+<li {{ attributes.addClass('toolbar-dropdown__item') }}>
   {{ link|add_class('toolbar-dropdown__link') }}
 </li>
