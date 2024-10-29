@@ -29,6 +29,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'navigation',
+    'navigation_top_bar',
     'block_content',
     'layout_builder',
     'layout_test',
@@ -67,6 +68,8 @@ class NavigationBlockUiTest extends WebDriverTestBase {
       'administer shortcuts',
       'administer site configuration',
       'access administration pages',
+      'view the administration theme',
+      'administer blocks',
     ]);
   }
 
@@ -154,6 +157,48 @@ class NavigationBlockUiTest extends WebDriverTestBase {
     $this->assertSession()->addressEquals($layout_url);
     $this->assertSession()->pageTextContains('Newer Shortcuts');
     $this->assertSession()->elementTextNotContains('css', 'form', 'New Shortcuts');
+  }
+
+  /**
+   * Test preview editable links areas.
+   */
+  public function testNavigationPreviewContextualLinks(): void {
+    $this->drupalCreateContentType([
+      'type' => 'page',
+      'name' => 'Basic page',
+      'display_submitted' => FALSE,
+    ]);
+    $themeInstaller = $this->container->get('theme_installer');
+    $themeConfig = $this->container->get('config.factory')
+      ->getEditable('system.theme');
+
+    // Prepare admin theme to test the contextual links.
+    $themeInstaller->install(['claro']);
+    $themeConfig->set('admin', 'claro')->save();
+
+    $this->drupalLogin($this->adminUser);
+    $node = $this->drupalCreateNode([
+      'title' => 'Node text',
+      'type' => 'page',
+    ]);
+    $this->container->get('module_installer')->install(['block', 'shortcut', 'contextual']);
+    $this->drupalPlaceBlock('system_powered_by_block', ['region' => 'footer']);
+    $this->rebuildContainer();
+
+    $this->drupalGet('/node/' . $node->id());
+    $this->assertSession()->pageTextContains('Node text');
+
+    $page = $this->getSession()->getPage();
+    $topBarElement = $page->find('css', '.top-bar');
+    $topBarElement->findButton('More actions')->click();
+    $topBarElement->findLink('Preview editable areas')->click();
+
+    $page->find('css', '.block-system-powered-by-block .contextual button')->isVisible();
+    $page->find('css', '.block-page-title-block .contextual button')->isVisible();
+
+    // Rollback the default admin settings.
+    $themeConfig->set('admin', $this->defaultTheme)->save();
+    $themeInstaller->uninstall(['claro']);
   }
 
   /**
