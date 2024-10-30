@@ -8,6 +8,8 @@
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\RevisionableInterface;
+use Drupal\Core\Entity\RevisionableStorageInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\File\Exception\FileException;
@@ -142,6 +144,9 @@ function file_file_download($uri) {
 
   // Find out which (if any) fields of this type contain the file.
   $references = file_get_file_references($file, NULL, EntityStorageInterface::FIELD_LOAD_CURRENT, NULL);
+  if (empty($references)) {
+    $references = file_get_file_references($file, NULL, EntityStorageInterface::FIELD_LOAD_REVISION, NULL);
+  }
 
   // Stop processing if there are no references in order to avoid returning
   // headers for files controlled by other modules. Make an exception for
@@ -973,7 +978,7 @@ function template_preprocess_file_upload_help(&$variables) {
  * @param \Drupal\Core\Field\FieldDefinitionInterface|null $field
  *   (optional) A field definition to be used for this check. If given,
  *   limits the reference check to the given field. Defaults to NULL.
- * @param int $age
+ * @param string $age
  *   (optional) A constant that specifies which references to count. Use
  *   EntityStorageInterface::FIELD_LOAD_REVISION (the default) to retrieve all
  *   references within all revisions or
@@ -986,23 +991,35 @@ function template_preprocess_file_upload_help(&$variables) {
  *   returned. Defaults to 'file'.
  *
  * @return array
- *   A multidimensional array. The keys are field_name, entity_type,
- *   entity_id and the value is an entity referencing this file.
+ *   A multidimensional array. Keyed by field_name, entity_type then either
+ *   entity_id or revision_id, the value is an entity referencing this file.
+ *   Returned entities are keyed by revision_id if $age is set to
+ *   EntityStorageInterface::FIELD_LOAD_REVISION (the default), and the
+ *   entity type is revisionable.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ *   Thrown if the entity type doesn't exist.
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ *   Thrown if the storage handler couldn't be loaded.
  *
  * @ingroup file
  */
 function file_get_file_references(FileInterface $file, ?FieldDefinitionInterface $field = NULL, $age = EntityStorageInterface::FIELD_LOAD_REVISION, $field_type = 'file') {
   $references = &drupal_static(__FUNCTION__, []);
   $field_columns = &drupal_static(__FUNCTION__ . ':field_columns', []);
+  $entity_type_manager = \Drupal::entityTypeManager();
 
   // Fill the static cache, disregard $field and $field_type for now.
-  if (!isset($references[$file->id()][$age])) {
-    $references[$file->id()][$age] = [];
+  if (!isset($references[$file->id()])) {
+    $references[$file->id()] = [];
     $usage_list = \Drupal::service('file.usage')->listUsage($file);
     $file_usage_list = $usage_list['file'] ?? [];
     foreach ($file_usage_list as $entity_type_id => $entity_ids) {
-      $entities = \Drupal::entityTypeManager()
-        ->getStorage($entity_type_id)->loadMultiple(array_keys($entity_ids));
+      $entity_type = $entity_type_manager->getDefinition($entity_type_id);
+      $storage = $entity_type_manager->getStorage($entity_type_id);
+      $entities = $storage->loadMultiple(array_keys($entity_ids));
+
+      /** @var \Drupal\Core\Entity\FieldableEntityInterface[] $entities */
       foreach ($entities as $entity) {
         $bundle = $entity->bundle();
         // We need to find file fields for this entity type and bundle.
@@ -1021,18 +1038,62 @@ function file_get_file_references(FileInterface $file, ?FieldDefinitionInterface
             }
           }
         }
+        $default_revision_match = FALSE;
         foreach ($file_fields[$entity_type_id][$bundle] as $field_name => $field_column) {
           // Iterate over the field items to find the referenced file and field
-          // name. This will fail if the usage checked is in a non-current
-          // revision because field items are from the current
-          // revision.
-          // We also iterate over all translations because a file can be linked
-          // to a language other than the default.
+          // name. We also iterate over all translations because a file can be
+          // linked to a language other than the default.
           foreach ($entity->getTranslationLanguages() as $langcode => $language) {
             foreach ($entity->getTranslation($langcode)->get($field_name) as $item) {
               if ($file->id() == $item->{$field_column}) {
-                $references[$file->id()][$age][$field_name][$entity_type_id][$entity->id()] = $entity;
+                // Revisionable entities will be returned keyed by revision ID.
+                if ($entity instanceof RevisionableInterface && $entity_type->isRevisionable()) {
+                  $reference_id = $entity->getRevisionId();
+                }
+                else {
+                  $reference_id = $entity->id();
+                }
+                $default_revision_match = TRUE;
+                $references[$file->id()][$field_name][$entity_type_id][$reference_id] = $entity;
                 break;
+              }
+            }
+          }
+        }
+        if (!$default_revision_match && $file_fields[$entity_type_id][$bundle] && $entity_type->isRevisionable() && $storage instanceof RevisionableStorageInterface) {
+          // The file reference was not found in any field in the current entity
+          // assume that it is referenced in a non-default revision. At this
+          // point, the possible fields are known, create a query that fetches
+          // the most recent revision that references the given file in
+          // any of those fields.
+          $query = $storage->getQuery()
+            ->accessCheck(FALSE)
+            ->allRevisions()
+            ->condition($entity_type->getKey('id'), $entity->id());
+
+          $fields_condition = $query->orConditionGroup();
+          foreach ($file_fields[$entity_type_id][$bundle] as $field_name => $field_column) {
+            $fields_condition->condition($field_name . '.' . $field_column, $file->id());
+          }
+          $results = $query
+            ->condition($fields_condition)
+            ->sort($entity_type->getKey('revision'), 'DESC')
+            ->range(0, 1)
+            ->execute();
+          if ($results) {
+            $revision = $storage->loadRevision(key($results));
+            foreach ($file_fields[$entity_type_id][$bundle] as $field_name => $field_column) {
+              // Iterate over the field items to find the referenced file and field
+              // name. We also iterate over all translations because a file can be
+              // linked to a language other than the default.
+              foreach ($revision->getTranslationLanguages() as $langcode => $language) {
+                foreach ($revision->getTranslation($langcode)->get($field_name) as $item) {
+                  if ($file->id() == $item->{$field_column}) {
+                    $reference_id = $revision->getRevisionId();
+                    $references[$file->id()][$field_name][$entity_type_id][$reference_id] = $revision;
+                    break;
+                  }
+                }
               }
             }
           }
@@ -1040,16 +1101,17 @@ function file_get_file_references(FileInterface $file, ?FieldDefinitionInterface
       }
     }
   }
-  $return = $references[$file->id()][$age];
+  $return = $references[$file->id()];
   // Filter the static cache down to the requested entries. The usual static
   // cache is very small so this will be very fast.
-  $entity_field_manager = \Drupal::service('entity_field.manager');
   if ($field || $field_type) {
+    /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
+    $entity_field_manager = \Drupal::service('entity_field.manager');
     foreach ($return as $field_name => $data) {
       foreach (array_keys($data) as $entity_type_id) {
         $field_storage_definitions = $entity_field_manager->getFieldStorageDefinitions($entity_type_id);
         $current_field = $field_storage_definitions[$field_name];
-        if (($field_type && $current_field->getType() != $field_type) || ($field && $field->uuid() != $current_field->uuid())) {
+        if (($field_type && $current_field->getType() != $field_type) || ($field && $field->getFieldStorageDefinition()->getUniqueStorageIdentifier() != $current_field->getUniqueIdentifier())) {
           unset($return[$field_name][$entity_type_id]);
         }
       }
