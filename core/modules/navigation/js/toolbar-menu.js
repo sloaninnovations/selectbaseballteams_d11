@@ -141,17 +141,20 @@
      *  Attach event into the navigation contextual link.
      */
     Drupal.behaviors.toggleContextualLinks = {
-      attach: () => {
+      attach: (context) => {
         const toggleContextualItems = (el) =>
           el.classList.toggle('visually-hidden');
-        const link = document.querySelector('.navigation-contextual-link');
-        if (link) {
+        once(
+          'preview-editable-areas',
+          '.navigation-contextual-link',
+          context,
+        ).forEach((link) => {
           link.addEventListener('click', () => {
             document
               .querySelectorAll('.contextual button')
               .forEach(toggleContextualItems);
           });
-        }
+        });
       },
     };
   }
