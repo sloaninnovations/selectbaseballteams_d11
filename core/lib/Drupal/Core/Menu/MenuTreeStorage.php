@@ -230,9 +230,26 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    */
   public function save(array $link) {
     $affected_menus = $this->doSave($link);
-    $this->resetDefinitions();
-    $cache_tags = Cache::buildTags('config:system.menu', $affected_menus, '.');
-    $this->cacheTagsInvalidator->invalidateTags($cache_tags);
+    // If a menu changed, reset the definitions.
+    if (in_array(TRUE, $affected_menus)) {
+      $this->resetDefinitions();
+    }
+    $cache_tags = [];
+    foreach ($affected_menus as $affected_menu => $did_change) {
+      if ($did_change === FALSE) {
+        $cache_tags = [
+          ...$cache_tags,
+          ...Cache::buildTags('config:system.menu', [$affected_menu], '.'),
+        ];
+      }
+      // Reset the key's value to the menu name
+      // to preserve bc.
+      $affected_menus[$affected_menu] = $affected_menu;
+    }
+    if (!empty($cache_tags)) {
+      $this->cacheTagsInvalidator->invalidateTags($cache_tags);
+    }
+
     return $affected_menus;
   }
 
@@ -244,9 +261,10 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   \Drupal\Core\Menu\MenuLinkInterface plugin.
    *
    * @return array
-   *   The menu names affected by the save operation. This will be one menu
-   *   name if the link is saved to the sane menu, or two if it is saved to a
-   *   new menu.
+   *   An associative array where the keys are the menu names affected by the
+   *   save operation and the value indicates whether the menu item changed or
+   *   not. There will be one menu name if the link is saved to the same menu,
+   *   or two if it is saved to a new menu.
    *
    * @throws \Exception
    *   Thrown if the storage back-end does not exist and could not be created.
@@ -280,6 +298,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       // - MenuTreeStorage::preSave() removes the 'mlid' from $fields.
       // - The order of the keys in $original and $fields is different.
       if (array_diff_assoc($fields, $original) == [] && array_diff_assoc($original, $fields) == ['mlid' => $link['mlid']]) {
+        $affected_menus[$original['menu_name']] = FALSE;
         return $affected_menus;
       }
     }
@@ -295,6 +314,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       }
       // We may be moving the link to a new menu.
       $affected_menus[$fields['menu_name']] = $fields['menu_name'];
+      $affected_menus = array_fill_keys(array_keys($affected_menus), TRUE);
       $query = $this->connection->update($this->table, $this->options);
       $query->condition('mlid', $link['mlid']);
       $query->fields($fields)
