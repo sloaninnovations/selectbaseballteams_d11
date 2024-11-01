@@ -26,7 +26,7 @@ module.exports = {
       browser
         .drupalRelativeURL('/')
         .waitForElementPresent(
-          '[data-once="admin-toolbar-document-triggers-listener"][data-admin-toolbar="expanded"]',
+          '[data-once="admin-toolbar-document-triggers-listener"]',
         )
         // This pause required to wait for first init event.
         .waitForElementVisible(selectors.expandButton.expanded)

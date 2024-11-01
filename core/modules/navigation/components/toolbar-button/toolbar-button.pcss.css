@@ -47,10 +47,12 @@
     background-color: var(--toolbar-button-has-active-child-bg);
   }
 
-  &[class*="toolbar-button--icon"]:has(+ .ajax-progress--throbber) {
+  &[class*="toolbar-button--icon"]:has(+ .ajax-progress--throbber),
+  &[class*="toolbar-button--icon"]:has(+ .ajax-progress-throbber) {
     --icon: url(./assets/throbber.svg);
 
-    & + .ajax-progress--throbber {
+    & + .ajax-progress--throbber,
+    & + .ajax-progress-throbber {
       display: none;
     }
   }
