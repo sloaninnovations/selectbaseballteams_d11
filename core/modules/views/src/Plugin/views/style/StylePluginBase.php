@@ -753,7 +753,7 @@ abstract class StylePluginBase extends PluginBase {
   }
 
   /**
-   * #pre_render callback for view row field rendering.
+   * The #pre_render callback for view row field rendering.
    *
    * @see self::render()
    *

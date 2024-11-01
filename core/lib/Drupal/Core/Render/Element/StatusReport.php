@@ -30,7 +30,7 @@ class StatusReport extends RenderElementBase {
   }
 
   /**
-   * #pre_render callback to group requirements.
+   * The #pre_render callback to group requirements.
    */
   public static function preRenderGroupRequirements($element) {
     $severities = static::getSeverities();

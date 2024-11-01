@@ -334,7 +334,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   abstract protected function allowedValuesDescription();
 
   /**
-   * #element_validate callback for options field allowed values.
+   * The #element_validate callback for options field allowed values.
    *
    * @param $element
    *   An associative array containing the properties and children of the
