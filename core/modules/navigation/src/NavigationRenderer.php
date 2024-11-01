@@ -3,6 +3,7 @@
 namespace Drupal\navigation;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -141,6 +142,11 @@ final class NavigationRenderer {
     $build[0] = NestedArray::mergeDeepArray([$build[0], $defaults]);
     $page_top['navigation'] = $build;
 
+    $promoted = $this->getPromotedContent();
+    if (!empty($promoted)) {
+      $page_top['navigation'][0]['promoted'] = $promoted;
+    }
+
     if ($logo_provider === self::LOGO_PROVIDER_CUSTOM) {
       $logo_path = $logo_settings->get('logo.path');
       if (!empty($logo_path) && is_file($logo_path)) {
@@ -153,6 +159,19 @@ final class NavigationRenderer {
         }
       }
     }
+  }
+
+  /**
+   * Gets the content for promoted section.
+   *
+   * @return array
+   *   The promoted section content.
+   */
+  protected function getPromotedContent(): array {
+    $promoted = $this->moduleHandler->invokeAll('navigation_promoted');
+    $this->moduleHandler->alter('navigation_promoted', $promoted);
+    uasort($promoted, [SortArray::class, 'sortByWeightElement']);
+    return $promoted;
   }
 
   /**

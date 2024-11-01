@@ -17,3 +17,36 @@ function navigation_test_preprocess_block__navigation(&$variables) {
   // in tests.
   $variables['attributes']['class'][] = Html::cleanCssIdentifier('block-' . $variables['elements']['#plugin_id']);
 }
+
+/**
+ * Implements hook_navigation_promoted().
+ */
+function navigation_test_navigation_promoted(): array {
+  if (\Drupal::state()->get('navigation_promoted')) {
+    return [
+      'navigation_foo' => [
+        '#markup' => 'foo',
+      ],
+      'navigation_bar' => [
+        '#markup' => 'bar',
+      ],
+      'navigation_baz' => [
+        '#markup' => 'baz',
+      ],
+    ];
+  }
+  else {
+    return [];
+  }
+}
+
+/**
+ * Implements hook_navigation_promoted_alter().
+ */
+function navigation_test_navigation_promoted_alter(&$promoted): void {
+  if (\Drupal::state()->get('navigation_promoted_alter')) {
+    unset($promoted['navigation_foo']);
+    $promoted['navigation_bar']['#markup'] = 'new bar';
+    $promoted['navigation_baz']['#weight'] = '-100';
+  }
+}

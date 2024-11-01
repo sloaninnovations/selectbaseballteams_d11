@@ -70,6 +70,12 @@
         } only %}
       </div>
 
+      {# Include the promoted region if has content. #}
+      {% if content.promoted is not empty %}
+        <div class="admin-toolbar__promoted">
+          {{ content.promoted }}
+        </div>
+      {% endif %}
       {{ content.content }}
     </nav>
 
