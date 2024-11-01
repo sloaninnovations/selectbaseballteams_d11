@@ -7,6 +7,8 @@ namespace Drupal\Tests\navigation\Functional;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 
+// cspell:ignore foobarbaz baznew
+
 /**
  * Tests for navigation header section.
  *
