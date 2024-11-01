@@ -236,7 +236,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     }
     $cache_tags = [];
     foreach ($affected_menus as $affected_menu => $did_change) {
-      if ($did_change === FALSE) {
+      if ($did_change === TRUE) {
         $cache_tags = [
           ...$cache_tags,
           ...Cache::buildTags('config:system.menu', [$affected_menu], '.'),
