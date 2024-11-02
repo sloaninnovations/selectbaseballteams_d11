@@ -525,9 +525,9 @@
  * Note that the base theme's form alterations will be run before any sub-theme
  * alterations.
  *
- * @param $form
+ * @param array $form
  *   Nested array of form elements that comprise the form.
- * @param $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The current state of the form.
  */
 function hook_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
@@ -1248,7 +1248,7 @@ function hook_page_bottom(array &$page_bottom) {
  * @see themeable
  * @see hook_theme_registry_alter()
  */
-function hook_theme($existing, $type, $theme, $path) {
+function hook_theme($existing, $type, $theme, $path): array {
   return [
     'my_module_display' => [
       'variables' => [
