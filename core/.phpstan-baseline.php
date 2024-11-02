@@ -5408,12 +5408,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/EntityAutocompleteMatcher.php',
 ];
 $ignoreErrors[] = [
-	// identifier: property.notFound
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityBase\\:\\:\\$id\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/EntityBase.php',
-];
-$ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\EntityBase\\:\\:delete\\(\\) has no return type specified\\.$#',
 	'count' => 1,
@@ -8159,12 +8153,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\Plugin\\\\Field\\\\FieldType\\\\MapItem\\:\\:setValue\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldType/MapItem.php',
-];
-$ignoreErrors[] = [
-	// identifier: property.notFound
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\Plugin\\\\Field\\\\FieldType\\\\NumericItemBase\\:\\:\\$value\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldType/NumericItemBase.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -19283,18 +19271,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/datetime_range/src/Plugin/Field/FieldType/DateRangeFieldItemList.php',
 ];
 $ignoreErrors[] = [
-	// identifier: property.notFound
-	'message' => '#^Access to an undefined property Drupal\\\\datetime_range\\\\Plugin\\\\Field\\\\FieldType\\\\DateRangeItem\\:\\:\\$end_date\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/datetime_range/src/Plugin/Field/FieldType/DateRangeItem.php',
-];
-$ignoreErrors[] = [
-	// identifier: property.notFound
-	'message' => '#^Access to an undefined property Drupal\\\\datetime_range\\\\Plugin\\\\Field\\\\FieldType\\\\DateRangeItem\\:\\:\\$start_date\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/datetime_range/src/Plugin/Field/FieldType/DateRangeItem.php',
-];
-$ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\datetime_range\\\\Plugin\\\\Field\\\\FieldType\\\\DateRangeItem\\:\\:onChange\\(\\) has no return type specified\\.$#',
 	'count' => 1,
@@ -24111,18 +24087,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\image\\\\ImageStyleStorageInterface\\:\\:setReplacementId\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/image/src/ImageStyleStorageInterface.php',
-];
-$ignoreErrors[] = [
-	// identifier: property.notFound
-	'message' => '#^Access to an undefined property Drupal\\\\image\\\\Plugin\\\\Field\\\\FieldType\\\\ImageItem\\:\\:\\$height\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/image/src/Plugin/Field/FieldType/ImageItem.php',
-];
-$ignoreErrors[] = [
-	// identifier: property.notFound
-	'message' => '#^Access to an undefined property Drupal\\\\image\\\\Plugin\\\\Field\\\\FieldType\\\\ImageItem\\:\\:\\$width\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/image/src/Plugin/Field/FieldType/ImageItem.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -35911,12 +35875,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/options/src/Plugin/Field/FieldType/ListIntegerItem.php',
 ];
 $ignoreErrors[] = [
-	// identifier: property.notFound
-	'message' => '#^Access to an undefined property Drupal\\\\options\\\\Plugin\\\\Field\\\\FieldType\\\\ListItemBase\\:\\:\\$value\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/options/src/Plugin/Field/FieldType/ListItemBase.php',
-];
-$ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\options\\\\Plugin\\\\Field\\\\FieldType\\\\ListItemBase\\:\\:addMoreAjax\\(\\) has no return type specified\\.$#',
 	'count' => 1,
@@ -36569,24 +36527,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\path\\\\Plugin\\\\Field\\\\FieldType\\\\PathFieldItemList\\:\\:setValue\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/path/src/Plugin/Field/FieldType/PathFieldItemList.php',
-];
-$ignoreErrors[] = [
-	// identifier: property.notFound
-	'message' => '#^Access to an undefined property Drupal\\\\path\\\\Plugin\\\\Field\\\\FieldType\\\\PathItem\\:\\:\\$alias\\.$#',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/path/src/Plugin/Field/FieldType/PathItem.php',
-];
-$ignoreErrors[] = [
-	// identifier: property.notFound
-	'message' => '#^Access to an undefined property Drupal\\\\path\\\\Plugin\\\\Field\\\\FieldType\\\\PathItem\\:\\:\\$langcode\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/path/src/Plugin/Field/FieldType/PathItem.php',
-];
-$ignoreErrors[] = [
-	// identifier: property.notFound
-	'message' => '#^Access to an undefined property Drupal\\\\path\\\\Plugin\\\\Field\\\\FieldType\\\\PathItem\\:\\:\\$pid\\.$#',
-	'count' => 5,
-	'path' => __DIR__ . '/modules/path/src/Plugin/Field/FieldType/PathItem.php',
 ];
 $ignoreErrors[] = [
 	// identifier: return.missing
