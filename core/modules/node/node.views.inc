@@ -55,7 +55,7 @@ function node_views_analyze(ViewExecutable $view) {
 /**
  * Implements hook_views_data_alter().
  */
-function node_views_data_alter(&$data) {
+function node_views_data_alter(&$data): void {
   if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
     $data['node_field_data']['term_node_tid'] = [
       'title' => t('Taxonomy terms on node'),
@@ -106,7 +106,7 @@ function node_views_data_alter(&$data) {
  *
  * @see views_field_default_views_data()
  */
-function node_field_views_data_alter(array &$data, FieldStorageConfigInterface $field_storage) {
+function node_field_views_data_alter(array &$data, FieldStorageConfigInterface $field_storage): void {
   if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
     if ($field_storage->getType() == 'entity_reference' && $field_storage->getSetting('target_type') == 'taxonomy_term') {
       foreach ($data as $table_name => $table_data) {
