@@ -48599,18 +48599,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Function taxonomy_field_views_data_alter\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/taxonomy.views.inc',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Function taxonomy_views_data_alter\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/taxonomy.views.inc',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Function taxonomy_crud_taxonomy_vocabulary_presave\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/taxonomy/tests/modules/taxonomy_crud/taxonomy_crud.module',

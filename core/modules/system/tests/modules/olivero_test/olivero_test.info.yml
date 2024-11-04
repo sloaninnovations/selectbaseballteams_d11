@@ -8,6 +8,7 @@ dependencies:
   - drupal:contact
   - drupal:form_test
   - drupal:image
+  - drupal:node
   - drupal:path
   - drupal:search
   - drupal:taxonomy
