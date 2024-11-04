@@ -255,7 +255,7 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     // No validation.
   }
 
@@ -319,7 +319,7 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $formValues = $form_state->getValues();
 
     $this->fieldTypeFilter = $formValues['field_type'];
