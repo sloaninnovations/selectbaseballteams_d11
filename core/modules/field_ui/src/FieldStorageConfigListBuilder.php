@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
+use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -52,17 +53,15 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
 
   /**
    * The Entity type repository.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeRepositoryInterface
    */
-  protected $entityTypeRepository;
+  protected EntityTypeRepositoryInterface $entityTypeRepository;
 
   /**
    * The array of field storage configs.
    *
    * @var \Drupal\field\FieldStorageConfigInterface[]
    */
-  protected $fieldStorageConfigs;
+  protected array $fieldStorageConfigs;
 
   /**
    * The name of field type.
@@ -80,10 +79,8 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
 
   /**
    * The form builder.
-   *
-   * @var \Drupal\Core\Form\FormBuilderInterface
    */
-  protected $formBuilder;
+  protected FormBuilderInterface $formBuilder;
 
   /**
    * Constructs a new FieldStorageConfigListBuilder object.
@@ -98,17 +95,20 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
    *   The bundle info service.
    * @param \Drupal\Core\Entity\EntityTypeRepositoryInterface $entityTypeRepository
    *   The entity type repository.
+   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   *   The form builder.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager, EntityTypeBundleInfoInterface $bundle_info_service, EntityTypeRepositoryInterface $entityTypeRepository) {
+  public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager, EntityTypeBundleInfoInterface $bundle_info_service, EntityTypeRepositoryInterface $entityTypeRepository, FormBuilderInterface $form_builder) {
     parent::__construct($entity_type, $entity_type_manager->getStorage($entity_type->id()));
 
-    $this->fieldStorageConfigs = $this->load();
     $this->entityTypeManager = $entity_type_manager;
     $this->bundles = $bundle_info_service->getAllBundleInfo();
     $this->fieldTypeManager = $field_type_manager;
     $this->fieldTypes = $this->fieldTypeManager->getDefinitions();
     $this->limit = FALSE;
     $this->entityTypeRepository = $entityTypeRepository;
+    $this->formBuilder = $form_builder;
+    $this->fieldStorageConfigs = $this->load();
   }
 
   /**
@@ -120,7 +120,8 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.field.field_type'),
       $container->get('entity_type.bundle.info'),
-      $container->get('entity_type.repository')
+      $container->get('entity_type.repository'),
+      $container->get('form_builder')
     );
   }
 
@@ -130,7 +131,7 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
    * @return string[]
    *   An array of entity IDs.
    */
-  protected function getEntityIds() {
+  protected function getEntityIds(): array {
     $query = $this->getStorage()->getQuery()
       ->sort($this->entityType->getKey('id'));
 
@@ -153,7 +154,7 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
    * {@inheritdoc}
    */
   public function render() {
-    $build = parent::render();
+    $build = $this->formBuilder->getForm($this);
     $build['#attached']['library'][] = 'field_ui/drupal.field_ui';
     return $build;
   }
@@ -220,7 +221,7 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['filters'] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['form--inline', 'clearfix']],
@@ -244,7 +245,7 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
     $form['filters']['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Filter'),
-      '#button_type' => 'primary',
+      '#button_type' => 'secondary',
     ];
 
     $form['table_container'] = parent::render();
@@ -268,7 +269,7 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
    * @return string[]
    *   The array of options.
    */
-  protected function entityTypeOptions(array $fieldStorageConfigs) {
+  protected function entityTypeOptions(array $fieldStorageConfigs): array {
     $entityLabels = $this->entityTypeRepository->getEntityTypeLabels();
 
     // Gather valid entity types.
@@ -297,7 +298,7 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
    * @return string[]
    *   The array of options.
    */
-  protected function fieldTypeOptions(array $fieldStorageConfigs) {
+  protected function fieldTypeOptions(array $fieldStorageConfigs): array {
     $existed_field_types = [];
     foreach ($fieldStorageConfigs as $fieldStorageConfig) {
       $existed_field_types[] = $fieldStorageConfig->getType();
@@ -328,21 +329,8 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
     $form_state->setRebuild();
   }
 
-  public function getFormId() {
+  public function getFormId(): string {
     return 'field_storage_config_form';
-  }
-
-  /**
-   * Returns the form builder.
-   *
-   * @return \Drupal\Core\Form\FormBuilderInterface
-   *   The form builder.
-   */
-  protected function formBuilder() {
-    if (!isset($this->formBuilder)) {
-      $this->formBuilder = \Drupal::formBuilder();
-    }
-    return $this->formBuilder;
   }
 
 }
