@@ -16,7 +16,7 @@ class DuplicateRoleFilterTest extends ViewTestBase {
    *
    * @var array
    */
-  public static $testViews = ['duplicate_role_filter'];
+  public static $testViews = ['test_duplicate_role_filter'];
 
   /**
    * {@inheritdoc}
