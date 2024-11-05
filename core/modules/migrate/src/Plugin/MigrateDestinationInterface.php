@@ -86,6 +86,10 @@ interface MigrateDestinationInterface extends PluginInspectionInterface {
    * @return array
    *   - Keys: machine names of the fields
    *   - Values: Human-friendly descriptions of the fields.
+   *
+   * @throws \Drupal\migrate\MigrateException
+   *   Throws an exception if there is a error in the configuration of the
+   *   destination plugin.
    */
   public function fields();
 

@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\Core\Entity\EntityFieldManager;
+use Drupal\Core\Serialization\Yaml;
 use Drupal\entity_test\Entity\EntityTestMul;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\migrate\MigrateExecutable;
@@ -28,7 +31,13 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['migrate', 'user', 'language', 'entity_test'];
+  protected static $modules = [
+    'migrate',
+    'user',
+    'language',
+    'entity_test',
+    'field',
+  ];
 
   /**
    * The storage for entity_test_mul.
@@ -55,6 +64,9 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
     \Drupal::state()->set('entity_test.required_default_field', TRUE);
     \Drupal::state()->set('entity_test.required_multi_default_field', TRUE);
     $this->installEntitySchema('entity_test_mul');
+
+    $this->installEntitySchema('entity_test_with_bundle');
+    $this->installEntitySchema('entity_test_no_bundle');
 
     ConfigurableLanguage::createFromLangcode('en')->save();
     ConfigurableLanguage::createFromLangcode('fr')->save();
@@ -100,7 +112,8 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
       [],
       $this->container->get('entity_field.manager'),
       $this->container->get('plugin.manager.field.field_type'),
-      $this->container->get('account_switcher')
+      $this->container->get('account_switcher'),
+      $this->container->get('entity_type.bundle.info')
     );
   }
 
@@ -350,6 +363,125 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
 
     $this->container->set('entity_field.manager', $decorated_entity_field_manager);
     $this->createEntityStub('migrate_string_id_entity_test');
+  }
+
+  /**
+   * Test destination fields() method.
+   */
+  public function testFields() {
+    // Create two bundles for the entity_test_with_bundle entity type.
+    $bundle_storage = $this->container->get('entity_type.manager')->getStorage('entity_test_bundle');
+    $bundle_storage->create([
+      'id' => 'test_bundle_no_fields',
+      'label' => 'Test bundle without fields',
+    ])->save();
+    $bundle_storage->create([
+      'id' => 'test_bundle_with_fields',
+      'label' => 'Test bundle with fields',
+    ])->save();
+
+    // Test with a migration with a default bundle that does not have fields.
+    $no_fields_definition = Yaml::decode(
+      <<<EOT
+      id: no_fields
+      label: Migrate to no bundle specified destination
+      source:
+        plugin: embedded_data
+        data_rows: {}
+        constants:
+          type: test_bundle_no_fields
+      process:
+        type: constants/type
+        title: title
+      destination:
+        plugin: entity:entity_test_with_bundle
+        default_bundle: test_bundle_no_fields
+      EOT
+    );
+
+    $no_fields_migration = \Drupal::service('plugin.manager.migration')->createStubMigration($no_fields_definition);
+    $no_fields_destination = $no_fields_migration->getDestinationPlugin();
+    $this->assertArrayHasKey('id', $no_fields_destination->fields());
+    $this->assertArrayNotHasKey('field_text', $no_fields_destination->fields());
+
+    // Test with a migration with a default bundle that has fields.
+    $with_fields_definition = Yaml::decode(
+      <<<EOT
+      id: with_fields
+      label: Migrate to bundle specified destination
+      source:
+        plugin: embedded_data
+        data_rows: {}
+        constants:
+          type: test_bundle_with_fields
+      process:
+        type: constants/type
+        title: title
+      destination:
+        plugin: entity:entity_test_with_bundle
+        default_bundle: test_bundle_with_fields
+      EOT
+    );
+
+    $with_fields_migration = \Drupal::service('plugin.manager.migration')->createStubMigration($with_fields_definition);
+    $with_fields_destination = $with_fields_migration->getDestinationPlugin();
+
+    $this->assertArrayHasKey('id', $with_fields_destination->fields());
+    $this->assertArrayNotHasKey('field_text', $with_fields_destination->fields());
+
+    // Create a text field attached to 'test_node_type_with_fields' node type.
+    FieldStorageConfig::create([
+      'type' => 'string',
+      'entity_type' => 'entity_test_with_bundle',
+      'field_name' => 'field_text',
+    ])->save();
+
+    FieldConfig::create([
+      'entity_type' => 'entity_test_with_bundle',
+      'bundle' => 'test_bundle_with_fields',
+      'field_name' => 'field_text',
+    ])->save();
+
+    $this->assertArrayHasKey('field_text', $with_fields_destination->fields());
+    // The no_fields migration has default bundle of test_bundle_no_fields so it
+    // shouldn't show the fields on other node types.
+    $this->assertArrayNotHasKey('field_text', $no_fields_destination->fields());
+
+    // Test with an entity type with no bundles.
+    $no_bundle_with_fields_definition = Yaml::decode(
+      <<<EOT
+      id: no_bundle_with_fields
+      label: Migrate to specified destination
+      source:
+        plugin: embedded_data
+        data_rows: {}
+      process:
+        title: title
+      destination:
+        plugin: entity:entity_test_no_bundle
+      EOT
+    );
+
+    $no_bundle_with_fields_migration = \Drupal::service('plugin.manager.migration')->createStubMigration($no_bundle_with_fields_definition);
+    $no_bundle_with_fields_destination = $no_bundle_with_fields_migration->getDestinationPlugin();
+
+    $this->assertArrayHasKey('id', $no_bundle_with_fields_destination->fields());
+    $this->assertArrayNotHasKey('field_text', $no_bundle_with_fields_destination->fields());
+
+    // Create a text field attached to the entity_test_no_bundle entity.
+    FieldStorageConfig::create([
+      'type' => 'string',
+      'entity_type' => 'entity_test_no_bundle',
+      'field_name' => 'field_text',
+    ])->save();
+
+    FieldConfig::create([
+      'entity_type' => 'entity_test_no_bundle',
+      'bundle' => 'entity_test_no_bundle',
+      'field_name' => 'field_text',
+    ])->save();
+
+    $this->assertArrayHasKey('field_text', $no_bundle_with_fields_destination->fields());
   }
 
 }
