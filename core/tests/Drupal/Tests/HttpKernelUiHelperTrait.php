@@ -8,9 +8,6 @@ use Behat\Mink\Driver\BrowserKitDriver;
 use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
-use Drupal\Tests\BrowserHtmlDebugTrait;
-use Drupal\Tests\HiddenFieldSelector;
-use Drupal\Tests\WebAssert;
 use Drupal\TestTools\HttpKernel\KernelTestHttpKernelBrowser;
 
 /**
