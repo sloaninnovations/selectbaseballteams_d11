@@ -8,6 +8,8 @@ use Drupal\Tests\views\Functional\ViewTestBase;
 
 /**
  * Tests filtering to ensure correct results with the role filter added twice.
+ *
+ * @group user
  */
 class DuplicateRoleFilterTest extends ViewTestBase {
 
