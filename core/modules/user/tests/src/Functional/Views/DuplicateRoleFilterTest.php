@@ -67,7 +67,7 @@ class DuplicateRoleFilterTest extends ViewTestBase {
     $this->drupalGet('admin/structure/views/nojs/handler/duplicate_role_filter/page_1/filter/roles_target_id');
     $this->submitForm($edit, 'Apply');
 
-    // Navigate to the duplicate role exposed filter in the view sett ings and apply the same roles.
+    // Navigate to the duplicate role exposed filter in the view settings and apply the same roles.
     $this->drupalGet('admin/structure/views/nojs/handler/duplicate_role_filter/page_1/filter/roles_target_id_1');
     $this->submitForm($edit, 'Apply');
     $this->drupalGet('admin/structure/views/view/duplicate_role_filter/edit/page_1');
