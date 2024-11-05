@@ -1,0 +1,95 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Tests\user\Functional\Views;
+
+use Drupal\Tests\views\Functional\ViewTestBase;
+
+/**
+ * Tests filtering to ensure correct results with the role filter added twice.
+ */
+class DuplicateRoleFilterTest extends ViewTestBase {
+
+  /**
+   * Views used by this test.
+   *
+   * @var array
+   */
+  public static $testViews = ['duplicate_role_filter'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['user', 'user_test_views', 'views_ui'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['user_test_views']): void {
+    parent::setUp($import_test_views, $modules);
+
+    $this->enableViewsTestModule();
+  }
+
+  /**
+   * Tests filtering to ensure correct results with the role filter added twice.
+   */
+  public function testUserRolesFilter(): void {
+    // Add two roles.
+    $role1 = $this->createRole([], 'test_role_1');
+    $role2 = $this->createRole([], 'test_role_2');
+    // User with test_role_1 role.
+    $user = $this->createUser([], 'User with role one');
+    $user->addRole($role1)->save();
+
+    // User with test_role_2 role.
+    $second_user = $this->createUser([], 'User with role two');
+    $second_user->addRole($role2)->save();
+
+    // Log in as the administrator to access Views and perform the tests.
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer users',
+      'administer views',
+      'access user profiles',
+    ]));
+
+    // Navigate to the view filter settings for roles and select the roles to filter.
+    $this->drupalGet('admin/structure/views/nojs/handler/duplicate_role_filter/page_1/filter/roles_target_id');
+    $edit = [
+      'options[value][]' => ['test_role_1', 'test_role_2'],
+    ];
+    $this->drupalGet('admin/structure/views/nojs/handler/duplicate_role_filter/page_1/filter/roles_target_id');
+    $this->submitForm($edit, 'Apply');
+
+    // Navigate to the duplicate role exposed filter in the view sett ings and apply the same roles.
+    $this->drupalGet('admin/structure/views/nojs/handler/duplicate_role_filter/page_1/filter/roles_target_id_1');
+    $this->submitForm($edit, 'Apply');
+    $this->drupalGet('admin/structure/views/view/duplicate_role_filter/edit/page_1');
+    $this->submitForm([], 'Save');
+
+    // Verify that we can save the view.
+    $this->assertSession()->pageTextContains('The view Duplicate role filter has been saved.');
+    $path = 'duplicate-role-filter';
+
+    // 1. Filter by "test_role_1" and assert that only "user_with_role_one" appears.
+    $options['query'] = ['roles_target_id_1' => 'test_role_1'];
+    $this->drupalGet($path, $options);
+    // Check that the page shows the user with role one and not the other.
+    $this->assertSession()->pageTextContains($user->getAccountName());
+    $this->assertSession()->pageTextNotContains($second_user->getAccountName());
+
+    // 2. Filter by "test_role_2" and assert that only "user_with_role_two" appears.
+    $options['query'] = ['roles_target_id_1' => 'test_role_2'];
+    $this->drupalGet($path, $options);
+
+    // Check that the page shows the user with role two and not the other.
+    $this->assertSession()->pageTextContains($second_user->getAccountName());
+    $this->assertSession()->pageTextNotContains($user->getAccountName());
+  }
+}
