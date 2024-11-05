@@ -388,10 +388,6 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
     return FALSE;
   }
 
-  /**
-   * Provide defaults for the handler.
-   */
-  public function defineExtraOptions(&$option) {}
 
   /**
    * Provide a form for setting options.
