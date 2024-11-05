@@ -92,4 +92,5 @@ class DuplicateRoleFilterTest extends ViewTestBase {
     $this->assertSession()->pageTextContains($second_user->getAccountName());
     $this->assertSession()->pageTextNotContains($user->getAccountName());
   }
+
 }
