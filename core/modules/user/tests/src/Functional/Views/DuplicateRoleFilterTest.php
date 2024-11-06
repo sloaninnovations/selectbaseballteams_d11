@@ -79,20 +79,26 @@ class DuplicateRoleFilterTest extends ViewTestBase {
     $this->assertSession()->pageTextContains('The view Duplicate role filter has been saved.');
     $path = 'duplicate-role-filter';
 
-    // 1. Filter by "test_role_1" and assert that only "user_with_role_one" appears.
+    // Filter by "All" to display all users.
+    $options['query'] = ['roles_target_id_1' => 'All'];
+    $this->drupalGet($path, $options);
+    // Assert that the page shows both users.
+    $this->assertSession()->pageTextContains($user->getDisplayName());
+    $this->assertSession()->pageTextContains($second_user->getDisplayName());
+
+    // Filter by "test_role_1" to display only the user with role one.
     $options['query'] = ['roles_target_id_1' => 'test_role_1'];
     $this->drupalGet($path, $options);
-    // Check that the page shows the user with role one and not the other.
-    $this->assertSession()->pageTextContains($user->getAccountName());
-    $this->assertSession()->pageTextNotContains($second_user->getAccountName());
+    // Assert that only the user with role one appears.
+    $this->assertSession()->pageTextContains($user->getDisplayName());
+    $this->assertSession()->pageTextNotContains($second_user->getDisplayName());
 
-    // 2. Filter by "test_role_2" and assert that only "user_with_role_two" appears.
+    // Filter by "test_role_2" to display only the user with role two.
     $options['query'] = ['roles_target_id_1' => 'test_role_2'];
     $this->drupalGet($path, $options);
-
-    // Check that the page shows the user with role two and not the other.
-    $this->assertSession()->pageTextContains($second_user->getAccountName());
-    $this->assertSession()->pageTextNotContains($user->getAccountName());
+    // Assert that only the user with role two appears.
+    $this->assertSession()->pageTextContains($second_user->getDisplayName());
+    $this->assertSession()->pageTextNotContains($user->getDisplayName());
   }
 
 }
