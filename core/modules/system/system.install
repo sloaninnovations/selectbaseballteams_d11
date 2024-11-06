@@ -1309,6 +1309,15 @@ function system_requirements($phase) {
     }
     $requirements['update status']['title'] = t('Update notifications');
 
+    if (Settings::get('development_mode', FALSE)) {
+      $requirements['development_mode'] = [
+        'title' => t('Development mode'),
+        'value' => t('Enabled'),
+        'severity' => REQUIREMENT_WARNING,
+        'description' => t('Development mode is enabled in settings.php. It is recommended to have this setting disabled in production environments.'),
+      ];
+    }
+
     if (Settings::get('rebuild_access')) {
       $requirements['rebuild access'] = [
         'title' => t('Rebuild access'),

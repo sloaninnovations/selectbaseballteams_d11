@@ -149,3 +149,15 @@ $settings['skip_permissions_hardening'] = TRUE;
  * the language or field module.
  */
 # $settings['config_exclude_modules'] = ['devel', 'stage_file_proxy'];
+
+/**
+ * Development mode.
+ *
+ * This setting can be set to TRUE to enable more verbose error messages. We try
+ * to not only log errors, but also display them when in development mode. This
+ * is unrelated to development specific settings, such as disabled TWIG caching
+ * or aggregated CSS and JS.
+ *
+ * It is not recommended to use this feature in production environments.
+ */
+$settings['development_mode'] = TRUE;
