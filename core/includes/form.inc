@@ -75,7 +75,7 @@ function form_select_options($element, $choices = NULL) {
  * index is not sufficient, and supporting this would make the
  * "helper" too complicated and cumbersome to be of any help.
  *
- * As usual with functions that can return array() or FALSE, do not
+ * As usual with functions that can return [] or FALSE, do not
  * forget to use === and !== if needed.
  *
  * @param $element
@@ -509,14 +509,14 @@ function template_preprocess_form_element_label(&$variables): void {
  * Example:
  * @code
  * $batch = [
- *   'title' => t('Exporting'),
- *   'operations' => [
- *     ['my_function_1', [$account->id(), 'story']],
- *     ['my_function_2', []],
- *   ],
- *   'finished' => 'my_finished_callback',
- *   'file' => 'path_to_file_containing_my_functions',
- * );
+ *  'title' => t('Exporting'),
+ *  'operations' => [
+ *    ['my_function_1', [$account->id(), 'story']],
+ *    ['my_function_2', []],
+ *  ],
+ *  'finished' => 'my_finished_callback',
+ *  'file' => 'path_to_file_containing_my_functions',
+ * ];
  * batch_set($batch);
  * // Only needed if not inside a form _submit handler.
  * // Setting redirect in batch_process.
@@ -800,7 +800,7 @@ function _batch_append_set(&$batch, $batch_set) {
  *   redirect response was returned by the 'finished' callback, the user will
  *   be redirected to the page that started the batch. Any query arguments will
  *   be automatically persisted.
- * @param \Drupal\Core\Url $url
+ * @param \Drupal\Core\Url|null $url
  *   (optional) URL of the batch processing page. Should only be used for
  *   separate scripts like update.php.
  * @param $redirect_callback
