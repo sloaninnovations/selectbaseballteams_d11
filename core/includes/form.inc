@@ -509,13 +509,13 @@ function template_preprocess_form_element_label(&$variables): void {
  * Example:
  * @code
  * $batch = [
- *  'title' => t('Exporting'),
- *  'operations' => [
- *    ['my_function_1', [$account->id(), 'story']],
- *    ['my_function_2', []],
- *  ],
- *  'finished' => 'my_finished_callback',
- *  'file' => 'path_to_file_containing_my_functions',
+ *   'title' => t('Exporting'),
+ *   'operations' => [
+ *     ['my_function_1', [$account->id(), 'story']],
+ *     ['my_function_2', []],
+ *   ],
+ *   'finished' => 'my_finished_callback',
+ *   'file' => 'path_to_file_containing_my_functions',
  * ];
  * batch_set($batch);
  * // Only needed if not inside a form _submit handler.
