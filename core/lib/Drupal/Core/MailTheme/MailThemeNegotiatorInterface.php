@@ -1,0 +1,37 @@
+<?php
+
+namespace Drupal\Core\MailTheme;
+
+/**
+ * Defines an interface for classes which determine the theme for an email.
+ *
+ * To set the active theme, create a new service tagged with
+ * 'mail_theme_negotiator'.
+ */
+interface MailThemeNegotiatorInterface {
+
+  /**
+   * Whether this theme negotiator should be used to set the sdc email theme.
+   *
+   * @param string $emailId
+   *   The email id.
+   *
+   * @return bool
+   *   TRUE if this negotiator should be used or FALSE to let other negotiators
+   *   decide.
+   */
+  public function applies(string $emailId): bool;
+
+  /**
+   * Determine the active theme for the email.
+   *
+   * @param string $emailId
+   *   The email id.
+   *
+   * @return string|null
+   *   The name of the theme, or NULL if other negotiators, like the configured
+   *   default one, should be used instead.
+   */
+  public function determineMailTheme(string $emailId): ?string;
+
+}
