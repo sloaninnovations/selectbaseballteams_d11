@@ -10,6 +10,8 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Mail\MailManager;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+use Drupal\Core\MailTheme\MailThemeManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -53,6 +55,11 @@ class MailManagerTest extends UnitTestCase {
    * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $renderer;
+
+  /**
+   * The mail theme manager.
+   */
+  protected MailThemeManagerInterface|MockObject $mailThemeManager;
 
   /**
    * The mail manager under test.
@@ -132,8 +139,9 @@ class MailManagerTest extends UnitTestCase {
     $logger_factory = $this->createMock('\Drupal\Core\Logger\LoggerChannelFactoryInterface');
     $string_translation = $this->getStringTranslationStub();
     $this->renderer = $this->createMock(RendererInterface::class);
+    $this->mailThemeManager = $this->createMock(MailThemeManagerInterface::class);
     // Construct the manager object and override its discovery.
-    $this->mailManager = new TestMailManager(new \ArrayObject(), $this->cache, $this->moduleHandler, $this->configFactory, $logger_factory, $string_translation, $this->renderer);
+    $this->mailManager = new TestMailManager(new \ArrayObject(), $this->cache, $this->moduleHandler, $this->configFactory, $logger_factory, $string_translation, $this->renderer, $this->mailThemeManager);
     $this->mailManager->setDiscovery($this->discovery);
 
     $this->request = new Request();
@@ -184,11 +192,19 @@ class MailManagerTest extends UnitTestCase {
     ];
     $this->setUpMailManager($interface);
 
+    $this->mailThemeManager->expects($this->exactly(1))
+      ->method('executeInMailTheme')
+      ->willReturnCallback(function (string $emailId, $callback) {
+        $message = $callback();
+        $this->assertSame($emailId, $message['id']);
+        return $message;
+      });
     $this->renderer->expects($this->exactly(1))
       ->method('executeInRenderContext')
       ->willReturnCallback(function (RenderContext $render_context, $callback) {
         $message = $callback();
         $this->assertEquals('example', $message['module']);
+        return $message;
       });
     $this->mailManager->mail('example', 'key', 'to@example.org', 'en');
   }

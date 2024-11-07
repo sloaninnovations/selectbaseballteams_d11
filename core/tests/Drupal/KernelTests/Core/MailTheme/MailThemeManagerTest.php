@@ -1,0 +1,103 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\KernelTests\Core\Theme;
+
+use Drupal\Core\Extension\ThemeInstallerInterface;
+use Drupal\Core\MailTheme\MailThemeManagerInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\KernelTests\KernelTestBase;
+
+/**
+ * Tests mail theme manager functionality.
+ *
+ * @group MailTheme
+ * @coversDefaultClass \Drupal\Core\MailTheme\MailThemeManager
+ */
+class MailThemeManagerTest extends KernelTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['system'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    // Default mail theme negatiotor relies on System module's system.theme
+    // configuration.
+    $this->installConfig(['system']);
+
+    // Install the test theme.
+    $this->container->get(ThemeInstallerInterface::class)->install(['test_theme']);
+  }
+
+  /**
+   * Tests that executeInMailTheme() uses the default theme.
+   *
+   * @covers ::executeInMailTheme
+   */
+  public function testDefaultConfig(): void {
+    /** @var \Drupal\Core\Theme\ThemeManagerInterface $themeManager */
+    $themeManager = $this->container->get(ThemeManagerInterface::class);
+    $this->assertSame('stark', $themeManager->getActiveTheme()->getName());
+
+    /** @var \Drupal\Core\MailTheme\MailThemeManagerInterface $mailThemeManager */
+    $mailThemeManager = $this->container->get(MailThemeManagerInterface::class);
+    $result = $mailThemeManager->executeInMailTheme('update_status_notify', function ($themeManager) {
+      $this->assertSame('stark', $themeManager->getActiveTheme()->getName());
+      return 'There is a security update available for your version of Drupal.';
+    });
+    $this->assertSame($result, 'There is a security update available for your version of Drupal.');
+
+    $this->assertSame('stark', $themeManager->getActiveTheme()->getName());
+  }
+
+  /**
+   * Tests that executeInMailTheme() switches to custom theme and back.
+   *
+   * @covers ::executeInMailTheme
+   */
+  public function testCustomMailTheme(): void {
+    /** @var \Drupal\Core\Theme\ThemeManagerInterface $themeManager */
+    $themeManager = $this->container->get(ThemeManagerInterface::class);
+    $this->assertSame('stark', $themeManager->getActiveTheme()->getName());
+
+    /** @var \Drupal\Core\MailTheme\MailThemeManagerInterface $mailThemeManager */
+    $mailThemeManager = $this->container->get(MailThemeManagerInterface::class);
+    $result = $mailThemeManager->executeInMailTheme('theme_test_trigger', function ($themeManager) {
+      $this->assertSame('test_theme', $themeManager->getActiveTheme()->getName());
+      return TRUE;
+    });
+    $this->assertSame(TRUE, $result);
+
+    $this->assertSame('stark', $themeManager->getActiveTheme()->getName());
+  }
+
+  /**
+   * Tests that executeInMailTheme() switches theme back when an exception is thrown.
+   *
+   * @covers ::executeInMailTheme
+   */
+  public function testExceptionInMailTheme(): void {
+    /** @var \Drupal\Core\Theme\ThemeManagerInterface $themeManager */
+    $themeManager = $this->container->get(ThemeManagerInterface::class);
+    $this->assertSame('stark', $themeManager->getActiveTheme()->getName());
+
+    /** @var \Drupal\Core\MailTheme\MailThemeManagerInterface $mailThemeManager */
+    $mailThemeManager = $this->container->get(MailThemeManagerInterface::class);
+
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage('Unable to render component');
+    $mailThemeManager->executeInMailTheme('theme_test_trigger', function ($themeManager) {
+      $this->assertSame('test_theme', $themeManager->getActiveTheme()->getName());
+      throw new \RuntimeException('Unable to render component');
+    });
+
+    $this->assertSame('stark', $themeManager->getActiveTheme()->getName());
+  }
+
+}
