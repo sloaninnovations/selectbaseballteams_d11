@@ -2,11 +2,11 @@
 
 namespace Drupal\responsive_image;
 
-use Drupal\Core\Url;
-use Drupal\breakpoint\BreakpointManagerInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Drupal\breakpoint\BreakpointManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Functional\EntityReference;
 
+use Drupal\Core\Form\FormOptionsHelper;
+use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
-use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests entity reference field default values storage in CMI.

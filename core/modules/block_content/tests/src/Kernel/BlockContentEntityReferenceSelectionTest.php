@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block_content\Kernel;
 
+use Drupal\Core\Form\FormOptionsHelper;
+use Drupal\KernelTests\KernelTestBase;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\block_content_test\Plugin\EntityReferenceSelection\TestSelection;
-use Drupal\Core\Form\FormOptionsHelper;
-use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Tests EntityReference selection handlers don't return non-reusable blocks.
@@ -180,7 +180,7 @@ class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
   /**
    * Provides possible fields and condition types.
    */
-  public static function fieldConditionProvider() {
+  public static function fieldConditionProvider(): array {
     $cases = [];
     foreach (['base', 'group', 'nested_group'] as $condition_type) {
       foreach ([TRUE, FALSE] as $reusable) {

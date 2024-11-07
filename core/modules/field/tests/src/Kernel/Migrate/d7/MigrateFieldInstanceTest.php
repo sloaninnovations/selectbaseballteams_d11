@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\field\Kernel\Migrate\d7;
 
 use Drupal\Core\Form\FormOptionsHelper;
+use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\FieldConfigInterface;
-use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 
 /**
  * Migrates Drupal 7 field instances.

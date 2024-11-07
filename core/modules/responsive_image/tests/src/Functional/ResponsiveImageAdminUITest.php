@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\responsive_image\Functional;
 
 use Drupal\Core\Form\FormOptionsHelper;
-use Drupal\responsive_image\ResponsiveImageStyleInterface;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\responsive_image\ResponsiveImageStyleInterface;
 
 // cspell:ignore modulenarrow
 
