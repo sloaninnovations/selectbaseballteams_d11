@@ -20,7 +20,10 @@ class MailThemeManagerTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
+  protected static $modules = [
+    'mail_theme_test',
+    'system',
+  ];
 
   /**
    * {@inheritdoc}
@@ -31,8 +34,12 @@ class MailThemeManagerTest extends KernelTestBase {
     // configuration.
     $this->installConfig(['system']);
 
-    // Install the test theme.
-    $this->container->get(ThemeInstallerInterface::class)->install(['test_theme']);
+    // Install themes required for tests and update the default theme.
+    $this->container->get(ThemeInstallerInterface::class)->install([
+      'stark',
+      'test_theme',
+    ]);
+    $this->config('system.theme')->set('default', 'stark')->save();
   }
 
   /**
@@ -47,7 +54,7 @@ class MailThemeManagerTest extends KernelTestBase {
 
     /** @var \Drupal\Core\MailTheme\MailThemeManagerInterface $mailThemeManager */
     $mailThemeManager = $this->container->get(MailThemeManagerInterface::class);
-    $result = $mailThemeManager->executeInMailTheme('update_status_notify', function ($themeManager) {
+    $result = $mailThemeManager->executeInMailTheme('update_status_notify', function () use ($themeManager) {
       $this->assertSame('stark', $themeManager->getActiveTheme()->getName());
       return 'There is a security update available for your version of Drupal.';
     });
@@ -68,7 +75,7 @@ class MailThemeManagerTest extends KernelTestBase {
 
     /** @var \Drupal\Core\MailTheme\MailThemeManagerInterface $mailThemeManager */
     $mailThemeManager = $this->container->get(MailThemeManagerInterface::class);
-    $result = $mailThemeManager->executeInMailTheme('theme_test_trigger', function ($themeManager) {
+    $result = $mailThemeManager->executeInMailTheme('theme_test_trigger', function () use ($themeManager) {
       $this->assertSame('test_theme', $themeManager->getActiveTheme()->getName());
       return TRUE;
     });
@@ -92,7 +99,7 @@ class MailThemeManagerTest extends KernelTestBase {
 
     $this->expectException(\RuntimeException::class);
     $this->expectExceptionMessage('Unable to render component');
-    $mailThemeManager->executeInMailTheme('theme_test_trigger', function ($themeManager) {
+    $mailThemeManager->executeInMailTheme('theme_test_trigger', function () use ($themeManager) {
       $this->assertSame('test_theme', $themeManager->getActiveTheme()->getName());
       throw new \RuntimeException('Unable to render component');
     });
