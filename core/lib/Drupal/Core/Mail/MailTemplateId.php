@@ -19,7 +19,7 @@ final class MailTemplateId {
    */
   public function __construct(
     public readonly string $provider,
-    public readonly string $key
+    public readonly string $key,
   ) {
   }
 
