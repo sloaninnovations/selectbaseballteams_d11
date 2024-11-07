@@ -47,7 +47,7 @@ function template_preprocess_select(&$variables): void {
  * @see https://www.drupal.org/node/3412600
  * @see \Drupal\Core\Form\FormOptionsHelper::formSelectOptions()
  */
-function form_select_options($element, $choices = NULL) {
+function form_select_options($element, $choices = NULL): array {
   @trigger_error(
     'form_select_options() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Form\FormOptionsHelper::formSelectOptions(). See https://www.drupal.org/node/3412600',
     E_USER_DEPRECATED
