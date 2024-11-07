@@ -27,7 +27,7 @@ class MailThemeManagerTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    // Default mail theme negatiotor relies on System module's system.theme
+    // Default mail theme negotiator relies on System module's system.theme
     // configuration.
     $this->installConfig(['system']);
 
@@ -72,7 +72,7 @@ class MailThemeManagerTest extends KernelTestBase {
       $this->assertSame('test_theme', $themeManager->getActiveTheme()->getName());
       return TRUE;
     });
-    $this->assertSame(TRUE, $result);
+    $this->assertTrue($result);
 
     $this->assertSame('stark', $themeManager->getActiveTheme()->getName());
   }
