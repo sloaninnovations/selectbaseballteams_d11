@@ -12,7 +12,7 @@ namespace Drupal\Core\MailTheme;
  *
  * Use the following pattern when preparing or sending mails:
  *
- * $result = $this->mailThemeManager->executeInMailTheme('mymodule_mymail', function () {
+ * $result = $this->mailThemeManager->executeInMailTheme($module . '_' . $key, function () {
  *   return $this->renderer->executeInRenderContext(new RenderContext(), function () {
  *     // Do stuff (e.g. replace tokens, render an entity, ...)
  *     return $result;
