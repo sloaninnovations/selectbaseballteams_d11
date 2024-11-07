@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\MailTheme;
 
 use Drupal\Core\Config\ConfigFactoryInterface;

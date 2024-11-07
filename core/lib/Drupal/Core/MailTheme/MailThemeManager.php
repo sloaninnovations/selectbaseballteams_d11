@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\MailTheme;
 
 use Drupal\Core\Theme\ThemeInitializationInterface;
@@ -56,10 +58,10 @@ class MailThemeManager implements MailThemeManagerInterface {
    * Switch to the given theme if necessary.
    *
    * @param string $theme
-   *   The new theme id.
+   *   The new theme ID.
    *
    * @return string
-   *   The previous theme id.
+   *   The previous theme ID.
    */
   protected function switchTheme(string $theme): string {
     $previousTheme = $this->themeManager->getActiveTheme();

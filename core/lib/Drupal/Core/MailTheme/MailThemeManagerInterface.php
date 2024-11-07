@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\MailTheme;
 
 /**
@@ -27,7 +29,7 @@ interface MailThemeManagerInterface {
    * @template Result
    *
    * @param string $emailId
-   *   The email id used to look up the theme.
+   *   The email ID used to look up the theme.
    * @param callable(): Result $function
    *   The callback to be executed.
    *

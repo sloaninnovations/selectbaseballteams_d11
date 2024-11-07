@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\MailTheme;
 
 /**
@@ -14,7 +16,7 @@ interface MailThemeNegotiatorInterface {
    * Whether this theme negotiator should be used to set the sdc email theme.
    *
    * @param string $emailId
-   *   The email id.
+   *   The email ID.
    *
    * @return bool
    *   TRUE if this negotiator should be used or FALSE to let other negotiators
@@ -26,7 +28,7 @@ interface MailThemeNegotiatorInterface {
    * Determine the active theme for the email.
    *
    * @param string $emailId
-   *   The email id.
+   *   The email ID.
    *
    * @return string|null
    *   The name of the theme, or NULL if other negotiators, like the configured
