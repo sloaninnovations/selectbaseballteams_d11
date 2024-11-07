@@ -55,11 +55,6 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
   protected $renderer;
 
   /**
-   * The mail theme manager.
-   */
-  protected MailThemeManagerInterface $mailThemeManager;
-
-  /**
    * List of already instantiated mail plugins.
    *
    * @var array
@@ -84,22 +79,21 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
    *   The string translation service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\MailTheme\MailThemeManagerInterface $mail_theme_manager
+   * @param \Drupal\Core\MailTheme\MailThemeManagerInterface $mailThemeManager
    *   The mail theme manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer, ?MailThemeManagerInterface $mail_theme_manager = NULL) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer, protected ?MailThemeManagerInterface $mailThemeManager = NULL) {
     parent::__construct('Plugin/Mail', $namespaces, $module_handler, 'Drupal\Core\Mail\MailInterface', Mail::class, 'Drupal\Core\Annotation\Mail');
-    if ($mail_theme_manager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $mail_theme_manager argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3486179', E_USER_DEPRECATED);
-      $mail_theme_manager = \Drupal::service(MailThemeManagerInterface::class);
-    }
     $this->alterInfo('mail_backend_info');
     $this->setCacheBackend($cache_backend, 'mail_backend_plugins');
     $this->configFactory = $config_factory;
     $this->loggerFactory = $logger_factory;
     $this->stringTranslation = $string_translation;
     $this->renderer = $renderer;
-    $this->mailThemeManager = $mail_theme_manager;
+    if ($this->mailThemeManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $mailThemeManager argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3486179', E_USER_DEPRECATED);
+      $this->mailThemeManager = \Drupal::service(MailThemeManagerInterface::class);
+    }
   }
 
   /**
