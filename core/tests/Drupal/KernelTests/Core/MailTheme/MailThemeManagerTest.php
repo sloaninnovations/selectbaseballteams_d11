@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\KernelTests\Core\Theme;
+namespace Drupal\KernelTests\Core\MailTheme;
 
 use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\Core\MailTheme\MailThemeManagerInterface;
