@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\MailTheme;
 
+use Drupal\Core\Mail\MailTemplateId;
+
 /**
  * Interface for mail theme manager implementations.
  *
@@ -14,7 +16,7 @@ namespace Drupal\Core\MailTheme;
  *
  * Use the following pattern when preparing or sending mails:
  *
- * $result = $this->mailThemeManager->executeInMailTheme($module . '_' . $key, function () {
+ * $result = $this->mailThemeManager->executeInMailTheme(new MailTemplateId($module, $key), function () {
  *   return $this->renderer->executeInRenderContext(new RenderContext(), function () {
  *     // Do stuff (e.g. replace tokens, render an entity, ...)
  *     return $result;
@@ -28,13 +30,13 @@ interface MailThemeManagerInterface {
    *
    * @template Result
    *
-   * @param string $emailId
-   *   The email ID used to look up the theme.
+   * @param \Drupal\Core\Mail\MailTemplateId $templateId
+   *   The mail template ID used to look up the theme.
    * @param callable(): Result $function
    *   The callback to be executed.
    *
    * @return Result
    */
-  public function executeInMailTheme(string $emailId, callable $function): mixed;
+  public function executeInMailTheme(MailTemplateId $templateId, callable $function): mixed;
 
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\MailTheme;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Mail\MailTemplateId;
 
 /**
  * Determines the default mail theme negotiator.
@@ -23,14 +24,14 @@ class DefaultNegotiator implements MailThemeNegotiatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(string $emailId): bool {
+  public function applies(MailTemplateId $templateId): bool {
     return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function determineMailTheme(string $emailId): ?string {
+  public function determineMailTheme(MailTemplateId $templateId): ?string {
     return $this->configFactory->get('system.theme')->get('default');
   }
 

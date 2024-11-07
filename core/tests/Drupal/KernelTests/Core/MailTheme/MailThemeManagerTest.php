@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\MailTheme;
 
 use Drupal\Core\Extension\ThemeInstallerInterface;
+use Drupal\Core\Mail\MailTemplateId;
 use Drupal\Core\MailTheme\MailThemeManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
@@ -54,7 +55,8 @@ class MailThemeManagerTest extends KernelTestBase {
 
     /** @var \Drupal\Core\MailTheme\MailThemeManagerInterface $mailThemeManager */
     $mailThemeManager = $this->container->get(MailThemeManagerInterface::class);
-    $result = $mailThemeManager->executeInMailTheme('update_status_notify', function () use ($themeManager) {
+    $templateId = new MailTemplateId('update_status', 'notify');
+    $result = $mailThemeManager->executeInMailTheme($templateId, function () use ($themeManager) {
       $this->assertSame('stark', $themeManager->getActiveTheme()->getName());
       return 'There is a security update available for your version of Drupal.';
     });
@@ -75,7 +77,8 @@ class MailThemeManagerTest extends KernelTestBase {
 
     /** @var \Drupal\Core\MailTheme\MailThemeManagerInterface $mailThemeManager */
     $mailThemeManager = $this->container->get(MailThemeManagerInterface::class);
-    $result = $mailThemeManager->executeInMailTheme('theme_test_trigger', function () use ($themeManager) {
+    $templateId = new MailTemplateId('mail_theme_test', 'trigger');
+    $result = $mailThemeManager->executeInMailTheme($templateId, function () use ($themeManager) {
       $this->assertSame('test_theme', $themeManager->getActiveTheme()->getName());
       return TRUE;
     });
@@ -99,7 +102,8 @@ class MailThemeManagerTest extends KernelTestBase {
 
     $this->expectException(\RuntimeException::class);
     $this->expectExceptionMessage('Unable to render component');
-    $mailThemeManager->executeInMailTheme('theme_test_trigger', function () use ($themeManager) {
+    $templateId = new MailTemplateId('mail_theme_test', 'trigger');
+    $mailThemeManager->executeInMailTheme($templateId, function () use ($themeManager) {
       $this->assertSame('test_theme', $themeManager->getActiveTheme()->getName());
       throw new \RuntimeException('Unable to render component');
     });

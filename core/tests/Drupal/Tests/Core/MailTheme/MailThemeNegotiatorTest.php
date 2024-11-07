@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\MailTheme;
 
+use Drupal\Core\Mail\MailTemplateId;
 use Drupal\Core\MailTheme\MailThemeNegotiator;
 use Drupal\Core\MailTheme\MailThemeNegotiatorInterface;
 use Drupal\Tests\UnitTestCase;
@@ -22,8 +23,9 @@ class MailThemeNegotiatorTest extends UnitTestCase {
    */
   public function testNoThemeNegotiators(): void {
     $negotiator = new MailThemeNegotiator([]);
-    $this->assertTrue($negotiator->applies('test'));
-    $this->assertNull($negotiator->determineMailTheme('test'));
+    $templateId = new MailTemplateId('mail_theme_test', 'trigger');
+    $this->assertTrue($negotiator->applies($templateId));
+    $this->assertNull($negotiator->determineMailTheme($templateId));
   }
 
   /**
@@ -32,14 +34,15 @@ class MailThemeNegotiatorTest extends UnitTestCase {
    * @covers ::determineMailTheme
    */
   public function testFirstOfTwoThemeNegotiators(): void {
+    $templateId = new MailTemplateId('update_status', 'notify');
     $negotiator1 = $this->createMock(MailThemeNegotiatorInterface::class);
     $negotiator1->expects($this->once())
       ->method('applies')
-      ->with('update_status_notify')
+      ->with($templateId)
       ->willReturn(TRUE);
     $negotiator1->expects($this->once())
       ->method('determineMailTheme')
-      ->with('update_status_notify')
+      ->with($templateId)
       ->willReturn('stark');
 
     $negotiator2 = $this->createMock(MailThemeNegotiatorInterface::class);
@@ -49,7 +52,7 @@ class MailThemeNegotiatorTest extends UnitTestCase {
       ->method('determineMailTheme');
 
     $negotiator = new MailThemeNegotiator([$negotiator1, $negotiator2]);
-    $result = $negotiator->determineMailTheme('update_status_notify');
+    $result = $negotiator->determineMailTheme($templateId);
     $this->assertSame('stark', $result);
   }
 
@@ -59,10 +62,11 @@ class MailThemeNegotiatorTest extends UnitTestCase {
    * @covers ::determineMailTheme
    */
   public function testSecondOfTwoThemeNegotiators(): void {
+    $templateId = new MailTemplateId('update_status', 'notify');
     $negotiator1 = $this->createMock(MailThemeNegotiatorInterface::class);
     $negotiator1->expects($this->once())
       ->method('applies')
-      ->with('update_status_notify')
+      ->with($templateId)
       ->willReturn(FALSE);
     $negotiator1->expects($this->never())
       ->method('determineMailTheme');
@@ -70,15 +74,15 @@ class MailThemeNegotiatorTest extends UnitTestCase {
     $negotiator2 = $this->createMock(MailThemeNegotiatorInterface::class);
     $negotiator2->expects($this->once())
       ->method('applies')
-      ->with('update_status_notify')
+      ->with($templateId)
       ->willReturn(TRUE);
     $negotiator2->expects($this->once())
       ->method('determineMailTheme')
-      ->with('update_status_notify')
+      ->with($templateId)
       ->willReturn('olivero');
 
     $negotiator = new MailThemeNegotiator([$negotiator1, $negotiator2]);
-    $result = $negotiator->determineMailTheme('update_status_notify');
+    $result = $negotiator->determineMailTheme($templateId);
     $this->assertSame('olivero', $result);
   }
 

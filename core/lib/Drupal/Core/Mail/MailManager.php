@@ -184,8 +184,8 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
     // attachments. Therefore we perform mailing inside its own render context,
     // to ensure it doesn't leak into the render context for the HTTP response
     // to the current request.
-    $emailId = $module . '_' . $key;
-    return $this->mailThemeManager->executeInMailTheme($emailId, function () use ($module, $key, $to, $langcode, $params, $reply, $send) {
+    $templateId = new MailTemplateId($module, $key);
+    return $this->mailThemeManager->executeInMailTheme($templateId, function () use ($module, $key, $to, $langcode, $params, $reply, $send) {
       return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($module, $key, $to, $langcode, $params, $reply, $send) {
         return $this->doMail($module, $key, $to, $langcode, $params, $reply, $send);
       });

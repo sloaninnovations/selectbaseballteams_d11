@@ -10,6 +10,7 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Mail\MailManager;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+use Drupal\Core\Mail\MailTemplateId;
 use Drupal\Core\MailTheme\MailThemeManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
@@ -194,9 +195,9 @@ class MailManagerTest extends UnitTestCase {
 
     $this->mailThemeManager->expects($this->exactly(1))
       ->method('executeInMailTheme')
-      ->willReturnCallback(function (string $emailId, $callback) {
+      ->willReturnCallback(function (MailTemplateId $templateId, $callback) {
         $message = $callback();
-        $this->assertSame($emailId, $message['id']);
+        $this->assertEquals($templateId, new MailTemplateId($message['module'], $message['key']));
         return $message;
       });
     $this->renderer->expects($this->exactly(1))

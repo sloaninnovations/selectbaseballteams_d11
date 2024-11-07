@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\MailTheme;
 
+use Drupal\Core\Mail\MailTemplateId;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
@@ -17,7 +18,7 @@ class MailThemeNegotiator implements MailThemeNegotiatorInterface {
   /**
    * Constructs a new MailThemeNegotiator.
    *
-   * @param iterable<\Drupal\sdc_email\MailTheme\MailThemeNegotiatorInterface> $negotiators
+   * @param iterable<\Drupal\Core\MailTheme\MailThemeNegotiatorInterface> $negotiators
    *   An array of negotiators.
    */
   public function __construct(
@@ -29,19 +30,19 @@ class MailThemeNegotiator implements MailThemeNegotiatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(string $emailId): bool {
+  public function applies(MailTemplateId $templateId): bool {
     return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function determineMailTheme(string $emailId): ?string {
+  public function determineMailTheme(MailTemplateId $templateId): ?string {
     $theme = NULL;
 
     foreach ($this->negotiators as $negotiator) {
-      if ($negotiator->applies($emailId)) {
-        $theme = $negotiator->determineMailTheme($emailId);
+      if ($negotiator->applies($templateId)) {
+        $theme = $negotiator->determineMailTheme($templateId);
         if ($theme !== NULL) {
           break;
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\MailTheme;
 
+use Drupal\Core\Mail\MailTemplateId;
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
@@ -32,9 +33,9 @@ class MailThemeManager implements MailThemeManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function executeInMailTheme(string $emailId, callable $function): mixed {
+  public function executeInMailTheme(MailTemplateId $templateId, callable $function): mixed {
     // 1. Negotiate the theme.
-    $theme = $this->themeNegotiator->determineMailTheme($emailId);
+    $theme = $this->themeNegotiator->determineMailTheme($templateId);
     $previousTheme = NULL;
     if ($theme) {
       $previousTheme = $this->switchTheme($theme);
