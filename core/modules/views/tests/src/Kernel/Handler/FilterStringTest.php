@@ -127,7 +127,7 @@ class FilterStringTest extends ViewsKernelTestBase {
       'job' => 'Drummer',
       'created' => gmmktime(6, 30, 10, 1, 1, 2000),
       'status' => 1,
-      'description' => NULL
+      'description' => NULL,
     ]);
     $query->execute();
 
