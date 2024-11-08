@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\block_content\BlockContentInterface;
+use Drupal\user\EntityOwnerTrait;
 
 /**
  * Defines the content block entity class.
@@ -69,6 +70,7 @@ use Drupal\block_content\BlockContentInterface;
  *     "langcode" = "langcode",
  *     "uuid" = "uuid",
  *     "published" = "status",
+ *     "owner" = "uid",
  *   },
  *   revision_metadata_keys = {
  *     "revision_user" = "revision_user",
@@ -88,6 +90,7 @@ use Drupal\block_content\BlockContentInterface;
 class BlockContent extends EditorialContentEntityBase implements BlockContentInterface {
 
   use RefinableDependentAccessTrait;
+  use EntityOwnerTrait;
 
   /**
    * The theme the block is being created in.
@@ -123,6 +126,35 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
    */
   public function getTheme() {
     return $this->theme;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+    // Set the owner of this block if it's empty. This is for database no-SQL
+    // databases such as MongoDB that could not run
+    // block_content_post_update_set_owner(). This only needs to happen for
+    // existing blocks.
+    if (!$this->isNew() && $this->getOwnerId() === NULL) {
+      /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+      $storage = \Drupal::entityTypeManager()->getStorage($this->getEntityTypeId());
+      $query = $storage->getQuery()
+        ->exists('revision_user')
+        ->accessCheck(FALSE)
+        ->allRevisions()
+        ->sort('revision_id', 'ASC')
+        ->range(0, 1);
+      $ids = $query->execute();
+      $revision = $storage->loadRevision(key($ids));
+      if ($revision instanceof BlockContentInterface) {
+        $uid = $revision->getRevisionUserId();
+        if ($uid !== NULL) {
+          $this->setOwnerId($uid);
+        }
+      }
+    }
   }
 
   /**
@@ -191,6 +223,7 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);
+    $fields += static::ownerBaseFieldDefinitions($entity_type);
 
     $fields['id']->setLabel(t('Content block ID'))
       ->setDescription(t('The content block ID.'));
