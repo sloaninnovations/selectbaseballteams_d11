@@ -70,6 +70,7 @@ class FilterStringTest extends ViewsKernelTestBase {
     $dataset[2]['description'] = 'Richard Starkey, MBE (born 7 July 1940), better known by his stage name Ringo Starr, is an English musician, singer-songwriter, and actor who gained worldwide fame as the drummer for The Beatles.';
     $dataset[3]['description'] = 'Sir James Paul McCartney, MBE (born 18 June 1942) is an English musician, singer-songwriter and composer. Formerly of The Beatles (1960–1970) and Wings (1971–1981), McCartney is the most commercially successful songwriter in the history of popular music, according to Guinness World Records.[1]';
     $dataset[4]['description'] = NULL;
+    $dataset[5]['description'] = NULL;
 
     return $dataset;
   }
@@ -110,6 +111,30 @@ class FilterStringTest extends ViewsKernelTestBase {
     $resultset = [
       [
         'name' => 'Ringo',
+      ],
+    ];
+    $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
+    $view->destroy();
+
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+
+    // Change the filtering
+    $view->displayHandlers->get('default')->overrideOption('filters', [
+      'name' => [
+        'id' => 'name',
+        'table' => 'views_test_data',
+        'field' => 'name',
+        'relationship' => 'none',
+        'operator' => '=',
+        'value' => 'Ringo%',
+      ],
+    ]);
+
+    $this->executeView($view);
+    $resultset = [
+      [
+        'name' => 'Ringo%',
       ],
     ];
     $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
