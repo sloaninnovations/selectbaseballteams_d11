@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Mailer\Transport;
 
 use Drupal\Core\Site\Settings;
+use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -20,7 +21,10 @@ class SendmailCommandValidationTransportFactory implements TransportFactoryInter
    * @param \Symfony\Component\Mailer\Transport\TransportFactoryInterface $inner
    *   The decorated sendmail transport factory.
    */
-  public function __construct(protected TransportFactoryInterface $inner) {
+  public function __construct(
+    #[AutowireDecorated]
+    protected TransportFactoryInterface $inner,
+  ) {
   }
 
   /**

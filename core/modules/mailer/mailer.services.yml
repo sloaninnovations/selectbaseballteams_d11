@@ -25,7 +25,7 @@ services:
       - { name: mailer.transport_factory }
   Drupal\Core\Mailer\Transport\SendmailCommandValidationTransportFactory:
     decorates: Symfony\Component\Mailer\Transport\SendmailTransportFactory
-    arguments: ['@.inner']
+    autowire: true
     public: false
   Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory:
     parent: Symfony\Component\Mailer\Transport\AbstractTransportFactory
