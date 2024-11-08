@@ -29,7 +29,7 @@ function navigation_help($route_name, RouteMatchInterface $route_match): string|
   }
   $configuration_route = 'layout_builder.navigation.';
   if (!$route_match->getRouteObject()->getOption('_layout_builder') || !str_starts_with($route_name, $configuration_route)) {
-    return layout_builder_help($route_name, $route_match);
+    return layout_builder_help($route_name, $route_match) ?? '';
   }
   if (str_starts_with($route_name, $configuration_route)) {
     $output = '<p>' . t('This layout builder tool allows you to configure the blocks in the navigation toolbar.') . '</p>';
