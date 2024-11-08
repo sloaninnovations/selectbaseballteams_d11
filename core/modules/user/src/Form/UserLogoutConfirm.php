@@ -26,7 +26,7 @@ class UserLogoutConfirm extends ConfirmFormBase implements WorkspaceSafeFormInte
    * {@inheritdoc}
    */
   public function getDescription() {
-    return $this->t('You’ll need to log in again to access your account.');
+    return $this->t('You will need to log in again to access your account.');
   }
 
   /**
