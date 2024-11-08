@@ -1479,7 +1479,8 @@ services:
   Drupal\Core\MailTheme\MailThemeNegotiatorInterface: '@Drupal\Core\MailTheme\MailThemeNegotiator'
   Drupal\Core\MailTheme\DefaultNegotiator:
     autowire: true
-    tag: { name: mail_theme_negotiator, priority: -100 }
+    tags:
+      - { name: mail_theme_negotiator, priority: -100 }
   plugin.manager.condition:
     class: Drupal\Core\Condition\ConditionManager
     parent: default_plugin_manager
