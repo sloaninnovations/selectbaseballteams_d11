@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Core\Database\Database;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 
@@ -70,7 +71,6 @@ class FilterStringTest extends ViewsKernelTestBase {
     $dataset[2]['description'] = 'Richard Starkey, MBE (born 7 July 1940), better known by his stage name Ringo Starr, is an English musician, singer-songwriter, and actor who gained worldwide fame as the drummer for The Beatles.';
     $dataset[3]['description'] = 'Sir James Paul McCartney, MBE (born 18 June 1942) is an English musician, singer-songwriter and composer. Formerly of The Beatles (1960–1970) and Wings (1971–1981), McCartney is the most commercially successful songwriter in the history of popular music, according to Guinness World Records.[1]';
     $dataset[4]['description'] = NULL;
-    $dataset[5]['description'] = NULL;
 
     return $dataset;
   }
@@ -115,6 +115,21 @@ class FilterStringTest extends ViewsKernelTestBase {
     ];
     $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
     $view->destroy();
+
+    // Get the original dataset
+    $data_set = $this->dataSet();
+    // Adds a new data point in the views_test_data table.
+    $query = Database::getConnection()->insert('views_test_data')
+      ->fields(array_keys($data_set[0]));
+    $query->values([
+      'name' => 'Ringo%',
+      'age' => 31,
+      'job' => 'Drummer',
+      'created' => gmmktime(6, 30, 10, 1, 1, 2000),
+      'status' => 1,
+      'description' => NULL
+    ]);
+    $query->execute();
 
     $view = Views::getView('test_view');
     $view->setDisplay();

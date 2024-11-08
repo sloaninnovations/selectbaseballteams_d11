@@ -271,13 +271,6 @@ class ViewTestData {
         'created' => gmmktime(6, 30, 10, 1, 1, 2000),
         'status' => 1,
       ],
-      [
-        'name' => 'Ringo%',
-        'age' => 31,
-        'job' => 'Drummer',
-        'created' => gmmktime(6, 30, 30, 1, 1, 2000),
-        'status' => 1,
-      ],
     ];
   }
 
