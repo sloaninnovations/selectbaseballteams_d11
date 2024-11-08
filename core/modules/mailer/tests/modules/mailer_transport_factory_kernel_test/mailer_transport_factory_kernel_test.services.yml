@@ -1,17 +1,7 @@
 services:
   _defaults:
     autoconfigure: true
-  mailer.transport_factory.test_failing_before:
-    parent: Symfony\Component\Mailer\Transport\AbstractTransportFactory
-    class: Drupal\mailer_transport_factory_kernel_test\Transport\FailingTransportFactory
-    tags:
-      - { name: mailer.transport_factory, priority: -1 }
   Drupal\mailer_transport_factory_kernel_test\Transport\CanaryTransportFactory:
     parent: Symfony\Component\Mailer\Transport\AbstractTransportFactory
-    tags:
-      - { name: mailer.transport_factory, priority: 1 }
-  mailer.transport_factory.test_failing_after:
-    parent: Symfony\Component\Mailer\Transport\AbstractTransportFactory
-    class: Drupal\mailer_transport_factory_kernel_test\Transport\FailingTransportFactory
     tags:
       - { name: mailer.transport_factory }
