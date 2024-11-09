@@ -13,6 +13,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\Entity\File;
 use Drupal\file\Plugin\Field\FieldWidget\FileWidget;
 use Drupal\image\Entity\ImageStyle;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'image_image' widget.
@@ -32,13 +33,6 @@ class ImageWidget extends FileWidget {
   protected $imageFactory;
 
   /**
-   * The entity repository.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
-   */
-  protected $entityRepository;
-
-  /**
    * Constructs an ImageWidget object.
    *
    * @param string $plugin_id
@@ -55,13 +49,30 @@ class ImageWidget extends FileWidget {
    *   The element info manager service.
    * @param \Drupal\Core\Image\ImageFactory|null $image_factory
    *   The image factory service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface|null $entityRepository
    *   The entity repository.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $element_info, ?ImageFactory $image_factory = NULL, EntityRepositoryInterface $entity_repository) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $element_info, ?ImageFactory $image_factory = NULL, protected ?EntityRepositoryInterface $entityRepository = NULL) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $element_info);
     $this->imageFactory = $image_factory ?: \Drupal::service('image.factory');
-    $this->entityRepository = $entity_repository;
+    if ($this->entityRepository === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $entityRepository argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3486475', E_USER_DEPRECATED);
+      $this->entityRepository = \Drupal::service('entity.repository');
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings'],
+      $container->get('element_info'),
+      $container->get('entity.repository'));
   }
 
   /**
