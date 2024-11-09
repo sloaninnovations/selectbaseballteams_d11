@@ -8,7 +8,7 @@
 /**
  * Implements hook_views_data_alter().
  */
-function views_test_data_views_data_alter_alter(array &$data) {
+function views_test_data_alter_views_data_alter(array &$data) {
   // Modify a filter to use a different filter handler plugin
   // by default so that we can test that the handler used
   // respects the handler plugin ID specified in the
