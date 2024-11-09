@@ -62,6 +62,8 @@ use Drupal\Core\Utility\UpdateException;
 /**
  * Defines one or more hooks that are exposed by a module.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * Normally hooks do not need to be explicitly defined. However, by declaring a
  * hook explicitly, a module may define a "group" for it. Modules that implement
  * a hook may then place their implementation in either $module.module or in
@@ -93,6 +95,8 @@ function hook_hook_info() {
 
 /**
  * Alter the registry of modules implementing a hook.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * This hook is invoked in \Drupal::moduleHandler()->getImplementationInfo().
  * A module may implement this hook in order to reorder the implementing
@@ -159,6 +163,8 @@ function hook_system_info_alter(array &$info, \Drupal\Core\Extension\Extension $
 /**
  * Perform necessary actions before a module is installed.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * @param string $module
  *   The name of the module about to be installed.
  * @param bool $is_syncing
@@ -175,6 +181,8 @@ function hook_module_preinstall($module, bool $is_syncing) {
 
 /**
  * Perform necessary actions after modules are installed.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * This function differs from hook_install() in that it gives all other modules
  * a chance to perform actions when a module is installed, whereas
@@ -208,6 +216,8 @@ function hook_modules_installed($modules, $is_syncing) {
 
 /**
  * Perform setup tasks when the module is installed.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * If the module implements hook_schema(), the database tables will
  * be created before this hook is fired.
@@ -249,13 +259,15 @@ function hook_modules_installed($modules, $is_syncing) {
  * @see hook_uninstall()
  * @see hook_modules_installed()
  */
-function hook_install($is_syncing) {
+function hook_install($is_syncing): void {
   // Set general module variables.
   \Drupal::state()->set('my_module.foo', 'bar');
 }
 
 /**
  * Perform necessary actions before a module is uninstalled.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * @param string $module
  *   The name of the module about to be uninstalled.
@@ -272,6 +284,8 @@ function hook_module_preuninstall($module, bool $is_syncing) {
 
 /**
  * Perform necessary actions after modules are uninstalled.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * This function differs from hook_uninstall() in that it gives all other
  * modules a chance to perform actions when a module is uninstalled, whereas
@@ -304,6 +318,8 @@ function hook_modules_uninstalled($modules, $is_syncing) {
 /**
  * Remove any information that the module sets.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * The information that the module should remove includes:
  * - state that the module has set using \Drupal::state()
  * - modifications to existing tables
@@ -333,7 +349,7 @@ function hook_modules_uninstalled($modules, $is_syncing) {
  * @see hook_modules_uninstalled()
  * @see \Drupal\Core\Extension\ModuleUninstallValidatorInterface
  */
-function hook_uninstall($is_syncing) {
+function hook_uninstall($is_syncing): void {
   // Delete remaining general module variables.
   \Drupal::state()->delete('my_module.foo');
 }
@@ -528,6 +544,8 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
 
 /**
  * Perform a single update between minor versions.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * Modules should use hook hook_update_N() to update between minor or major
  * versions of the module. Sites upgrading from Drupal 6 or 7 to any higher
@@ -822,6 +840,8 @@ function hook_update_N(&$sandbox) {
 /**
  * Executes an update which is intended to update data, like entities.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * These implementations have to be placed in a MODULE.post_update.php file or
  * a THEME.post_update.php file.
  *
@@ -959,6 +979,8 @@ function hook_update_dependencies() {
 
 /**
  * Return a number which is no longer available as hook_update_N().
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * If you remove some update functions from your my_module.install file, you
  * should notify Drupal of those missing functions. This way, Drupal can
