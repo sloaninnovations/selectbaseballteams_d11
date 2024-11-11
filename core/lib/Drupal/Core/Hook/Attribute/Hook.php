@@ -30,9 +30,8 @@ namespace Drupal\Core\Hook\Attribute;
  *   }
  *   @endcode
  *
- * Ordering hook implementations can be done by specifying the 'priority' on the
- * attribute, or by manipulating the kernel listeners in service alter
- * providers. See \Drupal\Core\Hook\HookOrder for details.
+ * Ordering hook implementations can be done by implementing
+ * hook_module_implements_alter.
  *
  * Classes that use this annotation on the class or on their methods are
  * automatically registered as autowired services with the class name as the
@@ -62,7 +61,12 @@ namespace Drupal\Core\Hook\Attribute;
  *
  * The following hooks can only have procedural hook implementations:
  *
+ * Legacy meta hooks:
+ * - hook_hook_info()
+ * - hook_module_implements_alter()
+ *
  * Install hooks:
+ * - hook_cache_flush()
  * - hook_install()
  * - hook_module_preinstall()
  * - hook_module_preuninstall()
