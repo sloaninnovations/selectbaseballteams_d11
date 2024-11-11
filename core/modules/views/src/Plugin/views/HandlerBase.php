@@ -388,6 +388,15 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
     return FALSE;
   }
 
+  /**
+   * Provide defaults for the handler.
+   *
+   * @deprecated in drupal:11.0.0 and is removed from drupal:12.0.0.
+   *   This method is no longer used by Drupal core.
+   *
+   * @see https://www.drupal.org/node/3486781
+   */
+  public function defineExtraOptions(&$option) {}
 
   /**
    * Provide a form for setting options.
