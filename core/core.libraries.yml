@@ -619,6 +619,13 @@ drupal.message:
     - core/drupal
     - core/drupal.announce
 
+drupal.modal.url:
+  version: VERSION
+  js:
+    misc/dialog/dialog.url.js: {}
+  dependencies:
+    - core/drupal.ajax
+
 drupal.progress:
   version: VERSION
   js:
