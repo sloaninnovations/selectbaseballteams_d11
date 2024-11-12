@@ -850,6 +850,7 @@ class EntityViewsDataWithDeprecations extends EntityViewsData {
    */
   public function getViewsData() {
     // Deprecated method.
+    // @phpstan-ignore-next-line
     $this->getFieldStorageDefinitions();
     return [];
   }
