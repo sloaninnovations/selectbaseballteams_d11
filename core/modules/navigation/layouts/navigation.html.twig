@@ -70,10 +70,10 @@
         } only %}
       </div>
 
-      {# Include the promoted region if has content. #}
-      {% if content.promoted is not empty %}
-        <div class="admin-toolbar__promoted">
-          {{ content.promoted }}
+      {# Include the content_top region if has content. #}
+      {% if content.content_top is not empty %}
+        <div class="admin-toolbar__content_top">
+          {{ content.content_top }}
         </div>
       {% endif %}
       {{ content.content }}
