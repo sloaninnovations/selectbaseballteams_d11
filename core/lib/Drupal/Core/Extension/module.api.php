@@ -96,6 +96,8 @@ function hook_hook_info() {
 /**
  * Alter the registry of modules implementing a hook.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * This hook is invoked in \Drupal::moduleHandler()->getImplementationInfo().
  * A module may implement this hook in order to reorder the implementing
  * modules, which are otherwise ordered by the module's system weight.
@@ -161,8 +163,6 @@ function hook_system_info_alter(array &$info, \Drupal\Core\Extension\Extension $
 /**
  * Perform necessary actions before a module is installed.
  *
- * Only procedural implementations are supported for this hook.
- *
  * @param string $module
  *   The name of the module about to be installed.
  * @param bool $is_syncing
@@ -179,8 +179,6 @@ function hook_module_preinstall($module, bool $is_syncing) {
 
 /**
  * Perform necessary actions after modules are installed.
- *
- * Only procedural implementations are supported for this hook.
  *
  * This function differs from hook_install() in that it gives all other modules
  * a chance to perform actions when a module is installed, whereas
@@ -265,8 +263,6 @@ function hook_install($is_syncing): void {
 /**
  * Perform necessary actions before a module is uninstalled.
  *
- * Only procedural implementations are supported for this hook.
- *
  * @param string $module
  *   The name of the module about to be uninstalled.
  * @param bool $is_syncing
@@ -282,8 +278,6 @@ function hook_module_preuninstall($module, bool $is_syncing) {
 
 /**
  * Perform necessary actions after modules are uninstalled.
- *
- * Only procedural implementations are supported for this hook.
  *
  * This function differs from hook_uninstall() in that it gives all other
  * modules a chance to perform actions when a module is uninstalled, whereas
@@ -920,7 +914,7 @@ function hook_post_update_NAME(&$sandbox) {
  *
  * @see hook_post_update_NAME()
  */
-function hook_removed_post_updates() {
+function hook_removed_post_updates(): array {
   return [
     'my_module_post_update_foo' => '8.x-2.0',
     'my_module_post_update_bar' => '8.x-3.0',
