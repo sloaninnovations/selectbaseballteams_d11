@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Drupal\layout_builder\Plugin\ConfigAction\Deriver;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
@@ -36,7 +34,7 @@ final class ConfigLayoutBuilderDeriver extends DeriverBase implements ContainerD
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinitions($base_plugin_definition) {
+  public function getDerivativeDefinitions($base_plugin_definition): array {
     $entity_types = [];
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type) {
       if ($entity_type->entityClassImplements(ConfigEntityInterface::class) && $entity_type->entityClassImplements(SectionListInterface::class)) {
