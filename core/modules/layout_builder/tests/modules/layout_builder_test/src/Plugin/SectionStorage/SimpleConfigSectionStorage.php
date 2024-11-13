@@ -39,7 +39,6 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
   use ContextAwarePluginTrait;
   use LayoutBuilderRoutesTrait;
   use SectionListTrait;
-  use ConfigSectionListTrait;
 
   /**
    * The config factory.
