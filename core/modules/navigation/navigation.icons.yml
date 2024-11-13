@@ -1,0 +1,30 @@
+navigation:
+  enabled: true
+  label: "Drupal Navigation"
+  description: "Icons available within Drupal Navigation module."
+  version: 11.x
+  license:
+    name: GPL2-or-later
+    url: https://api.drupal.org/api/drupal/core%21LICENSE.txt/11.x
+    gpl-compatible: true
+  extractor: svg
+  config:
+    sources:
+      - assets/icons/*.svg
+      - components/toolbar-button/assets/*.svg
+  settings:
+    # Because we can have wild icons not with a square ratio, do not use size.
+    size:
+      title: "Size"
+      description: "Set a size for this icon."
+      type: "integer"
+      default: 32
+  template: >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+      class="toolbar-button--icon toolbar-button--icon--{{ icon_id|clean_class }}"
+      width="{{ size|default(32) }}"
+      height="{{ size|default(32) }}"
+      aria-hidden="true"
+    >
+      {{ content }}
+    </svg>
