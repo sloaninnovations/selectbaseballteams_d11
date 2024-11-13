@@ -51,10 +51,6 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
    */
   protected $fieldTypeManager;
 
-  /**
-   * The Entity type repository.
-   */
-  protected EntityTypeRepositoryInterface $entityTypeRepository;
 
   /**
    * The array of field storage configs.
@@ -78,11 +74,6 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
   protected $entityTypeFilter;
 
   /**
-   * The form builder.
-   */
-  protected FormBuilderInterface $formBuilder;
-
-  /**
    * Constructs a new FieldStorageConfigListBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -95,10 +86,10 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
    *   The bundle info service.
    * @param \Drupal\Core\Entity\EntityTypeRepositoryInterface $entityTypeRepository
    *   The entity type repository.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   * @param \Drupal\Core\Form\FormBuilderInterface $formBuilder
    *   The form builder.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager, EntityTypeBundleInfoInterface $bundle_info_service, EntityTypeRepositoryInterface $entityTypeRepository, FormBuilderInterface $form_builder) {
+  public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager, EntityTypeBundleInfoInterface $bundle_info_service, protected EntityTypeRepositoryInterface $entityTypeRepository, protected FormBuilderInterface $formBuilder) {
     parent::__construct($entity_type, $entity_type_manager->getStorage($entity_type->id()));
 
     $this->entityTypeManager = $entity_type_manager;
@@ -106,8 +97,6 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder implements F
     $this->fieldTypeManager = $field_type_manager;
     $this->fieldTypes = $this->fieldTypeManager->getDefinitions();
     $this->limit = FALSE;
-    $this->entityTypeRepository = $entityTypeRepository;
-    $this->formBuilder = $form_builder;
     $this->fieldStorageConfigs = $this->load();
   }
 
