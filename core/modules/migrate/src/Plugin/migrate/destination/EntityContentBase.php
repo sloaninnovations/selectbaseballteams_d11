@@ -151,7 +151,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     $this->fieldTypeManager = $field_type_manager;
     $this->accountSwitcher = $account_switcher;
     if ($entity_type_bundle_info === NULL) {
-      @trigger_error('Calling ' . __NAMESPACE__ . '\EntityContentBase::__construct() without the $entity_type_bundle_info argument is deprecated in drupal:11.1.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/2630732', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __NAMESPACE__ . '\EntityContentBase::__construct() without the $entity_type_bundle_info argument is deprecated in drupal:11.1.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3476634', E_USER_DEPRECATED);
       $entity_type_bundle_info = \Drupal::service('entity_type.bundle.info');
     }
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
