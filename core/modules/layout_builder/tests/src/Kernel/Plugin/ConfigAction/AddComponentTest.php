@@ -6,16 +6,10 @@ namespace Drupal\Tests\layout_builder\Kernel\Plugin\ConfigAction;
 
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
-use Drupal\Core\Plugin\Context\EntityContext;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
-use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage;
-use Drupal\layout_builder\Section;
-use Drupal\layout_builder\SectionComponent;
 use Drupal\layout_builder\SectionStorage\SectionStorageDefinition;
 
 /**
@@ -65,13 +59,15 @@ class AddComponentTest extends KernelTestBase {
     $this->configActionManager = $this->container->get('plugin.manager.config_action');
   }
 
-
+  /**
+   * Tests adding a component to a view display using a config action.
+   */
   public function testAddComponent(): void {
     $this->configActionManager->applyAction(
       'addComponent',
       'core.entity_view_display.entity_test.bundle_with_extra_fields.default',
       [
-        'section' =>  0,
+        'section' => 0,
         'position' => 4,
         'component' => [
           'region' => [

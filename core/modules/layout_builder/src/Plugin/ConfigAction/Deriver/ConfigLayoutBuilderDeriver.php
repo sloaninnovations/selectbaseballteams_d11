@@ -34,20 +34,19 @@ final class ConfigLayoutBuilderDeriver extends DeriverBase implements ContainerD
   }
 
   /**
-   *
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
     $entity_types = [];
-    foreach ($this->entityTypeManager->getDefinitions() as $id => $entity_type) {
+    foreach ($this->entityTypeManager->getDefinitions() as $entity_type) {
       if ($entity_type->entityClassImplements(ConfigEntityInterface::class) && $entity_type->entityClassImplements(SectionListInterface::class)) {
         $entity_types[] = $entity_type->id();
       }
     }
     $base_plugin_definition['entity_types'] = $entity_types;
-    $this->derivatives["addComponent"] = [
-        'admin_label' => $this->t('Add component'),
-      ] + $base_plugin_definition;
+    $this->derivatives['addComponent'] = [
+      'admin_label' => $this->t('Add component'),
+    ] + $base_plugin_definition;
     return $this->derivatives;
   }
 
