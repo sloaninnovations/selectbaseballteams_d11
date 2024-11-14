@@ -12,7 +12,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 /**
  * Implements hook_help().
  */
-function navigation_top_bar_help($route_name, RouteMatchInterface $route_match) {
+function navigation_top_bar_help($route_name, RouteMatchInterface $route_match): string|array {
   switch ($route_name) {
     case 'help.page.navigation_top_bar':
       $output = '<h2>' . t('About') . '</h2>';
@@ -25,4 +25,5 @@ function navigation_top_bar_help($route_name, RouteMatchInterface $route_match) 
       ]) . '</p>';
       return $output;
   }
+  return '';
 }
