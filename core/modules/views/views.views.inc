@@ -839,6 +839,12 @@ function views_field_views_data(FieldStorageConfigInterface $field_storage) {
           ],
         ],
       ];
+      if ($target_base_table && $field_storage->isTranslatable()) {
+        $data[$target_base_table][$pseudo_field_name]['relationship']['join_extra'][] = [
+          'field' => 'langcode',
+          'left_field' => 'langcode',
+        ];
+      }
     }
 
     // Provide an argument plugin that has a meaningful titleQuery()
