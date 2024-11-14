@@ -27,6 +27,7 @@ use Prophecy\Argument;
 /**
  * @coversDefaultClass \Drupal\Core\Layout\LayoutPluginManager
  * @group Layout
+ * @group legacy
  */
 class LayoutPluginManagerTest extends UnitTestCase {
 
@@ -108,6 +109,8 @@ class LayoutPluginManagerTest extends UnitTestCase {
     $class_loader->addPsr4("Drupal\\Core\\", vfsStream::url("root/core/lib/Drupal/Core"));
     $class_loader->register(TRUE);
     $this->layoutPluginManager = new LayoutPluginManager($namespaces, $this->cacheBackend->reveal(), $this->moduleHandler->reveal(), $this->themeHandler->reveal());
+
+    $this->expectDeprecation('Using @Layout annotation for plugin with ID plugin_provided_by_annotation_layout is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use a Drupal\Core\Layout\Attribute\Layout attribute instead. See https://www.drupal.org/project/drupal/issues/3252386');
   }
 
   /**
