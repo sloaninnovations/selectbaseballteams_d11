@@ -8,10 +8,12 @@ namespace Drupal\block_content\Access;
 // exist.
 // @codingStandardsIgnoreStart
 if (!trait_exists(RefinableDependentAccessTrait::class)) {
+  // @phpstan-ignore-next-line
   trait RefinableDependentAccessTrait {}
 }
 
 if (!interface_exists(RefinableDependentAccessInterface::class)) {
+  // @phpstan-ignore-next-line
   interface RefinableDependentAccessInterface {}
 }
 // @codingStandardsIgnoreEnd
