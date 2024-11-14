@@ -26,6 +26,8 @@ class EntityTypeInfoTest extends KernelTestBase {
     'content_moderation',
     'workflows',
     'entity_test',
+    'system',
+    'user',
   ];
 
   /**
@@ -58,6 +60,12 @@ class EntityTypeInfoTest extends KernelTestBase {
     $this->entityTypeInfo = $this->container->get('class_resolver')->getInstanceFromDefinition(EntityTypeInfo::class);
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->entityFieldManager = $this->container->get('entity_field.manager');
+
+    $this->installEntitySchema('action');
+    $this->installEntitySchema('entity_test');
+    $this->installEntitySchema('entity_test_with_bundle');
+    $this->installEntitySchema('workflow');
+    $this->installEntitySchema('user');
 
     $this->installConfig(['content_moderation']);
   }
@@ -144,8 +152,7 @@ class EntityTypeInfoTest extends KernelTestBase {
    */
   protected function enableModeration($entity_type_id, $bundle): void {
     $workflow = $this->createEditorialWorkflow();
-    $workflow->getTypePlugin()->addEntityTypeAndBundle($entity_type_id, $bundle);
-    $workflow->save();
+    $this->addEntityTypeAndBundleToWorkflow($workflow, $entity_type_id, $bundle);
   }
 
 }
