@@ -154,6 +154,158 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
   }
 
   /**
+   * Tests the logo tokens for the active and default theme.
+   */
+  public function testSystemSiteLogoTokenReplacement() {
+    // Install Olivero and Claro.
+    \Drupal::service('theme_installer')->install(['olivero', 'claro']);
+
+    // Prepare instances that we need only once.
+    $theme_initialization = \Drupal::service('theme.initialization');
+    $theme_manager = \Drupal::service('theme.manager');
+    $renderer = \Drupal::service('renderer');
+
+    // Prepare configurations.
+    $global_theme_config = $this->config('system.theme.global');
+    $global_theme_config
+      ->set('logo.path', '/path/to/global_logo.svg')
+      ->set('logo.use_default', FALSE)
+      ->save();
+    $olivero_config = $this->config('olivero.settings');
+    $olivero_config
+      ->set('logo.path', '/path/to/olivero_logo.svg')
+      ->set('logo.use_default', FALSE)
+      ->save();
+    $claro_config = $this->config('claro.settings');
+    $claro_config
+      ->set('logo.path', '/path/to/claro_logo.svg')
+      ->set('logo.use_default', FALSE)
+      ->save();
+
+    // Set Olivero as the default theme.
+    $system_theme_config = $this->config('system.theme');
+    $system_theme_config
+      ->set('default', 'olivero')
+      ->save();
+
+    // And set Claro as the active theme.
+    $active_theme = $theme_initialization->initTheme('claro');
+    $theme_manager->setActiveTheme($active_theme);
+
+    // Render both theme logos.
+    $build = [
+      '#theme' => 'image',
+      '#uri' => theme_get_setting('logo.url', 'olivero'),
+      '#alt' => 'The site logo',
+    ];
+    $olivero_logo = (string) $renderer->renderPlain($build);
+    $build = [
+      '#theme' => 'image',
+      '#uri' => theme_get_setting('logo.url', 'claro'),
+      '#alt' => 'The site logo',
+    ];
+    $claro_logo = (string) $renderer->renderPlain($build);
+
+    $tests = [];
+    $tests['[site:logo]'] = $claro_logo;
+    $tests['[site:logo:active-theme]'] = $claro_logo;
+    $tests['[site:logo:active-theme:url]'] = Url::fromUserInput($claro_config->get('logo.path'), ['absolute' => TRUE])->toString();
+    $tests['[site:logo:default-theme]'] = $olivero_logo;
+    $tests['[site:logo:default-theme:url]'] = Url::fromUserInput($olivero_config->get('logo.path'), ['absolute' => TRUE])->toString();
+
+    $bubbleable_metadata_claro = BubbleableMetadata::createFromObject($global_theme_config)
+      ->addCacheableDependency($claro_config)
+      ->addCacheContexts(['theme']);
+    $bubbleable_metadata_default = BubbleableMetadata::createFromObject($system_theme_config)
+      ->addCacheableDependency($global_theme_config)
+      ->addCacheableDependency($olivero_config);
+
+    $metadata_tests = [];
+    $metadata_tests['[site:logo]'] = $bubbleable_metadata_claro;
+    $metadata_tests['[site:logo:active-theme]'] = $bubbleable_metadata_claro;
+    $metadata_tests['[site:logo:active-theme:url]'] = $bubbleable_metadata_claro;
+    $metadata_tests['[site:logo:default-theme]'] = $bubbleable_metadata_default;
+    $metadata_tests['[site:logo:default-theme:url]'] = $bubbleable_metadata_default;
+
+    // Test to make sure that we generated something for each token.
+    $this->assertFalse(in_array(0, array_map('strlen', $tests)), 'No empty tokens generated.');
+
+    foreach ($tests as $input => $expected) {
+      $bubbleable_metadata = new BubbleableMetadata();
+      $output = $this->tokenService->replace($input, [], [], $bubbleable_metadata);
+      $this->assertSame($expected, $output, "Token '$input' was not replaced.");
+      $this->assertEquals($metadata_tests[$input], $bubbleable_metadata, new FormattableMarkup('Asserting metadata for token %token.', ['%token' => $input]));
+    }
+  }
+
+  /**
+   * Tests the logo tokens for a specific theme.
+   */
+  public function testSystemSiteLogoThemeTokenReplacement() {
+    // Install Olivero and Claro.
+    \Drupal::service('theme_installer')->install(['olivero', 'claro']);
+
+    // Prepare instances that we need only once.
+    $renderer = \Drupal::service('renderer');
+
+    // Prepare configurations.
+    // Do not set a logo for Claro, it should fall back to the global logo.
+    $global_theme_config = $this->config('system.theme.global');
+    $global_theme_config
+      ->set('logo.path', '/path/to/global_logo.svg')
+      ->set('logo.use_default', FALSE)
+      ->save();
+    $olivero_config = $this->config('olivero.settings');
+    $olivero_config
+      ->set('logo.path', '/path/to/olivero_logo.svg')
+      ->set('logo.use_default', FALSE)
+      ->save();
+
+    // Render the Olivero logo.
+    $build = [
+      '#theme' => 'image',
+      '#uri' => theme_get_setting('logo.url', 'olivero'),
+      '#alt' => 'The site logo',
+    ];
+    $olivero_logo = (string) $renderer->renderPlain($build);
+
+    // Generate and test tokens.
+    $tests = [];
+    $tests['[site:logo:theme-olivero]'] = $olivero_logo;
+    $tests['[site:logo:theme-olivero:url]'] = Url::fromUserInput($olivero_config->get('logo.path'), ['absolute' => TRUE])->toString();
+    $tests['[site:logo:theme-olivero:foo]'] = '[site:logo:theme-olivero:foo]';
+    $tests['[site:logo:theme-not-enabled-theme]'] = '[site:logo:theme-not-enabled-theme]';
+    $tests['[site:logo:theme-not-enabled-theme:url]'] = '[site:logo:theme-not-enabled-theme:url]';
+    $tests['[site:logo:theme-not-enabled-theme:foo]'] = '[site:logo:theme-not-enabled-theme:foo]';
+
+    $bubbleable_metadata_olivero = BubbleableMetadata::createFromObject($global_theme_config)
+      ->addCacheableDependency($olivero_config);
+
+    $metadata_tests = [];
+    $metadata_tests['[site:logo:theme-olivero]'] = $bubbleable_metadata_olivero;
+    $metadata_tests['[site:logo:theme-olivero:url]'] = $bubbleable_metadata_olivero;
+    $metadata_tests['[site:logo:theme-olivero:foo]'] = new BubbleableMetadata();
+    $metadata_tests['[site:logo:theme-not-enabled-theme]'] = new BubbleableMetadata();
+    $metadata_tests['[site:logo:theme-not-enabled-theme:url]'] = new BubbleableMetadata();
+    $metadata_tests['[site:logo:theme-not-enabled-theme:foo]'] = new BubbleableMetadata();
+
+    // Test to make sure that we generated something for each token.
+    $this->assertFalse(in_array(0, array_map('strlen', $tests)), 'No empty tokens generated.');
+
+    // Test that the Claro logo has the path to the global logo.
+    $bubbleable_metadata = new BubbleableMetadata();
+    $output = $this->tokenService->replace('[site:logo:theme-claro:url]', [], [], $bubbleable_metadata);
+    $this->assertStringContainsString($global_theme_config->get('logo.path'), $output, 'Token for undefined theme logo falls back to global logo.');
+
+    foreach ($tests as $input => $expected) {
+      $bubbleable_metadata = new BubbleableMetadata();
+      $output = $this->tokenService->replace($input, [], [], $bubbleable_metadata);
+      $this->assertSame($expected, $output, "Token '$input' was not replaced.");
+      $this->assertEquals($metadata_tests[$input], $bubbleable_metadata, new FormattableMarkup('Asserting metadata for token %token.', ['%token' => $input]));
+    }
+  }
+
+  /**
    * Tests the generation of all system date tokens.
    */
   public function testSystemDateTokenReplacement(): void {
