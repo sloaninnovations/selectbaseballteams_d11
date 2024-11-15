@@ -168,8 +168,8 @@ final class NavigationRenderer {
    *   The content_top section content.
    */
   protected function getContentTop(): array {
-    $promoted = $this->moduleHandler->invokeAll('navigation_promoted');
-    $this->moduleHandler->alter('navigation_promoted', $promoted);
+    $promoted = $this->moduleHandler->invokeAll('navigation_content_top');
+    $this->moduleHandler->alter('navigation_content_top', $promoted);
     uasort($promoted, [SortArray::class, 'sortByWeightElement']);
     return $promoted;
   }

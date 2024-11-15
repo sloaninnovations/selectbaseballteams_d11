@@ -19,10 +19,10 @@ function navigation_test_preprocess_block__navigation(&$variables) {
 }
 
 /**
- * Implements hook_navigation_promoted().
+ * Implements hook_navigation_content_top().
  */
-function navigation_test_navigation_promoted(): array {
-  if (\Drupal::state()->get('navigation_promoted')) {
+function navigation_test_navigation_content_top(): array {
+  if (\Drupal::state()->get('navigation_content_top')) {
     return [
       'navigation_foo' => [
         '#markup' => 'foo',
@@ -41,10 +41,10 @@ function navigation_test_navigation_promoted(): array {
 }
 
 /**
- * Implements hook_navigation_promoted_alter().
+ * Implements hook_navigation_content_top_alter().
  */
-function navigation_test_navigation_promoted_alter(&$promoted): void {
-  if (\Drupal::state()->get('navigation_promoted_alter')) {
+function navigation_test_navigation_content_top_alter(&$promoted): void {
+  if (\Drupal::state()->get('navigation_content_top_alter')) {
     unset($promoted['navigation_foo']);
     $promoted['navigation_bar']['#markup'] = 'new bar';
     $promoted['navigation_baz']['#weight'] = '-100';

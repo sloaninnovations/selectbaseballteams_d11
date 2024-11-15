@@ -16,9 +16,9 @@
  * @return array
  *   An associative array of renderable elements.
  *
- * @see hook_navigation_promoted_alter()
+ * @see hook_navigation_content_top_alter()
  */
-function hook_navigation_promoted(): array {
+function hook_navigation_content_top(): array {
   return [
     'navigation_foo' => [
       '#markup' => 'foo',
@@ -36,11 +36,11 @@ function hook_navigation_promoted(): array {
  * Alter replacement values for placeholder tokens.
  *
  * @param $promoted
- *   An associative array of content returned by hook_navigation_promoted().
+ *   An associative array of content returned by hook_navigation_content_top().
  *
- * @see hook_navigation_promoted()
+ * @see hook_navigation_content_top()
  */
-function hook_navigation_promoted_alter(array &$promoted): void {
+function hook_navigation_content_top_alter(array &$promoted): void {
   // Remove a specific element.
   unset($promoted['navigation_foo']);
   // Modify an element.

@@ -44,11 +44,11 @@ class NavigationContentTopTest extends BrowserTestBase {
     $test_page_url = Url::fromRoute('test_page_test.test_page');
     $this->drupalGet($test_page_url);
     $this->assertSession()->elementNotExists('css', '.admin-toolbar__content_top');
-    \Drupal::state()->set('navigation_promoted', 1);
+    \Drupal::state()->set('navigation_content_top', 1);
     drupal_flush_all_caches();
     $this->drupalGet($test_page_url);
     $this->assertSession()->elementTextContains('css', '.admin-toolbar__content_top', 'foobarbaz');
-    \Drupal::state()->set('navigation_promoted_alter', 1);
+    \Drupal::state()->set('navigation_content_top_alter', 1);
     drupal_flush_all_caches();
     $this->drupalGet($test_page_url);
     $this->assertSession()->elementTextContains('css', '.admin-toolbar__content_top', 'baznew bar');
