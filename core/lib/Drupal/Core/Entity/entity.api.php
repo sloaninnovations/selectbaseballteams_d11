@@ -367,8 +367,9 @@ use Drupal\node\Entity\NodeType;
  *   for more information.
  * - Define a class for your entity, implementing your interface and extending
  *   either \Drupal\Core\Config\Entity\ConfigEntityBase or
- *   \Drupal\Core\Entity\ContentEntityBase, with annotation for
- *   \@ConfigEntityType or \@ContentEntityType in its documentation block.
+ *   \Drupal\Core\Entity\ContentEntityBase, with a
+ *   \Drupal\Core\Entity\Attribute\ConfigEntityType or
+ *   \Drupal\Core\Entity\Attribute\ContentEntityType attribute set on the class.
  *   If you are defining a content entity type, it is recommended to extend the
  *   \Drupal\Core\Entity\EditorialContentEntityBase base class in order to get
  *   out-of-the-box support for Entity API's revisioning and publishing
@@ -844,7 +845,7 @@ function hook_entity_type_build(array &$entity_types) {
  * @see \Drupal\Core\Entity\Entity
  * @see \Drupal\Core\Entity\EntityTypeInterface
  */
-function hook_entity_type_alter(array &$entity_types) {
+function hook_entity_type_alter(array &$entity_types): void {
   /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
   // Set the controller class for nodes to an alternate implementation of the
   // Drupal\Core\Entity\EntityStorageInterface interface.
