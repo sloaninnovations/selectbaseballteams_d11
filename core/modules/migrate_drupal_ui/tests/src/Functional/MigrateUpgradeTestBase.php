@@ -343,10 +343,10 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
   }
 
   /**
-   * Provides a list of managed files.
+   * Gets the file data.
    *
-   * @return array
-   *   The source base path.
+   * @return string[][]
+   *   Data from the source file_managed table.
    */
   protected function getManagedFiles() {
     return [];
