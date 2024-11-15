@@ -45,8 +45,8 @@ class DefaultPluginManagerTest extends KernelTestBase {
     // Ensure there is a class with the expected name. We cannot reflect on this
     // as it triggers a fatal error.
     $this->assertFileExists($base_directory . '/' . $subdir . '/UsingNonInstalledTraitClass.php');
-    $this->expectDeprecation('Using @PluginExample annotation for plugin with ID example_1 is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use a Drupal\plugin_test\Plugin\Attribute\PluginExample attribute instead. See https://www.drupal.org/project/drupal/issues/3252386');
     $this->expectDeprecation('Using @PluginExample annotation for plugin with ID example_2 is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use a Drupal\plugin_test\Plugin\Attribute\PluginExample attribute instead. See https://www.drupal.org/project/drupal/issues/3252386');
+    $this->expectDeprecation('Using @PluginExample annotation for plugin with ID example_1 is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use a Drupal\plugin_test\Plugin\Attribute\PluginExample attribute instead. See https://www.drupal.org/project/drupal/issues/3252386');
 
     // Annotation only.
     $manager = new DefaultPluginManager($subdir, $namespaces, $module_handler, NULL, AnnotationPluginExample::class);
