@@ -43,15 +43,15 @@ class NavigationContentTopTest extends BrowserTestBase {
   public function testNavigationContentTop(): void {
     $test_page_url = Url::fromRoute('test_page_test.test_page');
     $this->drupalGet($test_page_url);
-    $this->assertSession()->elementNotExists('css', '.admin-toolbar__content_top');
+    $this->assertSession()->elementNotExists('css', '.admin-toolbar__content-top');
     \Drupal::state()->set('navigation_content_top', 1);
     drupal_flush_all_caches();
     $this->drupalGet($test_page_url);
-    $this->assertSession()->elementTextContains('css', '.admin-toolbar__content_top', 'foobarbaz');
+    $this->assertSession()->elementTextContains('css', '.admin-toolbar__content-top', 'foobarbaz');
     \Drupal::state()->set('navigation_content_top_alter', 1);
     drupal_flush_all_caches();
     $this->drupalGet($test_page_url);
-    $this->assertSession()->elementTextContains('css', '.admin-toolbar__content_top', 'baznew bar');
+    $this->assertSession()->elementTextContains('css', '.admin-toolbar__content-top', 'baznew bar');
   }
 
 }
