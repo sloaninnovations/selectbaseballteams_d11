@@ -11,7 +11,7 @@
  */
 
 /**
- * Provide content for Navigation promoted section.
+ * Provide content for Navigation content_top section.
  *
  * @return array
  *   An associative array of renderable elements.
@@ -35,18 +35,18 @@ function hook_navigation_content_top(): array {
 /**
  * Alter replacement values for placeholder tokens.
  *
- * @param $promoted
+ * @param $content_top
  *   An associative array of content returned by hook_navigation_content_top().
  *
  * @see hook_navigation_content_top()
  */
-function hook_navigation_content_top_alter(array &$promoted): void {
+function hook_navigation_content_top_alter(array &$content_top): void {
   // Remove a specific element.
-  unset($promoted['navigation_foo']);
+  unset($content_top['navigation_foo']);
   // Modify an element.
-  $promoted['navigation_bar']['#markup'] = 'new bar';
+  $content_top['navigation_bar']['#markup'] = 'new bar';
   // Change weight.
-  $promoted['navigation_baz']['#weight'] = '-100';
+  $content_top['navigation_baz']['#weight'] = '-100';
 }
 
 /**

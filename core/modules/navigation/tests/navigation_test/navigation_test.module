@@ -43,10 +43,10 @@ function navigation_test_navigation_content_top(): array {
 /**
  * Implements hook_navigation_content_top_alter().
  */
-function navigation_test_navigation_content_top_alter(&$promoted): void {
+function navigation_test_navigation_content_top_alter(&$content_top): void {
   if (\Drupal::state()->get('navigation_content_top_alter')) {
-    unset($promoted['navigation_foo']);
-    $promoted['navigation_bar']['#markup'] = 'new bar';
-    $promoted['navigation_baz']['#weight'] = '-100';
+    unset($content_top['navigation_foo']);
+    $content_top['navigation_bar']['#markup'] = 'new bar';
+    $content_top['navigation_baz']['#weight'] = '-100';
   }
 }

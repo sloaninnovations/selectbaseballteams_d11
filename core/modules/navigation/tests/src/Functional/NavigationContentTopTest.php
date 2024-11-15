@@ -38,9 +38,9 @@ class NavigationContentTopTest extends BrowserTestBase {
   }
 
   /**
-   * Tests behavior of promoted section hooks.
+   * Tests behavior of content_top section hooks.
    */
-  public function testNavigationPromoted(): void {
+  public function testNavigationContentTop(): void {
     $test_page_url = Url::fromRoute('test_page_test.test_page');
     $this->drupalGet($test_page_url);
     $this->assertSession()->elementNotExists('css', '.admin-toolbar__content_top');

@@ -142,9 +142,9 @@ final class NavigationRenderer {
     $build[0] = NestedArray::mergeDeepArray([$build[0], $defaults]);
     $page_top['navigation'] = $build;
 
-    $promoted = $this->getContentTop();
-    if (!empty($promoted)) {
-      $page_top['navigation'][0]['content_top'] = $promoted;
+    $content_top = $this->getContentTop();
+    if (!empty($content_top)) {
+      $page_top['navigation'][0]['content_top'] = $content_top;
     }
 
     if ($logo_provider === self::LOGO_PROVIDER_CUSTOM) {
@@ -168,10 +168,10 @@ final class NavigationRenderer {
    *   The content_top section content.
    */
   protected function getContentTop(): array {
-    $promoted = $this->moduleHandler->invokeAll('navigation_content_top');
-    $this->moduleHandler->alter('navigation_content_top', $promoted);
-    uasort($promoted, [SortArray::class, 'sortByWeightElement']);
-    return $promoted;
+    $content_top = $this->moduleHandler->invokeAll('navigation_content_top');
+    $this->moduleHandler->alter('navigation_content_top', $content_top);
+    uasort($content_top, [SortArray::class, 'sortByWeightElement']);
+    return $content_top;
   }
 
   /**
