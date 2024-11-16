@@ -26,7 +26,7 @@ use Drupal\Core\Mail\MailTemplateId;
 interface MailThemeManagerInterface {
 
   /**
-   * Switches to the theme for the given email id and runs a callback.
+   * Switches to the theme for the given mail template ID and runs a callback.
    *
    * @template Result
    *
