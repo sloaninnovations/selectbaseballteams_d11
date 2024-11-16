@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Core\Mail;
+namespace Drupal\Core\MailTheme;
 
 /**
  * A value object that identifies a mail template.

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\MailTheme;
 
-use Drupal\Core\Mail\MailTemplateId;
-
 /**
  * Defines an interface for classes which determine the theme for an email.
  *
@@ -17,7 +15,7 @@ interface MailThemeNegotiatorInterface {
   /**
    * Whether this theme negotiator should be used to set the mail theme.
    *
-   * @param \Drupal\Core\Mail\MailTemplateId $templateId
+   * @param \Drupal\Core\MailTheme\MailTemplateId $templateId
    *   The mail template ID.
    *
    * @return bool
@@ -29,7 +27,7 @@ interface MailThemeNegotiatorInterface {
   /**
    * Determine the active theme for the email.
    *
-   * @param \Drupal\Core\Mail\MailTemplateId $templateId
+   * @param \Drupal\Core\MailTheme\MailTemplateId $templateId
    *   The mail template ID.
    *
    * @return string|null

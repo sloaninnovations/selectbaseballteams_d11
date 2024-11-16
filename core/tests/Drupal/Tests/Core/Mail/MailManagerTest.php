@@ -10,7 +10,7 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Mail\MailManager;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
-use Drupal\Core\Mail\MailTemplateId;
+use Drupal\Core\MailTheme\MailTemplateId;
 use Drupal\Core\MailTheme\MailThemeManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;

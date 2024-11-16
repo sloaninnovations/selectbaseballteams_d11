@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\MailTheme;
 
-use Drupal\Core\Mail\MailTemplateId;
+use Drupal\Core\MailTheme\MailTemplateId;
 use Drupal\Core\MailTheme\MailThemeNegotiator;
 use Drupal\Core\MailTheme\MailThemeNegotiatorInterface;
 use Drupal\Tests\UnitTestCase;

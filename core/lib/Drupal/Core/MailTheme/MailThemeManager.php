@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\MailTheme;
 
-use Drupal\Core\Mail\MailTemplateId;
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 

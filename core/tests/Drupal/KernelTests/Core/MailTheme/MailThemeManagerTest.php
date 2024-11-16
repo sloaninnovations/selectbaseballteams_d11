@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\MailTheme;
 
 use Drupal\Core\Extension\ThemeInstallerInterface;
-use Drupal\Core\Mail\MailTemplateId;
+use Drupal\Core\MailTheme\MailTemplateId;
 use Drupal\Core\MailTheme\MailThemeManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\KernelTests\KernelTestBase;

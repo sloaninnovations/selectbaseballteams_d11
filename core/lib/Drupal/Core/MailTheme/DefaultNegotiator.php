@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Core\MailTheme;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Mail\MailTemplateId;
 
 /**
  * Determines the default mail theme negotiator.

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\MailTheme;
 
-use Drupal\Core\Mail\MailTemplateId;
-
 /**
  * Interface for mail theme manager implementations.
  *
@@ -30,7 +28,7 @@ interface MailThemeManagerInterface {
    *
    * @template Result
    *
-   * @param \Drupal\Core\Mail\MailTemplateId $templateId
+   * @param \Drupal\Core\MailTheme\MailTemplateId $templateId
    *   The mail template ID used to look up the theme.
    * @param callable(): Result $function
    *   The callback to be executed.

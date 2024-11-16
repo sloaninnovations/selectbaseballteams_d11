@@ -12,6 +12,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\MailTheme\MailTemplateId;
 use Drupal\Core\MailTheme\MailThemeManagerInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderContext;
