@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\workflows\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -146,14 +148,14 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
   /**
    * {@inheritdoc}
    */
-  public function getPossibleValues(AccountInterface $account = NULL) {
+  public function getPossibleValues(?AccountInterface $account = NULL) {
     return array_keys($this->getPossibleOptions($account));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getPossibleOptions(AccountInterface $account = NULL) {
+  public function getPossibleOptions(?AccountInterface $account = NULL) {
     $workflow = $this->getWorkflow();
     $state_labels = array_map(function (StateInterface $state) {
       return $state->label();
@@ -165,14 +167,14 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
   /**
    * {@inheritdoc}
    */
-  public function getSettableValues(AccountInterface $account = NULL) {
+  public function getSettableValues(?AccountInterface $account = NULL) {
     return array_keys($this->getSettableOptions($account));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getSettableOptions(AccountInterface $account = NULL) {
+  public function getSettableOptions(?AccountInterface $account = NULL) {
     // $this->value is unpopulated due to https://www.drupal.org/node/2629932
     $field_name = $this->getFieldDefinition()->getName();
     $value = $this->getEntity()->get($field_name)->value;
