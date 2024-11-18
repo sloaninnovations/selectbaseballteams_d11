@@ -5,8 +5,8 @@ namespace Drupal\Core\Extension;
 use Drupal\Component\Graph\Graph;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
-use Drupal\Core\Hook\HookCollectorPass;
 use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\Hook\HookCollectorPass;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -59,8 +59,9 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected $includeFileKeys = [];
 
   /**
+   * Hook and module keyed list of listeners.
+   *
    * @var array
-   *   hook and module keyed list of listeners.
    */
   protected array $invokeMap = [];
 
@@ -199,9 +200,11 @@ class ModuleHandler implements ModuleHandlerInterface {
     // Load all includes so the legacy section of invoke can handle hooks in includes.
     $hook_collector->loadAllIncludes();
     // Register procedural implementations.
-    foreach ($hook_collector->getImplementations() as $hook => $class_implementations) {
-      foreach ($class_implementations[ProceduralCall::class] ?? [] as $method => $hook_data) {
-        $this->invokeMap[$hook][$hook_data['module']][] = $method;
+    foreach ($hook_collector->getImplementations() as $hook => $moduleImplements) {
+      foreach ($moduleImplements as $module => $classImplements) {
+        foreach ($classImplements[ProceduralCall::class] ?? [] as $method) {
+          $this->invokeMap[$hook][$module][] = $method;
+        }
       }
     }
   }
@@ -250,7 +253,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   public function loadInclude($module, $type, $name = NULL) {
     if ($type == 'install') {
-      // Make sure the installation API is available
+      // Make sure the installation API is available.
       include_once $this->root . '/core/includes/install.inc';
     }
 
@@ -389,11 +392,8 @@ class ModuleHandler implements ModuleHandlerInterface {
   private function triggerDeprecationError($description, $hook) {
     $modules = array_keys($this->getHookListeners($hook));
     if (!empty($modules)) {
-      $message = 'The deprecated hook hook_' . $hook . '() is implemented in these functions: ';
-      $implementations = array_map(function ($module) use ($hook) {
-        return $module . '_' . $hook . '()';
-      }, $modules);
-      @trigger_error($message . implode(', ', $implementations) . '. ' . $description, E_USER_DEPRECATED);
+      $message = 'The deprecated hook hook_' . $hook . '() is implemented in these modules: ';
+      @trigger_error($message . implode(', ', $modules) . '. ' . $description, E_USER_DEPRECATED);
     }
   }
 
@@ -508,8 +508,11 @@ class ModuleHandler implements ModuleHandlerInterface {
         if (is_string($listener)) {
           $functions[] = substr($listener, 1);
         }
+        else {
+          $functions[] = get_class($listener[0]) . '::' . $listener[1];
+        }
       }
-      $message = 'The deprecated alter hook hook_' . $type . '_alter() is implemented in these functions: ' . implode(', ', $functions) . '.';
+      $message = 'The deprecated alter hook hook_' . $type . '_alter() is implemented in these locations: ' . implode(', ', $functions) . '.';
       @trigger_error($message . ' ' . $description, E_USER_DEPRECATED);
     }
   }
