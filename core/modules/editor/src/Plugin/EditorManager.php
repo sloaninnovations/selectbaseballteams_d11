@@ -25,6 +25,13 @@ class EditorManager extends DefaultPluginManager {
   protected array $attachments = ['library' => []];
 
   /**
+   * Editors.
+   *
+   * @var array
+   */
+  protected array $editors = [];
+
+  /**
    * Constructs an EditorManager object.
    *
    * @param \Traversable $namespaces
@@ -67,13 +74,15 @@ class EditorManager extends DefaultPluginManager {
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()
    */
   public function getAttachments(array $format_ids) {
-    $settings = $this->attachments['drupalSettings'] ?? [];
     foreach ($format_ids as $format_id) {
-      if (isset($settings['editor']['formats'][$format_id])) {
+      // Check if editor had already been loaded for text format.
+      if (isset($this->editors[$format_id])) {
         continue;
       }
 
+      // Load editor; set to FALSE if no editor is assigned to text format.
       $editor = editor_load($format_id);
+      $editor = $this->editors[$format_id] = !is_null($editor) ? $editor : FALSE;
       if (!$editor) {
         continue;
       }
@@ -84,6 +93,7 @@ class EditorManager extends DefaultPluginManager {
       // Libraries.
       $this->attachments['library'] = array_merge($this->attachments['library'], $plugin->getLibraries($editor));
 
+      $settings = $this->attachments['drupalSettings'] ?? [];
       // Format-specific JavaScript settings.
       $settings['editor']['formats'][$format_id] = [
         'format' => $format_id,
