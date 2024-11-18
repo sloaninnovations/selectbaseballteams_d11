@@ -181,7 +181,7 @@ class FieldStorageAddForm extends FormBase {
             '#variant' => 'field-suboption',
           ];
           $radio_element['#return_value'] = $option['unique_identifier'];
-          if ((string)$option['unique_identifier'] === 'entity_reference') {
+          if ((string) $option['unique_identifier'] === 'entity_reference') {
             $radio_element['#title'] = 'Other';
             $radio_element['#weight'] = 10;
           }

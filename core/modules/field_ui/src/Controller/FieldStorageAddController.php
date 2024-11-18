@@ -63,16 +63,16 @@ final class FieldStorageAddController extends ControllerBase {
    * Builds the field selection links.
    *
    * @param string|null $entity_type_id
-   *   (optional) The name of the entity type.
+   *   The name of the entity type.
    * @param string|null $bundle
-   *   (optional) The entity bundle.
+   *   The entity bundle.
    * @param string|null $field_name
-   *   (optional) The field name.
+   *   The field name.
    *
    * @return array
    *   The field selection links.
    */
-  public function getFieldSelectionLinks(string $entity_type_id = NULL, string $bundle = NULL, string $field_name = NULL) {
+  public function getFieldSelectionLinks(?string $entity_type_id = NULL, ?string $bundle = NULL, ?string $field_name = NULL) {
     $build = [];
     if (!empty($field_name)) {
       $this->tempStore->delete("$entity_type_id:$field_name");
