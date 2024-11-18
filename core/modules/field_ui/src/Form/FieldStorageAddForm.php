@@ -90,7 +90,6 @@ class FieldStorageAddForm extends FormBase {
     $this->entityTypeId = $form_state->get('entity_type_id');
     $this->bundle = $form_state->get('bundle');
 
-
     $ui_definitions = $this->fieldTypePluginManager->getUiDefinitions();
     \Drupal::moduleHandler()->invokeAll('field_ui_field_type_ui_definitions_alter', [&$ui_definitions, $entity_type_id]);
     if ($selected_field_type === 'comment' && !array_key_exists($selected_field_type, $ui_definitions)) {
@@ -329,8 +328,8 @@ class FieldStorageAddForm extends FormBase {
       $response->addCommand(new ReplaceCommand('#field-storage-subfield', $form));
     }
     else {
-        $response = $this->successfulAjaxSubmit($form, $form_state);
-      }
+      $response = $this->successfulAjaxSubmit($form, $form_state);
+    }
     return $response;
   }
 

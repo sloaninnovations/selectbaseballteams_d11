@@ -63,11 +63,11 @@ final class FieldStorageAddController extends ControllerBase {
    * Builds the field selection links.
    *
    * @param string|null $entity_type_id
-   *   The name of the entity type.
+   *   (optional) The name of the entity type.
    * @param string|null $bundle
-   *   The entity bundle.
+   *   (optional) The entity bundle.
    * @param string|null $field_name
-   *   The field name.
+   *   (optional) The field name.
    *
    * @return array
    *   The field selection links.
@@ -118,11 +118,11 @@ final class FieldStorageAddController extends ControllerBase {
       $entity_type = $this->entityTypeManager()->getDefinition($this->entityTypeId);
       $display_as_group = !($category_info instanceof FallbackFieldTypeCategory);
       $route_parameters = [
-          'entity_type' => $this->entityTypeId,
-          'bundle' => $this->bundle,
-          'display_as_group' => $display_as_group ? 'true' : 'false',
-          'selected_field_type' => $category_info->getPluginId(),
-        ] + FieldUI::getRouteBundleParameter($entity_type, $this->bundle);
+        'entity_type' => $this->entityTypeId,
+        'bundle' => $this->bundle,
+        'display_as_group' => $display_as_group ? 'true' : 'false',
+        'selected_field_type' => $category_info->getPluginId(),
+      ] + FieldUI::getRouteBundleParameter($entity_type, $this->bundle);
       $cleaned_class_name = Html::getClass($field_type['unique_identifier']);
       $field_type_options_radios[$id] = [
         '#type' => 'html_tag',

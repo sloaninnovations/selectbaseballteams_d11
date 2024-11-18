@@ -306,9 +306,9 @@ class FieldConfigEditForm extends EntityForm {
     if ($this->entity->isNew()) {
       $entity_type = $this->entity->getTargetEntityTypeId();
       $route_parameters = [
-          'field_name' => $this->entity->getName(),
-          'entity_type' => $entity_type,
-        ] + FieldUI::getRouteBundleParameter($this->entityTypeManager->getDefinition($entity_type), $this->entity->getTargetBundle());
+        'field_name' => $this->entity->getName(),
+        'entity_type' => $entity_type,
+      ] + FieldUI::getRouteBundleParameter($this->entityTypeManager->getDefinition($entity_type), $this->entity->getTargetBundle());
       $actions['back'] = [
         '#type' => 'link',
         '#weight' => 1,
