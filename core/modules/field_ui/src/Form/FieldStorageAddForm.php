@@ -98,18 +98,17 @@ class FieldStorageAddForm extends FormBase {
       $controller = $controller_resolver->getControllerFromDefinition('\Drupal\field_ui\Controller\FieldStorageAddController::getFieldSelectionLinks');
       return $controller($entity_type_id, $bundle);
     }
-
-    if (!$form_state->has('unique_definitions')) {
-      $unique_definitions = [];
-      $grouped_definitions = $this->fieldTypePluginManager
-        ->getGroupedDefinitions($this->fieldTypePluginManager->getEntityTypeUiDefinitions($this->entityTypeId), 'label', 'id');
-      if (array_key_exists($selected_field_type, $grouped_definitions)) {
-        $field_types = $grouped_definitions[$selected_field_type];
-        foreach ($field_types as $name => $field_type) {
-          $unique_definitions[$selected_field_type][$name] = ['unique_identifier' => $name] + $field_type;
-        }
+    $unique_definitions = [];
+    $grouped_definitions = $this->fieldTypePluginManager
+      ->getGroupedDefinitions($this->fieldTypePluginManager->getEntityTypeUiDefinitions($this->entityTypeId), 'label', 'id');
+    if (array_key_exists($selected_field_type, $grouped_definitions)) {
+      $field_types = $grouped_definitions[$selected_field_type];
+      foreach ($field_types as $name => $field_type) {
+        $unique_definitions[$selected_field_type][$name] = ['unique_identifier' => $name] + $field_type;
       }
     }
+    $entity_type = $this->entityTypeManager->getDefinition($this->entityTypeId);
+    $route_parameters_back = [] + FieldUI::getRouteBundleParameter($entity_type, $this->bundle);
 
     $form['actions'] = ['#type' => 'actions'];
 
