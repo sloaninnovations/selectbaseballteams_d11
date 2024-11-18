@@ -74,6 +74,8 @@ class EditorManager extends DefaultPluginManager {
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()
    */
   public function getAttachments(array $format_ids) {
+    $settings = $this->attachments['drupalSettings'] ?? [];
+
     foreach ($format_ids as $format_id) {
       // Check if editor had already been loaded for text format.
       if (isset($this->editors[$format_id])) {
@@ -93,7 +95,6 @@ class EditorManager extends DefaultPluginManager {
       // Libraries.
       $this->attachments['library'] = array_merge($this->attachments['library'], $plugin->getLibraries($editor));
 
-      $settings = $this->attachments['drupalSettings'] ?? [];
       // Format-specific JavaScript settings.
       $settings['editor']['formats'][$format_id] = [
         'format' => $format_id,
