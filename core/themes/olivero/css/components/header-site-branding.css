@@ -66,6 +66,7 @@
 .site-branding__inner {
   display: flex;
   align-items: center;
+  gap: --var(--sp0-5);
 }
 
 .site-branding__inner a {

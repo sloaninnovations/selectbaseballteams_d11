@@ -15,21 +15,24 @@
 #}
 {% set attributes = attributes.addClass('site-branding') %}
 {% block content %}
-  <div class="site-branding__inner">
-    <a href="{{ path('<front>') }}" rel="home" title="{{ 'Home'|t }}" class="site-branding__logo">
-      {% if site_logo %}
-        <img src="{{ site_logo }}" alt="{{ 'Home'|t }}" fetchpriority="high"/>
-      {% endif %}
-      {% if site_name or site_slogan %}
-        <div class="site-branding__text">
-          {% if site_name %}
-            <div class="site-branding__name">{{ site_name }}</div>
-          {% endif %}
-          {% if site_slogan %}
-            <div class="site-branding__slogan">{{ site_slogan }}</div>
-          {% endif %}
-        </div>
-      {% endif %}
-    </a>
-  </div>
+	<div class="site-branding__inner">
+		{% if site_logo %}
+			<a href="{{ path('<front>') }}" rel="home" class="site-branding__logo">
+				<img src="{{ site_logo }}" alt="{{ 'Home'|t }}" fetchpriority="high"/>
+			</a>
+		{% endif %}
+		{% if site_name or site_slogan %}
+			<div class="site-branding__text">
+				{% if site_name %}
+					<div class="site-branding__name">
+						<a href="{{ path('<front>') }}" rel="home" title="{{ site_name|t }}">{{ site_name }}</a>
+					</div>
+				{% endif %}
+				{% if site_slogan %}
+					<div class="site-branding__slogan">{{ site_slogan }}</div>
+				{% endif %}
+			</div>
+		{% endif %}
+	</div>
 {% endblock %}
+
