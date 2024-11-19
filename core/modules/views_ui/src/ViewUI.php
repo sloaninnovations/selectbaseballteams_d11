@@ -39,7 +39,7 @@ class ViewUI implements ViewEntityInterface {
    *
    * @var array
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $changed_display;
 
   /**
@@ -47,7 +47,7 @@ class ViewUI implements ViewEntityInterface {
    *
    * @var float
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $render_time;
 
   /**
@@ -72,7 +72,7 @@ class ViewUI implements ViewEntityInterface {
    *
    * @var array
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $temporary_options;
 
   /**
@@ -87,10 +87,8 @@ class ViewUI implements ViewEntityInterface {
    *
    * @var bool
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $live_preview;
-
-  public $renderPreview = FALSE;
 
   /**
    * The View storage object.
@@ -471,7 +469,7 @@ class ViewUI implements ViewEntityInterface {
         }
         $id = $this->getExecutable()->addHandler($display_id, $type, $table, $field);
 
-        // check to see if we have group by settings
+        // Check to see if we have group by settings
         $key = $type;
         // Footer,header and empty text have a different internal handler type(area).
         if (isset($types[$type]['type'])) {
@@ -486,7 +484,7 @@ class ViewUI implements ViewEntityInterface {
           $this->addFormToStack('handler-group', $display_id, $type, $id);
         }
 
-        // check to see if this type has settings, if so add the settings form first
+        // Check to see if this type has settings, if so add the settings form first
         if ($handler && $handler->hasExtraOptions()) {
           $this->addFormToStack('handler-extra', $display_id, $type, $id);
         }

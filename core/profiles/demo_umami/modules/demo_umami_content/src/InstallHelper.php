@@ -94,7 +94,7 @@ class InstallHelper implements ContainerInjectionInterface {
   /**
    * The module's path.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected string $module_path;
 
   /**
@@ -184,9 +184,9 @@ class InstallHelper implements ContainerInjectionInterface {
     foreach ($translated_languages as $language) {
       if (file_exists($default_content_path . "$language/$filename") &&
       ($handle = fopen($default_content_path . "$language/$filename", 'r')) !== FALSE) {
-        $header = fgetcsv($handle);
+        $header = fgetcsv($handle, escape: '');
         $line_counter = 0;
-        while (($content = fgetcsv($handle)) !== FALSE) {
+        while (($content = fgetcsv($handle, escape: '')) !== FALSE) {
           $keyed_content[$language][$line_counter] = array_combine($header, $content);
           $line_counter++;
         }
@@ -867,7 +867,7 @@ class InstallHelper implements ContainerInjectionInterface {
     try {
       $uri = $this->fileSystem->copy($path, 'public://' . $filename, FileExists::Replace);
     }
-    catch (FileException $e) {
+    catch (FileException) {
       $uri = FALSE;
     }
     $file = $this->entityTypeManager->getStorage('file')->create([

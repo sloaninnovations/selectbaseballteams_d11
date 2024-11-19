@@ -62,6 +62,8 @@ use Drupal\Core\Utility\UpdateException;
 /**
  * Defines one or more hooks that are exposed by a module.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * Normally hooks do not need to be explicitly defined. However, by declaring a
  * hook explicitly, a module may define a "group" for it. Modules that implement
  * a hook may then place their implementation in either $module.module or in
@@ -93,6 +95,8 @@ function hook_hook_info() {
 
 /**
  * Alter the registry of modules implementing a hook.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * This hook is invoked in \Drupal::moduleHandler()->getImplementationInfo().
  * A module may implement this hook in order to reorder the implementing
@@ -209,6 +213,8 @@ function hook_modules_installed($modules, $is_syncing) {
 /**
  * Perform setup tasks when the module is installed.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * If the module implements hook_schema(), the database tables will
  * be created before this hook is fired.
  *
@@ -249,7 +255,7 @@ function hook_modules_installed($modules, $is_syncing) {
  * @see hook_uninstall()
  * @see hook_modules_installed()
  */
-function hook_install($is_syncing) {
+function hook_install($is_syncing): void {
   // Set general module variables.
   \Drupal::state()->set('my_module.foo', 'bar');
 }
@@ -304,6 +310,8 @@ function hook_modules_uninstalled($modules, $is_syncing) {
 /**
  * Remove any information that the module sets.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * The information that the module should remove includes:
  * - state that the module has set using \Drupal::state()
  * - modifications to existing tables
@@ -333,7 +341,7 @@ function hook_modules_uninstalled($modules, $is_syncing) {
  * @see hook_modules_uninstalled()
  * @see \Drupal\Core\Extension\ModuleUninstallValidatorInterface
  */
-function hook_uninstall($is_syncing) {
+function hook_uninstall($is_syncing): void {
   // Delete remaining general module variables.
   \Drupal::state()->delete('my_module.foo');
 }
@@ -529,6 +537,8 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
 /**
  * Perform a single update between minor versions.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * Modules should use hook hook_update_N() to update between minor or major
  * versions of the module. Sites upgrading from Drupal 6 or 7 to any higher
  * version should use the @link migrate Migrate API @endlink instead.
@@ -541,8 +551,6 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
  * name)_update_(number).
  *
  * The number (N) must be higher than hook_update_last_removed().
- *
- * @see hook_update_last_removed()
  *
  * The numbers are normally composed of three parts:
  * - 1 or 2 digits for Drupal core compatibility (Drupal 8, 9, 10, etc.). This
@@ -667,6 +675,82 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
  * See the @link batch Batch operations topic @endlink for more information on
  * how to use the Batch API.
  *
+ * @section sec_equivalent_updates Multiple upgrade paths
+ * There are situations where changes require a hook_update_N() to be applied to
+ * different major branches. This results in more than one upgrade path from the
+ * current major version to the next major version.
+ *
+ * For example, if an update is added to 11.1.0 and 10.4.0, then a site on
+ * 10.3.7 can update either to 10.4.0 and from there to 11.1.0, or directly from
+ * 10.3.7 to 11.1.1. In one case, the update will run on the 10.x code base, and
+ * in another on the 11.x code base, but the update system needs to ensure that
+ * it doesn't run twice on the same site.
+ *
+ * hook_update_N() numbers are sequential integers, and numbers lower than the
+ * modules current schema version will never be run. This means once a site has
+ * run an update, for example, 11100, it will not run a later update added as
+ * 10400. Backporting of updates therefore needs to allow 'space' for the 10.4.x
+ * codebase to include updates which don't exist in 11.x (for example to ensure
+ * a later 11.x update goes smoothly).
+ *
+ * To resolve this, when handling potential backports of updates between major
+ * branches, we use different update numbers for each branch, but record the
+ * relationship between those updates in the older branches. This is best
+ * explained by an example showing the different branches updates could be
+ * applied to:
+ * - The first update, system_update_10300 is applied to 10.3.0.
+ * - Then, 11.0.0 is released with the update removed,
+ *   system_update_last_removed() is added which returns 10300.
+ * - The next update, system_update_11100, is applied to 11.1.x only.
+ * - Then 10.4.0 and 11.1.0 are released. system_update_11100 is not backported
+ *   to 11.0.x or any 10.x branch.
+ * - Finally, a critical data loss update is necessary. The bug-fix supported
+ *   branches are 11.1.x, 11.0.x, and 10.4.x. This results in adding the updates
+ *   system_update_10400 (10.4.x), system_update_11000 (11.0.x) and
+ *   system_update_11101 (11.1.x) and making the 10.4.1, 11.0.1 and 11.1.1
+ *   releases.
+ *
+ * This is a list of the example releases and the updates they contain:
+ * - 10.3.0: system_update_10300
+ * - 10.4.1: system_update_10300 and system_update_10400 (equivalent to
+ *   system_update_11101)
+ * - 11.0.0: No updates
+ * - 11.0.1: system_update_11000 (equivalent to system_update_11101)
+ * - 11.1.0: system_update_11100
+ * - 11.1.1: system_update_11100 and system_update_11101
+ *
+ * In this situation, sites on 10.4.1 or 11.0.1 will be required to update to
+ * versions that contain system_update_11101. For example, a site on 10.4.1
+ * would not be able to update to 11.0.0, because that would result in it going
+ * 'backwards' in terms of database schema, but it would be able to update to
+ * 11.1.1. The same is true for a site on 11.0.1.
+ *
+ * The following examples show how to implement a hook_update_N() that must be
+ * skipped in a future update process.
+ *
+ * Future updates can be marked as equivalent by adding the following code to an
+ * update.
+ * @code
+ * function my_module_update_10400() {
+ *   \Drupal::service('update.update_hook_registry')->markFutureUpdateEquivalent(11101, '11.1.1');
+ *
+ *   // The rest of the update function.
+ * }
+ * @endcode
+ *
+ * At the moment we need to add defensive coding in the future update to ensure
+ * it is skipped.
+ * @code
+ * function my_module_update_11101() {
+ *   $equivalent_update = \Drupal::service('update.update_hook_registry')->getEquivalentUpdate();
+ *   if ($equivalent_update instanceof \Drupal\Core\Update\EquivalentUpdate) {
+ *     return $equivalent_update->toSkipMessage();
+ *   }
+ *
+ *   // The rest of the update function.
+ * }
+ * @endcode
+ *
  * @param array $sandbox
  *   Stores information for batch updates. See above for more information.
  *
@@ -748,6 +832,8 @@ function hook_update_N(&$sandbox) {
 /**
  * Executes an update which is intended to update data, like entities.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * These implementations have to be placed in a MODULE.post_update.php file or
  * a THEME.post_update.php file.
  *
@@ -828,7 +914,7 @@ function hook_post_update_NAME(&$sandbox) {
  *
  * @see hook_post_update_NAME()
  */
-function hook_removed_post_updates() {
+function hook_removed_post_updates(): array {
   return [
     'my_module_post_update_foo' => '8.x-2.0',
     'my_module_post_update_bar' => '8.x-3.0',
@@ -886,6 +972,8 @@ function hook_update_dependencies() {
 /**
  * Return a number which is no longer available as hook_update_N().
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * If you remove some update functions from your my_module.install file, you
  * should notify Drupal of those missing functions. This way, Drupal can
  * ensure that no update is accidentally skipped.
@@ -901,7 +989,7 @@ function hook_update_dependencies() {
  *
  * @see hook_update_N()
  */
-function hook_update_last_removed() {
+function hook_update_last_removed(): int {
   // We've removed the 8.x-1.x version of my_module, including database updates.
   // The next update function is my_module_update_8200().
   return 8103;
@@ -912,7 +1000,7 @@ function hook_update_last_removed() {
  *
  * Drupal\Core\Updater\Updater is a class that knows how to update various parts
  * of the Drupal file system, for example to update modules that have newer
- * releases, or to install a new theme.
+ * releases.
  *
  * @return array
  *   An associative array of information about the updater(s) being provided.
@@ -952,8 +1040,7 @@ function hook_updater_info() {
  * Alter the Updater information array.
  *
  * An Updater is a class that knows how to update various parts of the Drupal
- * file system, for example to update modules that have newer releases, or to
- * install a new theme.
+ * file system, for example to update modules that have newer releases.
  *
  * @param array $updaters
  *   Associative array of updaters as defined through hook_updater_info().
