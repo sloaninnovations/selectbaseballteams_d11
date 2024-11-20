@@ -321,8 +321,9 @@ class PathWorkspacesTest extends BrowserTestBase {
     // Edit the path alias to set its language to "Not specified".
     $alias_edit_path = "admin/config/search/path/edit/{$default_node->id()}";
     $this->drupalGet($alias_edit_path);
+    // Set the alias language to "Not specified".
     $edit = [
-      'langcode[0][value]' => 'und', // Set the alias language to "Not specified".
+      'langcode[0][value]' => 'und',
     ];
     $this->submitForm($edit, 'Save');
 
