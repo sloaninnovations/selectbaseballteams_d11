@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Hook;
 use Drupal\Core\Hook\HookCollectorPass;
 use Drupal\KernelTests\KernelTestBase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * @coversDefaultClass \Drupal\Core\Hook\HookCollectorPass
@@ -36,6 +37,7 @@ class HookCollectorPassTest extends KernelTestBase {
       'user_hooks_test' => ['pathname' => "$this->siteDirectory/user_hooks_test.info.yml"],
     ];
     $container->setParameter('container.modules', $module_filenames);
+    $container->setDefinition('module_handler', new Definition());
     (new HookCollectorPass())->process($container);
     $implementations = [
       'user_format_name_alter' => [
@@ -46,6 +48,38 @@ class HookCollectorPassTest extends KernelTestBase {
     ];
 
     $this->assertSame($implementations, $container->getParameter('hook_implementations_map'));
+  }
+
+  /**
+   * Test that ordering works.
+   */
+  public function testOrdering(): void {
+    $container = new ContainerBuilder();
+    $module_filenames = [
+      'module_handler_test_all1' => ['pathname' => "core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/module_handler_test_all1.info.yml"],
+      'module_handler_test_all2' => ['pathname' => "core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2/module_handler_test_all2.info.yml"],
+    ];
+    include_once 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/src/Hook/ModuleHandlerTestAll1Hooks.php';
+    $container->setParameter('container.modules', $module_filenames);
+    $container->setDefinition('module_handler', new Definition());
+    (new HookCollectorPass())->process($container);
+    $priorities = [];
+    foreach ($container->findTaggedServiceIds('kernel.event_listener') as $tags) {
+      foreach ($tags as $attributes) {
+        if (str_starts_with($attributes['event'], 'drupal_hook.order')) {
+          $priorities[$attributes['event']][$attributes['method']] = $attributes['priority'];
+        }
+      }
+    }
+    // For the order1 hook, module_handler_test_all2_order1() fires first
+    // despite all1 coming before all2 in the module list, because
+    // module_handler_test_all1_module_implements_alter() moved all1 to the
+    // end. The array key 'order' comes from
+    // ModuleHandlerTestAll1Hooks::order().
+    $this->assertGreaterThan($priorities['drupal_hook.order1']['order'], $priorities['drupal_hook.order1']['module_handler_test_all2_order1']);
+    // For the hook order2 or any hook but order1, however, all1 fires first
+    // and all2 second.
+    $this->assertLessThan($priorities['drupal_hook.order2']['order'], $priorities['drupal_hook.order2']['module_handler_test_all2_order2']);
   }
 
 }
