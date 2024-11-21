@@ -105,6 +105,7 @@ class PathHooks {
       $fields['path'] = BaseFieldDefinition::create('path')->setLabel(t('URL alias'))->setTranslatable(TRUE)->setDisplayOptions('form', ['type' => 'path', 'weight' => 30])->setDisplayConfigurable('form', TRUE)->setComputed(TRUE);
       return $fields;
     }
+    return [];
   }
 
   /**

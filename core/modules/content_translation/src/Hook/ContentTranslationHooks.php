@@ -256,6 +256,7 @@ class ContentTranslationHooks {
         return $definitions;
       }
     }
+    return [];
   }
 
   /**

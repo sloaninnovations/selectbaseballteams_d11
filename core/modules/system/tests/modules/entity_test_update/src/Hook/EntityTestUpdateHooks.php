@@ -23,11 +23,11 @@ class EntityTestUpdateHooks {
     // Add a base field that will be used to test that fields added through
     // hook_entity_base_field_info() are handled correctly during a schema
     // conversion (e.g. from non-revisionable to revisionable).
+    $fields = [];
     if ($entity_type->id() == 'entity_test_update') {
-      $fields = [];
       $fields['test_entity_base_field_info'] = BaseFieldDefinition::create('string')->setLabel(new TranslatableMarkup('Field added by hook_entity_base_field_info()'))->setTranslatable(TRUE)->setRevisionable(TRUE);
-      return $fields;
     }
+    return $fields;
   }
 
   /**
@@ -38,6 +38,7 @@ class EntityTestUpdateHooks {
     if ($entity_type->id() == 'entity_test_update') {
       return \Drupal::state()->get('entity_test_update.additional_field_storage_definitions', []);
     }
+    return [];
   }
 
   /**

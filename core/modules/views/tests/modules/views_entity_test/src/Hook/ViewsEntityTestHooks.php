@@ -27,6 +27,7 @@ class ViewsEntityTestHooks {
       $definitions['test_text_access'] = BaseFieldDefinition::create('string')->setLabel(t('Test access'))->setTranslatable(FALSE)->setSetting('max_length', 64)->setDisplayOptions('form', ['type' => 'string_textfield', 'weight' => 10]);
       return $definitions;
     }
+    return [];
   }
 
   /**

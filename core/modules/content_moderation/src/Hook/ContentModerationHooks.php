@@ -98,6 +98,7 @@ class ContentModerationHooks {
       $base_field_definitions['moderation_state']->setTargetBundle($bundle);
       return ['moderation_state' => $base_field_definitions['moderation_state']];
     }
+    return [];
   }
 
   /**

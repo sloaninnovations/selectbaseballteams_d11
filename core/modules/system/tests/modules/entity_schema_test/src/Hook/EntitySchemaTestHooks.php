@@ -54,6 +54,7 @@ class EntitySchemaTestHooks {
       }
       return $definitions;
     }
+    return [];
   }
 
   /**
@@ -65,6 +66,7 @@ class EntitySchemaTestHooks {
       $definitions['custom_bundle_field'] = FieldStorageDefinition::create('string')->setName('custom_bundle_field')->setLabel($this->t('A custom bundle field'))->setRevisionable(TRUE)->setTargetEntityTypeId($entity_type->id());
       return $definitions;
     }
+    return [];
   }
 
   /**
@@ -78,6 +80,7 @@ class EntitySchemaTestHooks {
       $definitions[$custom_bundle_field_storage->getName()] = FieldDefinition::createFromFieldStorageDefinition($custom_bundle_field_storage);
       return $definitions;
     }
+    return [];
   }
 
   /**

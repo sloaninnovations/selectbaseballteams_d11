@@ -46,6 +46,7 @@ class LanguageTestHooks {
         ],
       ];
     }
+    return [];
   }
 
   /**
