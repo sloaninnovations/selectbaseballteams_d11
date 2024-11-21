@@ -71,7 +71,6 @@ class LayoutBuilderAccessTest extends BrowserTestBase {
    *   An array of expected permission dependencies.
    *
    * @dataProvider providerTestAccessWithBundles
-   *
    */
   public function testAccessWithBundles(array $permissions, $default_access, $non_editable_access, $editable_access, array $permission_dependencies): void {
     $permissions[] = 'edit own bundle_with_section_field content';

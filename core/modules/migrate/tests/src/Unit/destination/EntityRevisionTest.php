@@ -179,8 +179,6 @@ class EntityRevisionTest extends UnitTestCase {
   /**
    * Helper method to create an entity revision destination with mock services.
    *
-   * @see \Drupal\Tests\migrate\Unit\Destination\EntityRevision
-   *
    * @param array $configuration
    *   Configuration for the destination.
    * @param string $plugin_id

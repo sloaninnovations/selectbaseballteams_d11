@@ -81,8 +81,6 @@ class FormatDateTest extends MigrateProcessTestCase {
    *
    * @covers ::transform
    *
-   * @dataProvider datesDataProvider
-   *
    * @param array $configuration
    *   The configuration of the migration process plugin.
    * @param string $value

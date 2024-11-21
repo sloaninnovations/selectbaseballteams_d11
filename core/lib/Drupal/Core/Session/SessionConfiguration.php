@@ -122,7 +122,7 @@ class SessionConfiguration implements SessionConfigurationInterface {
    * @see http://tools.ietf.org/html/rfc2109
    * @see http://tools.ietf.org/html/rfc2965
    * @see http://tools.ietf.org/html/rfc6265
- */
+   */
   protected function getCookieDomain(Request $request) {
     if (isset($this->options['cookie_domain'])) {
       $cookie_domain = $this->options['cookie_domain'];
