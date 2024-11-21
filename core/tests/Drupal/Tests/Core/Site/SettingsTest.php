@@ -179,7 +179,6 @@ class SettingsTest extends UnitTestCase {
    *
    * @see self::testRealDeprecatedSettings()
    * @see self::providerTestRealDeprecatedSettings()
-   *
    */
   public function testFakeDeprecatedSettings(array $settings_config, string $setting_name, string $expected_value, bool $expect_deprecation_message = TRUE): void {
 

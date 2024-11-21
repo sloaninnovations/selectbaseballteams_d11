@@ -202,13 +202,13 @@ class UrlHelperTest extends TestCase {
   /**
    * Tests invalid relative URLs.
    *
-   * @dataProvider providerTestInvalidRelativeData
-   * @covers ::isValid
-   *
    * @param string $url
    *   The URL to test.
    * @param string $prefix
    *   The prefix to test.
+   *
+   * @dataProvider providerTestInvalidRelativeData
+   * @covers ::isValid
    */
   public function testInvalidRelative(string $url, string $prefix): void {
     $test_url = $prefix . $url;

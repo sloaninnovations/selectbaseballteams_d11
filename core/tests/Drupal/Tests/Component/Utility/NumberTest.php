@@ -50,7 +50,6 @@ class NumberTest extends TestCase {
    *
    * @dataProvider providerTestValidStepOffset
    * @covers ::validStep
-
    */
   public function testValidStepOffset($value, $step, $offset, $expected): void {
     $return = Number::validStep($value, $step, $offset);
@@ -130,7 +129,7 @@ class NumberTest extends TestCase {
    * @dataProvider providerTestConversions
    * @covers ::intToAlphadecimal
    * @covers ::alphadecimalToInt
- */
+   */
   public function testConversions($value, $expected): void {
     $this->assertSame(Number::intToAlphadecimal($value), $expected);
     $this->assertSame($value, Number::alphadecimalToInt($expected));
