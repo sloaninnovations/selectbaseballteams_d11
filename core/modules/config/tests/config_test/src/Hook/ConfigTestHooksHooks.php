@@ -24,7 +24,7 @@ class ConfigTestHooksHooks {
    * Implements hook_ENTITY_TYPE_create() for 'config_test'.
    */
   #[Hook('config_test_create')]
-  public function configTestCreate(ConfigTest $config_test) {
+  public function configTestCreate(ConfigTest $config_test): void {
     if (\Drupal::state()->get('config_test.prepopulate')) {
       $config_test->set('foo', 'baz');
     }

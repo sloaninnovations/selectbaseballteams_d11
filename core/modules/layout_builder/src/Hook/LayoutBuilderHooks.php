@@ -194,7 +194,7 @@ class LayoutBuilderHooks {
    * Implements hook_entity_presave().
    */
   #[Hook('entity_presave')]
-  public function entityPresave(EntityInterface $entity) {
+  public function entityPresave(EntityInterface $entity): void {
     if (\Drupal::moduleHandler()->moduleExists('block_content')) {
       /** @var \Drupal\layout_builder\InlineBlockEntityOperations $entity_operations */
       $entity_operations = \Drupal::classResolver(InlineBlockEntityOperations::class);
@@ -206,7 +206,7 @@ class LayoutBuilderHooks {
    * Implements hook_entity_delete().
    */
   #[Hook('entity_delete')]
-  public function entityDelete(EntityInterface $entity) {
+  public function entityDelete(EntityInterface $entity): void {
     if (\Drupal::moduleHandler()->moduleExists('block_content')) {
       /** @var \Drupal\layout_builder\InlineBlockEntityOperations $entity_operations */
       $entity_operations = \Drupal::classResolver(InlineBlockEntityOperations::class);
@@ -360,7 +360,7 @@ class LayoutBuilderHooks {
    * Implements hook_entity_translation_create().
    */
   #[Hook('entity_translation_create')]
-  public function entityTranslationCreate(EntityInterface $translation) {
+  public function entityTranslationCreate(EntityInterface $translation): void {
     /** @var \Drupal\Core\Entity\FieldableEntityInterface $translation */
     if ($translation->hasField(OverridesSectionStorage::FIELD_NAME) && $translation->getFieldDefinition(OverridesSectionStorage::FIELD_NAME)->isTranslatable()) {
       // When creating a new translation do not copy untranslated sections because
