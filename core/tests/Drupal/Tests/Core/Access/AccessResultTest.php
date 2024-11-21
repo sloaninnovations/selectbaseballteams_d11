@@ -909,8 +909,6 @@ class AccessResultTest extends UnitTestCase {
   /**
    * Tests allowedIfHasPermissions().
    *
-   * @covers ::allowedIfHasPermissions
-   *
    * @param string[] $permissions
    *   The permissions to check for.
    * @param string $conjunction
@@ -918,6 +916,7 @@ class AccessResultTest extends UnitTestCase {
    * @param \Drupal\Core\Access\AccessResult $expected_access
    *   The expected access check result.
    *
+   * @covers ::allowedIfHasPermissions
    * @dataProvider providerTestAllowedIfHasPermissions
    */
   public function testAllowedIfHasPermissions($permissions, $conjunction, AccessResult $expected_access): void {

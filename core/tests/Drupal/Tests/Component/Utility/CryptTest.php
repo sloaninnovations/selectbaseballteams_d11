@@ -35,15 +35,15 @@ class CryptTest extends TestCase {
   /**
    * Tests HMAC generation.
    *
-   * @dataProvider providerTestHmacBase64
-   * @covers ::hmacBase64
-   *
    * @param string $data
    *   Data to hash.
    * @param string $key
    *   Key to use in hashing process.
    * @param string $expected_hmac
    *   Expected result from hashing $data using $key.
+   *
+   * @dataProvider providerTestHmacBase64
+   * @covers ::hmacBase64
    */
   public function testHmacBase64($data, $key, $expected_hmac): void {
     $hmac = Crypt::hmacBase64($data, $key);

@@ -5,6 +5,8 @@
  * Hooks related to module and update systems.
  */
 
+// phpcs:ignore Drupal.Commenting.DocComment.ParamNotFirst
+
 use Drupal\Core\Database\Database;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
