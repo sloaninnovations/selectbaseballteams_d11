@@ -887,7 +887,7 @@ function hook_entity_view_mode_info_alter(&$view_modes) {
  * @see \Drupal\Core\Entity\EntityTypeBundleInfo::getBundleInfo()
  * @see hook_entity_bundle_info_alter()
  */
-function hook_entity_bundle_info() {
+function hook_entity_bundle_info(): array {
   $bundles['user']['user']['label'] = t('User');
   return $bundles;
 }
@@ -1942,7 +1942,7 @@ function hook_entity_form_display_alter(\Drupal\Core\Entity\Display\EntityFormDi
  * @see \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
  * @see https://www.drupal.org/node/3034742
  */
-function hook_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type) {
+function hook_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type): array {
   if ($entity_type->id() == 'node') {
     $fields = [];
     $fields['my_module_text'] = BaseFieldDefinition::create('string')
@@ -2006,7 +2006,7 @@ function hook_entity_base_field_info_alter(&$fields, \Drupal\Core\Entity\EntityT
  * @todo WARNING: This hook will be changed in
  * https://www.drupal.org/node/2346347.
  */
-function hook_entity_bundle_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
+function hook_entity_bundle_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle, array $base_field_definitions): array {
   // Add a property only to nodes of the 'article' bundle.
   if ($entity_type->id() == 'node' && $bundle == 'article') {
     $fields = [];
@@ -2062,7 +2062,7 @@ function hook_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\Entit
  * @see \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
  * @see https://www.drupal.org/node/3034742
  */
-function hook_entity_field_storage_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type) {
+function hook_entity_field_storage_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type): array {
   if (\Drupal::entityTypeManager()->getStorage($entity_type->id()) instanceof DynamicallyFieldableEntityStorageInterface) {
     // Query by filtering on the ID as this is more efficient than filtering
     // on the entity_type property directly.
@@ -2259,7 +2259,7 @@ function hook_ENTITY_TYPE_field_values_init(\Drupal\Core\Entity\FieldableEntityI
  *   The array structure is identical to that of the return value of
  *   \Drupal\Core\Entity\EntityFieldManagerInterface::getExtraFields().
  */
-function hook_entity_extra_field_info() {
+function hook_entity_extra_field_info(): array {
   $extra = [];
   $module_language_enabled = \Drupal::moduleHandler()->moduleExists('language');
   $description = t('Node module element');
