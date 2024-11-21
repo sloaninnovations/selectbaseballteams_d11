@@ -113,7 +113,7 @@ class ContentModerationHooks {
    */
   #[Hook('entity_presave')]
   public function entityPresave(EntityInterface $entity): void {
-    return \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityPresave($entity);
+    \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityPresave($entity);
   }
 
   /**
@@ -121,7 +121,7 @@ class ContentModerationHooks {
    */
   #[Hook('entity_insert')]
   public function entityInsert(EntityInterface $entity): void {
-    return \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityInsert($entity);
+    \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityInsert($entity);
   }
 
   /**
@@ -129,7 +129,7 @@ class ContentModerationHooks {
    */
   #[Hook('entity_update')]
   public function entityUpdate(EntityInterface $entity): void {
-    return \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityUpdate($entity);
+    \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityUpdate($entity);
   }
 
   /**
@@ -137,7 +137,7 @@ class ContentModerationHooks {
    */
   #[Hook('entity_delete')]
   public function entityDelete(EntityInterface $entity): void {
-    return \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityDelete($entity);
+    \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityDelete($entity);
   }
 
   /**
@@ -145,7 +145,7 @@ class ContentModerationHooks {
    */
   #[Hook('entity_revision_delete')]
   public function entityRevisionDelete(EntityInterface $entity): void {
-    return \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityRevisionDelete($entity);
+    \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityRevisionDelete($entity);
   }
 
   /**
@@ -153,7 +153,7 @@ class ContentModerationHooks {
    */
   #[Hook('entity_translation_delete')]
   public function entityTranslationDelete(EntityInterface $translation): void {
-    return \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityTranslationDelete($translation);
+    \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityTranslationDelete($translation);
   }
 
   /**
