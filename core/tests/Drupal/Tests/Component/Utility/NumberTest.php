@@ -50,7 +50,7 @@ class NumberTest extends TestCase {
    *
    * @dataProvider providerTestValidStepOffset
    * @covers ::validStep
-   *
+
    */
   public function testValidStepOffset($value, $step, $offset, $expected): void {
     $return = Number::validStep($value, $step, $offset);
@@ -139,12 +139,12 @@ class NumberTest extends TestCase {
   /**
    * Data provider for testConversions().
    *
-   * @see testConversions()
-   *
    * @return array
    *   An array containing:
    *     - The integer value.
    *     - The alphadecimal value.
+   *
+   * @see testConversions()
    */
   public static function providerTestConversions() {
     return [

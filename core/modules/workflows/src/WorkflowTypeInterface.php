@@ -54,7 +54,7 @@ interface WorkflowTypeInterface extends PluginWithFormsInterface, DerivativeInsp
    * @internal
    *   Marked as internal until it's validated this should form part of the
    *   public API in https://www.drupal.org/node/2897148.
- */
+   */
   public function workflowStateHasData(WorkflowInterface $workflow, StateInterface $state);
 
   /**

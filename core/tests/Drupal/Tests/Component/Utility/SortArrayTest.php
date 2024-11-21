@@ -182,7 +182,6 @@ class SortArrayTest extends TestCase {
    * @dataProvider providerSortByTitleElement
    * @covers ::sortByTitleElement
    * @covers ::sortByKeyString
-   *
    */
   public function testSortByTitleElement($a, $b, $expected): void {
     $result = SortArray::sortByTitleElement($a, $b);

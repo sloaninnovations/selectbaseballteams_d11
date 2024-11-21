@@ -252,7 +252,6 @@ EOF;
    *
    * @dataProvider providerTestValidateUtf8
    * @covers ::validateUtf8
-   *
    */
   public function testValidateUtf8($text, $expected, $message): void {
     $this->assertEquals($expected, Unicode::validateUtf8($text), $message);
