@@ -238,7 +238,7 @@ class ContentTranslationHooks {
    * Implements hook_entity_base_field_info().
    */
   #[Hook('entity_base_field_info')]
-  public function entityBaseFieldInfo(EntityTypeInterface $entity_type) {
+  public function entityBaseFieldInfo(EntityTypeInterface $entity_type): array {
     /** @var \Drupal\content_translation\ContentTranslationManagerInterface $manager */
     $manager = \Drupal::service('content_translation.manager');
     $entity_type_id = $entity_type->id();
@@ -418,7 +418,7 @@ class ContentTranslationHooks {
    * Implements hook_entity_extra_field_info().
    */
   #[Hook('entity_extra_field_info')]
-  public function entityExtraFieldInfo() {
+  public function entityExtraFieldInfo(): array {
     $extra = [];
     $bundle_info_service = \Drupal::service('entity_type.bundle.info');
     foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type => $info) {
