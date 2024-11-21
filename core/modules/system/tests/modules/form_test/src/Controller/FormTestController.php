@@ -57,4 +57,22 @@ class FormTestController extends ControllerBase {
     return new JsonResponse($result);
   }
 
+  /**
+   * Returns a form and a button that has the form attribute.
+   *
+   * @return array
+   *   A render array containing the form and the button.
+   */
+  public function buttonWithFormAttribute() {
+    $return['form'] = $this->formBuilder()->getForm('Drupal\form_test\FormTestObject');
+    $return['button'] = [
+      '#type' => 'submit',
+      '#value' => 'Attribute Button',
+      '#attributes' => [
+        'form' => 'form-test-form-test-object',
+      ],
+    ];
+    return $return;
+  }
+
 }
