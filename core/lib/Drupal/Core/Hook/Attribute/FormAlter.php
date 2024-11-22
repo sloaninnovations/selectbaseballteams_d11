@@ -11,8 +11,8 @@ namespace Drupal\Core\Hook\Attribute;
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class FormAlter extends Hook {
-  const PREFIX = 'form';
-  const SUFFIX = 'alter';
+  public const string PREFIX = 'form';
+  public const string SUFFIX = 'alter';
 
   /**
    * Constructs a Hook attribute object.
