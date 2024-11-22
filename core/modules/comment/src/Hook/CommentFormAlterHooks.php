@@ -9,6 +9,7 @@ use Drupal\Core\Hook\Attribute\FormAlter;
  * Hook implementations for comment.
  */
 class CommentFormAlterHooks {
+
   /**
    * Implements hook_form_FORM_ID_alter() for field_ui_field_storage_add_form.
    */
@@ -41,4 +42,5 @@ class CommentFormAlterHooks {
       $form['#title'] = \Drupal::service('comment.manager')->getFieldUIPageTitle($route_match->getParameter('commented_entity_type'), $route_match->getParameter('field_name'));
     }
   }
+
 }
