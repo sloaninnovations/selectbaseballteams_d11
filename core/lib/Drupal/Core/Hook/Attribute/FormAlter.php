@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Core\Hook\Attribute;
+
+/**
+ * Hook attribute for FormAlter.
+ *
+ * @see hook_form_alter().
+ */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
+class FormAlter extends Hook {
+  const PREFIX = 'form';
+  const SUFFIX = 'alter';
+
+  /**
+   * Constructs a Hook attribute object.
+   *
+   * @param string $form_id
+   *   The ID of the form that this implementation alters.
+   * @param string $method
+   *   (optional) The method name. If this attribute is on a method, this
+   *   parameter is not required. If this attribute is on a class and this
+   *   parameter is omitted, the class must have an __invoke() method, which is
+   *   taken as the hook implementation.
+   * @param int|null $priority
+   *   (optional) The priority of this implementation relative to other
+   *   implementations of this hook. Hook implementations with higher priority
+   *   are executed first. If omitted, the module order is used to order the
+   *   hook implementations.
+   * @param string|null $module
+   *   (optional) The module this implementation is for. This allows one module to
+   *   implement a hook on behalf of another module. Defaults to the module the
+   *   implementation is in.
+   */
+  public function __construct(
+    string $form_id = '',
+    public string $method = '',
+    public ?int $priority = NULL,
+    public ?string $module = NULL,
+  ) {
+    parent::__construct($form_id, $method, $priority, $module);
+  }
+
+}
