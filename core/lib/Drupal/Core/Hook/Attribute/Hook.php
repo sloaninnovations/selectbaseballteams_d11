@@ -123,7 +123,7 @@ class Hook {
     public string $method = '',
     public ?string $module = NULL,
   ) {
-    $this->hook = implode('_', [static::PREFIX, $hook, static::SUFFIX]);
+    $this->hook = implode('_', array_filter([static::PREFIX, $hook, static::SUFFIX]));
   }
 
   /**
