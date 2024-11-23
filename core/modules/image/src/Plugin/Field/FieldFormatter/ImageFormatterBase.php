@@ -38,7 +38,7 @@ abstract class ImageFormatterBase extends FileFormatterBase {
           '_loaded' => TRUE,
           '_is_default' => TRUE,
         ]);
-        if (isset($file->_referringItem)) {
+        if ($file->_referringItem) {
           // If the file entity is already being referenced by another field
           // item, clone it so that _referringItem is set to the correct item
           // in each instance.
