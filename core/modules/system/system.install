@@ -573,7 +573,7 @@ function system_requirements($phase) {
       'title' => t('Database support for JSON'),
       'severity' => REQUIREMENT_OK,
       'value' => t('Available'),
-      'description' => t('Drupal requires databases that support JSON.'),
+      'description' => t('Drupal requires databases that support JSON storage.'),
     ];
 
     if (!Database::getConnection()->hasJson()) {
