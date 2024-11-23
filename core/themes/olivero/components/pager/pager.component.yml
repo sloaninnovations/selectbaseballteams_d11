@@ -1,0 +1,16 @@
+name: pager
+props:
+  type: object
+  required:
+    - items
+    - current
+    - heading_id
+  properties:
+    heading_id:
+      type: string
+    items:
+      type: object
+    ellipses:
+      type: array
+    current:
+      type: integer
