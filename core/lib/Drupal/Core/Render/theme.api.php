@@ -602,7 +602,7 @@ function hook_preprocess(&$variables, $hook) {
  * @param $variables
  *   The variables array (modify in place).
  */
-function hook_preprocess_HOOK(&$variables) {
+function hook_preprocess_HOOK(&$variables): void {
   // This example is from node_preprocess_html(). It adds the node type to
   // the body classes, when on an individual node page or node preview page.
   if (($node = \Drupal::routeMatch()->getParameter('node')) || ($node = \Drupal::routeMatch()->getParameter('node_preview'))) {
@@ -1248,7 +1248,7 @@ function hook_page_bottom(array &$page_bottom) {
  * @see themeable
  * @see hook_theme_registry_alter()
  */
-function hook_theme($existing, $type, $theme, $path) {
+function hook_theme($existing, $type, $theme, $path): array {
   return [
     'my_module_display' => [
       'variables' => [

@@ -1618,7 +1618,7 @@ function system_requirements($phase) {
 /**
  * Implements hook_install().
  */
-function system_install() {
+function system_install(): void {
   // Populate the cron key state variable.
   $cron_key = Crypt::randomBytesBase64(55);
   \Drupal::state()->set('system.cron_key', $cron_key);
@@ -1638,7 +1638,7 @@ function system_install() {
 /**
  * Implements hook_schema().
  */
-function system_schema() {
+function system_schema(): array {
   // @deprecated The sequences table has been deprecated in drupal:10.2.0 and is
   // removed from drupal:12.0.0. See https://www.drupal.org/node/3220378.
   // @todo Remove sequences table in Drupal 12. See https://www.drupal.org/i/3335756
@@ -1661,7 +1661,7 @@ function system_schema() {
 /**
  * Implements hook_update_last_removed().
  */
-function system_update_last_removed() {
+function system_update_last_removed(): int {
   return 10201;
 }
 
@@ -1721,4 +1721,26 @@ function _system_advisories_requirements(array &$requirements): void {
       )->toRenderable();
     }
   }
+}
+
+/**
+ * Update length of menu_tree fields url and route_param_key from 255 to 2048.
+ */
+function system_update_11001(): void {
+  $schema = \Drupal::database()->schema();
+  $spec = [
+    'description' => 'The external path this link points to (when not using a route).',
+    'type' => 'varchar',
+    'length' => 2048,
+    'not null' => TRUE,
+    'default' => '',
+  ];
+  $schema->changeField('menu_tree', 'url', 'url', $spec);
+
+  $spec = [
+    'description' => 'An encoded string of route parameters for loading by route.',
+    'type' => 'varchar',
+    'length' => 2048,
+  ];
+  $schema->changeField('menu_tree', 'route_param_key', 'route_param_key', $spec);
 }

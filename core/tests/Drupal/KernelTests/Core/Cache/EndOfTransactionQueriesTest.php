@@ -50,7 +50,7 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
 
     $container->register('serializer', PhpSerialize::class);
@@ -154,7 +154,7 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
    *
    * @param string[] $statements
    *   A list of query statements.
-   * @param $table_name
+   * @param string $table_name
    *   The name of the table to filter by.
    *
    * @return string[]
