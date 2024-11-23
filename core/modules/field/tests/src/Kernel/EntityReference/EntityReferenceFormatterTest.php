@@ -428,14 +428,22 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
    * Tests formatters set the correct _referringItem on referenced entities.
    */
   public function testFormatterReferencingItem(): void {
-    // Set the default view mode to use the 'entity_reference_entity_id'
+    // Set the default view mode to use the 'entity_reference_label'
     // formatter.
     \Drupal::service('entity_display.repository')
       ->getViewDisplay($this->entityType, $this->bundle)
       ->setComponent($this->fieldName, [
-        'type' => 'entity_reference_entity_id',
+        'type' => 'entity_reference_label',
       ])
       ->save();
+
+    // We need to create an anonymous user for access checks in the formatter.
+    $this->createUser(values: [
+      'uid' => 0,
+      'status' => 0,
+      'name' => '',
+    ]);
+
     $storage = \Drupal::entityTypeManager()->getStorage($this->entityType);
     // Create a referencing entity and confirm that the _referringItem property
     // on the referenced entity in the built render array's items is set to the
@@ -448,6 +456,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     $build_1 = $referencing_entity_1->get($this->fieldName)->view();
     $this->assertEquals($this->referencedEntity->id(), $build_1['#items'][0]->entity->id());
     $this->assertEquals($referencing_entity_1->id(), $build_1['#items'][0]->entity->_referringItem->getEntity()->id());
+    $this->assertEquals($referencing_entity_1->id(), $build_1[0]['#entity']->_referringItem->getEntity()->id());
     // Create a second referencing entity and confirm that the _referringItem
     // property on the referenced entity in the built render array's items is
     // set to the field item on the second referencing entity.
@@ -459,6 +468,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     $build_2 = $referencing_entity_2->get($this->fieldName)->view();
     $this->assertEquals($this->referencedEntity->id(), $build_2['#items'][0]->entity->id());
     $this->assertEquals($referencing_entity_2->id(), $build_2['#items'][0]->entity->_referringItem->getEntity()->id());
+    $this->assertEquals($referencing_entity_2->id(), $build_2[0]['#entity']->_referringItem->getEntity()->id());
     // Confirm that the _referringItem property for the entity referenced by the
     // first referencing entity is still set to the field item on the first
     // referencing entity.
