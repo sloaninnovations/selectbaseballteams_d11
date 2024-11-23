@@ -1,11 +1,28 @@
 <?php
 
+namespace Drupal\block_content\Access;
+
+// The layout_builder module does not depend on the block_content module but
+// requires a trait and an interface from it in its own block_content specific
+// block plugin. Dynamically define that trait and interface if they don't
+// exist.
+// @codingStandardsIgnoreStart
+if (!trait_exists(RefinableDependentAccessTrait::class)) {
+  trait RefinableDependentAccessTrait {}
+}
+
+if (!interface_exists(RefinableDependentAccessInterface::class)) {
+  interface RefinableDependentAccessInterface {}
+}
+// @codingStandardsIgnoreEnd
+
 namespace Drupal\layout_builder\Plugin\Block;
 
 use Drupal\block_content\Access\RefinableDependentAccessInterface;
 use Drupal\block_content\Access\RefinableDependentAccessTrait;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
@@ -14,21 +31,22 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\layout_builder\Plugin\Derivative\InlineBlockDeriver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines an inline block plugin type.
  *
- * @Block(
- *  id = "inline_block",
- *  admin_label = @Translation("Inline block"),
- *  category = @Translation("Inline blocks"),
- *  deriver = "Drupal\layout_builder\Plugin\Derivative\InlineBlockDeriver",
- * )
- *
  * @internal
  *   Plugin classes are internal.
  */
+#[Block(
+  id: 'inline_block',
+  admin_label: new TranslatableMarkup('Inline Block'),
+  category: new TranslatableMarkup('Inline blocks'),
+  deriver: InlineBlockDeriver::class
+)]
 class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, RefinableDependentAccessInterface {
 
   use RefinableDependentAccessTrait;
