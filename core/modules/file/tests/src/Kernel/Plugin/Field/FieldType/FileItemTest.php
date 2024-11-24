@@ -9,6 +9,11 @@ use Drupal\file\Entity\File;
 use Drupal\file\Plugin\Field\FieldType\FileItem;
 use Drupal\KernelTests\KernelTestBase;
 
+/**
+ * Tests the file field type.
+ *
+ * @group file
+ */
 class FileItemTest extends KernelTestBase {
 
   protected static $modules = ['file', 'field', 'user'];
