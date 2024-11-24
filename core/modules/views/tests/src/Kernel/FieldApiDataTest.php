@@ -160,7 +160,7 @@ class FieldApiDataTest extends ViewsKernelTestBase {
     $this->assertEquals('Appears in: page, article. Also known as: Content: GiraffeA&quot; label (field_string)', $data[$current_table][$field_storage_string->getName() . '_value']['help']);
 
     // Since each label is only used once,
-    // \Drupal::service('entity_field.manager')->getFieldLabels();
+    // EntityFieldManagerInterface::getFieldLabels();
     // will return a label using alphabetical sorting.
     $this->assertEquals('GiraffeA&quot; label (field_string)', $data[$current_table][$field_storage_string->getName() . '_value']['title']);
 
@@ -179,7 +179,7 @@ class FieldApiDataTest extends ViewsKernelTestBase {
     $data = $this->getViewsData();
 
     // Now the 'GiraffeB&quot; label' is used twice and therefore will be
-    // selected by \Drupal::service('entity_field.manager')->getFieldLabels();.
+    // selected by EntityFieldManagerInterface::getFieldLabels();.
     $this->assertEquals('GiraffeB&quot; label (field_string)', $data[$current_table][$field_storage_string->getName() . '_value']['title']);
     $this->assertInstanceOf(MarkupInterface::class, $data[$current_table][$field_storage_string->getName()]['help']);
     $this->assertEquals('Appears in: page, article, news. Also known as: Content: GiraffeA&quot; label', $data[$current_table][$field_storage_string->getName()]['help']);
