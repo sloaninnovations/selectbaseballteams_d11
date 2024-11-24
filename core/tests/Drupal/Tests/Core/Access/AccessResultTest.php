@@ -614,7 +614,7 @@ class AccessResultTest extends UnitTestCase {
       [$allowed_ct, 'OR', $allowed_cf, TRUE, TRUE],
       [$allowed_ct, 'OR', $allowed_un, TRUE, TRUE],
       // Allowed (cf) OR allowed (ct,cf,un).
-      [$allowed_cf, 'OR', $allowed_ct, TRUE, TRUE],
+      [$allowed_cf, 'OR', $allowed_ct, TRUE, FALSE],
       [$allowed_cf, 'OR', $allowed_cf, TRUE, FALSE],
       [$allowed_cf, 'OR', $allowed_un, TRUE, FALSE],
       // Allowed (un) OR allowed (ct,cf,un).
@@ -627,7 +627,7 @@ class AccessResultTest extends UnitTestCase {
       [$allowed_ct, 'OR', $forbidden_cf, TRUE, FALSE],
       [$allowed_ct, 'OR', $forbidden_un, TRUE, FALSE],
       // Allowed (cf) OR forbidden (ct,cf,un).
-      [$allowed_cf, 'OR', $forbidden_ct, TRUE, TRUE],
+      [$allowed_cf, 'OR', $forbidden_ct, TRUE, FALSE],
       [$allowed_cf, 'OR', $forbidden_cf, TRUE, FALSE],
       [$allowed_cf, 'OR', $forbidden_un, TRUE, FALSE],
       // Allowed (un) OR forbidden (ct,cf,un).
@@ -692,7 +692,7 @@ class AccessResultTest extends UnitTestCase {
       [$neutral_ct, 'OR', $allowed_cf, TRUE, FALSE],
       [$neutral_ct, 'OR', $allowed_un, TRUE, FALSE],
       // Neutral (cf) OR allowed (ct,cf,un).
-      [$neutral_cf, 'OR', $allowed_ct, TRUE, TRUE],
+      [$neutral_cf, 'OR', $allowed_ct, TRUE, FALSE],
       [$neutral_cf, 'OR', $allowed_cf, TRUE, FALSE],
       [$neutral_cf, 'OR', $allowed_un, TRUE, FALSE],
       // Neutral (un) OR allowed (ct,cf,un).
@@ -705,7 +705,7 @@ class AccessResultTest extends UnitTestCase {
       [$neutral_ct, 'OR', $neutral_cf, TRUE, TRUE],
       [$neutral_ct, 'OR', $neutral_un, TRUE, TRUE],
       // Neutral (cf) OR neutral (ct,cf,un).
-      [$neutral_cf, 'OR', $neutral_ct, TRUE, TRUE],
+      [$neutral_cf, 'OR', $neutral_ct, TRUE, FALSE],
       [$neutral_cf, 'OR', $neutral_cf, TRUE, FALSE],
       [$neutral_cf, 'OR', $neutral_un, TRUE, FALSE],
       // Neutral (un) OR neutral (ct,cf,un).
@@ -744,7 +744,7 @@ class AccessResultTest extends UnitTestCase {
       [$allowed_ct, 'AND', $forbidden_cf, TRUE, FALSE],
       [$allowed_ct, 'AND', $forbidden_un, TRUE, FALSE],
       // Allowed (cf) AND forbidden (ct,cf,un).
-      [$allowed_cf, 'AND', $forbidden_ct, TRUE, TRUE],
+      [$allowed_cf, 'AND', $forbidden_ct, TRUE, FALSE],
       [$allowed_cf, 'AND', $forbidden_cf, TRUE, FALSE],
       [$allowed_cf, 'AND', $forbidden_un, TRUE, FALSE],
       // Allowed (un) AND forbidden (ct,cf,un).

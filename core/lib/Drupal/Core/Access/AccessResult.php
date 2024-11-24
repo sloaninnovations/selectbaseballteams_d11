@@ -330,9 +330,12 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
         $result->setReason($other->getReason());
       }
     }
-    $result->inheritCacheability($this);
+    $result->addCacheableDependency($this);
     if ($merge_other) {
-      $result->inheritCacheability($other);
+      $result->addCacheableDependency($other);
+      if (!$this->isAllowed() && $this->getCacheMaxAge() === 0 && $other->isForbidden() && $other instanceof CacheableDependencyInterface) {
+        $result->setCacheMaxAge($other->getCacheMaxAge());
+      }
     }
     return $result;
   }
@@ -377,15 +380,15 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
         }
       }
     }
-    $result->inheritCacheability($this);
+    $result->addCacheableDependency($this);
     if ($merge_other) {
-      $result->inheritCacheability($other);
+      $result->addCacheableDependency($other);
       // If this access result is not cacheable, then an AND with another access
       // result must also not be cacheable, except if the other access result
       // has isForbidden() === TRUE. isForbidden() access results are contagious
       // in that they propagate regardless of the other value.
-      if ($this->getCacheMaxAge() === 0 && !$result->isForbidden()) {
-        $result->setCacheMaxAge(0);
+      if ($this->isNeutral() && $this->getCacheMaxAge() === 0 && $other->isForbidden() && $other instanceof CacheableDependencyInterface) {
+        $result->setCacheMaxAge($other->getCacheMaxAge());
       }
     }
     return $result;
@@ -406,6 +409,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    * @return $this
    */
   public function inheritCacheability(AccessResultInterface $other) {
+    // @todo Remove usages and deprecate?
     $this->addCacheableDependency($other);
     if ($other instanceof CacheableDependencyInterface) {
       if ($this->getCacheMaxAge() !== 0 && $other->getCacheMaxAge() !== 0) {
