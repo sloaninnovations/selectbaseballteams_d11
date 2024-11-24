@@ -116,6 +116,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    * Gets the field storage definitions.
    *
    * @return \Drupal\Core\Field\FieldStorageDefinitionInterface[]
+   *   The array of field storage definitions, keyed by field name.
    */
   protected function getFieldStorageDefinitions() {
     if (!isset($this->fieldStorageDefinitions)) {
