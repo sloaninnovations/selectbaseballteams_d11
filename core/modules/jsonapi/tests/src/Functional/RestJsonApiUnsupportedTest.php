@@ -18,7 +18,7 @@ use Drupal\Tests\rest\Functional\ResourceTestBase;
  *
  * @internal
  */
-class RestJsonApiUnsupported extends ResourceTestBase {
+class RestJsonApiUnsupportedTest extends ResourceTestBase {
 
   use AnonResourceTestTrait;
 
