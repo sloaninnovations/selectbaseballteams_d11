@@ -50,7 +50,7 @@ class ImageViewsHooks {
     $pseudo_field_name = 'reverse_' . $field_name . '_' . $entity_type_id;
     /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
     $table_mapping = $entity_type_manager->getStorage($entity_type_id)->getTableMapping();
-    [$label] = \Drupal::service('entity_field.manager')->getFieldLabels($entity_type, $field_name);
+    [$label] = \Drupal::service('entity_field.manager')->getFieldLabels($entity_type_id, $field_name);
     $data['file_managed'][$pseudo_field_name]['relationship'] = [
       'title' => t('@entity using @field', [
         '@entity' => $entity_type->getLabel(),

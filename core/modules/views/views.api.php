@@ -644,7 +644,7 @@ function hook_field_views_data_views_data_alter(array &$data, FieldStorageConfig
   $entity_type_id = $field->getTargetEntityTypeId();
   $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
   $pseudo_field_name = 'reverse_' . $field_name . '_' . $entity_type_id;
-  [$label] = \Drupal::service('entity_field.manager')->getFieldLabels($entity_type, $field_name);
+  [$label] = \Drupal::service('entity_field.manager')->getFieldLabels($entity_type_id, $field_name);
   $table_mapping = \Drupal::entityTypeManager()->getStorage($entity_type_id)->getTableMapping();
 
   // Views data for this field is in $data[$data_key].
