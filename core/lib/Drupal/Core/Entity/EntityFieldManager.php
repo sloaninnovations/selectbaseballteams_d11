@@ -701,9 +701,8 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     $label_counter = [];
     $all_labels = [];
     // Count the amount of fields per label per field storage.
-    $entity_field_manager = \Drupal::service('entity_field.manager');
-    foreach (array_keys(\Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type)) as $bundle) {
-      $bundle_fields = array_filter($entity_field_manager->getFieldDefinitions($entity_type, $bundle), function ($field_definition) {
+    foreach (array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type)) as $bundle) {
+      $bundle_fields = array_filter($this->getFieldDefinitions($entity_type, $bundle), function ($field_definition) {
         return $field_definition instanceof FieldConfigInterface;
       });
       if (isset($bundle_fields[$field_name])) {
