@@ -697,7 +697,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFieldLabels($entity_type, $field_name): array {
+  public function getFieldLabels(string $entity_type, string $field_name): array {
     $label_counter = [];
     $all_labels = [];
     // Count the amount of fields per label per field storage.

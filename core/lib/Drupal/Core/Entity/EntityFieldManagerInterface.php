@@ -153,6 +153,6 @@ interface EntityFieldManagerInterface {
    *   field on this entity type (or the first in alphabetical order if there
    *   is a tie), and whose second element is a list of all labels in use.
    */
-  public function getFieldLabels($entity_type, $field_name): array;
+  public function getFieldLabels(string $entity_type, string $field_name): array;
 
 }
