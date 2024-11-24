@@ -361,7 +361,10 @@ class FileItem extends EntityReferenceItem {
     \Drupal::service('file_system')->prepareDirectory($dirname, FileSystemInterface::CREATE_DIRECTORY);
 
     // Generate a file entity.
-    $destination = $dirname . '/' . $random->name(10, TRUE) . '.txt';
+    if (!empty($settings['file_directory'])) {
+      $dirname .= '/';
+    }
+    $destination = $dirname . $random->name(10) . '.txt';
     $data = $random->paragraphs(3);
     /** @var \Drupal\file\FileRepositoryInterface $file_repository */
     $file_repository = \Drupal::service('file.repository');

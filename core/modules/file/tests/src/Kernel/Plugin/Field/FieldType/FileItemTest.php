@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Tests\file\Kernel\Plugin\Field\FieldType;
+
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\file\Entity\File;
+use Drupal\file\Plugin\Field\FieldType\FileItem;
+use Drupal\KernelTests\KernelTestBase;
+
+class FileItemTest extends KernelTestBase {
+
+  protected static $modules = ['file', 'field', 'user'];
+
+  protected function setUp(): void {
+    parent::setUp();
+    $this->installEntitySchema('file');
+  }
+
+  public function testGenerateSampleValues(): void {
+    $definition = $this->createMock(FieldDefinitionInterface::class);
+    $definition->expects($this->any())
+      ->method('getSettings')
+      ->willReturn([
+        'file_extensions' => 'txt',
+        'file_directory' => '',
+        'uri_scheme' => 'public',
+        'display_default' => TRUE,
+      ]);
+    $value = FileItem::generateSampleValue($definition);
+    $this->assertNotEmpty($value);
+
+    $fid = $value['target_id'];
+    $file = File::load($fid);
+    $fileUri = $file->getFileUri();
+
+    $this->assertStringStartsNotWith('public:///', $fileUri);
+  }
+
+}
