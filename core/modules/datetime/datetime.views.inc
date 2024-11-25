@@ -16,7 +16,7 @@ use Drupal\field\FieldStorageConfigInterface;
  * @param \Drupal\field\FieldStorageConfigInterface $field_storage
  *   The field storage config entity.
  * @param array $data
- *   Field view data or views_field_default_views_data($field_storage) if empty.
+ *   Field view data or ViewsFieldDefaultViewsData::defaultFieldImplementation($field_storage) if empty.
  * @param string $column_name
  *   The schema column name with the datetime value.
  *
@@ -29,7 +29,7 @@ use Drupal\field\FieldStorageConfigInterface;
 function datetime_type_field_views_data_helper(FieldStorageConfigInterface $field_storage, array $data, $column_name) {
   // @todo This code only covers configurable fields, handle base table fields
   //   in https://www.drupal.org/node/2489476.
-  $data = empty($data) ? views_field_default_views_data($field_storage) : $data;
+  $data = empty($data) ? \Drupal::service('views.views_field_default_data')->defaultFieldImplementation($field_storage) : $data;
   foreach ($data as $table_name => $table_data) {
     // Set the 'datetime' filter type.
     $data[$table_name][$field_storage->getName() . '_' . $column_name]['filter']['id'] = 'datetime';

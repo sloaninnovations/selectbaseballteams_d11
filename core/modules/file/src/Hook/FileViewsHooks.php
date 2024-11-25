@@ -23,11 +23,11 @@ class FileViewsHooks {
    * Views integration for file fields. Adds a file relationship to the default
    * field data.
    *
-   * @see views_field_default_views_data()
+   * @see ViewsFieldDefaultViewsData::defaultFieldImplementation()
    */
   #[Hook('field_views_data')]
   public function fieldViewsData(FieldStorageConfigInterface $field_storage): array {
-    $data = views_field_default_views_data($field_storage);
+    $data = \Drupal::service('views.views_field_default_data')->defaultFieldImplementation($field_storage);
     foreach ($data as $table_name => $table_data) {
       // Add the relationship only on the fid field.
       $data[$table_name][$field_storage->getName() . '_target_id']['relationship'] = [
