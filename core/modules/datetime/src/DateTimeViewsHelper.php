@@ -13,7 +13,7 @@ use Drupal\views\ViewsFieldDefaultViewsData;
 class DateTimeViewsHelper {
 
   public function __construct(
-    private readonly ViewsFieldDefaultViewsData $viewsFieldDefaultViewsData,
+    private readonly ?ViewsFieldDefaultViewsData $viewsFieldDefaultViewsData,
   ) {}
 
   /**
