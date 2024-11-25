@@ -31,6 +31,7 @@ class MigrateFieldTest extends MigrateDrupal7TestBase {
     'taxonomy',
     'telephone',
     'text',
+    'views',
   ];
 
   /**

@@ -45,6 +45,7 @@ class SeparatorTranslationTest extends KernelTestBase {
     'language',
     'system',
     'user',
+    'views',
   ];
 
   /**

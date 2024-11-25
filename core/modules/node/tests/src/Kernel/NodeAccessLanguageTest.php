@@ -19,7 +19,11 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['language', 'node_access_test'];
+  protected static $modules = [
+    'language',
+    'node_access_test',
+    'views',
+  ];
 
   /**
    * {@inheritdoc}

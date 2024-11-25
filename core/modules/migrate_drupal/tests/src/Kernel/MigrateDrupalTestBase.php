@@ -22,6 +22,7 @@ abstract class MigrateDrupalTestBase extends MigrateTestBase {
     'migrate_drupal',
     'options',
     'file',
+    'views',
   ];
 
   /**
