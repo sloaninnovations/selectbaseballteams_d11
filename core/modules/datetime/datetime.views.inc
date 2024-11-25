@@ -25,51 +25,13 @@ use Drupal\field\FieldStorageConfigInterface;
  *
  * @see datetime_field_views_data()
  * @see datetime_range_field_views_data()
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+ * \Drupal::service('datetime.views_helper')
+ * ->fieldViewsDataHelper($field_storage, $data, $column_name); instead.
+ * @see https://www.drupal.org/node/3489502
  */
 function datetime_type_field_views_data_helper(FieldStorageConfigInterface $field_storage, array $data, $column_name) {
-  // @todo This code only covers configurable fields, handle base table fields
-  //   in https://www.drupal.org/node/2489476.
-  $data = empty($data) ? \Drupal::service('views.views_field_default_data')->defaultFieldImplementation($field_storage) : $data;
-  foreach ($data as $table_name => $table_data) {
-    // Set the 'datetime' filter type.
-    $data[$table_name][$field_storage->getName() . '_' . $column_name]['filter']['id'] = 'datetime';
-
-    // Set the 'datetime' argument type.
-    $data[$table_name][$field_storage->getName() . '_' . $column_name]['argument']['id'] = 'datetime';
-
-    // Create year, month, and day arguments.
-    $group = $data[$table_name][$field_storage->getName() . '_' . $column_name]['group'];
-    $arguments = [
-      // Argument type => help text.
-      'year' => t('Date in the form of YYYY.'),
-      'month' => t('Date in the form of MM (01 - 12).'),
-      'day' => t('Date in the form of DD (01 - 31).'),
-      'week' => t('Date in the form of WW (01 - 53).'),
-      'year_month' => t('Date in the form of YYYYMM.'),
-      'full_date' => t('Date in the form of CCYYMMDD.'),
-    ];
-    foreach ($arguments as $argument_type => $help_text) {
-      $column_name_text = $column_name === $field_storage->getMainPropertyName() ? '' : ':' . $column_name;
-      $data[$table_name][$field_storage->getName() . '_' . $column_name . '_' . $argument_type] = [
-        'title' => t('@label@column (@argument)', [
-          '@label' => $field_storage->getLabel(),
-          '@column' => $column_name_text,
-          '@argument' => $argument_type,
-        ]),
-        'help' => $help_text,
-        'argument' => [
-          'field' => $field_storage->getName() . '_' . $column_name,
-          'id' => 'datetime_' . $argument_type,
-          'entity_type' => $field_storage->getTargetEntityTypeId(),
-          'field_name' => $field_storage->getName(),
-        ],
-        'group' => $group,
-      ];
-    }
-
-    // Set the 'datetime' sort handler.
-    $data[$table_name][$field_storage->getName() . '_' . $column_name]['sort']['id'] = 'datetime';
-  }
-
-  return $data;
+  @trigger_error('datetime_type_field_views_data_helper() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'datetime.views_helper\')->fieldViewsDataHelper($field_storage, $data, $column_name). See https://www.drupal.org/node/3489502', E_USER_DEPRECATED);
+  return \Drupal::service('datetime.views_helper')->fieldViewsDataHelper($field_storage, $data, $column_name);
 }

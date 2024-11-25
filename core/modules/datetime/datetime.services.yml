@@ -1,2 +1,8 @@
 parameters:
   datetime.hooks_converted: true
+
+services:
+  datetime.views_helper:
+    class: Drupal\datetime\DateTimeViewsHelper
+    arguments: ['@views.views_field_default_data']
+  Drupal\datetime\DateTimeViewsHelper: '@datetime.views_helper'
