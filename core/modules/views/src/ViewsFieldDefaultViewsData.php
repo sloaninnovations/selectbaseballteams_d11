@@ -503,10 +503,10 @@ class ViewsFieldDefaultViewsData {
    * @param \Drupal\field\FieldStorageConfigInterface $field_storage
    *   The field storage definition.
    *
-   * @return \Drupal\Core\Entity\Sql\SqlContentEntityStorage
+   * @return \Drupal\Core\Entity\Sql\SqlContentEntityStorage|bool
    *   Returns the entity type storage if supported.
    */
-  public function getEntityTypeStorage(FieldStorageConfigInterface $field_storage) {
+  public function getEntityTypeStorage(FieldStorageConfigInterface $field_storage): SqlContentEntityStorage|bool {
     $result = FALSE;
     if ($this->entityTypeManager->hasDefinition($field_storage->getTargetEntityTypeId())) {
       $storage = $this->entityTypeManager->getStorage($field_storage->getTargetEntityTypeId());
