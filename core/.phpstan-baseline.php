@@ -453,12 +453,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Function drupal_common_theme\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/includes/theme.inc',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Function drupal_find_theme_templates\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/includes/theme.inc',
@@ -35390,12 +35384,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\system\\\\Hook\\\\SystemHooks\\:\\:pageAttachments\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Hook/SystemHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\system\\\\Hook\\\\SystemHooks\\:\\:pageTop\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Hook/SystemHooks.php',
@@ -35609,12 +35597,6 @@ $ignoreErrors[] = [
 	'message' => '#^Variable \\$site_path might not be defined\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/system.install',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Function _system_page_attachments\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/system.module',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -61366,12 +61348,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/ContentEntityBaseUnitTest.php',
 ];
 $ignoreErrors[] = [
-	// identifier: method.deprecated
-	'message' => '#^Call to deprecated method getMockForAbstractClass\\(\\) of class PHPUnit\\\\Framework\\\\TestCase\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityFormTest.php',
-];
-$ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityFormTest\\:\\:providerTestFormIds\\(\\) has no return type specified\\.$#',
 	'count' => 1,
@@ -61492,12 +61468,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityStorageBaseTest.php',
 ];
 $ignoreErrors[] = [
-	// identifier: method.deprecated
-	'message' => '#^Call to deprecated method getMockForAbstractClass\\(\\) of class PHPUnit\\\\Framework\\\\TestCase\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
-];
-$ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\TestEntityForm\\:\\:getBaseFormId\\(\\) has no return type specified\\.$#',
 	'count' => 1,
@@ -61532,12 +61502,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\TestEntityFormInjected\\:\\:create\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
-];
-$ignoreErrors[] = [
-	// identifier: method.deprecated
-	'message' => '#^Call to deprecated method getMockForAbstractClass\\(\\) of class PHPUnit\\\\Framework\\\\TestCase\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
