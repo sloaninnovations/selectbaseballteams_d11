@@ -15,6 +15,7 @@ use Drupal\field\FieldStorageConfigInterface;
  *
  * @return \Drupal\Core\Entity\Sql\SqlContentEntityStorage
  *   Returns the entity type storage if supported.
+ *
  * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
  * \Drupal::service('views.views_field_default_data')
  * ->getEntityTypeStorage($field_storage); instead.
@@ -70,6 +71,7 @@ function views_entity_field_label($entity_type, $field_name) {
  *
  * @return array
  *   The default views data for the field.
+ *
  * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
  * \Drupal::service('views.views_field_default_data')
  * ->defaultFieldImplementation($field_storage); instead.
