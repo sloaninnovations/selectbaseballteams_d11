@@ -1943,16 +1943,16 @@ function hook_entity_form_display_alter(\Drupal\Core\Entity\Display\EntityFormDi
  * @see https://www.drupal.org/node/3034742
  */
 function hook_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type): array {
+  $fields = [];
   if ($entity_type->id() == 'node') {
-    $fields = [];
     $fields['my_module_text'] = BaseFieldDefinition::create('string')
       ->setLabel(t('The text'))
       ->setDescription(t('A text property added by my_module.'))
       ->setComputed(TRUE)
       ->setClass('\Drupal\my_module\EntityComputedText');
 
-    return $fields;
   }
+  return $fields;
 }
 
 /**
@@ -2007,15 +2007,14 @@ function hook_entity_base_field_info_alter(&$fields, \Drupal\Core\Entity\EntityT
  * https://www.drupal.org/node/2346347.
  */
 function hook_entity_bundle_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle, array $base_field_definitions): array {
+  $fields = [];
   // Add a property only to nodes of the 'article' bundle.
   if ($entity_type->id() == 'node' && $bundle == 'article') {
-    $fields = [];
     $storage_definitions = my_module_entity_field_storage_info($entity_type);
     $fields['my_module_bundle_field'] = FieldDefinition::createFromFieldStorageDefinition($storage_definitions['my_module_bundle_field'])
       ->setLabel(t('Bundle Field'));
-    return $fields;
   }
-
+  return $fields;
 }
 
 /**
@@ -2063,6 +2062,7 @@ function hook_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\Entit
  * @see https://www.drupal.org/node/3034742
  */
 function hook_entity_field_storage_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type): array {
+  $result = [];
   if (\Drupal::entityTypeManager()->getStorage($entity_type->id()) instanceof DynamicallyFieldableEntityStorageInterface) {
     // Query by filtering on the ID as this is more efficient than filtering
     // on the entity_type property directly.
@@ -2071,13 +2071,11 @@ function hook_entity_field_storage_info(\Drupal\Core\Entity\EntityTypeInterface 
       ->execute();
     // Fetch all fields and key them by field name.
     $field_storages = FieldStorageConfig::loadMultiple($ids);
-    $result = [];
     foreach ($field_storages as $field_storage) {
       $result[$field_storage->getName()] = $field_storage;
     }
-
-    return $result;
   }
+  return $result;
 }
 
 /**
