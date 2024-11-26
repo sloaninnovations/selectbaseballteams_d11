@@ -29,6 +29,19 @@ class FieldThirdPartyTestHooks {
   }
 
   /**
+   * Implements hook_field_widget_third_party_settings_form().
+   */
+  #[Hook('field_widget_third_party_settings_form')]
+  public function fieldWidgetThirdPartySettingsFormAdditionalImplementation(WidgetInterface $plugin, FieldDefinitionInterface $field_definition, $form_mode, $form, FormStateInterface $form_state): array {
+    $element['second_field_widget_third_party_settings_form'] = [
+      '#type' => 'number',
+      '#title' => t('Second 3rd party widget settings form'),
+      '#default_value' => $plugin->getThirdPartySetting('field_third_party_test', 'second_field_widget_third_party_settings_form'),
+    ];
+    return $element;
+  }
+
+  /**
    * Implements hook_field_widget_settings_summary_alter().
    */
   #[Hook('field_widget_settings_summary_alter')]

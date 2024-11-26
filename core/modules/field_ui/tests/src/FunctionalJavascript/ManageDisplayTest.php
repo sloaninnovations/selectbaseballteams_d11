@@ -327,10 +327,22 @@ class ManageDisplayTest extends WebDriverTestBase {
     $field_test_settings->click();
     $assert_session->assertExpectedAjaxRequest(1);
 
-    // Assert that the field added in
-    // field_test_field_widget_third_party_settings_form() is present.
-    $field_third_party_test = $page->findField('fields[field_test][settings_edit_form][third_party_settings][field_third_party_test][field_test_widget_third_party_settings_form]');
+    // Assert that the field added in the hook
+    // field_widget_third_party_settings_form
+    // FieldThirdPartyTestHooks::fieldWidgetThirdPartySettingsForm().
+    // is present. Use exact match.
+    $field_third_party_test = $page->find('named_exact', ['field', 'fields[field_test][settings_edit_form][third_party_settings][field_third_party_test][field_test_widget_third_party_settings_form]']);
     $this->assertNotEmpty($field_third_party_test, 'The field added in hook_field_widget_third_party_settings_form() is present on the settings form.');
+    $this->assertEquals($field_third_party_test->getAttribute('type'), 'text');
+
+    // Assert that the additional field added in the hook
+    // field_widget_third_party_settings_form
+    // FieldThirdPartyTestHooks::fieldWidgetThirdPartySettingsFormAdditionalImplementation().
+    // is also present.
+    $field_third_party_test_additional = $page->find('named_exact', ['field', 'fields[field_test][settings_edit_form][third_party_settings][field_third_party_test][second_field_widget_third_party_settings_form]']);
+    $this->assertNotEmpty($field_third_party_test_additional, 'The second field added in hook_field_widget_third_party_settings_form() is present on the settings form.');
+    $this->assertEquals($field_third_party_test_additional->getAttribute('type'), 'number');
+
     $field_third_party_test->setValue('foo');
     $page->findButton('Update')->click();
     $assert_session->assertWaitOnAjaxRequest();

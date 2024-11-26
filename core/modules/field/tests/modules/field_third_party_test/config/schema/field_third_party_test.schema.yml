@@ -13,3 +13,6 @@ field.widget.third_party.field_third_party_test:
     field_test_widget_third_party_settings_form:
       type: string
       label: field_test_widget_third_party_settings_form
+    second_field_widget_third_party_settings_form:
+      type: string
+      label: second_field_widget_third_party_settings_form
