@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Cache\MemoryCache;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\Cache;
 
 /**
@@ -16,21 +17,19 @@ use Drupal\Core\Cache\Cache;
 class LruMemoryCache extends MemoryCache {
 
   /**
-   * The number of slots allocated for items in the cache.
-   *
-   * @var int
-   */
-  protected $allowedSlots = 100;
-
-  /**
    * Constructs an LruMemoryCache object.
    *
-   * @param int $slots
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
+   * @param int $allowedSlots
    *   (optional) The number of slots to allocate for items in the cache.
    *   Defaults to 300.
    */
-  public function __construct(int $slots = 300) {
-    $this->allowedSlots = $slots;
+  public function __construct(
+    TimeInterface $time,
+    protected readonly int $allowedSlots = 300,
+  ) {
+    parent::__construct($time);
   }
 
   /**
@@ -53,7 +52,9 @@ class LruMemoryCache extends MemoryCache {
     if (isset($this->cache[$cid])) {
       unset($this->cache[$cid]);
       parent::set($cid, $data, $expire, $tags);
+      return;
     }
+
     parent::set($cid, $data, $expire, $tags);
     $diff = count($this->cache) - $this->allowedSlots;
 
