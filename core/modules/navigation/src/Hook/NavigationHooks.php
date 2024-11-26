@@ -76,7 +76,7 @@ class NavigationHooks {
    */
   #[Hook('theme')]
   public function theme($existing, $type, $theme, $path) : array {
-    $items['top_bar'] = ['variables' => ['local_tasks' => []]];
+    $items['top_bar'] = ['render element' => 'element'];
     $items['top_bar_local_tasks'] = ['variables' => ['local_tasks' => []]];
     $items['top_bar_local_task'] = ['variables' => ['link' => []]];
     $items['big_pipe_interface_preview__navigation_shortcut_lazy_builder_lazyLinks__Shortcuts'] = [
@@ -131,12 +131,10 @@ class NavigationHooks {
   #[Hook('plugin_filter_block__layout_builder_alter')]
   public function pluginFilterBlockLayoutBuilderAlter(array &$definitions, array $extra): void {
     if (($extra['section_storage'] ?? NULL) instanceof NavigationSectionStorage) {
-      // Remove all blocks other than the ones we support.
-      $navigation_safe = ['navigation_user', 'navigation_shortcuts', 'navigation_menu'];
-      $definitions = array_filter($definitions, static function (array $definition, string $plugin_id) use ($navigation_safe) : bool {
-          [$base_plugin_id] = explode(PluginBase::DERIVATIVE_SEPARATOR, $plugin_id);
-          return in_array($base_plugin_id, $navigation_safe, TRUE);
-      }, ARRAY_FILTER_USE_BOTH);
+      // Include only blocks explicitly indicated as Navigation allowed.
+      $definitions = array_filter($definitions,
+        fn (array $definition): bool => ($definition['allow_in_navigation'] ?? FALSE) === TRUE
+      );
     }
   }
 
@@ -156,18 +154,28 @@ class NavigationHooks {
    */
   #[Hook('block_alter')]
   public function blockAlter(&$definitions) : void {
-    $hidden = [
-      'navigation_user',
-      'navigation_shortcuts',
-      'navigation_menu',
-      'navigation_link',
-      'navigation_workspaces',
-    ];
-    foreach ($hidden as $block_id) {
-      if (isset($definitions[$block_id])) {
-        $definitions[$block_id]['_block_ui_hidden'] = TRUE;
+    array_walk($definitions, function (&$definition, $block_id) {
+      [$base_plugin_id] = explode(PluginBase::DERIVATIVE_SEPARATOR, $block_id);
+
+      // Add the allow_in_navigation attribute to those blocks valid for Navigation.
+      // @todo Refactor to use actual block Attribute once
+      //   https://www.drupal.org/project/drupal/issues/3443882 is merged.
+      $allow_in_navigation = [
+        'navigation_user',
+        'navigation_shortcuts',
+        'navigation_menu',
+        'navigation_workspaces',
+      ];
+      if (in_array($base_plugin_id, $allow_in_navigation, TRUE)) {
+        $definition['allow_in_navigation'] = TRUE;
       }
-    }
+
+      // Hide Navigation specific blocks from the generic UI.
+      $hidden = ['navigation_user', 'navigation_shortcuts', 'navigation_menu', 'navigation_link'];
+      if (in_array($base_plugin_id, $hidden, TRUE)) {
+        $definition['_block_ui_hidden'] = TRUE;
+      }
+    });
   }
 
   /**

@@ -72,7 +72,7 @@ final class InputConfigurator {
         $definition['constraints'],
       );
       $data_definition->setSettings($definition);
-      $this->data[$name] = $typedDataManager->create($data_definition);
+      $this->data[$name] = $typedDataManager->create($data_definition, name: "$prefix.$name");
     }
   }
 
@@ -112,9 +112,9 @@ final class InputConfigurator {
     foreach ($this->dependencies->recipes as $dependency) {
       $descriptions = array_merge($descriptions, $dependency->input->describeAll());
     }
-    foreach ($this->getDataDefinitions() as $key => $definition) {
-      $name = $this->prefix . '.' . $key;
-      $descriptions[$name] = $definition->getDescription();
+    foreach ($this->data as $data) {
+      $name = $data->getName();
+      $descriptions[$name] = $data->getDataDefinition()->getDescription();
     }
     return $descriptions;
   }
@@ -133,15 +133,13 @@ final class InputConfigurator {
    *   constraints.
    */
   public function collectAll(InputCollectorInterface $collector, array &$processed = []): void {
-    if (is_array($this->values)) {
-      throw new \LogicException('Input values cannot be changed once they have been set.');
-    }
-
     // Don't bother collecting values for a recipe we've already seen.
     if (in_array($this->prefix, $processed, TRUE)) {
       return;
     }
-
+    if (is_array($this->values)) {
+      throw new \LogicException('Input values cannot be changed once they have been set.');
+    }
     // First, collect values for the recipe's dependencies.
     /** @var \Drupal\Core\Recipe\Recipe $dependency */
     foreach ($this->dependencies->recipes as $dependency) {
@@ -153,7 +151,7 @@ final class InputConfigurator {
       $definition = $data->getDataDefinition();
 
       $value = $collector->collectValue(
-        $this->prefix . '.' . $key,
+        $data->getName(),
         $definition,
         $this->getDefaultValue($definition),
       );
@@ -161,7 +159,7 @@ final class InputConfigurator {
 
       $violations = $data->validate();
       if (count($violations) > 0) {
-        throw new ValidationFailedException($value, $violations);
+        throw new ValidationFailedException($data, $violations);
       }
       $this->values[$key] = $data->getCastedValue();
     }

@@ -453,12 +453,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Function drupal_common_theme\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/includes/theme.inc',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Function drupal_find_theme_templates\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/includes/theme.inc',
@@ -11382,12 +11376,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\announcements_feed\\\\Hook\\\\AnnouncementsFeedHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/announcements_feed/src/Hook/AnnouncementsFeedHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\announcements_feed\\\\Hook\\\\AnnouncementsFeedHooks\\:\\:help\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/announcements_feed/src/Hook/AnnouncementsFeedHooks.php',
@@ -13491,12 +13479,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\comment\\\\Form\\\\DeleteForm\\:\\:logDeletionMessage\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/comment/src/Form/DeleteForm.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\comment\\\\Hook\\\\CommentHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/Hook/CommentHooks.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -17436,12 +17418,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\dblog\\\\Hook\\\\DblogHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/dblog/src/Hook/DblogHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\dblog\\\\Hook\\\\DblogHooks\\:\\:help\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/dblog/src/Hook/DblogHooks.php',
@@ -17931,12 +17907,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\field\\\\FieldConfigStorage\\:\\:importDelete\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/field/src/FieldConfigStorage.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\field\\\\Hook\\\\FieldHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/src/Hook/FieldHooks.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -19674,12 +19644,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\file\\\\Hook\\\\FileHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/src/Hook/FileHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\file\\\\Hook\\\\FileHooks\\:\\:fileDownload\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/src/Hook/FileHooks.php',
@@ -21081,12 +21045,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\history\\\\Controller\\\\HistoryController\\:\\:readNode\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/history/src/Controller/HistoryController.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\history\\\\Hook\\\\HistoryHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/history/src/Hook/HistoryHooks.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -24120,12 +24078,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\layout_builder\\\\Hook\\\\LayoutBuilderHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/src/Hook/LayoutBuilderHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\layout_builder\\\\Hook\\\\LayoutBuilderHooks\\:\\:entityDelete\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/layout_builder/src/Hook/LayoutBuilderHooks.php',
@@ -25561,12 +25513,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\locale\\\\Hook\\\\LocaleHooks\\:\\:configurableLanguageUpdate\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/locale/src/Hook/LocaleHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\locale\\\\Hook\\\\LocaleHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/locale/src/Hook/LocaleHooks.php',
 ];
@@ -30518,12 +30464,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\node\\\\Hook\\\\NodeHooks1\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Hook/NodeHooks1.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\node\\\\Hook\\\\NodeHooks1\\:\\:entityExtraFieldInfo\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/src/Hook/NodeHooks1.php',
@@ -33530,12 +33470,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\search\\\\Hook\\\\SearchHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/src/Hook/SearchHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\search\\\\Hook\\\\SearchHooks\\:\\:help\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/search/src/Hook/SearchHooks.php',
@@ -35414,12 +35348,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\system\\\\Hook\\\\SystemHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Hook/SystemHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\system\\\\Hook\\\\SystemHooks\\:\\:entityTypeBuild\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Hook/SystemHooks.php',
@@ -35457,12 +35385,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\system\\\\Hook\\\\SystemHooks\\:\\:modulesUninstalled\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Hook/SystemHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\system\\\\Hook\\\\SystemHooks\\:\\:pageAttachments\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Hook/SystemHooks.php',
 ];
@@ -35681,12 +35603,6 @@ $ignoreErrors[] = [
 	'message' => '#^Variable \\$site_path might not be defined\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/system.install',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Function _system_page_attachments\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/system.module',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -36386,12 +36302,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\common_test\\\\Hook\\\\CommonTestHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/common_test/src/Hook/CommonTestHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\common_test\\\\Hook\\\\CommonTestHooks\\:\\:libraryInfoBuild\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/common_test/src/Hook/CommonTestHooks.php',
@@ -36401,12 +36311,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\common_test\\\\Hook\\\\CommonTestHooks\\:\\:pageAttachments\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/common_test/src/Hook/CommonTestHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\common_test_cron_helper\\\\Hook\\\\CommonTestCronHelperHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/common_test_cron_helper/src/Hook/CommonTestCronHelperHooks.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -43508,12 +43412,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\update\\\\Form\\\\UpdateReady\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/update/src/Form/UpdateReady.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\update\\\\Hook\\\\UpdateHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/update/src/Hook/UpdateHooks.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -55097,12 +54995,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\workspaces\\\\Hook\\\\WorkspacesHooks\\:\\:cron\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Hook/WorkspacesHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\workspaces\\\\Hook\\\\WorkspacesHooks\\:\\:entityAccess\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/src/Hook/WorkspacesHooks.php',
@@ -61462,12 +61354,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/ContentEntityBaseUnitTest.php',
 ];
 $ignoreErrors[] = [
-	// identifier: method.deprecated
-	'message' => '#^Call to deprecated method getMockForAbstractClass\\(\\) of class PHPUnit\\\\Framework\\\\TestCase\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityFormTest.php',
-];
-$ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityFormTest\\:\\:providerTestFormIds\\(\\) has no return type specified\\.$#',
 	'count' => 1,
@@ -61588,12 +61474,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityStorageBaseTest.php',
 ];
 $ignoreErrors[] = [
-	// identifier: method.deprecated
-	'message' => '#^Call to deprecated method getMockForAbstractClass\\(\\) of class PHPUnit\\\\Framework\\\\TestCase\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
-];
-$ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\TestEntityForm\\:\\:getBaseFormId\\(\\) has no return type specified\\.$#',
 	'count' => 1,
@@ -61628,12 +61508,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\TestEntityFormInjected\\:\\:create\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
-];
-$ignoreErrors[] = [
-	// identifier: method.deprecated
-	'message' => '#^Call to deprecated method getMockForAbstractClass\\(\\) of class PHPUnit\\\\Framework\\\\TestCase\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
