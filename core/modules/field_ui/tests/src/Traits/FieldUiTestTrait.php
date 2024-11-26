@@ -50,11 +50,7 @@ trait FieldUiTestTrait {
       // First step: 'Add field' page.
       $this->drupalGet($bundle_path);
     }
-    else {
-      $bundle_path = $this->getUrl();
-    }
-    $page = $this->getSession()->getPage();
-    file_put_contents('/Users/kunal.sachdev/www/test_sample_1.html', $this->getSession()->getPage()->getContent());
+
     try {
       // First check if the passed in field type is not part of a group.
       /** @var \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_plugin_manager */
@@ -76,8 +72,6 @@ trait FieldUiTestTrait {
       $this->clickLink($field_group);
       $initial_edit['field_options_wrapper'] = $field_type;
     }
-    $page = $this->getSession()->getPage();
-    file_put_contents('/Users/kunal.sachdev/www/test_sample.html', $this->getSession()->getPage()->getContent());
     $this->submitForm($initial_edit, 'Continue');
     if ($save_settings) {
       $this->assertSession()->pageTextContains("These settings apply to the $label field everywhere it is used.");
