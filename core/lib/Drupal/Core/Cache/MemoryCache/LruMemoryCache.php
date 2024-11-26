@@ -4,6 +4,7 @@ namespace Drupal\Core\Cache\MemoryCache;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheBackendInterface;
 
 /**
  * Defines a least recently used (LRU) static cache implementation.
@@ -56,15 +57,34 @@ class LruMemoryCache extends MemoryCache {
     }
 
     parent::set($cid, $data, $expire, $tags);
-    $diff = count($this->cache) - $this->allowedSlots;
 
     // Remove one item from the cache to ensure we remain within the allowed
     // number of slots. Avoid using array_slice() because it makes a copy of the
     // array, and avoid using array_splice() or array_shift() because they
     // re-index numeric keys.
-    if ($diff > 0) {
+    if (count($this->cache) > $this->allowedSlots) {
       $first_key = array_key_first($this->cache);
       unset($this->cache[$first_key]);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMultiple(array $items = []) {
+    foreach ($items as $cid => $item) {
+      parent::set($cid, $item['data'], $item['expire'] ?? CacheBackendInterface::CACHE_PERMANENT, $item['tags'] ?? []);
+    }
+
+    // Remove items from the cache to ensure we remain within the allowed number
+    // of slots. Avoid using array_slice() because it makes a copy of the array,
+    // and avoid using array_splice() or array_shift() because they re-index
+    // numeric keys.
+    $diff = count($this->cache) - $this->allowedSlots;
+    while ($diff > 0) {
+      $first_key = array_key_first($this->cache);
+      unset($this->cache[$first_key]);
+      $diff--;
     }
   }
 
