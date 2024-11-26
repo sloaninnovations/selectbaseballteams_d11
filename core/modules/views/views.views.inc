@@ -5,26 +5,6 @@
  */
 
 use Drupal\field\FieldConfigInterface;
-use Drupal\field\FieldStorageConfigInterface;
-
-/**
- * Determines whether the entity type the field appears in is SQL based.
- *
- * @param \Drupal\field\FieldStorageConfigInterface $field_storage
- *   The field storage definition.
- *
- * @return \Drupal\Core\Entity\Sql\SqlContentEntityStorage
- *   Returns the entity type storage if supported.
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
- * \Drupal::service('views.views_field_default_data')
- * ->getEntityTypeStorage($field_storage); instead.
- * @see https://www.drupal.org/node/3489502
- */
-function _views_field_get_entity_type_storage(FieldStorageConfigInterface $field_storage) {
-  @trigger_error('_views_field_get_entity_type_storage() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'views.views_field_default_data\')->getEntityTypeStorage($field_storage). See https://www.drupal.org/node/3489502', E_USER_DEPRECATED);
-  return \Drupal::service('views.views_field_default_data')->getEntityTypeStorage($field_storage);
-}
 
 /**
  * Returns the label of a certain field.
@@ -61,23 +41,4 @@ function views_entity_field_label($entity_type, $field_name) {
   });
   $label_counter = array_keys($label_counter);
   return [$label_counter[0], $all_labels];
-}
-
-/**
- * Default views data implementation for a field.
- *
- * @param \Drupal\field\FieldStorageConfigInterface $field_storage
- *   The field definition.
- *
- * @return array
- *   The default views data for the field.
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
- * \Drupal::service('views.views_field_default_data')
- * ->defaultFieldImplementation($field_storage); instead.
- * @see https://www.drupal.org/node/3489502
- */
-function views_field_default_views_data(FieldStorageConfigInterface $field_storage) {
-  @trigger_error('views_field_default_views_data() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'views.views_field_default_data\')->defaultFieldImplementation($field_storage). See https://www.drupal.org/node/3489502', E_USER_DEPRECATED);
-  return \Drupal::service('views.views_field_default_data')->defaultFieldImplementation($field_storage);
 }
