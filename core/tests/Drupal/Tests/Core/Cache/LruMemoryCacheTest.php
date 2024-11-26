@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Cache;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\MemoryCache\LruMemoryCache;
 use Drupal\Tests\UnitTestCase;
 
@@ -27,8 +28,11 @@ class LruMemoryCacheTest extends UnitTestCase {
    * @covers ::set
    * @covers ::delete
    */
-  public function testGetSetDelete() {
-    $this->memoryCache = new LruMemoryCache(3);
+  public function testGetSetDelete(): void {
+    $this->memoryCache = new LruMemoryCache(
+      $this->createMock(TimeInterface::class),
+      3,
+    );
     $cids = [
       ['sparrow', 'sparrow'],
       ['pidgin', 'pidgin'],
@@ -81,8 +85,11 @@ class LruMemoryCacheTest extends UnitTestCase {
    * @covers ::invalidate
    * @covers ::invalidateMultiple
    */
-  public function testInvalidate() {
-    $this->memoryCache = new LruMemoryCache(3);
+  public function testInvalidate(): void {
+    $this->memoryCache = new LruMemoryCache(
+      $this->createMock(TimeInterface::class),
+      3,
+    );
     $cids = [
       ['sparrow', 'sparrow'],
       ['pidgin', 'pidgin'],
@@ -119,7 +126,7 @@ class LruMemoryCacheTest extends UnitTestCase {
    *   the value to check. When the second element is FALSE, this method will
    *   check that the cache ID is not present.
    */
-  protected function assertCids(array $cids) {
+  protected function assertCids(array $cids): void {
     foreach ($cids as $items) {
       $cached = $this->memoryCache->get($items[0]);
       if ($items[1]) {
