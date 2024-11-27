@@ -186,7 +186,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     // is present. Use exact match.
     $field_third_party = $page->find('named_exact', ['field', 'fields[field_test][settings_edit_form][third_party_settings][field_third_party_test][field_test_field_formatter_third_party_settings_form]']);
     $this->assertNotEmpty($field_third_party, 'The field added in hook_field_formatter_third_party_settings_form() is present on the settings form.');
-    $this->assertEquals($field_third_party_test->getAttribute('type'), 'text');
+    $this->assertEquals($field_third_party->getAttribute('type'), 'text');
 
     // Assert that the additional field added in the hook
     // field_formatter_third_party_settings_form

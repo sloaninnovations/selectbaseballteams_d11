@@ -66,7 +66,7 @@ class FieldThirdPartyTestHooks {
    * Implements hook_field_formatter_third_party_settings_form().
    */
   #[Hook('field_formatter_third_party_settings_form')]
-  public function fieldFormatterThirdPartySettingsFormAdditionalImplmentation(FormatterInterface $plugin, FieldDefinitionInterface $field_definition, $view_mode, $form, FormStateInterface $form_state): array {
+  public function fieldFormatterThirdPartySettingsFormAdditionalImplementation(FormatterInterface $plugin, FieldDefinitionInterface $field_definition, $view_mode, $form, FormStateInterface $form_state): array {
     $element['second_field_formatter_third_party_settings_form'] = [
       '#type' => 'number',
       '#title' => t('Second 3rd party formatter settings form'),
