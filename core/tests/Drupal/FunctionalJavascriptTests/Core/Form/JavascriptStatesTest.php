@@ -614,7 +614,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
   /**
    * Tests states of elements affected by ajax.
    */
-  protected function doAjaxAffectedTriggerTests() {
+  protected function doAjaxAffectedTriggerTests(): void {
     $this->drupalGet('form-test/javascript-states-form');
     $page = $this->getSession()->getPage();
 
