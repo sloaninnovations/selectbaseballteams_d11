@@ -202,12 +202,6 @@ class NavigationHooks {
       if ($plugin_id == 'help.main' || $plugin_id == 'system.admin_content') {
         unset($tree[$key]);
       }
-
-      // Remove child items of content menu, if any.
-      $parent = $item->link->getParent();
-      if ($parent == 'system.admin_content') {
-        unset($tree[$key]);
-      }
     }
   }
 
