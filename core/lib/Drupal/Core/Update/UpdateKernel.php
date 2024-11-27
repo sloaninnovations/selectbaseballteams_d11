@@ -189,4 +189,18 @@ class UpdateKernel extends DrupalKernel {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function getExtensions(): array|false {
+    $extensions = parent::getExtensions() ?: [];
+    if (!isset($extensions['module']['system'])) {
+      $extensions['module']['system'] = 0;
+    }
+    if (!isset($extensions['module']['user'])) {
+      $extensions['module']['user'] = 0;
+    }
+    return $extensions;
+  }
+
 }
