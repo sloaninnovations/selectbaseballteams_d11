@@ -85,6 +85,7 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
 
   /**
    * @param \Drupal\Core\TypedData\DataDefinition $definition
+   *   Data definition.
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface|object
    * @throws \Exception
