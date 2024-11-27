@@ -856,6 +856,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $extensions = $module_handler->getModuleList();
     $this->container->get('kernel')->updateModules($extensions, $extensions);
 
+    $this->container = $this->container->get('kernel')->getContainer();
+
     // Ensure isLoaded() is TRUE in order to make
     // \Drupal\Core\Theme\ThemeManagerInterface::render() work.
     // Note that the kernel has rebuilt the container; this $module_handler is
