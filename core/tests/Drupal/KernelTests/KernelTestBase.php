@@ -855,7 +855,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
 
     // Update the kernel to make their services available.
     $this->container->get('kernel')->updateModules($extensions, $extensions);
-
     $this->container = $this->container->get('kernel')->getContainer();
 
     // Ensure isLoaded() is TRUE in order to make

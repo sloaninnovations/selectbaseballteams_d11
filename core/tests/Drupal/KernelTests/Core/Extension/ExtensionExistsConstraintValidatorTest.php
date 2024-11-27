@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Extension;
 
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -45,6 +46,7 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $this->assertSame("Module 'user' is not installed.", (string) $violations->get(0)->getMessage());
 
     $this->enableModules(['user']);
+    $data = $typed_data->create($definition, 'core');
     $this->assertCount(0, $data->validate());
 
     // NULL should not trigger a validation error: a value may be nullable.
@@ -61,10 +63,7 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $this->assertTrue($this->container->get('theme_installer')->install(['stark']));
     // Installing the theme rebuilds the container, so we need to ensure the
     // constraint is instantiated with an up-to-date theme handler.
-    $data = $this->container->get('kernel')
-      ->getContainer()
-      ->get('typed_data_manager')
-      ->create($definition, 'stark');
+    $data = $this->getData($definition);
     $this->assertCount(0, $data->validate());
 
     // `core` provides many plugins without the need to install a module, but it
@@ -82,6 +81,19 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $definition->setConstraints(['ExtensionExists' => 'profile']);
     $this->expectExceptionMessage("Unknown extension type: 'profile'");
     $data->validate();
+  }
+
+  /**
+   * @param \Drupal\Core\TypedData\DataDefinition $definition
+   *
+   * @return \Drupal\Core\TypedData\TypedDataInterface|object
+   * @throws \Exception
+   */
+  public function getData(DataDefinition $definition): TypedDataInterface {
+    return $this->container->get('kernel')
+      ->getContainer()
+      ->get('typed_data_manager')
+      ->create($definition, 'stark');
   }
 
 }
