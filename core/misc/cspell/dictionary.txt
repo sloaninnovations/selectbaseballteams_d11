@@ -26,7 +26,6 @@ autocreation
 autogenerator
 autoloadable
 autoloaded
-autoloader
 autoloaders
 autoloading
 autop
@@ -35,14 +34,8 @@ autoplay
 autoreply
 autosubmit
 backlink
-backported
-backporting
-backports
 bakeware
 barchart
-basefield
-basepath
-basetheme
 beatle
 bebebe
 beforeclose
@@ -65,7 +58,6 @@ blockrelated
 boing
 bootable
 bovigo
-brotli
 browserkit
 browsertest
 browsertestbase
@@ -80,19 +72,15 @@ buytaert
 bytea
 cachetag
 cachetags
-callables
-callout
 camelid
 camelids
 canvastext
-castable
 catalana
 catchable
 ccyy
 ccyymm
 ccyymmdd
 chainedfast
-changelist
 checkboxified
 checkboxifier
 checkboxify
@@ -119,8 +107,6 @@ colspans
 columnschange
 comida
 commenters
-compositionend
-compositionstart
 configentity
 configurator
 contentblock
@@ -204,7 +190,6 @@ enoki
 entityviewedit
 errmode
 eslintcache
-etag
 eurozone
 evenodd
 eventhandler
@@ -228,7 +213,6 @@ fieldgroups
 fieldnames
 fieldsets
 filemime
-filesystems
 filetransfer
 findwith
 flickr
@@ -238,7 +222,6 @@ fodg
 fodp
 fods
 fodt
-formattable
 fouc
 fourcol
 fraîche
@@ -259,6 +242,7 @@ guzzlehttp
 hande
 hateoas
 hexcode
+hhvm
 hilited
 hmac
 hookname
@@ -274,6 +258,7 @@ imagecache
 imagetextalternative
 indexname
 inited
+inlines
 inno
 instantiator
 interactable
@@ -316,6 +301,7 @@ longblob
 longerthan
 longtext
 lrdd
+lspeak
 lstitle
 ltitle
 lzma
@@ -349,8 +335,6 @@ moderatable
 modernizr
 mojito
 msgctxt
-msgid
-msgstr
 multibuys
 multibyte
 multicardinality
@@ -387,8 +371,8 @@ notnull
 notsimpletest
 nourriture
 nplurals
-nproc
 ntfs
+nyholm
 oembed
 omittable
 onecol
@@ -435,8 +419,6 @@ prepopulate
 prepopulates
 prepopulating
 prepopulation
-preprocesses
-preprocessors
 prerender
 prerendered
 presave
@@ -446,14 +428,12 @@ proname
 prophesize
 prophesized
 prophesizing
-protobuf
 protossl
 pseudotag
 puzzlepiece
 pwprompt
 questionmark
 quicklinks
-quickstart
 quinlan
 qvalue
 qvalues
@@ -490,7 +470,6 @@ rowspans
 rtsp
 ruleset
 sameorigin
-samesite
 savepoints
 sayre
 schemaapi
@@ -513,7 +492,6 @@ smacss
 smalldatetime
 smtps
 somecompany
-sortablejs
 splitbutton
 splitbuttons
 squaresmall
@@ -532,7 +510,6 @@ strikethrough
 striptags
 strs
 styleguide
-stylelint
 stylelintcache
 stylescombo
 subarrays
@@ -552,8 +529,6 @@ subplugins
 subproject
 subprojects
 subproperties
-subqueries
-subquery
 subrequest
 subrequest's
 subrequests
@@ -570,6 +545,7 @@ subvalues
 subview
 supercede
 svgz
+syncer
 synchronizable
 syrop
 tabbingmanager
@@ -584,6 +560,7 @@ tablesorts
 tabset
 tabwidth
 taskless
+tbachert
 testbot
 testbots
 testgroups
@@ -621,7 +598,6 @@ trgm
 truecolor
 twistie
 twocol
-tzid
 uids
 unban
 uncacheable
@@ -632,12 +608,9 @@ ungroup
 ungroupable
 unindexed
 uninstallations
-unmanaged
 unminified
 unmoderated
 unpromote
-unpublish
-unpublishes
 unpublishing
 unrevisionable
 unrouted
@@ -647,7 +620,6 @@ unserialized
 unserializes
 unserializing
 unsets
-unsetting
 unsticky
 untabbable
 upcasted
@@ -676,7 +648,6 @@ writeln
 xbap
 xbitmap
 xmlhttp
-xmlhttprequest
 xpsdocument
 xtmpl
 yamls
