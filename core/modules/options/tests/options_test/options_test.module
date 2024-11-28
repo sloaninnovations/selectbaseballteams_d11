@@ -17,7 +17,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @see options_allowed_values()
  */
-function options_test_allowed_values_callback(FieldStorageDefinitionInterface $definition, ?FieldableEntityInterface $entity = NULL) {
+function options_test_allowed_values_callback(FieldStorageDefinitionInterface $definition, ?FieldableEntityInterface $entity = NULL): array {
   $values = [
     'Group 1' => [
       0 => 'Zero',
@@ -71,7 +71,7 @@ function options_test_form_entity_test_entity_test_form_alter(&$form, FormStateI
 /**
  * Implements hook_options_list_alter().
  */
-function options_test_options_list_alter(array &$options, array $context) {
+function options_test_options_list_alter(array &$options, array $context): void {
   if ($context['fieldDefinition']->getName() === 'card_4' && $context['widget']->getPluginId() === 'options_select') {
     // Rename _none option.
     $options[FormOptionsHelper::OPTIONS_EMPTY_OPTION] = '- Select something -';
