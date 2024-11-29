@@ -532,19 +532,11 @@ function hook_views_data_alter(array &$data) {
  * When collecting the views data, views_views_data() invokes this hook for each
  * field storage definition, on the module that provides the field storage
  * definition. If the return value is empty, the result of
-<<<<<<< HEAD
  * FieldViewsDataProvider::defaultFieldImplementation() is used instead. Then the result is altered
  * by invoking hook_field_views_data_alter() on all modules.
  *
  * If no hook implementation exists, hook_views_data() falls back to
  * FieldViewsDataProvider::defaultFieldImplementation().
-=======
- * ViewsFieldDefaultViewsData::defaultFieldImplementation() is used instead. Then the result is altered
- * by invoking hook_field_views_data_alter() on all modules.
- *
- * If no hook implementation exists, hook_views_data() falls back to
- * ViewsFieldDefaultViewsData::defaultFieldImplementation().
->>>>>>> 65c30718f0f (Deprecate views_field_default_views_data _views_field_get_entity_type_storage)
  *
  * @param \Drupal\field\FieldStorageConfigInterface $field_storage
  *   The field storage config entity.
@@ -577,12 +569,8 @@ function hook_field_views_data(FieldStorageConfigInterface $field_storage): arra
  *
  * This is called on all modules even if there is no hook_field_views_data()
  * implementation for the field, and therefore may be used to alter the
-<<<<<<< HEAD
- * default data that FieldViewsDataProvider::defaultFieldImplementation() supplies for the
-=======
- * default data that ViewsFieldDefaultViewsData::defaultFieldImplementation() supplies for the
->>>>>>> 65c30718f0f (Deprecate views_field_default_views_data _views_field_get_entity_type_storage)
- * field storage.
+ * default data that FieldViewsDataProvider::defaultFieldImplementation()
+ * supplies for the field storage.
  *
  * @param array $data
  *   The views data for the field storage. This has the same format as the
