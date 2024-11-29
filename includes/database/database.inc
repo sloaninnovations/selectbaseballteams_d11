@@ -225,6 +225,13 @@ abstract class DatabaseConnection {
   protected $transactionLayers = array();
 
   /**
+   * Post-root (non-nested) transaction commit callbacks.
+   *
+   * @var array
+   */
+  protected $rootTransactionEndCallbacks = array();
+
+  /**
    * Index of what driver-specific class to use for various operations.
    *
    * @var array
@@ -1136,7 +1143,12 @@ abstract class DatabaseConnection {
         $rolled_back_other_active_savepoints = TRUE;
       }
     }
+
+    // Allow callbacks to perform their own cleanup.
+    $this->executeRootTransactionEndCallbacks(FALSE);
+
     $this->connection->rollBack();
+
     if ($rolled_back_other_active_savepoints) {
       throw new DatabaseTransactionOutOfOrderException();
     }
@@ -1202,7 +1214,55 @@ abstract class DatabaseConnection {
   }
 
   /**
-   * Internal function: commit all the transaction layers that can commit.
+   * Adds a root transaction end callback.
+   *
+   * These callbacks are invoked immediately after the transaction has been
+   * committed.
+   *
+   * It can for example be used to avoid deadlocks on write-heavy tables that
+   * do not need to be part of the transaction, like cache tag invalidations.
+   *
+   * Another use case is that services using alternative backends like Redis and
+   * Memcache cache implementations can replicate the transaction-behavior of
+   * the database cache backend and avoid race conditions.
+   *
+   * @param string $callback
+   *   The callback to invoke.
+   *
+   * @see DatabaseConnection::doCommit()
+   *
+   * @throws DatabaseTransactionNoActiveException
+   */
+  public function addRootTransactionEndCallback($callback) {
+    if (!$this->inTransaction()) {
+      throw new DatabaseTransactionNoActiveException();
+    }
+    $this->rootTransactionEndCallbacks[] = $callback;
+  }
+
+  /**
+   * Execute callbacks registered while the root transaction has been open.
+   *
+   * @param bool $committed
+   *   Whether the transaction was committed or rolled back.
+   *
+   * @internal
+   */
+  protected function executeRootTransactionEndCallbacks($committed) {
+    if (!empty($this->rootTransactionEndCallbacks)) {
+      $callbacks = $this->rootTransactionEndCallbacks;
+      // Reset callbacks before calling.
+      $this->rootTransactionEndCallbacks = array();
+      foreach ($callbacks as $callback) {
+        call_user_func($callback, $committed);
+      }
+    }
+  }
+
+  /**
+   * Commit all the transaction layers that can commit.
+   *
+   * @internal
    */
   protected function popCommittableTransactions() {
     // Commit all the committable layers.
@@ -1215,14 +1275,28 @@ abstract class DatabaseConnection {
       // If there are no more layers left then we should commit.
       unset($this->transactionLayers[$name]);
       if (empty($this->transactionLayers)) {
-        if (!$this->connection->commit()) {
-          throw new DatabaseTransactionCommitFailedException();
-        }
+        $this->doCommit();
       }
       else {
         $this->query('RELEASE SAVEPOINT ' . $name);
       }
     }
+  }
+
+  /**
+   * Do the actual commit, invoke pre-commit callbacks.
+   *
+   * @internal
+   */
+  protected function doCommit() {
+    $success = $this->connection->commit();
+    $this->executeRootTransactionEndCallbacks($success);
+
+    if (!$success) {
+      throw new DatabaseTransactionCommitFailedException();
+    }
+
+    return $success;
   }
 
   /**
