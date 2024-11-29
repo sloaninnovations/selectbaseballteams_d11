@@ -56,7 +56,7 @@ use Drupal\views\Attribute\ViewsJoin;
  *     )
  * @endcode
  *
- * @see ViewsFieldDefaultViewsData::defaultFieldImplementation()
+ * @see FieldViewsDataProvider::defaultFieldImplementation()
  *
  * @ingroup views_join_handlers
  */

@@ -12,7 +12,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 class DatetimeViewsHooks {
 
   public function __construct(
-    private readonly DateTimeViewsHelper $dateTimeViewsHelper,
+    protected readonly DateTimeViewsHelper $dateTimeViewsHelper,
   ) {}
 
   /**
@@ -20,7 +20,7 @@ class DatetimeViewsHooks {
    */
   #[Hook('field_views_data')]
   public function fieldViewsData(FieldStorageConfigInterface $field_storage): array {
-    return $this->dateTimeViewsHelper->fieldViewsDataHelper($field_storage, [], $field_storage->getMainPropertyName());
+    return $this->dateTimeViewsHelper->buildViewsData($field_storage, [], $field_storage->getMainPropertyName());
   }
 
 }

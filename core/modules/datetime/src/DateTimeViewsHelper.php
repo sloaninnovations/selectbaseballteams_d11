@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\datetime;
 
 use Drupal\field\FieldStorageConfigInterface;
-use Drupal\views\ViewsFieldDefaultViewsData;
+use Drupal\views\FieldViewsDataProvider;
 
 /**
  * A helper for datetime fields integrating with views.
@@ -13,7 +13,7 @@ use Drupal\views\ViewsFieldDefaultViewsData;
 class DateTimeViewsHelper {
 
   public function __construct(
-    private readonly ?ViewsFieldDefaultViewsData $viewsFieldDefaultViewsData,
+    private readonly ?FieldViewsDataProvider $fieldViewsDataProvider,
   ) {}
 
   /**
@@ -36,10 +36,10 @@ class DateTimeViewsHelper {
    * @see datetime_field_views_data()
    * @see datetime_range_field_views_data()
    */
-  public function fieldViewsDataHelper(FieldStorageConfigInterface $field_storage, array $data, string $column_name): array {
+  public function buildViewsData(FieldStorageConfigInterface $field_storage, array $data, string $column_name): array {
     // @todo This code only covers configurable fields, handle base table fields
     //   in https://www.drupal.org/node/2489476.
-    $data = empty($data) ? $this->viewsFieldDefaultViewsData->defaultFieldImplementation($field_storage) : $data;
+    $data = empty($data) ? $this->fieldViewsDataProvider->defaultFieldImplementation($field_storage) : $data;
     foreach ($data as $table_name => $table_data) {
       // Set the 'datetime' filter type.
       $data[$table_name][$field_storage->getName() . '_' . $column_name]['filter']['id'] = 'datetime';

@@ -2,6 +2,7 @@
 
 /**
  * @file
+ * Holds datetime views field data helper for deprecation.
  */
 
 use Drupal\field\FieldStorageConfigInterface;
@@ -16,7 +17,7 @@ use Drupal\field\FieldStorageConfigInterface;
  * @param \Drupal\field\FieldStorageConfigInterface $field_storage
  *   The field storage config entity.
  * @param array $data
- *   Field view data or ViewsFieldDefaultViewsData::defaultFieldImplementation($field_storage) if empty.
+ *   Field view data or FieldViewsDataProvider::defaultFieldImplementation($field_storage) if empty.
  * @param string $column_name
  *   The schema column name with the datetime value.
  *

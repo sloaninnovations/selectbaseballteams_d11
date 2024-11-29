@@ -11,13 +11,13 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\FieldStorageConfigInterface;
 
 /**
- * Class to provide default views data for fields.
+ * Provide default views data for fields.
  */
-class ViewsFieldDefaultViewsData {
+class FieldViewsDataProvider {
 
   public function __construct(
-    private readonly EntityTypeManager $entityTypeManager,
-    private readonly FieldTypePluginManagerInterface $fieldTypePluginManager,
+    protected readonly EntityTypeManager $entityTypeManager,
+    protected readonly FieldTypePluginManagerInterface $fieldTypePluginManager,
   ) {}
 
   /**

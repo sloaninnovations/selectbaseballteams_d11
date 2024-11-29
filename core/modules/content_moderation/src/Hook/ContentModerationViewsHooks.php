@@ -13,8 +13,8 @@ use Drupal\content_moderation\ViewsData;
 class ContentModerationViewsHooks {
 
   public function __construct(
-    private readonly EntityTypeManagerInterface $entityTypeManager,
-    private readonly ModerationInformation $moderationInformation,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly ModerationInformation $moderationInformation,
   ) {}
 
   /**
