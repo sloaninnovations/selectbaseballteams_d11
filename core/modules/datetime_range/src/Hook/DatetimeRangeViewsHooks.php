@@ -12,7 +12,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 class DatetimeRangeViewsHooks {
 
   public function __construct(
-    private readonly DateTimeViewsHelper $dateTimeViewsHelper,
+    protected readonly DateTimeViewsHelper $dateTimeViewsHelper,
   ) {}
 
   /**
