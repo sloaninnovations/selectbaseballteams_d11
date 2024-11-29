@@ -176,6 +176,22 @@ default:
       when: manual
       allow_failure: true
 
+'Unit tests':
+  stage: 🗜️ Test
+  trigger:
+    # Rely on the status of the child pipeline.
+    strategy: depend
+    include:
+      - local: .gitlab-ci/unit-pipeline.yml
+  # Run on MR, schedule, push and parent pipeline.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
+
 # Default configuration.
 'DEFAULT: PHP 8.3 MySQL 8.0':
   <<: *default-stage
