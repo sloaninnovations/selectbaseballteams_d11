@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Kernel;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\KernelTests\KernelTestBase;
@@ -54,23 +53,9 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
     // Determine which hooks were called.
     $actual = array_keys(array_filter(file_test_get_all_calls()));
 
-    // Determine if there were any expected that were not called.
-    $uncalled = array_diff($expected, $actual);
-    if (count($uncalled)) {
-      $this->assertTrue(FALSE, sprintf('Expected hooks %s to be called but %s was not called.', implode(', ', $expected), implode(', ', $uncalled)));
-    }
-    else {
-      $this->assertTrue(TRUE, sprintf('All the expected hooks were called: %s', empty($expected) ? '(none)' : implode(', ', $expected)));
-    }
-
-    // Determine if there were any unexpected calls.
-    $unexpected = array_diff($actual, $expected);
-    if (count($unexpected)) {
-      $this->assertTrue(FALSE, sprintf('Unexpected hooks were called: %s.', empty($unexpected) ? '(none)' : implode(', ', $unexpected)));
-    }
-    else {
-      $this->assertTrue(TRUE, 'No unexpected hooks were called.');
-    }
+    // Determine if there were any expected that were not called, or any
+    // unexpected calls.
+    $this->assertEqualsCanonicalizing($expected, $actual);
   }
 
   /**
@@ -84,20 +69,7 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    *   Optional translated string message.
    */
   public function assertFileHookCalled($hook, $expected_count = 1, $message = NULL) {
-    $actual_count = count(file_test_get_calls($hook));
-
-    if (!isset($message)) {
-      if ($actual_count == $expected_count) {
-        $message = new FormattableMarkup('hook_file_@name was called correctly.', ['@name' => $hook]);
-      }
-      elseif ($expected_count == 0) {
-        $message = \Drupal::translation()->formatPlural($actual_count, 'hook_file_@name was not expected to be called but was actually called once.', 'hook_file_@name was not expected to be called but was actually called @count times.', ['@name' => $hook, '@count' => $actual_count]);
-      }
-      else {
-        $message = new FormattableMarkup('hook_file_@name was expected to be called %expected times but was called %actual times.', ['@name' => $hook, '%expected' => $expected_count, '%actual' => $actual_count]);
-      }
-    }
-    $this->assertEquals($expected_count, $actual_count, (string) $message);
+    $this->assertCount($expected_count, file_test_get_calls($hook), $message ?? "hook_file_$hook was called correctly.");
   }
 
   /**
