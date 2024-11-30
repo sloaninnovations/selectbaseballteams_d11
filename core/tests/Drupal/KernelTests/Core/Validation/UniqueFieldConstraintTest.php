@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Validation;
 
-use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestStringId;
 use Drupal\KernelTests\KernelTestBase;
@@ -86,11 +86,7 @@ class UniqueFieldConstraintTest extends KernelTestBase {
     /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
     $violations = $entity->get('name')->validate();
 
-    $message = new FormattableMarkup('A @entity_type with @field_name %value already exists.', [
-      '%value' => $value,
-      '@entity_type' => $entity->getEntityType()->getSingularLabel(),
-      '@field_name' => 'Name',
-    ]);
+    $message = sprintf('A %s with Name %s already exists.', $entity->getEntityType()->getSingularLabel(), HTML::escape($value));
 
     // Check that the validation has created the appropriate violation.
     $this->assertCount(1, $violations);
@@ -140,11 +136,7 @@ class UniqueFieldConstraintTest extends KernelTestBase {
     /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
     $violations = $entity->get('name')->validate();
 
-    $message = new FormattableMarkup('A @entity_type with @field_name %value already exists.', [
-      '%value' => 'A totally unique entity name',
-      '@entity_type' => $entity->getEntityType()->getSingularLabel(),
-      '@field_name' => 'Name',
-    ]);
+    $message = sprintf('A %s with Name A totally unique entity name already exists.', $entity->getEntityType()->getSingularLabel());
 
     // Check that the validation has created the appropriate violation.
     $this->assertCount(1, $violations);
