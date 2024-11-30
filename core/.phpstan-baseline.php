@@ -20333,12 +20333,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/tests/src/Kernel/FileManagedUnitTestBase.php',
 ];
 $ignoreErrors[] = [
-	// identifier: empty.variable
-	'message' => '#^Variable \\$unexpected in empty\\(\\) always exists and is not falsy\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Kernel/FileManagedUnitTestBase.php',
-];
-$ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Kernel\\\\ManagedFileTest\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'count' => 1,
