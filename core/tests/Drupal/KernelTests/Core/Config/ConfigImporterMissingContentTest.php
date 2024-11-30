@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\Config;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Block\Plugin\Block\Broken;
 use Drupal\Core\Config\ConfigImporter;
@@ -195,7 +194,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
    * {@inheritdoc}
    */
   public function log($level, $message, array $context = []): void {
-    $this->logMessages[] = PlainTextOutput::renderFromHtml(new FormattableMarkup($message, $context));
+    $this->logMessages[] = PlainTextOutput::renderFromHtml(strtr($message, $context));
   }
 
 }
