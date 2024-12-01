@@ -1215,7 +1215,7 @@ function hook_requirements_alter(array &$requirements): void {
  *     - REQUIREMENT_ERROR: The requirement failed with an error.
  *     Defaults to REQUIREMENT_INFO.
  */
-function hook_runtime_requirements() {
+function hook_runtime_requirements(): array {
   $requirements = [];
 
   // Report Drupal version
