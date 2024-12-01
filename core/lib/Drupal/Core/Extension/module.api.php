@@ -1190,9 +1190,9 @@ function hook_requirements_alter(array &$requirements): void {
 /**
  * Check runtime requirements and do status reporting.
  *
- * This hook will report requirements on Status report. ($phase == 'runtime')
+ * This hook will report requirements on Status report.
  *
- * The 'runtime' phase is not limited to pure installation requirements
+ * The runtime_requirements is not limited to pure installation requirements
  * but can also be used for more general status information like maintenance
  * tasks and security issues.
  * The returned 'requirements' will be listed on the status report in the
