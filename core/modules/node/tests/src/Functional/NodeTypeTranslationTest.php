@@ -169,7 +169,7 @@ class NodeTypeTranslationTest extends BrowserTestBase {
     // Add an email field.
     $this->drupalGet("admin/structure/types/manage/{$type}/fields/add-field");
     $this->clickLink('Email');
-    $this->submitForm([],'Continue');
+    $this->submitForm([], 'Continue');
     $this->submitForm([
       'label' => 'Email',
       'field_name' => 'email',
