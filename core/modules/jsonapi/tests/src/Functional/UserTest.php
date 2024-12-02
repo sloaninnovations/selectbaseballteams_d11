@@ -395,7 +395,7 @@ class UserTest extends ResourceTestBase {
   public function testGetMailFieldOnlyVisibleToOwner(): void {
     // Create user B, with the same roles (and hence permissions) as user A.
     $user_a = $this->account;
-    $user_b = $this->createUser([],'sibling-of-' . $user_a->getAccountName(), null, ['roles' => $user_a->getRoles()]);
+    $user_b = $this->createUser([],'sibling-of-' . $user_a->getAccountName(), false, ['roles' => $user_a->getRoles()]);
 
     // Grant permission to role that both users use.
     $this->grantPermissionsToTestedRole(['access user profiles']);
@@ -510,10 +510,8 @@ class UserTest extends ResourceTestBase {
     $this->grantPermissionsToTestedRole(['access content']);
 
     // Create data.
-    $user_a = User::create([])->setUsername('A')->activate();
-    $user_a->save();
-    $user_b = User::create([])->setUsername('B')->set('field_favorite_animal', 'stegosaurus')->block();
-    $user_b->save();
+    $user_a = $this->createUser([],'A');
+    $user_b = $this->createUser([],'B', false, ['field_favorite_animal' => 'stegosaurus'])->block()->save();
     $node_a = Node::create(['type' => 'x'])->setTitle('Owned by A')->setOwner($user_a);
     $node_a->save();
     $node_b = Node::create(['type' => 'x'])->setTitle('Owned by B')->setOwner($user_b);
