@@ -40,6 +40,7 @@ class FileItemTest extends KernelTestBase {
     $file = File::load($fid);
     $fileUri = $file->getFileUri();
 
+    // Confirm there are only two forward slashes.
     $this->assertStringStartsNotWith('public:///', $fileUri);
   }
 
