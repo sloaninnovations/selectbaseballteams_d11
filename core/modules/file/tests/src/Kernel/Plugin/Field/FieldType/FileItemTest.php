@@ -18,6 +18,9 @@ class FileItemTest extends KernelTestBase {
 
   protected static $modules = ['file', 'field', 'user'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('file');
