@@ -12,6 +12,8 @@ use Drupal\navigation\Attribute\TopBarItem;
 use Drupal\navigation\TopBarItemBase;
 use Drupal\navigation\TopBarRegion;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\node\NodeInterface;
+
 
 /**
  * Provides the Page Context top bar item.
@@ -21,8 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   region: TopBarRegion::Context,
   label: new TranslatableMarkup('Page Context'),
 )]
-final class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterface
-{
+final class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterface {
 
   /**
    * The entity type manager service.
@@ -57,7 +58,7 @@ final class PageContext extends TopBarItemBase implements ContainerFactoryPlugin
     $plugin_id,
     $plugin_definition,
     EntityTypeManagerInterface $entityTypeManager,
-    RouteMatchInterface $routeMatch
+    RouteMatchInterface $routeMatch,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entityTypeManager;
@@ -67,8 +68,7 @@ final class PageContext extends TopBarItemBase implements ContainerFactoryPlugin
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static
-  {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
       $configuration,
       $plugin_id,
@@ -81,13 +81,12 @@ final class PageContext extends TopBarItemBase implements ContainerFactoryPlugin
   /**
    * {@inheritdoc}
    */
-  public function build(): array
-  {
+  public function build(): array {
     $build = [];
     $parameters = $this->routeMatch->getParameters();
 
     // Focus on node entities.
-    if ($parameters->has('node') && ($node = $parameters->get('node')) instanceof \Drupal\node\NodeInterface) {
+    if ($parameters->has('node') && ($node = $parameters->get('node')) instanceof NodeInterface) {
       $title = $node->getTitle();
       $status = $node->isPublished() ? 'Published' : 'Unpublished';
       $status_class = $node->isPublished() ? 'published' : 'unpublished';
@@ -102,13 +101,9 @@ final class PageContext extends TopBarItemBase implements ContainerFactoryPlugin
           '#wrapper_attributes' => ['class' => ['context-status', $status_class]],
         ],
       ];
-      $build =
-        [
+      $build = [
           '#theme' => 'item_list',
           '#items' => $items,
-          '#wrapper_attributes' => [
-            'class' => array('top-bar-context-values'),
-          ],
         ];
     }
 
