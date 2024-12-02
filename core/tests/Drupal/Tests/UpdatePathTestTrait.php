@@ -101,7 +101,6 @@ trait UpdatePathTestTrait {
       /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
       $module_list = $this->container->get('extension.list.module');
       foreach (array_keys(array_diff_key($config_module_list, $module_handler_list)) as $module) {
-        $module_handler->addModule($module, $module_list->getPath($module));
         $modules_installed = TRUE;
       }
       $modules_uninstalled = FALSE;
