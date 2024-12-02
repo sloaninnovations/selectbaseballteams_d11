@@ -23,6 +23,9 @@ class FileItemTest extends KernelTestBase {
     $this->installEntitySchema('file');
   }
 
+  /**
+   * Tests using entity fields of the file field type.
+   */
   public function testGenerateSampleValues(): void {
     $definition = $this->createMock(FieldDefinitionInterface::class);
     // Create a definition that does not include a file directory.
