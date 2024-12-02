@@ -511,7 +511,8 @@ class UserTest extends ResourceTestBase {
 
     // Create data.
     $user_a = $this->createUser([],'A');
-    $user_b = $this->createUser([],'B', false, ['field_favorite_animal' => 'stegosaurus'])->block()->save();
+    $user_b = $this->createUser([],'B', false, ['field_favorite_animal' => 'stegosaurus'])->block();
+    $user_b->save();
     $node_a = Node::create(['type' => 'x'])->setTitle('Owned by A')->setOwner($user_a);
     $node_a->save();
     $node_b = Node::create(['type' => 'x'])->setTitle('Owned by B')->setOwner($user_b);
