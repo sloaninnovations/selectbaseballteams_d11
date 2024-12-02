@@ -77,6 +77,33 @@
   align-items: center;
   justify-content: start;
 }
+.top-bar__context ul {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: start;
+  list-style: none;
+}
+.top-bar__context ul li {
+  padding: var(--admin-toolbar-space-4) var(--admin-toolbar-space-10);
+  border-radius: var(--admin-toolbar-space-8);
+  background-color: var(--admin-topbar-color-gray);
+}
+.top-bar__context ul .context-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40ch; /* Approximate character length for larger screens */
+}
+/* Smaller devices: Truncate to 20 characters */
+@media (max-width: 37.5rem) {
+  .top-bar__context ul .context-title {
+    max-width: 20ch;
+  }
+}
+.top-bar__context ul .published {
+  background-color: var(--admin-topbar-color-green);
+}
 .top-bar__tools {
   display: flex;
   gap: 0.5rem;
