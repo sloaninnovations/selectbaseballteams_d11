@@ -16,6 +16,9 @@ use Drupal\KernelTests\KernelTestBase;
  */
 class FileItemTest extends KernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['file', 'field', 'user'];
 
   /**
@@ -48,7 +51,7 @@ class FileItemTest extends KernelTestBase {
     $fileUri = $file->getFileUri();
 
     // Confirm there are only two forward slashes.
-    $this->assertStringStartsNotWith('public:///', $fileUri);
+    $this->assertStringStartsWith('public://', $fileUri);
   }
 
 }
