@@ -51,10 +51,35 @@ class ModuleHandlerTest extends UnitTestCase {
    * @return \Drupal\Core\Extension\ModuleHandler
    *   The module handler to test.
    */
-  protected function getModuleHandler($implementations = []) {
-    $module_handler = new ModuleHandler($this->root, [], $this->eventDispatcher, $implementations);
-    $module_handler->addModule('module_handler_test', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test');
-    return $module_handler;
+   protected function getModuleHandler($modules = [], $implementations = []) {
+    // This only works if there's a single $hook but oh well. Let's discuss if there's multiple.
+    if ($modules && $implementations) {
+      $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+      foreach ($implementations as $hook => $data) {
+        foreach ($data as $class => $classData) {
+          foreach ($classData as $method => $module) {
+            $listeners[] = [new $class([]), $method];
+          }
+        }
+      }
+
+      $eventDispatcher->expects($this->once())
+        ->method('getListeners')
+        ->with("drupal_hook.$hook")
+        ->willReturn($listeners);
+    }
+    $modules['module_handler_test'] = 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test';
+    $moduleList = [];
+    foreach ($modules as $module => $path) {
+      $moduleList[$module] = [
+        'type' => 'module',
+        'pathname' => "$path/$module.info.yml",
+        'filename' => "$module.module",
+      ];
+    }
+    $moduleHandler = new ModuleHandler($this->root, $moduleList, $eventDispatcher, $implementations);
+    $moduleHandler->loadAll();
+    return $moduleHandler;
   }
 
   /**
@@ -63,11 +88,13 @@ class ModuleHandlerTest extends UnitTestCase {
    * @covers ::load
    */
   public function testLoadModule(): void {
-    $module_handler = $this->getModuleHandler();
+    $moduleList = [
+      'module_handler_test_added' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_added',
+    ];
+    $module_handler = $this->getModuleHandler($moduleList);
     $this->assertTrue($module_handler->load('module_handler_test'));
     $this->assertTrue(function_exists('module_handler_test_hook'));
 
-    $module_handler->addModule('module_handler_test_added', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_added');
     $this->assertTrue($module_handler->load('module_handler_test_added'));
     $this->assertTrue(function_exists('module_handler_test_added_helper'), 'Function exists after being loaded.');
     $this->assertTrue($module_handler->load('module_handler_test_added'));
@@ -81,9 +108,11 @@ class ModuleHandlerTest extends UnitTestCase {
    * @covers ::loadAll
    */
   public function testLoadAllModules(): void {
-    $module_handler = $this->getModuleHandler();
-    $module_handler->addModule('module_handler_test_all1', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1');
-    $module_handler->addModule('module_handler_test_all2', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2');
+    $moduleList = [
+      'module_handler_test_all1' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1',
+      'module_handler_test_all2' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2',
+    ];
+    $module_handler = $this->getModuleHandler($moduleList);
     $module_handler->loadAll();
     $this->assertTrue(function_exists('module_handler_test_all1_hook'), 'Function exists after being loaded.');
     $this->assertTrue(function_exists('module_handler_test_all2_hook'), 'Function exists after being loaded.');
@@ -311,14 +340,14 @@ class ModuleHandlerTest extends UnitTestCase {
    */
   public function testImplementsHookModuleEnabled(): void {
     $implementations['hook'][ProceduralCall::class]['module_handler_test_hook'] = 'module_handler_test';
-    $module_handler = $this->getModuleHandler($implementations);
+    $moduleList = [
+      'module_handler_test_added' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_added',
+      'module_handler_test_no_hook' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_no_hook',
+    ];
+    $module_handler = $this->getModuleHandler($moduleList, $implementations);
 
     $this->assertTrue($module_handler->hasImplementations('hook', 'module_handler_test'), 'Installed module implementation found.');
-
-    $module_handler->addModule('module_handler_test_added', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_added');
     $this->assertTrue($module_handler->hasImplementations('hook', 'module_handler_test_added'), 'Runtime added module with implementation in include found.');
-
-    $module_handler->addModule('module_handler_test_no_hook', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_no_hook');
     $this->assertFalse($module_handler->hasImplementations('hook', 'module_handler_test_no_hook'), 'Missing implementation not found.');
   }
 
@@ -328,9 +357,14 @@ class ModuleHandlerTest extends UnitTestCase {
    * @covers ::invokeAll
    */
   public function testInvokeAll(): void {
-    $module_handler = $this->getModuleHandler();
-    $module_handler->addModule('module_handler_test_all1', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1');
-    $module_handler->addModule('module_handler_test_all2', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2');
+    $implementations['hook'][ProceduralCall::class]['module_handler_test_hook'] = 'module_handler_test';
+    $implementations['hook'][ProceduralCall::class]['module_handler_test_all1_hook'] = 'module_handler_test_all1';
+    $implementations['hook'][ProceduralCall::class]['module_handler_test_all2_hook'] = 'module_handler_test_all2';
+    $moduleList = [
+      'module_handler_test_all1' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1',
+      'module_handler_test_all2' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2',
+    ];
+    $module_handler = $this->getModuleHandler($moduleList, $implementations);
     $this->assertEquals([TRUE, TRUE, TRUE], $module_handler->invokeAll('hook', [TRUE]));
   }
 
@@ -349,7 +383,7 @@ class ModuleHandlerTest extends UnitTestCase {
 
     };
     $implementations['some_hook'][get_class($c)]['some_method'] = 'some_module';
-    $module_handler = $this->getModuleHandler($implementations);
+    $module_handler = $this->getModuleHandler([], $implementations);
     $module_handler->setModuleList(['some_module' => TRUE]);
     $r = new \ReflectionObject($module_handler);
 
@@ -376,10 +410,15 @@ class ModuleHandlerTest extends UnitTestCase {
    * @covers ::getModuleDirectories
    */
   public function testGetModuleDirectories(): void {
-    $module_handler = $this->getModuleHandler();
-    $module_handler->setModuleList([]);
-    $module_handler->addModule('node', 'core/modules/node');
-    $this->assertEquals(['node' => $this->root . '/core/modules/node'], $module_handler->getModuleDirectories());
+    $moduleList = [
+      'node' => 'core/modules/node',
+    ];
+    $module_handler = $this->getModuleHandler($moduleList);
+    $ModuleDirectories = [
+      'node' => $this->root . '/core/modules/node',
+      'module_handler_test' => $this->root . '/core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test',
+    ];
+    $this->assertEquals($ModuleDirectories, $module_handler->getModuleDirectories());
   }
 
   /**
