@@ -25,6 +25,7 @@ class FileItemTest extends KernelTestBase {
 
   public function testGenerateSampleValues(): void {
     $definition = $this->createMock(FieldDefinitionInterface::class);
+    // Create a definition that does not include a file directory.
     $definition->expects($this->any())
       ->method('getSettings')
       ->willReturn([
