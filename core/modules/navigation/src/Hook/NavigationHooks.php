@@ -2,19 +2,44 @@
 
 namespace Drupal\navigation\Hook;
 
-use Drupal\navigation\RenderCallbacks;
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
 use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
+use Drupal\navigation\RenderCallbacks;
 
 /**
  * Hook implementations for navigation.
  */
 class NavigationHooks {
+
+  use StringTranslationTrait;
+
+  /**
+   * NavigationHooks constructor.
+   *
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
+   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   *   The current user.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
+   *   The route match.
+   * @param \Drupal\navigation\NavigationRenderer $navigationRenderer
+   *   The navigation renderer.
+   */
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected AccountInterface $currentUser,
+    protected RouteMatchInterface $routeMatch,
+    protected NavigationRenderer $navigationRenderer,
+  ) {
+  }
 
   /**
    * Implements hook_help().
@@ -24,18 +49,18 @@ class NavigationHooks {
     switch ($route_name) {
       case 'help.page.navigation':
         $output = '';
-        $output .= '<h3>' . t('About') . '</h3>';
-        $output .= '<p>' . t('The Navigation module provides a left-aligned, collapsible, vertical sidebar navigation.') . '</p>';
-        $output .= '<p>' . t('For more information, see the <a href=":docs">online documentation for the Navigation module</a>.', [':docs' => 'https://www.drupal.org/project/navigation']) . '</p>';
+        $output .= '<h3>' . $this->t('About') . '</h3>';
+        $output .= '<p>' . $this->t('The Navigation module provides a left-aligned, collapsible, vertical sidebar navigation.') . '</p>';
+        $output .= '<p>' . $this->t('For more information, see the <a href=":docs">online documentation for the Navigation module</a>.', [':docs' => 'https://www.drupal.org/project/navigation']) . '</p>';
         return $output;
     }
     $configuration_route = 'layout_builder.navigation.';
     if (!$route_match->getRouteObject()->getOption('_layout_builder') || !str_starts_with($route_name, $configuration_route)) {
-      return \Drupal::moduleHandler()->invoke('layout_builder', 'help', [$route_name, $route_match]);
+      return $this->moduleHandler->invoke('layout_builder', 'help', [$route_name, $route_match]);
     }
     if (str_starts_with($route_name, $configuration_route)) {
-      $output = '<p>' . t('This layout builder tool allows you to configure the blocks in the navigation toolbar.') . '</p>';
-      $output .= '<p>' . t('Forms and links inside the content of the layout builder tool have been disabled.') . '</p>';
+      $output = '<p>' . $this->t('This layout builder tool allows you to configure the blocks in the navigation toolbar.') . '</p>';
+      $output .= '<p>' . $this->t('Forms and links inside the content of the layout builder tool have been disabled.') . '</p>';
       return $output;
     }
   }
@@ -45,13 +70,13 @@ class NavigationHooks {
    */
   #[Hook('page_top')]
   public function pageTop(array &$page_top): void {
-    if (!\Drupal::currentUser()->hasPermission('access navigation')) {
+    if (!$this->currentUser->hasPermission('access navigation')) {
       return;
     }
     $navigation_renderer = \Drupal::service('navigation.renderer');
     assert($navigation_renderer instanceof NavigationRenderer);
     $navigation_renderer->removeToolbar($page_top);
-    if (\Drupal::routeMatch()->getRouteName() !== 'layout_builder.navigation.view') {
+    if ($this->routeMatch->getRouteName() !== 'layout_builder.navigation.view') {
       // Don't render the admin toolbar if in layout edit mode.
       $navigation_renderer->buildNavigation($page_top);
       $navigation_renderer->buildTopBar($page_top);
@@ -118,9 +143,7 @@ class NavigationHooks {
    */
   #[Hook('block_build_local_tasks_block_alter')]
   public function blockBuildLocalTasksBlockAlter(array &$build, BlockPluginInterface $block): void {
-    $navigation_renderer = \Drupal::service('navigation.renderer');
-    assert($navigation_renderer instanceof NavigationRenderer);
-    $navigation_renderer->removeLocalTasks($build, $block);
+    $this->navigationRenderer->removeLocalTasks($build, $block);
   }
 
   /**
@@ -184,6 +207,25 @@ class NavigationHooks {
   public function elementInfoAlter(array &$info): void {
     if (array_key_exists('layout_builder', $info)) {
       $info['layout_builder']['#pre_render'][] = [RenderCallbacks::class, 'alterLayoutBuilder'];
+    }
+  }
+
+  /**
+   * Implements hook_modules_installed().
+   */
+  #[Hook('modules_installed')]
+  public function modulesInstalled($modules): void {
+    foreach ($modules as $module) {
+      $blocks = $this->moduleHandler->invoke($module, 'navigation_defaults');
+
+      if (!is_array($blocks)) {
+        return;
+      }
+
+      $manager = \Drupal::service('plugin.manager.config_action');
+      foreach ($blocks as $block) {
+        $manager->applyAction('addNavigationBlock', 'navigation.block_layout', $block);
+      }
     }
   }
 

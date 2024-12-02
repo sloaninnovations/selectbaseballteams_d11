@@ -6,6 +6,17 @@
  */
 
 /**
+ * Implements hook_install().
+ */
+function navigation_install(): void {
+  $blocks = \Drupal::moduleHandler()->invokeAll('navigation_defaults');
+  $manager = \Drupal::service('plugin.manager.config_action');
+  foreach ($blocks as $block) {
+    $manager->applyAction('addNavigationBlock', 'navigation.block_layout', $block);
+  }
+}
+
+/**
  * Implements hook_requirements().
  */
 function navigation_requirements($phase) {
