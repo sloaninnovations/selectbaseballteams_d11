@@ -395,16 +395,7 @@ class UserTest extends ResourceTestBase {
   public function testGetMailFieldOnlyVisibleToOwner(): void {
     // Create user B, with the same roles (and hence permissions) as user A.
     $user_a = $this->account;
-    $pass = \Drupal::service('password_generator')->generate();
-    $user_b = User::create([
-      'name' => 'sibling-of-' . $user_a->getAccountName(),
-      'mail' => 'sibling-of-' . $user_a->getAccountName() . '@example.com',
-      'pass' => $pass,
-      'status' => 1,
-      'roles' => $user_a->getRoles(),
-    ]);
-    $user_b->save();
-    $user_b->passRaw = $pass;
+    $user_b = $this->createUser([],'sibling-of-' . $user_a->getAccountName(), null, ['roles' => $user_a->getRoles()]);
 
     // Grant permission to role that both users use.
     $this->grantPermissionsToTestedRole(['access user profiles']);
