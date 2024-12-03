@@ -47,7 +47,7 @@ class EntityAccessControlHandlerTest extends EntityLanguageTestBase {
       $access_result = !isset($result) ? 'null' : ($result ? 'true' : 'false');
       $message = "Entity access returns $access_result with operation '$op'.";
 
-      $this->assertEquals($object->access($op, $account), $result, (string) $message);
+      $this->assertEquals($object->access($op, $account), $result, $message);
     }
   }
 
