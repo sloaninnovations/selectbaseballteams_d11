@@ -90,8 +90,8 @@
 }
 .top-bar__context ul .context-title {
   overflow: hidden;
-  white-space: nowrap;
   max-width: 40ch; /* Approximate character length for larger screens */
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 .top-bar__context ul .context-status {
