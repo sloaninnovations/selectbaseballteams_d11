@@ -23,6 +23,25 @@ class ModuleUpdateRequirementsHooks {
         'description' => t("Update Error."),
         'severity' => REQUIREMENT_ERROR,
       ],
+      'test.update.error.alter' => [
+        'title' => t('UpdateError'),
+        'value' => t('None'),
+        'description' => t("Update Error."),
+        'severity' => REQUIREMENT_ERROR,
+      ],
+    ];
+  }
+
+  /**
+   * Implements hook_update_requirements_alter().
+   */
+  #[Hook('update_requirements_alter')]
+  public function updateRequirementsAlter(array &$requirements): void {
+    $requirements['test.update.error.alter'] = [
+      'title' => t('UpdateWarning'),
+      'value' => t('None'),
+      'description' => t("Update Warning."),
+      'severity' => REQUIREMENT_WARNING,
     ];
   }
 
