@@ -233,7 +233,7 @@ class ConfigImporterTest extends KernelTestBase {
 
     $logs = $config_importer->getErrors();
     $this->assertCount(1, $logs);
-    $this->assertEquals(sprintf('Deleted and replaced configuration entity "%s"', $name_secondary), $logs[0]);
+    $this->assertEquals('Deleted and replaced configuration entity "' . $name_secondary . '"', $logs[0]);
   }
 
   /**
@@ -363,7 +363,7 @@ class ConfigImporterTest extends KernelTestBase {
 
     $logs = $config_importer->getErrors();
     $this->assertCount(1, $logs);
-    $this->assertEquals(sprintf('Update target "%s" is missing.', $name_dependent), $logs[0]);
+    $this->assertEquals('Update target "' . $name_dependent . '" is missing.', $logs[0]);
   }
 
   /**

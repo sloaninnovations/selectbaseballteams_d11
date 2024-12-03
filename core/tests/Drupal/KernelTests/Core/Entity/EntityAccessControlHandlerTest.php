@@ -45,7 +45,7 @@ class EntityAccessControlHandlerTest extends EntityLanguageTestBase {
   public function assertEntityAccess(array $ops, AccessibleInterface $object, ?AccountInterface $account = NULL): void {
     foreach ($ops as $op => $result) {
       $access_result = !isset($result) ? 'null' : ($result ? 'true' : 'false');
-      $message = sprintf("Entity access returns %s with operation '%s'.", $access_result, $op);
+      $message = "Entity access returns $access_result with operation '$op'.";
 
       $this->assertEquals($object->access($op, $account), $result, (string) $message);
     }

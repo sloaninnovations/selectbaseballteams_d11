@@ -86,7 +86,7 @@ class UniqueFieldConstraintTest extends KernelTestBase {
     /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
     $violations = $entity->get('name')->validate();
 
-    $message = sprintf('A %s with Name %s already exists.', $entity->getEntityType()->getSingularLabel(), HTML::escape($value));
+    $message = 'A ' . $entity->getEntityType()->getSingularLabel() . ' with Name ' . HTML::escape($value) . ' already exists.';
 
     // Check that the validation has created the appropriate violation.
     $this->assertCount(1, $violations);
@@ -136,7 +136,7 @@ class UniqueFieldConstraintTest extends KernelTestBase {
     /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
     $violations = $entity->get('name')->validate();
 
-    $message = sprintf('A %s with Name A totally unique entity name already exists.', $entity->getEntityType()->getSingularLabel());
+    $message = 'A ' . $entity->getEntityType()->getSingularLabel() . ' with Name A totally unique entity name already exists.';
 
     // Check that the validation has created the appropriate violation.
     $this->assertCount(1, $violations);
