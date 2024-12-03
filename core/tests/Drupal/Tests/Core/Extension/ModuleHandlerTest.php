@@ -51,7 +51,7 @@ class ModuleHandlerTest extends UnitTestCase {
    * @return \Drupal\Core\Extension\ModuleHandler
    *   The module handler to test.
    */
-   protected function getModuleHandler($modules = [], $implementations = [], $loadAll = TRUE) {
+  protected function getModuleHandler($modules = [], $implementations = [], $loadAll = TRUE) {
     // This only works if there's a single $hook but oh well. Let's discuss if there's multiple.
     if ($implementations) {
       $listeners = array_map(fn ($function) => [new ProceduralCall([]), $function], array_keys($implementations));
@@ -134,19 +134,13 @@ class ModuleHandlerTest extends UnitTestCase {
       ->onlyMethods(['load'])
       ->getMock();
     $calls = [
-      // First reload.
       'module_handler_test',
-      // Second reload.
-      'module_handler_test',
-      'module_handler_test_added',
     ];
-    $module_handler->expects($this->exactly(count($calls)))
+    $module_handler->expects($this->once())
       ->method('load')
       ->with($this->callback(function (string $module) use (&$calls): bool {
         return $module === array_shift($calls);
       }));
-    $module_handler->reload();
-    $module_handler->addModule('module_handler_test_added', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_added');
     $module_handler->reload();
   }
 
@@ -222,9 +216,11 @@ class ModuleHandlerTest extends UnitTestCase {
    *
    * @covers ::addModule
    * @covers ::add
+   *
+   * @group legacy
    */
   public function testAddModule(): void {
-
+    $this->expectDeprecation('ModuleHandler::addModule($name, $path) is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3491200');
     $module_handler = $this->getMockBuilder(ModuleHandler::class)
       ->setConstructorArgs([
         $this->root, [], $this->eventDispatcher, [],
@@ -244,9 +240,11 @@ class ModuleHandlerTest extends UnitTestCase {
    *
    * @covers ::addProfile
    * @covers ::add
+   *
+   * @group legacy
    */
   public function testAddProfile(): void {
-
+    $this->expectDeprecation('ModuleHandler::addProfile($name, $path) is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3491200');
     $module_handler = $this->getMockBuilder(ModuleHandler::class)
       ->setConstructorArgs([
         $this->root, [], $this->eventDispatcher, [],
@@ -411,11 +409,11 @@ class ModuleHandlerTest extends UnitTestCase {
       'node' => 'core/modules/node',
     ];
     $module_handler = $this->getModuleHandler($moduleList);
-    $ModuleDirectories = [
+    $moduleDirectories = [
       'node' => $this->root . '/core/modules/node',
       'module_handler_test' => $this->root . '/core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test',
     ];
-    $this->assertEquals($ModuleDirectories, $module_handler->getModuleDirectories());
+    $this->assertEquals($moduleDirectories, $module_handler->getModuleDirectories());
   }
 
   /**
