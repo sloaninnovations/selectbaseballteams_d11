@@ -89,17 +89,10 @@
       border-radius: var(--admin-toolbar-space-8);
     }
     .context-title {
-      white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
+      white-space: nowrap;
       max-width: 40ch; /* Approximate character length for larger screens */
-    }
-
-    /* Smaller devices: Truncate to 20 characters */
-    @media (max-width: 600px) {
-      .context-title {
-        max-width: 20ch;
-      }
+      text-overflow: ellipsis;
     }
 
     .context-status {
@@ -108,6 +101,13 @@
 
     .published {
       background-color: var(--admin-topbar-color-green);
+    }
+
+    /* Smaller devices: Truncate to 20 characters */
+    @media (max-width: 600px) {
+      .context-title {
+        max-width: 20ch;
+      }
     }
   }
 }
