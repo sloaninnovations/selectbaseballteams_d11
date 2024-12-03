@@ -145,18 +145,7 @@ class TimestampFormatterTest extends KernelTestBase {
    * Tests TimestampAgoFormatter.
    */
   public function testTimestampAgoFormatter(): void {
-    $data = [];
-
-    foreach ([1, 2, 3, 4, 5, 6, 7] as $granularity) {
-      $data[] = [
-        'future_format' => '@interval hence',
-        'past_format' => '@interval ago',
-        'granularity' => $granularity,
-      ];
-    }
-
-    foreach ($data as $settings) {
-      $granularity = $settings['granularity'];
+    foreach (range(1, 7) as $granularity) {
       $request_time = \Drupal::requestStack()->getCurrentRequest()->server->get('REQUEST_TIME');
 
       // Test a timestamp in the past
@@ -166,7 +155,7 @@ class TimestampFormatterTest extends KernelTestBase {
 
       $component = $this->display->getComponent($this->fieldName);
       $component['type'] = 'timestamp_ago';
-      $component['settings'] = $settings;
+      $component['settings'] = ['granularity' => $granularity];
       $this->display->setComponent($this->fieldName, $component);
 
       $entity = EntityTest::create([]);
@@ -182,7 +171,7 @@ class TimestampFormatterTest extends KernelTestBase {
 
       $component = $this->display->getComponent($this->fieldName);
       $component['type'] = 'timestamp_ago';
-      $component['settings'] = $settings;
+      $component['settings'] = ['granularity' => $granularity];
       $this->display->setComponent($this->fieldName, $component);
 
       $entity = EntityTest::create([]);
