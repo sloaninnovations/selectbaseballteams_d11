@@ -13,8 +13,6 @@ class ModuleRuntimeRequirementsHooks {
 
   /**
    * Implements hook_runtime_requirements().
-   *
-   * Manipulate module dependencies to test dependency chains.
    */
   #[Hook('runtime_requirements')]
   public function runtimeRequirements(): array {
