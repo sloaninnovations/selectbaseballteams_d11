@@ -67,6 +67,15 @@ class Type extends StringArgument {
     return $this->node_type($this->argument);
   }
 
+  /**
+   * Loads and returns the label of a node type.
+   *
+   * @param string $type_name
+   *   The machine name of the node type.
+   *
+   * @return string
+   *   The label of the node type, or a placeholder if not found.
+   */
   public function node_type($type_name) {
     $type = $this->nodeTypeStorage->load($type_name);
     $output = $type ? $type->label() : $this->t('Unknown content type');

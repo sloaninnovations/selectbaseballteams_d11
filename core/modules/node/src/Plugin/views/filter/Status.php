@@ -14,14 +14,31 @@ use Drupal\views\Plugin\views\filter\FilterPluginBase;
 #[ViewsFilter("node_status")]
 class Status extends FilterPluginBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function adminSummary() {}
 
+  /**
+   * Defines the operator form for the filter.
+   *
+   * @param array $form
+   *   The form structure.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
   protected function operatorForm(&$form, FormStateInterface $form_state) {}
 
+  /**
+   * {@inheritdoc}
+   */
   public function canExpose() {
     return FALSE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     $table = $this->ensureMyTable();
     $snippet = "$table.status = 1 OR ($table.uid = ***CURRENT_USER*** AND ***CURRENT_USER*** <> 0 AND ***VIEW_OWN_UNPUBLISHED_NODES*** = 1) OR ***BYPASS_NODE_ACCESS*** = 1";

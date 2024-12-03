@@ -77,6 +77,15 @@ class Permissions extends ManyToOne {
     );
   }
 
+  /**
+   * Retrieves the options for filtering by permissions.
+   *
+   * Generates an array of permissions and their corresponding module names
+   * to be used in the filter options.
+   *
+   * @return array
+   *   An associative array of permissions grouped by module name.
+   */
   public function getValueOptions() {
     if (!isset($this->valueOptions)) {
       $permissions = $this->permissionHandler->getPermissions();

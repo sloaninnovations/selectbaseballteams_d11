@@ -14,10 +14,24 @@ use Drupal\views\Plugin\views\filter\FilterPluginBase;
 #[ViewsFilter("node_access")]
 class Access extends FilterPluginBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function adminSummary() {}
 
+  /**
+   * Defines the operator form for the filter.
+   *
+   * @param array $form
+   *   The form structure.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
   protected function operatorForm(&$form, FormStateInterface $form_state) {}
 
+  /**
+   * {@inheritdoc}
+   */
   public function canExpose() {
     return FALSE;
   }

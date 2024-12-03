@@ -56,11 +56,23 @@ class Rss extends RssPluginBase {
     return $options;
   }
 
+  /**
+   * Provides a title for the summary.
+   *
+   * @return string
+   *   The title of the summary option.
+   */
   public function summaryTitle() {
     $options = $this->buildOptionsForm_summary_options();
     return $options[$this->options['view_mode']];
   }
 
+  /**
+   * Prepares nodes for rendering.
+   *
+   * @param array $values
+   *   The values to pre-render.
+   */
   public function preRender($values) {
     $nids = [];
     foreach ($values as $row) {
@@ -71,6 +83,15 @@ class Rss extends RssPluginBase {
     }
   }
 
+  /**
+   * Renders a single RSS item.
+   *
+   * @param object $row
+   *   A row object representing a node.
+   *
+   * @return array|null
+   *   A render array for the RSS item or NULL if the node ID is invalid.
+   */
   public function render($row) {
     global $base_url;
 
