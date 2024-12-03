@@ -8,6 +8,8 @@ use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Tests Update Requirements Hook.
+ *
+ * @group Hooks
  */
 class UpdateRequirementsTest extends KernelTestBase {
 
