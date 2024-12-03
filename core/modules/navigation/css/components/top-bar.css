@@ -87,7 +87,6 @@
 .top-bar__context ul li {
   padding: var(--admin-toolbar-space-4) var(--admin-toolbar-space-10);
   border-radius: var(--admin-toolbar-space-8);
-  background-color: var(--admin-topbar-color-gray);
 }
 .top-bar__context ul .context-title {
   white-space: nowrap;
@@ -100,6 +99,9 @@
   .top-bar__context ul .context-title {
     max-width: 20ch;
   }
+}
+.top-bar__context ul .context-status {
+  background-color: var(--admin-topbar-color-gray);
 }
 .top-bar__context ul .published {
   background-color: var(--admin-topbar-color-green);

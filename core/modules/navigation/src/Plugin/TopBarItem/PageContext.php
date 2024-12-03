@@ -12,8 +12,8 @@ use Drupal\navigation\Attribute\TopBarItem;
 use Drupal\navigation\TopBarItemBase;
 use Drupal\navigation\TopBarRegion;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\node\NodeInterface;
-
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 
 /**
  * Provides the Page Context top bar item.
@@ -70,11 +70,11 @@ final class PageContext extends TopBarItemBase implements ContainerFactoryPlugin
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager'),
-      $container->get('current_route_match')
+    $configuration,
+    $plugin_id,
+    $plugin_definition,
+    $container->get('entity_type.manager'),
+    $container->get('current_route_match')
     );
   }
 
@@ -83,30 +83,33 @@ final class PageContext extends TopBarItemBase implements ContainerFactoryPlugin
    */
   public function build(): array {
     $build = [];
-    $parameters = $this->routeMatch->getParameters();
 
-    // Focus on node entities.
-    if ($parameters->has('node') && ($node = $parameters->get('node')) instanceof NodeInterface) {
-      $title = $node->getTitle();
-      $status = $node->isPublished() ? 'Published' : 'Unpublished';
-      $status_class = $node->isPublished() ? 'published' : 'unpublished';
-
-      $items = [
+    foreach ($this->routeMatch->getParameters() as $parameter) {
+      if ($parameter instanceof EntityInterface) {
+        $title = $parameter->label();
+        $status = '';
+        $status_class = '';
+        if ($parameter instanceof EntityPublishedInterface) {
+          $status = $parameter->isPublished() ? 'Published' : 'Unpublished';
+          $status_class = $parameter->isPublished() ? 'published' : 'unpublished';
+        }
+        $items = [
         [
-          '#markup' => $title,
+          '#markup' => new TranslatableMarkup($title),
           '#wrapper_attributes' => ['class' => ['context-title']],
         ],
         [
-          '#markup' => $status,
+          '#markup' => new TranslatableMarkup($status),
           '#wrapper_attributes' => ['class' => ['context-status', $status_class]],
         ],
-      ];
-      $build = [
+        ];
+        $build = [
           '#theme' => 'item_list',
           '#items' => $items,
         ];
+      }
     }
-
     return $build;
   }
+
 }

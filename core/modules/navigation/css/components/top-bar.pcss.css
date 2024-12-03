@@ -87,7 +87,6 @@
     li {
       padding: var(--admin-toolbar-space-4) var(--admin-toolbar-space-10);
       border-radius: var(--admin-toolbar-space-8);
-      background-color: var(--admin-topbar-color-gray);
     }
     .context-title {
       white-space: nowrap;
@@ -101,6 +100,10 @@
       .context-title {
         max-width: 20ch;
       }
+    }
+
+    .context-status {
+      background-color: var(--admin-topbar-color-gray);
     }
 
     .published {
