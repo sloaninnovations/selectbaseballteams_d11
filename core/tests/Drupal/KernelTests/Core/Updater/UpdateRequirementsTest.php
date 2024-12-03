@@ -28,4 +28,21 @@ class UpdateRequirementsTest extends KernelTestBase {
     $this->assertEquals($testRequirements, $requirements);
   }
 
+  /**
+   * Tests hook_update_requirements_alter.
+   */
+  public function testUpdateRequirementsAlter(): void {
+    require_once 'core/includes/update.inc';
+
+    \Drupal::service('module_installer')->install(['module_update_requirements']);
+    $testRequirements = [
+      'title' => t('UpdateWarning'),
+      'value' => t('None'),
+      'description' => t("Update Warning."),
+      'severity' => REQUIREMENT_WARNING,
+    ];
+    $requirements = update_check_requirements()['test.update.error.alter'];
+    $this->assertEquals($testRequirements, $requirements);
+  }
+
 }
