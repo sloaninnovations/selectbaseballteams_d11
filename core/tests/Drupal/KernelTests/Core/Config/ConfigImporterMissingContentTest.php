@@ -194,7 +194,13 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
    * {@inheritdoc}
    */
   public function log($level, $message, array $context = []): void {
-    $this->logMessages[] = PlainTextOutput::renderFromHtml(strtr($message, $context));
+    if ($message === 'The "%plugin_id" block plugin was not found' && isset($context['%plugin_id'])) {
+      $this->logMessages[] = 'The "' . $context['%plugin_id'] . '" block plugin was not found';
+    }
+    else {
+      // Just log message.
+      $this->logMessages[] = $message;
+    }
   }
 
 }
