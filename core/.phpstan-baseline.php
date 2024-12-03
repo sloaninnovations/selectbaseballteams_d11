@@ -19286,31 +19286,31 @@ $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\FunctionalJavascript\\\\DefaultValueWidgetTest\\:\\:assertFieldDoesNotExistOnOverview\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionJavascript/DefaultValueWidgetTest',
+	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionalJavascript/DefaultValueWidgetTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\FunctionalJavascript\\\\DefaultValueWidgetTest\\:\\:assertFieldExistsOnOverview\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionJavascript/DefaultValueWidgetTest',
+	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionalJavascript/DefaultValueWidgetTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '##^Method Drupal\\\\Tests\\\\field_ui\\\\FunctionalJavascript\\\\DefaultValueWidgetTest\\:\\:fieldUIAddExistingField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionJavascript/DefaultValueWidgetTest',
+	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionalJavascript/DefaultValueWidgetTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\FunctionalJavascript\\\\DefaultValueWidgetTest\\:\\:fieldUIAddNewField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionJavascript/DefaultValueWidgetTest',
+	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionalJavascript/DefaultValueWidgetTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\FunctionalJavascript\\\\DefaultValueWidgetTest\\:\\:fieldUIDeleteField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionJavascript/DefaultValueWidgetTest',
+	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionalJavascript/DefaultValueWidgetTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -31666,13 +31666,13 @@ $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\options\\\\FunctionalJavascript\\\\OptionsFieldUIAllowedValuesTest\\:\\:assertFieldDoesNotExistOnOverview\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/options/tests/src/FunctionJavascript/OptionsFieldUIAllowedValuesTest.php',
+	'path' => __DIR__ . '/modules/options/tests/src/FunctionalJavascript/OptionsFieldUIAllowedValuesTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\options\\\\FunctionalJavascript\\\\OptionsFieldUIAllowedValuesTest\\:\\:assertFieldExistsOnOverview\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/options/tests/src/FunctionJavascript/OptionsFieldUIAllowedValuesTest.php',
+	'path' => __DIR__ . '/modules/options/tests/src/FunctionalJavascript/OptionsFieldUIAllowedValuesTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -31696,49 +31696,49 @@ $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '##^Method Drupal\\\\Tests\\\\options\\\\FunctionalJavascript\\\\OptionsFieldUIAllowedValuesTest\\:\\:fieldUIAddExistingField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/options/tests/src/FunctionJavascript/OptionsFieldUIAllowedValuesTest.php',
+	'path' => __DIR__ . '/modules/options/tests/src/FunctionalJavascript/OptionsFieldUIAllowedValuesTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\options\\\\FunctionalJavascript\\\\OptionsFieldUIAllowedValuesTest\\:\\:fieldUIAddNewField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/options/tests/src/FunctionJavascript/OptionsFieldUIAllowedValuesTest.php',
+	'path' => __DIR__ . '/modules/options/tests/src/FunctionalJavascript/OptionsFieldUIAllowedValuesTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\options\\\\FunctionalJavascript\\\\OptionsFieldUIAllowedValuesTest\\:\\:fieldUIDeleteField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/options/tests/src/FunctionJavascript/OptionsFieldUIAllowedValuesTest.php',
+	'path' => __DIR__ . '/modules/options/tests/src/FunctionalJavascript/OptionsFieldUIAllowedValuesTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\options\\\\FunctionalJavascript\\\\OptionsFieldUITest\\:\\:assertFieldDoesNotExistOnOverview\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/options/tests/src/FunctionJavascript/OptionsFieldUITest.php',
+	'path' => __DIR__ . '/modules/options/tests/src/FunctionalJavascript/OptionsFieldUITest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\options\\\\FunctionalJavascript\\\\OptionsFieldUITest\\:\\:assertFieldExistsOnOverview\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/options/tests/src/FunctionJavascript/OptionsFieldUITest.php',
+	'path' => __DIR__ . '/modules/options/tests/src/FunctionalJavascript/OptionsFieldUITest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '##^Method Drupal\\\\Tests\\\\options\\\\FunctionalJavascript\\\\OptionsFieldUITest\\:\\:fieldUIAddExistingField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/options/tests/src/FunctionJavascript/OptionsFieldUITest.php',
+	'path' => __DIR__ . '/modules/options/tests/src/FunctionalJavascript/OptionsFieldUITest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\options\\\\FunctionalJavascript\\\\OptionsFieldUITest\\:\\:fieldUIAddNewField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/options/tests/src/FunctionJavascript/OptionsFieldUITest.php',
+	'path' => __DIR__ . '/modules/options/tests/src/FunctionalJavascript/OptionsFieldUITest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\options\\\\FunctionalJavascript\\\\OptionsFieldUITest\\:\\:fieldUIDeleteField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/options/tests/src/FunctionJavascript/OptionsFieldUITest.php',
+	'path' => __DIR__ . '/modules/options/tests/src/FunctionalJavascript/OptionsFieldUITest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -32566,31 +32566,31 @@ $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\FunctionalJavascript\\\\ResponsiveImageFieldUiTest\\:\\:assertFieldDoesNotExistOnOverview\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/FunctionJavascript/ResponsiveImageFieldUiTest.php',
+	'path' => __DIR__ . '/modules/responsive_image/tests/src/FunctionalJavascript/ResponsiveImageFieldUiTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\FunctionalJavascript\\\\ResponsiveImageFieldUiTest\\:\\:assertFieldExistsOnOverview\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/FunctionJavascript/ResponsiveImageFieldUiTest.php',
+	'path' => __DIR__ . '/modules/responsive_image/tests/src/FunctionalJavascript/ResponsiveImageFieldUiTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '##^Method Drupal\\\\Tests\\\\responsive_image\\\\FunctionalJavascript\\\\ResponsiveImageFieldUiTest\\:\\:fieldUIAddExistingField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/FunctionJavascript/ResponsiveImageFieldUiTest.php',
+	'path' => __DIR__ . '/modules/responsive_image/tests/src/FunctionalJavascript/ResponsiveImageFieldUiTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\FunctionalJavascript\\\\ResponsiveImageFieldUiTest\\:\\:fieldUIAddNewField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/FunctionJavascript/ResponsiveImageFieldUiTestt.php',
+	'path' => __DIR__ . '/modules/responsive_image/tests/src/FunctionalJavascript/ResponsiveImageFieldUiTestt.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\FunctionalJavascript\\\\ResponsiveImageFieldUiTest\\:\\:fieldUIDeleteField\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/FunctionJavascript/ResponsiveImageFieldUiTest.php',
+	'path' => __DIR__ . '/modules/responsive_image/tests/src/FunctionalJavascript/ResponsiveImageFieldUiTest.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
