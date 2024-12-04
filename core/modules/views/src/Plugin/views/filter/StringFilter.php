@@ -65,6 +65,9 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -219,6 +222,12 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
     return $options;
   }
 
+  /**
+   * Provides an admin summary of the filter.
+   *
+   * @return string
+   *   A string summary of the filter configuration.
+   */
   public function adminSummary() {
     if ($this->isAGroup()) {
       return $this->t('grouped');
@@ -238,6 +247,15 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
     return $output;
   }
 
+  /**
+   * Returns the operator values.
+   *
+   * @param int $values
+   *   The number of values for the operator.
+   *
+   * @return array
+   *   The operator values.
+   */
   protected function operatorValues($values = 1) {
     $options = [];
     foreach ($this->operators() as $id => $info) {
@@ -357,11 +375,23 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
     $this->query->addWhere($this->options['group'], $field, $this->value, $this->operator());
   }
 
+  /**
+   * Adds a where clause for the operation, 'contains'.
+   *
+   * @param string $field
+   *   The database field to filter.
+   */
   protected function opContains($field) {
     $operator = $this->getConditionOperator('LIKE');
     $this->query->addWhere($this->options['group'], $field, '%' . $this->connection->escapeLike($this->value) . '%', $operator);
   }
 
+  /**
+   * Adds a where clause for the operation, 'contains any word'.
+   *
+   * @param string $field
+   *   The database field to filter.
+   */
   protected function opContainsWord($field) {
     $where = $this->operator == 'word' ? $this->query->getConnection()->condition('OR') : $this->query->getConnection()->condition('AND');
 
@@ -374,7 +404,7 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
     $operator = $this->getConditionOperator('LIKE');
     foreach ($matches as $match) {
       $phrase = FALSE;
-      // Strip off phrase quotes
+      // Strip off phrase quotes.
       if ($match[2][0] == '"') {
         $match[2] = substr($match[2], 1, -1);
         $phrase = TRUE;
@@ -395,31 +425,67 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
     $this->query->addWhere($this->options['group'], $where);
   }
 
+  /**
+   * Adds a where clause for the operation, 'starts with'.
+   *
+   * @param string $field
+   *   The database field to filter.
+   */
   protected function opStartsWith($field) {
     $operator = $this->getConditionOperator('LIKE');
     $this->query->addWhere($this->options['group'], $field, $this->connection->escapeLike($this->value) . '%', $operator);
   }
 
+  /**
+   * Adds a where clause for the operation, 'not starts with'.
+   *
+   * @param string $field
+   *   The database field to filter.
+   */
   protected function opNotStartsWith($field) {
     $operator = $this->getConditionOperator('NOT LIKE');
     $this->query->addWhere($this->options['group'], $field, $this->connection->escapeLike($this->value) . '%', $operator);
   }
 
+  /**
+   * Adds a where clause for the operation, 'ends with'.
+   *
+   * @param string $field
+   *   The database field to filter.
+   */
   protected function opEndsWith($field) {
     $operator = $this->getConditionOperator('LIKE');
     $this->query->addWhere($this->options['group'], $field, '%' . $this->connection->escapeLike($this->value), $operator);
   }
 
+  /**
+   * Adds a where clause for the operation, 'not ends with'.
+   *
+   * @param string $field
+   *   The database field to filter.
+   */
   protected function opNotEndsWith($field) {
     $operator = $this->getConditionOperator('NOT LIKE');
     $this->query->addWhere($this->options['group'], $field, '%' . $this->connection->escapeLike($this->value), $operator);
   }
 
+  /**
+   * Adds a where clause for the operation, 'not like'.
+   *
+   * @param string $field
+   *   The database field to filter.
+   */
   protected function opNotLike($field) {
     $operator = $this->getConditionOperator('NOT LIKE');
     $this->query->addWhere($this->options['group'], $field, '%' . $this->connection->escapeLike($this->value) . '%', $operator);
   }
 
+  /**
+   * Adds a where clause for the operation, 'shorter than'.
+   *
+   * @param string $field
+   *   The database field to filter.
+   */
   protected function opShorterThan($field) {
     $placeholder = $this->placeholder();
     // Type cast the argument to an integer because the SQLite database driver
@@ -427,6 +493,12 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
     $this->query->addWhereExpression($this->options['group'], "LENGTH($field) < $placeholder", [$placeholder => (int) $this->value]);
   }
 
+  /**
+   * Adds a where clause for the operation, 'longer than'.
+   *
+   * @param string $field
+   *   The database field to filter.
+   */
   protected function opLongerThan($field) {
     $placeholder = $this->placeholder();
     // Type cast the argument to an integer because the SQLite database driver
@@ -454,6 +526,12 @@ class StringFilter extends FilterPluginBase implements FilterOperatorsInterface 
     $this->query->addWhere($this->options['group'], $field, $this->value, 'NOT REGEXP');
   }
 
+  /**
+   * Adds a where clause for the operation, 'empty'.
+   *
+   * @param string $field
+   *   The database field to filter.
+   */
   protected function opEmpty($field) {
     if ($this->operator == 'empty') {
       $operator = "IS NULL";

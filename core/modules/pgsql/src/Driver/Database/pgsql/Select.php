@@ -14,6 +14,15 @@ use Drupal\Core\Database\Query\Select as QuerySelect;
  */
 class Select extends QuerySelect {
 
+  /**
+   * Orders the query results randomly.
+   *
+   * This method adds a random field expression to the query and orders
+   * the results by that field.
+   *
+   * @return $this
+   *   The called object for chaining.
+   */
   public function orderRandom() {
     $alias = $this->addExpression('RANDOM()', 'random_field');
     $this->orderBy($alias);

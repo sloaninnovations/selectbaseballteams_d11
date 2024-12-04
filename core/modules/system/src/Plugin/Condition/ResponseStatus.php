@@ -39,7 +39,7 @@ class ResponseStatus extends ConditionPluginBase implements ContainerFactoryPlug
   }
 
   /**
-   *  Sets the request stack.
+   * Sets the request stack.
    */
   public function setRequestStack(RequestStack $requestStack): void {
     $this->requestStack = $requestStack;

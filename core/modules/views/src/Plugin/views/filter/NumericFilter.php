@@ -15,6 +15,9 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
 
   protected $alwaysMultiple = TRUE;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -189,6 +192,15 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
     return $options;
   }
 
+  /**
+   * Retrieves operator values based on the specified value count.
+   *
+   * @param int $values
+   *   The number of values the operators should accept. Defaults to 1.
+   *
+   * @return array
+   *   An array of operator IDs that match the specified value count.
+   */
   protected function operatorValues($values = 1) {
     $options = [];
     foreach ($this->operators() as $id => $info) {
@@ -330,6 +342,9 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     $this->ensureMyTable();
     $field = "$this->tableAlias.$this->realField";
@@ -361,10 +376,22 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
     }
   }
 
+  /**
+   * Applies a simple condition to the query based on the operator and value.
+   *
+   * @param string $field
+   *   The field to which the condition is applied.
+   */
   protected function opSimple($field) {
     $this->query->addWhere($this->options['group'], $field, $this->value['value'], $this->operator);
   }
 
+  /**
+   * Filters by the empty operator (IS NULL or IS NOT NULL).
+   *
+   * @param string $field
+   *   The field to apply the filter on.
+   */
   protected function opEmpty($field) {
     if ($this->operator == 'empty') {
       $operator = "IS NULL";
@@ -396,6 +423,12 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
     $this->query->addWhere($this->options['group'], $field, $this->value['value'], 'NOT REGEXP');
   }
 
+  /**
+   * Provides a summary of the filter configuration for the admin interface.
+   *
+   * @return string
+   *   The filter configuration summary.
+   */
   public function adminSummary() {
     if ($this->isAGroup()) {
       return $this->t('grouped');

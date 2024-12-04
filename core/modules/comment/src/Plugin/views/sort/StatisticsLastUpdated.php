@@ -25,6 +25,12 @@ class StatisticsLastUpdated extends Date {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected string $field_alias;
 
+  /**
+   * {@inheritdoc}
+   *
+   * Adds an order by condition to the query based on the newer of the node's
+   * last update time and the last comment timestamp.
+   */
   public function query() {
     $this->ensureMyTable();
     $this->node_table = $this->query->ensureTable('node', $this->relationship);

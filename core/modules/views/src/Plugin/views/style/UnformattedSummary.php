@@ -20,6 +20,14 @@ use Drupal\views\Attribute\ViewsStyle;
 )]
 class UnformattedSummary extends DefaultSummary {
 
+  /**
+   * {@inheritdoc}
+   *
+   * Defines additional style options for the unformatted summary plugin.
+   *
+   * @return array
+   *   An array of options with default values.
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['inline'] = ['default' => FALSE];
@@ -27,6 +35,16 @@ class UnformattedSummary extends DefaultSummary {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * Builds the options form for the unformatted summary style plugin.
+   *
+   * @param array $form
+   *   The form structure to be built.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
     $form['inline'] = [

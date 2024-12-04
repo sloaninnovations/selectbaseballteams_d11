@@ -151,6 +151,9 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -913,7 +916,6 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
     $group_items = $form_state->getValue(['options', 'group_info', 'group_items']);
     uasort($group_items, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
     // Filter out removed items.
-
     // Start from 1 to avoid problems with #default_value in the widget.
     $new_id = 1;
     $new_default = 'All';
@@ -1220,8 +1222,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       // Each rows contains three widgets:
       // a) The title, where users define how they identify a pair of operator | value
       // b) The operator
-      // c) The value (or values) to use in the filter with the selected operator
-
+      // c) The value (or values) to use in the filter with the selected operator.
       // In each row, we have to display the operator form and the value from
       // $row acts as a fake form to render each widget in a row.
       $row = [];
@@ -1645,6 +1646,17 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
     return TRUE;
   }
 
+  /**
+   * Stores the exposed input in the session for a specific view display.
+   *
+   * @param array $input
+   *   The input values to be stored in the session.
+   * @param bool $status
+   *   A flag indicating whether to store (TRUE) or erase (FALSE) the input.
+   *
+   * @return bool
+   *   Returns TRUE if the input is successfully stored, FALSE otherwise.
+   */
   public function storeExposedInput($input, $status) {
     if (empty($this->options['exposed']) || empty($this->options['expose']['identifier'])) {
       return TRUE;

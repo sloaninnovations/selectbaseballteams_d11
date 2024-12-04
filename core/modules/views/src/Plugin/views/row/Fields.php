@@ -30,6 +30,12 @@ class Fields extends RowPluginBase {
    */
   protected $usesFields = TRUE;
 
+  /**
+   * Defines the default options for the row plugin.
+   *
+   * @return array
+   *   The options array with default values.
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 

@@ -62,6 +62,12 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     );
   }
 
+  /**
+   * Defines default options for the SQL-based pager.
+   *
+   * @return array
+   *   An array of default options.
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['items_per_page'] = ['default' => 10];
@@ -232,6 +238,16 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     ];
   }
 
+  /**
+   * Validates options form.
+   *
+   * Ensures that the exposed options contain valid numeric values.
+   *
+   * @param array $form
+   *   The options form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
   public function validateOptionsForm(&$form, FormStateInterface $form_state) {
     // Only accept integer values.
     $error = FALSE;
@@ -265,6 +281,9 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     }
   }
 
+  /**
+   * Executes the pager query with limit and offset settings.
+   */
   public function query() {
     if ($this->itemsPerPageExposed()) {
       $query = $this->view->getRequest()->query;
@@ -313,6 +332,12 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     $this->current_page = max(0, $this->pagerParameters->findPage($this->options['id']));
   }
 
+  /**
+   * Gets the total number of pages for the pager.
+   *
+   * @return int
+   *   The total number of pages. If items per page is zero, returns 1.
+   */
   public function getPagerTotal() {
     if ($items_per_page = intval($this->getItemsPerPage())) {
       return ceil($this->total_items / $items_per_page);
@@ -347,18 +372,44 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     }
   }
 
+  /**
+   * Checks if any options are exposed for user control.
+   *
+   * @return bool
+   *   TRUE if options are exposed, FALSE otherwise.
+   */
   public function usesExposed() {
     return $this->itemsPerPageExposed() || $this->isOffsetExposed();
   }
 
+  /**
+   * Determines if the items-per-page option is exposed to the user.
+   *
+   * @return bool
+   *   TRUE if items-per-page is exposed, FALSE otherwise.
+   */
   protected function itemsPerPageExposed() {
     return !empty($this->options['expose']['items_per_page']);
   }
 
+  /**
+   * Determines if the offset option is exposed to the user.
+   *
+   * @return bool
+   *   TRUE if the offset is exposed, FALSE otherwise.
+   */
   protected function isOffsetExposed() {
     return !empty($this->options['expose']['offset']);
   }
 
+  /**
+   * Alters the exposed form for the pager.
+   *
+   * @param array $form
+   *   The form structure to alter.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state object.
+   */
   public function exposedFormAlter(&$form, FormStateInterface $form_state) {
     if ($this->itemsPerPageExposed()) {
       $options = explode(',', $this->options['expose']['items_per_page_options']);
@@ -390,6 +441,14 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     }
   }
 
+  /**
+   * Validates the exposed form for the pager.
+   *
+   * @param array $form
+   *   The form structure.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state object.
+   */
   public function exposedFormValidate(&$form, FormStateInterface $form_state) {
     if (!$form_state->isValueEmpty('offset') && trim($form_state->getValue('offset'))) {
       if (!is_numeric($form_state->getValue('offset')) || $form_state->getValue('offset') < 0) {

@@ -25,6 +25,11 @@ class StatisticsLastCommentName extends SortPluginBase {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected string $user_field;
 
+  /**
+   * {@inheritdoc}
+   *
+   * Adds an order by condition to the query based on the last commenter's name.
+   */
   public function query() {
     $this->ensureMyTable();
     $definition = [

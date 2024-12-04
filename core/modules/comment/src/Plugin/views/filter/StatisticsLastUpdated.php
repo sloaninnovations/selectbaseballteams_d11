@@ -19,6 +19,11 @@ class StatisticsLastUpdated extends Date {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected ?string $node_table;
 
+  /**
+   * {@inheritdoc}
+   *
+   * Builds the query to filter by the newer of the last comment or node update timestamp.
+   */
   public function query() {
     $this->ensureMyTable();
     $this->node_table = $this->query->ensureTable('node', $this->relationship);

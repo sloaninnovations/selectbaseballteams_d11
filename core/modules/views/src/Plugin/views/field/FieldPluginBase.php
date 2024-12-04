@@ -476,6 +476,9 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     return TRUE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -1805,6 +1808,9 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     return $output;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function themeFunctions() {
     $themes = [];
     $hook = 'views_view_field';

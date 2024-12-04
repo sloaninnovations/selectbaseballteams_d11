@@ -271,6 +271,9 @@ class Schema extends DatabaseSchema {
     return $map;
   }
 
+  /**
+   *
+   */
   protected function createKeysSql($spec) {
     $keys = [];
 
@@ -355,6 +358,15 @@ class Schema extends DatabaseSchema {
     }
   }
 
+  /**
+   * Constructs a SQL fragment for a key definition from the given fields.
+   *
+   * @param array $fields
+   *   An array of field definitions.
+   *
+   * @return string
+   *   A SQL fragment representing the key definition.
+   */
   protected function createKeySql($fields) {
     $return = [];
     foreach ($fields as $field) {

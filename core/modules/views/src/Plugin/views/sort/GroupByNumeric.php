@@ -43,6 +43,15 @@ class GroupByNumeric extends SortPluginBase {
     $this->query->addOrderBy($this->tableAlias, $this->realField, $this->options['order'], NULL, $params);
   }
 
+  /**
+   * Provides the administrative label for the sort handler.
+   *
+   * @param bool $short
+   *   Whether to use the short version of the label.
+   *
+   * @return string
+   *   The formatted administrative label.
+   */
   public function adminLabel($short = FALSE) {
     return $this->getField(parent::adminLabel($short));
   }

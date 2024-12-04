@@ -41,6 +41,9 @@ abstract class SortPluginBase extends HandlerBase implements CacheableDependency
     $this->query->addOrderBy($this->tableAlias, $this->realField, $this->options['order']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -97,7 +100,7 @@ abstract class SortPluginBase extends HandlerBase implements CacheableDependency
     $form['expose_button'] = [
       '#prefix' => '<div class="views-expose clearfix">',
       '#suffix' => '</div>',
-      // Should always come first
+      // Should always come first.
       '#weight' => -1000,
     ];
 
@@ -178,14 +181,20 @@ abstract class SortPluginBase extends HandlerBase implements CacheableDependency
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function sortValidate(&$form, FormStateInterface $form_state) {}
 
+  /**
+   * {@inheritdoc}
+   */
   public function sortSubmit(&$form, FormStateInterface $form_state) {}
 
   /**
    * Provide a list of options for the default sort form.
    *
-   * Should be overridden by classes that don't override sort_form
+   * Should be overridden by classes that don't override sort_form.
    */
   protected function sortOptions() {
     return [
@@ -194,6 +203,17 @@ abstract class SortPluginBase extends HandlerBase implements CacheableDependency
     ];
   }
 
+  /**
+   * Builds the exposed form for sorting configuration.
+   *
+   * This method creates the form elements needed for sorting configuration in
+   * the exposed filter. It includes fields for the label and field identifier.
+   *
+   * @param array $form
+   *   The form structure.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current form state.
+   */
   public function buildExposeForm(&$form, FormStateInterface $form_state) {
     // #flatten will move everything from $form['expose'][$key] to $form[$key]
     // prior to rendering. That's why the preRender for it needs to run first,

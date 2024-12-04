@@ -14,6 +14,15 @@ use Drupal\views\Attribute\ViewsSort;
 #[ViewsSort("date")]
 class Date extends SortPluginBase {
 
+  /**
+   * Defines the default options for the sort handler.
+   *
+   * Adds a `granularity` option with a default value of `second`,
+   * allowing for fine-grained control over how dates are compared.
+   *
+   * @return array
+   *   An array of default options.
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -22,6 +31,14 @@ class Date extends SortPluginBase {
     return $options;
   }
 
+  /**
+   * Builds the options form for the sort handler.
+   *
+   * @param array $form
+   *   The form structure.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
 

@@ -14,6 +14,11 @@ use Drupal\views\Plugin\views\filter\FilterPluginBase;
 #[ViewsFilter("comment_user_uid")]
 class UserUid extends FilterPluginBase {
 
+  /**
+   * {@inheritdoc}
+   *
+   * Builds the query to filter by user ID for nodes the user has posted or commented on.
+   */
   public function query() {
     $this->ensureMyTable();
 

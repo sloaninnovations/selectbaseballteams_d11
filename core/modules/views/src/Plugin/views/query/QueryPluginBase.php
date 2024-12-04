@@ -115,10 +115,24 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
    */
   public function getAggregationInfo() {}
 
+  /**
+   * {@inheritdoc}
+   */
   public function validateOptionsForm(&$form, FormStateInterface $form_state) {}
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitOptionsForm(&$form, FormStateInterface $form_state) {}
 
+  /**
+   * Provides the summary title for the options form.
+   *
+   * This title is used in the Views UI to summarize settings.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The translated summary title string.
+   */
   public function summaryTitle() {
     return $this->t('Settings');
   }
@@ -181,7 +195,7 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
       $group = empty($groups) ? 1 : max(array_keys($groups)) + 1;
     }
 
-    // Create an empty group
+    // Create an empty group.
     if (empty($groups[$group])) {
       $groups[$group] = ['conditions' => [], 'args' => []];
     }

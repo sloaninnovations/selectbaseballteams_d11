@@ -347,6 +347,23 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return preg_match('/^' . $pattern . '$/', $subject);
   }
 
+  /**
+   * Executes a limited range of a query.
+   *
+   * @param string $query
+   *   The base query string.
+   * @param int $from
+   *   The starting index.
+   * @param int $count
+   *   The number of records to return.
+   * @param array $args
+   *   (optional) Query arguments.
+   * @param array $options
+   *   (optional) Additional options for query execution.
+   *
+   * @return \Drupal\Core\Database\StatementInterface|null
+   *   The result of the query, or NULL on failure.
+   */
   public function queryRange($query, $from, $count, array $args = [], array $options = []) {
     return $this->query($query . ' LIMIT ' . (int) $from . ', ' . (int) $count, $args, $options);
   }
@@ -367,10 +384,16 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return 'temp.' . $tablename;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function driver() {
     return 'sqlite';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function databaseType() {
     return 'sqlite';
   }
@@ -391,6 +414,15 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
   }
 
+  /**
+   * Maps a condition operator for SQLite queries.
+   *
+   * @param string $operator
+   *   The operator to map.
+   *
+   * @return string|null
+   *   The mapped operator, or NULL if no mapping exists.
+   */
   public function mapConditionOperator($operator) {
     return static::$sqliteConditionOperatorMap[$operator] ?? NULL;
   }

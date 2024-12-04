@@ -18,6 +18,9 @@ class Combine extends StringFilter {
    */
   public $query;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['fields'] = ['default' => []];
@@ -25,11 +28,14 @@ class Combine extends StringFilter {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
     $this->view->initStyle();
 
-    // Allow to choose all fields as possible
+    // Allow to choose all fields as possible.
     if ($this->view->style_plugin->usesFields()) {
       $options = [];
       foreach ($this->view->display_handler->getHandlers('field') as $name => $field) {
@@ -55,6 +61,9 @@ class Combine extends StringFilter {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     $this->view->_build('field');
     $fields = [];
@@ -138,6 +147,9 @@ class Combine extends StringFilter {
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => $this->value]);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function opContains($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('LIKE');
@@ -178,42 +190,63 @@ class Combine extends StringFilter {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function opStartsWith($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('LIKE');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => $this->connection->escapeLike($this->value) . '%']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function opNotStartsWith($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('NOT LIKE');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => $this->connection->escapeLike($this->value) . '%']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function opEndsWith($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('LIKE');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => '%' . $this->connection->escapeLike($this->value)]);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function opNotEndsWith($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('NOT LIKE');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => '%' . $this->connection->escapeLike($this->value)]);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function opNotLike($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('NOT LIKE');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => '%' . $this->connection->escapeLike($this->value) . '%']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function opRegex($expression) {
     $placeholder = $this->placeholder();
     $operator = $this->getConditionOperator('REGEXP');
     $this->query->addWhereExpression($this->options['group'], "$expression $operator $placeholder", [$placeholder => $this->value]);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function opEmpty($expression) {
     if ($this->operator == 'empty') {
       $operator = "IS NULL";

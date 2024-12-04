@@ -9,6 +9,15 @@ use Drupal\Core\Database\Query\Insert as QueryInsert;
  */
 class Insert extends QueryInsert {
 
+  /**
+   * Executes the insert query.
+   *
+   * @return int|null
+   *   The last inserted ID if the operation is successful, or NULL on failure.
+   *
+   * @throws \Exception
+   *   Thrown if an exception occurs during query execution.
+   */
   public function execute() {
     if (!$this->preExecute()) {
       return NULL;
@@ -44,6 +53,15 @@ class Insert extends QueryInsert {
     return $last_insert_id;
   }
 
+  /**
+   * Builds the SQL string for the insert query.
+   *
+   * Constructs the SQL string for inserting values into the specified table.
+   * If a `fromQuery` is provided, the method appends the `SELECT` query.
+   *
+   * @return string
+   *   The constructed SQL string.
+   */
   public function __toString() {
     // Create a sanitized comment string to prepend to the query.
     $comments = $this->connection->makeComment($this->comments);
