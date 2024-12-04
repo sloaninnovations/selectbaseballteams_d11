@@ -287,17 +287,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   }
 
   /**
-   * Initialize authorize.php during testing.
-   *
-   * @see system_authorized_init()
-   */
-  public function authorizeInit($page_title) {
-    $authorize_url = Url::fromUri('base:core/authorize.php', ['absolute' => TRUE])->toString();
-    system_authorized_init('system_test_authorize_run', __DIR__ . '/../../system_test.module', [], $page_title);
-    return new RedirectResponse($authorize_url);
-  }
-
-  /**
    * Sets a header.
    */
   public function setHeader(Request $request) {

@@ -154,47 +154,6 @@ class SystemHooks {
   }
 
   /**
-   * @} End of "defgroup authorize".
-   */
-
-  /**
-   * Implements hook_updater_info().
-   */
-  #[Hook('updater_info')]
-  public function updaterInfo() {
-    return [
-      'module' => [
-        'class' => 'Drupal\Core\Updater\Module',
-        'name' => t('Update modules'),
-        'weight' => 0,
-      ],
-      'theme' => [
-        'class' => 'Drupal\Core\Updater\Theme',
-        'name' => t('Update themes'),
-        'weight' => 0,
-      ],
-    ];
-  }
-
-  /**
-   * Implements hook_filetransfer_info().
-   */
-  #[Hook('filetransfer_info')]
-  public function filetransferInfo() {
-    $backends = [];
-    // This is the default, will be available on most systems.
-    if (function_exists('ftp_connect')) {
-      $backends['ftp'] = ['title' => t('FTP'), 'class' => 'Drupal\Core\FileTransfer\FTP', 'weight' => 0];
-    }
-    // SSH2 lib connection is only available if the proper PHP extension is
-    // installed.
-    if (function_exists('ssh2_connect')) {
-      $backends['ssh'] = ['title' => t('SSH'), 'class' => 'Drupal\Core\FileTransfer\SSH', 'weight' => 20];
-    }
-    return $backends;
-  }
-
-  /**
    * Implements hook_js_settings_build().
    *
    * Sets values for the core/drupal.ajax library, which just depends on the
