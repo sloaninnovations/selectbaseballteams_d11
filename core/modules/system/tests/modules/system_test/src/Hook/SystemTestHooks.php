@@ -109,20 +109,6 @@ class SystemTestHooks {
   }
 
   /**
-   * Implements hook_filetransfer_info().
-   */
-  #[Hook('filetransfer_info')]
-  public function filetransferInfo() {
-    return [
-      'system_test' => [
-        'title' => t('System Test FileTransfer'),
-        'class' => 'Drupal\system_test\MockFileTransfer',
-        'weight' => -10,
-      ],
-    ];
-  }
-
-  /**
    * Implements hook_module_preinstall().
    */
   #[Hook('module_preinstall')]
