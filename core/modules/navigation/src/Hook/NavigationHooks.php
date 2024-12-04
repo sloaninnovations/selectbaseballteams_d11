@@ -220,6 +220,8 @@ class NavigationHooks {
         return;
       }
 
+      // To be able to autowire this service through the constructor, we need
+      // the service alias to be defined in core.services.yml.
       $manager = \Drupal::service('plugin.manager.config_action');
       foreach ($blocks as $block) {
         $manager->applyAction('addNavigationBlock', 'navigation.block_layout', $block);
