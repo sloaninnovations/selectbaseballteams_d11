@@ -982,6 +982,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * filter.
    */
   public function groupForm(&$form, FormStateInterface $form_state) {
+    $groups = [];
     if (!empty($this->options['group_info']['optional']) && !$this->multipleExposedInput()) {
       $groups = ['All' => $this->t('- Any -')];
     }
@@ -1243,19 +1244,18 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       $children = Element::children($row['value']);
       if (!empty($children)) {
         foreach ($children as $child) {
-          if (!empty($row['value'][$child]['#states']['visible'])) {
+          if (isset($row['value'][$child]['#states']['visible'])) {
             foreach ($row['value'][$child]['#states']['visible'] as $state) {
               if (isset($state[':input[name="options[group_info][group_items][' . $item_id . '][operator]"]'])) {
                 $row['value'][$child]['#title'] = '';
 
+                if (isset($this->options['group_info']['group_items'][$item_id]['value'][$child])) {
+                  $row['value'][$child]['#default_value'] = $this->options['group_info']['group_items'][$item_id]['value'][$child];
+                }
                 // Exit this loop and process the next child element.
                 break;
               }
             }
-          }
-
-          if (isset($this->options['group_info']['group_items'][$item_id]['value'][$child])) {
-            $row['value'][$child]['#default_value'] = $this->options['group_info']['group_items'][$item_id]['value'][$child];
           }
         }
       }
