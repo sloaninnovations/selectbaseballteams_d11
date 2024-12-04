@@ -73,13 +73,11 @@ class NavigationHooks {
     if (!$this->currentUser->hasPermission('access navigation')) {
       return;
     }
-    $navigation_renderer = \Drupal::service('navigation.renderer');
-    assert($navigation_renderer instanceof NavigationRenderer);
-    $navigation_renderer->removeToolbar($page_top);
+    $this->navigationRenderer->removeToolbar($page_top);
     if ($this->routeMatch->getRouteName() !== 'layout_builder.navigation.view') {
       // Don't render the admin toolbar if in layout edit mode.
-      $navigation_renderer->buildNavigation($page_top);
-      $navigation_renderer->buildTopBar($page_top);
+      $this->navigationRenderer->buildNavigation($page_top);
+      $this->navigationRenderer->buildTopBar($page_top);
       return;
     }
     // But if in layout mode, add an empty element to leave space. We need to use
@@ -93,7 +91,7 @@ class NavigationHooks {
         'class' => 'admin-toolbar',
       ],
     ];
-    $navigation_renderer->buildTopBar($page_top);
+    $this->navigationRenderer->buildTopBar($page_top);
   }
 
   /**
