@@ -129,6 +129,7 @@ class AuditResult implements MarkupInterface, \Countable {
    *
    * @return string
    *   The reasons why the migration passed or failed the audit.
+   *
    * @see \Drupal\Component\Render\MarkupInterface
    */
   public function __toString() {

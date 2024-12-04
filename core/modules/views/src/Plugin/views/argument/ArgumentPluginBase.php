@@ -1108,7 +1108,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
   /**
    * Set the input for this argument.
    *
-   * @return TRUE
+   * @return true
    *   if it successfully validates; FALSE if it does not.
    */
   public function setArgument($arg) {
