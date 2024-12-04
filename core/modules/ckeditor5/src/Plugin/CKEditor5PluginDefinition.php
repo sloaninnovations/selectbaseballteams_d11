@@ -58,6 +58,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
    * Gets an array representation of this CKEditor 5 plugin definition.
    *
    * @return array
+   *   The array representation of this CKEditor 5 plugin definition.
    */
   public function toArray(): array {
     return [
@@ -347,6 +348,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
    * Gets the human-readable name of the CKEditor plugin.
    *
    * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The human-readable name of the CKEditor plugin.
    *
    * @see \Drupal\ckeditor5\Annotation\DrupalAspectsOfCKEditor5Plugin::$label
    */
@@ -381,6 +383,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
    * Whether this plugin has conditions.
    *
    * @return bool
+   *   TRUE if the plugin has conditions, FALSE otherwise.
    *
    * @see \Drupal\ckeditor5\Annotation\DrupalAspectsOfCKEditor5Plugin::$conditions
    */

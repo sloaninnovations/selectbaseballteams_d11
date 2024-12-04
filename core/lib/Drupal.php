@@ -161,6 +161,7 @@ class Drupal {
    * Returns the currently active global container.
    *
    * @return \Drupal\Component\DependencyInjection\ContainerInterface
+   *   The currently active global container.
    *
    * @throws \Drupal\Core\DependencyInjection\ContainerNotInitializedException
    */
@@ -175,6 +176,7 @@ class Drupal {
    * Returns TRUE if the container has been initialized, FALSE otherwise.
    *
    * @return bool
+   *   TRUE if the container is initialized, FALSE otherwise.
    */
   public static function hasContainer() {
     return static::$container !== NULL;
@@ -215,6 +217,7 @@ class Drupal {
    * Gets the app root.
    *
    * @return string
+   *   The app root directory path.
    */
   public static function root() {
     return static::getContainer()->getParameter('app.root');
@@ -300,6 +303,7 @@ class Drupal {
    * @endcode
    *
    * @return \Drupal\Core\Session\AccountProxyInterface
+   *   The current user account proxy.
    */
   public static function currentUser() {
     return static::getContainer()->get('current_user');
@@ -385,6 +389,7 @@ class Drupal {
    * Returns the locking layer instance.
    *
    * @return \Drupal\Core\Lock\LockBackendInterface
+   *   The locking layer instance.
    *
    * @ingroup lock
    */
@@ -461,6 +466,7 @@ class Drupal {
    *   Name of the key/value collection to return.
    *
    * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   *   The key/value storage collection for the specified name.
    */
   public static function keyValue($collection) {
     return static::getContainer()->get('keyvalue')->get($collection);
@@ -476,6 +482,7 @@ class Drupal {
    * (for example, the system maintenance message) should use \Drupal::config() instead.
    *
    * @return \Drupal\Core\State\StateInterface
+   *   The state storage service.
    */
   public static function state() {
     return static::getContainer()->get('state');
@@ -529,6 +536,7 @@ class Drupal {
    * Returns the flood instance.
    *
    * @return \Drupal\Core\Flood\FloodInterface
+   *   The flood instance.
    */
   public static function flood() {
     return static::getContainer()->get('flood');
@@ -538,6 +546,7 @@ class Drupal {
    * Returns the module handler.
    *
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
+   *   The module handler interface.
    */
   public static function moduleHandler() {
     return static::getContainer()->get('module_handler');
@@ -581,6 +590,7 @@ class Drupal {
    * Returns the link generator service.
    *
    * @return \Drupal\Core\Utility\LinkGeneratorInterface
+   *   The link generator service.
    */
   public static function linkGenerator() {
     return static::getContainer()->get('link_generator');
@@ -647,6 +657,7 @@ class Drupal {
    * Gets the theme service.
    *
    * @return \Drupal\Core\Theme\ThemeManagerInterface
+   *   The theme manager service.
    */
   public static function theme() {
     return static::getContainer()->get('theme.manager');
@@ -690,6 +701,7 @@ class Drupal {
    * Returns the path validator.
    *
    * @return \Drupal\Core\Path\PathValidatorInterface
+   *   The path validator service.
    */
   public static function pathValidator() {
     return static::getContainer()->get('path.validator');

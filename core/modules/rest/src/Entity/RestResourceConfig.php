@@ -241,6 +241,7 @@ class RestResourceConfig extends ConfigEntityBase implements RestResourceConfigI
    * Returns the REST resource dependencies.
    *
    * @return \Drupal\rest\Entity\ConfigDependencies
+   *   The REST resource dependencies.
    */
   protected function getRestResourceDependencies() {
     return \Drupal::service('class_resolver')->getInstanceFromDefinition(ConfigDependencies::class);
