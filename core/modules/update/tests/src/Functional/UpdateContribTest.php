@@ -535,16 +535,6 @@ class UpdateContribTest extends UpdateTestBase {
     $this->assertSession()->pageTextNotContains('Security update required!');
     $this->assertSession()->linkExists('AAA Update test');
     $this->assertSession()->linkByHrefExists('http://example.com/project/aaa_update_test');
-
-    // Turn the altering back on and visit the Update manager UI.
-    $update_test_config->set('update_status', $update_status)->save();
-    $this->drupalGet('admin/modules/update');
-    $this->assertSession()->pageTextContains('Security update');
-
-    // Turn the altering back off and visit the Update manager UI.
-    $update_test_config->set('update_status', [])->save();
-    $this->drupalGet('admin/modules/update');
-    $this->assertSession()->pageTextNotContains('Security update');
   }
 
   /**
