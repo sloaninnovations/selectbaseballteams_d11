@@ -34,6 +34,8 @@ class NavigationHooks {
    *   The route match.
    * @param \Drupal\navigation\NavigationRenderer $navigationRenderer
    *   The navigation renderer.
+   * @param \Drupal\Core\Config\Action\ConfigActionManager $configActionManager
+   *   The config action manager.
    */
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
