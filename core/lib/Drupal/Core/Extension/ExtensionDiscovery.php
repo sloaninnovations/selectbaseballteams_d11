@@ -82,7 +82,7 @@ class ExtensionDiscovery {
    *
    * @var \Drupal\Component\FileCache\FileCacheInterface
    *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
    *   direct replacement.
    *
    * @see https://www.drupal.org/node/3490431
