@@ -143,22 +143,15 @@ class UpdateMailTest extends UnitTestCase {
     $this->assertSame("New release(s) available for $site_name", $message['subject']);
 
     // Confirm each part of the body.
-    if ($authorized) {
+    if (empty($params)) {
       $this->assertSame($expected_body[0], $message['body'][0]);
-      $this->assertSame($expected_body[1], $message['body'][1]);
-      $this->assertSame($expected_body[2], $message['body'][2]->render());
+      $this->assertSame($expected_body[1], $message['body'][1]->render());
     }
     else {
-      if (empty($params)) {
-        $this->assertSame($expected_body[0], $message['body'][0]);
-        $this->assertSame($expected_body[1], $message['body'][1]->render());
-      }
-      else {
-        $this->assertSame($expected_body[0], $message['body'][0]->render());
-        $this->assertSame($expected_body[1], $message['body'][1]);
-        $this->assertSame($expected_body[2], $message['body'][2]);
-        $this->assertSame($expected_body[3], $message['body'][3]->render());
-      }
+      $this->assertSame($expected_body[0], $message['body'][0]->render());
+      $this->assertSame($expected_body[1], $message['body'][1]);
+      $this->assertSame($expected_body[2], $message['body'][2]);
+      $this->assertSame($expected_body[3], $message['body'][3]->render());
     }
   }
 
@@ -201,15 +194,6 @@ class UpdateMailTest extends UnitTestCase {
           '',
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates/settings",
           "Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates.",
-        ],
-      ],
-      'authorize' => [
-        'all',
-        [],
-        [
-          "See the available updates page for more information:\nhttps://example.com/admin/reports/updates/settings",
-          "You can automatically download your missing updates using the Update manager:\nhttps://example.com/admin/reports/updates",
-          'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates.',
         ],
       ],
     ];
