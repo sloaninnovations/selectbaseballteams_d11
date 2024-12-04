@@ -4,6 +4,7 @@ namespace Drupal\navigation\Hook;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -13,6 +14,7 @@ use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
 use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
 use Drupal\navigation\RenderCallbacks;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Hook implementations for navigation.
@@ -38,6 +40,8 @@ class NavigationHooks {
     protected AccountInterface $currentUser,
     protected RouteMatchInterface $routeMatch,
     protected NavigationRenderer $navigationRenderer,
+    #[Autowire('@plugin.manager.config_action')]
+    protected ConfigActionManager $configActionManager,
   ) {
   }
 
@@ -220,11 +224,8 @@ class NavigationHooks {
         return;
       }
 
-      // To be able to autowire this service through the constructor, we need
-      // the service alias to be defined in core.services.yml.
-      $manager = \Drupal::service('plugin.manager.config_action');
       foreach ($blocks as $block) {
-        $manager->applyAction('addNavigationBlock', 'navigation.block_layout', $block);
+        $this->configActionManager->applyAction('addNavigationBlock', 'navigation.block_layout', $block);
       }
     }
   }
