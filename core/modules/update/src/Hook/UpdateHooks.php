@@ -25,10 +25,6 @@ class UpdateHooks {
           ':update' => 'https://www.drupal.org/documentation/modules/update',
           ':modules' => Url::fromRoute('system.modules_list')->toString(),
         ]) . '</p>';
-        // Only explain the Update manager if it has not been uninstalled.
-        if (_update_manager_access()) {
-          $output .= '<p>' . t('The Update Manager also allows administrators to add and update modules and themes through the administration interface.') . '</p>';
-        }
         $output .= '<h2>' . t('Uses') . '</h2>';
         $output .= '<dl>';
         $output .= '<dt>' . t('Checking for available updates') . '</dt>';
@@ -177,8 +173,6 @@ class UpdateHooks {
       \Drupal::moduleHandler()->loadInclude('update', 'inc', 'update.fetch');
       _update_cron_notify();
     }
-    // Clear garbage from disk.
-    update_clear_update_disk_cache();
   }
 
   /**
@@ -244,9 +238,6 @@ class UpdateHooks {
       $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode);
     }
     $message['body'][] = t('See the available updates page for more information:', [], ['langcode' => $langcode]) . "\n" . Url::fromRoute('update.status', [], ['absolute' => TRUE, 'language' => $language])->toString();
-    if (_update_manager_access()) {
-      $message['body'][] = t('You can automatically download your missing updates using the Update manager:', [], ['langcode' => $langcode]) . "\n" . Url::fromRoute('update.report_update', [], ['absolute' => TRUE, 'language' => $language])->toString();
-    }
     $settings_url = Url::fromRoute('update.settings', [], ['absolute' => TRUE])->toString();
     if (\Drupal::config('update.settings')->get('notification.threshold') == 'all') {
       $message['body'][] = t('Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, @url.', ['@url' => $settings_url]);
