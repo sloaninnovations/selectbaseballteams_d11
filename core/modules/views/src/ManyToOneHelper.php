@@ -39,10 +39,16 @@ class ManyToOneHelper {
     $this->handler = $handler;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function defineOptions(&$options) {
     $options['reduce_duplicates'] = ['default' => FALSE];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $form['reduce_duplicates'] = [
       '#type' => 'checkbox',
@@ -123,6 +129,9 @@ class ManyToOneHelper {
     return $alias;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getJoin() {
     return $this->handler->getJoin();
   }
@@ -275,6 +284,12 @@ class ManyToOneHelper {
     return $this->handler->query->placeholder($this->handler->options['table'] . '_' . $this->handler->options['field']);
   }
 
+  /**
+   * Adds a filter condition to the query based on the handler's options and value.
+   *
+   * @return void
+   *   This method does not return any value. It modifies the query directly.
+   */
   public function addFilter() {
     if (empty($this->handler->value)) {
       return;

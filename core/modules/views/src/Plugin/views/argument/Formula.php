@@ -34,6 +34,12 @@ class Formula extends ArgumentPluginBase {
     }
   }
 
+  /**
+   * Gets the formula for this handler.
+   *
+   * @return string
+   *   The formula used by the handler, with table alias replaced.
+   */
   public function getFormula() {
     return str_replace('***table***', $this->tableAlias, $this->formula);
   }

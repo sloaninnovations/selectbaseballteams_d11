@@ -272,7 +272,13 @@ class Schema extends DatabaseSchema {
   }
 
   /**
+   * Creates the SQL for defining keys and indexes in a database schema.
    *
+   * @param array $spec
+   *   An associative array describing the schema.
+   *
+   * @return array
+   *   An array of SQL clauses for keys and indexes.
    */
   protected function createKeysSql($spec) {
     $keys = [];

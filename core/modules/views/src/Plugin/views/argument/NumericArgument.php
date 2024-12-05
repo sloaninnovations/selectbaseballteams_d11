@@ -24,6 +24,9 @@ class NumericArgument extends ArgumentPluginBase {
    */
   public $value;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -33,6 +36,9 @@ class NumericArgument extends ArgumentPluginBase {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
 
@@ -54,6 +60,9 @@ class NumericArgument extends ArgumentPluginBase {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function title() {
     if (!$this->argument) {
       return !empty($this->definition['empty field name']) ? $this->definition['empty field name'] : $this->t('Uncategorized');
@@ -89,6 +98,9 @@ class NumericArgument extends ArgumentPluginBase {
     return $this->value;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query($group_by = FALSE) {
     $this->ensureMyTable();
 

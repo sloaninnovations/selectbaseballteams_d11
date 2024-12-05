@@ -1837,6 +1837,9 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     return $themes;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function adminLabel($short = FALSE) {
     return $this->getField(parent::adminLabel($short));
   }

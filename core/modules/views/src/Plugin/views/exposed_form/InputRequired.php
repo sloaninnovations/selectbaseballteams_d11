@@ -128,7 +128,7 @@ class InputRequired extends ExposedFormPluginBase {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   public function query() {
     if (!$this->exposedFilterApplied()) {
