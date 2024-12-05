@@ -461,23 +461,3 @@ function drupal_flush_all_caches($kernel = NULL) {
     drupal_maintenance_theme();
   }
 }
-
-/**
- * Assembles the Drupal FileTransfer registry.
- *
- * @return array
- *   The Drupal FileTransfer class registry.
- *
- * @see \Drupal\Core\FileTransfer\FileTransfer
- * @see hook_filetransfer_info()
- * @see hook_filetransfer_info_alter()
- */
-function drupal_get_filetransfer_info() {
-  $info = &drupal_static(__FUNCTION__);
-  if (!isset($info)) {
-    $info = \Drupal::moduleHandler()->invokeAll('filetransfer_info');
-    \Drupal::moduleHandler()->alter('filetransfer_info', $info);
-    uasort($info, [SortArray::class, 'sortByWeightElement']);
-  }
-  return $info;
-}

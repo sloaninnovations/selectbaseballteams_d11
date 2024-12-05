@@ -144,59 +144,5 @@ function hook_archiver_info_alter(&$info) {
 }
 
 /**
- * Register information about FileTransfer classes provided by a module.
- *
- * The FileTransfer class allows transferring files over a specific type of
- * connection. Core provides classes for FTP and SSH. Contributed modules are
- * free to extend the FileTransfer base class to add other connection types,
- * and if these classes are registered via hook_filetransfer_info(), those
- * connection types will be available to site administrators using the Update
- * manager when they are redirected to the authorize.php script to authorize
- * the file operations.
- *
- * @return array
- *   Nested array of information about FileTransfer classes. Each key is a
- *   FileTransfer type (not human readable, used for form elements and
- *   variable names, etc), and the values are subarrays that define properties
- *   of that type. The keys in each subarray are:
- *   - 'title': Required. The human-readable name of the connection type.
- *   - 'class': Required. The name of the FileTransfer class. The constructor
- *     will always be passed the full path to the root of the site that should
- *     be used to restrict where file transfer operations can occur (the $jail)
- *     and an array of settings values returned by the settings form.
- *   - 'weight': Optional. Integer weight used for sorting connection types on
- *     the authorize.php form.
- *
- * @see \Drupal\Core\FileTransfer\FileTransfer
- * @see authorize.php
- * @see hook_filetransfer_info_alter()
- * @see drupal_get_filetransfer_info()
- */
-function hook_filetransfer_info() {
-  $info['sftp'] = [
-    'title' => t('SFTP (Secure FTP)'),
-    'class' => 'Drupal\Core\FileTransfer\SFTP',
-    'weight' => 10,
-  ];
-  return $info;
-}
-
-/**
- * Alter the FileTransfer class registry.
- *
- * @param array $filetransfer_info
- *   Reference to a nested array containing information about the FileTransfer
- *   class registry.
- *
- * @see hook_filetransfer_info()
- */
-function hook_filetransfer_info_alter(&$filetransfer_info) {
-  // Remove the FTP option entirely.
-  unset($filetransfer_info['ftp']);
-  // Make sure the SSH option is listed first.
-  $filetransfer_info['ssh']['weight'] = -10;
-}
-
-/**
  * @} End of "addtogroup hooks".
  */
