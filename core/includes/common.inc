@@ -8,7 +8,6 @@
  * a cached page are instead located in bootstrap.inc.
  */
 
-use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\DrupalKernel;
 
