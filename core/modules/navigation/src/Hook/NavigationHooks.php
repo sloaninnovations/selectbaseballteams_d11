@@ -218,7 +218,11 @@ class NavigationHooks {
    * Implements hook_modules_installed().
    */
   #[Hook('modules_installed')]
-  public function modulesInstalled($modules): void {
+  public function modulesInstalled($modules, $is_syncing): void {
+    // Do not modify config during sync. Config should be already consolidated.
+    if ($is_syncing) {
+      return;
+    }
     foreach ($modules as $module) {
       $blocks = $this->moduleHandler->invoke($module, 'navigation_defaults');
 
