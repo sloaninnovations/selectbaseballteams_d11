@@ -463,30 +463,6 @@ function drupal_flush_all_caches($kernel = NULL) {
 }
 
 /**
- * Assembles the Drupal Updater registry.
- *
- * An Updater is a class that knows how to update various parts of the Drupal
- * file system, for example to update modules that have newer releases, or to
- * install a new theme.
- *
- * @return array
- *   The Drupal Updater class registry.
- *
- * @see \Drupal\Core\Updater\Updater
- * @see hook_updater_info()
- * @see hook_updater_info_alter()
- */
-function drupal_get_updaters() {
-  $updaters = &drupal_static(__FUNCTION__);
-  if (!isset($updaters)) {
-    $updaters = \Drupal::moduleHandler()->invokeAll('updater_info');
-    \Drupal::moduleHandler()->alter('updater_info', $updaters);
-    uasort($updaters, [SortArray::class, 'sortByWeightElement']);
-  }
-  return $updaters;
-}
-
-/**
  * Assembles the Drupal FileTransfer registry.
  *
  * @return array
