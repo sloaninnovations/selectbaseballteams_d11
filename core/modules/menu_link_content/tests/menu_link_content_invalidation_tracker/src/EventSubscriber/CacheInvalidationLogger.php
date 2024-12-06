@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\menu_link_content_invalidation_tracker\EventSubscriber;
 
+use Drupal\Core\Cache\CacheTagsInvalidator;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 
 /**
@@ -19,7 +20,7 @@ class CacheInvalidationLogger implements CacheTagsInvalidatorInterface {
   /**
    * Constructs a new instance of CacheInvalidationLogger.
    */
-  public function __construct(protected CacheTagsInvalidatorInterface $inner) {}
+  public function __construct(protected CacheTagsInvalidator $inner) {}
 
   /**
    * Records invalidated tags before passing to decorated service.
@@ -27,6 +28,13 @@ class CacheInvalidationLogger implements CacheTagsInvalidatorInterface {
   public function invalidateTags(array $tags): void {
     $this->invalidatedTags = array_merge($this->invalidatedTags, $tags);
     $this->inner->invalidateTags($tags);
+  }
+
+  /**
+   * Delegates to inner resetChecksums method.
+   */
+  public function resetChecksums(): void {
+    $this->inner->resetChecksums();
   }
 
   /**
