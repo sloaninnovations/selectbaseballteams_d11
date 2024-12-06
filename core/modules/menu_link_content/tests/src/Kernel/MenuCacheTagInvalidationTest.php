@@ -38,6 +38,12 @@ class MenuCacheTagInvalidationTest extends KernelTestBase {
       'label' => 'Test menu',
       'description' => 'Description text',
     ])->save();
+
+    Menu::create([
+      'id' => 'menu-test-2',
+      'label' => 'Test menu 2',
+      'description' => 'Description text 2',
+    ])->save();
   }
 
   /**
@@ -59,10 +65,26 @@ class MenuCacheTagInvalidationTest extends KernelTestBase {
     $tags = $cacheInvalidationLogger->getInvalidatedTags();
     $this->assertContains('config:system.menu.menu-test', array_unique($tags));
 
+    // Test re-saving menu without any changes.
     $cacheInvalidationLogger->resetInvalidatedTags();
     $link->save();
     $tags = $cacheInvalidationLogger->getInvalidatedTags();
     $this->assertNotContains('config:system.menu.menu-test', array_unique($tags));
+
+    // Test re-saving menu with title change.
+    $cacheInvalidationLogger->resetInvalidatedTags();
+    $link->set('title', 'Menu link test updated');
+    $link->save();
+    $tags = $cacheInvalidationLogger->getInvalidatedTags();
+    $this->assertContains('config:system.menu.menu-test', array_unique($tags));
+
+    // Test re-saving menu item to new menu.
+    $cacheInvalidationLogger->resetInvalidatedTags();
+    $link->set('menu_name', 'menu-test-2');
+    $link->save();
+    $tags = $cacheInvalidationLogger->getInvalidatedTags();
+    $this->assertContains('config:system.menu.menu-test', array_unique($tags));
+    $this->assertContains('config:system.menu.menu-test-2', array_unique($tags));
 
   }
 
