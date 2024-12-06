@@ -1,0 +1,4 @@
+type: module
+core_version_requirement: ^11 || ^ 12
+name: Menu Link Content Invalidation Tracker
+description: Tracks cache invalidations during tests.
