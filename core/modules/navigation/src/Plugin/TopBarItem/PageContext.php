@@ -26,20 +26,6 @@ use Drupal\Core\Entity\EntityPublishedInterface;
 final class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  private EntityTypeManagerInterface $entityTypeManager;
-
-  /**
-   * The route match service.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  private RouteMatchInterface $routeMatch;
-
-  /**
    * Constructs a new PageContext instance.
    *
    * @param array $configuration
@@ -57,12 +43,10 @@ final class PageContext extends TopBarItemBase implements ContainerFactoryPlugin
     array $configuration,
     $plugin_id,
     $plugin_definition,
-    EntityTypeManagerInterface $entityTypeManager,
-    RouteMatchInterface $routeMatch,
+    private EntityTypeManagerInterface $entityTypeManager,
+    private RouteMatchInterface $routeMatch,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->entityTypeManager = $entityTypeManager;
-    $this->routeMatch = $routeMatch;
   }
 
   /**
