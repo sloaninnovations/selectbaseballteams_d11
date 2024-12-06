@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_link_content\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -50,7 +52,7 @@ class MenuCacheTagInvalidationTest extends KernelTestBase {
       'provider' => 'module_test',
       'menu_name' => 'menu-test',
       'link' => ['uri' => 'internal:/foobar'],
-      ];
+    ];
     $link = MenuLinkContent::create($link);
     $link->save();
 
