@@ -159,7 +159,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
     }
     // Swallow the error if the table hasn't been created yet.
     catch (\Exception $e) {
-      if ($connection->schema()->tableExists('sessions')) {
+      if ($this->connection->schema()->tableExists('sessions')) {
         // If the exception happened for other reason than the missing
         // table, propagate the exception.
         throw $e;
