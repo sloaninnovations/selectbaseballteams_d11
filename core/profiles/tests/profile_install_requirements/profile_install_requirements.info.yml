@@ -1,6 +1,6 @@
 
 name: 'Test Install Requirements'
 type: profile
-hidden: tru
+hidden: true
 description: 'Support profile for testing install requirements.'
 version: VERSION
