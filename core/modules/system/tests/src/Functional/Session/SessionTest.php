@@ -183,8 +183,6 @@ class SessionTest extends BrowserTestBase {
    * Tests that an invalid session ID in the cookie is rejected.
    *
    * @covers \Drupal\Core\Session\SessionManager::start
-   *
-   * @see https://www.drupal.org/project/drupal/issues/2631220
    */
   public function testAnonymousSessionFixation(): void {
 
