@@ -158,7 +158,12 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
         ->execute();
     }
     // Swallow the error if the table hasn't been created yet.
-    catch (\Exception) {
+    catch (\Exception $e) {
+      if ($connection->schema()->tableExists('sessions')) {
+        // If the exception happened for other reason than the missing
+        // table, propagate the exception.
+        throw $e;
+      }
     }
     return FALSE;
   }

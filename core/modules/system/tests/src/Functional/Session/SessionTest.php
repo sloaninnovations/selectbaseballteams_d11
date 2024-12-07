@@ -182,13 +182,13 @@ class SessionTest extends BrowserTestBase {
   /**
    * Tests that an invalid session ID in the cookie is rejected.
    *
-   * @covers \Drupal\Core\Session\WriteSafeSessionHandler::validateId()
+   * @covers \Drupal\Core\Session\SessionManager::start
    *
    * @see https://www.drupal.org/project/drupal/issues/2631220
    */
-  public function testSessionFixation(): void {
+  public function testAnonymousSessionFixation(): void {
 
-    $session = $this->getSession();
+    $mink = $this->getSession();
     $connection = Database::getConnection();
 
     // Initialize a session for anonymous user.
@@ -196,21 +196,21 @@ class SessionTest extends BrowserTestBase {
 
     // Switch browser cookie to arbitrary session_id.
     $session_cookie_name = $this->getSessionName();
-    $initial_session_cookie_value = $session->getCookie($session_cookie_name);
+    $initial_session_cookie_value = $mink->getCookie($session_cookie_name);
 
-    $session->restart();
+    $mink->restart();
     $this->initFrontPage();
     // Session restart always resets all the cookies by design, so we
     // set an arbitrary session_id in the cookie for the next request.
     $invalid_session_cookie_value = bin2hex($this->randomMachineName(13));
-    $session->setCookie($session_cookie_name, $invalid_session_cookie_value);
+    $mink->setCookie($session_cookie_name, $invalid_session_cookie_value);
 
     // Make another request.
     sleep(1);
     $this->drupalGet('session-test/set/bar');
 
     // Check returned cookie value.
-    $returned_session_cookie_value = $session->getCookie($session_cookie_name);
+    $returned_session_cookie_value = $mink->getCookie($session_cookie_name);
 
     // The backend should reject $invalid_session_cookie_value and return a
     // new session_id that's different from both the first and the invalid
