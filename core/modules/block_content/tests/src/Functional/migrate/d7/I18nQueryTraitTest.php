@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\block_content\Functional\d7;
+namespace Drupal\Tests\block_content\Functional\migrate\d7;
 
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
 
