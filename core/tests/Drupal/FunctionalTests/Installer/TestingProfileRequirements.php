@@ -7,7 +7,7 @@ namespace Drupal\FunctionalTests\Installer;
 use Drupal\Tests\BrowserTestBase;
 
 /**
- * Tests installing the Testing profile with update notifications on.
+ * Tests installing a profile that implements InstallRequirementsInterface.
  *
  * @group Installer
  */

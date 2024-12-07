@@ -802,12 +802,12 @@ function install_profile_info($profile, $langcode = 'en') {
 }
 
 /**
- * Checks a module's requirements in RequirementsInterface.
+ * Checks a module or profile requirements in RequirementsInterface.
  *
  * @param string $module
- *   Machine name of module to check.
+ *   Machine name of module or profile to check.
  * @param string $module_path
- *   The path to the module.
+ *   The path to the module or profile.
  *
  * @return array
  *   The requirements.

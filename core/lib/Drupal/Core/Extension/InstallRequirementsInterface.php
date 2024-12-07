@@ -7,9 +7,10 @@ interface InstallRequirementsInterface {
   /**
    * Check installation requirements.
    *
-   * @todo Do we need this to be in a specific location.
-   *
-   * @todo Is this restricted to one.
+   * Classes implementing this must be in the Install namespace.
+   * For example src/Install/Requirements.php.
+   * Classes implementing this must be called Requirements.
+   * There must be only one class implementing this per project.
    *
    * During the 'install' phase, modules can for example assert that
    * library or server versions are available or sufficient.
