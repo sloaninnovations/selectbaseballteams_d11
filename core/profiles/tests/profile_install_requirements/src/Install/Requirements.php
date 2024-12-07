@@ -12,9 +12,13 @@ class Requirements implements InstallRequirementsInterface {
    * {@inheritdoc}
    */
   public function getRequirements(): array {
-    $GLOBALS['profile_install_requirements'] = 'profile_install_requirements';
+    $requirements['testing_requirements'] = [
+      'title' => t('Testing requirements'),
+      'severity' => REQUIREMENT_ERROR,
+      'description' => t('Testing requirements failed requirements.'),
+    ];
 
-    return [];
+    return $requirements;
   }
 
 }
