@@ -620,7 +620,7 @@ function drupal_check_profile($profile) {
         $requirements = array_merge($requirements, $function('install'));
       }
 
-      $requirements = array_merge($requirements, check_class_requirements($module, $module_path));
+      $requirements = array_merge($requirements, check_class_requirements($module));
     }
   }
 
@@ -813,10 +813,13 @@ function install_profile_info($profile, $langcode = 'en') {
  * @return array
  *   The requirements.
  */
-function check_class_requirements(string $module, string $module_path): array {
+function check_class_requirements(string $module, string $module_path = ''): array {
   $requirements = [];
   $camelized = ContainerBuilder::camelize($module);
   $name = "{$camelized}Requirements";
+  if ($module_path) {
+    \Drupal::service('class_loader')->addPsr4('Drupal\\' . $module . '\\', \Drupal::root() . "/$module_path/src");
+  }
 
   $class = "Drupal\\{$module}\\Install\\$name";
   if (class_exists($class)) {
