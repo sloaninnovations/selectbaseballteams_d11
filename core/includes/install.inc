@@ -814,8 +814,6 @@ function install_profile_info($profile, $langcode = 'en') {
  */
 function check_class_requirements(string $module, string $module_path): array {
   $requirements = [];
-  // @todo Do we need this.
-  \Drupal::service('class_loader')->addPsr4('Drupal\\' . $module . '\\', DRUPAL_ROOT . "/$module_path/src");
   $class = "Drupal\\{$module}\\Install\\Requirements";
   if (class_exists($class)) {
     $requirementsGet = new $class();

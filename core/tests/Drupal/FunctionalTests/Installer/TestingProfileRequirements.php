@@ -21,7 +21,6 @@ class TestingProfileRequirements extends InstallerTestBase {
    */
   protected $defaultTheme = 'stark';
 
-
   /**
    * {@inheritdoc}
    */

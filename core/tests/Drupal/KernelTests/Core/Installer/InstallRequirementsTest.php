@@ -25,4 +25,12 @@ class InstallRequirementsTest extends KernelTestBase {
     $this->assertTrue(isset($GLOBALS['module_install_requirements']));
   }
 
+  /**
+   * Tests that the installer returns false if module requirements are not met.
+   */
+  public function testRequirementsFailure(): void {
+    require_once 'core/includes/install.inc';
+    $this->assertFalse(drupal_check_module('module_install_unmet_requirements'));
+  }
+
 }
