@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
-use Drupal\FunctionalTests\Installer\InstallerTestBase;
-
 /**
  * Tests installing a profile that implements InstallRequirementsInterface.
  *
