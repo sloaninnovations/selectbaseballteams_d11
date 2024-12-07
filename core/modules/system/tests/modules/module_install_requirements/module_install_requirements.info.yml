@@ -1,0 +1,6 @@
+
+name: 'Test Hook Install Requirements'
+type: module
+description: 'Support module for testing install requirements.'
+package: Testing
+version: VERSION

@@ -662,12 +662,24 @@ function drupal_requirements_severity(&$requirements) {
 function drupal_check_module($module) {
   /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
   $module_list = \Drupal::service('extension.list.module');
-  $file = DRUPAL_ROOT . '/' . $module_list->getPath($module) . "/$module.install";
+  $module_path = $module_list->getPath($module);
+  $file = DRUPAL_ROOT . '/' . $module_path . "/$module.install";
   if (is_file($file)) {
     require_once $file;
   }
   // Check requirements
   $requirements = \Drupal::moduleHandler()->invoke($module, 'requirements', ['install']);
+  \Drupal::service('class_loader')->addPsr4('Drupal\\' . $module . '\\', DRUPAL_ROOT . "/$module_path/src");
+  $class = "Drupal\\{$module}\\Install\\Requirements";
+  if (class_exists($class)) {
+    $requirementsGet = new $class();
+    if (!is_array($requirements)) {
+      $requirements = $requirementsGet->getRequirements();
+    }
+    else {
+      $requirements = array_merge($requirements, $requirementsGet->getRequirements());
+    }
+  }
   if (is_array($requirements) && drupal_requirements_severity($requirements) == REQUIREMENT_ERROR) {
     // Print any error messages
     foreach ($requirements as $requirement) {
