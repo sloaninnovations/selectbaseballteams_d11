@@ -66,7 +66,7 @@ class I18nQueryTraitTest extends MigrateUpgradeExecuteTestBase {
   }
 
   /**
-   *  Tests that I18nQueryTrait is available for migrations.
+   * Tests that I18nQueryTrait is available for migrations.
    */
   public function testUpgradeStart(): void {
     // Start the upgrade process.
