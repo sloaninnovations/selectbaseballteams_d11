@@ -6,7 +6,7 @@ namespace Drupal\module_install_unmet_requirements\Install;
 
 use Drupal\Core\Extension\InstallRequirementsInterface;
 
-class Requirements implements InstallRequirementsInterface {
+class ModuleInstallUnmetRequirementsRequirements implements InstallRequirementsInterface {
 
   /**
    * {@inheritdoc}

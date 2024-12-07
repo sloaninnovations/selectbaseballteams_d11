@@ -8,6 +8,7 @@
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Database\Database;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\Dependency;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Installer\InstallerKernel;
@@ -814,7 +815,10 @@ function install_profile_info($profile, $langcode = 'en') {
  */
 function check_class_requirements(string $module, string $module_path): array {
   $requirements = [];
-  $class = "Drupal\\{$module}\\Install\\Requirements";
+  $camelized = ContainerBuilder::camelize($module);
+  $name = "{$camelized}Requirements";
+
+  $class = "Drupal\\{$module}\\Install\\$name";
   if (class_exists($class)) {
     $requirementsGet = new $class();
     $requirements = $requirementsGet->getRequirements();

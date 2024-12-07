@@ -6,7 +6,7 @@ namespace Drupal\profile_install_requirements\Install;
 
 use Drupal\Core\Extension\InstallRequirementsInterface;
 
-class Requirements implements InstallRequirementsInterface {
+class ProfileInstallRequirementsRequirements implements InstallRequirementsInterface {
 
   /**
    * {@inheritdoc}
