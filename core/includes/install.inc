@@ -618,6 +618,8 @@ function drupal_check_profile($profile) {
       if (function_exists($function)) {
         $requirements = array_merge($requirements, $function('install'));
       }
+
+      $requirements = array_merge($requirements, check_class_requirements($module, $module_path));
     }
   }
 
@@ -626,6 +628,9 @@ function drupal_check_profile($profile) {
   if (function_exists($function)) {
     $requirements = array_merge($requirements, $function('install'));
   }
+
+  $profile_path = \Drupal::service('extension.list.profile')->getPath($profile);
+  $requirements = array_merge($requirements, check_class_requirements($profile, $profile_path));
 
   return $requirements;
 }
@@ -668,19 +673,10 @@ function drupal_check_module($module) {
     require_once $file;
   }
   // Check requirements
-  $requirements = \Drupal::moduleHandler()->invoke($module, 'requirements', ['install']);
-  \Drupal::service('class_loader')->addPsr4('Drupal\\' . $module . '\\', DRUPAL_ROOT . "/$module_path/src");
-  $class = "Drupal\\{$module}\\Install\\Requirements";
-  if (class_exists($class)) {
-    $requirementsGet = new $class();
-    if (!is_array($requirements)) {
-      $requirements = $requirementsGet->getRequirements();
-    }
-    else {
-      $requirements = array_merge($requirements, $requirementsGet->getRequirements());
-    }
-  }
-  if (is_array($requirements) && drupal_requirements_severity($requirements) == REQUIREMENT_ERROR) {
+  $requirements = \Drupal::moduleHandler()->invoke($module, 'requirements', ['install']) ?? [];
+  $requirements = array_merge($requirements, check_class_requirements($module, $module_path));
+
+  if (is_array($requirements) && !empty($requirements) && drupal_requirements_severity($requirements) == REQUIREMENT_ERROR) {
     // Print any error messages
     foreach ($requirements as $requirement) {
       if (isset($requirement['severity']) && $requirement['severity'] == REQUIREMENT_ERROR) {
@@ -803,4 +799,28 @@ function install_profile_info($profile, $langcode = 'en') {
     $cache[$profile][$langcode] = $info;
   }
   return $cache[$profile][$langcode];
+}
+
+/**
+ * Checks a module's requirements in RequirementsInterface.
+ *
+ * @param string $module
+ *   Machine name of module to check.
+ * @param string $module_path
+ *   The path to the module.
+ *
+ * @return array
+ *   The requirements.
+ */
+function check_class_requirements(string $module, string $module_path): array {
+  $requirements = [];
+  // @todo Do we need this.
+  \Drupal::service('class_loader')->addPsr4('Drupal\\' . $module . '\\', DRUPAL_ROOT . "/$module_path/src");
+  $class = "Drupal\\{$module}\\Install\\Requirements";
+  if (class_exists($class)) {
+    $requirementsGet = new $class();
+    $requirements = $requirementsGet->getRequirements();
+  }
+
+  return $requirements;
 }

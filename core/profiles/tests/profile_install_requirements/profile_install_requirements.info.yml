@@ -1,0 +1,6 @@
+
+name: 'Test Hook Install Requirements'
+type: profile
+description: 'Support profile for testing install requirements.'
+package: Testing
+version: VERSION

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\module_install_requirements\Install;
+namespace Drupal\profile_install_requirements\Install;
 
 use Drupal\Core\Extension\InstallRequirementsInterface;
 
@@ -12,7 +12,7 @@ class Requirements implements InstallRequirementsInterface {
    * {@inheritdoc}
    */
   public function getRequirements(): array {
-    $GLOBALS['module_install_requirements'] = 'module_install_requirements';
+    $GLOBALS['profile_install_requirements'] = 'profile_install_requirements';
 
     return [];
   }
