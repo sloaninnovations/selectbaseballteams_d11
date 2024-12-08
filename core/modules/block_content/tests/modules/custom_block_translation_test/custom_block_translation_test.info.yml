@@ -1,5 +1,5 @@
-name: "Content Block module tests"
+name: "Migrate custom block translations"
 type: module
-description: "Support module for content block related testing."
+description: "Support module to test location of i18nQueryTrait."
 package: Testing
 version: VERSION
