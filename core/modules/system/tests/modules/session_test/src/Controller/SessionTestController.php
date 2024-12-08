@@ -168,6 +168,59 @@ class SessionTestController extends ControllerBase {
   }
 
   /**
+   * Returns a preexisting trace recorded by test proxy session handlers as JSON.
+   *
+   * Expects that there is an existing stacked session handler trace as recorded
+   * by `traceHandler()`.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The response.
+   *
+   * @throws \AssertionError
+   */
+  public function traceHandlerGet() {
+    $this->assertExistingStackedHandlerTrace();
+
+    // Collect traces and return them in JSON format.
+    $trace = \Drupal::service('session_test.session_handler_proxy_trace')->getArrayCopy();
+
+    return new JsonResponse($trace);
+  }
+
+  /**
+   * Returns an updated trace recorded by test proxy session handlers as JSON.
+   *
+   * The session data is rewritten without modification to invoke
+   * `\SessionUpdateTimestampHandlerInterface::updateTimestamp`.
+   *
+   * Expects that there is an existing stacked session handler trace as recorded
+   * by `traceHandler()`.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The incoming request.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The response.
+   *
+   * @throws \AssertionError
+   */
+  public function traceHandlerRewriteUnmodified(Request $request) {
+    $this->assertExistingStackedHandlerTrace();
+
+    // Save unmodified session data.
+    assert(
+      ini_get('session.lazy_write'),
+      'session.lazy_write must be enabled to invoke updateTimestamp()'
+    );
+    $request->getSession()->save();
+
+    // Collect traces and return them in JSON format.
+    $trace = \Drupal::service('session_test.session_handler_proxy_trace')->getArrayCopy();
+
+    return new JsonResponse($trace);
+  }
+
+  /**
    * Returns the values stored in the active session and the user ID.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -284,6 +337,18 @@ class SessionTestController extends ControllerBase {
     });
 
     return new Response();
+  }
+
+  /**
+   * Asserts that there is an existing session with stacked handler trace data.
+   *
+   * @throws \AssertionError
+   */
+  protected function assertExistingStackedHandlerTrace() {
+    assert(
+      is_int($_SESSION['trace-handler']) && $_SESSION['trace-handler'] > 0,
+      'Existing stacked session handler trace not found'
+    );
   }
 
 }
