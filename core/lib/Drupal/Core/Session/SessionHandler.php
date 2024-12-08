@@ -150,13 +150,13 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
   /**
    * {@inheritdoc}
    *
-   * This function is intentionally a noop. Drupal uses a MetadataBag to manage
-   * session expiry.
+   * This function is intentionally a no-op. Drupal manages session expiry in the
+   * MetadataBag, and the timestamp should not be updated here.
    *
    * @see \Drupal\Core\Session\MetadataBag::__construct()
    */
   public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool {
-    return FALSE;
+    return TRUE;
   }
 
   /**
