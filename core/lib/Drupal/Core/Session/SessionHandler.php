@@ -149,22 +149,13 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
 
   /**
    * {@inheritdoc}
+   *
+   * This function is intentionally a noop. Drupal uses a MetadataBag to manage
+   * session expiry.
+   *
+   * @see \Drupal\Core\Session\MetadataBag::__construct()
    */
   public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool {
-    try {
-      return (bool) $this->connection->update('sessions')
-        ->condition('sid', Crypt::hashBase64($sessionId))
-        ->fields(['timestamp' => $this->time->getRequestTime()])
-        ->execute();
-    }
-    // Swallow the error if the table hasn't been created yet.
-    catch (\Exception $e) {
-      if ($this->connection->schema()->tableExists('sessions')) {
-        // If the exception happened for other reason than the missing
-        // table, propagate the exception.
-        throw $e;
-      }
-    }
     return FALSE;
   }
 
