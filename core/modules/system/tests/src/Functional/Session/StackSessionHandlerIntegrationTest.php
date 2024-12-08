@@ -60,8 +60,6 @@ class StackSessionHandlerIntegrationTest extends BrowserTestBase {
    *
    * The trace should not include `write` or `updateTimestamp` because the
    * session data is only read.
-   *
-   * @covers \Drupal\session_test\Session\TestSessionHandlerProxy::validateId
    */
   public function testRequestReadInvokesValidateId(): void {
     $options['query'][MainContentViewSubscriber::WRAPPER_FORMAT] = 'drupal_ajax';
@@ -99,8 +97,6 @@ class StackSessionHandlerIntegrationTest extends BrowserTestBase {
    *
    * The trace should include `write` but not include `updateTimestamp` because
    * the session data is modified.
-   *
-   * @covers \Drupal\session_test\Session\TestSessionHandlerProxy::validateId
    */
   public function testRequestWriteInvokesValidateId(): void {
     $options['query'][MainContentViewSubscriber::WRAPPER_FORMAT] = 'drupal_ajax';
@@ -148,9 +144,6 @@ class StackSessionHandlerIntegrationTest extends BrowserTestBase {
    * The trace should include `updateTimestamp` but not include `write` because
    * the session data is rewritten without modification and `session.lazy_write`
    * is enabled.
-   *
-   * @covers \Drupal\session_test\Session\TestSessionHandlerProxy::updateTimestamp
-   * @covers \Drupal\session_test\Session\TestSessionHandlerProxy::validateId
    */
   public function testRequestWriteInvokesUpdateTimestamp(): void {
     $options['query'][MainContentViewSubscriber::WRAPPER_FORMAT] = 'drupal_ajax';
