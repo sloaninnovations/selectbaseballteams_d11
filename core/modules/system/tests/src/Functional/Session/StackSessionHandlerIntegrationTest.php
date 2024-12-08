@@ -54,43 +54,6 @@ class StackSessionHandlerIntegrationTest extends BrowserTestBase {
   }
 
   /**
-   * Tests a session read request with a valid session cookie.
-   *
-   * The trace should include `validateId` because a session cookie is included.
-   *
-   * The trace should not include `write` or `updateTimestamp` because the
-   * session data is only read.
-   */
-  public function testRequestReadInvokesValidateId(): void {
-    $options['query'][MainContentViewSubscriber::WRAPPER_FORMAT] = 'drupal_ajax';
-    $headers = ['X-Requested-With' => 'XMLHttpRequest'];
-
-    // Call the write trace handler to store the trace and retrieve a session
-    // cookie.
-    $this->drupalGet('session-test/trace-handler');
-
-    // Call the read-only trace handler with the session cookie.
-    $actual_trace = json_decode($this->drupalGet('session-test/trace-handler-get', $options, $headers));
-    $sessionId = $this->getSessionCookies()->getCookieByName($this->getSessionName())->getValue();
-
-    $expect_trace = [
-      ["BEGIN", "test_argument", "open"],
-      ["BEGIN", NULL, "open"],
-      ["END", NULL, "open"],
-      ["END", "test_argument", "open"],
-      ["BEGIN", "test_argument", "validateId", $sessionId],
-      ["BEGIN", NULL, "validateId", $sessionId],
-      ["END", NULL, "validateId", $sessionId],
-      ["END", "test_argument", "validateId", $sessionId],
-      ["BEGIN", "test_argument", "read", $sessionId],
-      ["BEGIN", NULL, "read", $sessionId],
-      ["END", NULL, "read", $sessionId],
-      ["END", "test_argument", "read", $sessionId],
-    ];
-    $this->assertEquals($expect_trace, $actual_trace);
-  }
-
-  /**
    * Tests a session modify request with a valid session cookie.
    *
    * The trace should include `validateId` because a session cookie is included.

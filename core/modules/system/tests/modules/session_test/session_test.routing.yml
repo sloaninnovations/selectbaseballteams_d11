@@ -98,14 +98,6 @@ session_test.trace_handler:
   requirements:
     _access: 'TRUE'
 
-session_test.trace_handler_get:
-  path: '/session-test/trace-handler-get'
-  defaults:
-    _title: 'Returns a preexisting trace recorded by test proxy session handlers as JSON'
-    _controller: '\Drupal\session_test\Controller\SessionTestController::traceHandlerGet'
-  requirements:
-    _access: 'TRUE'
-
 session_test.trace_handler_rewrite_unmodified:
   path: '/session-test/trace-handler-rewrite-unmodified'
   defaults:

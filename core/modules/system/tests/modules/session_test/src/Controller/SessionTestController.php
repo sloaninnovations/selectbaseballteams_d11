@@ -168,26 +168,6 @@ class SessionTestController extends ControllerBase {
   }
 
   /**
-   * Returns a preexisting trace recorded by test proxy session handlers as JSON.
-   *
-   * Expects that there is an existing stacked session handler trace as recorded
-   * by `traceHandler()`.
-   *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
-   *   The response.
-   *
-   * @throws \AssertionError
-   */
-  public function traceHandlerGet() {
-    $this->assertExistingStackedHandlerTrace();
-
-    // Collect traces and return them in JSON format.
-    $trace = \Drupal::service('session_test.session_handler_proxy_trace')->getArrayCopy();
-
-    return new JsonResponse($trace);
-  }
-
-  /**
    * Returns an updated trace recorded by test proxy session handlers as JSON.
    *
    * The session data is rewritten without modification to invoke
@@ -205,7 +185,11 @@ class SessionTestController extends ControllerBase {
    * @throws \AssertionError
    */
   public function traceHandlerRewriteUnmodified(Request $request) {
-    $this->assertExistingStackedHandlerTrace();
+    // Assert that there is an existing session with stacked handler trace data.
+    assert(
+      is_int($_SESSION['trace-handler']) && $_SESSION['trace-handler'] > 0,
+      'Existing stacked session handler trace not found'
+    );
 
     // Save unmodified session data.
     assert(
@@ -337,18 +321,6 @@ class SessionTestController extends ControllerBase {
     });
 
     return new Response();
-  }
-
-  /**
-   * Asserts that there is an existing session with stacked handler trace data.
-   *
-   * @throws \AssertionError
-   */
-  protected function assertExistingStackedHandlerTrace(): void {
-    assert(
-      is_int($_SESSION['trace-handler']) && $_SESSION['trace-handler'] > 0,
-      'Existing stacked session handler trace not found'
-    );
   }
 
 }
