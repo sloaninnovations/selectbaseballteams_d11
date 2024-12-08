@@ -344,7 +344,7 @@ class SessionTestController extends ControllerBase {
    *
    * @throws \AssertionError
    */
-  protected function assertExistingStackedHandlerTrace() {
+  protected function assertExistingStackedHandlerTrace(): void {
     assert(
       is_int($_SESSION['trace-handler']) && $_SESSION['trace-handler'] > 0,
       'Existing stacked session handler trace not found'
