@@ -180,7 +180,6 @@ td.is-active {
 td > .form-item {
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
 td > .form-item > .form-item__prefix {
