@@ -450,7 +450,9 @@ class HookCollectorPass implements CompilerPassInterface {
    * @return void
    */
   protected function changePriority(ContainerBuilder $container, string $hook, string $class_and_method, bool $should_be_larger, ?array $others = NULL): void {
-    $events = $this->orderGroup[$hook] ?? ["drupal_hook.$hook"];
+    // @todo clean this up.
+    // $events = $this->orderGroup[$hook] ?? ["drupal_hook.$hook"];
+    $events = ["drupal_hook.$hook"];
     foreach ($container->findTaggedServiceIds('kernel.event_listener') as $id => $attributes) {
       foreach ($attributes as $key => $tag) {
         if (in_array($tag['event'], $events)) {
