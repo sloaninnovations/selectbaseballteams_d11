@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Hook;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Extension\ProceduralCall;
-use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\HookCollectorPass;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Tests\Core\GroupIncludesTestTrait;
