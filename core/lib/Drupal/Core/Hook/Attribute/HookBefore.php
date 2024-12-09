@@ -26,11 +26,11 @@ class HookBefore {
   /**
    * Constructs a core/lib/Drupal/Core/Hook/Attribute/HookBefore.php attribute object.
    *
-   * @param string $module
+   * @param array $modules
    *   The module this implementation should run before.
    */
   public function __construct(
-    public string $module,
+    public array $modules,
   ) {}
 
 }

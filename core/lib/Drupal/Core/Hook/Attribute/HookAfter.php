@@ -26,11 +26,11 @@ class HookAfter {
   /**
    * Constructs a core/lib/Drupal/Core/Hook/Attribute/HookAfter.php attribute object.
    *
-   * @param string $module
+   * @param array $modules
    *   The module this implementation should run before.
    */
   public function __construct(
-    public string $module,
+    public array $modules,
   ) {}
 
 }

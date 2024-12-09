@@ -9,6 +9,11 @@ use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Attribute\HookAfter;
+use Drupal\Core\Hook\Attribute\HookBefore;
+use Drupal\Core\Hook\Attribute\HookFirst;
+use Drupal\Core\Hook\Attribute\HookLast;
+use Drupal\Core\Hook\Attribute\HookOrderGroup;
 use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -74,7 +79,12 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * A list of implementations to reprioritize.
    */
-  protected array $orderGroup = [];
+  protected array $moduleAttributes = [];
+
+  /**
+   * An organized list of hooks to reorder.
+   */
+  protected array $orderMap = [];
 
   /**
    * {@inheritdoc}
@@ -94,6 +104,42 @@ class HookCollectorPass implements CompilerPassInterface {
     }
     $definition = $container->getDefinition('module_handler');
     $definition->setArgument('$groupIncludes', $groupIncludes);
+    foreach ($this->moduleAttributes as $module => $classAttributes) {
+      foreach ($classAttributes as $class => $methodAttributes) {
+        foreach ($methodAttributes as $method => $attributes) {
+          foreach ($attributes as $attribute) {
+            $attribute = $attribute->newInstance();
+            switch (get_class($attribute)) {
+              case Hook::class:
+                self::checkForProceduralOnlyHooks($attribute->hook, $class);
+                $this->addFromAttribute($attribute, $class, $module);
+                break;
+
+              case HookAfter::class:
+                $this->orderMap[$hook][$class][$method]['after'] = $attribute->modules;
+                break;
+
+              case HookBefore::class:
+                $this->orderMap[$hook][$class][$method]['before'] = $attribute->modules;
+                break;
+
+              case HookFirst::class:
+                $this->orderMap[$hook][$class][$method]['first'] = 9999;
+                break;
+
+              case HookLast::class:
+                $this->orderMap[$hook][$class][$method]['last'] = -9999;
+                break;
+
+              case HookOrderGroup::class:
+                $this->orderMap[$hook][$class][$method]['sort'] = $attribute->group;
+                break;
+            }
+          }
+        }
+      }
+    }
+
     foreach ($collector->moduleImplements as $hook => $moduleImplements) {
       foreach ($collector->moduleImplementsAlters as $alter) {
         $alter($moduleImplements, $hook);
@@ -114,13 +160,41 @@ class HookCollectorPass implements CompilerPassInterface {
             $definition->addTag('kernel.event_listener', [
               'event' => "drupal_hook.$hook",
               'method' => $method,
-              'priority' => $priority--,
+              'priority' => $priority,
             ]);
           }
         }
       }
     }
     $container->setParameter('hook_implementations_map', $map);
+
+    foreach ($this->orderMap as $hook => $classes) {
+      foreach ($classes as $class => $methods) {
+        foreach ($methods as $method => $actions) {
+          foreach ($actions as $action => $others) {
+            switch ($action) {
+              case 'first':
+                $this->changePriority($container, $hook, "$class::$method", TRUE);
+                break;
+
+              case 'before':
+                // @todo $others likely needs to be updated.
+                $this->changePriority($container, $hook, "$class::$method", TRUE, $others);
+                break;
+
+              case 'after':
+                // @todo $others likely needs to be updated.
+                $this->changePriority($container, $hook, "$class::$method", FALSE, $others);
+                break;
+
+              case 'last':
+                $this->changePriority($container, $hook, "$class::$method", FALSE);
+                break;
+            }
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -173,6 +247,7 @@ class HookCollectorPass implements CompilerPassInterface {
   protected function collectModuleHookImplementations($dir, $module, $module_preg, bool $skip_procedural): void {
     $hook_file_cache = FileCacheFactory::get('hook_implementations');
     $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . $module_preg);
+    $this->moduleAttributes[$module] = [];
 
     $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS);
     $iterator = new \RecursiveCallbackFilterIterator($iterator, static::filterIterator(...));
@@ -191,6 +266,8 @@ class HookCollectorPass implements CompilerPassInterface {
       }
       if ($extension === 'php') {
         $cached = $hook_file_cache->get($filename);
+        // @todo remove this comment.
+        // $cached = FALSE;
         if ($cached) {
           $class = $cached['class'];
           $attributes = $cached['attributes'];
@@ -200,16 +277,19 @@ class HookCollectorPass implements CompilerPassInterface {
           $class = $namespace . '/' . $fileinfo->getBasename('.php');
           $class = str_replace('/', '\\', $class);
           if (class_exists($class)) {
-            $attributes = static::getHookAttributesInClass($class);
+            $reflectionClass = new \ReflectionClass($class);
+            $reflectionClass = new \ReflectionClass($class);
+            $attributes['__invoke'] = $reflectionClass->getAttributes();
+            foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $methodName => $methodReflection) {
+              $attributes[$methodName] = $methodReflection->getAttributes();
+            }
             $hook_file_cache->set($filename, ['class' => $class, 'attributes' => $attributes]);
           }
           else {
             $attributes = [];
           }
         }
-        foreach ($attributes as $attribute) {
-          $this->addFromAttribute($attribute, $class, $module);
-        }
+        $this->moduleAttributes[$module][$class] = array_merge($this->moduleAttributes[$module][$class] ?? [], $attributes);
       }
       elseif (!$skip_procedural) {
         $implementations = $procedural_hook_file_cache->get($filename);
@@ -260,45 +340,6 @@ class HookCollectorPass implements CompilerPassInterface {
   }
 
   /**
-   * An array of Hook attributes on this class with $method set.
-   *
-   * @param string $class
-   *   The class.
-   *
-   * @return \Drupal\Core\Hook\Attribute\Hook[]
-   *   An array of Hook attributes on this class. The $method property is guaranteed to be set.
-   */
-  protected static function getHookAttributesInClass(string $class): array {
-    $reflection_class = new \ReflectionClass($class);
-    $class_implementations = [];
-    // Check for #[Hook] on the class itself.
-    foreach ($reflection_class->getAttributes(Hook::class, \ReflectionAttribute::IS_INSTANCEOF) as $reflection_attribute) {
-      $hook = $reflection_attribute->newInstance();
-      assert($hook instanceof Hook);
-      self::checkForProceduralOnlyHooks($hook, $class);
-      if (!$hook->method) {
-        if (method_exists($class, '__invoke')) {
-          $hook->setMethod('__invoke');
-        }
-        else {
-          throw new \LogicException("The Hook attribute for hook $hook->hook on class $class must specify a method.");
-        }
-      }
-      $class_implementations[] = $hook;
-    }
-    // Check for #[Hook] on methods.
-    foreach ($reflection_class->getMethods(\ReflectionMethod::IS_PUBLIC) as $method_reflection) {
-      foreach ($method_reflection->getAttributes(Hook::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute_reflection) {
-        $hook = $attribute_reflection->newInstance();
-        assert($hook instanceof Hook);
-        self::checkForProceduralOnlyHooks($hook, $class);
-        $class_implementations[] = $hook->setMethod($method_reflection->getName());
-      }
-    }
-    return $class_implementations;
-  }
-
-  /**
    * Adds a Hook attribute implementation.
    *
    * @param \Drupal\Core\Hook\Attribute\Hook $hook
@@ -314,14 +355,6 @@ class HookCollectorPass implements CompilerPassInterface {
     }
     $this->moduleImplements[$hook->hook][$module] = '';
     $this->implementations[$hook->hook][$module][$class][] = $hook->method;
-
-    if ($hook->orderGroup) {
-      if (!isset($this->orderGroup[$hook->orderGroup])) {
-        $this->orderGroup[$hook->orderGroup] = ['drupal_hook' . $hook->orderGroup];
-      }
-      $this->orderGroup[$hook->orderGroup][$hook->hook] = ['drupal_hook' . $hook->hook];
-
-    }
   }
 
   /**
@@ -342,6 +375,7 @@ class HookCollectorPass implements CompilerPassInterface {
       $this->hookInfo[] = $function;
     }
     if ($hook === 'module_implements_alter') {
+      // @todo confirm this is skipped when #[LegacyHook] should be.
       $this->moduleImplementsAlters[] = $function;
     }
     if ($fileinfo->getExtension() !== 'module') {
@@ -395,7 +429,7 @@ class HookCollectorPass implements CompilerPassInterface {
     }
   }
 
-    /**
+  /**
    * Change the priority of a hook implementation.
    *
    * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container

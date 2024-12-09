@@ -26,11 +26,11 @@ class HookOrderGroup {
   /**
    * Constructs a core/lib/Drupal/Core/Hook/Attribute/HookAfter.php attribute object.
    *
-   * @param array
+   * @param array $group
    *   The group of implementations to change.
    */
   public function __construct(
-    public string $group,
+    public array $group,
   ) {}
 
 }
