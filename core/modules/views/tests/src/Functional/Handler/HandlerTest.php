@@ -79,9 +79,13 @@ class HandlerTest extends ViewTestBase {
   public function testBreakString(): void {
     // Check defaults.
     $this->assertEquals((object) ['value' => [], 'operator' => NULL], HandlerBase::breakString(''));
+    // Create a string of 'word' repeated 4000 times, joined by '+' to simulate an "OR" operation.
     $long_string_or = implode('+', array_fill(0, 4000, 'word'));
+    // Create a string of 'word' repeated 4000 times, joined by ',' to simulate an "AND" operation.
     $long_string_and = implode(',', array_fill(0, 4000, 'word'));
+    // Create a string of 'word:word1' repeated 4000 times, joined by '+' to simulate an "OR" operation with a regex-like pattern.
     $long_string_or_regex = implode('+', array_fill(0, 4000, 'word:word1'));
+    // Create a string of 'word:word1' repeated 4000 times, joined by ',' to simulate an "AND" operation with a regex-like pattern.
     $long_string_and_regex = implode(',', array_fill(0, 4000, 'word:word1'));
 
     // Test ors

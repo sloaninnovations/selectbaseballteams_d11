@@ -830,29 +830,28 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    */
   public static function breakString($str, $force_int = FALSE) {
     $operator = NULL;
+    // Initialize $value as an empty array by default.
     $value = [];
 
-    // Check if the string is empty.
-    if (trim($str) === '') {
-      $value = [];
-      // Keep the operator as NULL for an empty string.
-    }
-    // Check if the string has only one word without any delimiters.
-    elseif (!strpos($str, '+') && !strpos($str, ',') && !strpos($str, ' ')) {
-      $value = [$str];
-      // Default to 'and' for a single word.
-      $operator = 'and';
-    }
-    // Check for 'and' operators (commas).
-    elseif (str_contains($str, ',')) {
-      $operator = 'and';
-      $value = explode(',', $str);
-    }
-    // Check for 'or' operators (plus signs or spaces).
-    elseif (str_contains($str, '+') || str_contains($str, ' ')) {
-      $operator = 'or';
-      // Replace plus signs with spaces and split.
-      $value = explode(' ', str_replace('+', ' ', $str));
+    // Process the string only if it is not empty.
+    if (trim($str) !== '') {
+      // Check if the string has only one word without any delimiters.
+      if (!strpos($str, '+') && !strpos($str, ',') && !strpos($str, ' ')) {
+        $value = [$str];
+        // Default to 'and' for a single word.
+        $operator = 'and';
+      }
+      // Check for 'and' operators (commas).
+      elseif (str_contains($str, ',')) {
+        $operator = 'and';
+        $value = explode(',', $str);
+      }
+      // Check for 'or' operators (plus signs or spaces).
+      elseif (str_contains($str, '+') || str_contains($str, ' ')) {
+        $operator = 'or';
+        // Replace plus signs with spaces and split.
+        $value = explode(' ', str_replace('+', ' ', $str));
+      }
     }
 
     // Filter any empty matches and reset array keys.
