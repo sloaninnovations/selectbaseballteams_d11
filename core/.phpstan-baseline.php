@@ -45574,12 +45574,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Plugin/Menu/ViewsMenuLink.php',
 ];
 $ignoreErrors[] = [
-	// identifier: method.notFound
-	'message' => '#^Call to an undefined method \\$this\\(Drupal\\\\views\\\\Plugin\\\\views\\\\HandlerBase\\)\\:\\:getFormula\\(\\)\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/HandlerBase.php',
-];
-$ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\HandlerBase\\:\\:acceptExposedInput\\(\\) has no return type specified\\.$#',
 	'count' => 1,
@@ -46523,12 +46517,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\argument\\\\Date\\:\\:getFormula\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/argument/Date.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\argument\\\\Date\\:\\:getSortName\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/argument/Date.php',
@@ -46556,12 +46544,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\argument\\\\EntityReferenceArgument\\:\\:summaryName\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/argument/EntityReferenceArgument.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\argument\\\\Formula\\:\\:getFormula\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/argument/Formula.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
@@ -46734,12 +46716,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\argument\\\\StringArgument\\:\\:buildOptionsForm\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/argument/StringArgument.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\argument\\\\StringArgument\\:\\:getFormula\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/argument/StringArgument.php',
 ];
