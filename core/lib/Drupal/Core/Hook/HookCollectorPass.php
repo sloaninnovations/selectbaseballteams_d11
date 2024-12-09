@@ -160,7 +160,7 @@ class HookCollectorPass implements CompilerPassInterface {
             $definition->addTag('kernel.event_listener', [
               'event' => "drupal_hook.$hook",
               'method' => $method,
-              'priority' => $priority,
+              'priority' => $priority--,
             ]);
           }
         }
