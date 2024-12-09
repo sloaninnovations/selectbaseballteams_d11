@@ -77,7 +77,7 @@ class HookCollectorPass implements CompilerPassInterface {
   private array $groupIncludes = [];
 
   /**
-   * A list of implementations to reprioritize.
+   * A list of attributes in modules for Hooks.
    */
   protected array $moduleAttributes = [];
 
@@ -113,26 +113,27 @@ class HookCollectorPass implements CompilerPassInterface {
               case Hook::class:
                 self::checkForProceduralOnlyHooks($attribute->hook, $class);
                 $this->addFromAttribute($attribute, $class, $module);
+                $this->orderMap[$module][$class][$method]['hook'] = $attribute->hook;
                 break;
 
               case HookAfter::class:
-                $this->orderMap[$hook][$class][$method]['after'] = $attribute->modules;
+                $this->orderMap[$module][$class][$method]['after'] = $attribute->modules;
                 break;
 
               case HookBefore::class:
-                $this->orderMap[$hook][$class][$method]['before'] = $attribute->modules;
+                $this->orderMap[$module][$class][$method]['before'] = $attribute->modules;
                 break;
 
               case HookFirst::class:
-                $this->orderMap[$hook][$class][$method]['first'] = 9999;
+                $this->orderMap[$module][$class][$method]['first'] = 9999;
                 break;
 
               case HookLast::class:
-                $this->orderMap[$hook][$class][$method]['last'] = -9999;
+                $this->orderMap[$module][$class][$method]['last'] = -9999;
                 break;
 
               case HookOrderGroup::class:
-                $this->orderMap[$hook][$class][$method]['sort'] = $attribute->group;
+                $this->orderMap[$module][$class][$method]['sort'] = $attribute->group;
                 break;
             }
           }
@@ -168,9 +169,10 @@ class HookCollectorPass implements CompilerPassInterface {
     }
     $container->setParameter('hook_implementations_map', $map);
 
-    foreach ($this->orderMap as $hook => $classes) {
+    foreach ($this->orderMap as $module => $classes) {
       foreach ($classes as $class => $methods) {
         foreach ($methods as $method => $actions) {
+          $hook = $this->orderMap[$module][$class][$method]['hook'];
           foreach ($actions as $action => $others) {
             switch ($action) {
               case 'first':
