@@ -420,6 +420,9 @@ class OverviewTerms extends FormBase {
         'id' => 'taxonomy',
       ],
     ];
+    if (!$operations_access && !$this->termFilter) {
+      $form['terms']['#header']['weight'] = $this->t('Weight');
+    }
     $this->renderer->addCacheableDependency($form['terms'], $create_access);
 
     foreach ($current_page as $key => $term) {
