@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook\Attribute;
 
+use Drupal\Core\Hook\HookPriority;
+
 /**
  * Attribute for marking that a hook should be executed last.
  *
@@ -18,11 +20,15 @@ namespace Drupal\Core\Hook\Attribute;
  * See \Drupal\Core\Hook\Attribute\LegacyHook for additional information.
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
-class HookLast {
+class HookLast implements HookOrderInterface {
 
   /**
    * Constructs a core/lib/Drupal/Core/Hook/Attribute/HookLast.php attribute object.
    */
   public function __construct() {}
+
+  public function getOrderAction(string $hook, string $class, string $method): \Closure {
+    return fn(HookPriority $hookPriority) => $hookPriority->change($hook, "$class::$method", FALSE);
+  }
 
 }

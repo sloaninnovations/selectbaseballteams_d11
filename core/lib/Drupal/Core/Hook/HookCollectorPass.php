@@ -9,11 +9,8 @@ use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\HookAfter;
-use Drupal\Core\Hook\Attribute\HookBefore;
-use Drupal\Core\Hook\Attribute\HookFirst;
-use Drupal\Core\Hook\Attribute\HookLast;
 use Drupal\Core\Hook\Attribute\HookOrderGroup;
+use Drupal\Core\Hook\Attribute\HookOrderInterface;
 use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -82,11 +79,6 @@ class HookCollectorPass implements CompilerPassInterface {
   protected array $moduleAttributes = [];
 
   /**
-   * An organized list of hooks to reorder.
-   */
-  protected array $orderMap = [];
-
-  /**
    * {@inheritdoc}
    */
   public function process(ContainerBuilder $container): void {
@@ -104,47 +96,39 @@ class HookCollectorPass implements CompilerPassInterface {
     }
     $definition = $container->getDefinition('module_handler');
     $definition->setArgument('$groupIncludes', $groupIncludes);
+    $orderGroups = [];
+    /** @var \Closure[] $orderActions */
+    $orderActions = [];
     foreach ($collector->moduleAttributes as $module => $classes) {
       foreach ($classes as $class => $methods) {
         foreach ($methods as $method => $attributes) {
+          $orderAttributes = [];
+          $orderGroup = FALSE;
+          $hook = FALSE;
           foreach ($attributes as $attribute) {
-            if ($attribute) {
-              switch (get_class($attribute)) {
-                case Hook::class:
-                  $hook = $attribute->hook;
-                  self::checkForProceduralOnlyHooks($attribute, $class);
-                  if ($on_behalf_module = $attribute->module) {
-                    $collector->moduleImplements[$hook][$on_behalf_module] = '';
-                    $collector->implementations[$hook][$on_behalf_module][$class][] = $method;
-                    $collector->orderMap[$on_behalf_module][$class][$method]['hook'] = $hook;
-                  }
-                  else {
-                    $collector->moduleImplements[$hook][$module] = '';
-                    $collector->implementations[$hook][$module][$class][] = $method;
-                    $collector->orderMap[$module][$class][$method]['hook'] = $hook;
-                  }
-                  break;
-
-                case HookAfter::class:
-                  $collector->orderMap[$module][$class][$method]['after'] = $attribute->modules;
-                  break;
-
-                case HookBefore::class:
-                  $collector->orderMap[$module][$class][$method]['before'] = $attribute->modules;
-                  break;
-
-                case HookFirst::class:
-                  $collector->orderMap[$module][$class][$method]['first'] = 9999;
-                  break;
-
-                case HookLast::class:
-                  $collector->orderMap[$module][$class][$method]['last'] = -9999;
-                  break;
-
-                case HookOrderGroup::class:
-                  $collector->orderMap[$module][$class][$method]['sort'] = $attribute->group;
-                  break;
+            if ($attribute instanceof Hook) {
+              self::checkForProceduralOnlyHooks($attribute, $class);
+              $hook = $attribute->hook;
+              $hookModule = $attribute->module ?: $module;
+              if ($attribute->method) {
+                $method = $attribute->method;
               }
+              $collector->moduleImplements[$hook][$hookModule] = '';
+              $collector->implementations[$hook][$hookModule][$class][] = $method;
+            }
+            if ($attribute instanceof HookOrderInterface) {
+              $orderAttributes[] = $attribute;
+            }
+            if ($attribute instanceof HookOrderGroup) {
+              $orderGroup = $attribute->group;
+            }
+          }
+          if ($hook) {
+            foreach ($orderAttributes as $orderAttribute) {
+              $orderActions[] = $orderAttribute->getOrderAction($hook, $class, $method);
+            }
+            if ($orderGroup) {
+              $orderGroups[] = array_merge($orderGroup, [$hook]);
             }
           }
         }
@@ -179,33 +163,9 @@ class HookCollectorPass implements CompilerPassInterface {
     }
     $container->setParameter('hook_implementations_map', $map);
 
-    foreach ($collector->orderMap as $module => $classes) {
-      foreach ($classes as $class => $methods) {
-        foreach ($methods as $method => $actions) {
-          $hook = $collector->orderMap[$module][$class][$method]['hook'];
-          foreach ($actions as $action => $others) {
-            switch ($action) {
-              case 'first':
-                $collector->changePriority($container, $hook, "$class::$method", TRUE);
-                break;
-
-              case 'before':
-                // @todo $others likely needs to be updated.
-                $collector->changePriority($container, $hook, "$class::$method", TRUE, $others);
-                break;
-
-              case 'after':
-                // @todo $others likely needs to be updated.
-                $collector->changePriority($container, $hook, "$class::$method", FALSE, $others);
-                break;
-
-              case 'last':
-                $collector->changePriority($container, $hook, "$class::$method", FALSE);
-                break;
-            }
-          }
-        }
-      }
+    $hookPriority = new HookPriority($container, $orderGroups);
+    foreach ($orderActions as $orderAction) {
+      $orderAction($hookPriority);
     }
   }
 
@@ -442,115 +402,6 @@ class HookCollectorPass implements CompilerPassInterface {
     if (in_array($hook->hook, $staticDenyHooks) || preg_match('/^(post_update_|preprocess_|update_\d+$)/', $hook->hook)) {
       throw new \LogicException("The hook $hook->hook on class $class does not support attributes and must remain procedural.");
     }
-  }
-
-  /**
-   * Change the priority of a hook implementation.
-   *
-   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
-   *   The container builder.
-   * @param string $hook
-   *   The name of the hook.
-   * @param string $class_and_method
-   *   Class and method separated by :: containing the hook implementation which
-   *   should be changed.
-   * @param bool $should_be_larger
-   *   TRUE for before/first, FALSE for after/last. Larger priority listeners
-   *   fire first.
-   * @param array|null $others
-   *   Other hook implementations to compare to, if any. The array is keyed by
-   *   string containing a class and method separated by ::, the value is not
-   *   used.
-   *
-   * @return void
-   */
-  protected function changePriority(ContainerBuilder $container, string $hook, string $class_and_method, bool $should_be_larger, ?array $others = NULL): void {
-    // @todo clean this up.
-    // $events = $this->orderGroup[$hook] ?? ["drupal_hook.$hook"];
-    $events = ["drupal_hook.$hook"];
-    foreach ($container->findTaggedServiceIds('kernel.event_listener') as $id => $attributes) {
-      foreach ($attributes as $key => $tag) {
-        if (in_array($tag['event'], $events)) {
-          $index = "$id.$key";
-          $priority = $tag['priority'];
-          // Symfony documents event listener priorities to be integers,
-          // HookCollectorPass sets them to be integers, ::setPriority() only
-          // accepts integers.
-          assert(is_int($priority));
-          $priorities[$index] = $priority;
-          $specifier = "$id::" . $tag['method'];
-          if ($class_and_method === $specifier) {
-            $index_this = $index;
-          }
-          // If $others is specified by ::before() / ::after() then for
-          // comparison only the priority of those matter.
-          // For ::first() / ::last() the priority of every other hook
-          // matters.
-          elseif (!isset($others) || isset($others[$specifier])) {
-            $priorities_other[] = $priority;
-          }
-        }
-      }
-    }
-    if (!isset($index_this) || !isset($priorities) || !isset($priorities_other)) {
-      return;
-    }
-    // The priority of the hook being changed.
-    $priority_this = $priorities[$index_this];
-    // The priority of the hook being compared to.
-    $priority_other = $should_be_larger ? max($priorities_other) : min($priorities_other);
-    // If the order is correct there is nothing to do. If the two priorities
-    // are the same then the order is undefined and so it can't be correct.
-    // If they are not the same and $priority_this is already larger exactly
-    // when $should_be_larger says then it's the correct order.
-    if ($priority_this !== $priority_other && ($should_be_larger === ($priority_this > $priority_other))) {
-      return;
-    }
-    $priority_new = $priority_other + ($should_be_larger ? 1 : -1);
-    // For ::first() / ::last() this new priority is already larger/smaller
-    // than all existing priorities but for ::before() / ::after() it might
-    // belong to an already existing hook. In this case set the new priority
-    // temporarily to be halfway between $priority_other and $priority_new
-    // then give all hook implementations new, integer priorities keeping this
-    // new order. This ensures the hook implementation being changed is in the
-    // right order relative to both $priority_other and the hook whose
-    // priority was $priority_new.
-    if (in_array($priority_new, $priorities)) {
-      $priorities[$index_this] = $priority_other + ($should_be_larger ? 0.5 : -0.5);
-      asort($priorities);
-      $changed_indexes = array_keys($priorities);
-      $priorities = array_combine($changed_indexes, range(1, count($changed_indexes)));
-    }
-    else {
-      $priorities[$index_this] = $priority_new;
-      $changed_indexes = [$index_this];
-    }
-    foreach ($changed_indexes as $index) {
-      [$id, $key] = explode('.', $index);
-      self::setPriority($container, $id, (int) $key, $priorities[$index]);
-    }
-  }
-
-  /**
-   * Set the priority of a listener.
-   *
-   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
-   *   The container.
-   * @param string $class
-   *   The name of the class, this is the same as the service id.
-   * @param int $key
-   *   The key within the tags array of the 'kernel.event_listener' tag for the
-   *   hook implementation to be changed.
-   * @param int $priority
-   *   The new priority.
-   *
-   * @return void
-   */
-  public static function setPriority(ContainerBuilder $container, string $class, int $key, int $priority): void {
-    $definition = $container->getDefinition($class);
-    $tags = $definition->getTags();
-    $tags['kernel.event_listener'][$key]['priority'] = $priority;
-    $definition->setTags($tags);
   }
 
 }

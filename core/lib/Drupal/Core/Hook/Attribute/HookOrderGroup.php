@@ -24,10 +24,13 @@ namespace Drupal\Core\Hook\Attribute;
 class HookOrderGroup {
 
   /**
-   * Constructs a core/lib/Drupal/Core/Hook/Attribute/HookAfter.php attribute object.
+   * Constructs a core/lib/Drupal/Core/Hook/Attribute/HookOrderGroup.php attribute object.
    *
    * @param array $group
-   *   The group of implementations to change.
+   *   A list of hooks to sort together. For example, if a method implementing
+   *   form_BASE_FORM_ID_alter wants to sort itself relative to some
+   *   implementations of form_FORM_ID_alter then this would contain those.
+   *   See Ckeditor5::formFilterFormatFormAlter() for example.
    */
   public function __construct(
     public array $group,

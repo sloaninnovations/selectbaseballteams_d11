@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook\Attribute;
 
+use Drupal\Core\Hook\HookPriority;
+
 /**
  * Attribute for marking that a hook should be changed.
  *
@@ -21,7 +23,7 @@ namespace Drupal\Core\Hook\Attribute;
  * See \Drupal\Core\Hook\Attribute\LegacyHook for additional information.
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
-class HookAfter {
+class HookAfter implements HookOrderInterface {
 
   /**
    * Constructs a core/lib/Drupal/Core/Hook/Attribute/HookAfter.php attribute object.
@@ -32,5 +34,9 @@ class HookAfter {
   public function __construct(
     public array $modules,
   ) {}
+
+  public function getOrderAction(string $hook, string $class, string $method): \Closure {
+    return fn(HookPriority $hookPriority) => $hookPriority->change($hook, "$class::$method", FALSE, $this->modules);
+  }
 
 }
