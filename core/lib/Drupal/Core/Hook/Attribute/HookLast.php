@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook\Attribute;
 
-use Drupal\Core\Hook\HookPriority;
+use Drupal\Core\Hook\Attribute\HookOrderBase;
 
 /**
  * Attribute for marking that a hook should be executed last.
@@ -23,7 +23,7 @@ use Drupal\Core\Hook\HookPriority;
 class HookLast extends HookOrderBase {
 
   /**
-   * Constructs a core/lib/Drupal/Core/Hook/Attribute/HookLast.php attribute object.
+   * Constructs a HookLast attribute.
    */
   public function __construct() {
     parent::__construct(FALSE);

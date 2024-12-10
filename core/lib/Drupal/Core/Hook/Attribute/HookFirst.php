@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook\Attribute;
 
-use Drupal\Core\Hook\HookPriority;
+use Drupal\Core\Hook\Attribute\HookOrderBase;
 
 /**
  * Attribute for marking that a hook should be executed first.
@@ -23,11 +23,10 @@ use Drupal\Core\Hook\HookPriority;
 class HookFirst extends HookOrderBase {
 
   /**
-   * Constructs a core/lib/Drupal/Core/Hook/Attribute/HookFirst.php attribute object.
+   * Constructs a HookFirst attribute.
    */
   public function __construct() {
     parent::__construct(TRUE);
   }
-
 
 }

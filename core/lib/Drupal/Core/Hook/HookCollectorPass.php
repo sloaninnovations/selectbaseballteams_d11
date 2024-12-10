@@ -208,7 +208,6 @@ class HookCollectorPass implements CompilerPassInterface {
     }
   }
 
-
   /**
    * Collects all hook implementations.
    *
