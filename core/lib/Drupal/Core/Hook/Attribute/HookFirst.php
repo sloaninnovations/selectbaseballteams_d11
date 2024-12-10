@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook\Attribute;
 
-use Drupal\Core\Hook\Attribute\HookOrderBase;
-
 /**
  * Attribute for marking that a hook should be executed first.
  *

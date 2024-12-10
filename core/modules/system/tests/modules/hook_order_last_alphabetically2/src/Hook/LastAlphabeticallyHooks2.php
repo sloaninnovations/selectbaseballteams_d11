@@ -14,22 +14,22 @@ use Drupal\Core\Hook\Attribute\HookOrderGroup;
 class LastAlphabeticallyHooks2 {
 
   /**
-   * Before FirstAlphabeticallyHooks2::cacheFlush1
+   * Before FirstAlphabeticallyHooks2::cacheFlush1.
    */
   #[Hook('cache_flush')]
   public static function cacheFlush1(): void {
     // This should be run before so HookAfter should not be set.
-    if(isset($GLOBALS['HookAfter'])) {
+    if (isset($GLOBALS['HookAfter'])) {
       $GLOBALS['HookOutOfOrderTestingAfter'] = 'HookOutOfOrderTestingAfter';
     }
     $GLOBALS['HookRanTestingAfter'] = 'HookRanTestingAfter';
   }
 
   /**
-   * Before FirstAlphabeticallyHooks2::cacheFlush2
+   * Before FirstAlphabeticallyHooks2::cacheFlush2.
    */
   #[HookBefore(['hook_order_last_alphabetically2'])]
-  #[HookOrderGroup(['cacheFlush2'])]
+  #[HookOrderGroup(['cache_flush'])]
   #[Hook('cache_flush')]
   public static function cacheFlush2(): void {
     $GLOBALS['HookBefore'] = 'HookBefore';

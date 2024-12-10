@@ -13,7 +13,7 @@ use Drupal\Core\Hook\Attribute\HookFirst;
 class LastAlphabeticallyHooks1 {
 
   /**
-   * Before FirstAlphabeticallyHooks1::cacheFlush1
+   * Before FirstAlphabeticallyHooks1::cacheFlush1.
    */
   #[HookFirst]
   #[Hook('cache_flush')]
@@ -22,22 +22,22 @@ class LastAlphabeticallyHooks1 {
   }
 
   /**
-   * Before FirstAlphabeticallyHooks1::cacheFlush2
+   * Before FirstAlphabeticallyHooks1::cacheFlush2.
    */
   #[Hook('cache_flush')]
   public static function cacheFlush2(): void {
-    if(isset($GLOBALS['HookLast'])) {
+    if (isset($GLOBALS['HookLast'])) {
       $GLOBALS['HookOutOfOrderTestingLast'] = 'HookOutOfOrderTestingLast';
     }
     $GLOBALS['HookRanTestingLast'] = 'HookRanTestingLast';
   }
 
   /**
-   * Before FirstAlphabeticallyHooks::cacheFlush3
+   * Before FirstAlphabeticallyHooks::cacheFlush3.
    */
   #[Hook('cache_flush')]
   public static function cacheFlush3(): void {
-    if(isset($GLOBALS['HookLast'])) {
+    if (isset($GLOBALS['HookLast'])) {
       $GLOBALS['HookOutOfOrderTestingLast'] = 'HookOutOfOrderTestingLast';
     }
     $GLOBALS['HookRanTestingLast'] = 'HookRanTestingLast';
