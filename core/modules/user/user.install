@@ -118,7 +118,9 @@ function user_requirements($phase): array {
 
   $query = \Drupal::database()->select('users_field_data');
   $query->addExpression('LOWER(mail)', 'lower_mail');
+  $query->groupBy('uid');
   $query->groupBy('lower_mail');
+  $query->groupBy('langcode');
   $query->having('COUNT(uid) > :matches', [':matches' => 1]);
   $conflicts = $query->countQuery()->execute()->fetchField();
 
