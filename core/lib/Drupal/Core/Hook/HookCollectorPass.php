@@ -124,8 +124,11 @@ class HookCollectorPass implements CompilerPassInterface {
 
   /**
    * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   *   The container.
    * @param \Drupal\Core\Hook\HookCollectorPass $collector
+   *   The collector.
    * @param array $allModuleImplements
+   *   Modules that implement hooks.
    *
    * @return void
    */

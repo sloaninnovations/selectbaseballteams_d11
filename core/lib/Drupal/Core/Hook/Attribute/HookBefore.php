@@ -26,7 +26,7 @@ use Drupal\Core\Hook\Attribute\HookOrderBase;
 class HookBefore extends HookOrderBase {
 
   /**
-   * Constructs a HookBefore attribute.
+   * Constructs a HookBefore lib/Drupal/Core/Hook/Attribute/attribute.
    *
    * @param array $modules
    *   The module this implementation should run before.
