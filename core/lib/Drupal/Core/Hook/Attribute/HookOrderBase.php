@@ -6,11 +6,20 @@ namespace Drupal\Core\Hook\Attribute;
 
 class HookOrderBase implements HookOrderInterface {
 
-  public readonly string $hook;
+  /**
+   * @internal
+   */
+  public string $hook;
 
-  public readonly string $class;
+  /**
+   * @internal
+   */
+  public string $class;
 
-  public readonly string $method;
+  /**
+   * @internal
+   */
+  public string $method;
 
   public function __construct(public readonly bool $shouldBeLarger) {
 
