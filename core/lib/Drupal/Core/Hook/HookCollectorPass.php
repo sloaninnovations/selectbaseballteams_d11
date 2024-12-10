@@ -293,7 +293,7 @@ class HookCollectorPass implements CompilerPassInterface {
             if ($class_attributes = $reflectionClass->getAttributes()) {
               $attributes['__invoke'] = array_map(fn ($x) => $x->newInstance(), $class_attributes);
             }
-            foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $methodName => $methodReflection) {
+            foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $methodReflection) {
               if ($method_attributes = $methodReflection->getAttributes()) {
                 $attributes[$methodReflection->getName()] = array_map(fn ($x) => $x->newInstance(), $method_attributes);
               }
