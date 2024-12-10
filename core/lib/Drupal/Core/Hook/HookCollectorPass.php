@@ -74,19 +74,6 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   public function process(ContainerBuilder $container): void {
     $collector = static::collectAllHookImplementations($container->getParameter('container.modules'), $container);
-    $map = [];
-    $container->register(ProceduralCall::class, ProceduralCall::class)
-      ->addArgument($collector->includes);
-    $groupIncludes = [];
-    foreach ($collector->hookInfo as $function) {
-      foreach ($function() as $hook => $info) {
-        if (isset($collector->groupIncludes[$info['group']])) {
-          $groupIncludes[$hook] = $collector->groupIncludes[$info['group']];
-        }
-      }
-    }
-    $definition = $container->getDefinition('module_handler');
-    $definition->setArgument('$groupIncludes', $groupIncludes);
     $orderGroups = [];
     /** @var \Closure[] $orderActions */
     $orderActions = [];
@@ -128,7 +115,35 @@ class HookCollectorPass implements CompilerPassInterface {
       }
     }
 
-    foreach ($moduleImplements ?? [] as $hook => $moduleImplements) {
+    $this->registerServices($container, $collector, $moduleImplements ?? []);
+
+    $hookPriority = new HookPriority($container, $orderGroups);
+    foreach ($orderActions as $orderAction) {
+      $orderAction($hookPriority);
+    }
+  }
+
+  /**
+   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param \Drupal\Core\Hook\HookCollectorPass $collector
+   * @param array $allModuleImplements
+   *
+   * @return void
+   */
+  protected function registerServices(ContainerBuilder $container, HookCollectorPass $collector, array $allModuleImplements): void {
+    $container->register(ProceduralCall::class, ProceduralCall::class)
+      ->addArgument($collector->includes);
+    $groupIncludes = [];
+    foreach ($collector->hookInfo as $function) {
+      foreach ($function() as $hook => $info) {
+        if (isset($collector->groupIncludes[$info['group']])) {
+          $groupIncludes[$hook] = $collector->groupIncludes[$info['group']];
+        }
+      }
+    }
+    $definition = $container->getDefinition('module_handler');
+    $definition->setArgument('$groupIncludes', $groupIncludes);
+    foreach ($allModuleImplements as $hook => $moduleImplements) {
       foreach ($collector->moduleImplementsAlters as $alter) {
         $alter($moduleImplements, $hook);
       }
@@ -154,12 +169,7 @@ class HookCollectorPass implements CompilerPassInterface {
         }
       }
     }
-    $container->setParameter('hook_implementations_map', $map);
-
-    $hookPriority = new HookPriority($container, $orderGroups);
-    foreach ($orderActions as $orderAction) {
-      $orderAction($hookPriority);
-    }
+    $container->setParameter('hook_implementations_map', $map ?? []);
   }
 
   /**
