@@ -388,10 +388,7 @@ class OverviewTerms extends FormBase {
       $form['tabledrag_disabled_help'] = [
         '#type' => 'container',
         'message' => [
-          '#markup' => $this->t('Reordering is disabled while terms are filtered.'),
-        ],
-        '#attributes' => [
-          'class' => ['messages'],
+          '#markup' => '<strong>' . $this->t('Reordering is disabled while terms are filtered.') . '</strong>',
         ],
       ];
     }
