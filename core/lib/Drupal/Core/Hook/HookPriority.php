@@ -13,7 +13,7 @@ class HookPriority {
   /**
    * Change the priority of a hook implementation.
    *
-   * @param string $hook
+   * @param array $hooks
    *   The name of the hook.
    * @param string $class_and_method
    *   Class and method separated by :: containing the hook implementation which

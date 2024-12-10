@@ -176,9 +176,13 @@ class HookCollectorPass implements CompilerPassInterface {
 
   /**
    * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   *   The container.
    * @param array $allOrderAttributes
+   *   All attributes related to ordering.
    * @param array $orderGroups
+   *   Groups to order by.
    * @param array $implementations
+   *   Hook implementations.
    *
    * @return void
    */
