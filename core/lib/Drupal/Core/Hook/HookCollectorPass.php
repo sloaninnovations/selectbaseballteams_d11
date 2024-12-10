@@ -157,7 +157,7 @@ class HookCollectorPass implements CompilerPassInterface {
       }
       $priority = 0;
       foreach ($moduleImplements as $module => $v) {
-        foreach ($collector->[$hook][$module] as $class => $method_hooks) {
+        foreach ($collector->implementations[$hook][$module] as $class => $method_hooks) {
           if ($container->has($class)) {
             $definition = $container->findDefinition($class);
           }
