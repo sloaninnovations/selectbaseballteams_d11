@@ -212,7 +212,6 @@ class HookCollectorPass implements CompilerPassInterface {
   protected function collectModuleHookImplementations($dir, $module, $module_preg, bool $skip_procedural): void {
     $hook_file_cache = FileCacheFactory::get('hook_implementations');
     $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . $module_preg);
-    $this->moduleAttributes[$module] = [];
 
     $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS);
     $iterator = new \RecursiveCallbackFilterIterator($iterator, static::filterIterator(...));
@@ -307,16 +306,17 @@ class HookCollectorPass implements CompilerPassInterface {
    * Adds a procedural hook implementation.
    *
    * @param \SplFileInfo $fileinfo
-   *   The file this procedural implementation is in. (You don't say)
+   *   The file this procedural implementation is in.
    * @param string $hook
-   *   The name of the hook. (Huh, right?)
-   * @param string $module
-   *   The name of the module. (Truly shocking!)
+   *   The name of the hook.
+   * @param string $hookModule
+   *   The name of the module this hook implementation belongs to. It can be
+   *   different to the file where $function is in.
    * @param string $function
-   *   The name of function implementing the hook. (Wow!)
+   *   The name of function implementing the hook.
    */
-  protected function addProceduralImplementation(\SplFileInfo $fileinfo, string $hook, string $module, string $function): void {
-    $this->moduleAttributes[$module][ProceduralCall::class][$function] = [new Hook($hook, $module . '_' . $hook)];
+  protected function addProceduralImplementation(\SplFileInfo $fileinfo, string $hook, string $hookModule, string $function): void  {
+    $this->moduleAttributes[$hookModule][ProceduralCall::class][$function] = [new Hook($hook, $hookModule . '_' . $hook)];
     if ($hook === 'hook_info') {
       $this->hookInfo[] = $function;
     }
