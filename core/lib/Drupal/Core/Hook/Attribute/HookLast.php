@@ -20,15 +20,13 @@ use Drupal\Core\Hook\HookPriority;
  * See \Drupal\Core\Hook\Attribute\LegacyHook for additional information.
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
-class HookLast implements HookOrderInterface {
+class HookLast extends HookOrderBase {
 
   /**
    * Constructs a core/lib/Drupal/Core/Hook/Attribute/HookLast.php attribute object.
    */
-  public function __construct() {}
-
-  public function getOrderAction(string $hook, string $class, string $method): \Closure {
-    return fn(HookPriority $hookPriority) => $hookPriority->change($hook, "$class::$method", FALSE);
+  public function __construct() {
+    parent::__construct(FALSE);
   }
 
 }

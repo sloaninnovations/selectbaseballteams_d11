@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class HookPriority {
 
-  public function __construct(protected ContainerBuilder $container, protected array $orderGroups) {}
+  public function __construct(protected ContainerBuilder $container) {}
 
   /**
    * Change the priority of a hook implementation.
@@ -27,16 +27,8 @@ class HookPriority {
    *
    * @return void
    */
-  public function change(string $hook, string $class_and_method, bool $should_be_larger, ?array $others = NULL): void {
-    $events = ["drupal_hook.$hook"];
-    foreach ($this->orderGroups as $group) {
-      if (in_array($hook, $group)) {
-        foreach ($group as $alsoHook) {
-          $events[] = "drupal_hook.$alsoHook";
-        }
-      }
-    }
-    $events = array_unique($events);
+  public function change(array $hooks, string $class_and_method, bool $should_be_larger, ?array $others = NULL): void {
+    $events = array_map(fn ($hook) => "drupal_hook.$hook", $hooks);
     foreach ($this->container->findTaggedServiceIds('kernel.event_listener') as $id => $attributes) {
       foreach ($attributes as $key => $tag) {
         if (in_array($tag['event'], $events)) {
@@ -95,15 +87,13 @@ class HookPriority {
     }
     foreach ($changed_indexes as $index) {
       [$id, $key] = explode('.', $index);
-      self::set($this->container, $id, (int) $key, $priorities[$index]);
+      $this->set($id, (int) $key, $priorities[$index]);
     }
   }
 
   /**
    * Set the priority of a listener.
    *
-   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
-   *   The container.
    * @param string $class
    *   The name of the class, this is the same as the service id.
    * @param int $key
@@ -114,8 +104,8 @@ class HookPriority {
    *
    * @return void
    */
-  public static function set(ContainerBuilder $container, string $class, int $key, int $priority): void {
-    $definition = $container->getDefinition($class);
+  public function set(string $class, int $key, int $priority): void {
+    $definition = $this->container->getDefinition($class);
     $tags = $definition->getTags();
     $tags['kernel.event_listener'][$key]['priority'] = $priority;
     $definition->setTags($tags);

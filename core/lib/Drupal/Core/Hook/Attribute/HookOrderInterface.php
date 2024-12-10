@@ -6,6 +6,8 @@ namespace Drupal\Core\Hook\Attribute;
 
 interface HookOrderInterface {
 
-  public function getOrderAction(string $hook, string $class, string $method): \Closure;
+  public function setHook(string $hook): static;
+  public function setClass(string $class): static;
+  public function setMethod(string $method): static;
 
 }

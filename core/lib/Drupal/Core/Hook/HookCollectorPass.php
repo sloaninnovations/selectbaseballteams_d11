@@ -75,8 +75,8 @@ class HookCollectorPass implements CompilerPassInterface {
   public function process(ContainerBuilder $container): void {
     $collector = static::collectAllHookImplementations($container->getParameter('container.modules'), $container);
     $orderGroups = [];
-    /** @var \Closure[] $orderActions */
-    $orderActions = [];
+    /** @var \Drupal\Core\Hook\Attribute\HookOrderBase[] $allOrderAttributes */
+    $allOrderAttributes = [];
     foreach (array_keys($container->getParameter('container.modules')) as $module) {
       foreach ($collector->moduleAttributes[$module] ?? [] as $class => $methods) {
         foreach ($methods as $method => $attributes) {
@@ -105,7 +105,10 @@ class HookCollectorPass implements CompilerPassInterface {
           }
           if ($hook) {
             foreach ($orderAttributes as $orderAttribute) {
-              $orderActions[] = $orderAttribute->getOrderAction($hook, $class, $method);
+              $allOrderAttributes[] = $orderAttribute
+                ->setHook($hook)
+                ->setClass($class)
+                ->setMethod($method);
             }
             if ($orderGroup) {
               $orderGroups[] = array_merge($orderGroup, [$hook]);
@@ -115,12 +118,8 @@ class HookCollectorPass implements CompilerPassInterface {
       }
     }
 
-    $this->registerServices($container, $collector, $moduleImplements ?? []);
-
-    $hookPriority = new HookPriority($container, $orderGroups);
-    foreach ($orderActions as $orderAction) {
-      $orderAction($hookPriority);
-    }
+    static::registerServices($container, $collector, $moduleImplements ?? []);
+    static::reOrderServices($container, $allOrderAttributes, $orderGroups, $collector->implementations);
   }
 
   /**
@@ -130,7 +129,7 @@ class HookCollectorPass implements CompilerPassInterface {
    *
    * @return void
    */
-  protected function registerServices(ContainerBuilder $container, HookCollectorPass $collector, array $allModuleImplements): void {
+  protected static function registerServices(ContainerBuilder $container, HookCollectorPass $collector, array $allModuleImplements): void {
     $container->register(ProceduralCall::class, ProceduralCall::class)
       ->addArgument($collector->includes);
     $groupIncludes = [];
@@ -171,6 +170,44 @@ class HookCollectorPass implements CompilerPassInterface {
     }
     $container->setParameter('hook_implementations_map', $map ?? []);
   }
+
+  /**
+   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param array $allOrderAttributes
+   * @param array $orderGroups
+   * @param array $implementations
+   *
+   * @return void
+   */
+  protected static function reOrderServices(ContainerBuilder $container, array $allOrderAttributes, array $orderGroups, array $implementations): void {
+    $hookPriority = new HookPriority($container);
+    foreach ($allOrderAttributes as $orderAttribute) {
+      $hooks = [$orderAttribute->hook];
+      foreach ($orderGroups as $group) {
+        if (in_array($orderAttribute->hook, $group)) {
+          $hooks = array_merge($hooks, $group);
+        }
+      }
+      $hooks = array_unique($hooks);
+      if (isset($orderAttribute->modules)) {
+        $others = [];
+        foreach ($orderAttribute->modules as $module) {
+          foreach ($hooks as $hook) {
+            foreach ($implementations[$hook][$module] as $class => $methods) {
+              foreach ($methods as $method) {
+                $others[] = "$class::$method";
+              }
+            }
+          }
+        }
+      }
+      else {
+        $others = NULL;
+      }
+      $hookPriority->change($hooks, "$orderAttribute->class::$orderAttribute->method", $orderAttribute->shouldBeLarger, $others);
+    }
+  }
+
 
   /**
    * Collects all hook implementations.
