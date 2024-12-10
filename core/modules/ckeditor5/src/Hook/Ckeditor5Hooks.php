@@ -98,17 +98,15 @@ class Ckeditor5Hooks {
 
   /**
    * Implements hook_form_FORM_ID_alter().
+   *
+   * This module's implementation of form_filter_format_form_alter() must
+   * happen after the editor module's implementation, as that implementation
+   * adds the active editor to $form_state. It must also happen after the media
+   * module's implementation so media_filter_format_edit_form_validate can be
+   * removed from the validation chain, as that validator is not needed with
+   * CKEditor 5 and will trigger a false error.
    */
   #[Hook('form_filter_format_form_alter')]
-
-  /**
- * This module's implementation of form_filter_format_form_alter() must happen
- *after the editor module's implementation, as that implementation adds the
- *active editor to $form_state. It must also happen after the media module's
- *implementation so media_filter_format_edit_form_validate can be removed
- *from the validation chain, as that validator is not needed with CKEditor 5
- *and will trigger a false error.
- */
   #[HookOrderGroup(['form_filter_format_add_form_alter', 'form_filter_format_edit_form_alter'])]
   #[HookAfter(['editor', 'media'])]
   public function formFilterFormatFormAlter(array &$form, FormStateInterface $form_state, $form_id) : void {
