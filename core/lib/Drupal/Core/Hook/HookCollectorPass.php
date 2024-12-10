@@ -280,10 +280,9 @@ class HookCollectorPass implements CompilerPassInterface {
           $class = str_replace('/', '\\', $class);
           if (class_exists($class)) {
             $reflectionClass = new \ReflectionClass($class);
-            $reflectionClass = new \ReflectionClass($class);
-            $attributes['__invoke'] = $reflectionClass->getAttributes();
+            $attributes['__invoke'] = array_map(fn ($x) => $x->newInstance(), $reflectionClass->getAttributes());
             foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $methodName => $methodReflection) {
-              $attributes[$methodName] = $methodReflection->getAttributes();
+              $attributes[$methodName] = array_map(fn ($x) => $x->newInstance(), $methodReflection->getAttributes());
             }
             $hook_file_cache->set($filename, ['class' => $class, 'attributes' => $attributes]);
           }
