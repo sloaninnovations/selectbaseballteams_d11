@@ -104,37 +104,47 @@ class HookCollectorPass implements CompilerPassInterface {
     }
     $definition = $container->getDefinition('module_handler');
     $definition->setArgument('$groupIncludes', $groupIncludes);
-    foreach ($this->moduleAttributes as $module => $classAttributes) {
-      foreach ($classAttributes as $class => $methodAttributes) {
-        foreach ($methodAttributes as $method => $attributes) {
+    foreach ($collector->moduleAttributes as $module => $classes) {
+      foreach ($classes as $class => $methods) {
+        foreach ($methods as $method => $attributes) {
           foreach ($attributes as $attribute) {
-            $attribute = $attribute->newInstance();
-            switch (get_class($attribute)) {
-              case Hook::class:
-                self::checkForProceduralOnlyHooks($attribute->hook, $class);
-                $this->addFromAttribute($attribute, $class, $module);
-                $this->orderMap[$module][$class][$method]['hook'] = $attribute->hook;
-                break;
+            if ($attribute) {
+              switch (get_class($attribute)) {
+                case Hook::class:
+                  $hook = $attribute->hook;
+                  self::checkForProceduralOnlyHooks($attribute, $class);
+                  if ($on_behalf_module = $attribute->module) {
+                    $collector->moduleImplements[$hook][$on_behalf_module] = '';
+                    $collector->implementations[$hook][$on_behalf_module][$class][] = $method;
+                    $collector->orderMap[$on_behalf_module][$class][$method]['hook'] = $hook;
+                  }
+                  else {
+                    $collector->moduleImplements[$hook][$module] = '';
+                    $collector->implementations[$hook][$module][$class][] = $method;
+                    $collector->orderMap[$module][$class][$method]['hook'] = $hook;
+                  }
+                  break;
 
-              case HookAfter::class:
-                $this->orderMap[$module][$class][$method]['after'] = $attribute->modules;
-                break;
+                case HookAfter::class:
+                  $collector->orderMap[$module][$class][$method]['after'] = $attribute->modules;
+                  break;
 
-              case HookBefore::class:
-                $this->orderMap[$module][$class][$method]['before'] = $attribute->modules;
-                break;
+                case HookBefore::class:
+                  $collector->orderMap[$module][$class][$method]['before'] = $attribute->modules;
+                  break;
 
-              case HookFirst::class:
-                $this->orderMap[$module][$class][$method]['first'] = 9999;
-                break;
+                case HookFirst::class:
+                  $collector->orderMap[$module][$class][$method]['first'] = 9999;
+                  break;
 
-              case HookLast::class:
-                $this->orderMap[$module][$class][$method]['last'] = -9999;
-                break;
+                case HookLast::class:
+                  $collector->orderMap[$module][$class][$method]['last'] = -9999;
+                  break;
 
-              case HookOrderGroup::class:
-                $this->orderMap[$module][$class][$method]['sort'] = $attribute->group;
-                break;
+                case HookOrderGroup::class:
+                  $collector->orderMap[$module][$class][$method]['sort'] = $attribute->group;
+                  break;
+              }
             }
           }
         }
@@ -147,7 +157,7 @@ class HookCollectorPass implements CompilerPassInterface {
       }
       $priority = 0;
       foreach ($moduleImplements as $module => $v) {
-        foreach ($collector->implementations[$hook][$module] as $class => $method_hooks) {
+        foreach ($collector->[$hook][$module] as $class => $method_hooks) {
           if ($container->has($class)) {
             $definition = $container->findDefinition($class);
           }
@@ -169,28 +179,28 @@ class HookCollectorPass implements CompilerPassInterface {
     }
     $container->setParameter('hook_implementations_map', $map);
 
-    foreach ($this->orderMap as $module => $classes) {
+    foreach ($collector->orderMap as $module => $classes) {
       foreach ($classes as $class => $methods) {
         foreach ($methods as $method => $actions) {
-          $hook = $this->orderMap[$module][$class][$method]['hook'];
+          $hook = $collector->orderMap[$module][$class][$method]['hook'];
           foreach ($actions as $action => $others) {
             switch ($action) {
               case 'first':
-                $this->changePriority($container, $hook, "$class::$method", TRUE);
+                $collector->changePriority($container, $hook, "$class::$method", TRUE);
                 break;
 
               case 'before':
                 // @todo $others likely needs to be updated.
-                $this->changePriority($container, $hook, "$class::$method", TRUE, $others);
+                $collector->changePriority($container, $hook, "$class::$method", TRUE, $others);
                 break;
 
               case 'after':
                 // @todo $others likely needs to be updated.
-                $this->changePriority($container, $hook, "$class::$method", FALSE, $others);
+                $collector->changePriority($container, $hook, "$class::$method", FALSE, $others);
                 break;
 
               case 'last':
-                $this->changePriority($container, $hook, "$class::$method", FALSE);
+                $collector->changePriority($container, $hook, "$class::$method", FALSE);
                 break;
             }
           }
@@ -280,9 +290,13 @@ class HookCollectorPass implements CompilerPassInterface {
           $class = str_replace('/', '\\', $class);
           if (class_exists($class)) {
             $reflectionClass = new \ReflectionClass($class);
-            $attributes['__invoke'] = array_map(fn ($x) => $x->newInstance(), $reflectionClass->getAttributes());
+            if ($class_attributes = $reflectionClass->getAttributes()) {
+              $attributes['__invoke'] = array_map(fn ($x) => $x->newInstance(), $class_attributes);
+            }
             foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $methodName => $methodReflection) {
-              $attributes[$methodName] = array_map(fn ($x) => $x->newInstance(), $methodReflection->getAttributes());
+              if ($method_attributes = $methodReflection->getAttributes()) {
+                $attributes[$methodReflection->getName()] = array_map(fn ($x) => $x->newInstance(), $method_attributes);
+              }
             }
             $hook_file_cache->set($filename, ['class' => $class, 'attributes' => $attributes]);
           }
@@ -290,7 +304,7 @@ class HookCollectorPass implements CompilerPassInterface {
             $attributes = [];
           }
         }
-        $this->moduleAttributes[$module][$class] = array_merge($this->moduleAttributes[$module][$class] ?? [], $attributes);
+        $this->moduleAttributes[$module][$class] = $attributes;
       }
       elseif (!$skip_procedural) {
         $implementations = $procedural_hook_file_cache->get($filename);
