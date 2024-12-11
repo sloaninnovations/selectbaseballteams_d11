@@ -12,7 +12,6 @@ drupal.field_ui:
     - core/once
     - core/drupal.ajax
     - core/drupal.dialog
-    - core/drupal.modal.url
 
 drupal.field_ui.manage_fields:
   version: VERSION
@@ -22,6 +21,8 @@ drupal.field_ui.manage_fields:
     theme:
       css/field_ui_add_field.theme.css: {}
       css/field_ui.icons.theme.css: {}
+  dependencies:
+    - core/drupal.modal.url
 
 drupal.field_ui_table:
   version: VERSION
