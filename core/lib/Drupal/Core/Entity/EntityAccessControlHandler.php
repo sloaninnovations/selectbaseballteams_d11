@@ -238,7 +238,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
       'langcode' => LanguageInterface::LANGCODE_DEFAULT,
     ];
 
-    $cid = $this->buildCreateAccessCid($entity_bundle, $context);
+    $cid = $this->buildCreateAccessCid($context, $entity_bundle);
     if ($cid && ($access = $this->getCache($cid, 'create', $context['langcode'], $account)) !== NULL) {
       // Cache hit, no work necessary.
       return $return_as_object ? $access : $access->isAllowed();
@@ -405,19 +405,21 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
 
   /**
    * Builds the create access result cache ID.
+   * 
+   * If there is no context other than langcode and entity type id, then the
+   * cache id can be simply the bundle. Otherwise, a custom implementation is
+   * needed to ensure cacheability, and the default implementation here
+   * returns null.
    *
-   * @param string|null $entity_bundle
-   *   The entity bundle, if any.
    * @param array $context
    *   The create access context.
+   * @param string|null $entity_bundle
+   *   The entity bundle, if the entity type has bundles.
    *
-   * @return string
-   *   The create access result cache ID.
+   * @return string|null
+   *   The create access result cache ID, or null if uncacheable.
    */
-  protected function buildCreateAccessCid(?string $entity_bundle, array $context): ?string {
-    // If there is no context other than langcode and entity type id, then the
-    // cache id can be simply the bundle. Otherwise, a custom implementation is
-    // needed.
+  protected function buildCreateAccessCid(array $context, ?string $entity_bundle): ?string {
     $extendedContext = array_filter($context, function ($key) {
       return !(in_array($key, ['entity_type_id', 'langcode']));
     }, ARRAY_FILTER_USE_KEY);

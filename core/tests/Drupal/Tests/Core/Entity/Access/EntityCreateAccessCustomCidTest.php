@@ -29,28 +29,28 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
    *
    * @var \Drupal\Core\Entity\EntityTypeInterface
    */
-  protected $entityType;
+  protected EntityTypeInterface $entityType;
 
   /**
    * A mock account.
    *
    * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $account;
+  protected AccountInterface $account;
 
   /**
    * A language code.
    *
    * @var string
    */
-  protected $langcode;
+  protected string $langcode;
 
   /**
    * A mock module handler.
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * {@inheritdoc}
@@ -83,7 +83,7 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
   /**
    * Setup the access cache on the entity handler for testing.
    *
-   * @param \Drupal\Core\Entity\EntityAccessControlHandlerInterface $handler
+   * @param \Drupal\Core\Entity\EntityAccessControlHandler $handler
    *   The access control handler.
    * @param bool $in_cache
    *   Whether to prefill the handler's access cache.
@@ -95,7 +95,7 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
    *
    * @throws \ReflectionException
    */
-  protected function setUpAccessCache($handler, $in_cache, $cid) {
+  protected function setUpAccessCache(EntityAccessControlHandler $handler, bool $in_cache, string $cid): \ReflectionProperty {
     $access_cache = new \ReflectionProperty($handler, 'accessCache');
     $access_cache->setAccessible(TRUE);
 
