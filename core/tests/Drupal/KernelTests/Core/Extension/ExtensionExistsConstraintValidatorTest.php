@@ -84,10 +84,13 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
   }
 
   /**
+   * Ensures test is getting fresh data.
+   *
    * @param \Drupal\Core\TypedData\DataDefinition $definition
    *   Data definition.
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface|object
+   *
    * @throws \Exception
    */
   public function getData(DataDefinition $definition): TypedDataInterface {

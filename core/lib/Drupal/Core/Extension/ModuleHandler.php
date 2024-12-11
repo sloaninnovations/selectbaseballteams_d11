@@ -189,7 +189,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    *   The module path; e.g., 'core/modules/node'.
    *
    * @todo Remove this when addModule() and addProfile() are removed.
-   *   See https://www.drupal.org/node/3491200
+   * @see https://www.drupal.org/project/drupal/issues/3493062
    */
   protected function add($type, $name, $path) {
     $pathname = "$path/$name.info.yml";
