@@ -110,20 +110,22 @@ class ExtensionDiscovery {
    *
    * @param string $root
    *   The app root.
-   * @param bool $use_file_cache
-   *   Whether file cache should be used.
+   * @param bool $use_info_parser
+   *   Whether the info_parser should be used. Note this argument also
+   *   determines if the deprecated file cache property is set to maintain BC in
+   *   Drupal 11.
    * @param string[] $profile_directories
    *   The available profile directories
    * @param string $site_path
    *   The path to the site.
    */
-  public function __construct(string $root, $use_file_cache = TRUE, ?array $profile_directories = NULL, ?string $site_path = NULL) {
+  public function __construct(string $root, $use_info_parser = TRUE, ?array $profile_directories = NULL, ?string $site_path = NULL) {
     $this->root = $root;
     // @phpstan-ignore property.deprecated
-    $this->fileCache = $use_file_cache ? FileCacheFactory::get('extension_discovery') : NULL;
+    $this->fileCache = $use_info_parser ? FileCacheFactory::get('extension_discovery') : NULL;
     $this->profileDirectories = $profile_directories;
     $this->sitePath = $site_path;
-    $this->infoParser = $use_file_cache ? new InfoParser($root) : NULL;
+    $this->infoParser = $use_info_parser ? new InfoParser($root) : NULL;
   }
 
   /**
