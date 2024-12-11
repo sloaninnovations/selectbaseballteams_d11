@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\hook_order_first_alphabetically3\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\HookAfter;
-use Drupal\Core\Hook\Attribute\HookOrderGroup;
 
 /**
  * Hook implementations for hook_order_first_alphabetically.

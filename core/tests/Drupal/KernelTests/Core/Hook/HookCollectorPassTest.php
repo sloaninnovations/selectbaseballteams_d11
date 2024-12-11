@@ -150,7 +150,6 @@ class HookCollectorPassTest extends KernelTestBase {
     $this->assertFalse(isset($GLOBALS['HookAfter']));
     $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingAfter']));
     $this->assertFalse(isset($GLOBALS['HookRanTestingAfter']));
-
     drupal_flush_all_caches();
     $this->assertTrue(isset($GLOBALS['HookAfter']));
     $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingAfter']));

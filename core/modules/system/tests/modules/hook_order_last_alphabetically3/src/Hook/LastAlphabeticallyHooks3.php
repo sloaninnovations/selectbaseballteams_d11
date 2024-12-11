@@ -16,7 +16,7 @@ class LastAlphabeticallyHooks3 {
   /**
    * Before FirstAlphabeticallyHooks3::cacheFlush.
    */
-  #[HookBefore(['hook_order_last_alphabetically3'])]
+  #[HookBefore(['hook_order_first_alphabetically3'])]
   #[HookOrderGroup(['cache_flush'])]
   #[Hook('cache_flush')]
   public static function cacheFlush(): void {
