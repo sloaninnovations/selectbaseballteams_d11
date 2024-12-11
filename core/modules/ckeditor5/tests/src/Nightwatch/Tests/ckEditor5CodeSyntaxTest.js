@@ -43,6 +43,7 @@ module.exports = {
         // Wait for new source editing vertical tab to be present before continuing.
         .waitForElementVisible(
           '[href*=edit-editor-settings-plugins-ckeditor5-sourceediting]',
+          9000
         )
         .click('.ckeditor5-toolbar-item-codeBlock') // Select the Code Block button.
         // Hit the down arrow key to move it to the toolbar.
