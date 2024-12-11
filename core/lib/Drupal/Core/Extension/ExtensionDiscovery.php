@@ -99,7 +99,7 @@ class ExtensionDiscovery {
   /**
    * The info parser.
    *
-   * Reads .info.yml efficiently.
+   * Reads .info.yml files efficiently.
    *
    * @var \Drupal\Core\Extension\InfoParser|null
    */
@@ -469,7 +469,7 @@ class ExtensionDiscovery {
         continue;
       }
 
-      // Determine extension type from info file.
+      // Determine the extension type from the info file.
       $type = FALSE;
       if ($this->infoParser === NULL) {
         $file = $fileinfo->openFile('r');
