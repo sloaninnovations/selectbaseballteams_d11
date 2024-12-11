@@ -188,7 +188,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * @param string $path
    *   The module path; e.g., 'core/modules/node'.
    *
-   * @todo Remove this when addModule and addProfile are removed.
+   * @todo Remove this when addModule() and addProfile() are removed.
    *   See https://www.drupal.org/node/3491200
    */
   protected function add($type, $name, $path) {

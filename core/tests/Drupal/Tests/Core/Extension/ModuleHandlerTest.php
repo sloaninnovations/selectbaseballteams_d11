@@ -333,8 +333,10 @@ class ModuleHandlerTest extends UnitTestCase {
    * @covers ::loadAllIncludes
    */
   public function testImplementsHookModuleEnabled(): void {
-    $implementations['module_handler_test_hook'] = 'module_handler_test';
-    $implementations['module_handler_test_added_hook'] = 'module_handler_test_added';
+    $implementations = [
+      'module_handler_test_hook' => 'module_handler_test',
+      'module_handler_test_added_hook' => 'module_handler_test_added',
+    ];
     $moduleList = [
       'module_handler_test_added' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_added',
       'module_handler_test_no_hook' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_no_hook',
@@ -352,9 +354,11 @@ class ModuleHandlerTest extends UnitTestCase {
    * @covers ::invokeAll
    */
   public function testInvokeAll(): void {
-    $implementations['module_handler_test_hook'] = 'module_handler_test';
-    $implementations['module_handler_test_all1_hook'] = 'module_handler_test_all1';
-    $implementations['module_handler_test_all2_hook'] = 'module_handler_test_all2';
+    $implementations = [
+      'module_handler_test_hook' => 'module_handler_test',
+      'module_handler_test_all1_hook' => 'module_handler_test_all1',
+      'module_handler_test_all2_hook' => 'module_handler_test_all2',
+    ];
     $moduleList = [
       'module_handler_test_all1' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1',
       'module_handler_test_all2' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2',
