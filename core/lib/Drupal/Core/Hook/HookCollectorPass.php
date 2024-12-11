@@ -32,13 +32,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class HookCollectorPass implements CompilerPassInterface {
 
   /**
-   * An associative array of hook implementations.
-   *
-   * Keys are hook, module, class. Values are a list of methods.
-   */
-  protected array $implementations = [];
-
-  /**
    * A list of include files.
    *
    * (This is required only for BC.)
@@ -72,8 +65,9 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * {@inheritdoc}
    */
-  public function process(ContainerBuilder $container): void {
+  public function process(ContainerBuilder $container): array {
     $collector = static::collectAllHookImplementations($container->getParameter('container.modules'), $container);
+    $implementations = [];
     $orderGroups = [];
     /** @var \Drupal\Core\Hook\Attribute\HookOrderBase[] $allOrderAttributes */
     $allOrderAttributes = [];
@@ -94,7 +88,7 @@ class HookCollectorPass implements CompilerPassInterface {
                 $method = $attribute->method;
               }
               $moduleImplements[$hook][$hookModule] = '';
-              $collector->implementations[$hook][$hookModule][$class][] = $method;
+              $implementations[$hook][$hookModule][$class][] = $method;
             }
             if ($attribute instanceof HookOrderInterface) {
               $orderAttributes[] = $attribute;
@@ -118,8 +112,12 @@ class HookCollectorPass implements CompilerPassInterface {
       }
     }
 
-    static::registerServices($container, $collector, $moduleImplements ?? []);
-    static::reOrderServices($container, $allOrderAttributes, $orderGroups, $collector->implementations);
+    // This can be removed when ModuleHandler::add() is removed.
+    if ($container->hasDefinition('module_handler')) {
+      static::registerServices($container, $collector, $moduleImplements ?? []);
+      static::reOrderServices($container, $allOrderAttributes, $orderGroups, $collector->implementations);
+    }
+    return $implementations;
   }
 
   /**
@@ -397,8 +395,10 @@ class HookCollectorPass implements CompilerPassInterface {
    *
    * @internal
    */
-  public function getImplementations(): array {
-    return $this->implementations;
+  public function getImplementations($paths): array {
+    $container = new ContainerBuilder();
+    $container->setParameter('container.modules', $paths);
+    return $this->process($container);
   }
 
   /**
