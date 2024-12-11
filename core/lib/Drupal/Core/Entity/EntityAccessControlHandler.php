@@ -405,7 +405,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
 
   /**
    * Builds the create access result cache ID.
-   * 
+   *
    * If there is no context other than langcode and entity type id, then the
    * cache id can be simply the bundle. Otherwise, a custom implementation is
    * needed to ensure cacheability, and the default implementation here
