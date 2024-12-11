@@ -114,8 +114,8 @@ class HookCollectorPass implements CompilerPassInterface {
 
     // This can be removed when ModuleHandler::add() is removed.
     if ($container->hasDefinition('module_handler')) {
-      static::registerServices($container, $collector, $moduleImplements ?? []);
-      static::reOrderServices($container, $allOrderAttributes, $orderGroups, $collector->implementations);
+      static::registerServices($container, $collector, $implementations, $moduleImplements ?? []);
+      static::reOrderServices($container, $allOrderAttributes, $orderGroups, $implementations);
     }
     return $implementations;
   }
@@ -125,12 +125,14 @@ class HookCollectorPass implements CompilerPassInterface {
    *   The container.
    * @param \Drupal\Core\Hook\HookCollectorPass $collector
    *   The collector.
+   * @param array $implementations
+   *   All implementations.
    * @param array $allModuleImplements
    *   Modules that implement hooks.
    *
    * @return void
    */
-  protected static function registerServices(ContainerBuilder $container, HookCollectorPass $collector, array $allModuleImplements): void {
+  protected static function registerServices(ContainerBuilder $container, HookCollectorPass $collector, array $implementations, array $allModuleImplements): void {
     $container->register(ProceduralCall::class, ProceduralCall::class)
       ->addArgument($collector->includes);
     $groupIncludes = [];
@@ -149,7 +151,7 @@ class HookCollectorPass implements CompilerPassInterface {
       }
       $priority = 0;
       foreach ($moduleImplements as $module => $v) {
-        foreach ($collector->implementations[$hook][$module] as $class => $method_hooks) {
+        foreach ($implementations[$hook][$module] as $class => $method_hooks) {
           if ($container->has($class)) {
             $definition = $container->findDefinition($class);
           }
