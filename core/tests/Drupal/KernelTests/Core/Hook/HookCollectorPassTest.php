@@ -150,13 +150,18 @@ class HookCollectorPassTest extends KernelTestBase {
     $this->assertFalse(isset($GLOBALS['HookAfter']));
     $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingAfter']));
     $this->assertFalse(isset($GLOBALS['HookRanTestingAfter']));
-    $this->assertFalse(isset($GLOBALS['HookBefore']));
-    $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingBefore']));
-    $this->assertFalse(isset($GLOBALS['HookRanTestingBefore']));
+
     drupal_flush_all_caches();
     $this->assertTrue(isset($GLOBALS['HookAfter']));
     $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingAfter']));
     $this->assertTrue(isset($GLOBALS['HookRanTestingAfter']));
+
+    $this->assertTrue($module_installer->install(['hook_order_first_alphabetically3']));
+    $this->assertTrue($module_installer->install(['hook_order_last_alphabetically3']));
+    $this->assertFalse(isset($GLOBALS['HookBefore']));
+    $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingBefore']));
+    $this->assertFalse(isset($GLOBALS['HookRanTestingBefore']));
+    drupal_flush_all_caches();
     $this->assertTrue(isset($GLOBALS['HookBefore']));
     $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingBefore']));
     $this->assertTrue(isset($GLOBALS['HookRanTestingBefore']));

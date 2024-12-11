@@ -32,15 +32,4 @@ class LastAlphabeticallyHooks1 {
     $GLOBALS['HookRanTestingLast'] = 'HookRanTestingLast';
   }
 
-  /**
-   * Before FirstAlphabeticallyHooks::cacheFlush3.
-   */
-  #[Hook('cache_flush')]
-  public static function cacheFlush3(): void {
-    if (isset($GLOBALS['HookLast'])) {
-      $GLOBALS['HookOutOfOrderTestingLast'] = 'HookOutOfOrderTestingLast';
-    }
-    $GLOBALS['HookRanTestingLast'] = 'HookRanTestingLast';
-  }
-
 }

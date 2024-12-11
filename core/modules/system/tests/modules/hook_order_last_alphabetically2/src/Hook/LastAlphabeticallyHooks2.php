@@ -25,14 +25,4 @@ class LastAlphabeticallyHooks2 {
     $GLOBALS['HookRanTestingAfter'] = 'HookRanTestingAfter';
   }
 
-  /**
-   * Before FirstAlphabeticallyHooks2::cacheFlush2.
-   */
-  #[HookBefore(['hook_order_last_alphabetically2'])]
-  #[HookOrderGroup(['cache_flush'])]
-  #[Hook('cache_flush')]
-  public static function cacheFlush2(): void {
-    $GLOBALS['HookBefore'] = 'HookBefore';
-  }
-
 }

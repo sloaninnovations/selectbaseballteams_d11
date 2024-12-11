@@ -23,15 +23,4 @@ class FirstAlphabeticallyHooks2 {
     $GLOBALS['HookAfter'] = 'HookAfter';
   }
 
-  /**
-   * After LastAlphabeticallyHooks2::cacheFlush2.
-   */
-  #[Hook('cache_flush')]
-  public static function cacheFlush2(): void {
-    if (!isset($GLOBALS['HookBefore'])) {
-      $GLOBALS['HookOutOfOrderTestingBefore'] = 'HookOutOfOrderTestingBefore';
-    }
-    $GLOBALS['HookRanTestingBefore'] = 'HookRanTestingBefore';
-  }
-
 }

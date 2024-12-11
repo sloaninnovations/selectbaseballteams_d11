@@ -1,0 +1,6 @@
+name: Hook ordering last
+type: module
+description: 'Test module used to test hook ordering.'
+package: Testing
+version: VERSION
+hidden: true
