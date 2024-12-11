@@ -113,7 +113,7 @@ class HookCollectorPass implements CompilerPassInterface {
     }
 
     // This can be removed when ModuleHandler::add() is removed.
-    if ($container->hasDefinition('module_handler')) {
+    if (count($container->getDefinitions()) > 1) {
       static::registerServices($container, $collector, $implementations, $moduleImplements ?? []);
       static::reOrderServices($container, $allOrderAttributes, $orderGroups, $implementations);
     }

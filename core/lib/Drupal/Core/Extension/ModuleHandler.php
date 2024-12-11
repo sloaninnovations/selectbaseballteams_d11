@@ -447,9 +447,7 @@ class ModuleHandler implements ModuleHandlerInterface {
       // the primary hook, we need to add them to the $modules array in their
       // appropriate order.
       $modules = array_keys($hook_listeners);
-      if (isset($extra_modules)) {
-        $modules = $this->reOrderModulesForAlter($modules, $hook);
-      }
+
       foreach ($modules as $module) {
         foreach ($hook_listeners[$module] ?? [] as $listener) {
           $this->alterEventListeners[$cid][] = $listener;
@@ -459,32 +457,6 @@ class ModuleHandler implements ModuleHandlerInterface {
     foreach ($this->alterEventListeners[$cid] as $listener) {
       $listener($data, $context1, $context2);
     }
-  }
-
-  /**
-   * Reorder modules for alters.
-   *
-   * @param array $modules
-   *   A list of modules.
-   * @param string $hook
-   *   The hook being worked on, for example form_alter.
-   *
-   * @return array
-   *   The list, potentially reordered and changed by
-   *   hook_module_implements_alter().
-   */
-  protected function reOrderModulesForAlter(array $modules, string $hook): array {
-    // Order by module order first.
-    $modules = array_intersect(array_keys($this->moduleList), $modules);
-    // Alter expects the module list to be in the keys.
-    $implementations = array_fill_keys($modules, FALSE);
-    // Let modules adjust the order solely based on the primary hook. This
-    // ensures the same module order regardless of whether this block
-    // runs. Calling $this->alter() recursively in this way does not
-    // result in an infinite loop, because this call is for a single
-    // $type, so we won't end up in this method again.
-    $this->alter('module_implements', $implementations, $hook);
-    return array_keys($implementations);
   }
 
   /**
@@ -573,6 +545,7 @@ class ModuleHandler implements ModuleHandlerInterface {
         }
       }
     }
+
     return $this->invokeMap[$hook] ?? [];
   }
 
