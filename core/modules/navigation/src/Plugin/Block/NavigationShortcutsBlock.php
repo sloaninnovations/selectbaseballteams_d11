@@ -85,7 +85,12 @@ final class NavigationShortcutsBlock extends BlockBase implements ContainerFacto
             '#theme' => 'navigation_menu',
             '#menu_name' => 'shortcuts',
             '#title' => $this->configuration['label'],
-            '#items' => [],
+            '#items' => [
+              [
+                'title' => $this->configuration['label'],
+                'class' => 'shortcuts',
+              ]
+            ],
           ],
         ],
       ],
