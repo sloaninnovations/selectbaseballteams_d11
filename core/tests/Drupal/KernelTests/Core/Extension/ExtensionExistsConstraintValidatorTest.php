@@ -63,7 +63,10 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $this->assertTrue($this->container->get('theme_installer')->install(['stark']));
     // Installing the theme rebuilds the container, so we need to ensure the
     // constraint is instantiated with an up-to-date theme handler.
-    $data = $this->getData($definition);
+    $data = $this->container->get('kernel')
+      ->getContainer()
+      ->get('typed_data_manager')
+      ->create($definition, 'stark');
     $this->assertCount(0, $data->validate());
 
     // `core` provides many plugins without the need to install a module, but it
@@ -81,23 +84,6 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $definition->setConstraints(['ExtensionExists' => 'profile']);
     $this->expectExceptionMessage("Unknown extension type: 'profile'");
     $data->validate();
-  }
-
-  /**
-   * Ensures test is getting fresh data.
-   *
-   * @param \Drupal\Core\TypedData\DataDefinition $definition
-   *   Data definition.
-   *
-   * @return \Drupal\Core\TypedData\TypedDataInterface|object
-   *
-   * @throws \Exception
-   */
-  public function getData(DataDefinition $definition): TypedDataInterface {
-    return $this->container->get('kernel')
-      ->getContainer()
-      ->get('typed_data_manager')
-      ->create($definition, 'stark');
   }
 
 }
