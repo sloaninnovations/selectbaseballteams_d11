@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Extension;
 
 use Drupal\Core\TypedData\DataDefinition;
-use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
