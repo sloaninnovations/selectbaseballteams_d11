@@ -106,7 +106,7 @@ class EntityTestAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function buildCreateAccessCid(array $context, ?string $entity_bundle): string {
-    $cid = parent::buildCreateAccessCid($entity_bundle, []);
+    $cid = parent::buildCreateAccessCid([], $entity_bundle);
     $cid .= isset($context['context_var1']) ? ":{$context['context_var1']}" : '';
     $cid .= isset($context['context_var2']) ? ":{$context['context_var2']}" : '';
     return $cid;
