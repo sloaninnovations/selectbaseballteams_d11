@@ -5,6 +5,8 @@
  * Install, update and uninstall functions for the dblog module.
  */
 
+use Drupal\user\Entity\Role;
+
 /**
  * Implements hook_schema().
  */
@@ -98,4 +100,18 @@ function dblog_schema(): array {
  */
 function dblog_update_last_removed(): int {
   return 10101;
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function dblog_update_111001(&$sandbox) {
+  $roles = Role::loadMultiple();
+
+  foreach ($roles as $role) {
+    if ($role->hasPermission('access site reports')) {
+      $role->grantPermission('access dblog reports');
+      $role->save();
+    }
+  }
 }
