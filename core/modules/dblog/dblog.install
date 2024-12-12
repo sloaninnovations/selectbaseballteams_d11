@@ -105,7 +105,7 @@ function dblog_update_last_removed(): int {
 /**
  * Implements hook_update_N().
  */
-function dblog_update_111001(&$sandbox) {
+function dblog_update_111001(&$sandbox): void {
   $roles = Role::loadMultiple();
 
   foreach ($roles as $role) {
