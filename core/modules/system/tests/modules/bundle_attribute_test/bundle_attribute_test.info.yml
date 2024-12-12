@@ -1,0 +1,6 @@
+name: 'Bundle attribute test'
+type: module
+description: 'Support module for testing entity bundle classes.'
+package: Testing
+dependencies:
+  - drupal:entity_test

@@ -52,6 +52,13 @@ class EntityTypeBundleInfo implements EntityTypeBundleInfoInterface {
   protected $entityTypeManager;
 
   /**
+   * The bundle class manager.
+   *
+   * @var \Drupal\Core\Entity\BundleClassManager
+   */
+  protected $bundleClassManager;
+
+  /**
    * Constructs a new EntityTypeBundleInfo.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -64,13 +71,16 @@ class EntityTypeBundleInfo implements EntityTypeBundleInfoInterface {
    *   The typed data manager.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   The cache backend.
+   * @param \Drupal\Core\Entity\BundleClassManager $bundle_class_manager
+   *   The bundle class manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, ModuleHandlerInterface $module_handler, TypedDataManagerInterface $typed_data_manager, CacheBackendInterface $cache_backend) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, ModuleHandlerInterface $module_handler, TypedDataManagerInterface $typed_data_manager, CacheBackendInterface $cache_backend, BundleClassManager $bundle_class_manager) {
     $this->entityTypeManager = $entity_type_manager;
     $this->languageManager = $language_manager;
     $this->moduleHandler = $module_handler;
     $this->typedDataManager = $typed_data_manager;
     $this->cacheBackend = $cache_backend;
+    $this->bundleClassManager = $bundle_class_manager;
   }
 
   /**
@@ -105,6 +115,17 @@ class EntityTypeBundleInfo implements EntityTypeBundleInfoInterface {
           // information, use the entity type name and label.
           elseif (!isset($this->bundleInfo[$type])) {
             $this->bundleInfo[$type][$type]['label'] = $entity_type->getLabel();
+          }
+        }
+        // Add bundle class information.
+        foreach ($this->bundleClassManager->getDefinitions() as $definition) {
+          $entity_type = $definition['entityType'];
+          $bundle = $definition['bundle'];
+          if (isset($this->bundleInfo[$entity_type][$bundle])) {
+            $this->bundleInfo[$entity_type][$bundle]['class'] = $definition['class'];
+            $this->bundleInfo[$entity_type][$bundle]['label'] = $definition['label']
+              ?? $this->bundleInfo[$entity_type][$bundle]['label']
+              ?? $definition['class'];
           }
         }
         $this->moduleHandler->alter('entity_bundle_info', $this->bundleInfo);
