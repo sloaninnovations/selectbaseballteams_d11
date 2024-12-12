@@ -80,11 +80,13 @@ class ModuleHandler implements ModuleHandlerInterface {
    *   An array keyed by hook, classname, method and the value is the module.
    * @param array $groupIncludes
    *   An array of .inc files to get helpers from.
+   * @param array $hooksOrderedByAttributes
+   *   An array of hooks that have been ordered by attributes.
    *
    * @see \Drupal\Core\DrupalKernel
    * @see \Drupal\Core\CoreServiceProvider
    */
-  public function __construct($root, array $module_list, protected EventDispatcherInterface $eventDispatcher, protected array $hookImplementationsMap, protected array $groupIncludes = []) {
+  public function __construct($root, array $module_list, protected EventDispatcherInterface $eventDispatcher, protected array $hookImplementationsMap, protected array $groupIncludes = [], protected array $hooksOrderedByAttributes = []) {
     $this->root = $root;
     $this->moduleList = [];
     foreach ($module_list as $name => $module) {
@@ -448,7 +450,14 @@ class ModuleHandler implements ModuleHandlerInterface {
       // appropriate order.
       $modules = array_keys($hook_listeners);
       if (isset($extra_modules)) {
-        $modules = $this->reOrderModulesForAlter($modules, $hook);
+        $orderingDone = FALSE;
+        if (count(array_intersect($extra_types, $this->hooksOrderedByAttributes)) === count($extra_types)) {
+          $orderingDone = TRUE;
+        }
+
+        if (!$orderingDone) {
+          $modules = $this->reOrderModulesForAlter($modules, $hook);
+        }
       }
       foreach ($modules as $module) {
         foreach ($hook_listeners[$module] ?? [] as $listener) {
