@@ -74,7 +74,6 @@ class DefaultsEntityForm extends EntityForm {
     $form['layout_builder'] = [
       '#type' => 'layout_builder',
       '#section_storage' => $section_storage,
-      '#process' => [[static::class, 'layoutBuilderElementGetKeys']],
     ];
     $form['layout_builder_message'] = $this->buildMessage($section_storage->getContextValue('display'));
 

@@ -31,7 +31,6 @@ class LayoutBuilderWidget extends WidgetBase {
       '#type' => 'layout_builder',
       '#section_storage' => $this->getSectionStorage($form_state),
     ];
-    $element['#process'][] = [static::class, 'layoutBuilderElementGetKeys'];
     return $element;
   }
 

@@ -3,6 +3,7 @@
 namespace Drupal\layout_builder\Element;
 
 use Drupal\Core\Ajax\AjaxHelperTrait;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
@@ -75,7 +76,24 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
       '#pre_render' => [
         [$this, 'preRender'],
       ],
+      '#process' => [
+        [static::class, 'layoutBuilderElementGetKeys'],
+      ],
     ];
+  }
+
+  /**
+   * Form element #process callback.
+   *
+   * Save the layout builder element array parents as a property on the top form
+   * element so that they can be used to access the element within the whole
+   * render array later.
+   *
+   * @see \Drupal\layout_builder\Controller\LayoutBuilderHtmlEntityFormController
+   */
+  public static function layoutBuilderElementGetKeys(array $element, FormStateInterface $form_state, &$form): array {
+    $form['#layout_builder_element_keys'] = $element['#array_parents'];
+    return $element;
   }
 
   /**
