@@ -98,13 +98,13 @@ class HandlerBaseTest extends UnitTestCase {
    * @param array &$option
    *   The options array to modify.
    *
-   * @deprecated in drupal:11.0.0 and is removed from drupal:12.0.0.
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
    *   This method is no longer in use and should not be called.
    *
    * @see https://www.drupal.org/node/3486781
    */
   public function defineExtraOptions(array &$option): void {
-    @trigger_error('defineExtraOptions() is deprecated in drupal:11.0.0 and is removed from drupal:12.0.0. This method is no longer in use and should not be called. See https://www.drupal.org/node/3486781', E_USER_DEPRECATED);
+    @trigger_error('defineExtraOptions() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. This method is no longer in use and should not be called. See https://www.drupal.org/node/3486781', E_USER_DEPRECATED);
   }
 
 }
