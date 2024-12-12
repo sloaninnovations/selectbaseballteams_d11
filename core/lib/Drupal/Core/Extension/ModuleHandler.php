@@ -166,7 +166,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function addModule($name, $path) {
-    @trigger_error('ModuleHandler::addModule($name, $path) is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
     $this->add('module', $name, $path);
   }
 
@@ -174,7 +174,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function addProfile($name, $path) {
-    @trigger_error('ModuleHandler::addProfile($name, $path) is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
     $this->add('profile', $name, $path);
   }
 
