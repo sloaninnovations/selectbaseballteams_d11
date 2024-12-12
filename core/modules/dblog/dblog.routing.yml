@@ -4,7 +4,7 @@ dblog.overview:
     _controller: '\Drupal\dblog\Controller\DbLogController::overview'
     _title: 'Recent log messages'
   requirements:
-    _permission: 'access site reports'
+    _permission: 'access dblog reports'
 
 dblog.confirm:
   path: '/admin/reports/dblog/confirm'
@@ -12,7 +12,7 @@ dblog.confirm:
     _form: '\Drupal\dblog\Form\DblogClearLogConfirmForm'
     _title: 'Confirm delete recent log messages'
   requirements:
-    _permission: 'access site reports'
+    _permission: 'access dblog reports'
 
 dblog.event:
   path: '/admin/reports/dblog/event/{event_id}'
@@ -20,7 +20,7 @@ dblog.event:
     _controller: '\Drupal\dblog\Controller\DbLogController::eventDetails'
     _title: 'Details'
   requirements:
-    _permission: 'access site reports'
+    _permission: 'access dblog reports'
 
 dblog.page_not_found:
   path: '/admin/reports/page-not-found'
@@ -29,7 +29,7 @@ dblog.page_not_found:
     _controller: '\Drupal\dblog\Controller\DbLogController::topLogMessages'
     type: 'page not found'
   requirements:
-    _permission: 'access site reports'
+    _permission: 'access dblog reports'
 
 dblog.access_denied:
   path: '/admin/reports/access-denied'
@@ -38,7 +38,7 @@ dblog.access_denied:
     _controller: '\Drupal\dblog\Controller\DbLogController::topLogMessages'
     type: 'access denied'
   requirements:
-    _permission: 'access site reports'
+    _permission: 'access dblog reports'
 
 dblog.search:
   path: '/admin/reports/search'
@@ -48,4 +48,4 @@ dblog.search:
     type: 'search'
   requirements:
     _module_dependencies: 'search'
-    _permission: 'access site reports'
+    _permission: 'access dblog reports'

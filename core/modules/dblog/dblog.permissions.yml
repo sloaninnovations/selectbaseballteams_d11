@@ -1,0 +1,3 @@
+access dblog reports:
+  title: 'Access Database Logging reports'
+  restrict access: true
