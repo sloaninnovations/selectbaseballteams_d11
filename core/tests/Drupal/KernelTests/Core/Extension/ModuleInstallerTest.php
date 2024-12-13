@@ -92,6 +92,21 @@ class ModuleInstallerTest extends KernelTestBase {
   }
 
   /**
+   * Ensure that hooks reacting to install or uninstall are invoked.
+   */
+  public function testInvokingRespondentHooks(): void {
+    $module_installer = $this->container->get('module_installer');
+    $this->assertTrue($module_installer->install(['respond_install_uninstall_hook_test']));
+    $this->assertTrue($module_installer->install(['cache_test']));
+    $this->assertTrue(isset($GLOBALS['hook_module_preinstall']));
+    $this->assertTrue(isset($GLOBALS['hook_modules_installed']));
+    $module_installer->uninstall(['cache_test']);
+    $this->assertTrue(isset($GLOBALS['hook_module_preuninstall']));
+    $this->assertTrue(isset($GLOBALS['hook_modules_uninstalled']));
+    $this->assertTrue(isset($GLOBALS['hook_cache_flush']));
+  }
+
+  /**
    * Tests install with a module with an invalid core version constraint.
    *
    * @dataProvider providerTestInvalidCoreInstall
@@ -148,6 +163,44 @@ class ModuleInstallerTest extends KernelTestBase {
     $this->expectException(ObsoleteExtensionException::class);
     $this->expectExceptionMessage("Unable to install modules: module 'system_status_obsolete_test' is obsolete.");
     $this->container->get('module_installer')->install(['system_status_obsolete_test']);
+  }
+
+  /**
+   * Tests container rebuilding due to the container_rebuild_required info key.
+   *
+   * @covers ::install
+   *
+   * @param array $modules
+   *   The modules to install.
+   * @param int $count
+   *   The number of times the container should have been rebuilt.
+   *
+   * @dataProvider containerRebuildRequiredProvider
+   */
+  public function testContainerRebuildRequired(array $modules, int $count): void {
+    $this->container->get('module_installer')->install(['module_test']);
+    $GLOBALS['container_rebuilt'] = 0;
+    $this->container->get('module_installer')->install($modules);
+    $this->assertSame($count, $GLOBALS['container_rebuilt']);
+  }
+
+  /**
+   * Data provider for ::testContainerRebuildRequired().
+   */
+  public static function containerRebuildRequiredProvider(): array {
+    return [
+      [['container_rebuild_required_true'], 1],
+      [['container_rebuild_required_false'], 1],
+      [['container_rebuild_required_false', 'container_rebuild_required_false_2'], 1],
+      [['container_rebuild_required_false', 'container_rebuild_required_false_2', 'container_rebuild_required_true'], 2],
+      [['container_rebuild_required_false', 'container_rebuild_required_false_2', 'container_rebuild_required_true', 'container_rebuild_required_true_2'], 3],
+      [['container_rebuild_required_true', 'container_rebuild_required_false', 'container_rebuild_required_false_2'], 2],
+      [['container_rebuild_required_false', 'container_rebuild_required_true', 'container_rebuild_required_false_2'], 3],
+      [['container_rebuild_required_false', 'container_rebuild_required_true', 'container_rebuild_required_false_2', 'container_rebuild_required_true_2'], 4],
+      [['container_rebuild_required_true', 'container_rebuild_required_false', 'container_rebuild_required_true_2', 'container_rebuild_required_false_2'], 4],
+      [['container_rebuild_required_false_2', 'container_rebuild_required_dependency_false'], 3],
+      [['container_rebuild_required_false_2', 'container_rebuild_required_dependency_false', 'container_rebuild_required_true'], 3],
+    ];
   }
 
   /**

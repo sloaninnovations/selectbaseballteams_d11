@@ -47,6 +47,10 @@ use Symfony\Component\VarDumper\VarDumper;
  * Drupal\Tests\your_module\Kernel namespace and live in the
  * modules/your_module/tests/src/Kernel directory.
  *
+ * Tests for core/lib/Drupal classes extending KernelTestBase must exist in the
+ * \Drupal\KernelTests\Core namespace and live in the
+ * core/tests/Drupal/KernelTests directory.
+ *
  * This base class should be useful for testing some types of integrations which
  * don't require the overhead of a fully-installed Drupal instance, but which
  * have many dependencies on parts of Drupal which can't or shouldn't be mocked.
@@ -567,6 +571,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       $this->keyValue = new KeyValueMemoryFactory();
     }
     $container->set('keyvalue', $this->keyValue);
+    $container->getDefinition('keyvalue')->setSynthetic(TRUE);
 
     // Set the default language on the minimal container.
     $container->setParameter('language.default_values', Language::$defaultValues);

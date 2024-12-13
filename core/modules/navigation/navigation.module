@@ -2,7 +2,6 @@
 
 /**
  * @file
- * Primary module hooks for navigation module.
  */
 
 use Drupal\Component\Plugin\PluginBase;
@@ -14,6 +13,7 @@ use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
 use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
 use Drupal\navigation\RenderCallbacks;
+use Drupal\navigation\TopBarRegion;
 
 /**
  * Implements hook_help().
@@ -165,58 +165,20 @@ function navigation_block_build_local_tasks_block_alter(array &$build, BlockPlug
 }
 
 /**
- * Implements hook_plugin_filter_TYPE__CONSUMER_alter().
+ * Prepares variables for navigation top bar template.
  *
- * Curate the blocks available in the Layout Builder "Add Block" UI.
+ * Default template: top-bar.html.twig
+ *
+ * @param $variables
+ *   An associative array containing:
+ *    - element: An associative array containing the properties and children of
+ *      the top bar.
  */
-function navigation_plugin_filter_block__layout_builder_alter(array &$definitions, array $extra) {
-  if (($extra['section_storage'] ?? NULL) instanceof NavigationSectionStorage) {
-    // Remove all blocks other than the ones we support.
-    $navigation_safe = [
-      'navigation_user',
-      'navigation_shortcuts',
-      'navigation_menu',
-    ];
-    $definitions = array_filter($definitions, static function (array $definition, string $plugin_id) use ($navigation_safe): bool {
-      [$base_plugin_id] = explode(PluginBase::DERIVATIVE_SEPARATOR, $plugin_id);
-      return in_array($base_plugin_id, $navigation_safe, TRUE);
-    }, ARRAY_FILTER_USE_BOTH);
-  }
-}
+function template_preprocess_top_bar(&$variables): void {
+  $element = $variables['element'];
 
-/**
- * Implements hook_plugin_filter_TYPE__CONSUMER_alter().
- */
-function navigation_plugin_filter_layout__layout_builder_alter(array &$definitions, array $extra) {
-  if (($extra['section_storage'] ?? NULL) instanceof NavigationSectionStorage) {
-    // We don't allow adding a new section.
-    $definitions = [];
-  }
-}
-
-/**
- * Implements hook_block_alter().
- */
-function navigation_block_alter(&$definitions): void {
-  $hidden = [
-    'navigation_user',
-    'navigation_shortcuts',
-    'navigation_menu',
-    'navigation_link',
-  ];
-  foreach ($hidden as $block_id) {
-    if (isset($definitions[$block_id])) {
-      $definitions[$block_id]['_block_ui_hidden'] = TRUE;
-    }
-  }
-}
-
-/**
- * Implements hook_element_info_alter().
- */
-function navigation_element_info_alter(array &$info) {
-  if (array_key_exists('layout_builder', $info)) {
-    $info['layout_builder']['#pre_render'][] = [RenderCallbacks::class, 'alterLayoutBuilder'];
+  foreach (TopBarRegion::cases() as $region) {
+    $variables[$region->value] = $element[$region->value] ?? NULL;
   }
 }
 
