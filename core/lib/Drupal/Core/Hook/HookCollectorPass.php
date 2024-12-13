@@ -99,6 +99,9 @@ class HookCollectorPass implements CompilerPassInterface {
           }
           if ($hook) {
             foreach ($orderAttributes as $orderAttribute) {
+              // $hookModule is set in the same clause as $hook
+              // if $hook is set then $hookModule is.
+              /** @phpstan-ignore variable.undefined */
               $allOrderAttributes[] = $orderAttribute->set(hook: $hook, class: $class, method: $method, module: $hookModule);
             }
             if ($orderGroup) {
