@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Kernel;
 
-use Drupal\file\Hook\FileRuntimeRequirements;
 use Drupal\KernelTests\KernelTestBase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -33,7 +32,6 @@ class RequirementsTest extends KernelTestBase {
 
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler */
     $moduleHandler = $this->container->get('module_handler');
-    $moduleHandler->loadInclude('file', 'install');
 
     // Test unspecified server software.
     $this->setServerSoftware(NULL);
