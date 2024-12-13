@@ -8,7 +8,7 @@ use Behat\Mink\Driver\BrowserKitDriver;
 use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
-use Drupal\TestTools\HttpKernel\KernelTestHttpKernelBrowser;
+use Symfony\Component\HttpKernel\HttpKernelBrowser;
 
 /**
  * Provides UI helper methods using the HTTP kernel to make requests.
@@ -116,7 +116,7 @@ trait HttpKernelUiHelperTrait {
    */
   protected function getDefaultDriverInstance() {
     $http_kernel = $this->container->get('http_kernel');
-    $browserkit_client = new KernelTestHttpKernelBrowser($http_kernel);
+    $browserkit_client = new HttpKernelBrowser($http_kernel);
     $driver = new BrowserKitDriver($browserkit_client);
     return $driver;
   }
