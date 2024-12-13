@@ -449,15 +449,8 @@ class ModuleHandler implements ModuleHandlerInterface {
       // the primary hook, we need to add them to the $modules array in their
       // appropriate order.
       $modules = array_keys($hook_listeners);
-      if (isset($extra_modules)) {
-        $orderingDone = FALSE;
-        if (isset($extra_types) && count(array_intersect($extra_types, $this->hooksOrderedByAttributes)) === count($extra_types)) {
-          $orderingDone = TRUE;
-        }
-
-        if (!$orderingDone) {
-          $modules = $this->reOrderModulesForAlter($modules, $hook);
-        }
+      if (isset($extra_modules) && array_diff($extra_types, $this->hooksOrderedByAttributes)) {
+        $modules = $this->reOrderModulesForAlter($modules, $hook);
       }
       foreach ($modules as $module) {
         foreach ($hook_listeners[$module] ?? [] as $listener) {
