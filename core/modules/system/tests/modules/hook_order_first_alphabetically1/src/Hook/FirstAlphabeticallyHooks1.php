@@ -21,4 +21,5 @@ class FirstAlphabeticallyHooks1 {
     }
     $GLOBALS['HookRanTestingFirst'] = 'HookRanTestingFirst';
   }
+
 }

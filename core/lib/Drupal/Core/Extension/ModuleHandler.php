@@ -449,6 +449,8 @@ class ModuleHandler implements ModuleHandlerInterface {
       // the primary hook, we need to add them to the $modules array in their
       // appropriate order.
       $modules = array_keys($hook_listeners);
+      // If $extra_modules is set then $extra_types must be set.
+      /** @phpstan-ignore variable.undefined */
       if (isset($extra_modules) && array_diff($extra_types, $this->hooksOrderedByAttributes)) {
         $modules = $this->reOrderModulesForAlter($modules, $hook);
       }
