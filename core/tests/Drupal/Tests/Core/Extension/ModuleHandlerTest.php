@@ -220,7 +220,7 @@ class ModuleHandlerTest extends UnitTestCase {
    * @group legacy
    */
   public function testAddModule(): void {
-    $this->expectDeprecation('Drupal\Core\Extension\ModuleHandler::addModule is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3491200');
+    $this->expectDeprecation('Drupal\Core\Extension\ModuleHandler::addModule() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3491200');
     $module_handler = $this->getMockBuilder(ModuleHandler::class)
       ->setConstructorArgs([
         $this->root, [], $this->eventDispatcher, [],
@@ -244,7 +244,7 @@ class ModuleHandlerTest extends UnitTestCase {
    * @group legacy
    */
   public function testAddProfile(): void {
-    $this->expectDeprecation('Drupal\Core\Extension\ModuleHandler::addProfile is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3491200');
+    $this->expectDeprecation('Drupal\Core\Extension\ModuleHandler::addProfile() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3491200');
     $module_handler = $this->getMockBuilder(ModuleHandler::class)
       ->setConstructorArgs([
         $this->root, [], $this->eventDispatcher, [],
