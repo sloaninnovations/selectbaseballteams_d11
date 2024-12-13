@@ -221,7 +221,7 @@ class HookCollectorPass implements CompilerPassInterface {
   protected static function reOrderServices(ContainerBuilder $container, array $allOrderAttributes, array $orderGroups, array $implementations): void {
     $hookPriority = new HookPriority($container);
     foreach ($allOrderAttributes as $orderAttribute) {
-      $hooks = self::getHooks($orderAttribute->hook, $orderGroups);
+      $hooks = self::getHooks((string) $orderAttribute->hook, $orderGroups);
       if (isset($orderAttribute->modules)) {
         $others = [];
         foreach ($orderAttribute->modules as $module) {
