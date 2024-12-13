@@ -32,7 +32,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
    *
    * @see https://getcomposer.org/doc/04-schema.md#minimum-stability
    */
-  protected const MINIMUM_STABILITY = 'stable';
+  protected const MINIMUM_STABILITY = 'RC';
 
   /**
    * The order of stability strings from least stable to most stable.
@@ -314,7 +314,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
    * @param string $version
    *   The version under test.
    */
-  protected function makeTestPackage($repository_path, $version) {
+  protected function makeTestPackage($repository_path, $version): void {
     $json = <<<JSON
 {
   "packages": {
@@ -353,7 +353,7 @@ JSON;
    * @param string $repository_path
    *   The path where to create the test package.
    */
-  protected function makeVendorPackage($repository_path) {
+  protected function makeVendorPackage($repository_path): void {
     $root = $this->getDrupalRoot();
     $process = $this->executeCommand("composer --working-dir=$root info --format=json");
     $this->assertCommandSuccessful();
@@ -424,6 +424,11 @@ JSON;
    */
   protected function getCoreStability() {
     $version = \Drupal::VERSION;
+    // If the current version is x.y-dev then this is the equivalent of the main
+    // branch and should be treated as a dev release.
+    if (preg_match('/^(\d)+\.(\d)+-dev$/', $version)) {
+      return 'dev';
+    }
     $stability = VersionParser::parseStability($version);
     if ($stability === 'dev') {
       // Strip off "-dev";
