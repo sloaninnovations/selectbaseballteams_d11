@@ -214,7 +214,7 @@ class HookCollectorPass implements CompilerPassInterface {
           foreach ($hooks as $hook) {
             foreach ($implementations[$hook][$module] ?? [] as $class => $methods) {
               foreach ($methods as $method) {
-                $others[] = [$class, $method,];
+                $others[] = [$class, $method];
               }
             }
           }
