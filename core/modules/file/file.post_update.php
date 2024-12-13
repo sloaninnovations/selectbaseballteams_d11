@@ -28,10 +28,12 @@ function file_post_update_add_playsinline(array &$sandbox = []): ?TranslatableMa
   $config_entity_updater = \Drupal::classResolver(ConfigEntityUpdater::class);
   return $config_entity_updater->update($sandbox, 'entity_view_display', function (EntityViewDisplayInterface $display) {
     $needs_update = FALSE;
-    foreach ($display->getComponents() as $component) {
+    $components = $display->getComponents();
+    foreach ($components as $name => $component) {
       if (isset($component['type']) && $component['type'] === 'file_video') {
         $needs_update = TRUE;
         $component['settings']['playsinline'] = FALSE;
+        $display->setComponent($name, $component);
       }
     }
     return $needs_update;

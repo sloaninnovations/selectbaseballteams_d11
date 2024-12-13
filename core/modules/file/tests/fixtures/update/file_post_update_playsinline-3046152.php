@@ -12,12 +12,12 @@
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Database\Database;
 
-$display = Yaml::decode(file_get_contents(__DIR__ . '/post_update_playsinline-3046152.yml'));
+$display = Yaml::decode(file_get_contents(__DIR__ . '/post_update_playsinline-3046152-node-article.yml'));
 
 $db = Database::getConnection();
-$db->insert('config')
+$db->update('config')
   ->fields([
-    'name' => 'core.entity_view_display.media.video.default',
     'data' => serialize($display),
   ])
+  ->condition('name', 'core.entity_view_display.node.article.default')
   ->execute();

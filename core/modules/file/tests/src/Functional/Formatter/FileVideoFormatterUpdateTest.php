@@ -32,15 +32,15 @@ class FileVideoFormatterUpdateTest extends UpdatePathTestBase {
    * @covers \file_post_update_add_playsinline
    */
   public function testPlaysInlineUpdate(): void {
-    $display = $this->config('core.entity_view_display.media.video.default');
+    $display = $this->config('core.entity_view_display.node.article.default');
 
-    $settings = $display->get('content.field_media_video_file.settings');
+    $settings = $display->get('content.field_video.settings');
     $this->assertArrayNotHasKey('playsinline', $settings);
 
     $this->runUpdates();
 
-    $display = $this->config('core.entity_view_display.media.video.default');
-    $settings = $display->get('content.field_media_video_file.settings');
+    $display = $this->config('core.entity_view_display.node.article.default');
+    $settings = $display->get('content.field_video.settings');
 
     $this->assertFalse($settings['playsinline']);
   }
