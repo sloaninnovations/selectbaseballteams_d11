@@ -78,9 +78,9 @@ namespace Drupal\Core\ProxyClass\File\MimeType {
         /**
          * {@inheritdoc}
          */
-        public function setMapping(?array $mapping = NULL)
+        public function setMapping(?array $mapping = NULL): void
         {
-            return $this->lazyLoadItself()->setMapping($mapping);
+            $this->lazyLoadItself()->setMapping($mapping);
         }
 
         /**
@@ -89,6 +89,14 @@ namespace Drupal\Core\ProxyClass\File\MimeType {
         public function isGuesserSupported(): bool
         {
             return $this->lazyLoadItself()->isGuesserSupported();
+        }
+
+        /**
+         * {@inheritdoc}
+         */
+        public function __get(string $name): mixed
+        {
+            return $this->lazyLoadItself()->__get($name);
         }
 
     }
