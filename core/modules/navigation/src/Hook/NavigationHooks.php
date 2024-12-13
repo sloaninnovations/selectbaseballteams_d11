@@ -84,7 +84,7 @@ class NavigationHooks {
       'variables' => [
         'link' => [],
         'attributes' => [],
-      ]
+      ],
     ];
     $items['big_pipe_interface_preview__navigation_shortcut_lazy_builder_lazyLinks__Shortcuts'] = [
       'variables' => [
@@ -198,7 +198,7 @@ class NavigationHooks {
    * Implements hook_menu_local_tasks_alter().
    */
   #[Hook('menu_local_tasks_alter')]
-  public function menuLocalTasksAlter(array&$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
+  public function menuLocalTasksAlter(array &$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
     if ($route_name === 'entity.node.canonical' && !empty($data['tabs'][0])) {
       $data['tabs'][0]['node.preview_editable_area'] = [
         '#theme' => 'menu_local_task',
