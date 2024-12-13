@@ -102,12 +102,16 @@ class HookCollectorPass implements CompilerPassInterface {
               $allOrderAttributes[] = $orderAttribute->set(hook: $hook, class: $class, method: $method);
             }
             if ($orderGroup) {
-              $orderGroups[] = array_merge($orderGroup, [$hook]);
+              $orderGroup[] = $hook;
+              foreach ($orderGroup as $extraHook) {
+                $orderGroups[$extraHook] = array_merge($orderGroups[$extraHook] ?? [], $orderGroup);
+              }
             }
           }
         }
       }
     }
+    $orderGroups = array_map('array_unique', $orderGroups);
 
     // This can be removed when ModuleHandler::add() is removed.
     if (count($container->getDefinitions()) > 1) {
@@ -115,24 +119,6 @@ class HookCollectorPass implements CompilerPassInterface {
       static::reOrderServices($container, $allOrderAttributes, $orderGroups, $implementations);
     }
     return $implementations;
-  }
-
-  /**
-   * @param mixed $hook
-   *   The hook to get from orderGroups.
-   * @param array $orderGroups
-   *   The hooks that have HookOrderGroup attributes.
-   *
-   * @return array
-   */
-  protected static function getHooks(string $hook, array $orderGroups): array {
-    $hooks = [$hook];
-    foreach ($orderGroups as $group) {
-      if (in_array($hook, $group)) {
-        $hooks = array_merge($hooks, $group);
-      }
-    }
-    return array_unique($hooks);
   }
 
   /**
@@ -163,9 +149,9 @@ class HookCollectorPass implements CompilerPassInterface {
 
     $hooksOrderedByAttribute = [];
     foreach ($legacyImplementations as $hook => $moduleImplements) {
-      $getHooks = self::getHooks((string) $hook, $reorderGroups);
-      $count = count($getHooks);
-      foreach ($getHooks as $extraHook) {
+      $extraHooks = $reorderGroups[$hook] ?? [];
+      $count = count($extraHooks);
+      foreach ($extraHooks as $extraHook) {
         $moduleImplements += $legacyImplementations[$extraHook] ?? [];
         if ($count > 1) {
           $hooksOrderedByAttribute[] = str_replace('_alter', '', $extraHook);
@@ -218,7 +204,7 @@ class HookCollectorPass implements CompilerPassInterface {
   protected static function reOrderServices(ContainerBuilder $container, array $allOrderAttributes, array $orderGroups, array $implementations): void {
     $hookPriority = new HookPriority($container);
     foreach ($allOrderAttributes as $orderAttribute) {
-      $hooks = self::getHooks((string) $orderAttribute->hook, $orderGroups);
+      $hooks = $orderGroups[$orderAttribute->hook] ?? [];
       if (isset($orderAttribute->modules)) {
         $others = [];
         foreach ($orderAttribute->modules as $module) {
