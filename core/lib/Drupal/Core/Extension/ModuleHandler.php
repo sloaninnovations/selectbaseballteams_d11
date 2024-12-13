@@ -431,10 +431,8 @@ class ModuleHandler implements ModuleHandlerInterface {
       $hook = $type . '_alter';
       $hook_listeners = $this->getHookListeners($hook);
       if (isset($extra_types)) {
-        // For multiple hooks, we need $modules to contain every module that
-        // implements at least one of them in the correct order.
-        foreach ($extra_types as $extra_type) {
-          foreach ($this->getHookListeners($extra_type . '_alter') as $module => $listeners) {
+        $find_listeners = function ($hook) use (&$hook_listeners, &$extra_modules) {
+          foreach ($this->getHookListeners($hook) as $module => $listeners) {
             if (isset($hook_listeners[$module])) {
               $hook_listeners[$module] = array_merge($hook_listeners[$module], $listeners);
             }
@@ -443,15 +441,28 @@ class ModuleHandler implements ModuleHandlerInterface {
               $extra_modules = TRUE;
             }
           }
+        };
+        // For multiple hooks, we need $modules to contain every module that
+        // implements at least one of them in the correct order. Hooks already
+        // ordered by attributes are also ordered by
+        // hook_module_implements_alter() they don't need to be ordered again.
+        foreach (array_merge($extra_types, [$type]) as $extra_type) {
+          if (isset($this->hooksOrderedByAttributes[$extra_type])) {
+            $group = $this->hooksOrderedByAttributes[$extra_type];
+            krsort($group);
+            $find_listeners(implode(':', $group));
+            $extra_types = array_diff($extra_types, $group);
+          }
+        }
+        foreach ($extra_types as $extra_type) {
+          $find_listeners($extra_type . '_alter');
         }
       }
       // If any modules implement one of the extra hooks that do not implement
       // the primary hook, we need to add them to the $modules array in their
       // appropriate order.
       $modules = array_keys($hook_listeners);
-      // If $extra_modules is set then $extra_types must be set.
-      /** @phpstan-ignore variable.undefined */
-      if (isset($extra_modules) && array_diff($extra_types, $this->hooksOrderedByAttributes)) {
+      if (!empty($extra_modules) && !empty($extra_types)) {
         $modules = $this->reOrderModulesForAlter($modules, $hook);
       }
       foreach ($modules as $module) {

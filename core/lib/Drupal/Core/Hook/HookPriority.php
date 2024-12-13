@@ -15,20 +15,38 @@ class HookPriority {
    *
    * @param array $hooks
    *   The name of the hook.
-   * @param string $class_and_method
-   *   Class and method separated by :: containing the hook implementation which
-   *   should be changed.
+   * @param string $class
+   *   Class containing the hook implementation which should be changed.
+   * @param string $method
+   *   Method of the hook implementation which should be changed.
    * @param bool $should_be_larger
    *   TRUE for before/first, FALSE for after/last. Larger priority listeners
    *   fire first.
    * @param array|null $others
    *   Other hook implementations to compare to, if any. The array is a list of
-   *   strings containing a class and method separated by ::.
+   *   arrays containing a class and method.
    *
    * @return void
    */
-  public function change(array $hooks, string $class_and_method, bool $should_be_larger, ?array $others = NULL): void {
+  public function change(array $hooks, string $class, string $method, bool $should_be_larger, ?array $others = NULL): void {
+    $class_and_method = "$class::$method";
+    if ($others) {
+      $other_specifiers = array_map(fn ($pair) => $pair[0] . '::' . $pair[1], $others);
+    }
     $events = array_map(fn ($hook) => "drupal_hook.$hook", $hooks);
+    if (count($hooks) > 1) {
+      krsort($hooks);
+      $combinedHookTag = implode(':', $hooks);
+      $others[] = [$class, $method];
+      foreach ($others as $other) {
+        $definition = $this->container->getDefinition($other[0]);
+        $definition->addTag('kernel.event_listener', [
+          'event' => "drupal_hook.$combinedHookTag",
+          'method' => $other[1],
+          'priority' => 0,
+        ]);
+      }
+    }
     foreach ($this->container->findTaggedServiceIds('kernel.event_listener') as $id => $attributes) {
       foreach ($attributes as $key => $tag) {
         if (in_array($tag['event'], $events)) {
@@ -43,10 +61,10 @@ class HookPriority {
           if ($class_and_method === $specifier) {
             $index_this = $index;
           }
-          // $others is specified for before and after, for these compare only
+          // $others is defined for before and after, for these compare only
           // the priority of those. For first and last the priority of every
           // other hook matters.
-          elseif (!isset($others) || in_array($specifier, $others)) {
+          elseif (!isset($other_specifiers) || in_array($specifier, $other_specifiers)) {
             $priorities_other[] = $priority;
           }
         }

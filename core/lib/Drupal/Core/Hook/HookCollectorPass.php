@@ -147,15 +147,10 @@ class HookCollectorPass implements CompilerPassInterface {
       }
     }
 
-    $hooksOrderedByAttribute = [];
     foreach ($legacyImplementations as $hook => $moduleImplements) {
       $extraHooks = $reorderGroups[$hook] ?? [];
-      $count = count($extraHooks);
       foreach ($extraHooks as $extraHook) {
         $moduleImplements += $legacyImplementations[$extraHook] ?? [];
-        if ($count > 1) {
-          $hooksOrderedByAttribute[] = str_replace('_alter', '', $extraHook);
-        }
       }
       foreach ($collector->moduleImplementsAlters as $alter) {
         $alter($moduleImplements, $hook);
@@ -183,9 +178,15 @@ class HookCollectorPass implements CompilerPassInterface {
         unset($implementations[$hook][$module]);
       }
     }
+
+    $hooksOrderedByAttributes = [];
+    foreach ($reorderGroups as $key => $values) {
+      // Remove _alter from the end.
+      $hooksOrderedByAttributes[substr($key, 0, -6)] = $values;
+    }
     $definition = $container->getDefinition('module_handler');
     $definition->setArgument('$groupIncludes', $groupIncludes);
-    $definition->setArgument('$hooksOrderedByAttributes', array_unique($hooksOrderedByAttribute) ?? []);
+    $definition->setArgument('$hooksOrderedByAttributes', array_unique($hooksOrderedByAttributes) ?? []);
     $container->setParameter('hook_implementations_map', $map ?? []);
   }
 
@@ -213,7 +214,7 @@ class HookCollectorPass implements CompilerPassInterface {
           foreach ($hooks as $hook) {
             foreach ($implementations[$hook][$module] ?? [] as $class => $methods) {
               foreach ($methods as $method) {
-                $others[] = "$class::$method";
+                $others[] = [$class, $method,];
               }
             }
           }
@@ -222,7 +223,7 @@ class HookCollectorPass implements CompilerPassInterface {
       else {
         $others = NULL;
       }
-      $hookPriority->change($hooks, "$orderAttribute->class::$orderAttribute->method", $orderAttribute->shouldBeLarger, $others);
+      $hookPriority->change($hooks, $orderAttribute->class, $orderAttribute->method, $orderAttribute->shouldBeLarger, $others);
     }
   }
 
