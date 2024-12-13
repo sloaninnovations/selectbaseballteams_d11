@@ -9,17 +9,21 @@ use Drupal\Core\Render\Element;
 /**
  * Provides an action button form element.
  *
- * When the button is pressed, unless #submit_button is set to FALSE, the form
- * will be submitted to Drupal, where it is validated and rebuilt. The submit
- * handler is not invoked.
+ * When the button is pressed:
+ * - If #submit_button is TRUE (default), the form will be submitted to Drupal,
+ *   where it is validated and rebuilt. The submit handler is not invoked.
+ * - If #submit_button is FALSE, the button will act as a regular HTML button 
+ *   (with the 'type' attribute set to 'button') and will not trigger a form
+ *   submission. This allows developers to define custom client-side behavior
+ *   using JavaScript or other mechanisms.
  *
  * Properties:
  * - #limit_validation_errors: An array of form element keys that will block
  *   form submission when validation for these elements or any child elements
  *   fails. Specify an empty array to suppress all form validation errors.
  * - #value: The text to be shown on the button.
- * - #submit_button: This has default value TRUE. If set to FALSE the 'type'
- *   attribute is set to 'button.'
+ * - #submit_button: This has a default value of TRUE. If set to FALSE, the
+ *   'type' attribute is set to 'button.'
  *
  *
  * Usage Example:
