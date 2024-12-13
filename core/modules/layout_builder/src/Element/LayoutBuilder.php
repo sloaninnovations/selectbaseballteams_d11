@@ -2,6 +2,7 @@
 
 namespace Drupal\layout_builder\Element;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxHelperTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -140,6 +141,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
     $output['#type'] = 'container';
     $output['#attributes']['id'] = 'layout-builder';
     $output['#attributes']['class'][] = 'layout-builder';
+    $output['#attributes']['class'][] = Html::getClass('layout-builder--' . $section_storage->getPluginId());
     // Mark this UI as uncacheable.
     $output['#cache']['max-age'] = 0;
     return $output;
