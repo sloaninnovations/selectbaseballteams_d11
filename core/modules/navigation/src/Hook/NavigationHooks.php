@@ -199,8 +199,10 @@ class NavigationHooks {
    */
   #[Hook('menu_local_tasks_alter')]
   public function menuLocalTasksAlter(array &$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
-    if ($route_name === 'entity.node.canonical' && !empty($data['tabs'][0])) {
-      $data['tabs'][0]['node.preview_editable_area'] = [
+    $navigation_renderer = \Drupal::service('navigation.renderer');
+    if ($navigation_renderer->meetsContentEntityRoutesCondition()) {
+      // Add a new local task for content entity pages.
+      $data['tabs'][0]['preview_editable_area'] = [
         '#theme' => 'menu_local_task',
         '#link' => [
           'title' => t('Preview editable areas'),

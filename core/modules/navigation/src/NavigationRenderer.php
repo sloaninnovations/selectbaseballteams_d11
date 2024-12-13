@@ -274,7 +274,7 @@ final class NavigationRenderer {
    * @return bool
    *   TRUE if the content entity route condition is met, FALSE otherwise.
    */
-  protected function meetsContentEntityRoutesCondition(): bool {
+  public function meetsContentEntityRoutesCondition(): bool {
     return array_key_exists($this->routeMatch->getRouteObject()->getPath(), $this->getContentEntityPaths());
   }
 
