@@ -105,6 +105,8 @@ trait BrowserHtmlDebugTrait {
    *   current page content is used.
    *
    * @see \Drupal\Tests\Listeners\VerbosePrinter::printResult()
+   *
+   * @return void
    */
   protected function htmlOutput($message = NULL) {
     if (!$this->htmlOutputEnabled) {
@@ -123,6 +125,8 @@ trait BrowserHtmlDebugTrait {
 
   /**
    * Creates the directory to store browser output.
+   *
+   * @return void
    */
   protected function initBrowserOutputFile() {
     $browserOutputFile = getenv('BROWSERTEST_OUTPUT_FILE');
