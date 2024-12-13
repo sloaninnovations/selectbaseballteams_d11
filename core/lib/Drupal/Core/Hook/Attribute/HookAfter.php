@@ -30,7 +30,7 @@ class HookAfter extends HookOrderBase {
    *   The module this implementation should run before.
    */
   public function __construct(
-    public readonly array $modules,
+    public array $modules,
   ) {
     parent::__construct(FALSE);
   }

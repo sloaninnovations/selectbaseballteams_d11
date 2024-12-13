@@ -31,6 +31,13 @@ class HookOrderBase implements HookOrderInterface {
   public string $method;
 
   /**
+   * The module of the hook.
+   *
+   * @internal
+   */
+  public string $module;
+
+  /**
    * Constructs a HookOrderBase class.
    */
   public function __construct(public readonly bool $shouldBeLarger) {}
@@ -38,10 +45,11 @@ class HookOrderBase implements HookOrderInterface {
   /**
    * {@inheritdoc}
    */
-  public function set(string $hook, string $class, string $method): static {
+  public function set(string $hook, string $class, string $method, string $module): static {
     $this->hook = $hook;
     $this->class = $class;
     $this->method = $method;
+    $this->module = $module;
     return $this;
   }
 

@@ -444,20 +444,21 @@ class ModuleHandler implements ModuleHandlerInterface {
             }
           }
         };
+        $extra_hooks = array_map(fn ($x) => $x . '_alter', $extra_types);
         // For multiple hooks, we need $modules to contain every module that
         // implements at least one of them in the correct order. Hooks already
         // ordered by attributes are also ordered by
         // hook_module_implements_alter() they don't need to be ordered again.
-        foreach (array_merge($extra_types, [$type]) as $extra_type) {
-          if (isset($this->hooksOrderedByAttributes[$extra_type])) {
-            $group = $this->hooksOrderedByAttributes[$extra_type];
+        foreach (array_merge($extra_hooks, [$type . '_alter']) as $extra_hook) {
+          if (isset($this->hooksOrderedByAttributes[$extra_hook])) {
+            $group = $this->hooksOrderedByAttributes[$extra_hook];
             krsort($group);
             $find_listeners(implode(':', $group));
-            $extra_types = array_diff($extra_types, $group);
+            $extra_types = array_diff($extra_hooks, $group);
           }
         }
-        foreach ($extra_types as $extra_type) {
-          $find_listeners($extra_type . '_alter');
+        foreach ($extra_hooks as $extra_hook) {
+          $find_listeners($extra_hook);
         }
       }
       // If any modules implement one of the extra hooks that do not implement

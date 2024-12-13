@@ -87,7 +87,7 @@ class HookCollectorPass implements CompilerPassInterface {
               if ($attribute->method) {
                 $method = $attribute->method;
               }
-              $moduleImplements[$hook][$hookModule] = '';
+              $legacyImplementations[$hook][$hookModule] = '';
               $implementations[$hook][$hookModule][$class][] = $method;
             }
             if ($attribute instanceof HookOrderInterface) {
@@ -99,7 +99,7 @@ class HookCollectorPass implements CompilerPassInterface {
           }
           if ($hook) {
             foreach ($orderAttributes as $orderAttribute) {
-              $allOrderAttributes[] = $orderAttribute->set(hook: $hook, class: $class, method: $method);
+              $allOrderAttributes[] = $orderAttribute->set(hook: $hook, class: $class, method: $method, module: $hookModule);
             }
             if ($orderGroup) {
               $orderGroup[] = $hook;
@@ -115,7 +115,7 @@ class HookCollectorPass implements CompilerPassInterface {
 
     // This can be removed when ModuleHandler::add() is removed.
     if (count($container->getDefinitions()) > 1) {
-      static::registerServices($container, $collector, $implementations, $moduleImplements ?? [], $orderGroups);
+      static::registerServices($container, $collector, $implementations, $legacyImplementations ?? [], $orderGroups);
       static::reOrderServices($container, $allOrderAttributes, $orderGroups, $implementations);
     }
     return $implementations;
@@ -155,6 +155,7 @@ class HookCollectorPass implements CompilerPassInterface {
       foreach ($collector->moduleImplementsAlters as $alter) {
         $alter($moduleImplements, $hook);
       }
+      $legacyImplementations[$hook] = $moduleImplements;
       $priority = 0;
       foreach ($moduleImplements as $module => $v) {
         foreach ($implementations[$hook][$module] ?? [] as $class => $method_hooks) {
@@ -181,12 +182,11 @@ class HookCollectorPass implements CompilerPassInterface {
 
     $hooksOrderedByAttributes = [];
     foreach ($reorderGroups as $key => $values) {
-      // Remove _alter from the end.
-      $hooksOrderedByAttributes[substr($key, 0, -6)] = $values;
+      $hooksOrderedByAttributes[$key] = $values;
     }
     $definition = $container->getDefinition('module_handler');
     $definition->setArgument('$groupIncludes', $groupIncludes);
-    $definition->setArgument('$hooksOrderedByAttributes', array_unique($hooksOrderedByAttributes) ?? []);
+    $definition->setArgument('$hooksOrderedByAttributes', $hooksOrderedByAttributes);
     $container->setParameter('hook_implementations_map', $map ?? []);
   }
 
@@ -214,7 +214,7 @@ class HookCollectorPass implements CompilerPassInterface {
           foreach ($hooks as $hook) {
             foreach ($implementations[$hook][$module] ?? [] as $class => $methods) {
               foreach ($methods as $method) {
-                $others[] = [$class, $method];
+                $others[] = [$class, $method, $module];
               }
             }
           }
@@ -223,7 +223,7 @@ class HookCollectorPass implements CompilerPassInterface {
       else {
         $others = NULL;
       }
-      $hookPriority->change($hooks, $orderAttribute->class, $orderAttribute->method, $orderAttribute->shouldBeLarger, $others);
+      $hookPriority->change($hooks, $orderAttribute, $others);
     }
   }
 
