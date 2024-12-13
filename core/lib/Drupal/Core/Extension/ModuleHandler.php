@@ -189,7 +189,9 @@ class ModuleHandler implements ModuleHandlerInterface {
    *   The module path; e.g., 'core/modules/node'.
    *
    * @todo Remove this when addModule() and addProfile() are removed.
-   * @see https://www.drupal.org/project/drupal/issues/3493062
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   * There is no direct replacement.
+   * @see https://www.drupal.org/node/3491200
    */
   protected function add($type, $name, $path) {
     $pathname = "$path/$name.info.yml";
