@@ -12,7 +12,7 @@ use Drupal\Core\Render\Element;
  * When the button is pressed:
  * - If #submit_button is TRUE (default), the form will be submitted to Drupal,
  *   where it is validated and rebuilt. The submit handler is not invoked.
- * - If #submit_button is FALSE, the button will act as a regular HTML button 
+ * - If #submit_button is FALSE, the button will act as a regular HTML button
  *   (with the 'type' attribute set to 'button') and will not trigger a form
  *   submission. This allows developers to define custom client-side behavior
  *   using JavaScript or other mechanisms.
