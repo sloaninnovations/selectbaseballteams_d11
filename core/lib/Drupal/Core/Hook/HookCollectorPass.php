@@ -166,7 +166,7 @@ class HookCollectorPass implements CompilerPassInterface {
 
     $hooksOrderedByAttribute = [];
     foreach ($legacyImplementations as $hook => $moduleImplements) {
-      $getHooks = self::getHooks($hook, $reorderGroups);
+      $getHooks = self::getHooks((string) $hook, $reorderGroups);
       $count = count($getHooks);
       foreach ($getHooks as $extraHook) {
         $moduleImplements += $legacyImplementations[$extraHook] ?? [];
