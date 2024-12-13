@@ -12,10 +12,10 @@ use Drupal\Core\Hook\Attribute\Hook;
 class LastAlphabeticallyHooks2 {
 
   /**
-   * Before FirstAlphabeticallyHooks2::cacheFlush1.
+   * Before FirstAlphabeticallyHooks2::cacheFlush.
    */
   #[Hook('cache_flush')]
-  public static function cacheFlush1(): void {
+  public static function cacheFlush(): void {
     // This should be run before so HookAfter should not be set.
     if (isset($GLOBALS['HookAfter'])) {
       $GLOBALS['HookOutOfOrderTestingAfter'] = 'HookOutOfOrderTestingAfter';

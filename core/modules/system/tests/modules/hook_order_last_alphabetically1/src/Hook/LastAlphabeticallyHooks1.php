@@ -6,6 +6,7 @@ namespace Drupal\hook_order_last_alphabetically1\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookFirst;
+use Drupal\Core\Hook\Attribute\HookOrderGroup;
 
 /**
  * Hook implementations for hook_order_last_alphabetically.
@@ -13,23 +14,13 @@ use Drupal\Core\Hook\Attribute\HookFirst;
 class LastAlphabeticallyHooks1 {
 
   /**
-   * Before FirstAlphabeticallyHooks1::cacheFlush1.
+   * Before FirstAlphabeticallyHooks1::cacheFlush.
    */
   #[HookFirst]
   #[Hook('cache_flush')]
-  public static function cacheFlush1(): void {
+  #[HookOrderGroup(['cache_flush'])]
+  public static function cacheFlush(): void {
     $GLOBALS['HookFirst'] = 'HookFirst';
-  }
-
-  /**
-   * Before FirstAlphabeticallyHooks1::cacheFlush2.
-   */
-  #[Hook('cache_flush')]
-  public static function cacheFlush2(): void {
-    if (isset($GLOBALS['HookLast'])) {
-      $GLOBALS['HookOutOfOrderTestingLast'] = 'HookOutOfOrderTestingLast';
-    }
-    $GLOBALS['HookRanTestingLast'] = 'HookRanTestingLast';
   }
 
 }
