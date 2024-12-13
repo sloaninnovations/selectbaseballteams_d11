@@ -99,10 +99,7 @@ class HookCollectorPass implements CompilerPassInterface {
           }
           if ($hook) {
             foreach ($orderAttributes as $orderAttribute) {
-              $allOrderAttributes[] = $orderAttribute
-                ->setHook($hook)
-                ->setClass($class)
-                ->setMethod($method);
+              $allOrderAttributes[] = $orderAttribute->set(hook: $hook, class: $class, method: $method);
             }
             if ($orderGroup) {
               $orderGroups[] = array_merge($orderGroup, [$hook]);

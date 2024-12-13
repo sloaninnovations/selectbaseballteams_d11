@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Core\Hook\Attribute;
 
 /**
- * Attribute for marking that a hook should be changed.
+ * Attribute for marking that a hook's order should be changed.
  *
  * This allows you to ensure the hook is executed after
- * a specific hook in another module.
+ * hooks in other modules.
  *
  * @section sec_backwards_compatibility Backwards-compatibility
  *

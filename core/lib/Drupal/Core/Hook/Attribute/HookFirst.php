@@ -7,6 +7,8 @@ namespace Drupal\Core\Hook\Attribute;
 /**
  * Attribute for marking that a hook should be executed first.
  *
+ * This makes sure that this hook runs before all other hooks of the same type.
+ *
  * @section sec_backwards_compatibility Backwards-compatibility
  *
  * To allow hook implementations to work on older versions of Drupal as well,
