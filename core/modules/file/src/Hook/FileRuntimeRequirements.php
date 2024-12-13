@@ -13,7 +13,7 @@ class FileRuntimeRequirements {
    * Implements hook_runtime_requirements().
    */
   #[Hook('runtime_requirements')]
-  public function runtime() {
+  public function runtime(): array {
     $requirements = [];
     $server_software = \Drupal::request()->server->get('SERVER_SOFTWARE', '');
 
