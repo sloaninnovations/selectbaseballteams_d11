@@ -19274,6 +19274,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field_ui/tests/src/Unit/FieldUiTableTest.php',
 ];
 $ignoreErrors[] = [
+	// identifier: missingType.return
 	'message' => '#^Function file_managed_file_submit\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
