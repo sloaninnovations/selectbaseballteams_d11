@@ -85,9 +85,9 @@ class HookCollectorPass implements CompilerPassInterface {
           $orderGroup = FALSE;
           $hook = FALSE;
           foreach ($attributes as $attribute) {
-            // A hook may be implemented on behalf of another module.
             // This prevents one hook implementing on behalf of another
-            // from overriding all following hooks in this class.
+            // module from overriding any following methods in this
+            // class.
             $currentModule = $module;
             switch (TRUE) {
               case $attribute instanceof Hook:
@@ -113,6 +113,8 @@ class HookCollectorPass implements CompilerPassInterface {
           }
           if ($hook) {
             foreach ($orderAttributes as $orderAttribute) {
+              // If $hook is not false then $currentModule is set.
+              /** @phpstan-ignore variable.undefined */
               $allOrderAttributes[] = $orderAttribute->set(hook: $hook, class: $class, method: $method, module: $currentModule);
             }
             if ($orderGroup) {
