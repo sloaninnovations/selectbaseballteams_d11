@@ -54,14 +54,14 @@ class BulkDeleteTest extends FieldKernelTestBase {
   /**
    * Tests that the expected hooks have been invoked on the expected entities.
    *
-   * @param $expected_hooks
+   * @param string[] $expected_hooks
    *   An array keyed by hook name, with one entry per expected invocation.
    *   Each entry is the value of the "$entity" parameter the hook is expected
    *   to have been passed.
-   * @param $actual_hooks
+   * @param array $actual_hooks
    *   The array of actual hook invocations recorded by field_test_memorize().
    */
-  public function checkHooksInvocations($expected_hooks, $actual_hooks) {
+  public function checkHooksInvocations($expected_hooks, $actual_hooks): void {
     foreach ($expected_hooks as $hook => $invocations) {
       $actual_invocations = $actual_hooks[$hook];
 
@@ -166,7 +166,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
    * This tests how EntityFieldQuery interacts with field deletion and could be
    * moved to FieldCrudTestCase, but depends on this class's setUp().
    */
-  public function testDeleteField() {
+  public function testDeleteField(): void {
     $bundle = reset($this->bundles);
     $field_storage = reset($this->fieldStorages);
     $field_name = $field_storage->getName();
@@ -227,7 +227,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
   /**
    * Tests that recreating a field with the name as a deleted field works.
    */
-  public function testPurgeWithDeletedAndActiveField() {
+  public function testPurgeWithDeletedAndActiveField(): void {
     $bundle = reset($this->bundles);
     // Create another field storage.
     $field_name = 'bf_3';
@@ -323,7 +323,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
    * Verify that field data items and fields are purged when a field storage is
    * deleted.
    */
-  public function testPurgeField() {
+  public function testPurgeField(): void {
     // Start recording hook invocations.
     field_test_memorize();
 
@@ -384,7 +384,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
    * Verify that field storages are preserved and purged correctly as multiple
    * fields are deleted and purged.
    */
-  public function testPurgeFieldStorage() {
+  public function testPurgeFieldStorage(): void {
     // Start recording hook invocations.
     field_test_memorize();
 

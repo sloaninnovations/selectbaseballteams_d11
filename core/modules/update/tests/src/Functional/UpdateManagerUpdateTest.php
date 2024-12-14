@@ -15,9 +15,7 @@ class UpdateManagerUpdateTest extends UpdateTestBase {
   use UpdateTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'aaa_update_test',
@@ -182,7 +180,7 @@ class UpdateManagerUpdateTest extends UpdateTestBase {
    *   - 'recommended': The recommended version.
    *   - 'range': The versions of Drupal core required for that version.
    */
-  public function testIncompatibleUpdatesTable($core_fixture, $a_fixture, $b_fixture, array $compatible, array $incompatible) {
+  public function testIncompatibleUpdatesTable($core_fixture, $a_fixture, $b_fixture, array $compatible, array $incompatible): void {
 
     $assert_session = $this->assertSession();
     $compatible_table_locator = '[data-drupal-selector="edit-projects"]';
@@ -231,7 +229,7 @@ class UpdateManagerUpdateTest extends UpdateTestBase {
   /**
    * Tests the Update form with an uninstalled module in the system.
    */
-  public function testUninstalledUpdatesTable() {
+  public function testUninstalledUpdatesTable(): void {
     $assert_session = $this->assertSession();
     $compatible_table_locator = '[data-drupal-selector="edit-projects"]';
     $uninstalled_table_locator = '[data-drupal-selector="edit-uninstalled-projects"]';
@@ -308,7 +306,7 @@ class UpdateManagerUpdateTest extends UpdateTestBase {
    *   Array of expected header texts, keyed by CSS selectors relative to the
    *   thead tr (for example, "th:nth-of-type(3)").
    */
-  private function checkTableHeaders($table_locator, array $expected_headers) {
+  private function checkTableHeaders($table_locator, array $expected_headers): void {
     $assert_session = $this->assertSession();
     $assert_session->elementExists('css', $table_locator);
     foreach ($expected_headers as $locator => $header) {

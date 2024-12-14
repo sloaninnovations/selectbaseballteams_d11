@@ -21,9 +21,7 @@ class UserAdminTest extends BrowserTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['taxonomy', 'views'];
 
@@ -48,7 +46,7 @@ class UserAdminTest extends BrowserTestBase {
   /**
    * Registers a user and deletes it.
    */
-  public function testUserAdmin() {
+  public function testUserAdmin(): void {
     $config = $this->config('user.settings');
     $user_a = $this->drupalCreateUser();
     $user_a->name = 'User A';
@@ -182,7 +180,7 @@ class UserAdminTest extends BrowserTestBase {
   /**
    * Tests the alternate notification email address for user mails.
    */
-  public function testNotificationEmailAddress() {
+  public function testNotificationEmailAddress(): void {
     // Test that the Notification Email address field is on the config page.
     $admin_user = $this->drupalCreateUser([
       'administer users',

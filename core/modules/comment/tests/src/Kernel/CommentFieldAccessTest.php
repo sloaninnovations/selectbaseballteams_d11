@@ -29,9 +29,7 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
   use GeneratePermutationsTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['comment', 'entity_test', 'user'];
 
@@ -95,7 +93,7 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
   /**
    * Tests permissions on comment fields.
    */
-  public function testAccessToAdministrativeFields() {
+  public function testAccessToAdministrativeFields(): void {
     // Create a comment type.
     $comment_type = CommentType::create([
       'id' => 'comment',

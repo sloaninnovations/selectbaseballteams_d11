@@ -22,9 +22,7 @@ class CommentPreviewTest extends CommentTestBase {
   }
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['olivero_test', 'test_user_config'];
 
@@ -36,7 +34,7 @@ class CommentPreviewTest extends CommentTestBase {
   /**
    * Tests comment preview.
    */
-  public function testCommentPreview() {
+  public function testCommentPreview(): void {
     $this->setCommentPreview(DRUPAL_OPTIONAL);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
@@ -92,7 +90,7 @@ class CommentPreviewTest extends CommentTestBase {
   /**
    * Tests comment preview.
    */
-  public function testCommentPreviewDuplicateSubmission() {
+  public function testCommentPreviewDuplicateSubmission(): void {
     $this->setCommentPreview(DRUPAL_OPTIONAL);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
@@ -133,7 +131,7 @@ class CommentPreviewTest extends CommentTestBase {
   /**
    * Tests comment edit, preview, and save.
    */
-  public function testCommentEditPreviewSave() {
+  public function testCommentEditPreviewSave(): void {
     $web_user = $this->drupalCreateUser([
       'access comments',
       'post comments',

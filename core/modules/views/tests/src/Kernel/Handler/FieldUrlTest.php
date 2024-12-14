@@ -16,6 +16,9 @@ use Drupal\views\Views;
  */
 class FieldUrlTest extends ViewsKernelTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['system'];
 
   /**
@@ -31,7 +34,7 @@ class FieldUrlTest extends ViewsKernelTestBase {
     return $data;
   }
 
-  public function testFieldUrl() {
+  public function testFieldUrl(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 

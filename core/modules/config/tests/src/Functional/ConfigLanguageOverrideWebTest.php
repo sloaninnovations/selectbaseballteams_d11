@@ -16,9 +16,7 @@ use Drupal\Tests\BrowserTestBase;
 class ConfigLanguageOverrideWebTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -41,7 +39,7 @@ class ConfigLanguageOverrideWebTest extends BrowserTestBase {
   /**
    * Tests translating the site name.
    */
-  public function testSiteNameTranslation() {
+  public function testSiteNameTranslation(): void {
     $adminUser = $this->drupalCreateUser([
       'administer site configuration',
       'administer languages',

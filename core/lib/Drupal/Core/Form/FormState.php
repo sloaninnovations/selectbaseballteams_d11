@@ -33,6 +33,7 @@ class FormState implements FormStateInterface {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $complete_form;
 
   /**
@@ -65,6 +66,7 @@ class FormState implements FormStateInterface {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $build_info = [
     'args' => [],
     'files' => [],
@@ -79,6 +81,7 @@ class FormState implements FormStateInterface {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $rebuild_info = [];
 
   /**
@@ -100,9 +103,9 @@ class FormState implements FormStateInterface {
    *
    * This property is uncacheable.
    *
-   * @see self::setRebuild()
-   *
    * @var bool
+   *
+   * @see self::setRebuild()
    */
   protected $rebuild = FALSE;
 
@@ -115,9 +118,9 @@ class FormState implements FormStateInterface {
    *
    * This property is uncacheable.
    *
-   * @see self::setInvalidToken()
-   *
    * @var bool
+   *
+   * @see self::setInvalidToken()
    */
   protected $invalidToken = FALSE;
 
@@ -146,11 +149,11 @@ class FormState implements FormStateInterface {
   /**
    * Used to redirect the form on submission.
    *
-   * @see self::getRedirect()
-   *
    * This property is uncacheable.
    *
    * @var \Drupal\Core\Url|\Symfony\Component\HttpFoundation\RedirectResponse|null
+   *
+   * @see self::getRedirect()
    */
   protected $redirect;
 
@@ -163,6 +166,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $no_redirect;
 
   /**
@@ -221,6 +225,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $no_cache;
 
   /**
@@ -279,6 +284,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $always_process;
 
   /**
@@ -293,6 +299,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $must_validate;
 
   /**
@@ -316,6 +323,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $programmed_bypass_access_check = TRUE;
 
   /**
@@ -328,6 +336,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $process_input;
 
   /**
@@ -359,6 +368,7 @@ class FormState implements FormStateInterface {
    *
    * @var array|null
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $triggering_element;
 
   /**
@@ -369,6 +379,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $has_file_element;
 
   /**
@@ -436,6 +447,7 @@ class FormState implements FormStateInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $validation_complete = FALSE;
 
   /**
@@ -461,6 +473,7 @@ class FormState implements FormStateInterface {
    *
    * @var array|null
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $limit_validation_errors;
 
   /**
@@ -470,6 +483,7 @@ class FormState implements FormStateInterface {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $validate_handlers = [];
 
   /**
@@ -479,6 +493,7 @@ class FormState implements FormStateInterface {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $submit_handlers = [];
 
   /**
@@ -647,7 +662,7 @@ class FormState implements FormStateInterface {
    * @return bool
    *
    * @see \Symfony\Component\HttpFoundation\Request::isMethodSafe()
-   * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
+   * @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
    */
   protected function isRequestMethodSafe() {
     return in_array($this->requestMethod, ['GET', 'HEAD']);
@@ -1256,7 +1271,7 @@ class FormState implements FormStateInterface {
       // @code
       //   array('foo', 'bar', 'baz')
       // @endcode
-      // then the corresponding self::getValues() part will look like this:
+      // Then the corresponding self::getValues() part will look like this:
       // @code
       // array(
       //   'foo' => array(

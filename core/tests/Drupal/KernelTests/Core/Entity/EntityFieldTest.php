@@ -34,9 +34,7 @@ use Drupal\node\Entity\NodeType;
 class EntityFieldTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['filter', 'text', 'node', 'user', 'field_test'];
 
@@ -81,7 +79,7 @@ class EntityFieldTest extends EntityKernelTestBase {
    *
    * @return \Drupal\Core\Entity\EntityInterface
    */
-  protected function createTestEntity($entity_type) {
+  protected function createTestEntity($entity_type): EntityInterface {
     $this->entityName = $this->randomMachineName();
     $this->entityUser = $this->createUser();
     $this->entityFieldText = $this->randomMachineName();
@@ -103,7 +101,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Test setting field values on revisionable entities.
    */
-  public function testFieldEntityRevisionWrite() {
+  public function testFieldEntityRevisionWrite(): void {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()->getStorage('entity_test_rev');
 
@@ -136,7 +134,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Tests reading and writing properties and field items.
    */
-  public function testReadWrite() {
+  public function testReadWrite(): void {
     // All entity variations have to have the same results.
     foreach (entity_test_entity_types() as $entity_type) {
       $this->doTestReadWrite($entity_type);
@@ -149,7 +147,7 @@ class EntityFieldTest extends EntityKernelTestBase {
    * @param string $entity_type
    *   The entity type to run the tests with.
    */
-  protected function doTestReadWrite($entity_type) {
+  protected function doTestReadWrite($entity_type): void {
     $entity = $this->createTestEntity($entity_type);
 
     $langcode = 'en';
@@ -402,7 +400,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Tries to save and load an entity again.
    */
-  public function testSave() {
+  public function testSave(): void {
     // All entity variations have to have the same results.
     foreach (entity_test_entity_types() as $entity_type) {
       $this->doTestSave($entity_type);
@@ -415,7 +413,7 @@ class EntityFieldTest extends EntityKernelTestBase {
    * @param string $entity_type
    *   The entity type to run the tests with.
    */
-  protected function doTestSave($entity_type) {
+  protected function doTestSave($entity_type): void {
     $langcode_key = $this->entityTypeManager->getDefinition($entity_type)->getKey('langcode');
     $entity = $this->createTestEntity($entity_type);
     $entity->save();
@@ -439,7 +437,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Tests introspection and getting metadata upfront.
    */
-  public function testIntrospection() {
+  public function testIntrospection(): void {
     // All entity variations have to have the same results.
     foreach (entity_test_entity_types() as $entity_type) {
       $this->doTestIntrospection($entity_type);
@@ -452,7 +450,7 @@ class EntityFieldTest extends EntityKernelTestBase {
    * @param string $entity_type
    *   The entity type to run the tests with.
    */
-  protected function doTestIntrospection($entity_type) {
+  protected function doTestIntrospection($entity_type): void {
     // Test getting metadata upfront. The entity types used for this test have
     // a default bundle that is the same as the entity type.
     $definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions($entity_type, $entity_type);
@@ -490,7 +488,7 @@ class EntityFieldTest extends EntityKernelTestBase {
     $this->assertEquals('string', $name_definition->getPropertyDefinition('value')->getDataType());
 
     // Test introspecting an entity object.
-    // @todo: Add bundles and test bundles as well.
+    // @todo Add bundles and test bundles as well.
     $entity = $this->container->get('entity_type.manager')
       ->getStorage($entity_type)
       ->create();
@@ -503,9 +501,9 @@ class EntityFieldTest extends EntityKernelTestBase {
     $name_properties = $entity->name->getFieldDefinition()->getPropertyDefinitions();
     $this->assertEquals('string', $name_properties['value']->getDataType(), $entity_type . ': String value property of the name found.');
 
-    $userref_properties = $entity->user_id->getFieldDefinition()->getPropertyDefinitions();
-    $this->assertEquals('integer', $userref_properties['target_id']->getDataType(), $entity_type . ': Entity id property of the user found.');
-    $this->assertEquals('entity_reference', $userref_properties['entity']->getDataType(), $entity_type . ': Entity reference property of the user found.');
+    $user_ref_properties = $entity->user_id->getFieldDefinition()->getPropertyDefinitions();
+    $this->assertEquals('integer', $user_ref_properties['target_id']->getDataType(), $entity_type . ': Entity id property of the user found.');
+    $this->assertEquals('entity_reference', $user_ref_properties['entity']->getDataType(), $entity_type . ': Entity reference property of the user found.');
 
     $textfield_properties = $entity->field_test_text->getFieldDefinition()->getFieldStorageDefinition()->getPropertyDefinitions();
     $this->assertEquals('string', $textfield_properties['value']->getDataType(), $entity_type . ': String value property of the test-text field found.');
@@ -543,7 +541,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Tests iterating over properties.
    */
-  public function testIterator() {
+  public function testIterator(): void {
     // All entity variations have to have the same results.
     foreach (entity_test_entity_types() as $entity_type) {
       $this->doTestIterator($entity_type);
@@ -556,7 +554,7 @@ class EntityFieldTest extends EntityKernelTestBase {
    * @param string $entity_type
    *   The entity type to run the tests with.
    */
-  protected function doTestIterator($entity_type) {
+  protected function doTestIterator($entity_type): void {
     $entity = $this->createTestEntity($entity_type);
 
     foreach ($entity as $name => $field) {
@@ -582,7 +580,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Tests working with the entity based upon the TypedData API.
    */
-  public function testDataStructureInterfaces() {
+  public function testDataStructureInterfaces(): void {
     // All entity variations have to have the same results.
     foreach (entity_test_entity_types() as $entity_type) {
       $this->doTestDataStructureInterfaces($entity_type);
@@ -595,7 +593,7 @@ class EntityFieldTest extends EntityKernelTestBase {
    * @param string $entity_type
    *   The entity type to run the tests with.
    */
-  protected function doTestDataStructureInterfaces($entity_type) {
+  protected function doTestDataStructureInterfaces($entity_type): void {
     $entity = $this->createTestEntity($entity_type);
 
     // Test using the whole tree of typed data by navigating through the tree of
@@ -604,8 +602,8 @@ class EntityFieldTest extends EntityKernelTestBase {
     $strings = [];
     $this->getContainedStrings($entity->getTypedData(), 0, $strings);
 
-    // @todo: Once the user entity has defined properties this should contain
-    // the user name and other user entity strings as well.
+    // @todo Once the user entity has defined properties this should contain
+    //   the user name and other user entity strings as well.
     $target_strings = [
       $entity->uuid->value,
       'en',
@@ -630,7 +628,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Gets all contained strings recursively.
    */
-  public function getContainedStrings(TypedDataInterface $wrapper, $depth, array &$strings) {
+  public function getContainedStrings(TypedDataInterface $wrapper, $depth, array &$strings): void {
 
     if ($wrapper instanceof StringInterface) {
       $strings[] = $wrapper->getValue();
@@ -654,7 +652,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Makes sure data types are correctly derived for all entity types.
    */
-  public function testDataTypes() {
+  public function testDataTypes(): void {
     $types = \Drupal::typedDataManager()->getDefinitions();
     foreach (entity_test_entity_types() as $entity_type) {
       $this->assertNotEmpty($types['entity:' . $entity_type]['class'], 'Entity data type registered.');
@@ -670,7 +668,7 @@ class EntityFieldTest extends EntityKernelTestBase {
    *
    * @see entity_test_entity_base_field_info_alter()
    */
-  public function testBaseFieldNonExistingBaseField() {
+  public function testBaseFieldNonExistingBaseField(): void {
     $this->entityTypeManager->getStorage('node_type')->create([
       'type' => 'page',
       'name' => 'page',
@@ -692,7 +690,7 @@ class EntityFieldTest extends EntityKernelTestBase {
    *
    * @see entity_test_entity_base_field_info_alter()
    */
-  public function testFieldOverrideBundleField() {
+  public function testFieldOverrideBundleField(): void {
     // First make sure the bundle field override in code, which is provided by
     // the test entity works.
     entity_test_create_bundle('some_test_bundle', 'Some test bundle', 'entity_test_field_override');
@@ -720,7 +718,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Tests validation constraints provided by the Entity API.
    */
-  public function testEntityConstraintValidation() {
+  public function testEntityConstraintValidation(): void {
     $entity = $this->createTestEntity('entity_test');
     $entity->save();
     // Create a reference field item and let it reference the entity.
@@ -774,7 +772,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Tests getting processed property values via a computed property.
    */
-  public function testComputedProperties() {
+  public function testComputedProperties(): void {
     // All entity variations have to have the same results.
     foreach (entity_test_entity_types() as $entity_type) {
       $this->doTestComputedProperties($entity_type);
@@ -784,7 +782,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Tests all the interaction points of a computed field.
    */
-  public function testComputedFields() {
+  public function testComputedFields(): void {
     $this->installEntitySchema('entity_test_computed_field');
 
     \Drupal::state()->set('entity_test_computed_field_item_list_value', ['foo computed']);
@@ -916,7 +914,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Tests an entity reference computed field.
    */
-  public function testEntityReferenceComputedField() {
+  public function testEntityReferenceComputedField(): void {
     $this->installEntitySchema('entity_test_computed_field');
 
     // Create 2 entities to be referenced.
@@ -945,7 +943,7 @@ class EntityFieldTest extends EntityKernelTestBase {
    * @param string $entity_type
    *   The entity type to run the tests with.
    */
-  protected function doTestComputedProperties($entity_type) {
+  protected function doTestComputedProperties($entity_type): void {
     $entity = $this->createTestEntity($entity_type);
     $entity->field_test_text->value = "The <strong>text</strong> text to filter.";
     $entity->field_test_text->format = filter_default_format();
@@ -964,7 +962,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Tests explicit entity ID assignment.
    */
-  public function testEntityIdAssignment() {
+  public function testEntityIdAssignment(): void {
     $entity_type = 'entity_test';
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage($entity_type);

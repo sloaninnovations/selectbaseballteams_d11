@@ -26,7 +26,7 @@ class MigrationTest extends KernelTestBase {
    *
    * @covers ::getProcessPlugins
    */
-  public function testGetProcessPlugins() {
+  public function testGetProcessPlugins(): void {
     $migration = \Drupal::service('plugin.manager.migration')->createStubMigration([]);
     $this->assertEquals([], $migration->getProcessPlugins([]));
   }
@@ -36,7 +36,7 @@ class MigrationTest extends KernelTestBase {
    *
    * @covers ::getProcessPlugins
    */
-  public function testGetProcessPluginsException() {
+  public function testGetProcessPluginsException(): void {
     $migration = \Drupal::service('plugin.manager.migration')->createStubMigration([]);
     $this->expectException(MigrateException::class);
     $this->expectExceptionMessage('Invalid process configuration for foobar');
@@ -53,7 +53,7 @@ class MigrationTest extends KernelTestBase {
    *
    * @dataProvider getProcessPluginsExceptionMessageProvider
    */
-  public function testGetProcessPluginsExceptionMessage(array $process) {
+  public function testGetProcessPluginsExceptionMessage(array $process): void {
     // Test with an invalid process pipeline.
     $plugin_definition = [
       'id' => 'foo',
@@ -71,33 +71,11 @@ class MigrationTest extends KernelTestBase {
   /**
    * Provides data for testing invalid process pipeline.
    */
-  public static function getProcessPluginsExceptionMessageProvider() {
-    return [
-      [
-        'Null' =>
-          [
-            'dest' => NULL,
-          ],
-      ],
-      [
-        'boolean' =>
-          [
-            'dest' => TRUE,
-          ],
-      ],
-      [
-        'integer' =>
-          [
-            'dest' => 2370,
-          ],
-      ],
-      [
-        'float' =>
-          [
-            'dest' => 1.61,
-          ],
-      ],
-    ];
+  public static function getProcessPluginsExceptionMessageProvider(): \Generator {
+    yield 'null' => ['process' => ['dest' => NULL]];
+    yield 'boolean' => ['process' => ['dest' => TRUE]];
+    yield 'integer' => ['process' => ['dest' => 2370]];
+    yield 'float' => ['process' => ['dest' => 1.61]];
   }
 
   /**
@@ -105,7 +83,7 @@ class MigrationTest extends KernelTestBase {
    *
    * @covers ::getMigrationDependencies
    */
-  public function testGetMigrationDependencies() {
+  public function testGetMigrationDependencies(): void {
     $plugin_manager = \Drupal::service('plugin.manager.migration');
     $plugin_definition = [
       'id' => 'foo',
@@ -162,7 +140,7 @@ class MigrationTest extends KernelTestBase {
    *
    * @covers ::getDestinationIds
    */
-  public function testGetDestinationIds() {
+  public function testGetDestinationIds(): void {
     $migration = \Drupal::service('plugin.manager.migration')->createStubMigration(['destinationIds' => ['foo' => 'bar']]);
     $destination_ids = $migration->getDestinationIds();
     $this->assertNotEmpty($destination_ids, 'Destination ids are not empty');
@@ -174,7 +152,7 @@ class MigrationTest extends KernelTestBase {
    *
    * @covers ::getDestinationPlugin
    */
-  public function testGetDestinationPlugin() {
+  public function testGetDestinationPlugin(): void {
     $migration = \Drupal::service('plugin.manager.migration')->createStubMigration(['destination' => ['no_stub' => TRUE]]);
     $this->expectException(MigrateSkipRowException::class);
     $this->expectExceptionMessage("Stub requested but not made because no_stub configuration is set.");

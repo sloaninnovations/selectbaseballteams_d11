@@ -19,9 +19,7 @@ class DateTimeTest extends BrowserTestBase {
   use FieldUiTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -59,7 +57,7 @@ class DateTimeTest extends BrowserTestBase {
   /**
    * Tests time zones and DST handling.
    */
-  public function testTimeZoneHandling() {
+  public function testTimeZoneHandling(): void {
     // Setup date/time settings for Honolulu time.
     $config = $this->config('system.date')
       ->set('timezone.default', 'Pacific/Honolulu')
@@ -100,7 +98,7 @@ class DateTimeTest extends BrowserTestBase {
   /**
    * Tests date format configuration.
    */
-  public function testDateFormatConfiguration() {
+  public function testDateFormatConfiguration(): void {
     // Confirm 'no custom date formats available' message appears.
     $this->drupalGet('admin/config/regional/date-time');
 
@@ -209,7 +207,7 @@ class DateTimeTest extends BrowserTestBase {
   /**
    * Tests handling case with invalid data in selectors (like February, 31st).
    */
-  public function testEnteringDateTimeViaSelectors() {
+  public function testEnteringDateTimeViaSelectors(): void {
 
     $this->drupalCreateContentType(['type' => 'page_with_date', 'name' => 'Page with date']);
 
@@ -259,7 +257,7 @@ class DateTimeTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('Selected combination of day and month is not valid.');
 
     $this->drupalGet('node/1');
-    $this->assertSession()->pageTextContains('Mon, 02/29/2016 - 01:30');
+    $this->assertSession()->pageTextContains('Mon, 29 Feb 2016 - 01:30');
   }
 
 }

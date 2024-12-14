@@ -21,9 +21,7 @@ class BreadcrumbTest extends BrowserTestBase {
   use AssertBreadcrumbTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -84,7 +82,7 @@ class BreadcrumbTest extends BrowserTestBase {
   /**
    * Tests breadcrumbs on node and administrative paths.
    */
-  public function testBreadCrumbs() {
+  public function testBreadCrumbs(): void {
     // Prepare common base breadcrumb elements.
     $home = ['' => 'Home'];
     $admin = $home + ['admin' => 'Administration'];
@@ -395,7 +393,7 @@ class BreadcrumbTest extends BrowserTestBase {
   /**
    * Tests AssertBreadcrumbTrait works as expected.
    */
-  public function testAssertBreadcrumbTrait() {
+  public function testAssertBreadcrumbTrait(): void {
     // Ensure the test trait works as expected using menu_test routes.
     $home = ['' => 'Home'];
     $trail = $home + ['menu-test' => 'Menu test root'];
@@ -409,7 +407,7 @@ class BreadcrumbTest extends BrowserTestBase {
       $this->assertBreadcrumb('menu-test/breadcrumb1', []);
       $this->fail($message);
     }
-    catch (ExpectationFailedException $e) {
+    catch (ExpectationFailedException) {
       $this->assertTrue(TRUE, $message);
     }
 
@@ -419,7 +417,7 @@ class BreadcrumbTest extends BrowserTestBase {
       $this->assertBreadcrumb('menu-test/breadcrumb1', $home);
       $this->fail($message);
     }
-    catch (ExpectationFailedException $e) {
+    catch (ExpectationFailedException) {
       $this->assertTrue(TRUE, $message);
     }
 
@@ -436,7 +434,7 @@ class BreadcrumbTest extends BrowserTestBase {
       $this->assertBreadcrumb('menu-test/breadcrumb1', $trail);
       $this->fail($message);
     }
-    catch (ExpectationFailedException $e) {
+    catch (ExpectationFailedException) {
       $this->assertTrue(TRUE, $message);
     }
   }

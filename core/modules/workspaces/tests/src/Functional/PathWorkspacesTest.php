@@ -30,6 +30,7 @@ class PathWorkspacesTest extends BrowserTestBase {
     'node',
     'path',
     'workspaces',
+    'workspaces_ui',
   ];
 
   /**
@@ -74,8 +75,8 @@ class PathWorkspacesTest extends BrowserTestBase {
 
     $this->setupWorkspaceSwitcherBlock();
 
-    // The \Drupal\path_alias\AliasWhitelist service performs cache clears after
-    // Drupal has flushed the response to the client. We use
+    // The \Drupal\path_alias\AliasPrefixList service performs cache clears
+    // after Drupal has flushed the response to the client. We use
     // WaitTerminateTestTrait to wait for Drupal to do this before continuing.
     $this->setWaitForTerminate();
   }
@@ -83,7 +84,7 @@ class PathWorkspacesTest extends BrowserTestBase {
   /**
    * Tests path aliases with workspaces.
    */
-  public function testPathAliases() {
+  public function testPathAliases(): void {
     // Create a published node in Live, without an alias.
     $node = $this->drupalCreateNode([
       'type' => 'article',
@@ -123,7 +124,7 @@ class PathWorkspacesTest extends BrowserTestBase {
   /**
    * Tests path aliases with workspaces and user switching.
    */
-  public function testPathAliasesUserSwitch() {
+  public function testPathAliasesUserSwitch(): void {
     // Create a published node in Live, without an alias.
     $node = $this->drupalCreateNode([
       'type' => 'article',
@@ -167,7 +168,7 @@ class PathWorkspacesTest extends BrowserTestBase {
   /**
    * Tests path aliases with workspaces for translatable nodes.
    */
-  public function testPathAliasesWithTranslation() {
+  public function testPathAliasesWithTranslation(): void {
     $stage = Workspace::load('stage');
 
     // Create one node with a random alias.

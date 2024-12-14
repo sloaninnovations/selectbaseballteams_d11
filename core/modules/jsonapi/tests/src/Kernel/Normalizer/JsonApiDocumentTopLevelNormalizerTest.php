@@ -32,7 +32,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * @coversDefaultClass \Drupal\jsonapi\Normalizer\JsonApiDocumentTopLevelNormalizer
  * @group jsonapi
- * @group #slow
  *
  * @internal
  */
@@ -158,7 +157,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
     );
     $this->createTextField('node', 'article', 'body', 'Body');
 
-    $this->createImageField('field_image', 'article');
+    $this->createImageField('field_image', 'node', 'article');
 
     $this->user = User::create([
       'name' => 'user1',
@@ -261,7 +260,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
   /**
    * @covers ::normalize
    */
-  public function testNormalize() {
+  public function testNormalize(): void {
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node', 'article');
 
     $resource_object = ResourceObject::createFromEntity($resource_type, $this->node);
@@ -362,7 +361,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
   /**
    * @covers ::normalize
    */
-  public function testNormalizeUuid() {
+  public function testNormalizeUuid(): void {
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node', 'article');
     $resource_object = ResourceObject::createFromEntity($resource_type, $this->node);
     $include_param = 'uid,field_tags';
@@ -403,7 +402,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
   /**
    * @covers ::normalize
    */
-  public function testNormalizeException() {
+  public function testNormalizeException(): void {
     $normalized = $this
       ->container
       ->get('jsonapi.serializer')
@@ -418,7 +417,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
     $this->assertEquals('Lorem', $normalized['errors'][0]['detail']);
     $this->assertEquals([
       'info' => [
-        'href' => 'http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1',
+        'href' => 'https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1',
       ],
       'via' => ['href' => 'http://localhost/'],
     ], $normalized['errors'][0]['links']);
@@ -427,7 +426,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
   /**
    * Tests the message and exceptions when requesting a Label only resource.
    */
-  public function testAliasFieldRouteException() {
+  public function testAliasFieldRouteException(): void {
     $this->assertSame('uid', $this->resourceTypeRepository->getByTypeName('node--article')->getPublicName('uid'));
     $this->assertSame('roles', $this->resourceTypeRepository->getByTypeName('user--user')->getPublicName('roles'));
     $resource_type_field_aliases = [
@@ -491,7 +490,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
   /**
    * @covers ::normalize
    */
-  public function testNormalizeConfig() {
+  public function testNormalizeConfig(): void {
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node_type', 'node_type');
     $resource_object = ResourceObject::createFromEntity($resource_type, $this->nodeType);
     $document_wrapper = new JsonApiDocumentTopLevel(new ResourceObjectData([$resource_object], 1), new NullIncludedData(), new LinkCollection([]));
@@ -522,7 +521,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
    *
    * @covers ::denormalize
    */
-  public function testDenormalize() {
+  public function testDenormalize(): void {
     $payload = '{"data":{"type":"article","attributes":{"title":"Testing article"}}}';
 
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node', 'article');
@@ -540,7 +539,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
    *
    * @covers ::denormalize
    */
-  public function testDenormalizeUuid() {
+  public function testDenormalizeUuid(): void {
     $configurations = [
       // Good data.
       [
@@ -634,7 +633,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
   /**
    * Tests denormalization for related resources with missing or invalid types.
    */
-  public function testDenormalizeInvalidTypeAndNoType() {
+  public function testDenormalizeInvalidTypeAndNoType(): void {
     $payload_data = [
       'data' => [
         'type' => 'node--article',
@@ -758,7 +757,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends JsonapiKernelTestBase {
    *
    * @dataProvider testCacheableMetadataProvider
    */
-  public function testCacheableMetadata(CacheableMetadata $expected_metadata) {
+  public function testCacheableMetadata(CacheableMetadata $expected_metadata): void {
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node', 'article');
     $resource_object = ResourceObject::createFromEntity($resource_type, $this->node);
     $context = [

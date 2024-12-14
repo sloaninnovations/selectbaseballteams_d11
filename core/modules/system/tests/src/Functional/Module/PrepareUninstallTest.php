@@ -37,9 +37,7 @@ class PrepareUninstallTest extends BrowserTestBase {
   protected $terms;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'taxonomy', 'entity_test', 'node_access_test'];
 
@@ -78,7 +76,7 @@ class PrepareUninstallTest extends BrowserTestBase {
   /**
    * Tests that Node and Taxonomy can be uninstalled.
    */
-  public function testUninstall() {
+  public function testUninstall(): void {
     // Check that Taxonomy cannot be uninstalled yet.
     $this->drupalGet('admin/modules/uninstall');
     $this->assertSession()->pageTextContains('Remove content items');

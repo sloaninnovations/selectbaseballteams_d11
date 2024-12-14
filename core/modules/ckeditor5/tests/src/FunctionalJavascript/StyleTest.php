@@ -10,7 +10,7 @@ use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * @coversDefaultClass \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Style
@@ -24,7 +24,7 @@ class StyleTest extends CKEditor5TestBase {
   /**
    * @covers \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Style::buildConfigurationForm
    */
-  public function testStyleSettingsForm() {
+  public function testStyleSettingsForm(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer filters']));
 
     $page = $this->getSession()->getPage();
@@ -151,7 +151,7 @@ JS;
   /**
    * Tests Style functionality: setting a class, expected style choices.
    */
-  public function testStyleFunctionality() {
+  public function testStyleFunctionality(): void {
     FilterFormat::create([
       'format' => 'test_format',
       'name' => 'Test format',
@@ -245,7 +245,7 @@ JS;
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(

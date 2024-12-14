@@ -18,9 +18,7 @@ use Drupal\Tests\BrowserTestBase;
 class EntityRevisionsTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'language'];
 
@@ -56,7 +54,7 @@ class EntityRevisionsTest extends BrowserTestBase {
   /**
    * Check node revision related operations.
    */
-  public function testRevisions() {
+  public function testRevisions(): void {
 
     // All revisable entity variations have to have the same results.
     foreach (entity_test_entity_types(ENTITY_TEST_TYPES_REVISABLE) as $entity_type) {
@@ -70,7 +68,7 @@ class EntityRevisionsTest extends BrowserTestBase {
    * @param string $entity_type
    *   The entity type to run the tests with.
    */
-  protected function runRevisionsTests($entity_type) {
+  protected function runRevisionsTests($entity_type): void {
     // Create a translatable test field.
     $field_storage = FieldStorageConfig::create([
       'entity_type' => $entity_type,
@@ -188,7 +186,7 @@ class EntityRevisionsTest extends BrowserTestBase {
   /**
    * Tests that an entity revision is upcasted in the correct language.
    */
-  public function testEntityRevisionParamConverter() {
+  public function testEntityRevisionParamConverter(): void {
     // Create a test entity with multiple revisions and translations for them.
     $entity = EntityTestMulRev::create([
       'name' => 'default revision - en',
@@ -230,7 +228,7 @@ class EntityRevisionsTest extends BrowserTestBase {
    * @covers \Drupal\Core\Entity\ContentEntityBase::setNewRevision
    * @covers \Drupal\Core\Entity\ContentEntityBase::isNewRevision
    */
-  public function testNewRevisionRevert() {
+  public function testNewRevisionRevert(): void {
     $entity = EntityTestMulRev::create(['name' => 'EntityLoadedRevisionTest']);
     $entity->save();
 

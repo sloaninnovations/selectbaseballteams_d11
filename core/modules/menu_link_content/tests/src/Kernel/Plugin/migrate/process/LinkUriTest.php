@@ -24,9 +24,7 @@ class LinkUriTest extends KernelTestBase {
   use UserCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'user'];
 
@@ -51,7 +49,7 @@ class LinkUriTest extends KernelTestBase {
    *
    * @covers ::transform
    */
-  public function testRouted($value, $expected) {
+  public function testRouted($value, $expected): void {
     $actual = $this->doTransform($value);
     $this->assertSame($expected, $actual);
   }
@@ -92,7 +90,7 @@ class LinkUriTest extends KernelTestBase {
    *
    * @dataProvider providerTestNotRouted
    */
-  public function testNotRouted($value, $exception_message) {
+  public function testNotRouted($value, $exception_message): void {
     $this->expectException(MigrateException::class);
     $this->expectExceptionMessage($exception_message);
     $this->doTransform($value);
@@ -137,7 +135,7 @@ class LinkUriTest extends KernelTestBase {
    *
    * @covers ::transform
    */
-  public function testDisablingRouteValidation($value, $expected) {
+  public function testDisablingRouteValidation($value, $expected): void {
     // Create a node so we have a valid route.
     Node::create([
       'nid' => 1,

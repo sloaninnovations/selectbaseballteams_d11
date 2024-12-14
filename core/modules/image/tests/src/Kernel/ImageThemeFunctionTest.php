@@ -28,9 +28,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'entity_test',
@@ -86,7 +84,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
   /**
    * Tests usage of the image field formatters.
    */
-  public function testImageFormatterTheme() {
+  public function testImageFormatterTheme(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
 
@@ -148,7 +146,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
   /**
    * Tests usage of the image style theme function.
    */
-  public function testImageStyleTheme() {
+  public function testImageStyleTheme(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
 
@@ -185,7 +183,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
   /**
    * Tests image alt attribute functionality.
    */
-  public function testImageAltFunctionality() {
+  public function testImageAltFunctionality(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
 

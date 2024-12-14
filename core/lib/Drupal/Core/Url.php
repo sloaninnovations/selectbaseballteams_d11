@@ -482,8 +482,12 @@ class Url implements TrustedCallbackInterface {
    *   would get an access denied running the same request via the normal page
    *   flow.
    *
-   * @throws \Drupal\Core\Routing\MatchingRouteNotFoundException
-   *   Thrown when the request cannot be matched.
+   * @throws Symfony\Component\Routing\Exception\NoConfigurationException
+   *   If no routing configuration could be found.
+   * @throws Symfony\Component\Routing\Exception\ResourceNotFoundException
+   *   If no matching resource could be found.
+   * @throws Symfony\Component\Routing\Exception\MethodNotAllowedException
+   *   If a matching resource was found but the request method is not allowed.
    */
   public static function createFromRequest(Request $request) {
     // We use the router without access checks because URL objects might be
@@ -559,7 +563,7 @@ class Url implements TrustedCallbackInterface {
    *
    * @return string
    *
-   * @throws \UnexpectedValueException.
+   * @throws \UnexpectedValueException
    *   If this is a URI with no corresponding route.
    */
   public function getRouteName() {
@@ -575,7 +579,7 @@ class Url implements TrustedCallbackInterface {
    *
    * @return array
    *
-   * @throws \UnexpectedValueException.
+   * @throws \UnexpectedValueException
    *   If this is a URI with no corresponding route.
    */
   public function getRouteParameters() {
@@ -594,7 +598,7 @@ class Url implements TrustedCallbackInterface {
    *
    * @return $this
    *
-   * @throws \UnexpectedValueException.
+   * @throws \UnexpectedValueException
    *   If this is a URI with no corresponding route.
    */
   public function setRouteParameters($parameters) {
@@ -615,7 +619,7 @@ class Url implements TrustedCallbackInterface {
    *
    * @return $this
    *
-   * @throws \UnexpectedValueException.
+   * @throws \UnexpectedValueException
    *   If this is a URI with no corresponding route.
    */
   public function setRouteParameter($key, $value) {
@@ -773,7 +777,7 @@ class Url implements TrustedCallbackInterface {
    * @return string
    *   The internal path for this route.
    *
-   * @throws \UnexpectedValueException.
+   * @throws \UnexpectedValueException
    *   If this is a URI with no corresponding system path.
    */
   public function getInternalPath() {
@@ -804,7 +808,7 @@ class Url implements TrustedCallbackInterface {
    *   returned, i.e. TRUE means access is explicitly allowed, FALSE means
    *   access is either explicitly forbidden or "no opinion".
    */
-  public function access(AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access(?AccountInterface $account = NULL, $return_as_object = FALSE) {
     if ($this->isRouted()) {
       return $this->accessManager()->checkNamedRoute($this->getRouteName(), $this->getRouteParameters(), $account, $return_as_object);
     }
@@ -855,7 +859,7 @@ class Url implements TrustedCallbackInterface {
    *
    * @return $this
    */
-  public function setUrlGenerator(UrlGeneratorInterface $url_generator = NULL) {
+  public function setUrlGenerator(?UrlGeneratorInterface $url_generator = NULL) {
     $this->urlGenerator = $url_generator;
     $this->internalPath = NULL;
     return $this;

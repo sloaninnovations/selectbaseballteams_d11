@@ -58,7 +58,7 @@ class EntityTestTextItemNormalizerTest extends EntityTestResourceTestBase {
       [
         'value' => 'Cádiz is the oldest continuously inhabited city in Spain and a nice place to spend a Sunday with friends.',
         'format' => 'my_text_format',
-        'processed' => '<p>Cádiz is the oldest continuously inhabited city in Spain and a nice place to spend a Sunday with friends.</p>' . "\n" . '<p>This is a dynamic llama.</p>',
+        'processed' => '<p>Cádiz is the oldest continuously inhabited city in Spain and a nice place to spend a Sunday with friends.</p>' . "\n" . '<p>This is a dynamic llama.</p><p>This is a static llama.</p>',
       ],
     ];
     return $expected;
@@ -157,7 +157,7 @@ class EntityTestTextItemNormalizerTest extends EntityTestResourceTestBase {
    *
    * @dataProvider providerTestGetWithFormat
    */
-  public function testGetWithFormat($text_format_id, array $expected_cache_tags) {
+  public function testGetWithFormat($text_format_id, array $expected_cache_tags): void {
     FilterFormat::create([
       'name' => 'Pablo Picasso',
       'format' => 'pablo',

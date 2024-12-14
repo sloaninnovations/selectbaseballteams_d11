@@ -206,6 +206,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $migration_tags = [];
 
   /**
@@ -227,19 +228,20 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
    *
    * The migration_dependencies value is structured like this:
    * @code
-   * array(
-   *   'required' => array(
+   * [
+   *   'required' => [
    *     // An array of migration IDs that must be run before this migration.
-   *   ),
-   *   'optional' => array(
+   *   ],
+   *   'optional' => [
    *     // An array of migration IDs that, if they exist, must be run before
    *     // this migration.
-   *   ),
-   * );
+   *   ],
+   * ];
    * @endcode
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $migration_dependencies = [];
 
   /**
@@ -323,6 +325,9 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
     }
 
     $this->migration_dependencies = ($this->migration_dependencies ?: []) + ['required' => [], 'optional' => []];
+    if (count($this->migration_dependencies) !== 2 || !is_array($this->migration_dependencies['required']) || !is_array($this->migration_dependencies['optional'])) {
+      throw new InvalidPluginDefinitionException($this->id(), "Invalid migration dependencies configuration for migration {$this->id()}");
+    }
   }
 
   /**
@@ -378,14 +383,13 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   /**
    * {@inheritdoc}
    */
-  public function getProcessPlugins(array $process = NULL) {
-    if (!isset($process)) {
-      $process = $this->getProcess();
-    }
+  public function getProcessPlugins(?array $process = NULL) {
+    $process = isset($process) ? $this->getProcessNormalized($process) : $this->getProcess();
     $index = serialize($process);
     if (!isset($this->processPlugins[$index])) {
       $this->processPlugins[$index] = [];
-      foreach ($this->getProcessNormalized($process) as $property => $configurations) {
+
+      foreach ($process as $property => $configurations) {
         $this->processPlugins[$index][$property] = [];
         foreach ($configurations as $configuration) {
           if (isset($configuration['source'])) {

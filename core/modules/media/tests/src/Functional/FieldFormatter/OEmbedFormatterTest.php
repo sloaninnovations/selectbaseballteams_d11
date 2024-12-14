@@ -72,6 +72,9 @@ class OEmbedFormatterTest extends MediaFunctionalTestBase {
             'height' => '360',
             'title' => 'Drupal Rap Video - Schipulcon09',
             'loading' => 'lazy',
+            // cSpell:disable-next-line
+            'allowtransparency' => NULL,
+            'frameborder' => NULL,
           ],
         ],
         'self_closing' => TRUE,
@@ -157,7 +160,7 @@ class OEmbedFormatterTest extends MediaFunctionalTestBase {
   /**
    * Tests that oEmbed media types' display can be configured correctly.
    */
-  public function testDisplayConfiguration() {
+  public function testDisplayConfiguration(): void {
     $account = $this->drupalCreateUser(['administer media display']);
     $this->drupalLogin($account);
 
@@ -189,7 +192,7 @@ class OEmbedFormatterTest extends MediaFunctionalTestBase {
    *
    * @dataProvider providerRender
    */
-  public function testRender($url, $resource_url, array $formatter_settings, array $selectors, bool $self_closing) {
+  public function testRender($url, $resource_url, array $formatter_settings, array $selectors, bool $self_closing): void {
     $account = $this->drupalCreateUser(['view media']);
     $this->drupalLogin($account);
 

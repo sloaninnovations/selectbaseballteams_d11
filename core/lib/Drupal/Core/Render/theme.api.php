@@ -49,15 +49,15 @@
  * preprocessing functions. For example, the core Search module defines a theme
  * hook for a search result item in search_theme():
  * @code
- * return array(
- *   'search_result' => array(
- *     'variables' => array(
+ * return [
+ *   'search_result' => [
+ *     'variables' => [
  *       'result' => NULL,
  *       'plugin_id' => NULL,
- *     ),
+ *     ],
  *    'file' => 'search.pages.inc',
- *   ),
- * );
+ *   ],
+ * ];
  * @endcode
  * Given this definition, the template file with the default implementation is
  * search-result.html.twig, which can be found in the
@@ -326,8 +326,9 @@
  * on plugins. You can search for classes with the RenderElement or FormElement
  * attribute to discover what render elements are available. API reference
  * sites (such as https://api.drupal.org) generate lists of all existing
- * elements from these classes. Look for the Elements link in the API Navigation
- * block.
+ * elements from these classes. Use the
+ * @link listing_page_element Elements link @endlink in the API Navigation
+ * block to view the available elements.
  *
  * Modules can define render elements by defining an element plugin.
  *
@@ -524,9 +525,9 @@
  * Note that the base theme's form alterations will be run before any sub-theme
  * alterations.
  *
- * @param $form
+ * @param array $form
  *   Nested array of form elements that comprise the form.
- * @param $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The current state of the form.
  */
 function hook_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
@@ -601,7 +602,7 @@ function hook_preprocess(&$variables, $hook) {
  * @param $variables
  *   The variables array (modify in place).
  */
-function hook_preprocess_HOOK(&$variables) {
+function hook_preprocess_HOOK(&$variables): void {
   // This example is from node_preprocess_html(). It adds the node type to
   // the body classes, when on an individual node page or node preview page.
   if (($node = \Drupal::routeMatch()->getParameter('node')) || ($node = \Drupal::routeMatch()->getParameter('node_preview'))) {
@@ -688,7 +689,7 @@ function hook_theme_suggestions_HOOK(array $variables) {
  *
  * @code
  * function MY_MODULE_theme_suggestions_alter(array &$suggestions, array &$variables, $hook) {
- *   if (\Drupal::currentUser()->isAuthenticated() && in_array($hook, array('node', 'taxonomy_term'))) {
+ *   if (\Drupal::currentUser()->isAuthenticated() && in_array($hook, ['node', 'taxonomy_term'])) {
  *     $suggestions[] = $hook . '__' . 'logged_in';
  *   }
  * }
@@ -1092,7 +1093,7 @@ function hook_css_alter(&$css, \Drupal\Core\Asset\AttachedAssetsInterface $asset
  *
  * @see hook_page_attachments_alter()
  */
-function hook_page_attachments(array &$attachments) {
+function hook_page_attachments(array &$attachments): void {
   // Unconditionally attach an asset to the page.
   $attachments['#attached']['library'][] = 'core/drupalSettings';
 
@@ -1118,7 +1119,7 @@ function hook_page_attachments(array &$attachments) {
  *
  * @see hook_page_attachments()
  */
-function hook_page_attachments_alter(array &$attachments) {
+function hook_page_attachments_alter(array &$attachments): void {
   // Conditionally remove an asset.
   if (in_array('core/jquery', $attachments['#attached']['library'])) {
     $index = array_search('core/jquery', $attachments['#attached']['library']);
@@ -1132,7 +1133,7 @@ function hook_page_attachments_alter(array &$attachments) {
  * @param array $page_top
  *   A renderable array representing the top of the page.
  */
-function hook_page_top(array &$page_top) {
+function hook_page_top(array &$page_top): void {
   $page_top['my_module'] = ['#markup' => 'This is the top.'];
 }
 
@@ -1142,7 +1143,7 @@ function hook_page_top(array &$page_top) {
  * @param array $page_bottom
  *   A renderable array representing the bottom of the page.
  */
-function hook_page_bottom(array &$page_bottom) {
+function hook_page_bottom(array &$page_bottom): void {
   $page_bottom['my_module'] = ['#markup' => 'This is the bottom.'];
 }
 
@@ -1247,16 +1248,32 @@ function hook_page_bottom(array &$page_bottom) {
  * @see themeable
  * @see hook_theme_registry_alter()
  */
-function hook_theme($existing, $type, $theme, $path) {
+function hook_theme($existing, $type, $theme, $path): array {
   return [
     'my_module_display' => [
-      'variables' => ['my_modules' => NULL, 'topics' => NULL, 'parents' => NULL, 'tid' => NULL, 'sortby' => NULL, 'my_module_per_page' => NULL],
+      'variables' => [
+        'my_modules' => NULL,
+        'topics' => NULL,
+        'parents' => NULL,
+        'tid' => NULL,
+        'sortby' => NULL,
+        'my_module_per_page' => NULL,
+      ],
     ],
     'my_module_list' => [
-      'variables' => ['my_modules' => NULL, 'parents' => NULL, 'tid' => NULL],
+      'variables' => [
+        'my_modules' => NULL,
+        'parents' => NULL,
+        'tid' => NULL,
+      ],
     ],
     'my_module_icon' => [
-      'variables' => ['new_posts' => NULL, 'num_posts' => 0, 'comment_mode' => 0, 'sticky' => 0],
+      'variables' => [
+        'new_posts' => NULL,
+        'num_posts' => 0,
+        'comment_mode' => 0,
+        'sticky' => 0,
+      ],
     ],
     'status_report' => [
       'render element' => 'requirements',
@@ -1281,24 +1298,24 @@ function hook_theme($existing, $type, $theme, $path) {
  *
  * For example:
  * @code
- * $theme_registry['block_content_add_list'] = array (
+ * $theme_registry['block_content_add_list'] = [
  *   'template' => 'block-content-add-list',
  *   'path' => 'core/themes/claro/templates',
  *   'type' => 'theme_engine',
  *   'theme path' => 'core/themes/claro',
- *   'includes' => array (
+ *   'includes' => [
  *     0 => 'core/modules/block_content/block_content.pages.inc',
- *   ),
- *   'variables' => array (
+ *   ],
+ *   'variables' => [
  *     'content' => NULL,
- *   ),
- *   'preprocess functions' => array (
+ *   ],
+ *   'preprocess functions' => [
  *     0 => 'template_preprocess',
  *     1 => 'template_preprocess_block_content_add_list',
  *     2 => 'contextual_preprocess',
  *     3 => 'claro_preprocess_block_content_add_list',
- *   ),
- * );
+ *   ],
+ * ];
  * @endcode
  *
  * @param $theme_registry

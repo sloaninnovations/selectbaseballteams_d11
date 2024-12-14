@@ -15,9 +15,7 @@ use Drupal\Tests\BrowserTestBase;
 class UrlTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
@@ -31,7 +29,7 @@ class UrlTest extends BrowserTestBase {
   /**
    * Tests that #type 'url' fields are properly validated and trimmed.
    */
-  public function testFormUrl() {
+  public function testFormUrl(): void {
     $edit = [];
     $edit['url'] = 'http://';
     $edit['url_required'] = ' ';

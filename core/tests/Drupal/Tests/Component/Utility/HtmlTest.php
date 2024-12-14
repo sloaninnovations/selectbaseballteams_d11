@@ -9,7 +9,6 @@ use Drupal\Component\Render\MarkupTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Random;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 // cspell:ignore répét répété
 
@@ -21,8 +20,6 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
  * @coversDefaultClass \Drupal\Component\Utility\Html
  */
 class HtmlTest extends TestCase {
-
-  use ExpectDeprecationTrait;
 
   /**
    * {@inheritdoc}
@@ -49,7 +46,7 @@ class HtmlTest extends TestCase {
    *
    * @covers ::cleanCssIdentifier
    */
-  public function testCleanCssIdentifier($expected, $source, $filter = NULL) {
+  public function testCleanCssIdentifier($expected, $source, $filter = NULL): void {
     if ($filter !== NULL) {
       $this->assertSame($expected, Html::cleanCssIdentifier($source, $filter));
     }
@@ -95,7 +92,7 @@ class HtmlTest extends TestCase {
    *
    * @covers ::getClass
    */
-  public function testHtmlClass() {
+  public function testHtmlClass(): void {
     // Verify Drupal coding standards are enforced.
     $this->assertSame('class-name--ü', Html::getClass('CLASS NAME_[Ü]'), 'Enforce Drupal coding standards.');
 
@@ -119,7 +116,7 @@ class HtmlTest extends TestCase {
    *
    * @covers ::getUniqueId
    */
-  public function testHtmlGetUniqueId($expected, $source, $reset = FALSE) {
+  public function testHtmlGetUniqueId($expected, $source, $reset = FALSE): void {
     if ($reset) {
       Html::resetSeenIds();
     }
@@ -162,7 +159,7 @@ class HtmlTest extends TestCase {
    *
    * @covers ::getUniqueId
    */
-  public function testHtmlGetUniqueIdWithAjaxIds($expected, $source) {
+  public function testHtmlGetUniqueIdWithAjaxIds($expected, $source): void {
     Html::setIsAjax(TRUE);
     $id = Html::getUniqueId($source);
 
@@ -206,7 +203,7 @@ class HtmlTest extends TestCase {
    *
    * @covers ::getId
    */
-  public function testHtmlGetId($expected, $source) {
+  public function testHtmlGetId($expected, $source): void {
     Html::setIsAjax(FALSE);
     $this->assertSame($expected, Html::getId($source));
   }
@@ -240,7 +237,7 @@ class HtmlTest extends TestCase {
    * @dataProvider providerDecodeEntities
    * @covers ::decodeEntities
    */
-  public function testDecodeEntities($text, $expected) {
+  public function testDecodeEntities($text, $expected): void {
     $this->assertEquals($expected, Html::decodeEntities($text));
   }
 
@@ -281,7 +278,7 @@ class HtmlTest extends TestCase {
    * @dataProvider providerEscape
    * @covers ::escape
    */
-  public function testEscape($expected, $text) {
+  public function testEscape($expected, $text): void {
     $this->assertEquals($expected, Html::escape($text));
   }
 
@@ -315,7 +312,7 @@ class HtmlTest extends TestCase {
    * @covers ::decodeEntities
    * @covers ::escape
    */
-  public function testDecodeEntitiesAndEscape() {
+  public function testDecodeEntitiesAndEscape(): void {
     $string = "<em>répét&eacute;</em>";
     $escaped = Html::escape($string);
     $this->assertSame('&lt;em&gt;répét&amp;eacute;&lt;/em&gt;', $escaped);
@@ -335,7 +332,7 @@ class HtmlTest extends TestCase {
    *
    * @covers ::serialize
    */
-  public function testSerialize() {
+  public function testSerialize(): void {
     $document = new \DOMDocument();
     $result = Html::serialize($document);
     $this->assertSame('', $result);
@@ -345,7 +342,7 @@ class HtmlTest extends TestCase {
    * @covers ::transformRootRelativeUrlsToAbsolute
    * @dataProvider providerTestTransformRootRelativeUrlsToAbsolute
    */
-  public function testTransformRootRelativeUrlsToAbsolute($html, $scheme_and_host, $expected_html) {
+  public function testTransformRootRelativeUrlsToAbsolute($html, $scheme_and_host, $expected_html): void {
     $this->assertSame($expected_html ?: $html, Html::transformRootRelativeUrlsToAbsolute($html, $scheme_and_host));
   }
 
@@ -353,7 +350,7 @@ class HtmlTest extends TestCase {
    * @covers ::transformRootRelativeUrlsToAbsolute
    * @dataProvider providerTestTransformRootRelativeUrlsToAbsoluteAssertion
    */
-  public function testTransformRootRelativeUrlsToAbsoluteAssertion($scheme_and_host) {
+  public function testTransformRootRelativeUrlsToAbsoluteAssertion($scheme_and_host): void {
     $this->expectException(\AssertionError::class);
     Html::transformRootRelativeUrlsToAbsolute('', $scheme_and_host);
   }
@@ -416,19 +413,6 @@ class HtmlTest extends TestCase {
       'host and path' => ['example.com/llama'],
       'scheme, host and path' => ['http://example.com/llama'],
     ];
-  }
-
-  /**
-   * Test deprecations.
-   *
-   * @group legacy
-   */
-  public function testDeprecations(): void {
-    $this->expectDeprecation('Passing NULL to Drupal\Component\Utility\Html::decodeEntities is deprecated in drupal:9.5.0 and will trigger a PHP error from drupal:11.0.0. Pass a string instead. See https://www.drupal.org/node/3318826');
-    $this->assertSame('', Html::decodeEntities(NULL));
-
-    $this->expectDeprecation('Passing NULL to Drupal\Component\Utility\Html::escape is deprecated in drupal:9.5.0 and will trigger a PHP error from drupal:11.0.0. Pass a string instead. See https://www.drupal.org/node/3318826');
-    $this->assertSame('', Html::escape(NULL));
   }
 
 }

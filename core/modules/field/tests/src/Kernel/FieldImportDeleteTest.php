@@ -16,7 +16,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 class FieldImportDeleteTest extends FieldKernelTestBase {
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * The default configuration provided by field_test_config is imported by
    * \Drupal\Tests\field\Kernel\FieldKernelTestBase::setUp() when it installs
@@ -29,7 +29,7 @@ class FieldImportDeleteTest extends FieldKernelTestBase {
   /**
    * Tests deleting field storages and fields as part of config import.
    */
-  public function testImportDelete() {
+  public function testImportDelete(): void {
     entity_test_create_bundle('test_bundle');
 
     $this->installConfig(['field_test_config']);

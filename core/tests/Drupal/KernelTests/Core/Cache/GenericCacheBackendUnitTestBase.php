@@ -135,7 +135,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   /**
    * Tests the get and set methods of Drupal\Core\Cache\CacheBackendInterface.
    */
-  public function testSetGet() {
+  public function testSetGet(): void {
     $backend = $this->getCacheBackend();
 
     $this->assertFalse($backend->get('test1'), "Backend does not contain data for cache id test1.");
@@ -226,12 +226,19 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
     $this->assertEquals('value', $backend->get('TEST8')->data);
     $this->assertFalse($backend->get('test8'));
 
+    // Test a cid with and without a trailing space is treated as two different
+    // IDs.
+    $cid_nospace = 'trailing-space-test';
+    $backend->set($cid_nospace, $cid_nospace);
+    $this->assertSame($cid_nospace, $backend->get($cid_nospace)->data);
+    $this->assertFalse($backend->get($cid_nospace . ' '));
+
     // Calling ::set() with invalid cache tags. This should fail an assertion.
     try {
       $backend->set('assertion_test', 'value', Cache::PERMANENT, ['node' => [3, 5, 7]]);
       $this->fail('::set() was called with invalid cache tags, but runtime assertion did not fail.');
     }
-    catch (\AssertionError $e) {
+    catch (\AssertionError) {
       // Do nothing; continue testing in extending classes.
     }
   }
@@ -239,7 +246,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   /**
    * Tests Drupal\Core\Cache\CacheBackendInterface::delete().
    */
-  public function testDelete() {
+  public function testDelete(): void {
     $backend = $this->getCacheBackend();
 
     $this->assertFalse($backend->get('test1'), "Backend does not contain data for cache id test1.");
@@ -267,7 +274,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   /**
    * Tests data type preservation.
    */
-  public function testValueTypeIsKept() {
+  public function testValueTypeIsKept(): void {
     $backend = $this->getCacheBackend();
 
     $variables = [
@@ -295,7 +302,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   /**
    * Tests Drupal\Core\Cache\CacheBackendInterface::getMultiple().
    */
-  public function testGetMultiple() {
+  public function testGetMultiple(): void {
     $backend = $this->getCacheBackend();
 
     // Set numerous testing keys.
@@ -389,7 +396,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   /**
    * Tests \Drupal\Core\Cache\CacheBackendInterface::setMultiple().
    */
-  public function testSetMultiple() {
+  public function testSetMultiple(): void {
     $backend = $this->getCacheBackend();
 
     $future_expiration = \Drupal::time()->getRequestTime() + 100;
@@ -435,7 +442,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
       $backend->setMultiple($items);
       $this->fail('::setMultiple() was called with invalid cache tags, but runtime assertion did not fail.');
     }
-    catch (\AssertionError $e) {
+    catch (\AssertionError) {
       // Do nothing; continue testing in extending classes.
     }
   }
@@ -454,7 +461,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
    * @covers \Drupal\Core\Cache\MemoryBackend::deleteMultiple
    * @covers \Drupal\Core\Cache\PhpBackend::deleteMultiple
    */
-  public function testDeleteMultiple() {
+  public function testDeleteMultiple(): void {
     $backend = $this->getCacheBackend();
 
     // Set numerous testing keys.
@@ -501,7 +508,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   /**
    * Tests Drupal\Core\Cache\CacheBackendInterface::deleteAll().
    */
-  public function testDeleteAll() {
+  public function testDeleteAll(): void {
     $backend_a = $this->getCacheBackend();
     $backend_b = $this->getCacheBackend('bootstrap');
 
@@ -531,7 +538,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
    * @covers \Drupal\Core\Cache\MemoryBackend::invalidateMultiple
    * @covers \Drupal\Core\Cache\PhpBackend::invalidateMultiple
    */
-  public function testInvalidate() {
+  public function testInvalidate(): void {
     $backend = $this->getCacheBackend();
     $backend->set('test1', 1);
     $backend->set('test2', 2);
@@ -563,7 +570,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   /**
    * Tests Drupal\Core\Cache\CacheBackendInterface::invalidateTags().
    */
-  public function testInvalidateTags() {
+  public function testInvalidateTags(): void {
     $backend = $this->getCacheBackend();
 
     // Create two cache entries with the same tag and tag value.
@@ -630,7 +637,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   /**
    * Tests Drupal\Core\Cache\CacheBackendInterface::invalidateAll().
    */
-  public function testInvalidateAll() {
+  public function testInvalidateAll(): void {
     $backend_a = $this->getCacheBackend();
     $backend_b = $this->getCacheBackend('bootstrap');
 
@@ -651,7 +658,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   /**
    * Tests Drupal\Core\Cache\CacheBackendInterface::removeBin().
    */
-  public function testRemoveBin() {
+  public function testRemoveBin(): void {
     $backend_a = $this->getCacheBackend();
     $backend_b = $this->getCacheBackend('bootstrap');
 

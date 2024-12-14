@@ -31,9 +31,7 @@ class ConfigImportAllTest extends ModuleTestBase {
   protected $webUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config'];
 
@@ -60,9 +58,9 @@ class ConfigImportAllTest extends ModuleTestBase {
   /**
    * Tests that a fixed set of modules can be installed and uninstalled.
    */
-  public function testInstallUninstall() {
+  public function testInstallUninstall(): void {
 
-    // Get a list of modules to enable.
+    // Get a list of modules to install.
     $all_modules = $this->container->get('extension.list.module')->getList();
     $all_modules = array_filter($all_modules, function ($module) {
       // Filter out contrib, hidden, testing, experimental, and deprecated

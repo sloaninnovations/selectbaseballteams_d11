@@ -132,7 +132,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
    * @param $element
    *   An associative array containing the properties and children of the
    *   generic form element.
-   * @param $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.
@@ -166,7 +166,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
    * field with properties:
    * @code
    * '#autocomplete_route_name' => 'my_module.autocomplete',
-   * '#autocomplete_route_parameters' => array('a' => $some_key, 'b' => $some_id),
+   * '#autocomplete_route_parameters' => ['a' => $some_key, 'b' => $some_id],
    * @endcode
    * If the user types "keywords" in that field, the full path called would be:
    * 'my_module_autocomplete/$some_key/$some_id?q=keywords'

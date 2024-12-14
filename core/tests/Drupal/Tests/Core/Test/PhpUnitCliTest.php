@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Test;
 
 use Drupal\Tests\UnitTestCase;
-use Drupal\TestTools\PhpUnitCompatibility\RunnerVersion;
 use Symfony\Component\Process\Process;
 
 /**
  * @group TestSuites
  * @group Test
+ * @group #slow
  */
 class PhpUnitCliTest extends UnitTestCase {
 
@@ -23,18 +23,13 @@ class PhpUnitCliTest extends UnitTestCase {
    * us from committing tests which don't break under run-tests.sh, but do
    * break under the PHPUnit CLI test runner tool.
    */
-  public function testPhpUnitListTests() {
+  public function testPhpUnitListTests(): void {
     $command = [
       'vendor/bin/phpunit',
       '--configuration',
       'core',
       '--list-tests',
     ];
-
-    // PHPUnit 10 dropped the --verbose command line option.
-    if (RunnerVersion::getMajor() < 10) {
-      $command[] = '--verbose';
-    }
 
     $process = new Process($command, $this->root);
     $process

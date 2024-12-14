@@ -11,6 +11,12 @@ use Drupal\Core\Installer\Form\SelectProfileForm;
 
 /**
  * Provides a base class for testing installing from existing configuration.
+ *
+ * @deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\FunctionalTests\Installer\InstallerConfigDirectoryTestBase
+ *   instead.
+ *
+ * @see https://www.drupal.org/node/3460001
  */
 abstract class InstallerExistingConfigTestBase extends InstallerTestBase {
 
@@ -22,9 +28,17 @@ abstract class InstallerExistingConfigTestBase extends InstallerTestBase {
   protected $profile = NULL;
 
   /**
-   * @todo
+   * @todo Fill out docblock.
    */
   protected $existingSyncDirectory = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(string $name) {
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. Use \Drupal\FunctionalTests\Installer\InstallerConfigDirectoryTestBase instead. See https://www.drupal.org/node/3460001');
+    parent::__construct($name);
+  }
 
   /**
    * {@inheritdoc}
@@ -134,7 +148,7 @@ abstract class InstallerExistingConfigTestBase extends InstallerTestBase {
   /**
    * Confirms that the installation installed the configuration correctly.
    */
-  public function testConfigSync() {
+  public function testConfigSync(): void {
     // After installation there is no snapshot and nothing to import.
     $change_list = $this->configImporter()->getStorageComparer()->getChangelist();
     $expected = [
