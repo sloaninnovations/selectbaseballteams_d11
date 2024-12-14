@@ -430,21 +430,13 @@ class ModuleHandler implements ModuleHandlerInterface {
       $this->alterEventListeners[$cid] = [];
       $hook = $type . '_alter';
       $hook_listeners = $this->getHookListeners($hook);
+      $extra_modules = FALSE;
+      $extra_listeners = [];
       if (isset($extra_types)) {
-        $find_listeners = function ($hook) use (&$hook_listeners, &$extra_modules) {
-          foreach ($this->getHookListeners($hook) as $module => $listeners) {
-            if (isset($hook_listeners[$module])) {
-              $hook_listeners[$module] = array_merge($hook_listeners[$module], $listeners);
-            }
-            else {
-              $hook_listeners[$module] = $listeners;
-              // It is used below.
-              // @phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
-              $extra_modules = TRUE;
-            }
-          }
-        };
         $extra_hooks = array_map(fn ($x) => $x . '_alter', $extra_types);
+        foreach ($extra_hooks as $extra_hook) {
+          $hook_listeners = $this->findListenersForAlter($extra_hook, $hook_listeners, $extra_modules);
+        }
         // For multiple hooks, we need $modules to contain every module that
         // implements at least one of them in the correct order. Hooks already
         // ordered by attributes are also ordered by
@@ -453,20 +445,22 @@ class ModuleHandler implements ModuleHandlerInterface {
           if (isset($this->hooksOrderedByAttributes[$extra_hook])) {
             $group = $this->hooksOrderedByAttributes[$extra_hook];
             krsort($group);
-            $find_listeners(implode(':', $group));
+            $extra_listeners = $this->findListenersForAlter(implode(':', $group));
             $extra_types = array_diff($extra_hooks, $group);
           }
-        }
-        foreach ($extra_hooks as $extra_hook) {
-          $find_listeners($extra_hook);
         }
       }
       // If any modules implement one of the extra hooks that do not implement
       // the primary hook, we need to add them to the $modules array in their
       // appropriate order.
-      $modules = array_keys($hook_listeners);
-      if (!empty($extra_modules) && !empty($extra_types)) {
-        $modules = $this->reOrderModulesForAlter($modules, $hook);
+      if (isset($extra_types) && !$extra_types) {
+        $modules = array_keys(array_intersect_key($extra_listeners, $hook_listeners));
+      }
+      else {
+        $modules = array_keys($hook_listeners);
+        if ($extra_modules) {
+          $modules = $this->reOrderModulesForAlter($modules, $hook);
+        }
       }
       foreach ($modules as $module) {
         foreach ($hook_listeners[$module] ?? [] as $listener) {
@@ -593,6 +587,21 @@ class ModuleHandler implements ModuleHandlerInterface {
     }
 
     return $this->invokeMap[$hook] ?? [];
+  }
+
+  public function findListenersForAlter($hook, array $hook_listeners = [], ?bool &$extra_modules = NULL): array {
+    foreach ($this->getHookListeners($hook) as $module => $listeners) {
+      if (isset($hook_listeners[$module])) {
+        $hook_listeners[$module] = array_merge($hook_listeners[$module], $listeners);
+      }
+      else {
+        $hook_listeners[$module] = $listeners;
+        // It is used below.
+        // @phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+        $extra_modules = TRUE;
+      }
+    }
+    return $hook_listeners;
   }
 
 }
