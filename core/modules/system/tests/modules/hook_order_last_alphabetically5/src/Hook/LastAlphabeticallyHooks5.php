@@ -27,6 +27,7 @@ class LastAlphabeticallyHooks5 {
    */
   #[Hook('cache_flush')]
   public static function cacheFlush(): void {
+    // This should be run before so HookLast should not be set.
     if (isset($GLOBALS['HookLast'])) {
       $GLOBALS['HookOutOfOrderTestingLast'] = 'HookOutOfOrderTestingLast';
     }

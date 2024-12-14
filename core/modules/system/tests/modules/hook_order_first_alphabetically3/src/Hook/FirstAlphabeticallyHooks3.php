@@ -27,6 +27,7 @@ class FirstAlphabeticallyHooks3 {
    */
   #[Hook('cache_flush')]
   public static function cacheFlush(): void {
+    // This should be run after so HookBefore should not be set.
     if (!isset($GLOBALS['HookBefore'])) {
       $GLOBALS['HookOutOfOrderTestingBefore'] = 'HookOutOfOrderTestingBefore';
     }

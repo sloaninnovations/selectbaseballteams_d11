@@ -32,6 +32,7 @@ class FirstAlphabeticallyHooks4 {
   #[HookOrderGroup(['custom_hook_extra_types2_alter'])]
   #[Hook('custom_hook_extra_types1_alter')]
   public static function customHookExtraTypes(): void {
+    // This should be run after so HookOrderGroupExtraTypes should not be set.
     if (!isset($GLOBALS['HookOrderGroupExtraTypes'])) {
       $GLOBALS['HookOutOfOrderTestingOrderGroupsExtraTypes'] = 'HookOutOfOrderTestingOrderGroupsExtraTypes';
     }
