@@ -166,12 +166,12 @@ class HookCollectorPass implements CompilerPassInterface {
    *   All implementations.
    * @param array $legacyImplementations
    *   Modules that implement hooks.
-   * @param array $reorderGroups
+   * @param array $orderGroups
    *   Groups of hooks to reorder.
    *
    * @return void
    */
-  protected static function registerServices(ContainerBuilder $container, HookCollectorPass $collector, array $implementations, array $legacyImplementations, array $reorderGroups): void {
+  protected static function registerServices(ContainerBuilder $container, HookCollectorPass $collector, array $implementations, array $legacyImplementations, array $orderGroups): void {
     $container->register(ProceduralCall::class, ProceduralCall::class)
       ->addArgument($collector->includes);
     $groupIncludes = [];
@@ -184,7 +184,7 @@ class HookCollectorPass implements CompilerPassInterface {
     }
 
     foreach ($legacyImplementations as $hook => $moduleImplements) {
-      $extraHooks = $reorderGroups[$hook] ?? [];
+      $extraHooks = $orderGroups[$hook] ?? [];
       foreach ($extraHooks as $extraHook) {
         $moduleImplements += $legacyImplementations[$extraHook] ?? [];
       }
@@ -212,13 +212,9 @@ class HookCollectorPass implements CompilerPassInterface {
       }
     }
 
-    $hooksOrderedByAttributes = [];
-    foreach ($reorderGroups as $key => $values) {
-      $hooksOrderedByAttributes[$key] = $values;
-    }
     $definition = $container->getDefinition('module_handler');
     $definition->setArgument('$groupIncludes', $groupIncludes);
-    $definition->setArgument('$hooksOrderedByAttributes', $hooksOrderedByAttributes);
+    $definition->setArgument('$orderGroups', $orderGroups);
     $container->setParameter('hook_implementations_map', $map ?? []);
   }
 

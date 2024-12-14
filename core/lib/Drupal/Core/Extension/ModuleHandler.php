@@ -80,13 +80,13 @@ class ModuleHandler implements ModuleHandlerInterface {
    *   An array keyed by hook, classname, method and the value is the module.
    * @param array $groupIncludes
    *   An array of .inc files to get helpers from.
-   * @param array $hooksOrderedByAttributes
+   * @param array $orderGroups
    *   An array of hooks that have been ordered by attributes.
    *
    * @see \Drupal\Core\DrupalKernel
    * @see \Drupal\Core\CoreServiceProvider
    */
-  public function __construct($root, array $module_list, protected EventDispatcherInterface $eventDispatcher, protected array $hookImplementationsMap, protected array $groupIncludes = [], protected array $hooksOrderedByAttributes = []) {
+  public function __construct($root, array $module_list, protected EventDispatcherInterface $eventDispatcher, protected array $hookImplementationsMap, protected array $groupIncludes = [], protected array $orderGroups = []) {
     $this->root = $root;
     $this->moduleList = [];
     foreach ($module_list as $name => $module) {
@@ -443,11 +443,8 @@ class ModuleHandler implements ModuleHandlerInterface {
         // used for ordering because the group might contain hooks not included
         // in this alter() call.
         foreach (array_merge($extra_hooks, [$type . '_alter']) as $extra_hook) {
-          if (isset($this->hooksOrderedByAttributes[$extra_hook])) {
-            $group = $this->hooksOrderedByAttributes[$extra_hook];
-            // When checking for already ordered groups ensure the listener
-            // is in the same order as when we set it.
-            krsort($group);
+          if (isset($this->orderGroups[$extra_hook])) {
+            $group = $this->orderGroups[$extra_hook];
             $extra_listeners = $this->findListenersForAlter(implode(':', $group));
             // Remove already ordered hooks.
             $extra_types = array_diff($extra_hooks, $group);

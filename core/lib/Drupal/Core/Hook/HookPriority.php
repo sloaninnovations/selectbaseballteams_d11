@@ -39,8 +39,6 @@ class HookPriority {
     }
     if (count($hooks) > 1) {
       $map = $this->container->getParameter('hook_implementations_map');
-      // Order the complex listener so we can find it runtime.
-      krsort($hooks);
       $combinedHookTag = implode(':', $hooks);
       $event = "drupal_hook.$combinedHookTag";
       $data = $others;
