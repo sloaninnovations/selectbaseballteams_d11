@@ -12,16 +12,11 @@ interface HookOrderInterface {
   /**
    * Set the properties on the attributes using this class.
    *
-   * @param string $hook
-   *   The hook to order.
+   * @param Drupal\Core\Hook\Attribute\Hook $hook
+   *   The hook attribute to order.
    * @param string $class
    *   The class the hook is in.
-   * @param string $method
-   *   The method of the hook.
-   * @param string $module
-   *   The module of the hook. Note this might be different from the module the
-   *   class is in.
    */
-  public function set(string $hook, string $class, string $method, string $module): static;
+  public function set(Hook $hook, string $class): static;
 
 }

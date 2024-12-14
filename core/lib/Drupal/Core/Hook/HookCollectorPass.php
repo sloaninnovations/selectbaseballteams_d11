@@ -83,23 +83,21 @@ class HookCollectorPass implements CompilerPassInterface {
         foreach ($methods as $method => $attributes) {
           $orderAttributes = [];
           $orderGroup = FALSE;
-          $hook = FALSE;
           foreach ($attributes as $attribute) {
-            // This prevents one hook implementing on behalf of another
-            // module from overriding any following methods in this
-            // class.
-            $currentModule = $module;
             switch (TRUE) {
               case $attribute instanceof Hook:
                 if ($class !== ProceduralCall::class) {
                   self::checkForProceduralOnlyHooks($attribute, $class);
                 }
-                $hook = $attribute->hook;
-                if ($attribute->module) {
-                  $currentModule = $attribute->module;
+                $hookAttribute = $attribute;
+                if (!$attribute->module) {
+                  $attribute->module = $module;
                 }
-                $legacyImplementations[$hook][$module] = '';
-                $implementations[$hook][$module][$class][] = $attribute->method ?: $method;
+                if (!$attribute->method) {
+                  $attribute->method = $method;
+                }
+                $legacyImplementations[$attribute->hook][$attribute->module] = '';
+                $implementations[$attribute->hook][$attribute->module][$class][] = $attribute->method;
                 break;
 
               case $attribute instanceof HookOrderInterface:
@@ -111,18 +109,17 @@ class HookCollectorPass implements CompilerPassInterface {
                 break;
             }
           }
-          if ($hook) {
+          if (isset($hookAttribute)) {
             foreach ($orderAttributes as $orderAttribute) {
-              // If $hook is not false then $currentModule is set.
-              /** @phpstan-ignore variable.undefined */
-              $allOrderAttributes[] = $orderAttribute->set(hook: $hook, class: $class, method: $method, module: $currentModule);
+              $allOrderAttributes[] = $orderAttribute->set(hook: $hookAttribute, class: $class);
             }
             if ($orderGroup) {
-              $orderGroup[] = $hook;
+              $orderGroup[] = $hookAttribute->hook;
               foreach ($orderGroup as $extraHook) {
                 $orderGroups[$extraHook] = array_merge($orderGroups[$extraHook] ?? [], $orderGroup);
               }
             }
+            unset($hookAttribute);
           }
         }
       }
