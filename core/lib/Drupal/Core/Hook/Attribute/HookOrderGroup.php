@@ -7,8 +7,8 @@ namespace Drupal\Core\Hook\Attribute;
 /**
  * Attribute for marking which specific implementations to group.
  *
- * This allows hook ordering to handle extra types such as ordering form_alter
- * relative to hook_form_FORM_ID_alter.
+ * This allows hook ordering to handle extra types such as ordering
+ * hook_form_alter relative to hook_form_FORM_ID_alter.
  *
  * @section sec_backwards_compatibility Backwards-compatibility
  *
@@ -24,13 +24,13 @@ namespace Drupal\Core\Hook\Attribute;
 class HookOrderGroup {
 
   /**
-   * Constructs a core/lib/Drupal/Core/Hook/Attribute/HookOrderGroup.php attribute object.
+   * Constructs a HookOrderGroup attribute object.
    *
    * @param array $group
    *   A list of hooks to sort together. For example, if a method implementing
    *   form_BASE_FORM_ID_alter wants to sort itself relative to some
    *   implementations of form_FORM_ID_alter then this would contain those.
-   *   See Ckeditor5::formFilterFormatFormAlter() for example.
+   *   See Ckeditor5::formFilterFormatFormAlter() for an example.
    */
   public function __construct(
     public array $group,

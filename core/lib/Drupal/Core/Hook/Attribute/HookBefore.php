@@ -7,7 +7,7 @@ namespace Drupal\Core\Hook\Attribute;
 /**
  * Attribute for marking that a hook's order should be changed.
  *
- * This allows you to ensure the hook is executed before
+ * This allows you to ensure the hook is executed before similar
  * hooks in other modules.
  *
  * @section sec_backwards_compatibility Backwards-compatibility
@@ -27,7 +27,7 @@ class HookBefore extends HookOrderBase {
    * Constructs a HookBefore lib/Drupal/Core/Hook/Attribute/attribute.
    *
    * @param array $modules
-   *   The module this implementation should run before.
+   *   The modules this implementation should run before.
    */
   public function __construct(
     public array $modules,

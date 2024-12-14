@@ -444,6 +444,8 @@ class ModuleHandler implements ModuleHandlerInterface {
         foreach (array_merge($extra_hooks, [$type . '_alter']) as $extra_hook) {
           if (isset($this->hooksOrderedByAttributes[$extra_hook])) {
             $group = $this->hooksOrderedByAttributes[$extra_hook];
+            // When checking for already ordered groups ensure the listener
+            // is in the same order as when we set it.
             krsort($group);
             $extra_listeners = $this->findListenersForAlter(implode(':', $group));
             $extra_types = array_diff($extra_hooks, $group);
@@ -589,14 +591,27 @@ class ModuleHandler implements ModuleHandlerInterface {
     return $this->invokeMap[$hook] ?? [];
   }
 
-  public function findListenersForAlter($hook, array $hook_listeners = [], ?bool &$extra_modules = NULL): array {
+  /**
+   * Helper to get hook listeners when in alter.
+   *
+   * @param string $hook
+   *   The extra hook or combination hook to check for.
+   * @param array $hook_listeners
+   *   Hook listeners for the current hook_alter.
+   * @param bool $extra_modules
+   *   Whether there are extra modules to order.
+   *
+   * @return array
+   *   The hook listeners.
+   */
+  public function findListenersForAlter(string $hook, array $hook_listeners = [], ?bool &$extra_modules = NULL): array {
     foreach ($this->getHookListeners($hook) as $module => $listeners) {
       if (isset($hook_listeners[$module])) {
         $hook_listeners[$module] = array_merge($hook_listeners[$module], $listeners);
       }
       else {
         $hook_listeners[$module] = $listeners;
-        // It is used below.
+        // It is used by reference.
         // @phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
         $extra_modules = TRUE;
       }

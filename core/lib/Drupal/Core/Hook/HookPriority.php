@@ -7,6 +7,9 @@ namespace Drupal\Core\Hook;
 use Drupal\Core\Hook\Attribute\HookOrderBase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * A class to handle updating priority of hook listeners.
+ */
 class HookPriority {
 
   public function __construct(protected ContainerBuilder $container) {}
@@ -20,7 +23,7 @@ class HookPriority {
    *   The order attribute.
    * @param array|null $others
    *   Other hook implementations to compare to, if any. The array is a list of
-   *   arrays containing a class, a method and module.
+   *   arrays containing a class, a method, and module.
    */
   public function change(array $hooks, HookOrderBase $attribute, ?array $others = NULL): void {
     $class_and_method = "$attribute->class::$attribute->method";
@@ -29,6 +32,7 @@ class HookPriority {
     }
     if (count($hooks) > 1) {
       $map = $this->container->getParameter('hook_implementations_map');
+      // Order the complex listener so we can find it runtime.
       krsort($hooks);
       $combinedHookTag = implode(':', $hooks);
       $event = "drupal_hook.$combinedHookTag";

@@ -116,7 +116,7 @@ class HookCollectorPass implements CompilerPassInterface {
     }
     $orderGroups = array_map('array_unique', $orderGroups);
 
-    // This can be removed when ModuleHandler::add() is removed.
+    // @todo remove if statement wrapper when ModuleHandler::add() is removed.
     if (count($container->getDefinitions()) > 1) {
       static::registerServices($container, $collector, $implementations, $legacyImplementations ?? [], $orderGroups);
       static::reOrderServices($container, $allOrderAttributes, $orderGroups, $implementations);
@@ -125,6 +125,11 @@ class HookCollectorPass implements CompilerPassInterface {
   }
 
   /**
+   * Register hook implementations as event listeners.
+   *
+   * Passes required include information to module_handler.
+   * Passes required runtime ordering information to module_handler.
+   *
    * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
    *   The container.
    * @param \Drupal\Core\Hook\HookCollectorPass $collector
@@ -194,6 +199,8 @@ class HookCollectorPass implements CompilerPassInterface {
   }
 
   /**
+   * Reorder services that have attributes specifying an order.
+   *
    * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
    *   The container.
    * @param array $allOrderAttributes

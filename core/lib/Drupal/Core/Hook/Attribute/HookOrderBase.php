@@ -39,6 +39,9 @@ class HookOrderBase implements HookOrderInterface {
 
   /**
    * Constructs a HookOrderBase class.
+   *
+   * @param bool $shouldBeLarger
+   *   Determines whether the hook should increase or decrease priority.
    */
   public function __construct(public readonly bool $shouldBeLarger) {}
 
