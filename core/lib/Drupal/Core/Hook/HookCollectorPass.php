@@ -58,7 +58,14 @@ class HookCollectorPass implements CompilerPassInterface {
   private array $groupIncludes = [];
 
   /**
-   * A list of attributes in modules for Hooks.
+   * A list of attributes for hook implementations.
+   *
+   * Keys are module, class and method. Values are all possible attributes on
+   * hook implementations: Hook to define the hook, HookOrderInterface to
+   * define the order in which the implementations fire, HookOrderGroup to
+   * define a group of hooks to be ordered together.
+   *
+   * @var array<string, <array string, <array string, Hook|HookOrderInterface|HookOrderGroup>>>
    */
   protected array $moduleAttributes = [];
 
@@ -78,31 +85,31 @@ class HookCollectorPass implements CompilerPassInterface {
           $orderGroup = FALSE;
           $hook = FALSE;
           foreach ($attributes as $attribute) {
-            if ($attribute instanceof Hook) {
-              if ($class !== ProceduralCall::class) {
-                self::checkForProceduralOnlyHooks($attribute, $class);
-              }
-              $hook = $attribute->hook;
-              $hookModule = $attribute->module ?: $module;
-              if ($attribute->method) {
-                $method = $attribute->method;
-              }
-              $legacyImplementations[$hook][$hookModule] = '';
-              $implementations[$hook][$hookModule][$class][] = $method;
-            }
-            if ($attribute instanceof HookOrderInterface) {
-              $orderAttributes[] = $attribute;
-            }
-            if ($attribute instanceof HookOrderGroup) {
-              $orderGroup = $attribute->group;
+            switch (TRUE) {
+              case $attribute instanceof Hook:
+                if ($class !== ProceduralCall::class) {
+                  self::checkForProceduralOnlyHooks($attribute, $class);
+                }
+                $hook = $attribute->hook;
+                if ($attribute->module) {
+                  $module = $attribute->module;
+                }
+                $legacyImplementations[$hook][$module] = '';
+                $implementations[$hook][$module][$class][] = $attribute->method ?: $method;
+                break;
+
+              case $attribute instanceof HookOrderInterface:
+                $orderAttributes[] = $attribute;
+                break;
+
+              case $attribute instanceof HookOrderGroup:
+                $orderGroup = $attribute->group;
+                break;
             }
           }
           if ($hook) {
             foreach ($orderAttributes as $orderAttribute) {
-              // $hookModule is set in the same clause as $hook
-              // if $hook is set then $hookModule is.
-              /** @phpstan-ignore variable.undefined */
-              $allOrderAttributes[] = $orderAttribute->set(hook: $hook, class: $class, method: $method, module: $hookModule);
+              $allOrderAttributes[] = $orderAttribute->set(hook: $hook, class: $class, method: $method, module: $module);
             }
             if ($orderGroup) {
               $orderGroup[] = $hook;
@@ -116,7 +123,9 @@ class HookCollectorPass implements CompilerPassInterface {
     }
     $orderGroups = array_map('array_unique', $orderGroups);
 
-    // @todo remove if statement wrapper when ModuleHandler::add() is removed.
+    // @todo investigate whether this if() is needed after ModuleHandler::add()
+    // is removed.
+    // @see https://www.drupal.org/project/drupal/issues/3481778
     if (count($container->getDefinitions()) > 1) {
       static::registerServices($container, $collector, $implementations, $legacyImplementations ?? [], $orderGroups);
       static::reOrderServices($container, $allOrderAttributes, $orderGroups, $implementations);
@@ -253,7 +262,8 @@ class HookCollectorPass implements CompilerPassInterface {
    * @internal
    *   This method is only used by ModuleHandler.
    *
-   * * @todo Pass only $container when ModuleHandler->add is removed https://www.drupal.org/project/drupal/issues/3481778
+   * @todo Pass only $container when ModuleHandler::add() is removed
+   *   @see https://www.drupal.org/project/drupal/issues/3481778
    */
   public static function collectAllHookImplementations(array $module_filenames, ?ContainerBuilder $container = NULL): static {
     $modules = array_map(fn ($x) => preg_quote($x, '/'), array_keys($module_filenames));
@@ -316,14 +326,9 @@ class HookCollectorPass implements CompilerPassInterface {
           $attributes = [];
           if (class_exists($class)) {
             $reflectionClass = new \ReflectionClass($class);
-            if ($class_attributes = $reflectionClass->getAttributes()) {
-              $attributes['__invoke'] = array_map(fn ($x) => $x->newInstance(), $class_attributes);
-            }
-            foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $methodReflection) {
-              if ($method_attributes = $methodReflection->getAttributes()) {
-                $attributes[$methodReflection->getName()] = array_map(fn ($x) => $x->newInstance(), $method_attributes);
-              }
-            }
+            $reflections = $reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC);
+            $reflections[] = $reflectionClass;
+            $attributes = self::getAttributeInstances($attributes, $reflections);
             $hook_file_cache->set($filename, ['class' => $class, 'attributes' => $attributes]);
           }
         }
@@ -384,14 +389,14 @@ class HookCollectorPass implements CompilerPassInterface {
    *   The file this procedural implementation is in.
    * @param string $hook
    *   The name of the hook.
-   * @param string $hookModule
-   *   The name of the module this hook implementation belongs to. It can be
-   *   different to the file where $function is in.
+   * @param string $module
+   *   The module of the hook. Note this might be different from the module the
+   *   function is in.
    * @param string $function
    *   The name of function implementing the hook.
    */
-  protected function addProceduralImplementation(\SplFileInfo $fileinfo, string $hook, string $hookModule, string $function): void  {
-    $this->moduleAttributes[$hookModule][ProceduralCall::class][$function] = [new Hook($hook, $hookModule . '_' . $hook)];
+  protected function addProceduralImplementation(\SplFileInfo $fileinfo, string $hook, string $module, string $function): void {
+    $this->moduleAttributes[$module][ProceduralCall::class][$function] = [new Hook($hook, $module . '_' . $hook)];
     if ($hook === 'hook_info') {
       $this->hookInfo[] = $function;
     }
@@ -406,6 +411,9 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * This method is only to be used by ModuleHandler.
    *
+   * @todo remove when ModuleHandler::add() is removed.
+   * @see https://www.drupal.org/project/drupal/issues/3481778
+   *
    * @internal
    */
   public function loadAllIncludes(): void {
@@ -416,6 +424,9 @@ class HookCollectorPass implements CompilerPassInterface {
 
   /**
    * This method is only to be used by ModuleHandler.
+   *
+   * @todo remove when ModuleHandler::add() is removed.
+   * @see https://www.drupal.org/project/drupal/issues/3481778
    *
    * @internal
    */
@@ -449,6 +460,27 @@ class HookCollectorPass implements CompilerPassInterface {
     if (in_array($hook->hook, $staticDenyHooks) || preg_match('/^(post_update_|preprocess_|update_\d+$)/', $hook->hook)) {
       throw new \LogicException("The hook $hook->hook on class $class does not support attributes and must remain procedural.");
     }
+  }
+
+  /**
+   * Get attribute instances from class and method reflections.
+   *
+   * @param array $attributes
+   *   The current attributes.
+   * @param array $reflections
+   *   A list of class and method reflections.
+   *
+   * @return array
+   *   A list of Hook|HookOrderInterface|HookOrderGroup attribute instances.
+   */
+  protected static function getAttributeInstances(array $attributes, array $reflections): array {
+    foreach ($reflections as $reflection) {
+      if ($reflection_attributes = $reflection->getAttributes()) {
+        $method = $reflection instanceof \ReflectionMethod ? $reflection->getName() : '__invoke';
+        $attributes[$method] = array_map(fn (\ReflectionAttribute $ra) => $ra->newInstance(), $reflection_attributes);
+      }
+    }
+    return $attributes;
   }
 
 }

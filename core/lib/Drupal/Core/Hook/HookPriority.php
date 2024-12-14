@@ -8,7 +8,9 @@ use Drupal\Core\Hook\Attribute\HookOrderBase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * A class to handle updating priority of hook listeners.
+ * Helper class for HookCollectorPass to change the priority of listeners.
+ *
+ * @internal
  */
 class HookPriority {
 
@@ -18,12 +20,17 @@ class HookPriority {
    * Change the priority of a hook implementation.
    *
    * @param array $hooks
-   *   The name of the hook.
+   *   The list of hooks to order. The list always contains the hook defined
+   *   in Drupal\Core\Hook\Attribute, and it might also contain
+   *   the hooks listed in the Drupal\Core\Hook\Attribute\HookOrderGroup
+   *   attribute.
    * @param \Drupal\Core\Hook\Attribute\HookOrderBase $attribute
    *   The order attribute.
    * @param array|null $others
    *   Other hook implementations to compare to, if any. The array is a list of
-   *   arrays containing a class, a method, and module.
+   *   lists, each containing class, method,  module.
+   *
+   * @internal
    */
   public function change(array $hooks, HookOrderBase $attribute, ?array $others = NULL): void {
     $class_and_method = "$attribute->class::$attribute->method";

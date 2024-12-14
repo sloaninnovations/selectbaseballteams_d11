@@ -434,13 +434,14 @@ class ModuleHandler implements ModuleHandlerInterface {
       $extra_listeners = [];
       if (isset($extra_types)) {
         $extra_hooks = array_map(fn ($x) => $x . '_alter', $extra_types);
+        // First get the listeners implementing extra hooks.
         foreach ($extra_hooks as $extra_hook) {
           $hook_listeners = $this->findListenersForAlter($extra_hook, $hook_listeners, $extra_modules);
         }
-        // For multiple hooks, we need $modules to contain every module that
-        // implements at least one of them in the correct order. Hooks already
-        // ordered by attributes are also ordered by
-        // hook_module_implements_alter() they don't need to be ordered again.
+        // Second, gather implementations defined in a
+        // Drupal\Core\Hook\Attribute\HookOrderGroup attribute. These are only
+        // used for ordering because the group might contain hooks not included
+        // in this alter() call.
         foreach (array_merge($extra_hooks, [$type . '_alter']) as $extra_hook) {
           if (isset($this->hooksOrderedByAttributes[$extra_hook])) {
             $group = $this->hooksOrderedByAttributes[$extra_hook];
@@ -448,20 +449,21 @@ class ModuleHandler implements ModuleHandlerInterface {
             // is in the same order as when we set it.
             krsort($group);
             $extra_listeners = $this->findListenersForAlter(implode(':', $group));
+            // Remove already ordered hooks.
             $extra_types = array_diff($extra_hooks, $group);
           }
         }
       }
-      // If any modules implement one of the extra hooks that do not implement
-      // the primary hook, we need to add them to the $modules array in their
-      // appropriate order.
-      if (isset($extra_types) && !$extra_types) {
+      // If multiple alters were called, but they were already ordered by
+      // ordering attributes then keep that order.
+      if (isset($extra_types) && empty($extra_types)) {
         $modules = array_keys(array_intersect_key($extra_listeners, $hook_listeners));
       }
       else {
+        // Otherwise, use a legacy ordering mechanism if needed.
         $modules = array_keys($hook_listeners);
         if ($extra_modules) {
-          $modules = $this->reOrderModulesForAlter($modules, $hook);
+          $modules = $this->legacyReOrderModulesForAlter($modules, $hook);
         }
       }
       foreach ($modules as $module) {
@@ -487,7 +489,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    *   The list, potentially reordered and changed by
    *   hook_module_implements_alter().
    */
-  protected function reOrderModulesForAlter(array $modules, string $hook): array {
+  protected function legacyReOrderModulesForAlter(array $modules, string $hook): array {
     // Order by module order first.
     $modules = array_intersect(array_keys($this->moduleList), $modules);
     // Alter expects the module list to be in the keys.

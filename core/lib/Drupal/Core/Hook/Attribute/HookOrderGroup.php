@@ -5,18 +5,26 @@ declare(strict_types=1);
 namespace Drupal\Core\Hook\Attribute;
 
 /**
- * Attribute for marking which specific implementations to group.
+ * List of alter hooks called together.
  *
- * This allows hook ordering to handle extra types such as ordering
- * hook_form_alter relative to hook_form_FORM_ID_alter.
+ * Ordering by attributes happens at build time by setting up the order of
+ * the listeners of a hook correctly. However, ModuleHandlerInterface::alter()
+ * can be called with multiple hooks runtime. If the hook defined on this
+ * method/class requires ordering relative to other such hooks then this
+ * attribute can be used to order relative to implementations of all hooks in
+ * the group. Include all alter hooks to be ordered against in the group even
+ * if no single alter() call includes all of them. For example, this can be
+ * used to order a hook_form_BASE_FORM_ID_alter() implementation relative to
+ * multiple hook_form_FORM_ID_alter() implementations as
+ * Drupal\ckeditor5\Hook\Ckeditor5Hooks::formFilterFormatFormAlter() does.
  *
  * @section sec_backwards_compatibility Backwards-compatibility
  *
  * To allow hook implementations to work on older versions of Drupal as well,
- * keep the hook_module_implements_alter implementation and add the appropriate
- * combination of #[HookFirst], #[HookLast], #[HookBefore], #[HookAfter], and
- * #[HookOrderGroup] attributes. Then ensure you have added #[LegacyHook] to
- * the hook_module_implements_alter() implementation.
+ * keep the hook_module_implements_alter() implementation and execute the
+ * same ordering as prescribed by the hook order attributes. Then add
+ * #[LegacyHook] to the hook_module_implements_alter() implementation so it
+ * only gets executed in older Drupal versions.
  *
  * See \Drupal\Core\Hook\Attribute\LegacyHook for additional information.
  */
@@ -27,10 +35,7 @@ class HookOrderGroup {
    * Constructs a HookOrderGroup attribute object.
    *
    * @param array $group
-   *   A list of hooks to sort together. For example, if a method implementing
-   *   form_BASE_FORM_ID_alter wants to sort itself relative to some
-   *   implementations of form_FORM_ID_alter then this would contain those.
-   *   See Ckeditor5::formFilterFormatFormAlter() for an example.
+   *   A list of hooks to sort together.
    */
   public function __construct(
     public array $group,

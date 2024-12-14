@@ -19,7 +19,8 @@ interface HookOrderInterface {
    * @param string $method
    *   The method of the hook.
    * @param string $module
-   *   The module of the hook.
+   *   The module of the hook. Note this might be different from the module the
+   *   class is in.
    */
   public function set(string $hook, string $class, string $method, string $module): static;
 
