@@ -242,15 +242,15 @@ class HookCollectorPass implements CompilerPassInterface {
       // ::process() adds the hook serving as key to the order group so it
       // does not need to be added if there's a group for the hook.
       $hooks = $orderGroups[$orderAttribute->hook] ?? [$orderAttribute->hook];
-      if (isset($orderAttribute->modules)) {
+      if (isset($orderAttribute->orderings)) {
         $others = [];
-        foreach ($orderAttribute->modules as $module) {
+        foreach ($orderAttribute->orderings as $ordering) {
           foreach ($hooks as $hook) {
-            if (is_array($module)) {
-              $others[] = $module;
+            if (is_array($ordering)) {
+              $others[] = $ordering;
             }
             else {
-              foreach ($implementations[$hook][$module] ?? [] as $class => $methods) {
+              foreach ($implementations[$hook][$ordering] ?? [] as $class => $methods) {
                 foreach ($methods as $method) {
                   $others[] = [$class, $method];
                 }

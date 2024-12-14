@@ -6,6 +6,7 @@ namespace Drupal\hook_second_order_first_alphabetically\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAfter;
+use Drupal\hook_second_order_last_alphabetically\Hook\TestHookAfterClassMethod as TestHookAfterClassMethodForAfter;
 
 /**
  * Hook implementations for verifying ordering hooks by attributes.
@@ -24,7 +25,7 @@ class TestHookAfterClassMethod {
   /**
    * This pair tests #[HookAfter] with a passed class and method.
    */
-  #[HookAfter(['hook_second_order_last_alphabetically', 'TestHookAfterClassMethod::hookAfterClassMethod'])]
+  #[HookAfter([[TestHookAfterClassMethodForAfter::class, 'hookAfterClassMethod']])]
   #[Hook('custom_hook_test_hook_after_class_method')]
   public static function hookAfterClassMethod(): void {
     $GLOBALS['HookAfterClassMethod'] = 'HookAfterMethod';

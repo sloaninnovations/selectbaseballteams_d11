@@ -17,12 +17,11 @@ class HookBefore extends HookOrderBase {
   /**
    * Constructs a HookBefore lib/Drupal/Core/Hook/Attribute/attribute.
    *
-   * @param array $modules
-   *   A list of things this implementation should run before. Each thing is
-   *   either a module name or a list of class and method.
+   * @param array $orderings
+   *   Each ordering is either a module name or a class and method pair array.
    */
   public function __construct(
-    public readonly array $modules,
+    public readonly array $orderings,
   ) {
     parent::__construct(TRUE);
   }
