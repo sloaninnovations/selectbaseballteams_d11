@@ -162,6 +162,24 @@ class HookCollectorPassTest extends KernelTestBase {
   /**
    * Tests hook ordering with attributes.
    */
+  public function testHookAfterClassMethod(): void {
+    $module_installer = $this->container->get('module_installer');
+    $this->assertTrue($module_installer->install(['hook_second_order_first_alphabetically']));
+    $this->assertTrue($module_installer->install(['hook_second_order_last_alphabetically']));
+    $this->assertFalse(isset($GLOBALS['HookAfterClassMethod']));
+    $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingHookAfterClassMethod']));
+    $this->assertFalse(isset($GLOBALS['HookRanTestingHookAfterClassMethod']));
+    $module_handler = $this->container->get('module_handler');
+    $data = ['hi'];
+    $module_handler->invokeAll('custom_hook_test_hook_after_class_method', $data);
+    $this->assertTrue(isset($GLOBALS['HookAfterClassMethod']));
+    $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingHookAfterClassMethod']));
+    $this->assertTrue(isset($GLOBALS['HookRanTestingHookAfterClassMethod']));
+  }
+
+  /**
+   * Tests hook ordering with attributes.
+   */
   public function testHookBefore(): void {
     $module_installer = $this->container->get('module_installer');
     $this->assertTrue($module_installer->install(['hook_order_first_alphabetically']));
