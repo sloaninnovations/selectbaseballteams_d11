@@ -85,16 +85,19 @@ class HookCollectorPass implements CompilerPassInterface {
           $orderGroup = FALSE;
           $hook = FALSE;
           foreach ($attributes as $attribute) {
+            // A hook may be implemented on behalf of another module.
+            // This prevents one hook implementing on behalf of another
+            // from overriding all following hooks in this class.
+            $currentModule = $module;
             switch (TRUE) {
               case $attribute instanceof Hook:
                 if ($class !== ProceduralCall::class) {
                   self::checkForProceduralOnlyHooks($attribute, $class);
                 }
                 $hook = $attribute->hook;
-                // This hook may be implemented on behalf of another module.
-                // This prevents one hook implementing on behalf of another
-                // from overriding all following hooks.
-                $moduleForHook = $attribute->module ?: $module;
+                if ($attribute->module) {
+                  $currentModule = $attribute->module;
+                }
                 $legacyImplementations[$hook][$module] = '';
                 $implementations[$hook][$module][$class][] = $attribute->method ?: $method;
                 break;
@@ -110,7 +113,7 @@ class HookCollectorPass implements CompilerPassInterface {
           }
           if ($hook) {
             foreach ($orderAttributes as $orderAttribute) {
-              $allOrderAttributes[] = $orderAttribute->set(hook: $hook, class: $class, method: $method, module: $moduleForHook);
+              $allOrderAttributes[] = $orderAttribute->set(hook: $hook, class: $class, method: $method, module: $currentModule);
             }
             if ($orderGroup) {
               $orderGroup[] = $hook;
