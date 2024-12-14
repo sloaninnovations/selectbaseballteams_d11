@@ -83,19 +83,20 @@ class HookCollectorPass implements CompilerPassInterface {
         foreach ($methods as $method => $attributes) {
           $orderAttributes = [];
           $orderGroup = FALSE;
+          $hookAttributes = [];
           foreach ($attributes as $attribute) {
             switch (TRUE) {
               case $attribute instanceof Hook:
                 if ($class !== ProceduralCall::class) {
                   self::checkForProceduralOnlyHooks($attribute, $class);
                 }
-                $hookAttribute = $attribute;
                 if (!$attribute->module) {
                   $attribute->module = $module;
                 }
                 if (!$attribute->method) {
                   $attribute->method = $method;
                 }
+                $hookAttributes[] = $attribute;
                 $legacyImplementations[$attribute->hook][$attribute->module] = '';
                 $implementations[$attribute->hook][$attribute->module][$class][] = $attribute->method;
                 break;
@@ -109,17 +110,25 @@ class HookCollectorPass implements CompilerPassInterface {
                 break;
             }
           }
-          if (isset($hookAttribute)) {
+          $hooksCount = count($hookAttributes);
+          if ($hooksCount === 1) {
+            $hookAttribute = reset($hookAttributes);
             foreach ($orderAttributes as $orderAttribute) {
               $allOrderAttributes[] = $orderAttribute->set(hook: $hookAttribute, class: $class);
             }
             if ($orderGroup) {
+              if (!$orderAttributes) {
+                throw new \LogicException('HookOrderGroup requires an order to be specified.');
+              }
               $orderGroup[] = $hookAttribute->hook;
               foreach ($orderGroup as $extraHook) {
                 $orderGroups[$extraHook] = array_merge($orderGroups[$extraHook] ?? [], $orderGroup);
               }
             }
             unset($hookAttribute);
+          }
+          elseif ($hooksCount > 1 && $orderAttributes) {
+            throw new \LogicException('Hook ordering can only be applied to methods with one Hook attribute.');
           }
         }
       }
