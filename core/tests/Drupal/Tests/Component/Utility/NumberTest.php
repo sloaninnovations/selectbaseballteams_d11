@@ -157,4 +157,30 @@ class NumberTest extends TestCase {
     ];
   }
 
+  /**
+   * Tests the alphadecimal conversion function input parameter checking.
+   *
+   * Number::alphadecimalToInt() must throw an exception
+   * when non-alphanumeric characters are passed as input.
+   *
+   * @covers ::alphadecimalToInt
+   */
+  public function testAlphadecimalToIntThrowsExceptionWithMalformedStrings(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    Number::alphadecimalToInt('#');
+  }
+
+  /**
+   * Tests the alphadecimal conversion function keeps backward compatibility.
+   *
+   * Many tests and code rely on Number::alphadecimalToInt() returning 0
+   * with the degenerated values '' and NULL. We must assure they are accepted.
+   *
+   * @covers ::alphadecimalToInt
+   */
+  public function testAlphadecimalToIntReturnsZeroWithNullAndEmptyString(): void {
+    $this->assertSame(0, Number::alphadecimalToInt(NULL));
+    $this->assertSame(0, Number::alphadecimalToInt(''));
+  }
+
 }
