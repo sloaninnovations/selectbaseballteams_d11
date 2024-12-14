@@ -15,6 +15,7 @@ use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * Collects and registers hook implementations.
@@ -110,24 +111,30 @@ class HookCollectorPass implements CompilerPassInterface {
                 break;
             }
           }
-          $hooksCount = count($hookAttributes);
+          // If no ordering is required the processing of this method is done.
+          if (!$orderAttributes) {
+            if ($orderGroup) {
+              throw new \LogicException('HookOrderGroup requires an order to be specified.');
+            }
+            continue;
+          }
+          // Now process ordering, if possible.
+          if (!$hooksCount = count($hookAttributes)) {
+            throw new \LogicException('Order attributes require a Hook attribute.');
+          }
           if ($hooksCount === 1) {
             $hookAttribute = reset($hookAttributes);
             foreach ($orderAttributes as $orderAttribute) {
               $allOrderAttributes[] = $orderAttribute->set(hook: $hookAttribute, class: $class);
             }
             if ($orderGroup) {
-              if (!$orderAttributes) {
-                throw new \LogicException('HookOrderGroup requires an order to be specified.');
-              }
               $orderGroup[] = $hookAttribute->hook;
               foreach ($orderGroup as $extraHook) {
                 $orderGroups[$extraHook] = array_merge($orderGroups[$extraHook] ?? [], $orderGroup);
               }
             }
-            unset($hookAttribute);
           }
-          elseif ($hooksCount > 1 && $orderAttributes) {
+          else {
             throw new \LogicException('Hook ordering can only be applied to methods with one Hook attribute.');
           }
         }
@@ -198,11 +205,7 @@ class HookCollectorPass implements CompilerPassInterface {
           }
           foreach ($method_hooks as $method) {
             $map[$hook][$class][$method] = $module;
-            $definition->addTag('kernel.event_listener', [
-              'event' => "drupal_hook.$hook",
-              'method' => $method,
-              'priority' => $priority--,
-            ]);
+            $priority = self::addTagToDefinition($definition, "drupal_hook.$hook", $method, $priority);
           }
         }
         unset($implementations[$hook][$module]);
@@ -243,9 +246,14 @@ class HookCollectorPass implements CompilerPassInterface {
         $others = [];
         foreach ($orderAttribute->modules as $module) {
           foreach ($hooks as $hook) {
-            foreach ($implementations[$hook][$module] ?? [] as $class => $methods) {
-              foreach ($methods as $method) {
-                $others[] = [$class, $method, $module];
+            if (is_array($module)) {
+              $others[] = $module;
+            }
+            else {
+              foreach ($implementations[$hook][$module] ?? [] as $class => $methods) {
+                foreach ($methods as $method) {
+                  $others[] = [$class, $method];
+                }
               }
             }
           }
@@ -493,6 +501,30 @@ class HookCollectorPass implements CompilerPassInterface {
       }
     }
     return $attributes;
+  }
+
+  /**
+   * Adds an event listener tag to a service definition.
+   *
+   * @param \Symfony\Component\DependencyInjection\Definition $definition
+   *   The service definition.
+   * @param string $event
+   *   The name of the event, typically starts with drupal_hook.
+   * @param string $method
+   *   The method.
+   * @param int $priority
+   *   The priority.
+   *
+   * @return int
+   *   A new priority, guaranteed to be lower than $priority.
+   */
+  public static function addTagToDefinition(Definition $definition, string $event, string $method, int $priority): int {
+    $definition->addTag('kernel.event_listener', [
+      'event' => $event,
+      'method' => $method,
+      'priority' => $priority--,
+    ]);
+    return $priority;
   }
 
 }

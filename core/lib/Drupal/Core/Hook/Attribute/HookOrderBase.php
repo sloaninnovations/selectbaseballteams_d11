@@ -31,16 +31,6 @@ class HookOrderBase implements HookOrderInterface {
   public string $method;
 
   /**
-   * The module of the hook.
-   *
-   * The module of the hook. Note this might be different from the module the
-   * function is in.
-   *
-   * @internal
-   */
-  public string $module;
-
-  /**
    * Constructs a HookOrderBase class.
    *
    * @param bool $shouldBeLarger
@@ -55,7 +45,6 @@ class HookOrderBase implements HookOrderInterface {
     $this->hook = $hook->hook;
     $this->class = $class;
     $this->method = $hook->method;
-    $this->module = $hook->module;
     return $this;
   }
 

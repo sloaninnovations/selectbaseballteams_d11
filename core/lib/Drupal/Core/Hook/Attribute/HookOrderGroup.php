@@ -38,7 +38,7 @@ class HookOrderGroup {
    *   A list of hooks to sort together.
    */
   public function __construct(
-    public array $group,
+    public readonly array $group,
   ) {}
 
 }

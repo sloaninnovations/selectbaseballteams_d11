@@ -18,10 +18,11 @@ class HookAfter extends HookOrderBase {
    * Constructs a HookAfter attribute.
    *
    * @param array $modules
-   *   The modules this implementation should run before.
+   *   A list of things this implementation should run after. Each thing is
+   *   either a module name or a list of class and method.
    */
   public function __construct(
-    public array $modules,
+    public readonly array $modules,
   ) {
     parent::__construct(FALSE);
   }

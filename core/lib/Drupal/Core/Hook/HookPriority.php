@@ -28,7 +28,7 @@ class HookPriority {
    *   The order attribute.
    * @param array|null $others
    *   Other hook implementations to compare to, if any. The array is a list of
-   *   lists, each containing class, method,  module.
+   *   class and method pairs.
    *
    * @internal
    */
@@ -44,16 +44,16 @@ class HookPriority {
       $combinedHookTag = implode(':', $hooks);
       $event = "drupal_hook.$combinedHookTag";
       $data = $others;
-      $data[] = [$attribute->class, $attribute->method, $attribute->module];
+      $data[] = [$attribute->class, $attribute->method];
       $priority = 0;
-      foreach ($data as [$class, $method, $module]) {
-        $definition = $this->container->findDefinition($class);
-        $definition->addTag('kernel.event_listener', [
-          'event' => "drupal_hook.$combinedHookTag",
-          'method' => $method,
-          'priority' => $priority--,
-        ]);
-        $map[$combinedHookTag][$class][$method] = $module;
+      foreach ($data as [$class, $method]) {
+        foreach ($hooks as $hook) {
+          if (isset($map[$hook][$class][$method])) {
+            $map[$combinedHookTag][$class][$method] = $map[$hook][$class][$method];
+            $priority = HookCollectorPass::addTagToDefinition($this->container->findDefinition($class), $event, $method, $priority);
+            break;
+          }
+        }
       }
       $this->container->setParameter('hook_implementations_map', $map);
     }
@@ -136,7 +136,7 @@ class HookPriority {
    * @return void
    */
   public function set(string $class, int $key, int $priority): void {
-    $definition = $this->container->getDefinition($class);
+    $definition = $this->container->findDefinition($class);
     $tags = $definition->getTags();
     $tags['kernel.event_listener'][$key]['priority'] = $priority;
     $definition->setTags($tags);
