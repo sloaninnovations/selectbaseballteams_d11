@@ -21,7 +21,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 class TestHookOrderGroup {
 
   /**
-   * This pair tests #[HookOrderGroup].
+   * This pair tests OrderType::After with Group.
    */
   #[Hook('custom_hook_extra_types2_alter')]
   public static function customHookExtraTypes(): void {

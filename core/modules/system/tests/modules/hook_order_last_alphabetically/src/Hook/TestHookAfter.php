@@ -21,7 +21,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 class TestHookAfter {
 
   /**
-   * This pair tests #[HookAfter].
+   * This pair tests OrderType::After.
    */
   #[Hook('custom_hook_test_hook_after')]
   public static function hookAfter(): void {

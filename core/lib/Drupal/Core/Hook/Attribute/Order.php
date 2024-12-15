@@ -13,7 +13,7 @@ class Order {
     public array $group = [],
   ) {
     if (!$this->modules && !$this->classesAndMethods) {
-      throw new \LogicException('Order against what?');
+      throw new \LogicException('Order must provide elements to order against.');
     }
   }
 

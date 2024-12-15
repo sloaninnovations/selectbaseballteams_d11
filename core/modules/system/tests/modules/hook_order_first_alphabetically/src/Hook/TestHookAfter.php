@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\hook_order_first_alphabetically\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\HookAfter;
 use Drupal\Core\Hook\Attribute\Order;
 use Drupal\Core\Hook\Attribute\OrderType;
 

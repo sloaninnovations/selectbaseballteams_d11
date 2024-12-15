@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\hook_order_last_alphabetically\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\HookFirst;
+use Drupal\Core\Hook\Attribute\SimpleOrderType;
 
 /**
  * Hook implementations for verifying ordering hooks by attributes.
@@ -22,10 +22,9 @@ use Drupal\Core\Hook\Attribute\HookFirst;
 class TestHookFirst {
 
   /**
-   * This pair tests #[HookFirst].
+   * This pair tests OrderType::First.
    */
-  #[HookFirst]
-  #[Hook('custom_hook_test_hook_first')]
+  #[Hook('custom_hook_test_hook_first', order: SimpleOrderType::First)]
   public static function hookFirst(): void {
     $GLOBALS['HookFirst'] = 'HookFirst';
   }

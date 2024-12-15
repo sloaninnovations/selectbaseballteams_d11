@@ -21,7 +21,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 class TestHookLast {
 
   /**
-   * This pair tests #[HookLast].
+   * This pair tests OrderType::Last.
    */
   #[Hook('custom_hook_test_hook_last')]
   public static function hookLast(): void {

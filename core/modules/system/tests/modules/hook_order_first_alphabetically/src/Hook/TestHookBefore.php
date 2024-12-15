@@ -21,7 +21,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 class TestHookBefore {
 
   /**
-   * This pair tests #[HookBefore].
+   * This pair tests OrderType::Before.
    */
   #[Hook('custom_hook_test_hook_before')]
   public static function hookBefore(): void {

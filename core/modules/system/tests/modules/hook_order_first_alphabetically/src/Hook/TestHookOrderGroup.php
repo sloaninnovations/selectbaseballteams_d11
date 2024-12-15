@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\hook_order_first_alphabetically\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\HookAfter;
-use Drupal\Core\Hook\Attribute\HookOrderGroup;
+use Drupal\Core\Hook\Attribute\Order;
+use Drupal\Core\Hook\Attribute\OrderType;
 
 /**
  * Hook implementations for verifying ordering hooks by attributes.
@@ -23,11 +23,15 @@ use Drupal\Core\Hook\Attribute\HookOrderGroup;
 class TestHookOrderGroup {
 
   /**
-   * This pair tests #[HookOrderGroup].
+   * This pair tests OrderType::After with Group.
    */
-  #[HookAfter(['hook_order_last_alphabetically'])]
-  #[HookOrderGroup(['custom_hook_extra_types2_alter'])]
-  #[Hook('custom_hook_extra_types1_alter')]
+  #[Hook('custom_hook_extra_types1_alter',
+    order: new Order(
+      type: OrderType::After,
+      modules: ['hook_order_last_alphabetically'],
+      group: ['custom_hook_extra_types2_alter'],
+    )
+  )]
   public static function customHookExtraTypes(): void {
     // This should be run after so HookOrderGroupExtraTypes should not be set.
     if (!isset($GLOBALS['HookOrderGroupExtraTypes'])) {
