@@ -755,7 +755,7 @@ class RequirementsHooks {
     $requirements['update access']['title'] = t('Access to update.php');
 
     // Display an error if a newly introduced dependency in a module is not resolved.
-    $this->verifyDependencies($requirements, $module_extension_list, $theme_extension_list);
+    $this->dependencyRequirments($requirements, $module_extension_list, $theme_extension_list);
 
     // Returns Unicode library status and errors.
     $libraries = [
@@ -1242,7 +1242,7 @@ class RequirementsHooks {
     }
 
     // Display an error if a newly introduced dependency in a module is not resolved.
-    $this->verifyDependencies($requirements, $module_extension_list, $theme_extension_list);
+    $this->dependencyRequirments($requirements, $module_extension_list, $theme_extension_list);
 
     // Returns Unicode library status and errors.
     $libraries = [
@@ -1474,7 +1474,7 @@ class RequirementsHooks {
    * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
    *   The theme extension list.
    */
-  public function verifyDependencies(array &$requirements, ModuleExtensionList $module_extension_list, ThemeExtensionList $theme_extension_list): void {
+  protected function dependencyRequirments(array &$requirements, ModuleExtensionList $module_extension_list, ThemeExtensionList $theme_extension_list): void {
     $create_extension_incompatibility_list = function (array $extension_names, PluralTranslatableMarkup $description, PluralTranslatableMarkup $title, TranslatableMarkup|string $message = '', TranslatableMarkup|string $additional_description = '') {
       if ($message === '') {
         $message = new TranslatableMarkup('Review the <a href=":url"> suggestions for resolving this incompatibility</a> to repair your installation, and then re-run update.php.', [':url' => 'https://www.drupal.org/docs/updating-drupal/troubleshooting-database-updates']);
@@ -1757,7 +1757,7 @@ class RequirementsHooks {
    * @param array[] $requirements
    *   The requirements array as specified in hook_requirements().
    */
-  function advisoryRequirements(array &$requirements): void {
+  protected function advisoryRequirements(array &$requirements): void {
     if (!\Drupal::config('system.advisories')->get('enabled')) {
       return;
     }
