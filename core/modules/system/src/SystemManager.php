@@ -2,7 +2,6 @@
 
 namespace Drupal\system;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Menu\MenuActiveTrailInterface;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
@@ -109,7 +108,7 @@ class SystemManager {
     // Check run-time requirements and status information.
     $requirements = $this->moduleHandler->invokeAll('requirements', ['runtime']);
     $runtime_requirements = $this->moduleHandler->invokeAll('runtime_requirements');
-    $requirements = NestedArray::mergeDeep($requirements, $runtime_requirements);
+    $requirements = array_merge($requirements, $runtime_requirements);
     $this->moduleHandler->alter('requirements', $requirements);
     $this->moduleHandler->alter('runtime_requirements', $requirements);
     uasort($requirements, function ($a, $b) {
