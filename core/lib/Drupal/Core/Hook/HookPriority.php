@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Core\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\HookOrderBase;
 use Drupal\Core\Hook\Attribute\SimpleOrderType;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -26,8 +25,8 @@ class HookPriority {
    *   in Drupal\Core\Hook\Attribute, and it might also contain
    *   the hooks listed in the Drupal\Core\Hook\Attribute\HookOrderGroup
    *   attribute.
-   * @param \Drupal\Core\Hook\Attribute\HookOrderBase $attribute
-   *   The order attribute.
+   * @param \Drupal\Core\Hook\Attribute\Hook $hook
+   *   The hook attribute.
    * @param array|null $others
    *   Other hook implementations to compare to, if any. The array is a list of
    *   class and method pairs.
@@ -86,7 +85,7 @@ class HookPriority {
     if (!isset($index_this) || !isset($priorities) || !isset($priorities_other)) {
       return;
     }
-    $shouldBeLarger = $hook->order instanceof SimpleOrderType ? $hook->order->shouldBeLast() : $hook->order->type->shouldBeLast();
+    $shouldBeLarger = boolval($hook->order instanceof SimpleOrderType ? $hook->order->value : $hook->order->type->value);
     // The priority of the hook being changed.
     $priority_this = $priorities[$index_this];
     // The priority of the hook being compared to.

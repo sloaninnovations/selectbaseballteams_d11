@@ -114,23 +114,4 @@ class Hook {
     public Order|SimpleOrderType|NULL $order = NULL,
   ) {}
 
-  /**
-   * Set the method the hook should apply to.
-   *
-   * @param string $method
-   *   The method that the hook attribute applies to.
-   *   This only needs to be set when the attribute is on the class.
-   *
-   * @internal
-   */
-  public function setMethod(string $method): static {
-    $this->method = $method;
-    return $this;
-  }
-
-  public function setClass(string $class): static {
-    $this->class = $class;
-    return $this;
-  }
-
 }
