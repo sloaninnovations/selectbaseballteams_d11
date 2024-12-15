@@ -2,7 +2,6 @@
 
 namespace Drupal\system\Hook;
 
-use Drupal\Component\FileSystem\FileSystem as FileSystemComponent;
 use Drupal\Component\Utility\Bytes;
 use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\OpCodeCache;
@@ -34,7 +33,7 @@ class RequirementsHooks {
    * Implements hook_runtime_requirements().
    */
   #[Hook('runtime_requirements')]
-  function runtimeRequirements(): array {
+  public function runtimeRequirements(): array {
     // Get the current default PHP requirements for this version of Drupal.
     $minimum_supported_php = PhpRequirements::getMinimumSupportedPhp();
 
@@ -215,7 +214,7 @@ class RequirementsHooks {
       }
       // Otherwise, the message should be an error at runtime, and a warning
       // during installation or update.
-      $requirements['php']['severity'] =REQUIREMENT_ERROR;
+      $requirements['php']['severity'] = REQUIREMENT_ERROR;
     }
     // For PHP versions that are still supported but no longer recommended,
     // inform users of what's recommended, allowing them to take action before it
@@ -964,12 +963,11 @@ class RequirementsHooks {
     return $requirements;
   }
 
-
   /**
    * Implements hook_update_requirements().
    */
   #[Hook('update_requirements')]
-  function updateRequirements(): array {
+  public function updateRequirements(): array {
     // Get the current default PHP requirements for this version of Drupal.
     $minimum_supported_php = PhpRequirements::getMinimumSupportedPhp();
 
@@ -1226,7 +1224,6 @@ class RequirementsHooks {
       'title' => t('File system'),
     ];
 
-    $error = '';
     // For installer, create the directories if possible.
     foreach ($directories as $directory) {
       if (!$directory) {
@@ -1553,11 +1550,11 @@ class RequirementsHooks {
             'description' => t('@name requires this module and version. Currently using @required_name version @version', [
               '@name' => $name,
               '@required_name' => $required_name,
-              '@version' => $version
+              '@version' => $version,
             ]),
             'value' => t('@required_name (Version @compatibility required)', [
               '@required_name' => $required_name,
-              '@compatibility' => $requirement->getConstraintString()
+              '@compatibility' => $requirement->getConstraintString(),
             ]),
             'severity' => REQUIREMENT_ERROR,
           ];
