@@ -21,7 +21,7 @@ use Drupal\Core\Hook\Attribute\SimpleOrderType;
  */
 class TestHookLast {
 
-    /**
+  /**
    * This pair tests OrderType::Last.
    */
   #[Hook('custom_hook_test_hook_last', order: SimpleOrderType::Last)]
