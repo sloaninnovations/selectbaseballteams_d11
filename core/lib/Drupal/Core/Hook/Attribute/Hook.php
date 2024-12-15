@@ -106,6 +106,9 @@ class Hook {
    *   (optional) The module this implementation is for. This allows one module to
    *   implement a hook on behalf of another module. Defaults to the module the
    *   implementation is in.
+   * @param Order|SimpleOrderType|null $order
+   *   (optional) Ordering information if you need to change the current order
+   *   of the implementation.
    */
   public function __construct(
     public string $hook,
@@ -114,6 +117,16 @@ class Hook {
     public Order|SimpleOrderType|NULL $order = NULL,
   ) {}
 
+  /**
+   * Set necessary parameters for the hook attribute.
+   *
+   * @param string $class
+   *   The class for the hook.
+   * @param string $module
+   *   The module for the hook.
+   * @param string $method
+   *   The method for the hook.
+   */
   public function set(string $class, string $module, string $method): void {
     $this->class = $class;
     if (!$this->module) {
