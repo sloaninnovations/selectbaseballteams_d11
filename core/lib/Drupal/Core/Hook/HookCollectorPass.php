@@ -9,9 +9,8 @@ use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\HookOrderGroup;
-use Drupal\Core\Hook\Attribute\HookOrderInterface;
 use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\Hook\Attribute\Order;
 use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -61,14 +60,9 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * A list of attributes for hook implementations.
    *
-   * Keys are module, class and method. Values are all possible attributes on
-   * hook implementations: Hook to define the hook, HookOrderInterface to
-   * define the order in which the implementations fire, HookOrderGroup to
-   * define a group of hooks to be ordered together.
-   *
-   * @var array<string, <array string, <array string, Hook|HookOrderInterface|HookOrderGroup>>>
+   * Keys are module, class and method. values are Hook attributes.
    */
-  protected array $moduleAttributes = [];
+  protected array $moduleHooks = [];
 
   /**
    * {@inheritdoc}
@@ -77,65 +71,32 @@ class HookCollectorPass implements CompilerPassInterface {
     $collector = static::collectAllHookImplementations($container->getParameter('container.modules'), $container);
     $implementations = [];
     $orderGroups = [];
-    /** @var \Drupal\Core\Hook\Attribute\HookOrderBase[] $allOrderAttributes */
-    $allOrderAttributes = [];
+    $orderAttributes = [];
     foreach (array_keys($container->getParameter('container.modules')) as $module) {
-      foreach ($collector->moduleAttributes[$module] ?? [] as $class => $methods) {
-        foreach ($methods as $method => $attributes) {
-          $orderAttributes = [];
-          $orderGroup = FALSE;
-          $hookAttributes = [];
-          foreach ($attributes as $attribute) {
-            switch (TRUE) {
-              case $attribute instanceof Hook:
-                if ($class !== ProceduralCall::class) {
-                  self::checkForProceduralOnlyHooks($attribute, $class);
-                }
-                if (!$attribute->module) {
-                  $attribute->module = $module;
-                }
-                if (!$attribute->method) {
-                  $attribute->method = $method;
-                }
-                $hookAttributes[] = $attribute;
-                $legacyImplementations[$attribute->hook][$attribute->module] = '';
-                $implementations[$attribute->hook][$attribute->module][$class][] = $attribute->method;
-                break;
-
-              case $attribute instanceof HookOrderInterface:
-                $orderAttributes[] = $attribute;
-                break;
-
-              case $attribute instanceof HookOrderGroup:
-                $orderGroup = $attribute->group;
-                break;
+      foreach ($collector->moduleHooks[$module] ?? [] as $class => $methods) {
+        foreach ($methods as $method => $hooks) {
+          foreach ($hooks as $hook) {
+            assert($hook instanceof Hook);
+            $hook->setClass($class);
+            if ($class !== ProceduralCall::class) {
+              self::checkForProceduralOnlyHooks($hook);
             }
-          }
-          // If no ordering is required the processing of this method is done.
-          if (!$orderAttributes) {
-            if ($orderGroup) {
-              throw new \LogicException('HookOrderGroup requires an order to be specified.');
+            if (!$hook->module) {
+              $hook->module = $module;
             }
-            continue;
-          }
-          // Now process ordering, if possible.
-          if (!$hooksCount = count($hookAttributes)) {
-            throw new \LogicException('Order attributes require a Hook attribute.');
-          }
-          if ($hooksCount === 1) {
-            $hookAttribute = reset($hookAttributes);
-            foreach ($orderAttributes as $orderAttribute) {
-              $allOrderAttributes[] = $orderAttribute->set(hook: $hookAttribute, class: $class);
+            if (!$hook->method) {
+              $hook->method = $method;
             }
-            if ($orderGroup) {
-              $orderGroup[] = $hookAttribute->hook;
-              foreach ($orderGroup as $extraHook) {
-                $orderGroups[$extraHook] = array_merge($orderGroups[$extraHook] ?? [], $orderGroup);
+            $legacyImplementations[$hook->hook][$hook->module] = '';
+            $implementations[$hook->hook][$hook->module][$class][] = $hook->method;
+            if ($hook->order) {
+              $orderAttributes[] = $hook;
+              if ($hook->order instanceof Order && $hook->order->group) {
+                foreach ($hook->order->group as $extraHook) {
+                  $orderGroups[$extraHook] = array_merge($orderGroups[$extraHook] ?? [], $hook->order->group);
+                }
               }
             }
-          }
-          else {
-            throw new \LogicException('Hook ordering can only be applied to methods with one Hook attribute.');
           }
         }
       }
@@ -147,7 +108,7 @@ class HookCollectorPass implements CompilerPassInterface {
     // @see https://www.drupal.org/project/drupal/issues/3481778
     if (count($container->getDefinitions()) > 1) {
       static::registerServices($container, $collector, $implementations, $legacyImplementations ?? [], $orderGroups);
-      static::reOrderServices($container, $allOrderAttributes, $orderGroups, $implementations);
+      static::reOrderServices($container, $orderAttributes, $orderGroups, $implementations);
     }
     return $implementations;
   }
@@ -223,7 +184,7 @@ class HookCollectorPass implements CompilerPassInterface {
    *
    * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
    *   The container.
-   * @param array $allOrderAttributes
+   * @param array $orderAttributes
    *   All attributes related to ordering.
    * @param array $orderGroups
    *   Groups to order by.
@@ -232,28 +193,25 @@ class HookCollectorPass implements CompilerPassInterface {
    *
    * @return void
    */
-  protected static function reOrderServices(ContainerBuilder $container, array $allOrderAttributes, array $orderGroups, array $implementations): void {
+  protected static function reOrderServices(ContainerBuilder $container, array $orderAttributes, array $orderGroups, array $implementations): void {
     $hookPriority = new HookPriority($container);
-    foreach ($allOrderAttributes as $orderAttribute) {
+    foreach ($orderAttributes as $orderAttribute) {
+      assert($orderAttribute instanceof Hook);
       // ::process() adds the hook serving as key to the order group so it
       // does not need to be added if there's a group for the hook.
       $hooks = $orderGroups[$orderAttribute->hook] ?? [$orderAttribute->hook];
-      if (isset($orderAttribute->orderings)) {
+      if ($orderAttribute->order instanceof Order) {
         $others = [];
-        foreach ($orderAttribute->orderings as $ordering) {
+        foreach ($orderAttribute->order->modules as $modules) {
           foreach ($hooks as $hook) {
-            if (is_array($ordering)) {
-              $others[] = $ordering;
-            }
-            else {
-              foreach ($implementations[$hook][$ordering] ?? [] as $class => $methods) {
-                foreach ($methods as $method) {
-                  $others[] = [$class, $method];
-                }
+            foreach ($implementations[$hook][$modules] ?? [] as $class => $methods) {
+              foreach ($methods as $method) {
+                $others[] = [$class, $method];
               }
             }
           }
         }
+        $others = array_merge($others, $orderAttribute->order->classesAndMethods);
       }
       else {
         $others = NULL;
@@ -348,7 +306,7 @@ class HookCollectorPass implements CompilerPassInterface {
             $hook_file_cache->set($filename, ['class' => $class, 'attributes' => $attributes]);
           }
         }
-        $this->moduleAttributes[$module][$class] = $attributes;
+        $this->moduleHooks[$module][$class] = $attributes;
       }
       elseif (!$skip_procedural) {
         $implementations = $procedural_hook_file_cache->get($filename);
@@ -412,7 +370,7 @@ class HookCollectorPass implements CompilerPassInterface {
    *   The name of function implementing the hook.
    */
   protected function addProceduralImplementation(\SplFileInfo $fileinfo, string $hook, string $module, string $function): void {
-    $this->moduleAttributes[$module][ProceduralCall::class][$function] = [new Hook($hook, $module . '_' . $hook)];
+    $this->moduleHooks[$module][ProceduralCall::class][$function] = [new Hook($hook, $module . '_' . $hook)];
     if ($hook === 'hook_info') {
       $this->hookInfo[] = $function;
     }
@@ -460,7 +418,7 @@ class HookCollectorPass implements CompilerPassInterface {
    * @param string $class
    *   The class the hook is implemented on.
    */
-  public static function checkForProceduralOnlyHooks(Hook $hook, string $class): void {
+  public static function checkForProceduralOnlyHooks(Hook $hook, string $class = ''): void {
     $staticDenyHooks = [
       'hook_info',
       'install',
@@ -474,6 +432,9 @@ class HookCollectorPass implements CompilerPassInterface {
     ];
 
     if (in_array($hook->hook, $staticDenyHooks) || preg_match('/^(post_update_|preprocess_|update_\d+$)/', $hook->hook)) {
+      if (!$class) {
+        $class = $hook->class;
+      }
       throw new \LogicException("The hook $hook->hook on class $class does not support attributes and must remain procedural.");
     }
   }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook;
 
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookOrderBase;
+use Drupal\Core\Hook\Attribute\SimpleOrderType;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -32,8 +34,8 @@ class HookPriority {
    *
    * @internal
    */
-  public function change(array $hooks, HookOrderBase $attribute, ?array $others = NULL): void {
-    $class_and_method = "$attribute->class::$attribute->method";
+  public function change(array $hooks, Hook $hook, ?array $others = NULL): void {
+    $class_and_method = "$hook->class::$hook->method";
     if ($others) {
       $other_specifiers = array_map(fn ($pair) => $pair[0] . '::' . $pair[1], $others);
     }
@@ -42,7 +44,7 @@ class HookPriority {
       $combinedHookTag = implode(':', $hooks);
       $event = "drupal_hook.$combinedHookTag";
       $data = $others;
-      $data[] = [$attribute->class, $attribute->method];
+      $data[] = [$hook->class, $hook->method];
       $priority = 0;
       foreach ($data as [$class, $method]) {
         foreach ($hooks as $hook) {
@@ -84,18 +86,19 @@ class HookPriority {
     if (!isset($index_this) || !isset($priorities) || !isset($priorities_other)) {
       return;
     }
+    $shouldBeLarger = $hook->order instanceof SimpleOrderType ? $hook->order->shouldBeLast() : $hook->order->type->shouldBeLast();
     // The priority of the hook being changed.
     $priority_this = $priorities[$index_this];
     // The priority of the hook being compared to.
-    $priority_other = $attribute->shouldBeLarger ? max($priorities_other) : min($priorities_other);
+    $priority_other = $shouldBeLarger ? max($priorities_other) : min($priorities_other);
     // If the order is correct there is nothing to do. If the two priorities
     // are the same then the order is undefined and so it can't be correct.
     // If they are not the same and $priority_this is already larger exactly
     // when $attribute->shouldBeLarger says then it's the correct order.
-    if ($priority_this !== $priority_other && ($attribute->shouldBeLarger === ($priority_this > $priority_other))) {
+    if ($priority_this !== $priority_other && ($shouldBeLarger === ($priority_this > $priority_other))) {
       return;
     }
-    $priority_new = $priority_other + ($attribute->shouldBeLarger ? 1 : -1);
+    $priority_new = $priority_other + ($shouldBeLarger ? 1 : -1);
     // For first and last this new priority is already larger/smaller
     // than all existing priorities but for before / after it might belong to
     // an already existing hook. In this case set the new priority temporarily
@@ -105,7 +108,7 @@ class HookPriority {
     // relative to both $priority_other and the hook whose priority was
     // $priority_new.
     if (in_array($priority_new, $priorities)) {
-      $priorities[$index_this] = $priority_other + ($attribute->shouldBeLarger ? 0.5 : -0.5);
+      $priorities[$index_this] = $priority_other + ($shouldBeLarger ? 0.5 : -0.5);
       asort($priorities);
       $changed_indexes = array_keys($priorities);
       $priorities = array_combine($changed_indexes, range(1, count($changed_indexes)));

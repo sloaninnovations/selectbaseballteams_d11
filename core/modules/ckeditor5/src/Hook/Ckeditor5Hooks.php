@@ -3,6 +3,8 @@
 namespace Drupal\ckeditor5\Hook;
 
 use Drupal\Core\Hook\Attribute\HookAfter;
+use Drupal\Core\Hook\Attribute\Order;
+use Drupal\Core\Hook\Attribute\OrderType;
 use Drupal\Core\Hook\Attribute\HookOrderGroup;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Asset\AttachedAssetsInterface;
@@ -106,9 +108,13 @@ class Ckeditor5Hooks {
    * removed from the validation chain, as that validator is not needed with
    * CKEditor 5 and will trigger a false error.
    */
-  #[Hook('form_filter_format_form_alter')]
-  #[HookOrderGroup(['form_filter_format_add_form_alter', 'form_filter_format_edit_form_alter'])]
-  #[HookAfter(['editor', 'media'])]
+  #[Hook('form_filter_format_form_alter',
+    order: new Order(
+      type: OrderType::After,
+      modules: ['editor', 'media'],
+      group: ['form_filter_format_add_form_alter', 'form_filter_format_edit_form_alter'],
+    )
+  )]
   public function formFilterFormatFormAlter(array &$form, FormStateInterface $form_state, $form_id) : void {
     $editor = $form_state->get('editor');
     // CKEditor 5 plugin config determines the available HTML tags. If an HTML

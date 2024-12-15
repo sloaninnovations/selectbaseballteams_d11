@@ -90,6 +90,8 @@ namespace Drupal\Core\Hook\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Hook {
 
+  public string $class = '';
+
   /**
    * Constructs a Hook attribute object.
    *
@@ -109,6 +111,7 @@ class Hook {
     public string $hook,
     public string $method = '',
     public ?string $module = NULL,
+    public Order|SimpleOrderType|NULL $order = NULL,
   ) {}
 
   /**
@@ -117,9 +120,16 @@ class Hook {
    * @param string $method
    *   The method that the hook attribute applies to.
    *   This only needs to be set when the attribute is on the class.
+   *
+   * @internal
    */
   public function setMethod(string $method): static {
     $this->method = $method;
+    return $this;
+  }
+
+  public function setClass(string $class): static {
+    $this->class = $class;
     return $this;
   }
 
