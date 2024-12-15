@@ -438,10 +438,10 @@ class ModuleHandler implements ModuleHandlerInterface {
         foreach ($extra_hooks as $extra_hook) {
           $hook_listeners = $this->findListenersForAlter($extra_hook, $hook_listeners, $extra_modules);
         }
-        // Second, gather implementations defined in a
-        // Drupal\Core\Hook\Attribute\HookOrderGroup attribute. These are only
-        // used for ordering because the group might contain hooks not included
-        // in this alter() call.
+        // Second, gather implementations grouped together. These are only used
+        // for ordering because the group might contain hooks not included in
+        // this alter() call. \Drupal\Core\Hook\HookPriority::change()
+        // registers the implementations of a grouped hook.
         foreach (array_merge($extra_hooks, [$type . '_alter']) as $extra_hook) {
           if (isset($this->orderGroups[$extra_hook])) {
             $group = $this->orderGroups[$extra_hook];

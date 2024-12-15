@@ -10,7 +10,6 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\LegacyHook;
-use Drupal\Core\Hook\Attribute\Order;
 use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -85,9 +84,10 @@ class HookCollectorPass implements CompilerPassInterface {
             $implementations[$hook->hook][$hook->module][$class][] = $hook->method;
             if ($hook->order) {
               $orderAttributes[] = $hook;
-              if ($hook->order instanceof Order) {
-                foreach ($hook->order->group as $extraHook) {
-                  $orderGroups[$extraHook] = array_merge($orderGroups[$extraHook] ?? [], $hook->order->group);
+              if ($hook->order instanceof ComplexOrder && ($group = $hook->order->group)) {
+                $group[] = $hook->hook;
+                foreach ($group as $extraHook) {
+                  $orderGroups[$extraHook] = array_merge($orderGroups[$extraHook] ?? [], $group);
                 }
               }
             }
@@ -194,7 +194,7 @@ class HookCollectorPass implements CompilerPassInterface {
       // ::process() adds the hook serving as key to the order group so it
       // does not need to be added if there's a group for the hook.
       $hooks = $orderGroups[$orderAttribute->hook] ?? [$orderAttribute->hook];
-      if ($orderAttribute->order instanceof Order) {
+      if ($orderAttribute->order instanceof ComplexOrder) {
         $others = [];
         foreach ($orderAttribute->order->modules as $modules) {
           foreach ($hooks as $hook) {

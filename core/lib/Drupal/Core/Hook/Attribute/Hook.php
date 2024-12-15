@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook\Attribute;
 
+use Drupal\Core\Hook\ComplexOrder;
+use Drupal\Core\Hook\Order;
+
 /**
  * Attribute for defining a class method as a hook implementation.
  *
  * Hook implementations in classes need to be marked with this attribute,
  * using one of the following techniques:
  * - On a method, use this attribute with the hook name:
+ *
  *   @code
  *   #[Hook('user_cancel')]
  *   public method userCancel(...)
@@ -90,6 +94,11 @@ namespace Drupal\Core\Hook\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Hook {
 
+  /**
+   * The class the hook implementation is in.
+   *
+   * @var string
+   */
   public string $class = '';
 
   /**
@@ -106,15 +115,14 @@ class Hook {
    *   (optional) The module this implementation is for. This allows one module to
    *   implement a hook on behalf of another module. Defaults to the module the
    *   implementation is in.
-   * @param Order|SimpleOrderType|null $order
-   *   (optional) Ordering information if you need to change the current order
-   *   of the implementation.
+   * @param \Drupal\Core\Hook\Order|\Drupal\Core\Hook\ComplexOrder|null $order
+   *   (optional) Set the order of the implementation.
    */
   public function __construct(
     public string $hook,
     public string $method = '',
     public ?string $module = NULL,
-    public Order|SimpleOrderType|NULL $order = NULL,
+    public Order|ComplexOrder|NULL $order = NULL,
   ) {}
 
   /**

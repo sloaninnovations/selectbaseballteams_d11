@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Drupal\hook_order_last_alphabetically\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\Order;
-use Drupal\Core\Hook\Attribute\OrderType;
+use Drupal\Core\Hook\OrderBefore;
 
 /**
  * Hook implementations for verifying ordering hooks by attributes.
@@ -23,12 +22,9 @@ use Drupal\Core\Hook\Attribute\OrderType;
 class TestHookBefore {
 
   /**
-   * This pair tests OrderType::Before.
+   * This pair tests OrderBefore.
    */
-  #[Hook('custom_hook_test_hook_before', order: new Order(
-    type: OrderType::Before,
-    modules: ['hook_order_first_alphabetically']
-  ))]
+  #[Hook('custom_hook_test_hook_before', order: new OrderBefore(['hook_order_first_alphabetically']))]
   public static function cacheFlush(): void {
     $GLOBALS['HookBefore'] = 'HookBefore';
   }

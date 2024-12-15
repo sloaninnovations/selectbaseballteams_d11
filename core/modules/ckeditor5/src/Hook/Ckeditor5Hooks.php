@@ -2,8 +2,7 @@
 
 namespace Drupal\ckeditor5\Hook;
 
-use Drupal\Core\Hook\Attribute\Order;
-use Drupal\Core\Hook\Attribute\OrderType;
+use Drupal\Core\Hook\OrderAfter;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Render\Element;
@@ -107,8 +106,7 @@ class Ckeditor5Hooks {
    * CKEditor 5 and will trigger a false error.
    */
   #[Hook('form_filter_format_form_alter',
-    order: new Order(
-      type: OrderType::After,
+    order: new OrderAfter(
       modules: ['editor', 'media'],
       group: ['form_filter_format_add_form_alter', 'form_filter_format_edit_form_alter'],
     )

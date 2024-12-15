@@ -21,7 +21,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 class TestHookFirst {
 
   /**
-   * This pair tests OrderType::First.
+   * This pair tests OrderFirst.
    */
   #[Hook('custom_hook_test_hook_first')]
   public static function hookFirst(): void {

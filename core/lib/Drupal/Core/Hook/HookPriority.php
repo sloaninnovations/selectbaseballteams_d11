@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Core\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\SimpleOrderType;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -34,11 +33,14 @@ class HookPriority {
    * @internal
    */
   public function change(array $hooks, Hook $hook, ?array $others = NULL): void {
-    $class_and_method = "$hook->class::$hook->method";
     if ($others) {
-      $other_specifiers = array_map(fn ($pair) => $pair[0] . '::' . $pair[1], $others);
+      $other_specifiers = array_map(fn ($pair) => is_array($pair) ? $pair[0] . '::' . $pair[1] : throw new \LogicException('classesAndMethods needs to be an array of arrays'), $others);
     }
     if (count($hooks) > 1) {
+      // Mark $hook implementation and everything in $others as implementing
+      // a single combined hook made from $hooks. This is necessary because
+      // ordering is only possible between the implementations of the same
+      // hook.
       $map = $this->container->getParameter('hook_implementations_map');
       $combinedHookTag = implode(':', $hooks);
       $event = "drupal_hook.$combinedHookTag";
@@ -46,9 +48,15 @@ class HookPriority {
       $data[] = [$hook->class, $hook->method];
       $priority = 0;
       foreach ($data as [$class, $method]) {
-        foreach ($hooks as $hook) {
-          if (isset($map[$hook][$class][$method])) {
-            $map[$combinedHookTag][$class][$method] = $map[$hook][$class][$method];
+        // If the class and method exists at all it surely implements a hook
+        // because it is being ordered against and then this implementation
+        // is already registered in the implementation map and allows finding
+        // out what the corresponding module is. This can't be found out from
+        // parsing the class name because a hook might be implemented on
+        // behalf of another module.
+        foreach ($hooks as $indexHook) {
+          if (isset($map[$indexHook][$class][$method])) {
+            $map[$combinedHookTag][$class][$method] = $map[$indexHook][$class][$method];
             $priority = HookCollectorPass::addTagToDefinition($this->container->findDefinition($class), $event, $method, $priority);
             break;
           }
@@ -70,7 +78,7 @@ class HookPriority {
           assert(is_int($priority));
           $priorities[$index] = $priority;
           $specifier = "$id::" . $tag['method'];
-          if ($class_and_method === $specifier) {
+          if ($specifier === "$hook->class::$hook->method") {
             $index_this = $index;
           }
           // $others is defined for before and after, for these compare only
@@ -85,7 +93,8 @@ class HookPriority {
     if (!isset($index_this) || !isset($priorities) || !isset($priorities_other)) {
       return;
     }
-    $shouldBeLarger = boolval($hook->order instanceof SimpleOrderType ? $hook->order->value : $hook->order->type->value);
+
+    $shouldBeLarger = (bool) $hook->order->value;
     // The priority of the hook being changed.
     $priority_this = $priorities[$index_this];
     // The priority of the hook being compared to.

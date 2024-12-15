@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Drupal\hook_second_order_first_alphabetically\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\Order;
-use Drupal\Core\Hook\Attribute\OrderType;
+use Drupal\Core\Hook\OrderAfter;
 use Drupal\hook_second_order_last_alphabetically\Hook\TestHookAfterClassMethod as TestHookAfterClassMethodForAfter;
 
 /**
@@ -24,12 +23,11 @@ use Drupal\hook_second_order_last_alphabetically\Hook\TestHookAfterClassMethod a
 class TestHookAfterClassMethod {
 
   /**
-   * This pair tests OrderType::After with a passed class and method.
+   * This pair tests OrderAfter with a passed class and method.
    */
   #[Hook('custom_hook_test_hook_after_class_method',
-    order: new Order(
-      type: OrderType::After,
-      classesAndMethods: [TestHookAfterClassMethodForAfter::class, 'hookAfterClassMethod'],
+    order: new OrderAfter(
+      classesAndMethods: [[TestHookAfterClassMethodForAfter::class, 'hookAfterClassMethod']],
     )
   )]
   public static function hookAfterClassMethod(): void {
