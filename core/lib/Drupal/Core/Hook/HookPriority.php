@@ -22,8 +22,7 @@ class HookPriority {
    * @param array $hooks
    *   The list of hooks to order. The list always contains the hook defined
    *   in Drupal\Core\Hook\Attribute, and it might also contain
-   *   the hooks listed in the Drupal\Core\Hook\Attribute\HookOrderGroup
-   *   attribute.
+   *   the hooks listed in the Drupal\Core\Hook\ComplexOrder $group
    * @param \Drupal\Core\Hook\Attribute\Hook $hook
    *   The hook attribute.
    * @param array|null $others

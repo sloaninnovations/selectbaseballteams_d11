@@ -447,13 +447,13 @@ class ModuleHandler implements ModuleHandlerInterface {
             $group = $this->orderGroups[$extra_hook];
             $extra_listeners = $this->findListenersForAlter(implode(':', $group));
             // Remove already ordered hooks.
-            $extra_types = array_diff($extra_hooks, $group);
+            $extra_hooks = array_diff($extra_hooks, $group);
           }
         }
       }
       // If multiple alters were called, but they were already ordered by
       // ordering attributes then keep that order.
-      if (isset($extra_types) && empty($extra_types)) {
+      if (isset($extra_hooks) && empty($extra_hooks)) {
         $modules = array_keys(array_intersect_key($extra_listeners, $hook_listeners));
       }
       else {

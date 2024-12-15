@@ -59,7 +59,7 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * A list of attributes for hook implementations.
    *
-   * Keys are module, class and method. values are Hook attributes.
+   * Keys are module, class and method. Values are Hook attributes.
    */
   protected array $moduleHooks = [];
 
@@ -101,8 +101,8 @@ class HookCollectorPass implements CompilerPassInterface {
     // is removed.
     // @see https://www.drupal.org/project/drupal/issues/3481778
     if (count($container->getDefinitions()) > 1) {
-      static::registerServices($container, $collector, $implementations, $legacyImplementations ?? [], $orderGroups);
-      static::reOrderServices($container, $orderAttributes, $orderGroups, $implementations);
+      static::registerImplementations($container, $collector, $implementations, $legacyImplementations ?? [], $orderGroups);
+      static::reOrderImplementations($container, $orderAttributes, $orderGroups, $implementations);
     }
     return $implementations;
   }
@@ -126,7 +126,7 @@ class HookCollectorPass implements CompilerPassInterface {
    *
    * @return void
    */
-  protected static function registerServices(ContainerBuilder $container, HookCollectorPass $collector, array $implementations, array $legacyImplementations, array $orderGroups): void {
+  protected static function registerImplementations(ContainerBuilder $container, HookCollectorPass $collector, array $implementations, array $legacyImplementations, array $orderGroups): void {
     $container->register(ProceduralCall::class, ProceduralCall::class)
       ->addArgument($collector->includes);
     $groupIncludes = [];
@@ -174,7 +174,7 @@ class HookCollectorPass implements CompilerPassInterface {
   }
 
   /**
-   * Reorder services that have attributes specifying an order.
+   * Reorder hook implementations specifying an order.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
    *   The container.
@@ -187,7 +187,7 @@ class HookCollectorPass implements CompilerPassInterface {
    *
    * @return void
    */
-  protected static function reOrderServices(ContainerBuilder $container, array $orderAttributes, array $orderGroups, array $implementations): void {
+  protected static function reOrderImplementations(ContainerBuilder $container, array $orderAttributes, array $orderGroups, array $implementations): void {
     $hookPriority = new HookPriority($container);
     foreach ($orderAttributes as $orderAttribute) {
       assert($orderAttribute instanceof Hook);
@@ -442,7 +442,7 @@ class HookCollectorPass implements CompilerPassInterface {
    *   A list of class and method reflections.
    *
    * @return array
-   *   A list of Hook|HookOrderInterface|HookOrderGroup attribute instances.
+   *   A list of Hook attribute instances.
    */
   protected static function getAttributeInstances(array $attributes, array $reflections): array {
     foreach ($reflections as $reflection) {

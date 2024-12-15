@@ -16,7 +16,7 @@ use Drupal\Core\Hook\Attribute\Hook;
  * In the normal order a hook implemented by first alphabetically would run
  * before the same hook in last alphabetically.
  *
- * Each method pair tests one hook ordering attribute.
+ * Each method pair tests one hook ordering permutation.
  */
 class TestHookLast {
 
