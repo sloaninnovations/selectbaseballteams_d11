@@ -283,7 +283,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     if (!$database_ok) {
       $requirements['database_extensions']['value'] = t('Disabled');
       $requirements['database_extensions']['severity'] = REQUIREMENT_ERROR;
-      $requirements['database_extensions']['description'] = $pdo_message;
+      $requirements['database_extensions']['description'] = $pdo_message ?? '';
     }
     else {
       $requirements['database_extensions']['value'] = t('Enabled');
@@ -396,18 +396,16 @@ class SystemRequirements implements InstallRequirementsInterface {
         // be treated as version, so provide none there.
         $description = t('An automated attempt to create this directory failed, possibly due to a permissions problem. To proceed with the installation, either create the directory and modify its permissions manually or ensure that the installer has the permissions to create it automatically. For more information, see INSTALL.txt or the <a href=":handbook_url">online handbook</a>.', [':handbook_url' => 'https://www.drupal.org/server-permissions']);
         $requirements['file system']['value'] = '';
-        if (!empty($description)) {
-          $description = [
-            '#type' => 'inline_template',
-            '#template' => '{{ error }} {{ description }}',
-            '#context' => [
-              'error' => $error,
-              'description' => $description,
-            ],
-          ];
-          $requirements['file system']['description'] = $description;
-          $requirements['file system']['severity'] = REQUIREMENT_ERROR;
-        }
+        $description = [
+          '#type' => 'inline_template',
+          '#template' => '{{ error }} {{ description }}',
+          '#context' => [
+            'error' => $error,
+            'description' => $description,
+          ],
+        ];
+        $requirements['file system']['description'] = $description;
+        $requirements['file system']['severity'] = REQUIREMENT_ERROR;
       }
       else {
         // This function can be called before the config_cache table has been
@@ -505,6 +503,5 @@ class SystemRequirements implements InstallRequirementsInterface {
 
     return $requirements;
   }
-
 
 }
