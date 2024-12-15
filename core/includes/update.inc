@@ -8,7 +8,6 @@
  * installation. It is included and used extensively by update.php.
  */
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Graph\Graph;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Utility\Error;
@@ -54,8 +53,8 @@ function update_check_requirements() {
 
   // Check requirements of all loaded modules.
   $requirements = \Drupal::moduleHandler()->invokeAll('requirements', ['update']);
-  $runtime_requirements = \Drupal::moduleHandler()->invokeAll('update_requirements');
-  $requirements = NestedArray::mergeDeep($requirements, $runtime_requirements);
+  $update_requirements = \Drupal::moduleHandler()->invokeAll('update_requirements');
+  $requirements = array_merge($requirements, $update_requirements);
   \Drupal::moduleHandler()->alter('requirements', $requirements);
   \Drupal::moduleHandler()->alter('update_requirements', $requirements);
   $requirements += update_system_schema_requirements();
