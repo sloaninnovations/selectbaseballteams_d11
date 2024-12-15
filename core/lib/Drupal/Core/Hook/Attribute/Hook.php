@@ -114,4 +114,14 @@ class Hook {
     public Order|SimpleOrderType|NULL $order = NULL,
   ) {}
 
+  public function set(string $class, string $module, string $method): void {
+    $this->class = $class;
+    if (!$this->module) {
+      $this->module = $module;
+    }
+    if (!$this->method) {
+      $this->method = $method;
+    }
+  }
+
 }

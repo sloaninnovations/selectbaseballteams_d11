@@ -6,6 +6,8 @@ namespace Drupal\hook_order_first_alphabetically\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAfter;
+use Drupal\Core\Hook\Attribute\Order;
+use Drupal\Core\Hook\Attribute\OrderType;
 
 /**
  * Hook implementations for verifying ordering hooks by attributes.
@@ -22,10 +24,12 @@ use Drupal\Core\Hook\Attribute\HookAfter;
 class TestHookAfter {
 
   /**
-   * This pair tests #[HookAfter].
+   * This pair tests OrderType::After.
    */
-  #[HookAfter(['hook_order_last_alphabetically'])]
-  #[Hook('custom_hook_test_hook_after')]
+  #[Hook('custom_hook_test_hook_after', order: new Order(
+    type: OrderType::After,
+    modules: ['hook_order_last_alphabetically']
+  ))]
   public static function hookAfter(): void {
     $GLOBALS['HookAfter'] = 'HookAfter';
   }

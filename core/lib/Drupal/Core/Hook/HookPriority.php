@@ -93,7 +93,7 @@ class HookPriority {
     // If the order is correct there is nothing to do. If the two priorities
     // are the same then the order is undefined and so it can't be correct.
     // If they are not the same and $priority_this is already larger exactly
-    // when $attribute->shouldBeLarger says then it's the correct order.
+    // when $shouldBeLarger says then it's the correct order.
     if ($priority_this !== $priority_other && ($shouldBeLarger === ($priority_this > $priority_other))) {
       return;
     }

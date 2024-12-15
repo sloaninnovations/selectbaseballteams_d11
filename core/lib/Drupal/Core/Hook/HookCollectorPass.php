@@ -77,21 +77,15 @@ class HookCollectorPass implements CompilerPassInterface {
         foreach ($methods as $method => $hooks) {
           foreach ($hooks as $hook) {
             assert($hook instanceof Hook);
-            $hook->class = $class;
+            $hook->set(class: $class, module: $module, method: $method);
             if ($class !== ProceduralCall::class) {
               self::checkForProceduralOnlyHooks($hook);
-            }
-            if (!$hook->module) {
-              $hook->module = $module;
-            }
-            if (!$hook->method) {
-              $hook->method = $method;
             }
             $legacyImplementations[$hook->hook][$hook->module] = '';
             $implementations[$hook->hook][$hook->module][$class][] = $hook->method;
             if ($hook->order) {
               $orderAttributes[] = $hook;
-              if ($hook->order instanceof Order && $hook->order->group) {
+              if ($hook->order instanceof Order) {
                 foreach ($hook->order->group as $extraHook) {
                   $orderGroups[$extraHook] = array_merge($orderGroups[$extraHook] ?? [], $hook->order->group);
                 }
