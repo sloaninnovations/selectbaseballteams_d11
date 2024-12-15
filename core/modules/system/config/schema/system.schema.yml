@@ -69,7 +69,7 @@ system.cron:
           type: integer
           label: 'Requirements warning period'
           constraints:
-            # @see system_requirements()
+            # @see \Drupal\system\Hook\RequirementsHooks::runtimeRequirements()
             Range:
               min: 60
         requirements_error:

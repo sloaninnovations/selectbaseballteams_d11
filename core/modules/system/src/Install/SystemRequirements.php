@@ -15,8 +15,14 @@ use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Utility\PhpRequirements;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Install requirements for system module.
+ */
 class SystemRequirements implements InstallRequirementsInterface {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getRequirements(): array {
     global $install_state;
 
