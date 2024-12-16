@@ -95,8 +95,8 @@
     }
 
     .context-status {
-      background-color: var(--admin-topbar-color-gray);
       padding: var(--admin-toolbar-space-4) var(--admin-toolbar-space-10);
+      background-color: var(--admin-topbar-color-gray);
     }
 
     .published {

@@ -94,8 +94,8 @@
   text-overflow: ellipsis;
 }
 .top-bar__context .navigation-top-bar-context .context-status {
-  background-color: var(--admin-topbar-color-gray);
   padding: var(--admin-toolbar-space-4) var(--admin-toolbar-space-10);
+  background-color: var(--admin-topbar-color-gray);
 }
 .top-bar__context .navigation-top-bar-context .published {
   background-color: var(--admin-topbar-color-green);
