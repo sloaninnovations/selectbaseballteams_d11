@@ -69,9 +69,14 @@ class I18nQueryTraitTest extends MigrateUpgradeExecuteTestBase {
    * Tests that I18nQueryTrait is available for migrations.
    */
   public function testUpgradeStart(): void {
+    // Ensure the test error log is empty before migrate start.
+    $this->assertFileDoesNotExist($this->root . '/' . $this->siteDirectory . '/error.log', 'Error.log not empty before start.');
+
     // Start the upgrade process.
     $this->submitCredentialForm();
-    $this->assertSession()->pageTextNotContains('Fatal error: Trait "Drupal\content_translation\Plugin\migrate\source\I18nQueryTrait" not found');
+
+    // No fatal error after form submit.
+    $this->assertFileDoesNotExist($this->root . '/' . $this->siteDirectory . '/error.log', 'Fatal error on migrate start.');
     $this->assertSession()->pageTextContains('Upgrade analysis report');
   }
 
