@@ -481,8 +481,8 @@ class HookCollectorPass implements CompilerPassInterface {
    *
    * @param \Symfony\Component\DependencyInjection\Definition $definition
    *   The service definition.
-   * @param string $hook
-   *   The name of the hook.
+   * @param string|int $hook
+   *   The name of the hook
    * @param string $method
    *   The method.
    * @param int $priority
@@ -491,7 +491,7 @@ class HookCollectorPass implements CompilerPassInterface {
    * @return int
    *   A new priority, guaranteed to be lower than $priority.
    */
-  protected static function addTagToDefinition(Definition $definition, string $hook, string $method, int $priority): int {
+  protected static function addTagToDefinition(Definition $definition, string|int $hook, string $method, int $priority): int {
     $definition->addTag('kernel.event_listener', [
       'event' => "drupal_hook.$hook",
       'method' => $method,
