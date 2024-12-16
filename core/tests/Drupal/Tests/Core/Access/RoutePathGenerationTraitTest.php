@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Access;
 
 use Drupal\Core\Access\AccessResultAllowed;
@@ -39,6 +41,7 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
   protected $accessCheck;
 
   protected function setUp(): void {
+    parent::setUp();
     $this->csrfToken = $this->getMockBuilder('Drupal\Core\Access\CsrfTokenGenerator')
       ->disableOriginalConstructor()
       ->getMock();
@@ -94,7 +97,7 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
     $this->assertInstanceOf(AccessResultAllowed::class, $this->accessCheck->access($route, $request, $routeMatch));
   }
 
-  public function providerTestCsrfTokenCompleteLifeCycle() {
+  public static function providerTestCsrfTokenCompleteLifeCycle(): array {
     return [
       [['param' => 'value']],
       [['param' => '']],

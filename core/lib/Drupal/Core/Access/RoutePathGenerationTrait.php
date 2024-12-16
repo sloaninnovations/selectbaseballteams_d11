@@ -4,8 +4,21 @@ namespace Drupal\Core\Access;
 
 use Symfony\Component\Routing\Route;
 
+/**
+ * Provides a method for generating route paths, replacing parameter placeholders with their values.
+ */
 trait RoutePathGenerationTrait {
 
+  /**
+   * Performs parameter placeholder replacements on a route path, given an array of parameters.
+   *
+   * @param \Symfony\Component\Routing\Route $route
+   *   The route.
+   * @param array $parameters
+   *   The parameters to substitute on the route path.
+   *
+   * @return string
+   */
   public function generateRoutePath(Route $route, array $parameters): string {
     $path = ltrim($route->getPath(), '/');
 
