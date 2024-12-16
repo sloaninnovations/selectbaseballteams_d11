@@ -71,6 +71,7 @@ class HookCollectorPass implements CompilerPassInterface {
     $implementations = [];
     $orderGroups = [];
     $orderAttributes = [];
+    $moduleFinder = [];
     foreach (array_keys($container->getParameter('container.modules')) as $module) {
       foreach ($collector->moduleHooks[$module] ?? [] as $class => $methods) {
         foreach ($methods as $method => $hooks) {
@@ -82,6 +83,7 @@ class HookCollectorPass implements CompilerPassInterface {
             }
             $legacyImplementations[$hook->hook][$hook->module] = '';
             $implementations[$hook->hook][$hook->module][$class][] = $hook->method;
+            $moduleFinder[$class][$method] = $hook->module;
             if ($hook->order) {
               $orderAttributes[] = $hook;
               if ($hook->order instanceof ComplexOrder && ($group = $hook->order->group)) {
@@ -102,7 +104,7 @@ class HookCollectorPass implements CompilerPassInterface {
     // @see https://www.drupal.org/project/drupal/issues/3481778
     if (count($container->getDefinitions()) > 1) {
       static::registerImplementations($container, $collector, $implementations, $legacyImplementations ?? [], $orderGroups);
-      static::reOrderImplementations($container, $orderAttributes, $orderGroups, $implementations);
+      static::reOrderImplementations($container, $orderAttributes, $orderGroups, $implementations, $moduleFinder);
     }
     return $implementations;
   }
@@ -160,7 +162,7 @@ class HookCollectorPass implements CompilerPassInterface {
           }
           foreach ($method_hooks as $method) {
             $map[$hook][$class][$method] = $module;
-            $priority = self::addTagToDefinition($definition, "drupal_hook.$hook", $method, $priority);
+            $priority = self::addTagToDefinition($definition, $hook, $method, $priority);
           }
         }
         unset($implementations[$hook][$module]);
@@ -184,33 +186,53 @@ class HookCollectorPass implements CompilerPassInterface {
    *   Groups to order by.
    * @param array $implementations
    *   Hook implementations.
+   * @param array $moduleFinder
+   *   An array keyed by the class and method of a hook implementation, value
+   *   is the module. This is not necessarily the same as the module the class
+   *   is in because the implementation might be on behalf of another module.
    *
    * @return void
    */
-  protected static function reOrderImplementations(ContainerBuilder $container, array $orderAttributes, array $orderGroups, array $implementations): void {
+  protected static function reOrderImplementations(ContainerBuilder $container, array $orderAttributes, array $orderGroups, array $implementations, array $moduleFinder): void {
     $hookPriority = new HookPriority($container);
     foreach ($orderAttributes as $orderAttribute) {
       assert($orderAttribute instanceof Hook);
       // ::process() adds the hook serving as key to the order group so it
       // does not need to be added if there's a group for the hook.
       $hooks = $orderGroups[$orderAttribute->hook] ?? [$orderAttribute->hook];
+      $combinedHook = implode(':', $hooks);
       if ($orderAttribute->order instanceof ComplexOrder) {
-        $others = [];
+        // Verify the correct structure of
+        // $orderAttribute->order->classesAndMethods and create specifiers
+        // for HookPriority::change() while at it.
+        $otherSpecifiers = array_map(fn ($pair) => is_array($pair) ? $pair[0] . '::' . $pair[1] : throw new \LogicException('classesAndMethods needs to be an array of arrays'), $orderAttribute->order->classesAndMethods);
+        // Collect classes and methods for
+        // self::registerComplexHookImplementations().
+        $classesAndMethods = $orderAttribute->order->classesAndMethods;
         foreach ($orderAttribute->order->modules as $modules) {
           foreach ($hooks as $hook) {
             foreach ($implementations[$hook][$modules] ?? [] as $class => $methods) {
               foreach ($methods as $method) {
-                $others[] = [$class, $method];
+                $classesAndMethods[] = [$class, $method];
+                $otherSpecifiers[] = "$class::$method";
               }
             }
           }
         }
-        $others = array_merge($others, $orderAttribute->order->classesAndMethods);
+        if (count($hooks) > 1) {
+          // The hook implementation in $orderAttribute and everything in
+          // $classesAndMethods will be ordered relative to each other as if
+          // they were implementing a single hook. This needs to be marked on
+          // their service definition and added to the
+          // hook_implementations_map container parameter.
+          $classesAndMethods[] = [$orderAttribute->class, $orderAttribute->method];
+          self::registerComplexHookImplementations($container, $classesAndMethods, $moduleFinder, $combinedHook);
+        }
       }
       else {
-        $others = NULL;
+        $otherSpecifiers = NULL;
       }
-      $hookPriority->change($hooks, $orderAttribute, $others);
+      $hookPriority->change("drupal_hook.$combinedHook", $orderAttribute, $otherSpecifiers);
     }
   }
 
@@ -220,7 +242,7 @@ class HookCollectorPass implements CompilerPassInterface {
    * @param array $module_filenames
    *   An associative array. Keys are the module names, values are relevant
    *   info yml file path.
-   * @param Symfony\Component\DependencyInjection\ContainerBuilder|null $container
+   * @param \Symfony\Component\DependencyInjection\ContainerBuilder|null $container
    *   The container.
    *
    * @return static
@@ -459,8 +481,8 @@ class HookCollectorPass implements CompilerPassInterface {
    *
    * @param \Symfony\Component\DependencyInjection\Definition $definition
    *   The service definition.
-   * @param string $event
-   *   The name of the event, typically starts with drupal_hook.
+   * @param string $hook
+   *   The name of the hook.
    * @param string $method
    *   The method.
    * @param int $priority
@@ -469,13 +491,38 @@ class HookCollectorPass implements CompilerPassInterface {
    * @return int
    *   A new priority, guaranteed to be lower than $priority.
    */
-  public static function addTagToDefinition(Definition $definition, string $event, string $method, int $priority): int {
+  protected static function addTagToDefinition(Definition $definition, string $hook, string $method, int $priority): int {
     $definition->addTag('kernel.event_listener', [
-      'event' => $event,
+      'event' => "drupal_hook.$hook",
       'method' => $method,
       'priority' => $priority--,
     ]);
     return $priority;
+  }
+
+  /**
+   * Register complex hook implementations.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   *   The container.
+   * @param array $classesAndMethods
+   *   A list of class-and-method pairs.
+   * @param array $moduleFinder
+   *   A module finder array, see ::reOrderImplementations() for explanation.
+   * @param string $combinedHook
+   *   A string made form list of hooks separated by :
+   */
+  protected static function registerComplexHookImplementations(ContainerBuilder $container, array $classesAndMethods, array $moduleFinder, string $combinedHook): void {
+    $map = $container->getParameter('hook_implementations_map');
+    $priority = 0;
+    foreach ($classesAndMethods as [$class, $method]) {
+      // Ordering against not installed modules is possible.
+      if (isset($moduleFinder[$class][$method])) {
+        $map[$combinedHook][$class][$method] = $moduleFinder[$class][$method];
+        $priority = self::addTagToDefinition($container->findDefinition($class), $combinedHook, $method, $priority);
+      }
+    }
+    $container->setParameter('hook_implementations_map', $map);
   }
 
 }

@@ -19,53 +19,17 @@ class HookPriority {
   /**
    * Change the priority of a hook implementation.
    *
-   * @param array $hooks
-   *   The list of hooks to order. The list always contains the hook defined
-   *   in Drupal\Core\Hook\Attribute, and it might also contain
-   *   the hooks listed in the Drupal\Core\Hook\ComplexOrder $group
+   * @param string $event
+   *   Listeners to this event will be ordered.
    * @param \Drupal\Core\Hook\Attribute\Hook $hook
    *   The hook attribute.
-   * @param array|null $others
+   * @param array|null $other_specifiers
    *   Other hook implementations to compare to, if any. The array is a list of
-   *   class and method pairs.
+   *   strings, each string is a class and method separated by ::.
    *
    * @internal
    */
-  public function change(array $hooks, Hook $hook, ?array $others = NULL): void {
-    if ($others) {
-      $other_specifiers = array_map(fn ($pair) => is_array($pair) ? $pair[0] . '::' . $pair[1] : throw new \LogicException('classesAndMethods needs to be an array of arrays'), $others);
-    }
-    if (count($hooks) > 1) {
-      // Mark $hook implementation and everything in $others as implementing
-      // a single combined hook made from $hooks. This is necessary because
-      // ordering is only possible between the implementations of the same
-      // hook.
-      $map = $this->container->getParameter('hook_implementations_map');
-      $combinedHookTag = implode(':', $hooks);
-      $event = "drupal_hook.$combinedHookTag";
-      $data = $others;
-      $data[] = [$hook->class, $hook->method];
-      $priority = 0;
-      foreach ($data as [$class, $method]) {
-        // If the class and method exists at all it surely implements a hook
-        // because it is being ordered against and then this implementation
-        // is already registered in the implementation map and allows finding
-        // out what the corresponding module is. This can't be found out from
-        // parsing the class name because a hook might be implemented on
-        // behalf of another module.
-        foreach ($hooks as $indexHook) {
-          if (isset($map[$indexHook][$class][$method])) {
-            $map[$combinedHookTag][$class][$method] = $map[$indexHook][$class][$method];
-            $priority = HookCollectorPass::addTagToDefinition($this->container->findDefinition($class), $event, $method, $priority);
-            break;
-          }
-        }
-      }
-      $this->container->setParameter('hook_implementations_map', $map);
-    }
-    else {
-      $event = 'drupal_hook.' . reset($hooks);
-    }
+  public function change(string $event, Hook $hook, ?array $other_specifiers = NULL): void {
     foreach ($this->container->findTaggedServiceIds('kernel.event_listener') as $id => $tags) {
       foreach ($tags as $key => $tag) {
         if ($tag['event'] === $event) {
@@ -80,9 +44,9 @@ class HookPriority {
           if ($specifier === "$hook->class::$hook->method") {
             $index_this = $index;
           }
-          // $others is defined for before and after, for these compare only
-          // the priority of those. For first and last the priority of every
-          // other hook matters.
+          // $other_specifiers is defined for before and after, for these
+          // compare only the priority of those. For first and last the
+          // priority of every other hook matters.
           elseif (!isset($other_specifiers) || in_array($specifier, $other_specifiers)) {
             $priorities_other[$specifier] = $priority;
           }
