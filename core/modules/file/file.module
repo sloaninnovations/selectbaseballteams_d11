@@ -26,24 +26,6 @@ use Drupal\file\IconMimeTypes;
 use Drupal\file\Upload\FormUploadedFile;
 
 /**
- * Examines a file entity and returns appropriate content headers for download.
- *
- * @param \Drupal\file\FileInterface $file
- *   A file entity.
- *
- * @return array
- *   An associative array of headers, as expected by
- *   \Symfony\Component\HttpFoundation\StreamedResponse.
- */
-function file_get_content_headers(FileInterface $file) {
-  return [
-    'Content-Type' => $file->getMimeType(),
-    'Content-Length' => $file->getSize(),
-    'Cache-Control' => 'private',
-  ];
-}
-
-/**
  * Saves form file uploads.
  *
  * The files will be added to the {file_managed} table as temporary files.
