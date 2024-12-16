@@ -10,6 +10,7 @@ use Drupal\Core\Access\RouteProcessorCsrf;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
@@ -81,15 +82,23 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
     $routeParams = $params;
     $this->processor->processOutbound('test.example', $route, $routeParams);
 
-    // Mock a Request and a RouteMatch with the params plus the generated token.
     $requestParams = $params + ['token' => $routeParams['token']];
+
+    // Mock Parameter bag.
     $parameterBag = $this->createMock(ParameterBagInterface::class);
     $parameterBag->method('get')->willReturnCallback(function ($key, $default = NULL) use ($requestParams) {
       return $requestParams[$key] ?? $default;
     });
     $parameterBag->method('all')->willReturn($requestParams);
+
+    // InputBag (we must use a real InputBag because it is a final class and cannot be mocked).
+    $inputBag = new InputBag($requestParams);
+
+    // Mock Request.
     $request = $this->createMock(Request::class);
-    $request->query = $parameterBag;
+    $request->query = $inputBag;
+
+    // Mock RouteMatch.
     $routeMatch = $this->createMock(RouteMatchInterface::class);
     $routeMatch->method('getRawParameters')->willReturn($parameterBag);
 
