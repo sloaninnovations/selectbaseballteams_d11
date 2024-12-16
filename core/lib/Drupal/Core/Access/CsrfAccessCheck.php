@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CsrfAccessCheck implements RoutingAccessInterface {
 
+  use RoutePathGenerationTrait;
+
   /**
    * The CSRF token generator.
    *
@@ -55,13 +57,7 @@ class CsrfAccessCheck implements RoutingAccessInterface {
    *   The access result.
    */
   public function access(Route $route, Request $request, RouteMatchInterface $route_match) {
-    $parameters = $route_match->getRawParameters();
-    $path = ltrim($route->getPath(), '/');
-    // Replace the path parameters with values from the parameters array.
-    foreach ($parameters as $param => $value) {
-      $path = str_replace("{{$param}}", $value, $path);
-    }
-
+    $path = $this->generateRoutePath($route, $route_match->getRawParameters()->all());
     if ($this->csrfToken->validate($request->query->get('token', ''), $path)) {
       $result = AccessResult::allowed();
     }
