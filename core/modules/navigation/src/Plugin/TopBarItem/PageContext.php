@@ -14,6 +14,7 @@ use Drupal\navigation\TopBarRegion;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Provides the Page Context top bar item.
@@ -24,6 +25,8 @@ use Drupal\Core\Entity\EntityPublishedInterface;
   label: new TranslatableMarkup('Page Context'),
 )]
 final class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterface {
+
+  use StringTranslationTrait;
 
   /**
    * Constructs a new PageContext instance.
@@ -74,22 +77,27 @@ final class PageContext extends TopBarItemBase implements ContainerFactoryPlugin
         $status = '';
         $status_class = '';
         if ($parameter instanceof EntityPublishedInterface) {
-          $status = $parameter->isPublished() ? 'Published' : 'Unpublished';
+          $status = $parameter->isPublished()
+          ? $this->t('Published')
+          : $this->t('Unpublished');
           $status_class = $parameter->isPublished() ? 'published' : 'unpublished';
         }
         $items = [
         [
-          '#markup' => new TranslatableMarkup($title),
+          '#markup' => $title,
           '#wrapper_attributes' => ['class' => ['context-title']],
         ],
         [
-          '#markup' => new TranslatableMarkup($status),
+          '#markup' => $status,
           '#wrapper_attributes' => ['class' => ['context-status', $status_class]],
         ],
         ];
         $build = [
           '#theme' => 'item_list',
           '#items' => $items,
+          '#attributes' => [
+            'class' => ['navigation-top-bar-context'],
+          ],
         ];
       }
     }
