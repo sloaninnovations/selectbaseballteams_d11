@@ -313,12 +313,18 @@ class AssetResolver implements AssetResolverInterface {
       return [[], []];
     }
 
+    // Skip caching if there are no libraries to load.
+    if (!$libraries_to_load) {
+      $cid = NULL;
+    }
     // Add the theme name to the cache key since themes may implement
     // hook_library_info_alter(). Additionally add the current language to
     // support translation of JavaScript files via hook_js_alter().
-    $cid = 'js:' . $theme_info->getName() . ':' . $language->getId() . ':' . Crypt::hashBase64(serialize($libraries_to_load)) . (int) (count($assets->getSettings()) > 0) . (int) $optimize;
+    else {
+      $cid = 'js:' . $theme_info->getName() . ':' . $language->getId() . ':' . Crypt::hashBase64(serialize($libraries_to_load)) . (int) (count($assets->getSettings()) > 0) . (int) $optimize;
+    }
 
-    if ($cached = $this->cache->get($cid)) {
+    if ($cid !== NULL && ($cached = $this->cache->get($cid))) {
       [$js_assets_header, $js_assets_footer, $settings, $settings_in_header] = $cached->data;
     }
     else {
@@ -408,7 +414,9 @@ class AssetResolver implements AssetResolverInterface {
         });
       }
       $settings_in_header = in_array('core/drupalSettings', $header_js_libraries);
-      $this->cache->set($cid, [$js_assets_header, $js_assets_footer, $settings, $settings_in_header], CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
+      if ($cid !== NULL) {
+        $this->cache->set($cid, [$js_assets_header, $js_assets_footer, $settings, $settings_in_header], CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
+      }
     }
 
     if ($settings !== FALSE) {
