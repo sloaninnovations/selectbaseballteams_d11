@@ -1764,7 +1764,7 @@ function system_update_11102(): TranslatableMarkup|null {
 /**
  * Add the [alias] field to the {router} table.
  */
-function system_update_10301() {
+function system_update_11201(): void {
   $schema = \Drupal::database()->schema();
 
   if ($schema->tableExists('router')) {

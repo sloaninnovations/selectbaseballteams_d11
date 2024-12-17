@@ -22,7 +22,7 @@ class RouteAliasUpdateTest extends UpdatePathTestBase {
   }
 
   /**
-   * Tests the upgrade path for Block Content reusable index.
+   * Tests the upgrade path for adding aliases to the router table.
    */
   public function testRunUpdates(): void {
     $connection = Database::getConnection();
