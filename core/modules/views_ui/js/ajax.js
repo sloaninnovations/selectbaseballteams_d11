@@ -50,7 +50,7 @@
         $form.find('input[type=submit].js-form-submit, button.js-form-submit'),
       ),
     );
-    $submitButtons.on('click mousedown', function () {
+    $submitButtons.on('click', function () {
       this.form.clk = this;
     });
     once('views-ajax-submit', $form).forEach((form) => {

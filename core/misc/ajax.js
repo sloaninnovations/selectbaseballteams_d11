@@ -399,7 +399,7 @@
   Drupal.Ajax = function (base, element, elementSettings) {
     const defaults = {
       httpMethod: 'POST',
-      event: element ? 'mousedown' : null,
+      event: element ? 'click' : null,
       keypress: true,
       selector: base ? `#${base}` : null,
       effect: 'none',
@@ -656,8 +656,7 @@
     }
 
     // If necessary, prevent the browser default action of an additional event.
-    // For example, prevent the browser default action of a click, even if the
-    // Ajax behavior binds to mousedown.
+    // For example, prevent the browser default action of a click.
     if (elementSettings.prevent) {
       $(ajax.element).on(elementSettings.prevent, false);
     }

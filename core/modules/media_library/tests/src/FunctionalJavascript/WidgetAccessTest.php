@@ -48,7 +48,7 @@ class WidgetAccessTest extends MediaLibraryTestBase {
     // Set the hidden value and trigger the mousedown event on the button via
     // JavaScript since the field and button are hidden.
     $session->executeScript("jQuery('[data-media-library-widget-value=\"field_unlimited_media\"]').val('1,2,{$unpublished_media->id()}')");
-    $session->executeScript("jQuery('[data-media-library-widget-update=\"field_unlimited_media\"]').trigger('mousedown')");
+    $session->executeScript("jQuery('[data-media-library-widget-update=\"field_unlimited_media\"]').trigger('click')");
     $this->assertElementExistsAfterWait('css', '.js-media-library-item');
     // Assert the published items are selected and the unpublished item is not
     // selected.
