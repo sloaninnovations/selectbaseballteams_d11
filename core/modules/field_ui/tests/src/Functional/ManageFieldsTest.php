@@ -139,10 +139,7 @@ class ManageFieldsTest extends BrowserTestBase {
 
     // Make sure field descriptions appear, both 1 line and multiple lines.
     $this->drupalGet('/admin/structure/types/manage/' . $type->id() . '/fields/add-field');
-    $edit = [
-      'new_storage_type' => 'field_test_descriptions',
-    ];
-    $this->submitForm($edit, 'Continue');
+    $this->clickLink('Fields for testing descriptions.');
     $this->assertSession()->pageTextContains('This one-line field description is important for testing');
     $this->assertSession()->pageTextContains('This multiple line description needs to use an array');
     $this->assertSession()->pageTextContains('This second line contains important information');
