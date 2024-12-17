@@ -376,7 +376,7 @@ class RouterTest extends BrowserTestBase {
     $this->assertTrue($deprecated_route instanceof Alias);
     $this->assertTrue($deprecated_route->isDeprecated());
     $deprecation = $deprecated_route->getDeprecation('router_test.deprecated');
-    $this->assertEquals('drupal', $deprecation['package']);
+    $this->assertEquals('drupal/core', $deprecation['package']);
     $this->assertEquals('11.2.0', $deprecation['version']);
     $this->assertEquals('The "router_test.deprecated" route alias is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Use the "router_test.1" route instead.', $deprecation['message']);
   }
