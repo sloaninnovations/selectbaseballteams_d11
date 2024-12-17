@@ -56,7 +56,7 @@ class AjaxFormImageButtonTest extends WebDriverTestBase {
   /**
    * Tests image buttons cannot be operated with right click.
    */
-  public function testAjaxImageButtonRightClick() {
+  public function testAjaxImageButtonRightClick(): void {
     // Get a Field UI manage-display page.
     $this->drupalGet('ajax_forms_image_button_form');
     $assertSession = $this->assertSession();
