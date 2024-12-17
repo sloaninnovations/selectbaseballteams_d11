@@ -167,14 +167,15 @@ class NumberTest extends TestCase {
    */
   public function testAlphadecimalToIntThrowsExceptionWithMalformedStrings(): void {
     $this->expectException(\InvalidArgumentException::class);
-    Number::alphadecimalToInt('#');
+    $nonAlphanumericChar = '#';
+    Number::alphadecimalToInt($nonAlphanumericChar);
   }
 
   /**
    * Tests the alphadecimal conversion function keeps backward compatibility.
    *
    * Many tests and code rely on Number::alphadecimalToInt() returning 0
-   * with the degenerated values '' and NULL. We must assure they are accepted.
+   * for degenerate values '' and NULL. We must ensure they are accepted.
    *
    * @covers ::alphadecimalToInt
    */
