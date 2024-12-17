@@ -188,8 +188,8 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       }
     }
 
-    // hides field to avoid self-blocking when user editing its own profile
-    if($user->id() !== $account->id()) {
+    // Hides field to avoid self-blocking when user editing its own profile
+    if ($user->id() !== $account->id()) {
       if (!$self_register) {
         $status = $account->get('status')->value;
       } else {
