@@ -366,9 +366,9 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   }
 
   /**
-   * Tests renaming a table where the name contains drupal_.
+   * Tests renaming a table which name contains drupal_ with multiple indexes.
    */
-  public function testRenameTableWithNameContainingDrupalUnderscore(): void {
+  public function testRenameTableWithNameContainingDrupalUnderscoreAndMultipleIndexes(): void {
     $table_name_old = 'field_drupal_foo';
     $table_name_new = 'field_drupal_bar';
     $table_specification = [
