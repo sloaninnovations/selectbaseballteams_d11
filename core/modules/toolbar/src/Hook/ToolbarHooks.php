@@ -16,7 +16,7 @@ class ToolbarHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.toolbar':
         $output = '<h2>' . t('About') . '</h2>';
@@ -29,6 +29,9 @@ class ToolbarHooks {
         $output .= '<dd>' . t('Trays are usually lists of links, which can be hierarchical like a menu. If a tray has been toggled open, it is displayed either vertically or horizontally below the tab bar, depending on the browser width. Only one tray may be open at a time. If you click another tab, that tray will replace the tray being displayed. In wide browser widths, the user has the ability to toggle from vertical to horizontal, using a link at the bottom or right of the tray. Hierarchical menus only have open/close behavior in vertical mode; if you display a tray containing a hierarchical menu horizontally, only the top-level links will be available.') . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

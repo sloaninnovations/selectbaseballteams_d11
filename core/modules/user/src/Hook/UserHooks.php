@@ -29,7 +29,7 @@ class UserHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.user':
         $output = '';
@@ -83,6 +83,9 @@ class UserHooks {
 
       case 'entity.entity_view_display.user.default':
         return '<p>' . t('This form lets administrators configure how fields should be displayed when rendering a user profile page.') . '</p>';
+
+      default:
+        return '';
     }
   }
 

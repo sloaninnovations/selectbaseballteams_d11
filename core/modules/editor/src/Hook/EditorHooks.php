@@ -23,7 +23,7 @@ class EditorHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.editor':
         $output = '';
@@ -51,6 +51,9 @@ class EditorHooks {
         $output .= '<dd>' . t('If you change the text format on a text field, the text editor will change as well because the text editor configuration is associated with the individual text format. This allows the use of the same text editor with different options for different text formats. It also allows users to choose between text formats with different text editors if they are installed.') . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

@@ -16,7 +16,7 @@ class HelpHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.main':
         $output = '<h2>' . t('Getting Started') . '</h2>';
@@ -44,7 +44,7 @@ class HelpHooks {
           ':support' => 'https://www.drupal.org/support',
           ':drupal' => 'https://www.drupal.org',
         ]) . '</p>';
-        return ['#markup' => $output];
+        return $output;
 
       case 'help.page.help':
         $help_home = Url::fromRoute('help.main')->toString();
@@ -77,11 +77,14 @@ class HelpHooks {
         $output .= '<dt>' . t('Configuring help search') . '</dt>';
         $output .= '<dd>' . t('To search help, you will need to install the core Search module, configure a search page, and add a search block to the Help page or another administrative page. (A search page is provided automatically, and if you use the core Claro administrative theme, a help search block is shown on the main Help page.) Then users with search permissions, and permission to view help, will be able to search help. See the <a href=":search_help">Search module help page</a> for more information.', [':search_help' => $search_help]) . '</dd>';
         $output .= '</dl>';
-        return ['#markup' => $output];
+        return $output;
 
       case 'help.help_topic':
         $help_home = Url::fromRoute('help.main')->toString();
         return '<p>' . t('See the <a href=":help_page">Help page</a> for more topics.', [':help_page' => $help_home]) . '</p>';
+
+      default:
+        return '';
     }
   }
 

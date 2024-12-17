@@ -13,7 +13,7 @@ class LayoutDiscoveryHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name) {
+  public function help($route_name): string {
     switch ($route_name) {
       case 'help.page.layout_discovery':
         $output = '<h2>' . t('About') . '</h2>';
@@ -22,6 +22,9 @@ class LayoutDiscoveryHooks {
           ':layout-discovery-documentation' => 'https://www.drupal.org/docs/8/api/layout-api',
         ]) . '</p>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

@@ -16,7 +16,7 @@ class LinkHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.link':
         $output = '';
@@ -50,6 +50,9 @@ class LinkHooks {
         $output .= '<dd>' . t('All links are validated after a link field is filled in. They can include anchors or query strings.') . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

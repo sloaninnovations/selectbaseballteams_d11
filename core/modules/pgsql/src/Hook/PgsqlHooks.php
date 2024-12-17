@@ -14,7 +14,7 @@ class PgsqlHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.pgsql':
         $output = '';
@@ -23,6 +23,9 @@ class PgsqlHooks {
           ':pgsql' => 'https://www.drupal.org/docs/core-modules-and-themes/core-modules/postgresql-module',
         ]) . '</p>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

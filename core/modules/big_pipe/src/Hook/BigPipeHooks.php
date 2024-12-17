@@ -16,7 +16,7 @@ class BigPipeHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.big_pipe':
         $output = '<h2>' . t('About') . '</h2>';
@@ -29,6 +29,9 @@ class BigPipeHooks {
         $output .= '<dd>' . t('The module requires no configuration. Every part of the page contains metadata that allows BigPipe to figure this out on its own.') . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

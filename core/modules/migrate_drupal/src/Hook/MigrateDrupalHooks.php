@@ -20,7 +20,7 @@ class MigrateDrupalHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.migrate_drupal':
         $output = '';
@@ -32,6 +32,9 @@ class MigrateDrupalHooks {
           ':migrate_drupal' => 'https://www.drupal.org/documentation/modules/migrate_drupal',
         ]) . '</p>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

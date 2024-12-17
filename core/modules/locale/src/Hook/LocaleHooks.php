@@ -20,7 +20,7 @@ class LocaleHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.locale':
         $output = '';
@@ -83,6 +83,9 @@ class LocaleHooks {
 
       case 'locale.translate_export':
         return '<p>' . t('This page exports the translated strings used by your site. An export file may be in Gettext Portable Object (<em>.po</em>) form, which includes both the original string and the translation (used to share translations with others), or in Gettext Portable Object Template (<em>.pot</em>) form, which includes the original strings only (used to create new translations with a Gettext translation editor).') . '</p>';
+
+      default:
+        return '';
     }
   }
 

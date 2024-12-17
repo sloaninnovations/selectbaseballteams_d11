@@ -14,7 +14,7 @@ class BreakpointHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.breakpoint':
         $output = '';
@@ -37,6 +37,9 @@ class BreakpointHooks {
         $output .= '<dd>' . t('Modules and themes can use the API provided by the Breakpoint module to define breakpoints and breakpoint groups, and to assign resolution multipliers to breakpoints.') . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

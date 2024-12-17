@@ -22,7 +22,7 @@ class ImageHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.image':
         $field_ui_url = \Drupal::moduleHandler()->moduleExists('field_ui') ? Url::fromRoute('help.page', ['name' => 'field_ui'])->toString() : '#';
@@ -65,12 +65,15 @@ class ImageHooks {
 
       case 'image.effect_add_form':
         $effect = \Drupal::service('plugin.manager.image.effect')->getDefinition($route_match->getParameter('image_effect'));
-        return isset($effect['description']) ? '<p>' . $effect['description'] . '</p>' : NULL;
+        return isset($effect['description']) ? '<p>' . $effect['description'] . '</p>' : '';
 
       case 'image.effect_edit_form':
         $effect = $route_match->getParameter('image_style')->getEffect($route_match->getParameter('image_effect'));
         $effect_definition = $effect->getPluginDefinition();
-        return isset($effect_definition['description']) ? '<p>' . $effect_definition['description'] . '</p>' : NULL;
+        return isset($effect_definition['description']) ? '<p>' . $effect_definition['description'] . '</p>' : '';
+
+      default:
+        return '';
     }
   }
 

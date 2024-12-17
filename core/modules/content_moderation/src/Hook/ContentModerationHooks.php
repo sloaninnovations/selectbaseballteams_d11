@@ -37,7 +37,7 @@ class ContentModerationHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       // Main module help for the content_moderation module.
       case 'help.page.content_moderation':
@@ -73,6 +73,9 @@ class ContentModerationHooks {
         $output .= '<dd>' . t('Each transition is exposed as a permission. If a user has the permission for a transition, they can use the transition to change the state of the content item, from Draft to Published.') . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

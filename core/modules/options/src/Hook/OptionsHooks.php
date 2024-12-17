@@ -17,7 +17,7 @@ class OptionsHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.options':
         $output = '';
@@ -45,6 +45,9 @@ class OptionsHooks {
         $output .= '<dd>' . t('There are three types of list fields, which store different types of data: <em>float</em>, <em>integer</em> or, <em>text</em>. The <em>float</em> type allows storing approximate decimal values. The <em>integer</em> type allows storing whole numbers, such as years (for example, 2012) or values (for example, 1, 2, 5, 305). The <em>text</em> list field type allows storing text values. No matter which type of list field you choose, you can define whatever labels you wish for data entry.') . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

@@ -14,7 +14,7 @@ class SqliteHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.sqlite':
         $output = '';
@@ -23,6 +23,9 @@ class SqliteHooks {
           ':sqlite' => 'https://www.drupal.org/docs/core-modules-and-themes/core-modules/sqlite-module',
         ]) . '</p>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

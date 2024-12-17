@@ -15,7 +15,7 @@ class PageCacheHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.page_cache':
         $output = '<h2>' . t('About') . '</h2>';
@@ -38,6 +38,9 @@ class PageCacheHooks {
         ]) . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

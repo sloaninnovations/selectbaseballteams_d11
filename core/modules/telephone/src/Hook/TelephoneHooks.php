@@ -16,7 +16,7 @@ class TelephoneHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.telephone':
         $output = '';
@@ -42,6 +42,9 @@ class TelephoneHooks {
         $output .= '<dd>' . t('Telephone numbers can be displayed as links with the scheme name <em>tel:</em> by choosing the <em>Telephone</em> display format on the <em>Manage display</em> page. Any spaces will be stripped out of the link text. This semantic markup improves the user experience on mobile and assistive technology devices.') . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

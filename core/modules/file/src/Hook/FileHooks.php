@@ -23,7 +23,7 @@ class FileHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.file':
         $output = '';
@@ -60,6 +60,9 @@ class FileHooks {
         $output .= '<dd>' . t('In the field settings, you can allow users to toggle whether individual files are displayed. In the display settings, you can then choose one of the following formats: <ul><li><em>Generic file</em> displays links to the files and adds icons that symbolize the file extensions. If <em>descriptions</em> are enabled and have been submitted, then the description is displayed instead of the file name.</li><li><em>URL to file</em> displays the full path to the file as plain text.</li><li><em>Table of files</em> lists links to the files and the file sizes in a table.</li><li><em>RSS enclosure</em> only displays the first file, and only in a RSS feed, formatted according to the RSS 2.0 syntax for enclosures.</li></ul> A file can still be linked to directly by its URI even if it is not displayed.') . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

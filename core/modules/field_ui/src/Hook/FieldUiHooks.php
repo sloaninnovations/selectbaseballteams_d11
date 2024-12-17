@@ -22,7 +22,7 @@ class FieldUiHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.field_ui':
         $output = '';
@@ -64,6 +64,9 @@ class FieldUiHooks {
 
       case 'entity.field_storage_config.collection':
         return '<p>' . t('This list shows all fields currently in use for easy reference.') . '</p>';
+
+      default:
+        return '';
     }
   }
 

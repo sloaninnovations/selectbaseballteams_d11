@@ -24,7 +24,7 @@ class ViewsHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.views':
         $output = '';
@@ -50,6 +50,9 @@ class ViewsHooks {
         $output .= '<dd>' . t('Independent of filtering, you can choose the display language (the language used to display the entities and their fields) via a setting on the display. Your language choices are the same as the filter language choices, with an additional choice of "Content language of view row" and "Original language of content in view row", which means to display each entity in the result row using the language that entity has or in which it was originally created. In theory, this would give you the flexibility to filter to French translations, for instance, and then display the results in Spanish. The more usual choices would be to use the same language choices for the display language and each entity filter in the view, or to use the Row language setting for the display.') . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

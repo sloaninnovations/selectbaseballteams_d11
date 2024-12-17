@@ -16,7 +16,7 @@ class UpdateHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.update':
         $output = '';
@@ -56,6 +56,9 @@ class UpdateHooks {
           ':update-php' => Url::fromRoute('system.db_update')->toString(),
           ':updates' => Url::fromRoute('update.status')->toString(),
         ]) . '</p>';
+
+      default:
+        return '';
     }
   }
 

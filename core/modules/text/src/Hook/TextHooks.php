@@ -15,7 +15,7 @@ class TextHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.text':
         $output = '';
@@ -49,6 +49,9 @@ class TextHooks {
         $output .= '<dd>' . t('If you choose <em>Text (plain)</em> or <em>Text (plain, long)</em> you restrict the input to <em>Plain text</em> only. If you choose <em>Text (formatted)</em>, <em>Text (formatted, long)</em>, or <em>Text (formatted, long with summary)</em> you allow users to write formatted text. Which options are available to individual users depends on the settings on the <a href=":formats">Text formats and editors page</a>.', [':formats' => Url::fromRoute('filter.admin_overview')->toString()]) . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

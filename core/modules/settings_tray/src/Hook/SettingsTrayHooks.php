@@ -18,7 +18,7 @@ class SettingsTrayHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.settings_tray':
         $output = '<h2>' . t('About') . '</h2>';
@@ -44,7 +44,10 @@ class SettingsTrayHooks {
         $output .= '<p>' . t('Save the form and the changes will be immediately visible on the page.') . '</p>';
         $output .= '</dd>';
         $output .= '</dl>';
-        return ['#markup' => $output];
+        return $output;
+
+      default:
+        return '';
     }
   }
 

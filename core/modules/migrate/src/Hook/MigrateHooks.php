@@ -14,7 +14,7 @@ class MigrateHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.migrate':
         $output = '<h2>' . t('About') . '</h2>';
@@ -22,6 +22,9 @@ class MigrateHooks {
         $output .= t('The Migrate module provides a framework for migrating data, usually from an external source into your site. It does not provide a user interface. For more information, see the <a href=":migrate">online documentation for the Migrate module</a>.', [':migrate' => 'https://www.drupal.org/documentation/modules/migrate']);
         $output .= '</p>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

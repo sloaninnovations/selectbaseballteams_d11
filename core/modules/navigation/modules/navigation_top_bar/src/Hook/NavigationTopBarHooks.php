@@ -14,7 +14,7 @@ class NavigationTopBarHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.navigation_top_bar':
         $output = '<h2>' . t('About') . '</h2>';
@@ -24,7 +24,11 @@ class NavigationTopBarHooks {
         $output .= '<p>' . t('It is recommended to leave this module off while it is under active development and experimental phase.') . '</p>';
         $output .= '<p>' . t('For more information, see the <a href=":docs">online documentation for the Navigation Top Bar module</a>.', [':docs' => 'https://www.drupal.org/project/navigation']) . '</p>';
         return $output;
+
+      default:
+        return '';
     }
+
   }
 
 }

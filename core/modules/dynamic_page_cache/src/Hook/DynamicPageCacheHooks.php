@@ -14,7 +14,7 @@ class DynamicPageCacheHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.dynamic_page_cache':
         $output = '<h2>' . t('About') . '</h2>';
@@ -28,6 +28,9 @@ class DynamicPageCacheHooks {
         $output .= '<dd>' . t('The module requires no configuration. Every part of the page contains metadata that allows Internal Dynamic Page Cache to figure this out on its own.') . '</dd>';
         $output .= '</dl>';
         return $output;
+
+      default:
+        return '';
     }
   }
 

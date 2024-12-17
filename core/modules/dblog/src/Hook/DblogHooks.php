@@ -18,7 +18,7 @@ class DblogHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string {
     switch ($route_name) {
       case 'help.page.dblog':
         $output = '';
@@ -37,6 +37,9 @@ class DblogHooks {
 
       case 'dblog.overview':
         return '<p>' . t('The Database Logging module logs system events in the Drupal database. Monitor your site or debug site problems on this page.') . '</p>';
+
+      default:
+        return '';
     }
   }
 
