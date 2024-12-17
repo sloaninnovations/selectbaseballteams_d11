@@ -192,7 +192,8 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     if ($user->id() !== $account->id()) {
       if (!$self_register) {
         $status = $account->get('status')->value;
-      } else {
+      }
+      else {
         $status = $config->get('register') == UserInterface::REGISTER_VISITORS ? 1 : 0;
       }
 
