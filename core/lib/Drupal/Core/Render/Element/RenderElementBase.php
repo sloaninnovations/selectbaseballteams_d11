@@ -285,7 +285,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
         case 'submit':
         case 'button':
         case 'image_button':
-          $element['#ajax']['event'] = 'mousedown';
+          $element['#ajax']['event'] = 'click';
           // Retain keyboard accessibility by setting 'keypress'. This causes
           // ajax.js to trigger 'event' when SPACE or ENTER are pressed while the
           // button has focus.

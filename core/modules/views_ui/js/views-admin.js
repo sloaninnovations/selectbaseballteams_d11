@@ -805,7 +805,7 @@
        *   The event triggered.
        */
       clickAddGroupButton(event) {
-        this.addGroupButton.trigger('mousedown');
+        this.addGroupButton.trigger('click');
         event.preventDefault();
       },
 
