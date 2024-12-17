@@ -217,8 +217,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       $alias = $result->getId();
       if ($result->isDeprecated()) {
         $deprecation = $result->getDeprecation($name);
-        $message = sprintf('The route alias "%s" is deprecated in "%s:%s" with message: "%s". Using the "%s" route instead.', $name, $deprecation['package'], $deprecation['version'], $deprecation['message'], $alias);
-        @trigger_error($message, E_USER_DEPRECATED);
+        @trigger_error($deprecation['message'], E_USER_DEPRECATED);
       }
       return $this->getRouteByName($alias);
     }
