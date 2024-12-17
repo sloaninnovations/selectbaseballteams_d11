@@ -155,7 +155,7 @@ class FileHooks {
       return -1;
     }
     // Access is granted.
-    $headers = $file->getFileContentHeaders();
+    $headers = $file->getDownloadHeaders();
     return $headers;
   }
 
