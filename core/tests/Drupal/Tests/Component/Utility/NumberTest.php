@@ -184,7 +184,7 @@ class NumberTest extends TestCase {
    * @covers ::alphadecimalToInt
    */
   public function testAlphadecimalToIntReturnsZeroWithNullAndEmptyString(): void {
-    $deprecationMessage = 'Passing NULL or an empty string to Drupal\Component\Utility\Number::alphadecimalToInt() is deprecated in drupal:11.0.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3494472';
+    $deprecationMessage = 'Passing NULL or an empty string to Drupal\Component\Utility\Number::alphadecimalToInt() is deprecated in drupal:11.2 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3494472';
     $this->expectDeprecation($deprecationMessage);
     $this->assertSame(0, Number::alphadecimalToInt(NULL));
     $this->expectDeprecation($deprecationMessage);
