@@ -307,7 +307,7 @@ class File extends ContentEntityBase implements FileInterface {
    *   An associative array of headers, as expected by
    *   \Symfony\Component\HttpFoundation\StreamedResponse.
    */
-  public function getDownloadHeaders() {
+  public function getDownloadHeaders(): array {
     return [
       'Content-Type' => $this->getMimeType(),
       'Content-Length' => $this->getSize(),
