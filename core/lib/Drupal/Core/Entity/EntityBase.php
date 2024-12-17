@@ -393,6 +393,12 @@ abstract class EntityBase implements EntityInterface {
     if ($entity_type->hasKey('uuid')) {
       $duplicate->{$entity_type->getKey('uuid')} = $this->uuidGenerator()->generate();
     }
+
+    // Modules might need to add or change the data initially held by the new
+    // entity object, for instance to fill-in default values.
+    \Drupal::moduleHandler()->invokeAll($this->getEntityTypeId() . '_duplicate_create', [$this, $duplicate]);
+    \Drupal::moduleHandler()->invokeAll('entity_duplicate_create', [$this, $duplicate]);
+
     return $duplicate;
   }
 
