@@ -77,7 +77,7 @@ class UpdateMailTest extends UnitTestCase {
    *
    * @dataProvider providerTestUpdateEmail
    */
-  public function testUpdateEmail($notification_threshold, $params, $authorized, array $expected_body): void {
+  public function testUpdateEmail($notification_threshold, $params, array $expected_body): void {
     $langcode = 'en';
     $available_updates_url = 'https://example.com/admin/reports/updates';
     $update_settings_url = 'https://example.com/admin/reports/updates/settings';
@@ -120,24 +120,12 @@ class UpdateMailTest extends UnitTestCase {
         ['update.settings', $config_notification],
       ]);
 
-    // The calls to generateFromRoute differ if authorized.
-    $count = 2;
-    if ($authorized) {
-      $this->currentUser
-        ->expects($this->once())
-        ->method('hasPermission')
-        ->with('administer software updates')
-        ->willReturn(TRUE);
-      $count = 3;
-    }
-    // When authorized also get the URL for the route 'update.report_update'.
     $this->urlGenerator
-      ->expects($this->exactly($count))
+      ->expects($this->exactly(2))
       ->method('generateFromRoute')
       ->willReturnMap([
         ['update.status', [], ['absolute' => TRUE, 'language' => $langcode], FALSE, $update_settings_url],
         ['update.settings', [], ['absolute' => TRUE], FALSE, $available_updates_url],
-        ['update.report_update', [], ['absolute' => TRUE, 'language' => $langcode], FALSE, $available_updates_url],
       ]);
 
     // Set the container.
@@ -155,22 +143,15 @@ class UpdateMailTest extends UnitTestCase {
     $this->assertSame("New release(s) available for $site_name", $message['subject']);
 
     // Confirm each part of the body.
-    if ($authorized) {
+    if (empty($params)) {
       $this->assertSame($expected_body[0], $message['body'][0]);
-      $this->assertSame($expected_body[1], $message['body'][1]);
-      $this->assertSame($expected_body[2], $message['body'][2]->render());
+      $this->assertSame($expected_body[1], $message['body'][1]->render());
     }
     else {
-      if (empty($params)) {
-        $this->assertSame($expected_body[0], $message['body'][0]);
-        $this->assertSame($expected_body[1], $message['body'][1]->render());
-      }
-      else {
-        $this->assertSame($expected_body[0], $message['body'][0]->render());
-        $this->assertSame($expected_body[1], $message['body'][1]);
-        $this->assertSame($expected_body[2], $message['body'][2]);
-        $this->assertSame($expected_body[3], $message['body'][3]->render());
-      }
+      $this->assertSame($expected_body[0], $message['body'][0]->render());
+      $this->assertSame($expected_body[1], $message['body'][1]);
+      $this->assertSame($expected_body[2], $message['body'][2]);
+      $this->assertSame($expected_body[3], $message['body'][3]->render());
     }
   }
 
@@ -188,7 +169,6 @@ class UpdateMailTest extends UnitTestCase {
       'all' => [
         'all',
         [],
-        FALSE,
         [
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates/settings",
           'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates.',
@@ -197,7 +177,6 @@ class UpdateMailTest extends UnitTestCase {
       'security' => [
         'security',
         [],
-        FALSE,
         [
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates/settings",
           'Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates.',
@@ -210,22 +189,11 @@ class UpdateMailTest extends UnitTestCase {
           'core' => UpdateManagerInterface::NOT_SECURE,
           'contrib' => NULL,
         ],
-        FALSE,
         [
           "There is a security update available for your version of Drupal. To ensure the security of your server, you should update immediately!",
           '',
           "See the available updates page for more information:\nhttps://example.com/admin/reports/updates/settings",
           "Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, https://example.com/admin/reports/updates.",
-        ],
-      ],
-      'authorize' => [
-        'all',
-        [],
-        TRUE,
-        [
-          "See the available updates page for more information:\nhttps://example.com/admin/reports/updates/settings",
-          "You can automatically download your missing updates using the Update manager:\nhttps://example.com/admin/reports/updates",
-          'Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, https://example.com/admin/reports/updates.',
         ],
       ],
     ];

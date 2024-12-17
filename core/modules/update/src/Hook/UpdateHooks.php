@@ -25,10 +25,6 @@ class UpdateHooks {
           ':update' => 'https://www.drupal.org/documentation/modules/update',
           ':modules' => Url::fromRoute('system.modules_list')->toString(),
         ]) . '</p>';
-        // Only explain the Update manager if it has not been uninstalled.
-        if (_update_manager_access()) {
-          $output .= '<p>' . t('The Update Manager also allows administrators to add and update modules and themes through the administration interface.') . '</p>';
-        }
         $output .= '<h2>' . t('Uses') . '</h2>';
         $output .= '<dl>';
         $output .= '<dt>' . t('Checking for available updates') . '</dt>';
@@ -36,15 +32,6 @@ class UpdateHooks {
           ':update-report' => Url::fromRoute('update.status')->toString(),
           ':update-settings' => Url::fromRoute('update.settings')->toString(),
         ]) . '</dd>';
-        // Only explain the Update manager if it has not been uninstalled.
-        if (_update_manager_access()) {
-          $output .= '<dt>' . t('Performing updates through the Update page') . '</dt>';
-          $output .= '<dd>' . t('The Update Manager module allows administrators to perform updates directly from the <a href=":update-page">Update page</a>. It lists all available updates, and you can confirm whether you want to download them. If you don\'t have sufficient access rights to your web server, you could be prompted for your FTP/SSH password. Afterwards the files are transferred into your site installation, overwriting your old files. Direct links to the Update page are also displayed on the <a href=":modules_page">Extend page</a> and the <a href=":themes_page">Appearance page</a>.', [
-            ':modules_page' => Url::fromRoute('system.modules_list')->toString(),
-            ':themes_page' => Url::fromRoute('system.themes_page')->toString(),
-            ':update-page' => Url::fromRoute('update.report_update')->toString(),
-          ]) . '</dd>';
-        }
         $output .= '</dl>';
         return $output;
 
@@ -71,14 +58,10 @@ class UpdateHooks {
       $route_name = \Drupal::routeMatch()->getRouteName();
       switch ($route_name) {
         // These pages don't need additional nagging.
-        case 'update.theme_update':
-        case 'update.module_update':
         case 'update.status':
-        case 'update.report_update':
         case 'update.settings':
         case 'system.status':
         case 'system.theme_install':
-        case 'update.confirmation_page':
         case 'system.batch_page.html':
           return;
 
@@ -190,8 +173,6 @@ class UpdateHooks {
       \Drupal::moduleHandler()->loadInclude('update', 'inc', 'update.fetch');
       _update_cron_notify();
     }
-    // Clear garbage from disk.
-    update_clear_update_disk_cache();
   }
 
   /**
@@ -257,9 +238,6 @@ class UpdateHooks {
       $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode);
     }
     $message['body'][] = t('See the available updates page for more information:', [], ['langcode' => $langcode]) . "\n" . Url::fromRoute('update.status', [], ['absolute' => TRUE, 'language' => $language])->toString();
-    if (_update_manager_access()) {
-      $message['body'][] = t('You can automatically download your missing updates using the Update manager:', [], ['langcode' => $langcode]) . "\n" . Url::fromRoute('update.report_update', [], ['absolute' => TRUE, 'language' => $language])->toString();
-    }
     $settings_url = Url::fromRoute('update.settings', [], ['absolute' => TRUE])->toString();
     if (\Drupal::config('update.settings')->get('notification.threshold') == 'all') {
       $message['body'][] = t('Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, @url.', ['@url' => $settings_url]);
@@ -267,64 +245,6 @@ class UpdateHooks {
     else {
       $message['body'][] = t('Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, @url.', ['@url' => $settings_url]);
     }
-  }
-
-  /**
-   * Implements hook_verify_update_archive().
-   *
-   * First, we ensure that the archive isn't a copy of Drupal core, which the
-   * update manager does not yet support. See https://www.drupal.org/node/606592.
-   *
-   * Then, we make sure that at least one module included in the archive file has
-   * an .info.yml file which claims that the code is compatible with the current
-   * version of Drupal core.
-   *
-   * @see \Drupal\Core\Extension\ExtensionDiscovery
-   */
-  #[Hook('verify_update_archive')]
-  public function verifyUpdateArchive($project, $archive_file, $directory) {
-    $errors = [];
-    // Make sure this isn't a tarball of Drupal core.
-    if (file_exists("{$directory}/{$project}/index.php") && file_exists("{$directory}/{$project}/core/install.php") && file_exists("{$directory}/{$project}/core/includes/bootstrap.inc") && file_exists("{$directory}/{$project}/core/modules/node/node.module") && file_exists("{$directory}/{$project}/core/modules/system/system.module")) {
-      return [
-        'no-core' => t('Automatic updating of Drupal core is not supported. See the <a href=":update-guide">Updating Drupal guide</a> for information on how to update Drupal core manually.', [
-          ':update-guide' => 'https://www.drupal.org/docs/updating-drupal',
-        ]),
-      ];
-    }
-    // Parse all the .info.yml files and make sure at least one is compatible with
-    // this version of Drupal core. If one is compatible, then the project as a
-    // whole is considered compatible (since, for example, the project may ship
-    // with some out-of-date modules that are not necessary for its overall
-    // functionality).
-    $compatible_project = FALSE;
-    $incompatible = [];
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-    $file_system = \Drupal::service('file_system');
-    $files = $file_system->scanDirectory("{$directory}/{$project}", '/.*\.info.yml$/', ['key' => 'name', 'min_depth' => 0]);
-    foreach ($files as $file) {
-      // Get the .info.yml file for the module or theme this file belongs to.
-      $info = \Drupal::service('info_parser')->parse($file->uri);
-      // If the module or theme is incompatible with Drupal core, set an error.
-      if ($info['core_incompatible']) {
-        $incompatible[] = !empty($info['name']) ? $info['name'] : t('Unknown');
-      }
-      else {
-        $compatible_project = TRUE;
-        break;
-      }
-    }
-    if (empty($files)) {
-      $errors[] = t('%archive_file does not contain any .info.yml files.', ['%archive_file' => $file_system->basename($archive_file)]);
-    }
-    elseif (!$compatible_project) {
-      $errors[] = \Drupal::translation()->formatPlural(count($incompatible), '%archive_file contains a version of %names that is not compatible with Drupal @version.', '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names', [
-        '@version' => \Drupal::VERSION,
-        '%archive_file' => $file_system->basename($archive_file),
-        '%names' => implode(', ', $incompatible),
-      ]);
-    }
-    return $errors;
   }
 
 }

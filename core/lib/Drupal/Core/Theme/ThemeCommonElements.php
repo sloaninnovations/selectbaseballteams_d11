@@ -161,14 +161,6 @@ class ThemeCommonElements {
           'variant' => NULL,
         ],
       ],
-      'authorize_report' => [
-        'variables' => [
-          'messages' => [],
-          'attributes' => [],
-        ],
-        'includes' => ['core/includes/theme.maintenance.inc'],
-        'template' => 'authorize-report',
-      ],
       'pager' => [
         'render element' => 'pager',
       ],
