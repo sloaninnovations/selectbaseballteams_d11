@@ -345,9 +345,9 @@ class RouterTest extends BrowserTestBase {
   }
 
   /**
-   * Tests the route aliasing functionality.
+   * Tests route aliasing.
    */
-  public function testRouteAliases(): void {
+  public function testRouteAlias(): void {
     $request = \Drupal::request();
     $route_provider = \Drupal::service('router.route_provider');
 
@@ -365,9 +365,20 @@ class RouterTest extends BrowserTestBase {
     $actual_route = $route_provider->getRouteByName('router_test.alias');
     $this->assertFalse($actual_route instanceof Alias);
     $this->assertEquals('/router_test/test1', $actual_route->getPath());
+  }
+
+  /**
+   * Tests route aliasing with deprecation.
+   *
+   * @group legacy
+   */
+  public function testRouteAliasWithDeprecation(): void {
+    $request = \Drupal::request();
+    $route_provider = \Drupal::service('router.route_provider');
 
     // Check an aliased route with a deprecation message.
     $deprecated_route_url = Url::fromRoute('router_test.deprecated');
+    $this->expectDeprecation('The "router_test.deprecated" route is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Use the "router_test.1" route instead.');
     $this->drupalGet($deprecated_route_url);
     $this->assertSession()->addressEquals($request->getUriForPath('/router_test/test1'));
 
@@ -378,7 +389,7 @@ class RouterTest extends BrowserTestBase {
     $deprecation = $deprecated_route->getDeprecation('router_test.deprecated');
     $this->assertEquals('drupal/core', $deprecation['package']);
     $this->assertEquals('11.2.0', $deprecation['version']);
-    $this->assertEquals('The "router_test.deprecated" route alias is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Use the "router_test.1" route instead.', $deprecation['message']);
+    $this->assertEquals('The "router_test.deprecated" route is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Use the "router_test.1" route instead.', $deprecation['message']);
   }
 
 }

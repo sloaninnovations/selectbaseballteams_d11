@@ -263,4 +263,4 @@ router_test.deprecated:
   deprecated:
     package: 'drupal/core'
     version: '11.2.0'
-    message: 'The "%alias_id%" route alias is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Use the "router_test.1" route instead.'
+    message: 'The "%alias_id%" route is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Use the "router_test.1" route instead.'
