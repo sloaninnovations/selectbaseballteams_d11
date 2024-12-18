@@ -96,11 +96,11 @@
 
     .context-status {
       padding: var(--admin-toolbar-space-4) var(--admin-toolbar-space-10);
-      background-color: var(--admin-topbar-color-gray);
+      background-color: var(--admin-top-bar-color-gray);
     }
 
     .published {
-      background-color: var(--admin-topbar-color-green);
+      background-color: var(--admin-top-bar-color-green);
     }
 
     /* Larger devices: Adjust max-width for larger screens */
