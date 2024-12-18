@@ -1007,7 +1007,6 @@ function hook_ENTITY_TYPE_duplicate_create(\Drupal\Core\Entity\EntityInterface $
   \Drupal::logger('example')->info('ENTITY_TYPE duplicated: @label', ['@label' => $entity->label()]);
 }
 
-
 /**
  * Respond to entity revision creation.
  *
