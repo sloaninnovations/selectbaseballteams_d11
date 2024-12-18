@@ -407,6 +407,7 @@ pingback
 pjpeg
 placeholdered
 placeholdering
+playsinline
 plusthick
 porterstemmer
 postcondition
