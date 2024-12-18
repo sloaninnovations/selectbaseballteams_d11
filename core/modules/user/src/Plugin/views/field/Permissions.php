@@ -75,11 +75,17 @@ class Permissions extends PrerenderList {
     $this->additional_fields['uid'] = ['table' => 'users_field_data', 'field' => 'uid'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     $this->addAdditionalFields();
     $this->field_alias = $this->aliases['uid'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function preRender(&$values) {
     $this->items = [];
 
@@ -114,6 +120,17 @@ class Permissions extends PrerenderList {
     }
   }
 
+  /**
+   * Renders the permission for a specific user.
+   *
+   * @param int $count
+   *   The index of the item being rendered.
+   * @param array $item
+   *   An array containing the permission information.
+   *
+   * @return string
+   *   The permission title to be displayed.
+   */
   public function render_item($count, $item) {
     return $item['permission'];
   }

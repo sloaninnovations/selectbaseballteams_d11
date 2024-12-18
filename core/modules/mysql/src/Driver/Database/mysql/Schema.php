@@ -271,6 +271,15 @@ class Schema extends DatabaseSchema {
     return $map;
   }
 
+  /**
+   * Creates the SQL for defining keys and indexes in a database schema.
+   *
+   * @param array $spec
+   *   An associative array describing the schema.
+   *
+   * @return array
+   *   An array of SQL clauses for keys and indexes.
+   */
   protected function createKeysSql($spec) {
     $keys = [];
 
@@ -355,6 +364,15 @@ class Schema extends DatabaseSchema {
     }
   }
 
+  /**
+   * Constructs a SQL fragment for a key definition from the given fields.
+   *
+   * @param array $fields
+   *   An array of field definitions.
+   *
+   * @return string
+   *   A SQL fragment representing the key definition.
+   */
   protected function createKeySql($fields) {
     $return = [];
     foreach ($fields as $field) {

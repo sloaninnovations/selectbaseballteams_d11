@@ -13,6 +13,9 @@ use Drupal\views\Attribute\ViewsFilter;
 #[ViewsFilter("date")]
 class Date extends NumericFilter {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -40,6 +43,9 @@ class Date extends NumericFilter {
     parent::valueForm($form, $form_state);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function validateOptionsForm(&$form, FormStateInterface $form_state) {
     parent::validateOptionsForm($form, $form_state);
 
@@ -51,6 +57,9 @@ class Date extends NumericFilter {
     $this->validateValidTime($form['value'], $form_state, $form_state->getValue(['options', 'operator']), $form_state->getValue(['options', 'value']));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function validateExposed(&$form, FormStateInterface $form_state) {
     if (empty($this->options['exposed'])) {
       return;
@@ -116,6 +125,16 @@ class Date extends NumericFilter {
     return $actual == $expected;
   }
 
+  /**
+   * Accepts exposed input values and processes them for the filter.
+   *
+   * @param array $input
+   *   The input values submitted via the exposed filter form.
+   *
+   * @return bool
+   *   Returns TRUE if the exposed input is accepted and valid, FALSE if the input
+   *   is invalid (e.g., missing required values).
+   */
   public function acceptExposedInput($input) {
     if (empty($this->options['exposed'])) {
       return TRUE;
@@ -165,6 +184,9 @@ class Date extends NumericFilter {
     return $rc;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function opBetween($field) {
     $a = intval(strtotime($this->value['min'], 0));
     $b = intval(strtotime($this->value['max'], 0));
@@ -181,6 +203,9 @@ class Date extends NumericFilter {
     $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function opSimple($field) {
     $value = intval(strtotime($this->value['value'], 0));
     if (!empty($this->value['type']) && $this->value['type'] == 'offset') {

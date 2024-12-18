@@ -13,6 +13,12 @@ use Drupal\views\Attribute\ViewsFilter;
 #[ViewsFilter("node_uid_revision")]
 class UidRevision extends Name {
 
+  /**
+   * Adds the query condition for filtering by user ID or revision user ID.
+   *
+   * @param bool $group_by
+   *   Whether to group the query. Defaults to FALSE.
+   */
   public function query($group_by = FALSE) {
     $this->ensureMyTable();
 

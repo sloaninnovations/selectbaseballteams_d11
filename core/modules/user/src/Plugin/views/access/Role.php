@@ -84,6 +84,12 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
     }
   }
 
+  /**
+   * Provides the summary title for this access plugin, based on the selected roles.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The translated summary title.
+   */
   public function summaryTitle() {
     $count = count($this->options['role']);
     if ($count < 1) {
@@ -98,6 +104,9 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['role'] = ['default' => []];
@@ -105,6 +114,9 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
     $form['role'] = [
@@ -116,6 +128,9 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function validateOptionsForm(&$form, FormStateInterface $form_state) {
     $role = $form_state->getValue(['access_options', 'role']);
     $role = array_filter($role);

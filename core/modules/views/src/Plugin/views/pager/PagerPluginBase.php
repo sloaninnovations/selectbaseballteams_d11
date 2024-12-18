@@ -252,20 +252,38 @@ abstract class PagerPluginBase extends PluginBase {
       && $this->total_items > (intval($this->current_page) + 1) * $this->getItemsPerPage();
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function exposedFormAlter(&$form, FormStateInterface $form_state) {}
 
+  /**
+   * {@inheritdoc}
+   */
   public function exposedFormValidate(&$form, FormStateInterface $form_state) {}
 
+  /**
+   * {@inheritdoc}
+   */
   public function exposedFormSubmit(&$form, FormStateInterface $form_state, &$exclude) {}
 
+  /**
+   * {@inheritdoc}
+   */
   public function usesExposed() {
     return FALSE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function itemsPerPageExposed() {
     return FALSE;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function isOffsetExposed() {
     return FALSE;
   }

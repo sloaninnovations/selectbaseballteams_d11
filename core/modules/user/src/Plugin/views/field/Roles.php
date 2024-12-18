@@ -59,11 +59,17 @@ class Roles extends PrerenderList {
     $this->additional_fields['uid'] = ['table' => 'users_field_data', 'field' => 'uid'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     $this->addAdditionalFields();
     $this->field_alias = $this->aliases['uid'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function preRender(&$values) {
     $uids = [];
     $this->items = [];
@@ -91,15 +97,40 @@ class Roles extends PrerenderList {
     }
   }
 
+  /**
+   * Renders the role for a specific user.
+   *
+   * @param int $count
+   *   The index of the item being rendered.
+   * @param array $item
+   *   An array containing the role information.
+   *
+   * @return string
+   *   The role label to be displayed.
+   */
   public function render_item($count, $item) {
     return $item['role'];
   }
 
+  /**
+   * Documents the available tokens for this field.
+   *
+   * @param array $tokens
+   *   The array of tokens that will be used in the view.
+   */
   protected function documentSelfTokens(&$tokens) {
     $tokens['{{ ' . $this->options['id'] . '__role' . ' }}'] = $this->t('The name of the role.');
     $tokens['{{ ' . $this->options['id'] . '__rid' . ' }}'] = $this->t('The role machine-name of the role.');
   }
 
+  /**
+   * Adds the appropriate tokens to the array for rendering.
+   *
+   * @param array $tokens
+   *   The array of tokens that will be used in the view.
+   * @param array $item
+   *   The item containing the role information.
+   */
   protected function addSelfTokens(&$tokens, $item) {
     if (!empty($item['role'])) {
       $tokens['{{ ' . $this->options['id'] . '__role }}'] = $item['role'];

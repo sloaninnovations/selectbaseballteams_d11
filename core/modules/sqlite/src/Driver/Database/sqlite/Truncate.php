@@ -12,6 +12,12 @@ use Drupal\Core\Database\Query\Truncate as QueryTruncate;
  */
 class Truncate extends QueryTruncate {
 
+  /**
+   * Converts the query to a string.
+   *
+   * @return string
+   *   The SQL DELETE statement as a string.
+   */
   public function __toString() {
     // Create a sanitized comment string to prepend to the query.
     $comments = $this->connection->makeComment($this->comments);

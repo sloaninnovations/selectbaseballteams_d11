@@ -37,6 +37,18 @@ class Rss extends StylePluginBase {
    */
   protected $usesRowPlugin = TRUE;
 
+  /**
+   * Attaches RSS feed information to the view build array.
+   *
+   * @param array $build
+   *   The render array for the view.
+   * @param string $display_id
+   *   The display ID.
+   * @param \Drupal\Core\Url $feed_url
+   *   The URL of the RSS feed.
+   * @param string $title
+   *   The title of the feed.
+   */
   public function attachTo(array &$build, $display_id, Url $feed_url, $title) {
     $url_options = [];
     $input = $this->view->getExposedInput();
@@ -63,6 +75,9 @@ class Rss extends StylePluginBase {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -71,6 +86,9 @@ class Rss extends StylePluginBase {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
 
@@ -108,6 +126,9 @@ class Rss extends StylePluginBase {
     return $description;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function render() {
     $rows = [];
 

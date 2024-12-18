@@ -228,7 +228,7 @@ class Sql extends QueryPluginBase {
       'join' => NULL,
     ];
 
-    // Init the tables with our primary table
+    // Init the tables with our primary table.
     $this->tables[$base_table][$base_table] = [
       'count' => 1,
       'alias' => $base_table,
@@ -290,6 +290,12 @@ class Sql extends QueryPluginBase {
     ];
   }
 
+  /**
+   * Defines the default options for the plugin.
+   *
+   * @return array
+   *   An associative array of default options.
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['disable_sql_rewrite'] = [
@@ -573,6 +579,21 @@ class Sql extends QueryPluginBase {
     return $alias;
   }
 
+  /**
+   * Marks a table as being used in the query.
+   *
+   * This method tracks the usage of a table, assigning it an alias if necessary.
+   *
+   * @param string $table
+   *   The name of the table.
+   * @param string $relationship
+   *   The relationship this table links to.
+   * @param string $alias
+   *   An optional alias for the table.
+   *
+   * @return string
+   *   The alias assigned to the table.
+   */
   protected function markTable($table, $relationship, $alias) {
     // Mark that this table has been added.
     if (empty($this->tables[$relationship][$table])) {
@@ -618,7 +639,7 @@ class Sql extends QueryPluginBase {
    *   cannot be ensured.
    */
   public function ensureTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL) {
-    // Ensure a relationship
+    // Ensure a relationship.
     if (empty($relationship)) {
       $relationship = $this->view->storage->get('base_table');
     }
@@ -667,10 +688,8 @@ class Sql extends QueryPluginBase {
       // the same table with the same join multiple times.  For
       // example, a view that filters on 3 taxonomy terms using AND
       // needs to join taxonomy_term_data 3 times with the same join.
-
       // Scan through the table queue to see if a matching join and
       // relationship exists.  If so, use it instead of this join.
-
       // @todo Scanning through $this->tableQueue results in an
       //   O(N^2) algorithm, and this code runs every time the view is
       //   instantiated (Views 2 does not currently cache queries).
@@ -763,7 +782,6 @@ class Sql extends QueryPluginBase {
     if ($relationship != $this->view->storage->get('base_table')) {
       // If we're linking to the primary table, the relationship to use will
       // be the prior relationship. Unless it's a direct link.
-
       // Safety! Don't modify an original here.
       $join = clone $join;
 
@@ -774,7 +792,7 @@ class Sql extends QueryPluginBase {
         $this->ensureTable($join->leftTable, $relationship);
       }
 
-      // First, if this is our link point/anchor table, just use the relationship
+      // First, if this is our link point/anchor table, just use the relationship.
       if ($join->leftTable == $this->relationships[$relationship]['table']) {
         $join->leftTable = $relationship;
       }
@@ -873,14 +891,13 @@ class Sql extends QueryPluginBase {
       $alias = $table . '_' . $field;
     }
 
-    // Make sure an alias is assigned
+    // Make sure an alias is assigned.
     $alias = $alias ? $alias : $field;
 
     // PostgreSQL truncates aliases to 63 characters:
     // https://www.drupal.org/node/571548.
-
     // We limit the length of the original alias up to 60 characters
-    // to get a unique alias later if its have duplicates
+    // to get a unique alias later if its have duplicates.
     $alias = strtolower(substr($alias, 0, 60));
 
     // Create a field info array.
@@ -1757,10 +1774,26 @@ class Sql extends QueryPluginBase {
     return $entities;
   }
 
+  /**
+   * Adds a signature field to the query.
+   *
+   * This adds the current view name and display to the query for debugging purposes.
+   *
+   * @param \Drupal\views\ViewExecutable $view
+   *   The view object.
+   */
   public function addSignature(ViewExecutable $view) {
     $view->query->addField(NULL, "'" . $view->storage->id() . ':' . $view->current_display . "'", 'view_name');
   }
 
+  /**
+   * Retrieves information about aggregation methods.
+   *
+   * This includes supported aggregation types and their handlers.
+   *
+   * @return array
+   *   An array of aggregation method definitions.
+   */
   public function getAggregationInfo() {
     // @todo Need a way to get database specific and customized aggregation
     //   functions into here.
@@ -1842,10 +1875,32 @@ class Sql extends QueryPluginBase {
     ];
   }
 
+  /**
+   * Generates a simple SQL aggregation method.
+   *
+   * @param string $group_type
+   *   The type of aggregation (e.g., SUM, AVG).
+   * @param string $field
+   *   The field to aggregate.
+   *
+   * @return string
+   *   The SQL aggregation string.
+   */
   public function aggregationMethodSimple($group_type, $field) {
     return strtoupper($group_type) . '(' . $field . ')';
   }
 
+  /**
+   * Generates a SQL aggregation method for distinct values.
+   *
+   * @param string $group_type
+   *   The type of aggregation (e.g., COUNT_DISTINCT).
+   * @param string $field
+   *   The field to aggregate.
+   *
+   * @return string
+   *   The SQL aggregation string with DISTINCT.
+   */
   public function aggregationMethodDistinct($group_type, $field) {
     $group_type = str_replace('_distinct', '', $group_type);
     return strtoupper($group_type) . '(DISTINCT ' . $field . ')';

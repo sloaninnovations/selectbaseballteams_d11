@@ -51,6 +51,12 @@ class UserUid extends ArgumentPluginBase {
     return new static($configuration, $plugin_id, $plugin_definition, $container->get('database'));
   }
 
+  /**
+   * Retrieves the title for the user argument.
+   *
+   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The user name or fallback title.
+   */
   public function title() {
     if (!$this->argument) {
       $title = \Drupal::config('user.settings')->get('anonymous');
@@ -65,6 +71,9 @@ class UserUid extends ArgumentPluginBase {
     return $title;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defaultActions($which = NULL) {
     // Disallow summary views on this argument.
     if (!$which) {
@@ -79,6 +88,12 @@ class UserUid extends ArgumentPluginBase {
     }
   }
 
+  /**
+   * Adds the user ID condition to the query.
+   *
+   * @param bool $group_by
+   *   Whether to group by this argument.
+   */
   public function query($group_by = FALSE) {
     $this->ensureMyTable();
 

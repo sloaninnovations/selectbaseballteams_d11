@@ -19,6 +19,9 @@ use Drupal\views\Views;
 )]
 class InputRequired extends ExposedFormPluginBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -27,6 +30,9 @@ class InputRequired extends ExposedFormPluginBase {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
 
@@ -40,6 +46,9 @@ class InputRequired extends ExposedFormPluginBase {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitOptionsForm(&$form, FormStateInterface $form_state) {
     $exposed_form_options = $form_state->getValue('exposed_form_options');
     $form_state->setValue(['exposed_form_options', 'text_input_required_format'], $exposed_form_options['text_input_required']['format']);
@@ -47,6 +56,15 @@ class InputRequired extends ExposedFormPluginBase {
     parent::submitOptionsForm($form, $form_state);
   }
 
+  /**
+   * Checks if any exposed filter is applied.
+   *
+   * This method iterates through the view's filters and checks if any exposed
+   * filter has a value in the exposed input.
+   *
+   * @return bool
+   *   TRUE if at least one exposed filter is applied, FALSE otherwise.
+   */
   protected function exposedFilterApplied() {
     static $cache = NULL;
     if (!isset($cache)) {
@@ -68,6 +86,15 @@ class InputRequired extends ExposedFormPluginBase {
     return $cache;
   }
 
+  /**
+   * Alters the view's rendering behavior before rendering results.
+   *
+   * This method sets up a placeholder text to display instead of results if no
+   * exposed filter has been applied.
+   *
+   * @param array $values
+   *   The current results of the view (not used in this method).
+   */
   public function preRender($values) {
     // Display the "text on demand" if needed. This is a site builder-defined
     // text to display instead of results until the user selects and applies
@@ -100,6 +127,9 @@ class InputRequired extends ExposedFormPluginBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     if (!$this->exposedFilterApplied()) {
       // We return with no query; this will force the empty text.

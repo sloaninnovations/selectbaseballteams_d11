@@ -20,6 +20,9 @@ use Drupal\views\Attribute\ViewsStyle;
 )]
 class DefaultSummary extends StylePluginBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -31,12 +34,23 @@ class DefaultSummary extends StylePluginBase {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * Adjusts the number of items per page based on the override option.
+   */
   public function query() {
     if (!empty($this->options['override'])) {
       $this->view->setItemsPerPage(intval($this->options['items_per_page']));
     }
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * Builds the options form for this view style, allowing users to configure
+   * the base path, record count display, and item display settings.
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $form['base_path'] = [
       '#type' => 'textfield',
@@ -71,6 +85,12 @@ class DefaultSummary extends StylePluginBase {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * Renders the summary list, including all result rows, and prepares them
+   * for theming.
+   */
   public function render() {
     $rows = [];
     foreach ($this->view->result as $row) {

@@ -224,7 +224,6 @@ class ViewUI implements ViewEntityInterface {
   public function standardSubmit($form, FormStateInterface $form_state) {
     // Determine whether the values the user entered are intended to apply to
     // the current display or the default display.
-
     [$was_defaulted, $is_defaulted, $revert] = $this->getOverrideValues($form, $form_state);
 
     // Based on the user's choice in the display dropdown, determine which display
@@ -469,7 +468,7 @@ class ViewUI implements ViewEntityInterface {
         }
         $id = $this->getExecutable()->addHandler($display_id, $type, $table, $field);
 
-        // Check to see if we have group by settings
+        // Check to see if we have group by settings.
         $key = $type;
         // Footer,header and empty text have a different internal handler type(area).
         if (isset($types[$type]['type'])) {
@@ -484,11 +483,11 @@ class ViewUI implements ViewEntityInterface {
           $this->addFormToStack('handler-group', $display_id, $type, $id);
         }
 
-        // Check to see if this type has settings, if so add the settings form first
+        // Check to see if this type has settings, if so add the settings form first.
         if ($handler && $handler->hasExtraOptions()) {
           $this->addFormToStack('handler-extra', $display_id, $type, $id);
         }
-        // Then add the form to the stack
+        // Then add the form to the stack.
         $this->addFormToStack('handler', $display_id, $type, $id);
       }
     }
@@ -497,7 +496,7 @@ class ViewUI implements ViewEntityInterface {
       unset($this->form_cache);
     }
 
-    // Store in cache
+    // Store in cache.
     $this->cacheSet();
   }
 
@@ -524,6 +523,18 @@ class ViewUI implements ViewEntityInterface {
     $this->additionalQueries = $queries;
   }
 
+  /**
+   * Renders a preview of a view display with query and performance statistics.
+   *
+   * @param string $display_id
+   *   The ID of the display to render the preview for.
+   * @param array $args
+   *   (optional) An array of arguments to pass to the view for the preview.
+   *
+   * @return array
+   *   A render array containing the view preview and associated query or statistics,
+   *   which can be rendered by Drupal's render system.
+   */
   public function renderPreview($display_id, $args = []) {
     // Save the current path so it can be restored before returning from this function.
     $request_stack = \Drupal::requestStack();
@@ -578,7 +589,6 @@ class ViewUI implements ViewEntityInterface {
       }
 
       // Make view links come back to preview.
-
       // Also override the current path so we get the pager, and make sure the
       // Request object gets all of the proper values from $_SERVER.
       $request = Request::createFromGlobals();

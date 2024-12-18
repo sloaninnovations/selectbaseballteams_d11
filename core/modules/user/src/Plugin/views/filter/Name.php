@@ -24,6 +24,14 @@ class Name extends InOperator {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected array $validated_exposed_input;
 
+  /**
+   * Builds the filter value form.
+   *
+   * @param array $form
+   *   The form array.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
   protected function valueForm(&$form, FormStateInterface $form_state) {
     $users = $this->value ? User::loadMultiple($this->value) : [];
     $default_value = EntityAutocomplete::getEntityLabels($users);
@@ -44,6 +52,14 @@ class Name extends InOperator {
     }
   }
 
+  /**
+   * Validates the exposed values for the filter.
+   *
+   * @param array $form
+   *   The form array.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
   protected function valueValidate($form, FormStateInterface $form_state) {
     $uids = [];
     if ($values = $form_state->getValue(['options', 'value'])) {
@@ -55,6 +71,9 @@ class Name extends InOperator {
     $form_state->setValue(['options', 'value'], $uids);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function acceptExposedInput($input) {
     $rc = parent::acceptExposedInput($input);
 
@@ -68,6 +87,14 @@ class Name extends InOperator {
     return $rc;
   }
 
+  /**
+   * Validates the exposed input before applying the filter.
+   *
+   * @param array $form
+   *   The form array.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
   public function validateExposed(&$form, FormStateInterface $form_state) {
     if (empty($this->options['exposed'])) {
       return;
@@ -98,6 +125,9 @@ class Name extends InOperator {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function valueSubmit($form, FormStateInterface $form_state) {
     // Prevent array filter from removing our anonymous user.
   }
@@ -109,6 +139,9 @@ class Name extends InOperator {
     return $this->valueOptions;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function adminSummary() {
     // Set up $this->valueOptions for the parent summary
     $this->valueOptions = [];

@@ -72,7 +72,7 @@ class Schema extends DatabaseSchema {
    *   - idx for indexes
    *   - key for constraints
    *   - pkey for primary keys
-   *   - seq for sequences
+   *   - seq for sequences.
    *
    * @param string $table_identifier_part
    *   The first argument used to build the identifier string. This usually
@@ -471,6 +471,15 @@ EOD;
     return $map;
   }
 
+  /**
+   * Creates the SQL expression for the provided fields.
+   *
+   * @param array $fields
+   *   An array of fields.
+   *
+   * @return string
+   *   A SQL-compatible string representing the fields.
+   */
   protected function _createKeySql($fields) {
     $return = [];
     foreach ($fields as $field) {
@@ -1020,12 +1029,33 @@ EOD;
     $this->resetTableInformation($table);
   }
 
+  /**
+   * Constructs an SQL statement for creating an index on a table.
+   *
+   * @param string $table
+   *   The name of the table where the index will be created.
+   * @param string $name
+   *   The name of the index.
+   * @param array $fields
+   *   An array of field names to include in the index.
+   *
+   * @return string
+   *   The SQL query string for creating the index.
+   */
   protected function _createIndexSql($table, $name, $fields) {
     $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} (';
     $query .= $this->_createKeySql($fields) . ')';
     return $query;
   }
 
+  /**
+   * Processes and creates database keys for a table.
+   *
+   * @param string $table
+   *   The name of the table to add keys to.
+   * @param array $new_keys
+   *   An associative array defining the keys to add.
+   */
   protected function _createKeys($table, $new_keys) {
     if (isset($new_keys['primary key'])) {
       $this->addPrimaryKey($table, $new_keys['primary key']);

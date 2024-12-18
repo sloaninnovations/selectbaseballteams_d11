@@ -52,16 +52,24 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
 
   /**
    * Contains the current active sort column.
+   *
    * @var string
    */
   public $active;
 
   /**
    * Contains the current active sort order, either desc or asc.
+   *
    * @var string
    */
   public $order;
 
+  /**
+   * Defines default options for the style plugin.
+   *
+   * @return array
+   *   An array of default option values.
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -185,7 +193,7 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
       }
 
       // If the field is the column, mark it so, or the column
-      // it's set to is a column, that's ok
+      // it's set to is a column, that's ok.
       if ($field == $column || $columns[$column] == $column && !empty($sanitized[$column])) {
         $sanitized[$field] = $column;
       }
@@ -319,7 +327,7 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
           '#return_value' => $field,
           '#parents' => ['style_options', 'default'],
           '#id' => $radio_id,
-          // Because 'radio' doesn't fully support '#id' =(
+          // Because 'radio' doesn't fully support '#id' =(.
           '#attributes' => ['id' => $radio_id],
           '#default_value' => $default,
           '#states' => [
@@ -382,13 +390,13 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
         ],
       ];
 
-      // Markup for the field name
+      // Markup for the field name.
       $form['info'][$field]['name'] = [
         '#markup' => $field_names[$field],
       ];
     }
 
-    // Provide a radio for no default sort
+    // Provide a radio for no default sort.
     $form['default'][-1] = [
       '#title' => $this->t('No default sort'),
       '#title_display' => 'invisible',
@@ -411,10 +419,34 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
     ];
   }
 
+  /**
+   * Determines whether to render the view even if it has no results.
+   *
+   * Overrides the parent implementation to include the 'empty_table' option.
+   *
+   * @return bool
+   *   TRUE if the view should render even when empty, FALSE otherwise.
+   */
   public function evenEmpty() {
     return parent::evenEmpty() || !empty($this->options['empty_table']);
   }
 
+  /**
+   * Handles form submission for the view wizard.
+   *
+   * Ensures that fields used in the table style display always have labels.
+   *
+   * @param array $form
+   *   The form array.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state object.
+   * @param \Drupal\views\Plugin\views\wizard\WizardInterface $wizard
+   *   The wizard plugin instance.
+   * @param array &$display_options
+   *   The display options array to be updated.
+   * @param string $display_type
+   *   The type of display being configured.
+   */
   public function wizardSubmit(&$form, FormStateInterface $form_state, WizardInterface $wizard, &$display_options, $display_type) {
     // If any of the displays use the table style, make sure that the fields
     // always have a labels by unsetting the override.

@@ -227,7 +227,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
         $this->limit_values = TRUE;
       }
 
-      // If "First and last only" is chosen, limit the values
+      // If "First and last only" is chosen, limit the values.
       if (!empty($this->options['delta_first_last'])) {
         $this->limit_values = TRUE;
       }
@@ -685,7 +685,6 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     parent::buildGroupByForm($form, $form_state);
     // With "field API" fields, the column target of the grouping function
     // and any additional grouping columns must be specified.
-
     $field_columns = array_keys($this->getFieldDefinition()->getColumns());
     $group_columns = [
       'entity_id' => $this->t('Entity ID'),
@@ -714,6 +713,9 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitGroupByForm(&$form, FormStateInterface $form_state) {
     parent::submitGroupByForm($form, $form_state);
     $item = &$form_state->get('handler')->options;
@@ -966,10 +968,29 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     return $processed_entity;
   }
 
+  /**
+   * Renders an individual item.
+   *
+   * @param int $count
+   *   The current count of the item being rendered (unused in this method).
+   * @param array $item
+   *   An associative array representing the item to render. The 'rendered' key
+   *   should contain the renderable array for the item.
+   *
+   * @return string|\Drupal\Component\Render\MarkupInterface
+   *   The rendered output.
+   */
   public function render_item($count, $item) {
     return $this->renderer->render($item['rendered']);
   }
 
+  /**
+   * Documents tokens provided by this field handler.
+   *
+   * @param array $tokens
+   *   An associative array of tokens where the key is the token name and the
+   *   value is its human-readable description.
+   */
   protected function documentSelfTokens(&$tokens) {
     $field = $this->getFieldDefinition();
     foreach ($field->getColumns() as $id => $column) {
@@ -977,6 +998,15 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     }
   }
 
+  /**
+   * Adds token replacements for the current field.
+   *
+   * @param array $tokens
+   *   An associative array of token replacements where the key is the token
+   *   name and the value is the token replacement value.
+   * @param array $item
+   *   An associative array representing the field item.
+   */
   protected function addSelfTokens(&$tokens, $item) {
     $field = $this->getFieldDefinition();
     foreach ($field->getColumns() as $id => $column) {
