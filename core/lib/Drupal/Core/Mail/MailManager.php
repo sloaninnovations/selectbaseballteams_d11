@@ -92,7 +92,7 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
     $this->stringTranslation = $string_translation;
     $this->renderer = $renderer;
     if ($this->mailThemeManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $mailThemeManager argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3486179', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $mailThemeManager argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3486179', E_USER_DEPRECATED);
       $this->mailThemeManager = \Drupal::service(MailThemeManagerInterface::class);
     }
   }
