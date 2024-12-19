@@ -47,6 +47,22 @@ class BlockAddTest extends WebDriverTestBase {
     $assert_session->assertWaitOnAjaxRequest();
     $assert_session->pageTextNotContains('The submitted value Pre-content in the Region element is not allowed.');
     $assert_session->optionExists('Region', '- Select -');
+    // Check that the "Response statusNot restricted" text is present as expected.
+    $assert_session->elementTextContains('css', '.vertical-tabs__menu-item-title', 'Response status');
+    $assert_session->elementTextContains('css', '.vertical-tabs__menu-item-summary', 'Not restricted');
+
+    // Ensure the tab text does not contain summary text.
+    $assert_session->elementTextNotContains('css', '.vertical-tabs__menu-item-title', 'Response status (Not restricted)');
+
+    // Click on the "Pages" tab and ensure the form opens.
+    $tab = $this->getSession()->getPage()->find('css', 'a[href="#edit-visibility-request-path"]');
+    $this->assertNotEmpty($tab, 'The "Pages" tab link exists.');
+    $tab->click();
+
+    // Check that the corresponding form section is open and visible.
+    $form_section = $this->getSession()->getPage()->find('css', '#edit-visibility-request-path');
+    $this->assertNotEmpty($form_section, 'The "Pages" form section exists.');
+    $this->assertTrue($form_section->isVisible(), 'The "Pages" form section is visible after clicking the tab.');
   }
 
 }
