@@ -61660,7 +61660,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\file\\\\Hook\\FileHooks\\:\\:fileDownload\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\file\\\\Hook\\\\FileHooks\\:\\:fileDownload\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/src/Hook/FileHooks.php',
 ];
