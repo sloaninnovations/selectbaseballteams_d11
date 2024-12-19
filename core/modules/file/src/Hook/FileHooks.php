@@ -117,7 +117,7 @@ class FileHooks {
    * Implements hook_file_download().
    */
   #[Hook('file_download')]
-  public function fileDownload($uri) {
+  public function fileDownload($uri): array {
     // Get the file record based on the URI. If not in the database just return.
     /** @var \Drupal\file\FileRepositoryInterface $file_repository */
     $file_repository = \Drupal::service('file.repository');
