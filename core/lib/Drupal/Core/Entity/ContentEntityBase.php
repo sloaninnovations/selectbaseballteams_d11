@@ -603,6 +603,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * Gets a translated field.
    *
    * @return \Drupal\Core\Field\FieldItemListInterface
+   *   The translated field.
    */
   protected function getTranslatedField($name, $langcode) {
     if ($this->translations[$this->activeLangcode]['status'] == static::TRANSLATION_REMOVED) {
@@ -952,6 +953,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $translation->isDefaultRevision = &$this->isDefaultRevision;
     $translation->enforceRevisionTranslationAffected = &$this->enforceRevisionTranslationAffected;
     $translation->isSyncing = &$this->isSyncing;
+    $translation->originalEntity = &$this->originalEntity;
 
     return $translation;
   }
@@ -1087,6 +1089,11 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       $return = $this->getTranslatedField($name, $this->activeLangcode);
       return $return;
     }
+    if ($name === 'original') {
+      // A variable is required that this technically is a return-by-reference.
+      $original = parent::__get('original');
+      return $original;
+    }
     // Else directly read/write plain values. That way, non-field entity
     // properties can always be accessed directly.
     if (!isset($this->values[$name])) {
@@ -1124,6 +1131,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // need to restore it.
     elseif ($name == 'translations') {
       $this->translations = $value;
+    }
+    elseif ($name == 'original') {
+      parent::__set('original', $value);
     }
     // Directly write non-field values.
     else {
@@ -1443,15 +1453,18 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       return TRUE;
     }
 
-    // $this->original only exists during save. See
+    // The original entity only exists during save. See
     // \Drupal\Core\Entity\EntityStorageBase::save(). If it exists we re-use it
     // here for performance reasons.
     /** @var \Drupal\Core\Entity\ContentEntityBase $original */
-    $original = $this->original ? $this->original : NULL;
+    $original = $this->getOriginal();
 
     if (!$original) {
       $id = $this->getOriginalId() ?? $this->id();
-      $original = $this->entityTypeManager()->getStorage($this->getEntityTypeId())->loadUnchanged($id);
+      $storage = $this->entityTypeManager()->getStorage($this->getEntityTypeId());
+      $original = !$this->wasDefaultRevision()
+        ? $storage->loadRevision($this->getLoadedRevisionId())
+        : $storage->loadUnchanged($id);
     }
 
     // If the current translation has just been added, we have a change.

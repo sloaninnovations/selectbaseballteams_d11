@@ -17,7 +17,7 @@ class ViewsTestDataViewsHooks {
    * Implements hook_views_data().
    */
   #[Hook('views_data')]
-  public function viewsData() {
+  public function viewsData(): array {
     $state = \Drupal::service('state');
     $state->set('views_hook_test_views_data', TRUE);
     // We use a state variable to keep track of how many times this function is
@@ -44,7 +44,7 @@ class ViewsTestDataViewsHooks {
    * Implements hook_views_analyze().
    */
   #[Hook('views_analyze')]
-  public function viewsAnalyze(ViewExecutable $view) {
+  public function viewsAnalyze(ViewExecutable $view): array {
     \Drupal::state()->set('views_hook_test_views_analyze', TRUE);
     $ret = [];
     $ret[] = Analyzer::formatMessage(t('Test ok message'), 'ok');
@@ -57,7 +57,7 @@ class ViewsTestDataViewsHooks {
    * Implements hook_views_invalidate_cache().
    */
   #[Hook('views_invalidate_cache')]
-  public function viewsInvalidateCache() {
+  public function viewsInvalidateCache(): void {
     \Drupal::state()->set('views_hook_test_views_invalidate_cache', TRUE);
   }
 
