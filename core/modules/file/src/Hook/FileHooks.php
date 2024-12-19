@@ -7,6 +7,8 @@ use Drupal\file\Entity\File;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\file\FileInterface;
 
 /**
  * Hook implementations for file.
