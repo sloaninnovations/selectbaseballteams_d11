@@ -61660,6 +61660,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
+	'message' => '#^Method Drupal\\\\file\\\\Hook\\:\\:fileDownload\\(\\) has no return type specified\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/core/modules/file/src/Hook/FileHooks.php',
+];
+$ignoreErrors[] = [
+	// identifier: missingType.return
 	'message' => '#^Function twig_extension\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/themes/engines/twig/twig.engine',
