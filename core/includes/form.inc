@@ -41,7 +41,7 @@ function template_preprocess_select(&$variables): void {
 }
 
 /**
- * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0.
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
  *    Use \Drupal\Core\Form\FormOptionsHelper::formSelectOptions().
  *
  * @see https://www.drupal.org/node/3412600
@@ -49,7 +49,7 @@ function template_preprocess_select(&$variables): void {
  */
 function form_select_options($element, $choices = NULL): array {
   @trigger_error(
-    'form_select_options() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Form\FormOptionsHelper::formSelectOptions(). See https://www.drupal.org/node/3412600',
+    'form_select_options() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Form\FormOptionsHelper::formSelectOptions(). See https://www.drupal.org/node/3412600',
     E_USER_DEPRECATED
   );
   return FormOptionsHelper::formSelectOptions($element, $choices);
@@ -87,13 +87,13 @@ function form_select_options($element, $choices = NULL): array {
  *   An array of indexes that match the given $key. Array will be
  *   empty if no elements were found. FALSE if optgroups were found.
  *
- * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0.
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
  *    There is no direct replacement.
  *
  * @see https://www.drupal.org/node/3412600
  */
 function form_get_options($element, $key) {
-  @trigger_error('form_get_options() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3412600',
+  @trigger_error('form_get_options() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3412600',
     E_USER_DEPRECATED);
   $keys = [];
   foreach ($element['#options'] as $index => $choice) {
@@ -603,7 +603,7 @@ function template_preprocess_form_element_label(&$variables): void {
  *   \Drupal::messenger()->addMessage($message);
  *   // Providing data for the redirected page is done through the session.
  *   foreach ($results as $result) {
- *     $items[] = t('Loaded node %title.', ['%title' => $result]);
+ *     $items[] = t('Loaded node %title.', ['%title' => $result)];
  *   }
  *   $session = \Drupal::getRequest()->getSession();
  *   $session->set('my_batch_results', $items);
@@ -635,7 +635,7 @@ function template_preprocess_form_element_label(&$variables): void {
  *     Example:
  *     @code
  *     [
- *       ['callback_batch_operation_1', [$arg1]],
+ *       ['callback_batch_operation_1', [$arg1)],
  *       ['callback_batch_operation_2', [$arg2_1, $arg2_2]],
  *     ]
  *     @endcode
@@ -676,7 +676,7 @@ function template_preprocess_form_element_label(&$variables): void {
  */
 function batch_set($batch_definition) {
   if ($batch_definition) {
-    $batch = &batch_get();
+    $batch = & batch_get();
 
     // Initialize the batch if needed.
     if (empty($batch)) {
@@ -811,10 +811,10 @@ function _batch_append_set(&$batch, $batch_set) {
  *   A redirect response if the batch is progressive. No return value otherwise.
  */
 function batch_process($redirect = NULL, ?Url $url = NULL, $redirect_callback = NULL) {
-  $batch = &batch_get();
+  $batch = & batch_get();
 
   if (isset($batch)) {
-    // Add process information.
+    // Add process information
     $process_info = [
       'current_set' => 0,
       'progressive' => TRUE,

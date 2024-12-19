@@ -78,6 +78,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
     $element['#key_column'] = $this->column;
 
     // The rest of the $element is built by child method implementations.
+
     return $element;
   }
 
