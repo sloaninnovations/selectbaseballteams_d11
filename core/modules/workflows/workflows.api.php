@@ -46,7 +46,7 @@
  *   THe name of the field to which the workflow is attached.
  */
 function hook_workflows_pre_transition(\Drupal\workflows\WorkflowInterface $workflow, \Drupal\workflows\Transition $transition, \Drupal\Core\Entity\FieldableEntityInterface $entity, $field_name) {
-  // @todo
+  // @todo Implement functionality.
 }
 
 /**
@@ -64,7 +64,7 @@ function hook_workflows_pre_transition(\Drupal\workflows\WorkflowInterface $work
  *   THe name of the field to which the workflow is attached.
  */
 function hook_workflows_post_transition(\Drupal\workflows\WorkflowInterface $workflow, \Drupal\workflows\Transition $transition, \Drupal\Core\Entity\FieldableEntityInterface $entity, $field_name) {
-  // @todo
+  // @todo Implement functionality.
 }
 
 /**
