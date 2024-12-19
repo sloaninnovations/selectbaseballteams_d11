@@ -7,6 +7,7 @@ namespace Drupal\Tests\navigation\Functional;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
+use Drupal\user\UserInterface;
 
 /**
  * Tests the PageContext top bar item functionality.
@@ -38,7 +39,7 @@ class PageContextTest extends BrowserTestBase {
    *
    * @var \Drupal\user\UserInterface
    */
-  protected $adminUser;
+  protected UserInterface $adminUser;
 
   /**
    * {@inheritdoc}
