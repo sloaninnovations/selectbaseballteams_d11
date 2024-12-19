@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Psr\Log\LoggerInterface;
@@ -71,7 +72,7 @@ class CommentTypeForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-
+    /** @var \Drupal\comment\CommentTypeInterface $comment_type */
     $comment_type = $this->entity;
 
     if ($this->operation === 'edit') {
@@ -121,7 +122,7 @@ class CommentTypeForm extends EntityForm {
         '#default_value' => $comment_type->getTargetEntityTypeId(),
         '#title' => $this->t('Target entity type'),
         '#required' => TRUE,
-        '#empty_value' => '_none',
+        '#empty_value' => FormOptionsHelper::OPTIONS_EMPTY_OPTION,
         '#options' => $options,
         '#description' => $this->t('The target entity type can not be changed after the comment type has been created.'),
       ];
@@ -186,12 +187,18 @@ class CommentTypeForm extends EntityForm {
     $edit_link = $this->entity->toLink($this->t('Edit'), 'edit-form')->toString();
     if ($status == SAVED_UPDATED) {
       $this->messenger()->addStatus($this->t('Comment type %label has been updated.', ['%label' => $comment_type->label()]));
-      $this->logger->notice('Comment type %label has been updated.', ['%label' => $comment_type->label(), 'link' => $edit_link]);
+      $this->logger->notice('Comment type %label has been updated.', [
+        '%label' => $comment_type->label(),
+        'link' => $edit_link,
+      ]);
     }
     else {
       $this->commentManager->addBodyField($comment_type->id());
       $this->messenger()->addStatus($this->t('Comment type %label has been added.', ['%label' => $comment_type->label()]));
-      $this->logger->notice('Comment type %label has been added.', ['%label' => $comment_type->label(), 'link' => $edit_link]);
+      $this->logger->notice('Comment type %label has been added.', [
+        '%label' => $comment_type->label(),
+        'link' => $edit_link,
+      ]);
     }
 
     $form_state->setRedirectUrl($comment_type->toUrl('collection'));

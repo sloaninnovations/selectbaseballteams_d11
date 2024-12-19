@@ -7,6 +7,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\OptGroup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -90,7 +91,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
    *   The form state.
    */
   public static function validateElement(array $element, FormStateInterface $form_state) {
-    if ($element['#required'] && $element['#value'] == '_none') {
+    if ($element['#required'] && $element['#value'] == FormOptionsHelper::OPTIONS_EMPTY_OPTION) {
       if (isset($element['#required_error'])) {
         $form_state->setError($element, $element['#required_error']);
       }
@@ -103,7 +104,6 @@ abstract class OptionsWidgetBase extends WidgetBase {
     // Drupal\Core\Field\WidgetBase::submit() expects values as
     // an array of values keyed by delta first, then by column, while our
     // widgets return the opposite.
-
     if (is_array($element['#value'])) {
       $values = array_values($element['#value']);
     }
@@ -113,7 +113,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
 
     // Filter out the 'none' option. Use a strict comparison, because
     // 0 == 'any string'.
-    $index = array_search('_none', $values, TRUE);
+    $index = array_search(FormOptionsHelper::OPTIONS_EMPTY_OPTION, $values, TRUE);
     if ($index !== FALSE) {
       unset($values[$index]);
     }
@@ -145,7 +145,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
 
       // Add an empty option if the widget needs one.
       if ($empty_label = $this->getEmptyLabel()) {
-        $options = ['_none' => $empty_label] + $options;
+        $options = [FormOptionsHelper::OPTIONS_EMPTY_OPTION => $empty_label] + $options;
       }
 
       $module_handler = \Drupal::moduleHandler();

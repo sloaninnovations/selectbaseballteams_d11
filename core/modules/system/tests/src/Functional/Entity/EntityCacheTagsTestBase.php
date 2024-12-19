@@ -10,11 +10,12 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Form\FormOptionsHelper;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 
@@ -243,7 +244,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
           'target_bundles' => [
             $referenced_entity->bundle() => $referenced_entity->bundle(),
           ],
-          'sort' => ['field' => '_none'],
+          'sort' => ['field' => FormOptionsHelper::OPTIONS_EMPTY_OPTION],
           'auto_create' => FALSE,
         ],
       ],
