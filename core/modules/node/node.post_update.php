@@ -18,3 +18,15 @@ function node_removed_post_updates(): array {
     'node_post_update_set_node_type_description_and_help_to_null' => '11.0.0',
   ];
 }
+
+/**
+ * Remove 'not null' constraint from node title column.
+ */
+function node_post_update_remove_title_not_null_constraint(): void {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+  $field_storage_definition = $definition_update_manager->getFieldStorageDefinition('title', 'node');
+  $field_storage_definition->setStorageRequired(FALSE);
+
+  $definition_update_manager->updateFieldStorageDefinition($field_storage_definition);
+}

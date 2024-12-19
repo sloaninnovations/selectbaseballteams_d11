@@ -289,6 +289,7 @@ class Node extends EditorialContentEntityBase implements NodeInterface {
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
+      ->setStorageRequired(FALSE)
       ->setSetting('max_length', 255)
       ->setDisplayOptions('view', [
         'label' => 'hidden',

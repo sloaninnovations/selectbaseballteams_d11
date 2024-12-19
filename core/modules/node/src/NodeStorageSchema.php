@@ -51,7 +51,6 @@ class NodeStorageSchema extends SqlContentEntityStorageSchema {
         case 'promote':
         case 'status':
         case 'sticky':
-        case 'title':
           // Improves the performance of the indexes defined
           // in getEntitySchema().
           $schema['fields'][$field_name]['not null'] = TRUE;
