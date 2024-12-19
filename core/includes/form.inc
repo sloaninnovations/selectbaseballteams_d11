@@ -676,7 +676,7 @@ function template_preprocess_form_element_label(&$variables): void {
  */
 function batch_set($batch_definition) {
   if ($batch_definition) {
-    $batch = & batch_get();
+    $batch =& batch_get();
 
     // Initialize the batch if needed.
     if (empty($batch)) {
@@ -811,7 +811,7 @@ function _batch_append_set(&$batch, $batch_set) {
  *   A redirect response if the batch is progressive. No return value otherwise.
  */
 function batch_process($redirect = NULL, ?Url $url = NULL, $redirect_callback = NULL) {
-  $batch = & batch_get();
+  $batch =& batch_get();
 
   if (isset($batch)) {
     // Add process information
