@@ -42,7 +42,7 @@ class WorkspacesHooks {
    * Implements hook_module_preinstall().
    */
   #[Hook('module_preinstall')]
-  public function modulePreinstall($module) {
+  public function modulePreinstall($module): void {
     if ($module !== 'workspaces') {
       return;
     }
@@ -62,8 +62,8 @@ class WorkspacesHooks {
    * Implements hook_entity_type_build().
    */
   #[Hook('entity_type_build')]
-  public function entityTypeBuild(array &$entity_types) {
-    return \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityTypeInfo::class)->entityTypeBuild($entity_types);
+  public function entityTypeBuild(array &$entity_types): void {
+    \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityTypeInfo::class)->entityTypeBuild($entity_types);
   }
 
   /**
@@ -105,7 +105,7 @@ class WorkspacesHooks {
    * Implements hook_entity_preload().
    */
   #[Hook('entity_preload')]
-  public function entityPreload(array $ids, $entity_type_id) {
+  public function entityPreload(array $ids, $entity_type_id): array {
     return \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityPreload($ids, $entity_type_id);
   }
 

@@ -3,12 +3,7 @@
 namespace Drupal\file\Hook;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Datetime\Entity\DateFormat;
-use Drupal\Core\StringTranslation\ByteSizeMarkup;
-use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\file\Entity\File;
-use Drupal\file\FileInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -17,13 +12,14 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for file.
  */
 class FileHooks {
+
   // cspell:ignore widthx
 
   /**
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): string|array|null {
     switch ($route_name) {
       case 'help.page.file':
         $output = '';
@@ -61,6 +57,7 @@ class FileHooks {
         $output .= '</dl>';
         return $output;
     }
+    return NULL;
   }
 
   /**
@@ -78,9 +75,9 @@ class FileHooks {
    * Implements hook_theme().
    */
   #[Hook('theme')]
-  public function theme() : array {
+  public function theme(): array {
     return [
-          // From file.module.
+      // From file.module.
       'file_link' => [
         'variables' => [
           'file' => NULL,
@@ -202,139 +199,8 @@ class FileHooks {
    * Implements hook_ENTITY_TYPE_predelete() for file entities.
    */
   #[Hook('file_predelete')]
-  public function filePredelete(File $file) {
-    // @todo Remove references to a file that is in-use.
-  }
-
-  /**
-   * Implements hook_tokens().
-   */
-  #[Hook('tokens')]
-  public function tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
-    $token_service = \Drupal::token();
-    $url_options = ['absolute' => TRUE];
-    if (isset($options['langcode'])) {
-      $url_options['language'] = \Drupal::languageManager()->getLanguage($options['langcode']);
-      $langcode = $options['langcode'];
-    }
-    else {
-      $langcode = NULL;
-    }
-    $replacements = [];
-    if ($type == 'file' && !empty($data['file'])) {
-      /** @var \Drupal\file\FileInterface $file */
-      $file = $data['file'];
-      foreach ($tokens as $name => $original) {
-        switch ($name) {
-          // Basic keys and values.
-          case 'fid':
-            $replacements[$original] = $file->id();
-            break;
-
-          case 'uuid':
-            $replacements[$original] = $file->uuid();
-            break;
-
-          // Essential file data
-          case 'name':
-            $replacements[$original] = $file->getFilename();
-            break;
-
-          case 'path':
-            $replacements[$original] = $file->getFileUri();
-            break;
-
-          case 'mime':
-            $replacements[$original] = $file->getMimeType();
-            break;
-
-          case 'size':
-            $replacements[$original] = ByteSizeMarkup::create($file->getSize());
-            break;
-
-          case 'url':
-            // Ideally, this would use return a relative URL, but because tokens
-            // are also often used in emails, it's better to keep absolute file
-            // URLs. The 'url.site' cache context is associated to ensure the
-            // correct absolute URL is used in case of a multisite setup.
-            $replacements[$original] = $file->createFileUrl(FALSE);
-            $bubbleable_metadata->addCacheContexts(['url.site']);
-            break;
-
-          // These tokens are default variations on the chained tokens handled below.
-          case 'created':
-            $date_format = DateFormat::load('medium');
-            $bubbleable_metadata->addCacheableDependency($date_format);
-            $replacements[$original] = \Drupal::service('date.formatter')->format($file->getCreatedTime(), 'medium', '', NULL, $langcode);
-            break;
-
-          case 'changed':
-            $date_format = DateFormat::load('medium');
-            $bubbleable_metadata = $bubbleable_metadata->addCacheableDependency($date_format);
-            $replacements[$original] = \Drupal::service('date.formatter')->format($file->getChangedTime(), 'medium', '', NULL, $langcode);
-            break;
-
-          case 'owner':
-            $owner = $file->getOwner();
-            $bubbleable_metadata->addCacheableDependency($owner);
-            $name = $owner->label();
-            $replacements[$original] = $name;
-            break;
-        }
-      }
-      if ($date_tokens = $token_service->findWithPrefix($tokens, 'created')) {
-        $replacements += $token_service->generate('date', $date_tokens, ['date' => $file->getCreatedTime()], $options, $bubbleable_metadata);
-      }
-      if ($date_tokens = $token_service->findWithPrefix($tokens, 'changed')) {
-        $replacements += $token_service->generate('date', $date_tokens, ['date' => $file->getChangedTime()], $options, $bubbleable_metadata);
-      }
-      if (($owner_tokens = $token_service->findWithPrefix($tokens, 'owner')) && $file->getOwner()) {
-        $replacements += $token_service->generate('user', $owner_tokens, ['user' => $file->getOwner()], $options, $bubbleable_metadata);
-      }
-    }
-    return $replacements;
-  }
-
-  /**
-   * Implements hook_token_info().
-   */
-  #[Hook('token_info')]
-  public function tokenInfo() {
-    $types['file'] = [
-      'name' => t("Files"),
-      'description' => t("Tokens related to uploaded files."),
-      'needs-data' => 'file',
-    ];
-    // File related tokens.
-    $file['fid'] = [
-      'name' => t("File ID"),
-      'description' => t("The unique ID of the uploaded file."),
-    ];
-    $file['uuid'] = ['name' => t('UUID'), 'description' => t('The UUID of the uploaded file.')];
-    $file['name'] = ['name' => t("File name"), 'description' => t("The name of the file on disk.")];
-    $file['path'] = [
-      'name' => t("Path"),
-      'description' => t("The location of the file relative to Drupal root."),
-    ];
-    $file['mime'] = ['name' => t("MIME type"), 'description' => t("The MIME type of the file.")];
-    $file['size'] = ['name' => t("File size"), 'description' => t("The size of the file.")];
-    $file['url'] = ['name' => t("URL"), 'description' => t("The web-accessible URL for the file.")];
-    $file['created'] = [
-      'name' => t("Created"),
-      'description' => t("The date the file created."),
-      'type' => 'date',
-    ];
-    $file['changed'] = [
-      'name' => t("Changed"),
-      'description' => t("The date the file was most recently changed."),
-      'type' => 'date',
-    ];
-    $file['owner'] = [
-      'name' => t("Owner"),
-      'description' => t("The user who originally uploaded the file."),
-      'type' => 'user',
-    ];
-    return ['types' => $types, 'tokens' => ['file' => $file]];
+  public function filePredelete(File $file): void {
+    // @todo Remove references to a file that is in-use. See https://www.drupal.org/project/drupal/issues/1506314
   }
 
   /**
@@ -350,7 +216,7 @@ class FileHooks {
    * @see \Drupal\file\EventSubscriber\FileEventSubscriber
    */
   #[Hook('form_system_file_system_settings_alter')]
-  public function formSystemFileSystemSettingsAlter(array &$form, FormStateInterface $form_state) : void {
+  public function formSystemFileSystemSettingsAlter(array &$form, FormStateInterface $form_state): void {
     $config = \Drupal::config('file.settings');
     $form['filename_sanitization'] = [
       '#type' => 'details',
