@@ -195,11 +195,10 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
   public function log($level, $message, array $context = []): void {
     if ($message === 'The "%plugin_id" block plugin was not found' && isset($context['%plugin_id'])) {
       $this->logMessages[] = 'The "' . $context['%plugin_id'] . '" block plugin was not found';
+      return;
     }
-    else {
-      // Just log message.
-      $this->logMessages[] = $message;
-    }
+    // Just log message.
+    $this->logMessages[] = $message;
   }
 
 }
