@@ -2,12 +2,9 @@
 
 namespace Drupal\views_ui\Form;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Form builder for the admin display defaults page.
@@ -16,28 +13,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class BasicSettingsForm extends ConfigFormBase {
   use RedundantEditableConfigNamesTrait;
-
-  /**
-   * Constructs a \Drupal\views_ui\Form\BasicSettingsForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager) {
-    parent::__construct($config_factory, $typedConfigManager);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('config.typed'),
-    );
-  }
 
   /**
    * {@inheritdoc}
