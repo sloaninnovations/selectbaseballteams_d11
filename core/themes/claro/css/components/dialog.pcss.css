@@ -50,6 +50,7 @@
       -webkit-font-smoothing: antialiased;
       font-size: var(--jui-dialog-title-font-size);
       font-weight: bold;
+      margin: 0;
     }
 
     .ui-dialog-titlebar-close {
