@@ -114,9 +114,9 @@ interface RouteProviderInterface {
    * @param string $route_name
    *   The route name.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
-   *   Collection of routes that are an alias for a given route name.
+   * @return \Symfony\Component\Routing\Alias[]
+   *   Iterable list of aliases for the given route name.
    */
-  public function getRouteAliases(string $route_name): RouteCollection;
+  public function getRouteAliases(string $route_name): array;
 
 }

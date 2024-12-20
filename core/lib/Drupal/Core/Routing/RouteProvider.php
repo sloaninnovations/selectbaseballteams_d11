@@ -542,17 +542,13 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
   /**
    * {@inheritdoc}
    */
-  public function getRouteAliases(string $route_name): RouteCollection {
-    $collection = new RouteCollection();
-    $routes = $this->connection->select($this->tableName, 'router')
+  public function getRouteAliases(string $route_name): array {
+    $alias_route_names = $this->connection->select($this->tableName, 'router')
       ->fields('router', ['name'])
       ->condition('alias', $route_name)
       ->execute()->fetchCol();
 
-    foreach ($routes as $name) {
-      $collection->addAlias($name, $route_name);
-    }
-    return $collection;
+    return $this->getRoutesByNames($alias_route_names);
   }
 
 }

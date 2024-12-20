@@ -96,7 +96,7 @@ class MockRouteProvider implements RouteProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRouteAliases(string $route_name): RouteCollection {
+  public function getRouteAliases(string $route_name): array {
     return new RouteCollection();
   }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Routing;
 
+use Symfony\Component\Routing\Alias;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -234,6 +235,27 @@ class RoutingFixtures {
   }
 
   /**
+   * Returns a set of routes and aliases for testing.
+   */
+  public function aliasedRouteCollection(): RouteCollection {
+    $collection = new RouteCollection();
+
+    $route = new Route('path/one');
+    $collection->add('route_a', $route);
+
+    $collection->addAlias('route_b', 'route_a');
+
+    $collection->addAlias('route_c', 'route_a')
+      ->setDeprecated(
+        'drupal/core',
+        '11.2.0',
+        '%alias_id% is deprecated!',
+      );
+
+    return $collection;
+  }
+
+  /**
    * Returns the table definition for the routing fixtures.
    *
    * @return array
@@ -301,11 +323,17 @@ class RoutingFixtures {
           'description' => 'A serialized Route object',
           'type' => 'text',
         ],
+        'alias' => [
+          'description' => 'The alias of the route, if applicable.',
+          'type' => 'varchar_ascii',
+          'length' => 255,
+        ],
       ],
       'indexes' => [
         'fit' => ['fit'],
         'pattern_outline' => ['pattern_outline'],
         'provider' => ['provider'],
+        'alias' => ['alias'],
       ],
       'primary key' => ['name'],
     ];

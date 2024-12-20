@@ -157,7 +157,7 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   /**
    * {@inheritdoc}
    */
-  public function getRouteAliases(string $route_name): RouteCollection {
+  public function getRouteAliases(string $route_name): array {
     return $this->getRouteProvider()->getRouteAliases($route_name);
   }
 

@@ -103,7 +103,7 @@ class RouteProvider implements PreloadableRouteProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRouteAliases(string $route_name): RouteCollection {
+  public function getRouteAliases(string $route_name): array {
     return $this->lazyLoadItself()->getRouteAliases($route_name);
   }
 
