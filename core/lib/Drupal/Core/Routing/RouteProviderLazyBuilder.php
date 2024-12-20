@@ -4,7 +4,6 @@ namespace Drupal\Core\Routing;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RouteCollection;
 
 /**
  * A Route Provider front-end for all Drupal-stored routes.

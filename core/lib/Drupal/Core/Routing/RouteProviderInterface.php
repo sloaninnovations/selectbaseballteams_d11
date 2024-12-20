@@ -3,7 +3,6 @@
 namespace Drupal\Core\Routing;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Defines the route provider interface.

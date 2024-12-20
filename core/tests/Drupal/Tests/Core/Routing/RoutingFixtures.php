@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Routing;
 
-use Symfony\Component\Routing\Alias;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
