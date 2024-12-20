@@ -2,7 +2,6 @@
 
 namespace Drupal\workspaces\Hook;
 
-use Drupal\Core\Url;
 use Drupal\workspaces\ViewsQueryAlter;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\ViewExecutable;
@@ -43,7 +42,7 @@ class WorkspacesHooks {
    * Implements hook_module_preinstall().
    */
   #[Hook('module_preinstall')]
-  public function modulePreinstall($module) {
+  public function modulePreinstall($module): void {
     if ($module !== 'workspaces') {
       return;
     }
@@ -63,8 +62,8 @@ class WorkspacesHooks {
    * Implements hook_entity_type_build().
    */
   #[Hook('entity_type_build')]
-  public function entityTypeBuild(array &$entity_types) {
-    return \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityTypeInfo::class)->entityTypeBuild($entity_types);
+  public function entityTypeBuild(array &$entity_types): void {
+    \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityTypeInfo::class)->entityTypeBuild($entity_types);
   }
 
   /**
@@ -90,7 +89,7 @@ class WorkspacesHooks {
    * Implements hook_field_info_alter().
    */
   #[Hook('field_info_alter')]
-  public function fieldInfoAlter(&$definitions) {
+  public function fieldInfoAlter(&$definitions): void {
     \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityTypeInfo::class)->fieldInfoAlter($definitions);
   }
 
@@ -106,7 +105,7 @@ class WorkspacesHooks {
    * Implements hook_entity_preload().
    */
   #[Hook('entity_preload')]
-  public function entityPreload(array $ids, $entity_type_id) {
+  public function entityPreload(array $ids, $entity_type_id): array {
     return \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityPreload($ids, $entity_type_id);
   }
 
@@ -221,69 +220,16 @@ class WorkspacesHooks {
    * Implements hook_views_query_alter().
    */
   #[Hook('views_query_alter')]
-  public function viewsQueryAlter(ViewExecutable $view, QueryPluginBase $query) {
-    return \Drupal::service('class_resolver')->getInstanceFromDefinition(ViewsQueryAlter::class)->alterQuery($view, $query);
+  public function viewsQueryAlter(ViewExecutable $view, QueryPluginBase $query): void {
+    \Drupal::service('class_resolver')->getInstanceFromDefinition(ViewsQueryAlter::class)->alterQuery($view, $query);
   }
 
   /**
    * Implements hook_cron().
    */
   #[Hook('cron')]
-  public function cron() {
+  public function cron(): void {
     \Drupal::service('workspaces.manager')->purgeDeletedWorkspacesBatch();
-  }
-
-  /**
-   * Implements hook_toolbar().
-   */
-  #[Hook('toolbar')]
-  public function toolbar() {
-    $items['workspace'] = ['#cache' => ['contexts' => ['user.permissions']]];
-    $current_user = \Drupal::currentUser();
-    if (!$current_user->hasPermission('administer workspaces') && !$current_user->hasPermission('view own workspace') && !$current_user->hasPermission('view any workspace')) {
-      return $items;
-    }
-    /** @var \Drupal\workspaces\WorkspaceInterface $active_workspace */
-    $active_workspace = \Drupal::service('workspaces.manager')->getActiveWorkspace();
-    $items['workspace'] += [
-      '#type' => 'toolbar_item',
-      'tab' => [
-        '#lazy_builder' => [
-          'workspaces.lazy_builders:renderToolbarTab',
-                  [],
-        ],
-        '#create_placeholder' => TRUE,
-        '#lazy_builder_preview' => [
-          '#type' => 'link',
-          '#title' => $active_workspace ? $active_workspace->label() : t('Live'),
-          '#url' => Url::fromRoute('entity.workspace.collection'),
-          '#attributes' => [
-            'class' => [
-              'toolbar-tray-lazy-placeholder-link',
-            ],
-          ],
-        ],
-      ],
-      '#wrapper_attributes' => [
-        'class' => [
-          'workspaces-toolbar-tab',
-        ],
-      ],
-      '#weight' => 500,
-    ];
-    // Add a special class to the wrapper if we don't have an active workspace so
-    // we can highlight it with a different color.
-    if (!$active_workspace) {
-      $items['workspace']['#wrapper_attributes']['class'][] = 'workspaces-toolbar-tab--is-default';
-    }
-    // \Drupal\toolbar\Element\ToolbarItem::preRenderToolbarItem adds an
-    // #attributes property to each toolbar item's tab child automatically.
-    // Lazy builders don't support an #attributes property so we need to
-    // add another render callback to remove the #attributes property. We start by
-    // adding the defaults, and then we append our own pre render callback.
-    $items['workspace'] += \Drupal::service('plugin.manager.element_info')->getInfo('toolbar_item');
-    $items['workspace']['#pre_render'][] = 'workspaces.lazy_builders:removeTabAttributes';
-    return $items;
   }
 
 }

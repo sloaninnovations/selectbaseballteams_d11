@@ -16,7 +16,7 @@ class ContextualHooks {
    * Implements hook_toolbar().
    */
   #[Hook('toolbar')]
-  public function toolbar() {
+  public function toolbar(): array {
     $items = [];
     $items['contextual'] = ['#cache' => ['contexts' => ['user.permissions']]];
     if (!\Drupal::currentUser()->hasPermission('access contextual links')) {
@@ -61,7 +61,7 @@ class ContextualHooks {
    * @see contextual_preprocess()
    */
   #[Hook('page_attachments')]
-  public function pageAttachments(array &$page) {
+  public function pageAttachments(array &$page): void {
     if (!\Drupal::currentUser()->hasPermission('access contextual links')) {
       return;
     }
@@ -110,7 +110,7 @@ class ContextualHooks {
    * @see \Drupal\contextual\Plugin\views\field\ContextualLinks::render()
    */
   #[Hook('contextual_links_view_alter')]
-  public function contextualLinksViewAlter(&$element, $items) {
+  public function contextualLinksViewAlter(&$element, $items): void {
     if (isset($element['#contextual_links']['contextual'])) {
       $encoded_links = $element['#contextual_links']['contextual']['metadata']['contextual-views-field-links'];
       $element['#links'] = Json::decode(rawurldecode($encoded_links));

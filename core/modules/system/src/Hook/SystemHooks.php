@@ -195,24 +195,13 @@ class SystemHooks {
   }
 
   /**
-   * Implements hook_page_attachments().
-   *
-   * @see template_preprocess_maintenance_page()
-   * @see \Drupal\Core\EventSubscriber\ActiveLinkResponseFilter
-   */
-  #[Hook('page_attachments')]
-  public function pageAttachments(array &$page) {
-    _system_page_attachments($page);
-  }
-
-  /**
    * Implements hook_js_settings_build().
    *
    * Sets values for the core/drupal.ajax library, which just depends on the
    * active theme but no other request-dependent values.
    */
   #[Hook('js_settings_build')]
-  public function jsSettingsBuild(&$settings, AttachedAssetsInterface $assets) {
+  public function jsSettingsBuild(&$settings, AttachedAssetsInterface $assets): void {
     // Generate the values for the core/drupal.ajax library.
     // We need to send ajaxPageState settings for core/drupal.ajax if:
     // - ajaxPageState is being loaded in this Response, in which case it will
@@ -239,7 +228,7 @@ class SystemHooks {
    * as well as theme_token ajax state.
    */
   #[Hook('js_settings_alter')]
-  public function jsSettingsAlter(&$settings, AttachedAssetsInterface $assets) {
+  public function jsSettingsAlter(&$settings, AttachedAssetsInterface $assets): void {
     // As this is being output in the final response always use the main request.
     $request = \Drupal::requestStack()->getMainRequest();
     $current_query = $request->query->all();
@@ -302,7 +291,7 @@ class SystemHooks {
    * Implements hook_system_info_alter().
    */
   #[Hook('system_info_alter')]
-  public function systemInfoAlter(&$info, Extension $file, $type) {
+  public function systemInfoAlter(&$info, Extension $file, $type): void {
     // Remove page-top and page-bottom from the blocks UI since they are reserved for
     // modules to populate from outside the blocks system.
     if ($type == 'theme') {
@@ -318,7 +307,7 @@ class SystemHooks {
    * ensure files directories have .htaccess files.
    */
   #[Hook('cron')]
-  public function cron() {
+  public function cron(): void {
     // Clean up the flood.
     \Drupal::flood()->garbageCollection();
     foreach (Cache::getBins() as $cache_backend) {
@@ -353,7 +342,7 @@ class SystemHooks {
    * Implements hook_mail().
    */
   #[Hook('mail')]
-  public function mail($key, &$message, $params) {
+  public function mail($key, &$message, $params): void {
     $token_service = \Drupal::token();
     $context = $params['context'];
     $subject = PlainTextOutput::renderFromHtml($token_service->replace($context['subject'], $context));
@@ -366,7 +355,7 @@ class SystemHooks {
    * Implements hook_entity_type_build().
    */
   #[Hook('entity_type_build')]
-  public function entityTypeBuild(array &$entity_types) {
+  public function entityTypeBuild(array &$entity_types): void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
     $entity_types['date_format']->setFormClass('add', 'Drupal\system\Form\DateFormatAddForm')->setFormClass('edit', 'Drupal\system\Form\DateFormatEditForm')->setFormClass('delete', 'Drupal\system\Form\DateFormatDeleteForm')->setListBuilderClass('Drupal\system\DateFormatListBuilder')->setLinkTemplate('edit-form', '/admin/config/regional/date-time/formats/manage/{date_format}')->setLinkTemplate('delete-form', '/admin/config/regional/date-time/formats/manage/{date_format}/delete')->setLinkTemplate('collection', '/admin/config/regional/date-time/formats');
   }
@@ -375,7 +364,7 @@ class SystemHooks {
    * Implements hook_block_view_BASE_BLOCK_ID_alter().
    */
   #[Hook('block_view_system_main_block_alter')]
-  public function blockViewSystemMainBlockAlter(array &$build, BlockPluginInterface $block) {
+  public function blockViewSystemMainBlockAlter(array &$build, BlockPluginInterface $block): void {
     // Contextual links on the system_main block would basically duplicate the
     // tabs/local tasks, so reduce the clutter.
     unset($build['#contextual_links']);
@@ -385,7 +374,7 @@ class SystemHooks {
    * Implements hook_query_TAG_alter() for entity reference selection handlers.
    */
   #[Hook('query_entity_reference_alter')]
-  public function queryEntityReferenceAlter(AlterableInterface $query) {
+  public function queryEntityReferenceAlter(AlterableInterface $query): void {
     $handler = $query->getMetadata('entity_reference_selection_handler');
     $handler->entityQueryAlter($query);
   }
@@ -394,7 +383,7 @@ class SystemHooks {
    * Implements hook_element_info_alter().
    */
   #[Hook('element_info_alter')]
-  public function elementInfoAlter(&$type) {
+  public function elementInfoAlter(&$type): void {
     if (isset($type['page'])) {
       $type['page']['#theme_wrappers']['off_canvas_page_wrapper'] = ['#weight' => -1000];
     }
@@ -404,7 +393,7 @@ class SystemHooks {
    * Implements hook_modules_uninstalled().
    */
   #[Hook('modules_uninstalled')]
-  public function modulesUninstalled($modules) {
+  public function modulesUninstalled($modules): void {
     // @todo Remove this when modules are able to maintain their revision metadata
     //   keys.
     //   @see https://www.drupal.org/project/drupal/issues/3074333
@@ -424,7 +413,7 @@ class SystemHooks {
    * Implements hook_library_info_alter().
    */
   #[Hook('library_info_alter')]
-  public function libraryInfoAlter(&$libraries, $extension) {
+  public function libraryInfoAlter(&$libraries, $extension): void {
     // If Claro is the admin theme but not the active theme, grant Claro the
     // ability to override the toolbar library with its own assets.
     if ($extension === 'toolbar' && _system_is_claro_admin_and_not_active()) {
@@ -437,7 +426,7 @@ class SystemHooks {
    * Implements hook_theme_registry_alter().
    */
   #[Hook('theme_registry_alter')]
-  public function themeRegistryAlter(array &$theme_registry) {
+  public function themeRegistryAlter(array &$theme_registry): void {
     // If Claro is the admin theme but not the active theme, use Claro's toolbar
     // templates.
     if (_system_is_claro_admin_and_not_active()) {
@@ -450,7 +439,7 @@ class SystemHooks {
    * Implements hook_page_top().
    */
   #[Hook('page_top')]
-  public function pageTop() {
+  public function pageTop(): void {
     /** @var \Drupal\Core\Routing\AdminContext $admin_context */
     $admin_context = \Drupal::service('router.admin_context');
     if ($admin_context->isAdminRoute() && \Drupal::currentUser()->hasPermission('administer site configuration')) {
@@ -530,7 +519,7 @@ class SystemHooks {
    * Implements hook_archiver_info_alter().
    */
   #[Hook('archiver_info_alter')]
-  public function archiverInfoAlter(&$info) {
+  public function archiverInfoAlter(&$info): void {
     if (!class_exists(\ZipArchive::class)) {
       // PHP Zip extension is missing.
       unset($info['Zip']);

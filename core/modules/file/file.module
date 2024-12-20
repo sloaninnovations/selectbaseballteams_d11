@@ -23,6 +23,7 @@ use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\Template\Attribute;
 use Drupal\file\FileInterface;
 use Drupal\file\IconMimeTypes;
+use Drupal\file\Upload\FileUploadHandlerInterface;
 use Drupal\file\Upload\FormUploadedFile;
 
 /**
@@ -205,8 +206,8 @@ function file_save_upload($form_field_name, $validators = [], $destination = FAL
     $destination = 'temporary://';
   }
 
-  /** @var \Drupal\file\Upload\FileUploadHandler $file_upload_handler */
-  $file_upload_handler = \Drupal::service('file.upload_handler');
+  /** @var \Drupal\file\Upload\FileUploadHandlerInterface $file_upload_handler */
+  $file_upload_handler = \Drupal::service(FileUploadHandlerInterface::class);
   /** @var \Drupal\Core\Render\RendererInterface $renderer */
   $renderer = \Drupal::service('renderer');
   $files = [];
@@ -402,7 +403,7 @@ function file_managed_file_save_upload($element, FormStateInterface $form_state)
  *   An associative array containing:
  *   - element: A render element representing the file.
  */
-function template_preprocess_file_managed_file(&$variables) {
+function template_preprocess_file_managed_file(&$variables): void {
   $element = $variables['element'];
 
   $variables['attributes'] = [];
@@ -427,7 +428,7 @@ function template_preprocess_file_managed_file(&$variables) {
  *   - description: A description to be displayed instead of the filename.
  *   - attributes: An associative array of attributes to be placed in the a tag.
  */
-function template_preprocess_file_link(&$variables) {
+function template_preprocess_file_link(&$variables): void {
   $file = $variables['file'];
   $options = [];
 
@@ -473,7 +474,7 @@ function template_preprocess_file_link(&$variables) {
  *   An associative array containing:
  *   - element: A render element representing the widgets.
  */
-function template_preprocess_file_widget_multiple(&$variables) {
+function template_preprocess_file_widget_multiple(&$variables): void {
   $element = $variables['element'];
   // Special ID and classes for draggable tables.
   $weight_class = $element['#id'] . '-weight';
@@ -589,7 +590,7 @@ function template_preprocess_file_widget_multiple(&$variables) {
  *   - upload_validators: An array of upload validators as used in
  *     $element['#upload_validators'].
  */
-function template_preprocess_file_upload_help(&$variables) {
+function template_preprocess_file_upload_help(&$variables): void {
   $description = $variables['description'];
   $upload_validators = $variables['upload_validators'];
   $cardinality = $variables['cardinality'];

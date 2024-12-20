@@ -158,7 +158,7 @@ class LocaleHooks {
    * Implements hook_modules_installed().
    */
   #[Hook('modules_installed')]
-  public function modulesInstalled($modules) {
+  public function modulesInstalled($modules): void {
     $components['module'] = $modules;
     locale_system_update($components);
   }
@@ -167,7 +167,7 @@ class LocaleHooks {
    * Implements hook_module_preuninstall().
    */
   #[Hook('module_preuninstall')]
-  public function modulePreuninstall($module) {
+  public function modulePreuninstall($module): void {
     $components['module'] = [$module];
     locale_system_remove($components);
   }
@@ -176,7 +176,7 @@ class LocaleHooks {
    * Implements hook_themes_installed().
    */
   #[Hook('themes_installed')]
-  public function themesInstalled($themes) {
+  public function themesInstalled($themes): void {
     $components['theme'] = $themes;
     locale_system_update($components);
   }
@@ -185,7 +185,7 @@ class LocaleHooks {
    * Implements hook_themes_uninstalled().
    */
   #[Hook('themes_uninstalled')]
-  public function themesUninstalled($themes) {
+  public function themesUninstalled($themes): void {
     $components['theme'] = $themes;
     locale_system_remove($components);
   }
@@ -196,7 +196,7 @@ class LocaleHooks {
    * @see \Drupal\locale\Plugin\QueueWorker\LocaleTranslation
    */
   #[Hook('cron')]
-  public function cron() {
+  public function cron(): void {
     // Update translations only when an update frequency was set by the admin
     // and a translatable language was set.
     // Update tasks are added to the queue here but processed by Drupal's cron.
@@ -210,7 +210,7 @@ class LocaleHooks {
    * Implements hook_cache_flush().
    */
   #[Hook('cache_flush')]
-  public function cacheFlush() {
+  public function cacheFlush(): void {
     \Drupal::state()->delete('system.javascript_parsed');
   }
 
@@ -218,7 +218,7 @@ class LocaleHooks {
    * Implements hook_js_alter().
    */
   #[Hook('js_alter')]
-  public function jsAlter(&$javascript, AttachedAssetsInterface $assets, LanguageInterface $language) {
+  public function jsAlter(&$javascript, AttachedAssetsInterface $assets, LanguageInterface $language): void {
     $files = [];
     foreach ($javascript as $item) {
       if (isset($item['type']) && $item['type'] == 'file') {
@@ -252,7 +252,7 @@ class LocaleHooks {
    * Provides language support.
    */
   #[Hook('library_info_alter')]
-  public function libraryInfoAlter(array &$libraries, $module) {
+  public function libraryInfoAlter(array &$libraries, $module): void {
     // When the locale module is enabled, we update the core/drupal library to
     // have a dependency on the locale/translations library, which provides
     // window.drupalTranslations, containing the translations for all strings in

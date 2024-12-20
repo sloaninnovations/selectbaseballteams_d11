@@ -63,7 +63,7 @@ class MenuUiHooks {
    * Implements hook_entity_type_build().
    */
   #[Hook('entity_type_build')]
-  public function entityTypeBuild(array &$entity_types) {
+  public function entityTypeBuild(array &$entity_types): void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
     $entity_types['menu']->setFormClass('add', 'Drupal\menu_ui\MenuForm')->setFormClass('edit', 'Drupal\menu_ui\MenuForm')->setFormClass('delete', 'Drupal\menu_ui\Form\MenuDeleteForm')->setListBuilderClass('Drupal\menu_ui\MenuListBuilder')->setLinkTemplate('add-form', '/admin/structure/menu/add')->setLinkTemplate('delete-form', '/admin/structure/menu/manage/{menu}/delete')->setLinkTemplate('edit-form', '/admin/structure/menu/manage/{menu}')->setLinkTemplate('add-link-form', '/admin/structure/menu/manage/{menu}/add')->setLinkTemplate('collection', '/admin/structure/menu');
     if (isset($entity_types['node'])) {
@@ -75,7 +75,7 @@ class MenuUiHooks {
    * Implements hook_block_view_BASE_BLOCK_ID_alter() for 'system_menu_block'.
    */
   #[Hook('block_view_system_menu_block_alter')]
-  public function blockViewSystemMenuBlockAlter(array &$build, BlockPluginInterface $block) {
+  public function blockViewSystemMenuBlockAlter(array &$build, BlockPluginInterface $block): void {
     if ($block->getBaseId() == 'system_menu_block') {
       $menu_name = $block->getDerivativeId();
       $build['#contextual_links']['menu'] = ['route_parameters' => ['menu' => $menu_name]];
@@ -256,7 +256,7 @@ class MenuUiHooks {
    * Implements hook_system_breadcrumb_alter().
    */
   #[Hook('system_breadcrumb_alter')]
-  public function systemBreadcrumbAlter(Breadcrumb $breadcrumb, RouteMatchInterface $route_match, array $context) {
+  public function systemBreadcrumbAlter(Breadcrumb $breadcrumb, RouteMatchInterface $route_match, array $context): void {
     // Custom breadcrumb behavior for editing menu links, we append a link to
     // the menu in which the link is found.
     if ($route_match->getRouteName() == 'menu_ui.link_edit' && ($menu_link = $route_match->getParameter('menu_link_plugin'))) {

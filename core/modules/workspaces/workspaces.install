@@ -61,7 +61,7 @@ function workspaces_install(): void {
 /**
  * Implements hook_schema().
  */
-function workspaces_schema() {
+function workspaces_schema(): array {
   $schema['workspace_association'] = [
     'description' => 'Stores the association between entity revisions and their workspace.',
     'fields' => [
@@ -141,4 +141,11 @@ function workspaces_update_11101(): void {
   $schema->addField('workspace_association', 'target_entity_id_string', $target_id_string_spec, [
     'primary key' => ['workspace', 'target_entity_type_id', 'target_entity_id', 'target_entity_id_string'],
   ]);
+}
+
+/**
+ * Install the new Workspaces UI module.
+ */
+function workspaces_update_11102(): void {
+  \Drupal::service('module_installer')->install(['workspaces_ui']);
 }

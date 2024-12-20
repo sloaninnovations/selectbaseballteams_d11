@@ -44,7 +44,7 @@ class DblogHooks {
    * Implements hook_menu_links_discovered_alter().
    */
   #[Hook('menu_links_discovered_alter')]
-  public function menuLinksDiscoveredAlter(&$links) {
+  public function menuLinksDiscoveredAlter(&$links): void {
     if (\Drupal::moduleHandler()->moduleExists('search')) {
       $links['dblog.search'] = [
         'title' => new TranslatableMarkup('Top search phrases'),
@@ -53,7 +53,6 @@ class DblogHooks {
         'parent' => 'system.admin_reports',
       ];
     }
-    return $links;
   }
 
   /**
@@ -62,7 +61,7 @@ class DblogHooks {
    * Controls the size of the log table, paring it to 'dblog_row_limit' messages.
    */
   #[Hook('cron')]
-  public function cron() {
+  public function cron(): void {
     // Cleanup the watchdog table.
     $row_limit = \Drupal::config('dblog.settings')->get('row_limit');
     // For row limit n, get the wid of the nth row in descending wid order.
@@ -101,7 +100,7 @@ class DblogHooks {
    * Implements hook_views_pre_render().
    */
   #[Hook('views_pre_render')]
-  public function viewsPreRender(ViewExecutable $view) {
+  public function viewsPreRender(ViewExecutable $view): void {
     if (isset($view) && $view->storage->get('base_table') == 'watchdog') {
       $view->element['#attached']['library'][] = 'dblog/drupal.dblog';
     }

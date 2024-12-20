@@ -61,7 +61,7 @@ class EditorHooks {
    * of text editors.
    */
   #[Hook('menu_links_discovered_alter')]
-  public function menuLinksDiscoveredAlter(array &$links) {
+  public function menuLinksDiscoveredAlter(array &$links): void {
     $links['filter.admin_overview']['title'] = new TranslatableMarkup('Text formats and editors');
     $links['filter.admin_overview']['description'] = new TranslatableMarkup('Select and configure text editors, and how content is filtered when displayed.');
   }
@@ -76,7 +76,7 @@ class EditorHooks {
    * @see \Drupal\filter\Element\TextFormat
    */
   #[Hook('element_info_alter')]
-  public function elementInfoAlter(&$types) {
+  public function elementInfoAlter(&$types): void {
     $types['text_format']['#pre_render'][] = 'element.editor:preRenderTextFormat';
   }
 
@@ -207,14 +207,14 @@ class EditorHooks {
     }
     // On new revisions, all files are considered to be a new usage and no
     // deletion of previous file usages are necessary.
-    if (!empty($entity->original) && $entity->getRevisionId() != $entity->original->getRevisionId()) {
+    if ($entity->getOriginal() && $entity->getRevisionId() != $entity->getOriginal()->getRevisionId()) {
       $referenced_files_by_field = _editor_get_file_uuids_by_field($entity);
       foreach ($referenced_files_by_field as $uuids) {
         _editor_record_file_usage($uuids, $entity);
       }
     }
     else {
-      $original_uuids_by_field = empty($entity->original) ? [] : _editor_get_file_uuids_by_field($entity->original);
+      $original_uuids_by_field = !$entity->getOriginal() ? [] : _editor_get_file_uuids_by_field($entity->getOriginal());
       $uuids_by_field = _editor_get_file_uuids_by_field($entity);
       // Detect file usages that should be incremented.
       foreach ($uuids_by_field as $field => $uuids) {

@@ -60,7 +60,7 @@ class ViewsUiHooks {
    * Implements hook_entity_type_build().
    */
   #[Hook('entity_type_build')]
-  public function entityTypeBuild(array &$entity_types) {
+  public function entityTypeBuild(array &$entity_types): void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
     $entity_types['view']->setFormClass('edit', 'Drupal\views_ui\ViewEditForm')->setFormClass('add', 'Drupal\views_ui\ViewAddForm')->setFormClass('preview', 'Drupal\views_ui\ViewPreviewForm')->setFormClass('duplicate', 'Drupal\views_ui\ViewDuplicateForm')->setFormClass('delete', 'Drupal\Core\Entity\EntityDeleteForm')->setFormClass('break_lock', 'Drupal\views_ui\Form\BreakLockForm')->setListBuilderClass('Drupal\views_ui\ViewListBuilder')->setLinkTemplate('edit-form', '/admin/structure/views/view/{view}')->setLinkTemplate('edit-display-form', '/admin/structure/views/view/{view}/edit/{display_id}')->setLinkTemplate('preview-form', '/admin/structure/views/view/{view}/preview/{display_id}')->setLinkTemplate('duplicate-form', '/admin/structure/views/view/{view}/duplicate')->setLinkTemplate('delete-form', '/admin/structure/views/view/{view}/delete')->setLinkTemplate('enable', '/admin/structure/views/view/{view}/enable')->setLinkTemplate('disable', '/admin/structure/views/view/{view}/disable')->setLinkTemplate('break-lock-form', '/admin/structure/views/view/{view}/break-lock')->setLinkTemplate('collection', '/admin/structure/views');
   }
@@ -154,7 +154,7 @@ class ViewsUiHooks {
    * Implements hook_views_plugins_display_alter().
    */
   #[Hook('views_plugins_display_alter')]
-  public function viewsPluginsDisplayAlter(&$plugins) {
+  public function viewsPluginsDisplayAlter(&$plugins): void {
     // Attach contextual links to each display plugin. The links will point to
     // paths underneath "admin/structure/views/view/{$view->id()}" (i.e., paths
     // for editing and performing other contextual actions on the view).
@@ -172,7 +172,7 @@ class ViewsUiHooks {
    * Implements hook_contextual_links_view_alter().
    */
   #[Hook('contextual_links_view_alter')]
-  public function contextualLinksViewAlter(&$element, $items) {
+  public function contextualLinksViewAlter(&$element, $items): void {
     // Remove contextual links from being rendered, when so desired, such as
     // within a View preview.
     if (views_ui_contextual_links_suppress()) {
@@ -193,7 +193,7 @@ class ViewsUiHooks {
    * node.views.inc as well.
    */
   #[Hook('views_analyze')]
-  public function viewsAnalyze(ViewExecutable $view) {
+  public function viewsAnalyze(ViewExecutable $view): array {
     $ret = [];
     // Check for something other than the default display:
     if (count($view->displayHandlers) < 2) {

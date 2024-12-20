@@ -816,7 +816,7 @@ function hook_ENTITY_TYPE_create_access(\Drupal\Core\Session\AccountInterface $a
  * @see \Drupal\Core\Entity\EntityTypeInterface
  * @see hook_entity_type_alter()
  */
-function hook_entity_type_build(array &$entity_types) {
+function hook_entity_type_build(array &$entity_types): void {
   /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
   // Add a form for a custom node form without overriding the default
   // node form. To override the default node form, use hook_entity_type_alter().
@@ -1041,7 +1041,7 @@ function hook_ENTITY_TYPE_revision_create(\Drupal\Core\Entity\EntityInterface $n
  *
  * @ingroup entity_crud
  */
-function hook_entity_preload(array $ids, $entity_type_id) {
+function hook_entity_preload(array $ids, $entity_type_id): array {
   $entities = [];
 
   foreach ($ids as $id) {
@@ -1101,7 +1101,7 @@ function hook_ENTITY_TYPE_load($entities) {
  *
  * @see hook_entity_load()
  */
-function hook_entity_storage_load(array $entities, $entity_type) {
+function hook_entity_storage_load(array $entities, $entity_type): void {
   foreach ($entities as $entity) {
     $entity->foo = my_module_add_something_uncached($entity);
   }
@@ -1126,8 +1126,8 @@ function hook_ENTITY_TYPE_storage_load(array $entities) {
 /**
  * Act on an entity before it is created or updated.
  *
- * You can get the original entity object from $entity->original when it is an
- * update of the entity.
+ * You can get the original entity object from
+ * $entity->getOriginal() when it is an update of the entity.
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object.
@@ -1145,8 +1145,8 @@ function hook_entity_presave(\Drupal\Core\Entity\EntityInterface $entity) {
 /**
  * Act on a specific type of entity before it is created or updated.
  *
- * You can get the original entity object from $entity->original when it is an
- * update of the entity.
+ * You can get the original entity object from
+ * $entity->getOriginal() when it is an update of the entity.
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object.
@@ -1213,7 +1213,7 @@ function hook_ENTITY_TYPE_insert(\Drupal\Core\Entity\EntityInterface $entity) {
  *
  * This hook runs once the entity storage has been updated. Note that hook
  * implementations may not alter the stored entity data. Get the original entity
- * object from $entity->original.
+ * object from $entity->getOriginal().
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object.
@@ -1237,7 +1237,7 @@ function hook_entity_update(\Drupal\Core\Entity\EntityInterface $entity) {
  *
  * This hook runs once the entity storage has been updated. Note that hook
  * implementations may not alter the stored entity data. Get the original entity
- * object from $entity->original.
+ * object from $entity->getOriginal().
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object.
@@ -2109,7 +2109,7 @@ function hook_entity_field_storage_info_alter(&$fields, \Drupal\Core\Entity\Enti
  *
  * @see \Drupal\Core\Entity\EntityListBuilderInterface::getOperations()
  */
-function hook_entity_operation(\Drupal\Core\Entity\EntityInterface $entity) {
+function hook_entity_operation(\Drupal\Core\Entity\EntityInterface $entity): array {
   $operations = [];
   $operations['translate'] = [
     'title' => t('Translate'),
