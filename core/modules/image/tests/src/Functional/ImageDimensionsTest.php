@@ -22,9 +22,7 @@ class ImageDimensionsTest extends BrowserTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['image', 'image_module_test'];
 
@@ -33,12 +31,15 @@ class ImageDimensionsTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
   protected $profile = 'testing';
 
   /**
    * Tests styled image dimensions cumulatively.
    */
-  public function testImageDimensions() {
+  public function testImageDimensions(): void {
     $image_factory = $this->container->get('image.factory');
     // Create a working copy of the file.
     $files = $this->drupalGetTestFiles('image');
@@ -305,7 +306,7 @@ class ImageDimensionsTest extends BrowserTestBase {
    * method and pass each time a fresh array so that $variables won't get
    * altered and the element is re-rendered each time.
    */
-  protected function getImageTag($variables) {
+  protected function getImageTag($variables): string {
     return str_replace("\n", '', (string) \Drupal::service('renderer')->renderRoot($variables));
   }
 

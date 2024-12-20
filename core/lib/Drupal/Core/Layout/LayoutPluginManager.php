@@ -149,6 +149,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     $regions = array_map(function ($region) {
       if (!$region['label'] instanceof TranslatableMarkup) {
         // Region labels from YAML discovery needs translation.
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $region['label'] = new TranslatableMarkup($region['label'], [], ['context' => 'layout_region']);
       }
       return $region;
@@ -227,7 +228,8 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    */
   public function getLayoutOptions() {
     $layout_options = [];
-    foreach ($this->getGroupedDefinitions() as $category => $layout_definitions) {
+    $filtered_definitions = $this->getFilteredDefinitions($this->getType());
+    foreach ($this->getGroupedDefinitions($filtered_definitions) as $category => $layout_definitions) {
       foreach ($layout_definitions as $name => $layout_definition) {
         $layout_options[$category][$name] = $layout_definition->getLabel();
       }

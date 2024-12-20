@@ -20,9 +20,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 class RegistryTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['theme_test', 'system'];
 
@@ -31,7 +29,7 @@ class RegistryTest extends KernelTestBase {
   /**
    * Tests the behavior of the theme registry class.
    */
-  public function testRaceCondition() {
+  public function testRaceCondition(): void {
     // The theme registry is not marked as persistable in case we don't have a
     // proper request.
     \Drupal::request()->setMethod('GET');
@@ -69,9 +67,9 @@ class RegistryTest extends KernelTestBase {
   /**
    * Tests the theme registry with multiple subthemes.
    */
-  public function testMultipleSubThemes() {
+  public function testMultipleSubThemes(): void {
     $theme_handler = \Drupal::service('theme_handler');
-    \Drupal::service('theme_installer')->install(['test_basetheme', 'test_subtheme', 'test_subsubtheme']);
+    \Drupal::service('theme_installer')->install(['test_base_theme', 'test_subtheme', 'test_subsubtheme']);
 
     $module_list = $this->container->get('extension.list.module');
     assert($module_list instanceof ModuleExtensionList);
@@ -80,13 +78,13 @@ class RegistryTest extends KernelTestBase {
     $registry_subsub_theme->setThemeManager(\Drupal::theme());
     $registry_sub_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $module_list, \Drupal::service('kernel'), 'test_subtheme',);
     $registry_sub_theme->setThemeManager(\Drupal::theme());
-    $registry_base_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $module_list, \Drupal::service('kernel'), 'test_basetheme');
+    $registry_base_theme = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), $module_list, \Drupal::service('kernel'), 'test_base_theme');
     $registry_base_theme->setThemeManager(\Drupal::theme());
 
     $preprocess_functions = $registry_subsub_theme->get()['theme_test_template_test']['preprocess functions'];
     $this->assertSame([
       'template_preprocess',
-      'test_basetheme_preprocess_theme_test_template_test',
+      'test_base_theme_preprocess_theme_test_template_test',
       'test_subtheme_preprocess_theme_test_template_test',
       'test_subsubtheme_preprocess_theme_test_template_test',
     ], $preprocess_functions);
@@ -94,21 +92,21 @@ class RegistryTest extends KernelTestBase {
     $preprocess_functions = $registry_sub_theme->get()['theme_test_template_test']['preprocess functions'];
     $this->assertSame([
       'template_preprocess',
-      'test_basetheme_preprocess_theme_test_template_test',
+      'test_base_theme_preprocess_theme_test_template_test',
       'test_subtheme_preprocess_theme_test_template_test',
     ], $preprocess_functions);
 
     $preprocess_functions = $registry_base_theme->get()['theme_test_template_test']['preprocess functions'];
     $this->assertSame([
       'template_preprocess',
-      'test_basetheme_preprocess_theme_test_template_test',
+      'test_base_theme_preprocess_theme_test_template_test',
     ], $preprocess_functions);
   }
 
   /**
    * Tests the theme registry with suggestions.
    */
-  public function testSuggestionPreprocessFunctions() {
+  public function testSuggestionPreprocessFunctions(): void {
     $theme_handler = \Drupal::service('theme_handler');
     \Drupal::service('theme_installer')->install(['test_theme']);
 
@@ -147,7 +145,7 @@ class RegistryTest extends KernelTestBase {
   /**
    * Tests that the theme registry can be altered by themes.
    */
-  public function testThemeRegistryAlterByTheme() {
+  public function testThemeRegistryAlterByTheme(): void {
 
     /** @var \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler */
     $theme_handler = \Drupal::service('theme_handler');
@@ -164,7 +162,7 @@ class RegistryTest extends KernelTestBase {
   /**
    * Tests front node theme suggestion generation.
    */
-  public function testThemeSuggestions() {
+  public function testThemeSuggestions(): void {
     // Mock the current page as the front page.
     /** @var \Drupal\Core\Path\PathMatcherInterface $path_matcher */
     $path_matcher = $this->prophesize(PathMatcherInterface::class);
@@ -197,7 +195,7 @@ class RegistryTest extends KernelTestBase {
   /**
    * Tests page theme suggestions for 200 responses.
    */
-  public function test200ThemeSuggestions() {
+  public function test200ThemeSuggestions(): void {
     $path_matcher = $this->prophesize(PathMatcherInterface::class);
     $path_matcher->isFrontPage()->willReturn(FALSE);
     \Drupal::getContainer()->set('path.matcher', $path_matcher->reveal());
@@ -259,7 +257,7 @@ class RegistryTest extends KernelTestBase {
   /**
    * Tests theme-provided templates that are registered by modules.
    */
-  public function testThemeTemplatesRegisteredByModules() {
+  public function testThemeTemplatesRegisteredByModules(): void {
     $theme_handler = \Drupal::service('theme_handler');
     \Drupal::service('theme_installer')->install(['test_theme']);
 

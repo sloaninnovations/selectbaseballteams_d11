@@ -36,7 +36,7 @@ class FormattableMarkupTest extends TestCase {
    * @covers ::__toString
    * @covers ::jsonSerialize
    */
-  public function testToString() {
+  public function testToString(): void {
     $string = 'Can I have a @replacement';
     $formattable_string = new FormattableMarkup($string, ['@replacement' => 'kitten']);
     $text = (string) $formattable_string;
@@ -48,7 +48,7 @@ class FormattableMarkupTest extends TestCase {
   /**
    * @covers ::count
    */
-  public function testCount() {
+  public function testCount(): void {
     $string = 'Can I have a @replacement';
     $formattable_string = new FormattableMarkup($string, ['@replacement' => 'kitten']);
     $this->assertEquals(strlen($string), $formattable_string->count());
@@ -66,7 +66,7 @@ class FormattableMarkupTest extends TestCase {
    * @param string $error_message
    *   The error message.
    */
-  public function errorHandler($error_number, $error_message) {
+  public function errorHandler($error_number, $error_message): void {
     $this->lastErrorNumber = $error_number;
     $this->lastErrorMessage = $error_message;
   }
@@ -75,7 +75,7 @@ class FormattableMarkupTest extends TestCase {
    * @covers ::__toString
    * @dataProvider providerTestUnexpectedPlaceholder
    */
-  public function testUnexpectedPlaceholder($string, $arguments, $error_number, $error_message) {
+  public function testUnexpectedPlaceholder($string, $arguments, $error_number, $error_message): void {
     // We set a custom error handler because of https://github.com/sebastianbergmann/phpunit/issues/487
     set_error_handler([$this, 'errorHandler']);
     // We want this to trigger an error.

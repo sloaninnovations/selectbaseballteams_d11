@@ -15,9 +15,7 @@ use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
 class NavigationUserBlockTest extends PageCacheTagsTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['navigation', 'test_page_test', 'block'];
 
@@ -64,7 +62,7 @@ class NavigationUserBlockTest extends PageCacheTagsTestBase {
   /**
    * Test output of user navigation block with regards to caching and contents.
    */
-  public function testNavigationUserBlock() {
+  public function testNavigationUserBlock(): void {
     // Verify some basic cacheability metadata. Ensures that we're not doing
     // anything so egregious as to upset expected caching behavior. In this
     // case, as an anonymous user, we should have zero effect on the page.

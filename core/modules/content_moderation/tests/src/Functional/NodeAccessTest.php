@@ -14,9 +14,7 @@ use Drupal\node\Entity\NodeType;
 class NodeAccessTest extends ModerationStateTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'content_moderation',
@@ -72,7 +70,7 @@ class NodeAccessTest extends ModerationStateTestBase {
   /**
    * Verifies that a non-admin user can still access the appropriate pages.
    */
-  public function testPageAccess() {
+  public function testPageAccess(): void {
     // Initially disable access grant records in
     // node_access_test_node_access_records().
     \Drupal::state()->set('node_access_test.private', TRUE);

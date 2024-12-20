@@ -46,6 +46,8 @@ abstract class StylePluginBase extends PluginBase {
 
   /**
    * Store all available tokens row rows.
+   *
+   * @var array
    */
   protected $rowTokens = [];
 
@@ -88,7 +90,7 @@ abstract class StylePluginBase extends PluginBase {
    *
    * @var array|null
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $rendered_fields;
 
   /**
@@ -115,7 +117,7 @@ abstract class StylePluginBase extends PluginBase {
    *
    * @var string[]
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public array $render_tokens = [];
 
   /**
@@ -538,26 +540,26 @@ abstract class StylePluginBase extends PluginBase {
    *   A nested set structure is generated if multiple grouping fields are used.
    *
    *   @code
-   *   array(
-   *     'grouping_field_1:grouping_1' => array(
+   *   [
+   *     'grouping_field_1:grouping_1' => [
    *       'group' => 'grouping_field_1:content_1',
    *       'level' => 0,
-   *       'rows' => array(
-   *         'grouping_field_2:grouping_a' => array(
+   *       'rows' => [
+   *         'grouping_field_2:grouping_a' => [
    *           'group' => 'grouping_field_2:content_a',
    *           'level' => 1,
-   *           'rows' => array(
+   *           'rows' => [
    *             $row_index_1 => $row_1,
    *             $row_index_2 => $row_2,
    *             // ...
-   *           )
-   *         ),
-   *       ),
-   *     ),
-   *     'grouping_field_1:grouping_2' => array(
+   *           ]
+   *         ],
+   *       ],
+   *     ],
+   *     'grouping_field_1:grouping_2' => [
    *       // ...
-   *     ),
-   *   )
+   *     ],
+   *   ]
    *   @endcode
    */
   public function renderGrouping($records, $groupings = [], $group_rendered = NULL) {

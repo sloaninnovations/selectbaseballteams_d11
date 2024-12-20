@@ -16,9 +16,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 class TranslationWebTest extends FieldTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'field_test', 'entity_test'];
 
@@ -95,7 +93,7 @@ class TranslationWebTest extends FieldTestBase {
   /**
    * Tests field translations when creating a new revision.
    */
-  public function testFieldFormTranslationRevisions() {
+  public function testFieldFormTranslationRevisions(): void {
     $web_user = $this->drupalCreateUser([
       'view test entity',
       'administer entity_test content',
@@ -138,7 +136,7 @@ class TranslationWebTest extends FieldTestBase {
    * Check if the field translation attached to the entity revision identified
    * by the passed arguments were correctly stored.
    */
-  private function checkTranslationRevisions($id, $revision_id, $available_langcodes) {
+  private function checkTranslationRevisions($id, $revision_id, $available_langcodes): void {
     $field_name = $this->fieldStorage->getName();
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->container->get('entity_type.manager')

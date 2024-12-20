@@ -15,6 +15,8 @@ use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\Reference;
 use Drupal\Component\Serialization\PhpSerialize;
 
+// cspell:ignore pretransaction
+
 /**
  * Tests delaying of cache tag invalidation queries to the end of transactions.
  *
@@ -48,7 +50,7 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
 
     $container->register('serializer', PhpSerialize::class);
@@ -73,6 +75,13 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
     Database::startLog('testEntitySave');
     $entity->save();
 
+    // Entity save should have deferred cache invalidation to after transaction
+    // completion for the "entity_test_list", "entity_test_list:entity_test"
+    // and "4xx-response" tags. Since cache invalidation is a MERGE database
+    // operation, and in core drivers each MERGE is split in two SELECT and
+    // INSERT|UPDATE operations, we expect the last 6 logged database queries
+    // to be related to the {cachetags} table.
+    $expected_tail_length = 6;
     $executed_statements = [];
     foreach (Database::getLog('testEntitySave') as $log) {
       // Exclude transaction related statements from the log.
@@ -85,9 +94,10 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
       }
       $executed_statements[] = $log['query'];
     }
-    $last_statement_index = max(array_keys($executed_statements));
-    $cachetag_statements = array_keys($this->getStatementsForTable($executed_statements, 'cachetags'));
-    $this->assertSame($last_statement_index - count($cachetag_statements) + 1, min($cachetag_statements), 'All of the last queries in the transaction are for the "cachetags" table.');
+    $expected_post_transaction_statements = array_keys(array_fill(array_key_last($executed_statements) - $expected_tail_length + 1, $expected_tail_length, TRUE));
+    $cachetag_statements = $this->getStatementsForTable($executed_statements, 'cachetags');
+    $tail_cachetag_statements = array_keys(array_slice($cachetag_statements, count($cachetag_statements) - $expected_tail_length, $expected_tail_length, TRUE));
+    $this->assertSame($expected_post_transaction_statements, $tail_cachetag_statements);
 
     // Verify that a nested entity save occurred.
     $this->assertSame('john doe', User::load(1)->getAccountName());
@@ -152,13 +162,13 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
    *
    * @param string[] $statements
    *   A list of query statements.
-   * @param $table_name
+   * @param string $table_name
    *   The name of the table to filter by.
    *
    * @return string[]
    *   Filtered statement list.
    */
-  protected function getStatementsForTable(array $statements, $table_name) {
+  protected function getStatementsForTable(array $statements, $table_name): array {
     return array_filter($statements, function ($statement) use ($table_name) {
       return $this->isStatementRelatedToTable($statement, $table_name);
     });

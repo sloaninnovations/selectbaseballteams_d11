@@ -23,9 +23,7 @@ class MiniPagerTest extends ViewTestBase {
   public static $testViews = ['test_mini_pager'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 
@@ -57,7 +55,7 @@ class MiniPagerTest extends ViewTestBase {
   /**
    * Tests the rendering of mini pagers.
    */
-  public function testMiniPagerRender() {
+  public function testMiniPagerRender(): void {
     // On first page, current page and next page link appear, previous page link
     // does not.
     $this->drupalGet('test_mini_pager');
@@ -151,7 +149,7 @@ class MiniPagerTest extends ViewTestBase {
   /**
    * Tests changing the heading level.
    */
-  public function testPagerHeadingLevel() {
+  public function testPagerHeadingLevel(): void {
     // Set "Pager Heading" to h3 and check that it is correct.
     $view = Views::getView('test_mini_pager');
     $view->setDisplay();

@@ -22,9 +22,7 @@ use Drupal\KernelTests\KernelTestBase;
 class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var string[]
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'image'];
 
@@ -59,7 +57,7 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     foreach ($this->providerTestCustomStreamWrappers() as $stream_wrapper) {
       $scheme = $stream_wrapper[0];
@@ -79,7 +77,7 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
    * @param string $expected_scheme
    *   The derivative expected stream wrapper scheme.
    */
-  public function testCustomStreamWrappers($source_scheme, $expected_scheme) {
+  public function testCustomStreamWrappers($source_scheme, $expected_scheme): void {
     $derivative_uri = $this->imageStyle->buildUri("$source_scheme://some/path/image.png");
     $derivative_scheme = StreamWrapperManager::getScheme($derivative_uri);
 

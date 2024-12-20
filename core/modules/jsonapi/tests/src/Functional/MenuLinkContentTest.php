@@ -15,7 +15,6 @@ use GuzzleHttp\RequestOptions;
  * JSON:API integration test for the "MenuLinkContent" content entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class MenuLinkContentTest extends ResourceTestBase {
 
@@ -63,7 +62,7 @@ class MenuLinkContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer menu']);
   }
 
@@ -87,7 +86,7 @@ class MenuLinkContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $base_url = Url::fromUri('base:/jsonapi/menu_link_content/menu_link_content/' . $this->entity->uuid())->setAbsolute();
     $self_url = clone $base_url;
     $version_identifier = 'id:' . $this->entity->getRevisionId();
@@ -157,7 +156,7 @@ class MenuLinkContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     return [
       'data' => [
         'type' => 'menu_link_content--menu_link_content',
@@ -187,7 +186,7 @@ class MenuLinkContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testCollectionFilterAccess() {
+  public function testCollectionFilterAccess(): void {
     $this->doTestCollectionFilterAccessBasedOnPermissions('title', 'administer menu');
   }
 
@@ -196,7 +195,7 @@ class MenuLinkContentTest extends ResourceTestBase {
    *
    * @see https://security.drupal.org/node/161923
    */
-  public function testLinkOptionsSerialization() {
+  public function testLinkOptionsSerialization(): void {
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
 
     $document = $this->getPostDocument();

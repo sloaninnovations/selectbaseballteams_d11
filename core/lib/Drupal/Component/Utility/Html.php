@@ -28,6 +28,7 @@ class Html {
 
   /**
    * An array of IDs, including incremented versions when an ID is duplicated.
+   *
    * @var array
    */
   protected static $seenIds;
@@ -51,10 +52,10 @@ class Html {
    *   tag. That tag only makes sense in an HTML-served-as-HTML context, in
    *   which case relative URLs are guaranteed to work.
    *
+   * @var string[]
+   *
    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes
    * @see https://stackoverflow.com/questions/2725156/complete-list-of-html-tag-attributes-which-have-a-url-value
-   *
-   * @var string[]
    */
   protected static $uriAttributes = ['href', 'poster', 'src', 'cite', 'data', 'action', 'formaction', 'srcset', 'about'];
 
@@ -85,7 +86,7 @@ class Html {
    * Link below shows the syntax for valid CSS identifiers (including element
    * names, classes, and IDs in selectors).
    *
-   * @see http://www.w3.org/TR/CSS21/syndata.html#characters
+   * @see https://www.w3.org/TR/CSS21/syndata.html#characters
    *
    * @param string $identifier
    *   The identifier to clean.
@@ -224,11 +225,11 @@ class Html {
   public static function getId($id) {
     $id = str_replace([' ', '_', '[', ']'], ['-', '-', '-', ''], mb_strtolower($id));
 
-    // As defined in http://www.w3.org/TR/html4/types.html#type-name, HTML IDs can
+    // As defined in https://www.w3.org/TR/html4/types.html#type-name, HTML IDs can
     // only contain letters, digits ([0-9]), hyphens ("-"), underscores ("_"),
     // colons (":"), and periods ("."). We strip out any character not in that
     // list. Note that the CSS spec doesn't allow colons or periods in identifiers
-    // (http://www.w3.org/TR/CSS21/syndata.html#characters), so we strip those two
+    // (https://www.w3.org/TR/CSS21/syndata.html#characters), so we strip those two
     // characters as well.
     $id = preg_replace('/[^A-Za-z0-9\-_]/', '', $id);
 
@@ -465,7 +466,7 @@ class Html {
     assert(isset(parse_url($scheme_and_host)["host"]), '$base_url is absolute and hence has a host.');
 
     $html_dom = Html::load($html);
-    $xpath = new \DOMXpath($html_dom);
+    $xpath = new \DOMXPath($html_dom);
 
     // Update all root-relative URLs to absolute URLs in the given HTML.
     // Perform on attributes that may contain a single URI.

@@ -26,7 +26,7 @@ class EntityContentBaseTest extends EntityTestBase {
    *
    * @covers ::import
    */
-  public function testImport() {
+  public function testImport(): void {
     $bundles = [];
     $destination = new EntityTestDestination([], '', [],
       $this->migration->reveal(),
@@ -60,7 +60,7 @@ class EntityContentBaseTest extends EntityTestBase {
    *
    * @covers ::import
    */
-  public function testImportEntityLoadFailure() {
+  public function testImportEntityLoadFailure(): void {
     $bundles = [];
     $destination = new EntityTestDestination([], '', [],
       $this->migration->reveal(),
@@ -79,7 +79,7 @@ class EntityContentBaseTest extends EntityTestBase {
   /**
    * Tests that translation destination fails for untranslatable entities.
    */
-  public function testUntranslatable() {
+  public function testUntranslatable(): void {
     // An entity type without a language.
     $this->entityType->getKey('langcode')->willReturn('');
     $this->entityType->getKey('id')->willReturn('id');
@@ -113,7 +113,7 @@ class EntityTestDestination extends EntityContentBase {
 
   private $entity = NULL;
 
-  public function setEntity($entity) {
+  public function setEntity($entity): void {
     $this->entity = $entity;
   }
 

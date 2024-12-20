@@ -19,9 +19,7 @@ use Drupal\Tests\BrowserTestBase;
 class NodeTypeTranslationTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -104,7 +102,7 @@ class NodeTypeTranslationTest extends BrowserTestBase {
   /**
    * Tests the node type translation.
    */
-  public function testNodeTypeTranslation() {
+  public function testNodeTypeTranslation(): void {
     $type = $this->randomMachineName(16);
     $name = $this->randomString();
     $this->drupalLogin($this->adminUser);
@@ -141,7 +139,7 @@ class NodeTypeTranslationTest extends BrowserTestBase {
   /**
    * Tests the node type title label translation.
    */
-  public function testNodeTypeTitleLabelTranslation() {
+  public function testNodeTypeTitleLabelTranslation(): void {
     $type = $this->randomMachineName(16);
     $name = $this->randomString();
     $this->drupalLogin($this->adminUser);

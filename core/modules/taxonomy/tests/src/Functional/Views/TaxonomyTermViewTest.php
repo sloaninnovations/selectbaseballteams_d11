@@ -19,9 +19,7 @@ use Drupal\views\Views;
 class TaxonomyTermViewTest extends TaxonomyTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['taxonomy', 'views'];
 
@@ -86,7 +84,7 @@ class TaxonomyTermViewTest extends TaxonomyTestBase {
   /**
    * Tests that the taxonomy term view is working properly.
    */
-  public function testTaxonomyTermView() {
+  public function testTaxonomyTermView(): void {
     // Create terms in the vocabulary.
     $term = $this->createTerm();
 

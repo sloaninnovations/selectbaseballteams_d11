@@ -24,7 +24,7 @@ class FileTokenReplaceTest extends FileFieldTestBase {
   /**
    * Creates a file, then tests the tokens generated from it.
    */
-  public function testFileTokenReplacement() {
+  public function testFileTokenReplacement(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $token_service = \Drupal::token();
     $language_interface = \Drupal::languageManager()->getCurrentLanguage();
@@ -53,6 +53,7 @@ class FileTokenReplaceTest extends FileFieldTestBase {
     // Generate and test sanitized tokens.
     $tests = [];
     $tests['[file:fid]'] = $file->id();
+    $tests['[file:uuid]'] = $file->uuid();
     $tests['[file:name]'] = Html::escape($file->getFilename());
     $tests['[file:path]'] = Html::escape($file->getFileUri());
     $tests['[file:mime]'] = Html::escape($file->getMimeType());
@@ -68,6 +69,7 @@ class FileTokenReplaceTest extends FileFieldTestBase {
     $base_bubbleable_metadata = BubbleableMetadata::createFromObject($file);
     $metadata_tests = [];
     $metadata_tests['[file:fid]'] = $base_bubbleable_metadata;
+    $metadata_tests['[file:uuid]'] = $base_bubbleable_metadata;
     $metadata_tests['[file:name]'] = $base_bubbleable_metadata;
     $metadata_tests['[file:path]'] = $base_bubbleable_metadata;
     $metadata_tests['[file:mime]'] = $base_bubbleable_metadata;

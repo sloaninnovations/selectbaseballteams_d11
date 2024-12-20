@@ -37,7 +37,7 @@ class DrupalKernelTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function bootKernel() {
+  protected function bootKernel(): void {
     // Do not boot the kernel, because we are testing aspects of this process.
   }
 
@@ -51,7 +51,7 @@ class DrupalKernelTest extends KernelTestBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   A request object to use in booting the kernel.
    * @param array $modules_enabled
-   *   A list of modules to enable on the kernel.
+   *   A list of modules to install on the kernel.
    *
    * @return \Drupal\Core\DrupalKernel
    *   New kernel for testing.
@@ -73,7 +73,7 @@ class DrupalKernelTest extends KernelTestBase {
   /**
    * Tests DIC compilation.
    */
-  public function testCompileDIC() {
+  public function testCompileDIC(): void {
     // @todo Write a memory based storage backend for testing.
     $modules_enabled = [
       'system' => 'system',
@@ -155,7 +155,7 @@ class DrupalKernelTest extends KernelTestBase {
   /**
    * Tests repeated loading of compiled DIC with different environment.
    */
-  public function testRepeatedBootWithDifferentEnvironment() {
+  public function testRepeatedBootWithDifferentEnvironment(): void {
     $request = Request::createFromGlobals();
     $class_loader = require $this->root . '/autoload.php';
 
@@ -177,7 +177,7 @@ class DrupalKernelTest extends KernelTestBase {
   /**
    * Tests setting of site path after kernel boot.
    */
-  public function testPreventChangeOfSitePath() {
+  public function testPreventChangeOfSitePath(): void {
     // @todo Write a memory based storage backend for testing.
     $modules_enabled = [
       'system' => 'system',
@@ -190,7 +190,7 @@ class DrupalKernelTest extends KernelTestBase {
     try {
       $kernel->setSitePath('/dev/null');
     }
-    catch (\LogicException $e) {
+    catch (\LogicException) {
       $pass = TRUE;
     }
     $this->assertTrue($pass, 'Throws LogicException if DrupalKernel::setSitePath() is called after boot');
@@ -203,6 +203,7 @@ class DrupalKernelTest extends KernelTestBase {
 
   /**
    * Data provider for self::testClassLoaderAutoDetect.
+   *
    * @return array
    */
   public static function providerClassLoaderAutoDetect() {
@@ -226,7 +227,7 @@ class DrupalKernelTest extends KernelTestBase {
    * @param bool $value
    *   The value to set class_loader_auto_detect to.
    */
-  public function testClassLoaderAutoDetect($value) {
+  public function testClassLoaderAutoDetect($value): void {
     // Create a virtual file system containing items that should be
     // excluded. Exception being modules directory.
     vfsStream::setup('root', NULL, [
@@ -264,7 +265,7 @@ class DrupalKernelTest extends KernelTestBase {
   /**
    * @covers ::resetContainer
    */
-  public function testResetContainer() {
+  public function testResetContainer(): void {
     $modules_enabled = [
       'system' => 'system',
       'user' => 'user',
@@ -317,7 +318,7 @@ class DrupalKernelTest extends KernelTestBase {
     // Test environment locale should be UTF-8.
     $this->assertSame($utf8_string, escapeshellcmd($utf8_string));
     $request = Request::createFromGlobals();
-    $kernel = $this->getTestKernel($request);
+    $this->getTestKernel($request);
     // Kernel environment locale should be UTF-8.
     $this->assertSame($utf8_string, escapeshellcmd($utf8_string));
   }

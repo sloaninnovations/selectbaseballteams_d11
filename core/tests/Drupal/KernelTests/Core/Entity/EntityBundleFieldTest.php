@@ -12,9 +12,7 @@ namespace Drupal\KernelTests\Core\Entity;
 class EntityBundleFieldTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_schema_test', 'entity_test_update'];
 
@@ -46,7 +44,7 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
   /**
    * Tests making use of a custom bundle field.
    */
-  public function testCustomBundleFieldUsage() {
+  public function testCustomBundleFieldUsage(): void {
     entity_test_create_bundle('custom', NULL, 'entity_test_update');
 
     // Check that an entity with bundle entity_test does not have the custom

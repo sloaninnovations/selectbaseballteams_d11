@@ -27,7 +27,7 @@ class ModuleInstallerTest extends KernelTestBase {
    * @covers ::install
    * @covers ::uninstall
    */
-  public function testRouteRebuild() {
+  public function testRouteRebuild(): void {
     // Remove the routing table manually to ensure it can be created lazily
     // properly.
     Database::getConnection()->schema()->dropTable('router');
@@ -46,7 +46,7 @@ class ModuleInstallerTest extends KernelTestBase {
    *
    * @covers ::install
    */
-  public function testConfigChangeOnInstall() {
+  public function testConfigChangeOnInstall(): void {
     // Install the child module so the parent is installed automatically.
     $this->container->get('module_installer')->install(['module_handler_test_multiple_child']);
     $modules = $this->config('core.extension')->get('module');
@@ -62,7 +62,7 @@ class ModuleInstallerTest extends KernelTestBase {
    *
    * @covers ::removeCacheBins
    */
-  public function testCacheBinCleanup() {
+  public function testCacheBinCleanup(): void {
     $schema = $this->container->get('database')->schema();
     $table = 'cache_module_cache_bin';
 
@@ -85,10 +85,25 @@ class ModuleInstallerTest extends KernelTestBase {
   /**
    * Ensure that rebuilding the container in hook_install() works.
    */
-  public function testKernelRebuildDuringHookInstall() {
+  public function testKernelRebuildDuringHookInstall(): void {
     \Drupal::state()->set('module_test_install:rebuild_container', TRUE);
     $module_installer = $this->container->get('module_installer');
     $this->assertTrue($module_installer->install(['module_test']));
+  }
+
+  /**
+   * Ensure that hooks reacting to install or uninstall are invoked.
+   */
+  public function testInvokingRespondentHooks(): void {
+    $module_installer = $this->container->get('module_installer');
+    $this->assertTrue($module_installer->install(['respond_install_uninstall_hook_test']));
+    $this->assertTrue($module_installer->install(['cache_test']));
+    $this->assertTrue(isset($GLOBALS['hook_module_preinstall']));
+    $this->assertTrue(isset($GLOBALS['hook_modules_installed']));
+    $module_installer->uninstall(['cache_test']);
+    $this->assertTrue(isset($GLOBALS['hook_module_preuninstall']));
+    $this->assertTrue(isset($GLOBALS['hook_modules_uninstalled']));
+    $this->assertTrue(isset($GLOBALS['hook_cache_flush']));
   }
 
   /**
@@ -97,7 +112,7 @@ class ModuleInstallerTest extends KernelTestBase {
    * @dataProvider providerTestInvalidCoreInstall
    * @covers ::install
    */
-  public function testInvalidCoreInstall($module_name, $install_dependencies) {
+  public function testInvalidCoreInstall($module_name, $install_dependencies): void {
     $this->expectException(MissingDependencyException::class);
     $this->expectExceptionMessage("Unable to install modules: module '$module_name' is incompatible with this version of Drupal core.");
     $this->container->get('module_installer')->install([$module_name], $install_dependencies);
@@ -124,7 +139,7 @@ class ModuleInstallerTest extends KernelTestBase {
    *
    * @covers ::install
    */
-  public function testDependencyInvalidCoreInstall() {
+  public function testDependencyInvalidCoreInstall(): void {
     $this->expectException(MissingDependencyException::class);
     $this->expectExceptionMessage("Unable to install modules: module 'system_incompatible_core_version_dependencies_test'. Its dependency module 'system_core_incompatible_semver_test' is incompatible with this version of Drupal core.");
     $this->container->get('module_installer')->install(['system_incompatible_core_version_dependencies_test']);
@@ -135,7 +150,7 @@ class ModuleInstallerTest extends KernelTestBase {
    *
    * @covers ::install
    */
-  public function testDependencyInvalidCoreInstallNoDependencies() {
+  public function testDependencyInvalidCoreInstallNoDependencies(): void {
     $this->assertTrue($this->container->get('module_installer')->install(['system_incompatible_core_version_dependencies_test'], FALSE));
   }
 
@@ -144,10 +159,48 @@ class ModuleInstallerTest extends KernelTestBase {
    *
    * @covers ::install
    */
-  public function testObsoleteInstall() {
+  public function testObsoleteInstall(): void {
     $this->expectException(ObsoleteExtensionException::class);
     $this->expectExceptionMessage("Unable to install modules: module 'system_status_obsolete_test' is obsolete.");
     $this->container->get('module_installer')->install(['system_status_obsolete_test']);
+  }
+
+  /**
+   * Tests container rebuilding due to the container_rebuild_required info key.
+   *
+   * @covers ::install
+   *
+   * @param array $modules
+   *   The modules to install.
+   * @param int $count
+   *   The number of times the container should have been rebuilt.
+   *
+   * @dataProvider containerRebuildRequiredProvider
+   */
+  public function testContainerRebuildRequired(array $modules, int $count): void {
+    $this->container->get('module_installer')->install(['module_test']);
+    $GLOBALS['container_rebuilt'] = 0;
+    $this->container->get('module_installer')->install($modules);
+    $this->assertSame($count, $GLOBALS['container_rebuilt']);
+  }
+
+  /**
+   * Data provider for ::testContainerRebuildRequired().
+   */
+  public static function containerRebuildRequiredProvider(): array {
+    return [
+      [['container_rebuild_required_true'], 1],
+      [['container_rebuild_required_false'], 1],
+      [['container_rebuild_required_false', 'container_rebuild_required_false_2'], 1],
+      [['container_rebuild_required_false', 'container_rebuild_required_false_2', 'container_rebuild_required_true'], 2],
+      [['container_rebuild_required_false', 'container_rebuild_required_false_2', 'container_rebuild_required_true', 'container_rebuild_required_true_2'], 3],
+      [['container_rebuild_required_true', 'container_rebuild_required_false', 'container_rebuild_required_false_2'], 2],
+      [['container_rebuild_required_false', 'container_rebuild_required_true', 'container_rebuild_required_false_2'], 3],
+      [['container_rebuild_required_false', 'container_rebuild_required_true', 'container_rebuild_required_false_2', 'container_rebuild_required_true_2'], 4],
+      [['container_rebuild_required_true', 'container_rebuild_required_false', 'container_rebuild_required_true_2', 'container_rebuild_required_false_2'], 4],
+      [['container_rebuild_required_false_2', 'container_rebuild_required_dependency_false'], 3],
+      [['container_rebuild_required_false_2', 'container_rebuild_required_dependency_false', 'container_rebuild_required_true'], 3],
+    ];
   }
 
   /**
@@ -157,7 +210,7 @@ class ModuleInstallerTest extends KernelTestBase {
    *
    * @group legacy
    */
-  public function testDeprecatedInstall() {
+  public function testDeprecatedInstall(): void {
     $this->expectDeprecation("The module 'deprecated_module' is deprecated. See http://example.com/deprecated");
     \Drupal::service('module_installer')->install(['deprecated_module']);
     $this->assertTrue(\Drupal::service('module_handler')->moduleExists('deprecated_module'));
@@ -171,7 +224,7 @@ class ModuleInstallerTest extends KernelTestBase {
    *
    * @group legacy
    */
-  public function testUninstallValidatorsBC() {
+  public function testUninstallValidatorsBC(): void {
     $this->expectDeprecation('The "module_installer.uninstall_validators" service is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject "!tagged_iterator module_install.uninstall_validator" instead. See https://www.drupal.org/node/3432595');
     $module_installer = new ModuleInstaller(
       $this->container->getParameter('app.root'),

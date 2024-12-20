@@ -41,12 +41,14 @@ class CallableResolverTest extends UnitTestCase {
   /**
    * @covers ::getCallableFromDefinition
    */
-  public function testCallbackResolver() {
+  public function testCallbackResolver(): void {
     $cases = [
       'Inline function' => [
         function ($suffix) {
           return __METHOD__ . '+' . $suffix;
         },
+        PHP_VERSION_ID >= 80400 ?
+        '{closure:Drupal\Tests\Core\Utility\CallableResolverTest::testCallbackResolver():47}' :
         'Drupal\Tests\Core\Utility\{closure}',
       ],
       'First-class callable function' => [
@@ -59,6 +61,8 @@ class CallableResolverTest extends UnitTestCase {
       ],
       'Arrow function' => [
         fn($suffix) => __METHOD__ . '+' . $suffix,
+        PHP_VERSION_ID >= 80400 ?
+        '{closure:Drupal\Tests\Core\Utility\CallableResolverTest::testCallbackResolver():63}' :
         'Drupal\Tests\Core\Utility\{closure}',
       ],
       'Static function' => [
@@ -109,7 +113,7 @@ class CallableResolverTest extends UnitTestCase {
    * @dataProvider callableResolverExceptionHandlingTestCases
    * @covers ::getCallableFromDefinition
    */
-  public function testCallbackResolverExceptionHandling($definition, $exception_class, $exception_message) {
+  public function testCallbackResolverExceptionHandling($definition, $exception_class, $exception_message): void {
     $this->expectException($exception_class);
     $this->expectExceptionMessage($exception_message);
     $this->resolver->getCallableFromDefinition($definition);

@@ -26,7 +26,7 @@ class StorageCopyTraitTest extends UnitTestCase {
    *
    * @dataProvider providerTestReplaceStorageContents
    */
-  public function testReplaceStorageContents($source_collections, $target_collections) {
+  public function testReplaceStorageContents($source_collections, $target_collections): void {
     $source = new MemoryStorage();
     $target = new MemoryStorage();
     // Empty the storage should be the same.
@@ -101,7 +101,7 @@ class StorageCopyTraitTest extends UnitTestCase {
    * @param bool $collections
    *   Add random collections or not.
    */
-  protected function generateRandomData(StorageInterface $storage, $collections = TRUE) {
+  protected function generateRandomData(StorageInterface $storage, $collections = TRUE): void {
     $generator = $this->getRandomGenerator();
     for ($i = 0; $i < rand(2, 10); $i++) {
       $storage->write($this->randomMachineName(), (array) $generator->object());
@@ -121,7 +121,7 @@ class StorageCopyTraitTest extends UnitTestCase {
    *
    * @covers ::replaceStorageContents
    */
-  public function testWithInvalidConfiguration() {
+  public function testWithInvalidConfiguration(): void {
     $source = new TestStorage();
     $this->generateRandomData($source);
 
@@ -179,7 +179,7 @@ class TestStorage extends MemoryStorage {
    * This method allows us to create invalid configurations. The method
    * ::write() only allows values of the type array.
    */
-  public function setValue($name, $value) {
+  public function setValue($name, $value): void {
     $this->config[$this->collection][$name] = $value;
   }
 

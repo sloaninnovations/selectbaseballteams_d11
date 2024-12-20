@@ -110,7 +110,6 @@ trait PerformanceTestTrait {
 
     $session = $this->getSession();
     $session->getDriver()->getWebDriverSession()->log('performance');
-    $collection = \Drupal::keyValue('performance_test');
     $collection->deleteAll();
     $return = $callable();
     $performance_data = $this->processChromeDriverPerformanceLogs($service_name);
@@ -376,7 +375,7 @@ trait PerformanceTestTrait {
     // 'encodedDataLength' for network requests, however in the case that the
     // file has already been requested by the browser, this will be the length
     // of a HEAD response for 304 not modified or similar. Additionally, core's
-    // aggregation adds the basepath to CSS aggregates, resulting in slightly
+    // aggregation adds the base path to CSS aggregates, resulting in slightly
     // different file sizes depending on whether tests run in a subdirectory or
     // not.
     foreach ($stylesheet_urls as $url) {
@@ -387,7 +386,7 @@ trait PerformanceTestTrait {
       }
       else {
         $filename = str_replace($GLOBALS['base_path'], '', parse_url($url, PHP_URL_PATH));
-        // Strip the basepath from the contents of the file so that tests
+        // Strip the base path from the contents of the file so that tests
         // running in a subdirectory get the same results.
         $stylesheet_bytes += strlen(str_replace($GLOBALS['base_path'], '/', file_get_contents($filename)));
       }
@@ -472,7 +471,7 @@ trait PerformanceTestTrait {
       ResourceAttributes::SERVICE_NAME => $service_name,
       ResourceAttributes::SERVICE_INSTANCE_ID => 1,
       ResourceAttributes::SERVICE_VERSION => \Drupal::VERSION,
-      ResourceAttributes::DEPLOYMENT_ENVIRONMENT => 'local',
+      ResourceAttributes::DEPLOYMENT_ENVIRONMENT_NAME => 'local',
     ])));
 
     $otel_collector_headers = getenv('OTEL_COLLECTOR_HEADERS') ?: [];
@@ -504,7 +503,7 @@ trait PerformanceTestTrait {
       $collection = \Drupal::keyValue('performance_test');
       $performance_test_data = $collection->get('performance_test_data');
       $query_events = $performance_test_data['database_events'] ?? [];
-      foreach ($query_events as $key => $event) {
+      foreach ($query_events as $event) {
         if (static::isDatabaseCache($event)) {
           continue;
         }
@@ -614,8 +613,12 @@ trait PerformanceTestTrait {
    *   Whether the event was triggered by the database cache implementation.
    */
   protected static function isDatabaseCache(DatabaseEvent $event): bool {
-    $class = str_replace('\\\\', '\\', $event->caller['class']);
-    return is_a($class, '\Drupal\Core\Cache\DatabaseBackend', TRUE) || is_a($class, '\Drupal\Core\Cache\DatabaseCacheTagsChecksum', TRUE);
+    // If there is no class, then this is called from a procedural function.
+    if (isset($event->caller['class'])) {
+      $class = str_replace('\\\\', '\\', $event->caller['class']);
+      return is_a($class, '\Drupal\Core\Cache\DatabaseBackend', TRUE) || is_a($class, '\Drupal\Core\Cache\DatabaseCacheTagsChecksum', TRUE);
+    }
+    return FALSE;
   }
 
 }

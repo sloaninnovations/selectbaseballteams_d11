@@ -88,7 +88,7 @@ class PermissionHandlerTest extends UnitTestCase {
    * @covers ::buildPermissionsYaml
    * @covers ::moduleProvidesPermissions
    */
-  public function testBuildPermissionsYaml() {
+  public function testBuildPermissionsYaml(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
@@ -153,7 +153,7 @@ EOF
    * @covers ::buildPermissionsYaml
    * @covers ::sortPermissions
    */
-  public function testBuildPermissionsSortPerModule() {
+  public function testBuildPermissionsSortPerModule(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
@@ -209,7 +209,7 @@ EOF
    * @covers ::getPermissions
    * @covers ::buildPermissionsYaml
    */
-  public function testBuildPermissionsYamlCallback() {
+  public function testBuildPermissionsYamlCallback(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
@@ -270,7 +270,7 @@ EOF
   /**
    * Tests a YAML file containing both static permissions and a callback.
    */
-  public function testPermissionsYamlStaticAndCallback() {
+  public function testPermissionsYamlStaticAndCallback(): void {
     vfsStreamWrapper::register();
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
@@ -388,6 +388,7 @@ class TestTranslationManager implements TranslationInterface {
    * {@inheritdoc}
    */
   public function translate($string, array $args = [], array $options = []) {
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     return new TranslatableMarkup($string, $args, $options, $this);
   }
 

@@ -20,7 +20,7 @@ class FetchTest extends DatabaseTestBase {
   /**
    * Confirms that we can fetch a record properly in default object mode.
    */
-  public function testQueryFetchDefault() {
+  public function testQueryFetchDefault(): void {
     $records = [];
     $result = $this->connection->query('SELECT [name] FROM {test} WHERE [age] = :age', [':age' => 25]);
     $this->assertInstanceOf(StatementInterface::class, $result);
@@ -36,7 +36,7 @@ class FetchTest extends DatabaseTestBase {
   /**
    * Confirms that we can fetch a record to an object explicitly.
    */
-  public function testQueryFetchObject() {
+  public function testQueryFetchObject(): void {
     $records = [];
     $result = $this->connection->query('SELECT [name] FROM {test} WHERE [age] = :age', [':age' => 25], ['fetch' => \PDO::FETCH_OBJ]);
     foreach ($result as $record) {
@@ -51,7 +51,7 @@ class FetchTest extends DatabaseTestBase {
   /**
    * Confirms that we can fetch a record to an associative array explicitly.
    */
-  public function testQueryFetchArray() {
+  public function testQueryFetchArray(): void {
     $records = [];
     $result = $this->connection->query('SELECT [name] FROM {test} WHERE [age] = :age', [':age' => 25], ['fetch' => \PDO::FETCH_ASSOC]);
     foreach ($result as $record) {
@@ -69,7 +69,7 @@ class FetchTest extends DatabaseTestBase {
    *
    * @see \Drupal\system\Tests\Database\FakeRecord
    */
-  public function testQueryFetchClass() {
+  public function testQueryFetchClass(): void {
     $records = [];
     $result = $this->connection->query('SELECT [name] FROM {test} WHERE [age] = :age', [':age' => 25], ['fetch' => FakeRecord::class]);
     foreach ($result as $record) {
@@ -87,7 +87,7 @@ class FetchTest extends DatabaseTestBase {
    * @see \Drupal\Tests\system\Functional\Database\FakeRecord
    * @see \Drupal\Core\Database\StatementPrefetch::fetchObject
    */
-  public function testQueryFetchObjectClass() {
+  public function testQueryFetchObjectClass(): void {
     $records = 0;
     $query = $this->connection->query('SELECT [name] FROM {test} WHERE [age] = :age', [':age' => 25]);
     while ($result = $query->fetchObject(FakeRecord::class, [1])) {
@@ -120,7 +120,7 @@ class FetchTest extends DatabaseTestBase {
   /**
    * Confirms that we can fetch a record into an indexed array explicitly.
    */
-  public function testQueryFetchNum() {
+  public function testQueryFetchNum(): void {
     $records = [];
     $result = $this->connection->query('SELECT [name] FROM {test} WHERE [age] = :age', [':age' => 25], ['fetch' => \PDO::FETCH_NUM]);
     foreach ($result as $record) {
@@ -136,7 +136,7 @@ class FetchTest extends DatabaseTestBase {
   /**
    * Confirms that we can fetch all records into an array explicitly.
    */
-  public function testQueryFetchAllColumn() {
+  public function testQueryFetchAllColumn(): void {
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
     $query->orderBy('name');
@@ -149,7 +149,7 @@ class FetchTest extends DatabaseTestBase {
   /**
    * Confirms that we can fetch an entire column of a result set at once.
    */
-  public function testQueryFetchCol() {
+  public function testQueryFetchCol(): void {
     $result = $this->connection->query('SELECT [name] FROM {test} WHERE [age] > :age', [':age' => 25]);
     $column = $result->fetchCol();
     $this->assertCount(3, $column, 'fetchCol() returns the right number of records.');
@@ -231,15 +231,78 @@ class FetchTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests ::fetchField() for edge values returned.
+   */
+  public function testQueryFetchFieldEdgeCases(): void {
+    $this->connection->insert('test_null')
+      ->fields([
+        'name' => 'Foo',
+        'age' => 0,
+      ])
+      ->execute();
+
+    $this->connection->insert('test_null')
+      ->fields([
+        'name' => 'Bar',
+        'age' => NULL,
+      ])
+      ->execute();
+
+    $this->connection->insert('test_null')
+      ->fields([
+        'name' => 'Qux',
+        'age' => (int) FALSE,
+      ])
+      ->execute();
+
+    $statement = $this->connection->select('test_null')
+      ->fields('test_null', ['age'])
+      ->orderBy('id')
+      ->execute();
+
+    // First fetch returns '0' since an existing value is always a string.
+    $this->assertSame('0', $statement->fetchField());
+
+    // Second fetch returns NULL since NULL was inserted.
+    $this->assertNull($statement->fetchField());
+
+    // Third fetch returns '0' since a FALSE bool cast to int was inserted.
+    $this->assertSame('0', $statement->fetchField());
+
+    // Fourth fetch returns FALSE since no row was available.
+    $this->assertFalse($statement->fetchField());
+  }
+
+  /**
+   * Confirms that an out of range index throws an error.
+   */
+  public function testQueryFetchFieldIndexOutOfRange(): void {
+    $this->expectException(\ValueError::class);
+    $this->expectExceptionMessage('Invalid column index');
+    $this->connection
+      ->query('SELECT [name] FROM {test} WHERE [age] = :age', [':age' => 25])
+      ->fetchField(200);
+  }
+
+  /**
+   * Confirms that empty result set prevails on out of range index.
+   */
+  public function testQueryFetchFieldIndexOutOfRangeOnEmptyResultSet(): void {
+    $this->assertFalse($this->connection
+      ->query('SELECT [name] FROM {test} WHERE [age] = :age', [':age' => 255])
+      ->fetchField(200));
+  }
+
+  /**
    * Tests that rowCount() throws exception on SELECT query.
    */
-  public function testRowCount() {
+  public function testRowCount(): void {
     $result = $this->connection->query('SELECT [name] FROM {test}');
     try {
       $result->rowCount();
       $exception = FALSE;
     }
-    catch (RowCountException $e) {
+    catch (RowCountException) {
       $exception = TRUE;
     }
     $this->assertTrue($exception, 'Exception was thrown');

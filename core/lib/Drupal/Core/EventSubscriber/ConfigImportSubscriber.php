@@ -73,7 +73,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
         try {
           Config::validateName($name);
         }
-        catch (ConfigNameException $e) {
+        catch (ConfigNameException) {
           $message = $this->t('The config name @config_name is invalid.', ['@config_name' => $name]);
           $event->getConfigImporter()->logError($message);
         }
@@ -340,6 +340,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
    * Gets theme data.
    *
    * @return \Drupal\Core\Extension\Extension[]
+   *   Processed extension objects, keyed by machine name.
    */
   protected function getThemeData() {
     if (!isset($this->themeData)) {

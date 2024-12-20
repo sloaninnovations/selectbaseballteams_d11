@@ -89,7 +89,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
    * @covers ::resolveInternalEntityQueryPath
    * @dataProvider resolveInternalIncludePathProvider
    */
-  public function testResolveInternalIncludePath($expect, $external_path, $entity_type_id = 'entity_test_with_bundle', $bundle = 'bundle1') {
+  public function testResolveInternalIncludePath($expect, $external_path, $entity_type_id = 'entity_test_with_bundle', $bundle = 'bundle1'): void {
     $path_parts = explode('.', $external_path);
     $resource_type = $this->resourceTypeRepository->get($entity_type_id, $bundle);
     $this->assertEquals($expect, $this->sut->resolveInternalIncludePath($resource_type, $path_parts));
@@ -131,7 +131,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
    * @covers ::resolveInternalIncludePath
    * @dataProvider resolveInternalIncludePathErrorProvider
    */
-  public function testResolveInternalIncludePathError($entity_type, $bundle, $external_path, $expected_message = '') {
+  public function testResolveInternalIncludePathError($entity_type, $bundle, $external_path, $expected_message = ''): void {
     $path_parts = explode('.', $external_path);
     $this->expectException(CacheableBadRequestHttpException::class);
     if (!empty($expected_message)) {
@@ -174,7 +174,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
    * @covers ::resolveInternalEntityQueryPath
    * @dataProvider resolveInternalEntityQueryPathProvider
    */
-  public function testResolveInternalEntityQueryPath($expect, $external_path, $entity_type_id = 'entity_test_with_bundle', $bundle = 'bundle1') {
+  public function testResolveInternalEntityQueryPath($expect, $external_path, $entity_type_id = 'entity_test_with_bundle', $bundle = 'bundle1'): void {
     $resource_type = $this->resourceTypeRepository->get($entity_type_id, $bundle);
     $this->assertEquals($expect, $this->sut->resolveInternalEntityQueryPath($resource_type, $external_path));
   }
@@ -255,7 +255,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
    * @covers ::resolveInternalEntityQueryPath
    * @dataProvider resolveInternalEntityQueryPathErrorProvider
    */
-  public function testResolveInternalEntityQueryPathError($entity_type, $bundle, $external_path, $expected_message = '') {
+  public function testResolveInternalEntityQueryPathError($entity_type, $bundle, $external_path, $expected_message = ''): void {
     $this->expectException(CacheableBadRequestHttpException::class);
     if (!empty($expected_message)) {
       $this->expectExceptionMessage($expected_message);
@@ -354,7 +354,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
    * @param string $name
    *   The name of the bundle to create.
    */
-  protected function makeBundle($name) {
+  protected function makeBundle($name): void {
     EntityTestBundle::create([
       'id' => $name,
     ])->save();
@@ -376,7 +376,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
    * @param array $config_settings
    *   Custom configuration settings for the field.
    */
-  protected function makeField($type, $name, $entity_type, array $bundles, array $storage_settings = [], array $config_settings = []) {
+  protected function makeField($type, $name, $entity_type, array $bundles, array $storage_settings = [], array $config_settings = []): void {
     $storage_config = [
       'field_name' => $name,
       'type' => $type,

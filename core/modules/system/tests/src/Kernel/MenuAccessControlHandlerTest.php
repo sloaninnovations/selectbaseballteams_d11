@@ -20,9 +20,7 @@ class MenuAccessControlHandlerTest extends KernelTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -50,7 +48,7 @@ class MenuAccessControlHandlerTest extends KernelTestBase {
    * @covers ::checkCreateAccess
    * @dataProvider testAccessProvider
    */
-  public function testAccess($permissions, $which_entity, $view_label_access_result, $view_access_result, $update_access_result, $delete_access_result, $create_access_result) {
+  public function testAccess($permissions, $which_entity, $view_label_access_result, $view_access_result, $update_access_result, $delete_access_result, $create_access_result): void {
     $user = $this->drupalCreateUser($permissions);
 
     $entity_values = ($which_entity === 'unlocked')
@@ -74,7 +72,7 @@ class MenuAccessControlHandlerTest extends KernelTestBase {
     $assertions = ini_set('zend.assertions', 0);
 
     $data = [
-      'permissionless + unlocked' => [
+      'no permission + unlocked' => [
         [],
         'unlocked',
         AccessResult::allowed(),
@@ -83,7 +81,7 @@ class MenuAccessControlHandlerTest extends KernelTestBase {
         AccessResult::neutral()->addCacheContexts(['user.permissions'])->setReason("The 'administer menu' permission is required.")->addCacheTags(['config:system.menu.llama']),
         AccessResult::neutral()->addCacheContexts(['user.permissions'])->setReason("The 'administer menu' permission is required."),
       ],
-      'permissionless + locked' => [
+      'no permission + locked' => [
         [],
         'locked',
         AccessResult::allowed(),

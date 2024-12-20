@@ -14,7 +14,6 @@ use Drupal\language\Entity\ConfigurableLanguage;
  * Tests the pluggable pager system.
  *
  * @group views
- * @group #slow
  */
 class PagerTest extends ViewTestBase {
 
@@ -28,9 +27,7 @@ class PagerTest extends ViewTestBase {
   public static $testViews = ['test_store_pager_settings', 'test_pager_none', 'test_pager_some', 'test_pager_full', 'test_view_pager_full_zero_items_per_page', 'test_view', 'content'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views_ui'];
 
@@ -51,7 +48,7 @@ class PagerTest extends ViewTestBase {
    *
    * @see https://www.drupal.org/node/652712
    */
-  public function testStorePagerSettings() {
+  public function testStorePagerSettings(): void {
     // Show the default display so the override selection is shown.
     \Drupal::configFactory()->getEditable('views.settings')->set('ui.show.default_display', TRUE)->save();
 
@@ -165,7 +162,7 @@ class PagerTest extends ViewTestBase {
     $this->submitForm($edit, 'Apply');
     $this->assertSession()->pageTextContains('20 items');
 
-    // add new display and test the settings again, by override it.
+    // Add new display and test the settings again, by override it.
     $edit = [];
     // Add a display and override the pager settings.
     $this->drupalGet('admin/structure/views/view/test_store_pager_settings/edit');
@@ -223,7 +220,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests the none-pager-query.
    */
-  public function testNoLimit() {
+  public function testNoLimit(): void {
     // Create 11 nodes and make sure that everyone is returned.
     // We create 11 nodes, because the default pager plugin had 10 items per page.
     $this->drupalCreateContentType(['type' => 'page']);
@@ -254,7 +251,7 @@ class PagerTest extends ViewTestBase {
     $this->assertEquals(0, $view->pager->getItemsPerPage());
   }
 
-  public function testViewTotalRowsWithoutPager() {
+  public function testViewTotalRowsWithoutPager(): void {
     $this->drupalCreateContentType(['type' => 'page']);
     for ($i = 0; $i < 23; $i++) {
       $this->drupalCreateNode();
@@ -270,7 +267,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests the some pager plugin.
    */
-  public function testLimit() {
+  public function testLimit(): void {
     // Create 11 nodes and make sure that everyone is returned.
     // We create 11 nodes, because the default pager plugin had 10 items per page.
     $this->drupalCreateContentType(['type' => 'page']);
@@ -304,7 +301,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests the normal pager.
    */
-  public function testNormalPager() {
+  public function testNormalPager(): void {
     // Create 11 nodes and make sure that everyone is returned.
     // We create 11 nodes, because the default pager plugin had 10 items per page.
     $this->drupalCreateContentType(['type' => 'page']);
@@ -382,7 +379,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests changing the heading level.
    */
-  public function testPagerHeadingLevel() {
+  public function testPagerHeadingLevel(): void {
     // Create 2 nodes and make sure that everyone is returned.
     $this->drupalCreateContentType(['type' => 'page']);
     for ($i = 0; $i < 2; $i++) {
@@ -416,7 +413,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests rendering with NULL pager.
    */
-  public function testRenderNullPager() {
+  public function testRenderNullPager(): void {
     // Create 11 nodes and make sure that everyone is returned.
     // We create 11 nodes, because the default pager plugin had 10 items per page.
     $this->drupalCreateContentType(['type' => 'page']);
@@ -436,7 +433,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests the api functions on the view object.
    */
-  public function testPagerApi() {
+  public function testPagerApi(): void {
     $view = Views::getView('test_pager_full');
     $view->setDisplay();
     // On the first round don't initialize the pager.
@@ -492,7 +489,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests translating the pager using config_translation.
    */
-  public function testPagerConfigTranslation() {
+  public function testPagerConfigTranslation(): void {
     $view = Views::getView('content');
     $display = &$view->storage->getDisplay('default');
     $display['display_options']['pager']['options']['items_per_page'] = 5;
@@ -551,7 +548,7 @@ class PagerTest extends ViewTestBase {
   /**
    * Tests translating the pager using locale.
    */
-  public function testPagerLocale() {
+  public function testPagerLocale(): void {
     // Enable locale and language module.
     $this->container->get('module_installer')->install(['locale', 'language']);
     $this->resetAll();

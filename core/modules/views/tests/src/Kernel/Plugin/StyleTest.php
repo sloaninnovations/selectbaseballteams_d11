@@ -29,7 +29,7 @@ class StyleTest extends ViewsKernelTestBase {
   /**
    * Tests the general rendering of styles.
    */
-  public function testStyle() {
+  public function testStyle(): void {
     $renderer = $this->container->get('renderer');
 
     // This run use the test row plugin and render with it.
@@ -78,7 +78,7 @@ class StyleTest extends ViewsKernelTestBase {
   /**
    * Tests the grouping features of styles.
    */
-  public function testGrouping() {
+  public function testGrouping(): void {
     $this->doTestGrouping(FALSE);
     $this->doTestGrouping(TRUE);
   }
@@ -86,7 +86,7 @@ class StyleTest extends ViewsKernelTestBase {
   /**
    * Provides reusable code for ::testGrouping().
    */
-  protected function doTestGrouping($stripped = FALSE) {
+  protected function doTestGrouping($stripped = FALSE): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
     // Setup grouping by the job and the age field.
@@ -278,7 +278,7 @@ class StyleTest extends ViewsKernelTestBase {
   /**
    * Tests custom CSS row classes.
    */
-  public function testCustomRowClasses() {
+  public function testCustomRowClasses(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 

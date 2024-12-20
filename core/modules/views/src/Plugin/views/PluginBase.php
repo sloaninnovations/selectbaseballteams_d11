@@ -79,9 +79,9 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
    *
    * For display plugins this is empty.
    *
-   * @todo find a better description
-   *
    * @var \Drupal\views\Plugin\views\display\DisplayPluginBase
+   *
+   * @todo find a better description
    */
   public $displayHandler;
 
@@ -117,7 +117,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    */
@@ -149,12 +149,12 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
   /**
    * Information about options for all kinds of purposes will be held here.
    * @code
-   * 'option_name' => array(
+   * 'option_name' => [
    *  - 'default' => default value,
    *  - 'contains' => (optional) array of items this contains, with its own
    *      defaults, etc. If contains is set, the default will be ignored and
-   *      assumed to be array().
-   *  ),
+   *      assumed to be [].
+   *  ],
    * @endcode
    *
    * @return array
@@ -581,6 +581,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
       // translate it again.
       // @see Drupal\Core\Language::filterLanguages().
       if (!$name instanceof TranslatableMarkup) {
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $name = $this->t($name);
       }
       $list[PluginBase::VIEWS_QUERY_LANGUAGE_SITE_DEFAULT] = $name;
