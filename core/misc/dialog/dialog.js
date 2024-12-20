@@ -119,7 +119,7 @@ class DrupalDialogEvent extends Event {
       openDialog({ modal: false });
     };
     dialog.showModal = () => {
-      openDialog({ modal: true });
+      openDialog({ modal: true, uiDialogTitleHeadingLevel: 1 });
     };
     dialog.close = closeDialog;
 
