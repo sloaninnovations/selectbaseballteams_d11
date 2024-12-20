@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\node_access_test;
+
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\node\NodeTypeInterface;
+
+/**
+ * Trait for node permission testing.
+ *
+ * This module's functionality depends on the following state variables:
+ * - node_access_test.no_access_uid: Used in NodeQueryAlterTest to enable the
+ *   node_access_all grant realm.
+ * - node_access_test.private: When TRUE, the module controls access for nodes
+ *   with a 'private' property set, and inherits the default core access for
+ *   nodes without this flag. When FALSE, the module controls access for all
+ *   nodes.
+ * - node_access_test_secret_catalan: When set to TRUE and using the Catalan
+ *   'ca' language code, makes all Catalan content secret.
+ *
+ * @see node_access_test_node_grants()
+ * @see \Drupal\Tests\node\Functional\NodeQueryAlterTest
+ * @see \Drupal\Tests\node\Functional\NodeAccessBaseTableTest
+ */
+trait NodeAccessTestTrait {
+
+  /**
+   * Adds the private field to a node type.
+   *
+   * @param \Drupal\node\NodeTypeInterface $type
+   *   A node type entity.
+   */
+  public function addPrivateField(NodeTypeInterface $type): void {
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'private',
+      'entity_type' => 'node',
+      'type' => 'integer',
+    ]);
+    $field_storage->save();
+    $field = FieldConfig::create([
+      'field_name' => 'private',
+      'entity_type' => 'node',
+      'bundle' => $type->id(),
+      'label' => 'Private',
+    ]);
+    $field->save();
+
+    // Assign widget settings for the 'default' form mode.
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay('node', $type->id())
+      ->setComponent('private', [
+        'type' => 'number',
+      ])
+      ->save();
+  }
+
+}
