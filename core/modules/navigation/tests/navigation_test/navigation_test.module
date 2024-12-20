@@ -17,36 +17,3 @@ function navigation_test_preprocess_block__navigation(&$variables): void {
   // in tests.
   $variables['attributes']['class'][] = Html::cleanCssIdentifier('block-' . $variables['elements']['#plugin_id']);
 }
-
-/**
- * Implements hook_navigation_content_top().
- */
-function navigation_test_navigation_content_top(): array {
-  if (\Drupal::state()->get('navigation_content_top')) {
-    return [
-      'navigation_foo' => [
-        '#markup' => 'foo',
-      ],
-      'navigation_bar' => [
-        '#markup' => 'bar',
-      ],
-      'navigation_baz' => [
-        '#markup' => 'baz',
-      ],
-    ];
-  }
-  else {
-    return [];
-  }
-}
-
-/**
- * Implements hook_navigation_content_top_alter().
- */
-function navigation_test_navigation_content_top_alter(&$content_top): void {
-  if (\Drupal::state()->get('navigation_content_top_alter')) {
-    unset($content_top['navigation_foo']);
-    $content_top['navigation_bar']['#markup'] = 'new bar';
-    $content_top['navigation_baz']['#weight'] = '-100';
-  }
-}

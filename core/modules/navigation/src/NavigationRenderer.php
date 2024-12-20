@@ -160,7 +160,7 @@ final class NavigationRenderer {
 
     $content_top = $this->getContentTop();
     if (!empty($content_top)) {
-      $page_top['navigation'][0]['content_top'] = $content_top;
+      $build[0]['content_top'] = $content_top;
     }
 
     if ($logo_provider === self::LOGO_PROVIDER_CUSTOM) {

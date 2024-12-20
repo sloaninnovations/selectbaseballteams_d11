@@ -34,4 +34,39 @@ class NavigationTestHooks {
     }
   }
 
+  /**
+   * Implements hook_navigation_content_top().
+   */
+  #[Hook('navigation_content_top')]
+  public function navigationContentTop(): array {
+    if (\Drupal::state()->get('navigation_content_top')) {
+      return [
+        'navigation_foo' => [
+          '#markup' => 'foo',
+        ],
+        'navigation_bar' => [
+          '#markup' => 'bar',
+        ],
+        'navigation_baz' => [
+          '#markup' => 'baz',
+        ],
+      ];
+    }
+    else {
+      return [];
+    }
+  }
+
+  /**
+   * Implements hook_navigation_content_top_alter().
+   */
+  #[Hook('navigation_content_top_alter')]
+  public function navigationContentTopAlter(&$content_top): void {
+    if (\Drupal::state()->get('navigation_content_top_alter')) {
+      unset($content_top['navigation_foo']);
+      $content_top['navigation_bar']['#markup'] = 'new bar';
+      $content_top['navigation_baz']['#weight'] = '-100';
+    }
+  }
+
 }
