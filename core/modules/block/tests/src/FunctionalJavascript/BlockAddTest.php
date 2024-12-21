@@ -47,7 +47,7 @@ class BlockAddTest extends WebDriverTestBase {
     $assert_session->assertWaitOnAjaxRequest();
     $assert_session->pageTextNotContains('The submitted value Pre-content in the Region element is not allowed.');
     $assert_session->optionExists('Region', '- Select -');
-    // Check whether the text "Response status" or "Not restricted" is present in the tab titles.
+    // Check that the summary line is not present in the title.
     $assert_session->elementTextNotContains('css', '.vertical-tabs__menu-item-title', 'Response status');
     $assert_session->elementTextNotContains('css', '.vertical-tabs__menu-item-title', 'Not restricted');
 
