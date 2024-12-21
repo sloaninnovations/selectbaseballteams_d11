@@ -55,8 +55,8 @@
 
 .ui-dialog .ui-dialog-titlebar .ui-dialog-title {
   -webkit-font-smoothing: antialiased;
-  font-size: var(--jui-dialog-title-font-size);
   margin: 0;
+  font-size: var(--jui-dialog-title-font-size);
   font-weight: bold;
 }
 
