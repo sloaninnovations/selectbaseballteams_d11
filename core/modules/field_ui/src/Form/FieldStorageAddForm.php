@@ -133,7 +133,7 @@ class FieldStorageAddForm extends FormBase {
       foreach ($field_types as $name => $field_type) {
         $definition = ['unique_identifier' => $name] + $field_type;
         if (!is_string($field_type['category']) || !$this->fieldTypeCategoryManager->hasDefinition($field_type['category'])) {
-          throw new \Exception('Invalid field category for field type' . $name . ', category must be the ID of a defined field category, got ' . $field_type['category'] . '.');
+          throw new \Exception('Invalid field category for field type: "' . $name . '", category must be the ID of a defined field category, got "' . $field_type['category'] . '".');
         }
         $category_info = $this->fieldTypeCategoryManager
           ->createInstance($field_type['category'], $definition);
