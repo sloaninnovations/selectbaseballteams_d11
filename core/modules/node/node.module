@@ -337,7 +337,7 @@ function template_preprocess_node(&$variables): void {
   $node = $variables['node'];
 
   // The page variable is deprecated.
-  $variables['deprecations']['page'] = "'page' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. Use 'view_mode' instead. See https://www.drupal.org/node/3458593";
+  $variables['deprecations']['page'] = "'page' is deprecated in drupal:11.2.0 and is removed in drupal:12.0.0. Use 'view_mode' instead. See https://www.drupal.org/node/3458593";
   // The 'page' variable is set to TRUE in two occasions:
   // - The view mode is 'full' and we are on the 'node.view' route.
   // - The node is in preview and view mode is either 'full' or 'default'.
