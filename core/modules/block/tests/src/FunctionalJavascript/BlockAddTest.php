@@ -48,8 +48,9 @@ class BlockAddTest extends WebDriverTestBase {
     $assert_session->pageTextNotContains('The submitted value Pre-content in the Region element is not allowed.');
     $assert_session->optionExists('Region', '- Select -');
     // Check that the summary line is not present in the title.
-    $assert_session->elementTextNotContains('css', '.vertical-tabs__menu-item-title', 'Response status');
-    $assert_session->elementTextNotContains('css', '.vertical-tabs__menu-item-title', 'Not restricted');
+    $summary_text = $this->getSession()->getPage()->find('css', 'li.vertical-tabs__menu-item:nth-child(1) > a:nth-child(1) > span:nth-child(2)')->getText();
+    $assert_session->elementTextContains('css', '.vertical-tabs__menu-item-title', 'Response status');
+    $assert_session->elementTextNotContains('css', '.vertical-tabs__menu-item-title', $summary_text);
 
     // Search for the "Pages" tab link and click it
     $tab = $this->getSession()->getPage()->find('css', 'a[href="#edit-visibility-request-path"]')->click();
