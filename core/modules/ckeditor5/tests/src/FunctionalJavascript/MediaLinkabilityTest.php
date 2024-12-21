@@ -299,4 +299,93 @@ class MediaLinkabilityTest extends MediaTestBase {
     $this->assertNotEmpty($xpath->query('//drupal-media'));
   }
 
+  public function testWithEntityLinkSuggestions(): void {
+    $content_to_add = $this->drupalCreateNode([
+      'type' => 'blog',
+      'title' => 'Zoo Party',
+    ]);
+    $content_to_add_uuid = $content_to_add->uuid();
+
+    $format = FilterFormat::load('test_format');
+    $format_settings = $format->toArray();
+    $filter_html = $format_settings['filters']['filter_html'];
+    $filter_html['settings']['allowed_html'] = '<p> <br> <strong> <em> <a href data-entity-type data-entity-uuid data-entity-metadata> <drupal-media data-link-entity-type data-link-entity-uuid data-link-entity-metadata data-entity-type data-entity-uuid data-align data-view-mode data-caption alt>';
+    $format->setFilterConfig('filter_html', $filter_html);
+    $format->setFilterConfig('entity_links', ['status' => TRUE]);
+    $format->save();
+
+    $this->assertSame([], array_map(
+      function (ConstraintViolationInterface $v) {
+        return (string) $v->getMessage();
+      },
+      iterator_to_array(CKEditor5::validatePair(
+        Editor::load('test_format'),
+        FilterFormat::load('test_format')
+      ))
+    ));
+
+    $session = $this->getSession();
+    $assert_session = $this->assertSession();
+    $page = $session->getPage();
+    $this->drupalGet($this->host->toUrl('edit-form'));
+    $this->waitForEditor();
+
+    // Click somewhere outside the editor area.
+    $page->find('css', 'h1')->click();
+
+    // Initial state: the Drupal Media CKEditor Widget is not selected.
+    $drupalmedia = $assert_session->waitForElementVisible('css', '.ck-content .ck-widget.drupal-media');
+    $this->assertNotEmpty($drupalmedia);
+    $page->find('css', '.ck-editor__main > .ck-editor__editable[contenteditable]')->click();
+    $this->assertVisibleBalloon('.ck-toolbar[aria-label="Drupal Media toolbar"]');
+    $link_media_button = $this->getBalloonButton('Link media');
+    $link_media_button->click();
+    $balloon = $this->assertVisibleBalloon('.ck-link-form');
+    $this->assertNotNull($autocomplete_field = $balloon->find('css', '.ck-input-text'));
+    $autocomplete_field->setValue('Z');
+    $this->assertTrue($this->getSession()->wait(5000, "document.querySelectorAll('.entity-link-suggestions-result-line.ui-menu-item').length > 0"));
+    $results = $page->findAll('css', '.entity-link-suggestions-result-line.ui-menu-item');
+    $results[0]->click();
+
+    $page->find('css', '.ck-link-form .ck-button-save')->click();
+    $this->assertBalloonClosed();
+    $this->assertNotNull($preview_button = $assert_session->waitForElementVisible('css', '#ck-aria-label-preview-button'));
+    $this->assertSame('Zoo Party (Content - blog)', $preview_button->getText());
+
+    $xpath = new \DOMXPath($this->getEditorDataAsDom());
+    $query = sprintf('//a[@href="entity:node/%s" and @data-entity-uuid="%s" and @data-entity-type="node" and @data-entity-metadata]/drupal-media', $content_to_add->id(), $content_to_add_uuid);
+    $this->assertCount(1, $xpath->query($query), "Search for $query");
+
+    $page->pressButton('Save');
+
+    $selector = sprintf('a[href="%s"][data-entity-uuid="%s"][data-entity-type="node"][data-entity-metadata] > article[data-link-entity-uuid="%s"][data-link-entity-type="node"][data-link-entity-metadata]', $content_to_add->toUrl('canonical')->toString(), $content_to_add_uuid, $content_to_add_uuid);
+    $link_around_media = $assert_session->elementExists('css', $selector);
+    $link_around_media->click();
+    $h1 = $page->find('css', 'h1');
+    $this->assertSame('Zoo Party', $h1->getText(), 'The link in the rendered page goes to the correct place');
+
+    $this->drupalGet($this->host->toUrl('edit-form'));
+    $this->waitForEditor();
+    $page->find('css', '.ck-editor__main > .ck-editor__editable[contenteditable]')->click();
+    $this->assertVisibleBalloon('.ck-toolbar[aria-label="Drupal Media toolbar"]');
+    $link_media_button = $this->getBalloonButton('Link media');
+    $link_media_button->click();
+
+    $preview_button = $assert_session->waitForElementVisible('css', '#ck-aria-label-preview-button');
+    $this->assertSame('Zoo Party (Content - blog)', $preview_button->getText());
+    $preview_button->click();
+
+    $iterations = 10;
+    while ((count($session->getWindowNames()) < 2 && $iterations > 0) == TRUE) {
+      $session->wait(1000);
+      $iterations--;
+    }
+
+    $window_names = $session->getWindowNames();
+    $this->getSession()->switchToWindow($window_names[1]);
+    $h1 = $page->find('css', 'h1');
+    $this->assertSame('Zoo Party', $h1->getText(), 'Clicking the preview opened a tab with the referenced node.');
+    $this->assertNull($page->find('css', 'form'), 'No forms on the page confirm we are viewing the node, not in the edit form.');
+  }
+
 }

@@ -15,7 +15,36 @@ use Drupal\Core\Ajax\MessageCommand;
 use Drupal\Core\Ajax\PrependCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Ajax\RemoveCommand;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_field_widget_single_element_form_alter().
+ */
+function ckeditor5_field_widget_single_element_form_alter(&$element, FormStateInterface $form_state, $context): void {
+  // Add an attribute so that CKEditor 5 plugins can vary their behavior based
+  // on host entity type, host entity bundle and host entity language.
+  // @see
+  if (!empty($element['#type']) && $element['#type'] == 'text_format') {
+    $items = $context['items'];
+    assert($items instanceof FieldItemListInterface);
+    $host_entity = $items->getEntity();
+    $element['#attributes']['data-ckeditor5-host-entity-type'] = $host_entity->getEntityTypeId();
+    $element['#attributes']['data-ckeditor5-host-entity-bundle'] = $host_entity->bundle();
+    $element['#attributes']['data-ckeditor5-host-entity-langcode'] = $host_entity->language()->getId();
+  }
+}
+
+/**
+ * Implements hook_entity_bundle_info_alter().
+ */
+function ckeditor5_entity_bundle_info_alter(&$bundles): void {
+  if (isset($bundles['node'])) {
+    foreach ($bundles['node'] as $key => $bundle) {
+      $bundles['node'][$key]['ckeditor5_link_suggestions'] = TRUE;
+    }
+  }
+}
 
 /**
  * Implements hook_module_implements_alter().

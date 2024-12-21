@@ -41,6 +41,7 @@ use Drupal\shortcut\ShortcutInterface;
       'edit' => ShortcutForm::class,
       'delete' => ShortcutDeleteForm::class,
     ],
+    'link_target' => ['view' => ShortcutLinkTarget::class],
   ],
   links: [
     'canonical' => '/admin/config/user-interface/shortcut/link/{shortcut}',
