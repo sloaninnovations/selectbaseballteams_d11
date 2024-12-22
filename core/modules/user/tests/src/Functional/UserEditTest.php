@@ -268,8 +268,8 @@ class UserEditTest extends BrowserTestBase {
 
     $this->drupalLogin($admin);
     $this->drupalGet("user/" . $admin->id() . "/edit");
-    // Status field must not be rendered when user is editing itself, so radio buttons must not be present in order to
-    // prevent self-blocking
+    // The status field must not be rendered when the user is editing itself.
+    // Therefore, radio buttons must not be present in order to prevent self-blocking.
     $this->assertFalse($this->getSession()->getPage()->hasField('edit-status-0'));
     $this->assertFalse($this->getSession()->getPage()->hasField('edit-status-1'));
 
