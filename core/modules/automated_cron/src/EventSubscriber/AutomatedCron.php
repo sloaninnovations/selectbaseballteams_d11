@@ -22,11 +22,11 @@ class AutomatedCron implements EventSubscriberInterface {
   protected $cron;
 
   /**
-   * The cron configuration.
+   * The config factory.
    *
-   * @var \Drupal\Core\Config\Config
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $config;
+  protected $configFactory;
 
   /**
    * The state key value store.
@@ -47,7 +47,7 @@ class AutomatedCron implements EventSubscriberInterface {
    */
   public function __construct(CronInterface $cron, ConfigFactoryInterface $config_factory, StateInterface $state) {
     $this->cron = $cron;
-    $this->config = $config_factory->get('automated_cron.settings');
+    $this->configFactory = $config_factory;
     $this->state = $state;
   }
 
@@ -58,7 +58,8 @@ class AutomatedCron implements EventSubscriberInterface {
    *   The Event to process.
    */
   public function onTerminate(TerminateEvent $event) {
-    $interval = $this->config->get('interval');
+    $config = $this->configFactory->get('automated_cron.settings');
+    $interval = $config->get('interval');
     if ($interval > 0) {
       $cron_next = $this->state->get('system.cron_last', 0) + $interval;
       if ((int) $event->getRequest()->server->get('REQUEST_TIME') > $cron_next) {
