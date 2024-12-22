@@ -14,7 +14,6 @@ use Drupal\node\Entity\NodeType;
  * JSON:API integration test for "ContentLanguageSettings" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class ContentLanguageSettingsTest extends ConfigEntityResourceTestBase {
 
@@ -48,7 +47,7 @@ class ContentLanguageSettingsTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer languages']);
   }
 

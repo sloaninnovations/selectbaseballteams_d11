@@ -11,7 +11,6 @@ use Drupal\Core\Url;
  * JSON:API integration test for the "CommentType" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class CommentTypeTest extends ConfigEntityResourceTestBase {
 
@@ -45,7 +44,7 @@ class CommentTypeTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer comment types']);
   }
 

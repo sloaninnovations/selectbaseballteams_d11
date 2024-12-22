@@ -39,9 +39,7 @@ class TypedDataTest extends KernelTestBase {
   protected $typedDataManager;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'field', 'file', 'user'];
 
@@ -695,6 +693,27 @@ class TypedDataTest extends KernelTestBase {
 
     $this->assertEquals('string', $violations[0]->getInvalidValue());
     $this->assertSame('0.value', $violations[0]->getPropertyPath());
+  }
+
+  /**
+   * Tests the last() method on typed data lists.
+   */
+  public function testTypedDataListsLast(): void {
+    // Create an ItemList with two string items.
+    $value = ['zero', 'one'];
+    $typed_data = $this->createTypedData(ListDataDefinition::create('string'), $value);
+
+    // Assert that the last item is the second one ('one').
+    $this->assertEquals('one', $typed_data->last()->getValue());
+
+    // Add another item to the list and check the last item.
+    $value[] = 'two';
+    $typed_data = $this->createTypedData(ListDataDefinition::create('string'), $value);
+    $this->assertEquals('two', $typed_data->last()->getValue());
+
+    // Check behavior with an empty list.
+    $typed_data = $this->createTypedData(ListDataDefinition::create('string'), []);
+    $this->assertNull($typed_data->last(), 'Empty list should return NULL.');
   }
 
 }

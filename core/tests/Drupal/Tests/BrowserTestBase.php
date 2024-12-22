@@ -34,6 +34,10 @@ use Symfony\Component\VarDumper\VarDumper;
  * Drupal\Tests\your_module\Functional namespace and live in the
  * modules/your_module/tests/src/Functional directory.
  *
+ * Tests for core/lib/Drupal classes extending BrowserTestBase must exist in the
+ * \Drupal\FunctionalTests\Core namespace and live in the
+ * core/tests/Drupal/FunctionalTests directory.
+ *
  * Tests extending this base class should only translate text when testing
  * translation functionality. For example, avoid wrapping test text with t()
  * or TranslatableMarkup().
@@ -98,7 +102,7 @@ abstract class BrowserTestBase extends TestCase {
   protected $configImporter;
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * The test runner will merge the $modules lists from this class, the class
    * it extends, and so on up the class hierarchy. It is not necessary to
@@ -370,10 +374,6 @@ abstract class BrowserTestBase extends TestCase {
     // Set up the browser test output file.
     $this->initBrowserOutputFile();
 
-    // Ensure that the test is not marked as risky because of no assertions. In
-    // PHPUnit 6 tests that only make assertions using $this->assertSession()
-    // can be marked as risky.
-    $this->addToAssertionCount(1);
   }
 
   /**

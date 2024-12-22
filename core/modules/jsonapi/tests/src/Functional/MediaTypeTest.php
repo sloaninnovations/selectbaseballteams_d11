@@ -11,7 +11,6 @@ use Drupal\media\Entity\MediaType;
  * JSON:API integration test for the "MediaType" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class MediaTypeTest extends ConfigEntityResourceTestBase {
 
@@ -45,7 +44,7 @@ class MediaTypeTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer media types']);
   }
 

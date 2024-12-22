@@ -12,7 +12,6 @@ use Drupal\Core\Url;
  *
  * @group jsonapi
  * @group path
- * @group #slow
  */
 class PathAliasTest extends ResourceTestBase {
 
@@ -56,7 +55,7 @@ class PathAliasTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer url aliases']);
   }
 

@@ -11,7 +11,6 @@ use Drupal\filter\Entity\FilterFormat;
  * JSON:API integration test for the "FilterFormat" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class FilterFormatTest extends ConfigEntityResourceTestBase {
 
@@ -45,7 +44,7 @@ class FilterFormatTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer filters']);
   }
 

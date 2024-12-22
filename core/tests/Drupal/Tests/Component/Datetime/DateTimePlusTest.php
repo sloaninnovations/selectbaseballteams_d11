@@ -91,7 +91,7 @@ class DateTimePlusTest extends TestCase {
   public function testInvalidDateDiff($input1, $input2, $absolute): void {
     $this->expectException(\BadMethodCallException::class);
     $this->expectExceptionMessage('Method Drupal\Component\Datetime\DateTimePlus::diff expects parameter 1 to be a \DateTime or \Drupal\Component\Datetime\DateTimePlus object');
-    $interval = $input1->diff($input2, $absolute);
+    $input1->diff($input2, $absolute);
   }
 
   /**
@@ -683,38 +683,38 @@ class DateTimePlusTest extends TestCase {
         'expected' => $positive_18_hours,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600, new \DateTimeZone('America/Los_Angeles')),
-        'input2' => DateTimePlus::createFromFormat('U', 0, new \DateTimeZone('UTC')),
+        'input1' => DateTimePlus::createFromFormat('U', '3600', new \DateTimeZone('America/Los_Angeles')),
+        'input2' => DateTimePlus::createFromTimestamp(0, new \DateTimeZone('UTC')),
         'absolute' => FALSE,
         'expected' => $negative_1_hour,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600),
-        'input2' => DateTimePlus::createFromFormat('U', 0),
+        'input1' => DateTimePlus::createFromTimestamp(3600),
+        'input2' => DateTimePlus::createFromTimestamp(0),
         'absolute' => FALSE,
         'expected' => $negative_1_hour,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600),
+        'input1' => DateTimePlus::createFromTimestamp(3600),
         'input2' => \DateTime::createFromFormat('U', '0'),
         'absolute' => FALSE,
         'expected' => $negative_1_hour,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600),
-        'input2' => DateTimePlus::createFromFormat('U', 0),
+        'input1' => DateTimePlus::createFromTimestamp(3600),
+        'input2' => DateTimePlus::createFromTimestamp(0),
         'absolute' => TRUE,
         'expected' => $positive_1_hour,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600),
+        'input1' => DateTimePlus::createFromTimestamp(3600),
         'input2' => \DateTime::createFromFormat('U', '0'),
         'absolute' => TRUE,
         'expected' => $positive_1_hour,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 0),
-        'input2' => DateTimePlus::createFromFormat('U', 0),
+        'input1' => DateTimePlus::createFromTimestamp(0),
+        'input2' => DateTimePlus::createFromTimestamp(0),
         'absolute' => FALSE,
         'expected' => $empty_interval,
       ],
@@ -733,12 +733,12 @@ class DateTimePlusTest extends TestCase {
   public static function providerTestInvalidDateDiff() {
     return [
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600),
+        'input1' => DateTimePlus::createFromTimestamp(3600),
         'input2' => '1970-01-01 00:00:00',
         'absolute' => FALSE,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600),
+        'input1' => DateTimePlus::createFromTimestamp(3600),
         'input2' => NULL,
         'absolute' => FALSE,
       ],

@@ -11,7 +11,6 @@ use Drupal\shortcut\Entity\ShortcutSet;
  * JSON:API integration test for the "ShortcutSet" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class ShortcutSetTest extends ConfigEntityResourceTestBase {
 
@@ -45,7 +44,7 @@ class ShortcutSetTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     switch ($method) {
       case 'GET':
         $this->grantPermissionsToTestedRole(['access shortcuts']);

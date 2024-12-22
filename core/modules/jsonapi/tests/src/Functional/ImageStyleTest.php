@@ -11,7 +11,6 @@ use Drupal\image\Entity\ImageStyle;
  * JSON:API integration test for the "ImageStyle" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class ImageStyleTest extends ConfigEntityResourceTestBase {
 
@@ -52,7 +51,7 @@ class ImageStyleTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer image styles']);
   }
 

@@ -43,9 +43,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
   protected $configImporter;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -58,7 +56,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     $container->register('logger.ConfigImporterMissingContentTest', __CLASS__)->addTag('logger');
     $container->set('logger.ConfigImporterMissingContentTest', $this);

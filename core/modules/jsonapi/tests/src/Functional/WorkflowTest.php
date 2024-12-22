@@ -11,7 +11,6 @@ use Drupal\workflows\Entity\Workflow;
  * JSON:API integration test for the "Workflow" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class WorkflowTest extends ConfigEntityResourceTestBase {
 
@@ -45,7 +44,7 @@ class WorkflowTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer workflows']);
   }
 

@@ -13,7 +13,6 @@ use Drupal\user\Entity\User;
  * JSON:API integration test for the "EntityTestComputedField" content entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class EntityTestComputedFieldTest extends ResourceTestBase {
 
@@ -52,7 +51,7 @@ class EntityTestComputedFieldTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer entity_test content']);
 
     switch ($method) {

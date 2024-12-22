@@ -14,7 +14,6 @@ use GuzzleHttp\RequestOptions;
  * JSON:API integration test for the "ConfigurableLanguage" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class ConfigurableLanguageTest extends ConfigEntityResourceTestBase {
 
@@ -48,7 +47,7 @@ class ConfigurableLanguageTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer languages']);
   }
 

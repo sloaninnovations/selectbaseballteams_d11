@@ -20,7 +20,6 @@ use Drupal\user\UserInterface;
  * Tests the file field widget with public and private files.
  *
  * @group file
- * @group #slow
  */
 class FileFieldWidgetTest extends FileFieldTestBase {
 
@@ -161,7 +160,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
       $remaining = 3;
       // Test clicking each "Remove" button. For extra robustness, test them out
       // of sequential order. They are 0-indexed, and get renumbered after each
-      // iteration, so array(1, 1, 0) means:
+      // iteration, so [1, 1, 0] means:
       // - First remove the 2nd file.
       // - Then remove what is then the 2nd file (was originally the 3rd file).
       // - Then remove the first file.
@@ -560,7 +559,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    * @param \Drupal\user\UserInterface $attacker_user
    *   The attacker user.
    */
-  protected function doTestTemporaryFileRemovalExploit(UserInterface $victim_user, UserInterface $attacker_user) {
+  protected function doTestTemporaryFileRemovalExploit(UserInterface $victim_user, UserInterface $attacker_user): void {
     $type_name = 'article';
     $field_name = 'test_file_field';
     $this->createFileField($field_name, 'node', $type_name);

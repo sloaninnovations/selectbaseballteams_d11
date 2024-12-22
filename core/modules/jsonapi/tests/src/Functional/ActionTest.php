@@ -12,7 +12,6 @@ use Drupal\user\RoleInterface;
  * JSON:API integration test for the "Action" config entity type.
  *
  * @group Action
- * @group #slow
  */
 class ActionTest extends ConfigEntityResourceTestBase {
 
@@ -46,7 +45,7 @@ class ActionTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer actions']);
   }
 

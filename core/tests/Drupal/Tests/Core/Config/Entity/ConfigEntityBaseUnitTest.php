@@ -160,7 +160,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $container->set('theme_handler', $this->themeHandler->reveal());
     \Drupal::setContainer($container);
 
-    $this->entity = $this->getMockBuilder(ConfigEntityBaseMockableClass::class)
+    $this->entity = $this->getMockBuilder(StubConfigEntity::class)
       ->setConstructorArgs([$values, $this->entityTypeId])
       ->onlyMethods([])
       ->getMock();
@@ -335,7 +335,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
    * @covers ::onDependencyRemoval
    */
   public function testCalculateDependenciesWithThirdPartySettings(): void {
-    $this->entity = $this->getMockBuilder(ConfigEntityBaseMockableClass::class)
+    $this->entity = $this->getMockBuilder(StubConfigEntity::class)
       ->setConstructorArgs([[], $this->entityTypeId])
       ->onlyMethods([])
       ->getMock();
@@ -513,23 +513,13 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
    * @covers ::sort
    */
   public function testSort(): void {
-    $this->entityTypeManager->expects($this->any())
-      ->method('getDefinition')
-      ->with($this->entityTypeId)
-      ->willReturn([
-        'entity_keys' => [
-          'label' => 'label',
-        ],
-      ]);
+    $this->entityType->expects($this->atLeastOnce())
+      ->method('getKey')
+      ->with('label')
+      ->willReturn('label');
 
-    $entity_a = $this->createMock(ConfigEntityBase::class);
-    $entity_a->expects($this->atLeastOnce())
-      ->method('label')
-      ->willReturn('foo');
-    $entity_b = $this->createMock(ConfigEntityBase::class);
-    $entity_b->expects($this->atLeastOnce())
-      ->method('label')
-      ->willReturn('bar');
+    $entity_a = new SortTestConfigEntityWithWeight(['label' => 'foo'], $this->entityTypeId);
+    $entity_b = new SortTestConfigEntityWithWeight(['label' => 'bar'], $this->entityTypeId);
 
     // Test sorting by label.
     $list = [$entity_a, $entity_b];
@@ -570,7 +560,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
    * @covers ::toArray
    */
   public function testToArrayIdKey(): void {
-    $entity = $this->getMockBuilder(ConfigEntityBaseMockableClass::class)
+    $entity = $this->getMockBuilder(StubConfigEntity::class)
       ->setConstructorArgs([[], $this->entityTypeId])
       ->onlyMethods(['id', 'get'])
       ->getMock();
@@ -733,7 +723,7 @@ class TestConfigEntityWithPluginCollections extends ConfigEntityBaseWithPluginCo
 
   protected array $the_plugin_collection_config = [];
 
-  public function setPluginManager(PluginManagerInterface $plugin_manager) {
+  public function setPluginManager(PluginManagerInterface $plugin_manager): void {
     $this->pluginManager = $plugin_manager;
   }
 
@@ -750,8 +740,22 @@ class TestConfigEntityWithPluginCollections extends ConfigEntityBaseWithPluginCo
 }
 
 /**
- * A class extending ConfigEntityBase for testing purposes.
+ * Test entity class to test sorting.
  */
-class ConfigEntityBaseMockableClass extends ConfigEntityBase {
+class SortTestConfigEntityWithWeight extends ConfigEntityBase {
+
+  /**
+   * The label.
+   *
+   * @var string
+   */
+  public string $label;
+
+  /**
+   * The weight.
+   *
+   * @var int
+   */
+  public int $weight;
 
 }

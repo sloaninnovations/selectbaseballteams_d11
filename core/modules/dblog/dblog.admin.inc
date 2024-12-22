@@ -2,7 +2,6 @@
 
 /**
  * @file
- * Administrative page callbacks for the Database Logging module.
  */
 
 use Drupal\Core\Logger\RfcLogLevel;
@@ -22,6 +21,7 @@ function dblog_filters() {
   $filters = [];
 
   foreach (_dblog_get_message_types() as $type) {
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     $types[$type] = t($type);
   }
 

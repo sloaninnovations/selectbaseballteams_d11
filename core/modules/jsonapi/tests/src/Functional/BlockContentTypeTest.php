@@ -11,7 +11,6 @@ use Drupal\Core\Url;
  * JSON:API integration test for the "BlockContentType" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class BlockContentTypeTest extends ConfigEntityResourceTestBase {
 
@@ -45,7 +44,7 @@ class BlockContentTypeTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer block types']);
   }
 

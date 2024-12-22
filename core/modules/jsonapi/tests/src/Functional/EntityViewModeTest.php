@@ -11,7 +11,6 @@ use Drupal\Core\Url;
  * JSON:API integration test for the "EntityViewMode" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class EntityViewModeTest extends ConfigEntityResourceTestBase {
 
@@ -47,7 +46,7 @@ class EntityViewModeTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer display modes']);
   }
 

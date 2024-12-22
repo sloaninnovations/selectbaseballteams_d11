@@ -11,7 +11,6 @@ use Drupal\Core\Url;
  * JSON:API integration test for the "ConfigTest" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class ConfigTestTest extends ConfigEntityResourceTestBase {
 
@@ -45,7 +44,7 @@ class ConfigTestTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['view config_test']);
   }
 

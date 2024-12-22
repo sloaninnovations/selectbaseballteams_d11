@@ -11,7 +11,6 @@ use Drupal\user\Entity\Role;
  * JSON:API integration test for the "Role" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class RoleTest extends ConfigEntityResourceTestBase {
 
@@ -45,7 +44,7 @@ class RoleTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer permissions']);
   }
 

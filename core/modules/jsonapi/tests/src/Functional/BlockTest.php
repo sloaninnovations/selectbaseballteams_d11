@@ -12,7 +12,6 @@ use Drupal\Core\Url;
  * JSON:API integration test for the "Block" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class BlockTest extends ConfigEntityResourceTestBase {
 
@@ -46,7 +45,7 @@ class BlockTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     switch ($method) {
       case 'GET':
         $this->entity->setVisibilityConfig('user_role', [])->save();

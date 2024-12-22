@@ -186,6 +186,7 @@ class DbLogController extends ControllerBase {
         'data' => [
           // Cells.
           ['class' => ['icon']],
+          // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
           $this->t($dblog->type),
           $this->dateFormatter->format($dblog->timestamp, 'short'),
           $message,
@@ -227,7 +228,12 @@ class DbLogController extends ControllerBase {
    *   If no event found for the given ID.
    */
   public function eventDetails($event_id) {
-    $dblog = $this->database->query('SELECT [w].*, [u].[uid] FROM {watchdog} [w] LEFT JOIN {users} [u] ON [u].[uid] = [w].[uid] WHERE [w].[wid] = :id', [':id' => $event_id])->fetchObject();
+    $query = $this->database->select('watchdog', 'w')
+      ->fields('w')
+      ->condition('w.wid', $event_id);
+    $query->leftJoin('users', 'u', '[u].[uid] = [w].[uid]');
+    $query->addField('u', 'uid', 'uid');
+    $dblog = $query->execute()->fetchObject();
 
     if (empty($dblog)) {
       throw new NotFoundHttpException();
@@ -243,6 +249,7 @@ class DbLogController extends ControllerBase {
     $rows = [
       [
         ['data' => $this->t('Type'), 'header' => TRUE],
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $this->t($dblog->type),
       ],
       [
@@ -374,6 +381,7 @@ class DbLogController extends ControllerBase {
             $row->backtrace = $variables['@backtrace_string'];
           }
         }
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $message = $this->t(Xss::filterAdmin($row->message), $variables);
       }
     }

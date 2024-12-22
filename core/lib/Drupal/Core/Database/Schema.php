@@ -30,9 +30,9 @@ abstract class Schema implements PlaceholderInterface {
    * by defining the defaultSchema variable only MySQL has to re-write the
    * method.
    *
-   * @see DatabaseSchema::getPrefixInfo()
-   *
    * @var string
+   *
+   * @see DatabaseSchema::getPrefixInfo()
    */
   protected $defaultSchema = 'public';
 
@@ -115,6 +115,31 @@ abstract class Schema implements PlaceholderInterface {
     $info = $this->getPrefixInfo($table);
     $args[0] = $info['table'];
     return implode('_', $args);
+  }
+
+  /**
+   * Executes a data definition language (DDL) statement.
+   *
+   * This method allows to void an active transaction when the driver does
+   * not support transactional DDL.
+   *
+   * @param string $sql
+   *   The DDL statement to execute. This is a SQL string that may contain
+   *   placeholders.
+   * @param array $arguments
+   *   (Optional) The associative array of arguments for the prepared
+   *   statement.
+   * @param array $options
+   *   (Optional) An associative array of options to control how the query is
+   *   run. The given options will be merged with self::defaultOptions().
+   */
+  protected function executeDdlStatement(string $sql, array $arguments = [], array $options = []): void {
+    $this->connection->query($sql, $arguments, $options);
+    // DDL statements when in a transaction force a commit in some databases.
+    // Void the transaction in that case.
+    if (!$this->connection->supportsTransactionalDDL() && $this->connection->transactionManager()->inTransaction()) {
+      $this->connection->transactionManager()->voidClientTransaction();
+    }
   }
 
   /**
@@ -522,6 +547,7 @@ abstract class Schema implements PlaceholderInterface {
    * @throws \RuntimeException
    *   If the driver does not implement this method.
    */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
   protected function introspectIndexSchema($table) {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
@@ -616,7 +642,7 @@ abstract class Schema implements PlaceholderInterface {
     }
     $statements = $this->createTableSql($name, $table);
     foreach ($statements as $statement) {
-      $this->connection->query($statement);
+      $this->executeDdlStatement($statement);
     }
   }
 
@@ -642,6 +668,7 @@ abstract class Schema implements PlaceholderInterface {
    *   make it private for each driver, and ::createTable actually an abstract
    *   method here for implementation in each driver.
    */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
   protected function createTableSql($name, $table) {
     throw new \BadMethodCallException(get_class($this) . '::createTableSql() not implemented.');
   }

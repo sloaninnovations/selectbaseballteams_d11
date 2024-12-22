@@ -15,7 +15,6 @@ use Drupal\filter\Entity\FilterFormat;
  * JSON:API integration test for the "Editor" config entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class EditorTest extends ConfigEntityResourceTestBase {
 
@@ -49,7 +48,7 @@ class EditorTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer filters']);
   }
 
@@ -168,7 +167,7 @@ class EditorTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessMessage($method) {
+  protected function getExpectedUnauthorizedAccessMessage($method): string {
     return "The 'administer filters' permission is required.";
   }
 

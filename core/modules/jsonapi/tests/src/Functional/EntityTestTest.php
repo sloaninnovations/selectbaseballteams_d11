@@ -14,7 +14,6 @@ use Drupal\user\Entity\User;
  * JSON:API integration test for the "EntityTest" content entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class EntityTestTest extends ResourceTestBase {
 
@@ -53,7 +52,7 @@ class EntityTestTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     switch ($method) {
       case 'GET':
         $this->grantPermissionsToTestedRole(['view test entity']);

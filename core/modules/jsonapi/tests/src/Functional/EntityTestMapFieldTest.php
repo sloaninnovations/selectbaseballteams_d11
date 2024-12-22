@@ -12,7 +12,6 @@ use Drupal\user\Entity\User;
  * JSON:API integration test for the "EntityTestMapField" content entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class EntityTestMapFieldTest extends ResourceTestBase {
 
@@ -67,7 +66,7 @@ class EntityTestMapFieldTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer entity_test content']);
   }
 
@@ -155,7 +154,7 @@ class EntityTestMapFieldTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessMessage($method) {
+  protected function getExpectedUnauthorizedAccessMessage($method): string {
     return "The 'administer entity_test content' permission is required.";
   }
 
