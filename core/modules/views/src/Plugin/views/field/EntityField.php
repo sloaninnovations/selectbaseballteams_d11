@@ -580,7 +580,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     [$prefix, $suffix] = explode('@count', $this->t('Display @count value(s)'));
 
     if ($field->getCardinality() == FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
-      $type = 'textfield';
+      $type = 'number';
       $options = NULL;
       $size = 5;
     }
@@ -638,7 +638,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
 
     [$prefix, $suffix] = explode('@count', $this->t('starting from @count'));
     $form['delta_offset'] = [
-      '#type' => 'textfield',
+      '#type' => 'number',
       '#size' => 5,
       '#field_prefix' => $prefix,
       '#field_suffix' => $suffix,
