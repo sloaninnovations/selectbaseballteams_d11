@@ -1,3 +1,4 @@
+abnf
 absolutezero
 adamson
 addedline
@@ -62,13 +63,11 @@ browserkit
 browsertest
 browsertestbase
 brûlée
-bubbleable
 bundleable
 bundleless
 bundlenode
 buttonpane
 buttonset
-buytaert
 bytea
 cachetag
 cachetags
@@ -127,7 +126,6 @@ daterange
 datestamp
 datetimeiso
 datetimeplus
-dbtng
 dburl
 dealerdirect
 defaultable
@@ -160,25 +158,18 @@ dragtable
 drillable
 dropbutton
 dropbuttons
-drupaldevdays
 drupalelementstyle
 drupalelementstylecommand
 drupalelementstyleediting
 drupalelementstyleui
 drupalhtmlbuilder
-drupalism
-drupalisms
-drupallink
-drupalmedia
 drupalmediaediting
 drupalmediatoolbar
-drupalorg
 editables
 egulias
 elbonia
 elems
 encapsed
-endapply
 endautoescape
 endcode
 endembed
@@ -190,6 +181,7 @@ enoki
 entityviewedit
 errmode
 eslintcache
+español
 eurozone
 evenodd
 eventhandler
@@ -199,13 +191,11 @@ extrasmall
 extraspace
 fakepath
 falsey
-fapi
 fastcgi
 favourite
 favstar
 fcgi
 fdiv
-fieldable
 fieldapi
 fieldblock
 fieldgroup
@@ -224,6 +214,8 @@ fods
 fodt
 fouc
 fourcol
+francais
+français
 fraîche
 frontpage
 fudgy
@@ -257,6 +249,7 @@ iframeupload
 imagecache
 imagetextalternative
 indexname
+inglés
 inited
 inlines
 inno
@@ -275,7 +268,6 @@ jsonlint
 justinrainbow
 keyevent
 keypresses
-keyvalue
 kinberg
 kolkata
 lamoids
@@ -355,7 +347,6 @@ newfieldinitial
 newwin
 nids
 nightwatch
-nightwatchjs
 nikic
 nntp
 nocase
@@ -450,7 +441,6 @@ referencers
 referer
 refinable
 reindexing
-renderable
 renderables
 reparenting
 replyto
@@ -563,7 +553,6 @@ taskless
 tbachert
 testbot
 testbots
-testgroups
 testlogger
 textareas
 textboxes

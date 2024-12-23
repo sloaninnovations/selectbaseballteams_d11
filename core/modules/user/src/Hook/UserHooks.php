@@ -222,7 +222,7 @@ class UserHooks {
    * Implements hook_user_login().
    */
   #[Hook('user_login')]
-  public function userLogin(UserInterface $account) {
+  public function userLogin(UserInterface $account): void {
     // Reset static cache of default variables in template_preprocess() to reflect
     // the new user.
     drupal_static_reset('template_preprocess');
@@ -242,7 +242,7 @@ class UserHooks {
    * Implements hook_user_logout().
    */
   #[Hook('user_logout')]
-  public function userLogout(AccountInterface $account) {
+  public function userLogout(AccountInterface $account): void {
     // Reset static cache of default variables in template_preprocess() to reflect
     // the new user.
     drupal_static_reset('template_preprocess');
@@ -252,7 +252,7 @@ class UserHooks {
    * Implements hook_mail().
    */
   #[Hook('mail')]
-  public function mail($key, &$message, $params) {
+  public function mail($key, &$message, $params): void {
     $token_service = \Drupal::token();
     $language_manager = \Drupal::languageManager();
     $langcode = $message['langcode'];
@@ -347,7 +347,7 @@ class UserHooks {
    * Implements hook_modules_uninstalled().
    */
   #[Hook('modules_uninstalled')]
-  public function modulesUninstalled($modules) {
+  public function modulesUninstalled($modules): void {
     // Remove any potentially orphan module data stored for users.
     \Drupal::service('user.data')->delete($modules);
   }
@@ -356,7 +356,7 @@ class UserHooks {
    * Implements hook_toolbar().
    */
   #[Hook('toolbar')]
-  public function toolbar() {
+  public function toolbar(): array {
     $user = \Drupal::currentUser();
     $items['user'] = [
       '#type' => 'toolbar_item',
@@ -480,7 +480,7 @@ class UserHooks {
    * Implements hook_filter_format_disable().
    */
   #[Hook('filter_format_disable')]
-  public function filterFormatDisable(FilterFormatInterface $filter_format) {
+  public function filterFormatDisable(FilterFormatInterface $filter_format): void {
     // Remove the permission from any roles.
     $permission = $filter_format->getPermissionName();
     /** @var \Drupal\user\Entity\Role $role */
@@ -495,7 +495,7 @@ class UserHooks {
    * Implements hook_entity_operation().
    */
   #[Hook('entity_operation')]
-  public function entityOperation(EntityInterface $entity) {
+  public function entityOperation(EntityInterface $entity): array {
     // Add Manage permissions link if this entity type defines the permissions
     // link template.
     if (!$entity->hasLinkTemplate('entity-permissions-form')) {

@@ -2,6 +2,7 @@
 
 namespace Drupal\media\Hook;
 
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
@@ -102,7 +103,7 @@ class MediaHooks {
    * Implements hook_entity_access().
    */
   #[Hook('entity_access')]
-  public function entityAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+  public function entityAccess(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
     if ($operation === 'delete' && $entity instanceof FieldConfigInterface && $entity->getTargetEntityTypeId() === 'media') {
       /** @var \Drupal\media\MediaTypeInterface $media_type */
       $media_type = \Drupal::entityTypeManager()->getStorage('media_type')->load($entity->getTargetBundle());
@@ -278,7 +279,7 @@ class MediaHooks {
    * Implements hook_views_query_substitutions().
    */
   #[Hook('views_query_substitutions')]
-  public function viewsQuerySubstitutions(ViewExecutable $view) {
+  public function viewsQuerySubstitutions(ViewExecutable $view): array {
     $account = \Drupal::currentUser();
     return [
       '***VIEW_OWN_UNPUBLISHED_MEDIA***' => (int) $account->hasPermission('view own unpublished media'),

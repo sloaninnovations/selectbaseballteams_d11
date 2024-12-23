@@ -2,6 +2,7 @@
 
 namespace Drupal\node\Hook;
 
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\language\ConfigurableLanguageInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Query\AlterableInterface;
@@ -209,7 +210,7 @@ class NodeHooks1 {
    * Implements hook_ranking().
    */
   #[Hook('ranking')]
-  public function ranking() {
+  public function ranking(): array {
     // Create the ranking array and add the basic ranking options.
     $ranking = [
       'relevance' => [
@@ -266,7 +267,7 @@ class NodeHooks1 {
    * Implements hook_page_top().
    */
   #[Hook('page_top')]
-  public function pageTop(array &$page_top) {
+  public function pageTop(array &$page_top): void {
     // Add 'Back to content editing' link on preview page.
     $route_match = \Drupal::routeMatch();
     if ($route_match->getRouteName() == 'entity.node.preview') {
@@ -361,7 +362,7 @@ class NodeHooks1 {
    * Implements hook_ENTITY_TYPE_access().
    */
   #[Hook('node_access')]
-  public function nodeAccess(NodeInterface $node, $operation, AccountInterface $account) {
+  public function nodeAccess(NodeInterface $node, $operation, AccountInterface $account): AccessResultInterface {
     $type = $node->bundle();
     // Note create access is handled by hook_ENTITY_TYPE_create_access().
     switch ($operation) {
@@ -469,7 +470,7 @@ class NodeHooks1 {
    * Implements hook_modules_installed().
    */
   #[Hook('modules_installed')]
-  public function modulesInstalled(array $modules) {
+  public function modulesInstalled(array $modules): void {
     // Check if any of the newly enabled modules require the node_access table to
     // be rebuilt.
     if (!node_access_needs_rebuild() && \Drupal::moduleHandler()->hasImplementations('node_grants', $modules)) {
@@ -481,7 +482,7 @@ class NodeHooks1 {
    * Implements hook_modules_uninstalled().
    */
   #[Hook('modules_uninstalled')]
-  public function modulesUninstalled($modules) {
+  public function modulesUninstalled($modules): void {
     // Check whether any of the disabled modules implemented hook_node_grants(),
     // in which case the node access table needs to be rebuilt.
     foreach ($modules as $module) {
