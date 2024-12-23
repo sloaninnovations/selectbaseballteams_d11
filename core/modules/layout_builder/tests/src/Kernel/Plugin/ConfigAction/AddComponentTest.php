@@ -79,7 +79,7 @@ class AddComponentTest extends KernelTestBase {
         ],
         'additional' => [
           'some_additional_value' => 'my_custom_value',
-        ]
+        ],
       ]);
 
     $view_display = $this->container->get(EntityTypeManagerInterface::class)
