@@ -396,8 +396,8 @@ abstract class EntityBase implements EntityInterface {
 
     // Modules might need to add or change the data initially held by the new
     // entity object, for instance to fill-in default values.
-    \Drupal::moduleHandler()->invokeAll($this->getEntityTypeId() . '_duplicate_create', [$this, $duplicate]);
-    \Drupal::moduleHandler()->invokeAll('entity_duplicate_create', [$this, $duplicate]);
+    \Drupal::moduleHandler()->alter($this->getEntityTypeId() . '_duplicate', $duplicate, $this);
+    \Drupal::moduleHandler()->alter('entity_duplicate', $duplicate, $this);
 
     return $duplicate;
   }
