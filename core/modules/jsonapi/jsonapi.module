@@ -14,8 +14,9 @@
  * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
  * \Drupal\jsonapi\JsonApiFilter::Among_All->value instead.
  *
- * See hook_jsonapi_entity_filter_access()
- * See hook_jsonapi_ENTITY_TYPE_filter_access()
+ * @see https://www.drupal.org/project/drupal/issues/3495600
+ * @see hook_jsonapi_entity_filter_access()
+ * @see hook_jsonapi_ENTITY_TYPE_filter_access()
  */
 const JSONAPI_FILTER_AMONG_ALL = 'filter_among_all';
 
@@ -31,8 +32,9 @@ const JSONAPI_FILTER_AMONG_ALL = 'filter_among_all';
  * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
  * \Drupal\jsonapi\JsonApiFilter::Among_Published->value instead.
  *
- * See hook_jsonapi_entity_filter_access()
- * See hook_jsonapi_ENTITY_TYPE_filter_access()
+ * @see https://www.drupal.org/project/drupal/issues/3495600
+ * @see hook_jsonapi_entity_filter_access()
+ * @see hook_jsonapi_ENTITY_TYPE_filter_access()
  */
 const JSONAPI_FILTER_AMONG_PUBLISHED = 'filter_among_published';
 
@@ -51,8 +53,9 @@ const JSONAPI_FILTER_AMONG_PUBLISHED = 'filter_among_published';
  * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
  * \Drupal\jsonapi\JsonApiFilter::Among_Enabled->value instead.
  *
- * See hook_jsonapi_entity_filter_access()
- * See hook_jsonapi_ENTITY_TYPE_filter_access()
+ * @see https://www.drupal.org/project/drupal/issues/3495600
+ * @see hook_jsonapi_entity_filter_access()
+ * @see hook_jsonapi_ENTITY_TYPE_filter_access()
  */
 const JSONAPI_FILTER_AMONG_ENABLED = 'filter_among_enabled';
 
@@ -76,7 +79,8 @@ const JSONAPI_FILTER_AMONG_ENABLED = 'filter_among_enabled';
  * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
  * \Drupal\jsonapi\JsonApiFilter::Among_Own->value instead.
  *
- * See hook_jsonapi_entity_filter_access()
- * See hook_jsonapi_ENTITY_TYPE_filter_access()
+ * @see https://www.drupal.org/project/drupal/issues/3495600
+ * @see hook_jsonapi_entity_filter_access()
+ * @see hook_jsonapi_ENTITY_TYPE_filter_access()
  */
 const JSONAPI_FILTER_AMONG_OWN = 'filter_among_own';
