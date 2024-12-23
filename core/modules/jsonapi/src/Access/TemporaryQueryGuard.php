@@ -388,7 +388,7 @@ class TemporaryQueryGuard {
     // @todo Remove ternary when the 'uid' key is added to the User entity type.
     $owner_field_name = $entity_type->id() === 'user' ? 'uid' : $entity_type->getKey('owner');
     if ($owner_field_name) {
-      $access_result = $access_results[JSONAPI_FILTER_AMONG_OWN];
+      $access_result = $access_results[JsonApiFilter::Among_Own->value];
       $cacheability->addCacheableDependency($access_result);
       if ($access_result->isAllowed()) {
         $cacheability->addCacheContexts(['user']);
