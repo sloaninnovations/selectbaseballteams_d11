@@ -11,6 +11,9 @@
  * regardless of whether they are published or enabled, and regardless of
  * their owner.
  *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+ * \Drupal\jsonapi\JsonApiFilter::Among_All->value instead.
+ *
  * @see hook_jsonapi_entity_filter_access()
  * @see hook_jsonapi_ENTITY_TYPE_filter_access()
  */
@@ -24,6 +27,9 @@ const JSONAPI_FILTER_AMONG_ALL = 'filter_among_all';
  *
  * This is used when an entity type has a "published" entity key and there's a
  * query condition for the value of that equaling 1.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+ * \Drupal\jsonapi\JsonApiFilter::Among_Published->value instead.
  *
  * @see hook_jsonapi_entity_filter_access()
  * @see hook_jsonapi_ENTITY_TYPE_filter_access()
@@ -41,6 +47,9 @@ const JSONAPI_FILTER_AMONG_PUBLISHED = 'filter_among_published';
  *
  * For the User entity type, which does not have a "status" entity key, the
  * "status" field is used.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+ * \Drupal\jsonapi\JsonApiFilter::Among_Enabled->value instead.
  *
  * @see hook_jsonapi_entity_filter_access()
  * @see hook_jsonapi_ENTITY_TYPE_filter_access()
@@ -63,6 +72,9 @@ const JSONAPI_FILTER_AMONG_ENABLED = 'filter_among_enabled';
  * - Access is being checked for an authenticated user.
  * - The entity type has an "owner" entity key.
  * - There's a filter/query condition for the value equal to the user's ID.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+ * \Drupal\jsonapi\JsonApiFilter::Among_Own->value instead.
  *
  * @see hook_jsonapi_entity_filter_access()
  * @see hook_jsonapi_ENTITY_TYPE_filter_access()
