@@ -986,7 +986,7 @@ function hook_ENTITY_TYPE_create(\Drupal\Core\Entity\EntityInterface $entity) {
  *   The original entity object.
  *
  * @ingroup entity_crud
- * @see hook_ENTITY_TYPE_duplicate_create()
+ * @see hook_ENTITY_TYPE_duplicate_alter()
  */
 function hook_entity_duplicate_alter(\Drupal\Core\Entity\EntityInterface $duplicate, \Drupal\Core\Entity\EntityInterface $entity): void {
   \Drupal::logger('example')->info('Entity duplicated: @label', ['@label' => $entity->label()]);
