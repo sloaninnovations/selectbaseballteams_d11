@@ -435,9 +435,9 @@ class TemporaryQueryGuard {
     /** @var \Drupal\Core\Access\AccessResultInterface[] $combined_access_results */
     $combined_access_results = [
       JsonApiFilter::Among_All->value => AccessResult::neutral(),
-      JsonApiFilter::Among_Published => AccessResult::neutral(),
-      JsonApiFilter::Among_Enabled => AccessResult::neutral(),
-      JsonApiFilter::Among_Own => AccessResult::neutral(),
+      JsonApiFilter::Among_Published->value => AccessResult::neutral(),
+      JsonApiFilter::Among_Enabled->value => AccessResult::neutral(),
+      JsonApiFilter::Among_Own->value => AccessResult::neutral(),
     ];
 
     // Invoke hook_jsonapi_entity_filter_access() and
