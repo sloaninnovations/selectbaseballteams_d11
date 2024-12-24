@@ -87,7 +87,7 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
     $this->verifyDynamicPageCache($this->node->toUrl(), 'MISS');
     $this->verifyDynamicPageCache($this->node->toUrl(), 'HIT');
     // Top Bar is not visible if the feature flag module is disabled.
-    $this->assertSession()->elementNotExists('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button/span");
+    $this->assertSession()->elementNotExists('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button");
     $this->assertSession()->elementExists('xpath', '//div[@id="block-tabs"]');
 
     \Drupal::service('module_installer')->install(['navigation_top_bar']);
@@ -110,9 +110,9 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
 
     foreach ($toolbar_links->findAll('css', 'li') as $toolbar_link) {
       $this->clickLink($toolbar_link->getText());
-      $this->assertSession()->elementExists('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button/span");
-      $this->assertSession()->elementTextEquals('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button/span", 'More actions');
-      $this->assertSession()->elementNotExists('xpath', '//div[@id="block-tabs"]');
+      $this->assertSession()->elementAttributeContains('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]", 'class', 'toolbar-button-exposed');
+      $this->assertSession()->elementTextEquals('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]//span", "Edit");
+      $this->assertSession()->elementAttributeContains('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[2]", 'class', 'toolbar-button--icon--kebab');
     }
 
     // Regular tabs are visible for user that cannot access to navigation.
