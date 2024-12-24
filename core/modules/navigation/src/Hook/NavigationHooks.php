@@ -183,11 +183,12 @@ class NavigationHooks {
     }
   }
 
+
   /**
    * Implements hook_theme_suggestions_HOOK_alter().
    */
   #[Hook('theme_suggestions_menu_local_tasks_alter')]
-  public function themeKunal(array &$suggestions, array $variables) : void {
+  public function themeSuggestionsMenuLocalTasksAlter(array &$suggestions, array $variables) : void {
     // Add a custom theme suggestion to use our module’s template.
     $suggestions[] = 'menu_local_tasks__navigation';
   }
