@@ -58,9 +58,9 @@
 .top-bar__actions .toolbar-button-exposed {
   list-style: none;
   color: var(--admin-toolbar-color-white);
-  background-color: var(--admin-toolbar-top-bar-action-color);
-  padding: 0;
   position: relative;
+  padding: 0;
+  background-color: var(--admin-toolbar-top-bar-action-color);
 }
 .top-bar__actions .toolbar-button-exposed::before {
   position: absolute;
@@ -71,9 +71,9 @@
   z-index: 1;
 }
 .top-bar__actions .toolbar-button-exposed .toolbar-dropdown__link {
+  padding-right: 1rem;
   color: var(--admin-toolbar-color-white);
   padding-inline: var(--admin-toolbar-space-40);
-  padding-right: 1rem;
 }
 .top-bar__actions .toolbar-button-exposed .toolbar-dropdown__link:hover {
   -webkit-text-decoration: none;

@@ -56,9 +56,9 @@
   .toolbar-button-exposed {
     list-style: none;
     color: var(--admin-toolbar-color-white);
-    background-color: var(--admin-toolbar-top-bar-action-color);
-    padding: 0;
     position: relative;
+    padding: 0;
+    background-color: var(--admin-toolbar-top-bar-action-color);
 
     &::before {
       position: absolute;
@@ -71,9 +71,9 @@
     }
 
     .toolbar-dropdown__link {
+      padding-right: 16px;
       color: var(--admin-toolbar-color-white);
       padding-inline: var(--admin-toolbar-space-40);
-      padding-right: 16px;
 
       &:hover {
         text-decoration: none;
