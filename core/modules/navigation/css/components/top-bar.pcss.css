@@ -2,7 +2,7 @@
 
 :root {
   --admin-toolbar-top-bar-height: calc(4 * var(--admin-toolbar-rem));
-  --admin-toolbar-top-bar-action-color: var(--drupal-admin-action-color, #0090FF);
+  --admin-toolbar-top-bar-action-color: var(--drupal-admin-action-color, #0090ff);
 }
 
 .top-bar {
@@ -55,8 +55,8 @@
 
   .toolbar-button-exposed {
     list-style: none;
-    color: var(--admin-toolbar-color-white);
     position: relative;
+    color: var(--admin-toolbar-color-white);
     padding: 0;
     background-color: var(--admin-toolbar-top-bar-action-color);
 
