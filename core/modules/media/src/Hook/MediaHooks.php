@@ -2,6 +2,7 @@
 
 namespace Drupal\media\Hook;
 
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
@@ -102,7 +103,7 @@ class MediaHooks {
    * Implements hook_entity_access().
    */
   #[Hook('entity_access')]
-  public function entityAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+  public function entityAccess(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
     if ($operation === 'delete' && $entity instanceof FieldConfigInterface && $entity->getTargetEntityTypeId() === 'media') {
       /** @var \Drupal\media\MediaTypeInterface $media_type */
       $media_type = \Drupal::entityTypeManager()->getStorage('media_type')->load($entity->getTargetBundle());
@@ -115,7 +116,7 @@ class MediaHooks {
    * Implements hook_field_ui_preconfigured_options_alter().
    */
   #[Hook('field_ui_preconfigured_options_alter')]
-  public function fieldUiPreconfiguredOptionsAlter(array &$options, $field_type) {
+  public function fieldUiPreconfiguredOptionsAlter(array &$options, $field_type): void {
     // If the field is not an "entity_reference"-based field, bail out.
     /** @var \Drupal\Core\Field\FieldTypePluginManager $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
@@ -158,7 +159,7 @@ class MediaHooks {
    * Implements hook_field_widget_complete_form_alter().
    */
   #[Hook('field_widget_complete_form_alter')]
-  public function fieldWidgetCompleteFormAlter(array &$field_widget_complete_form, FormStateInterface $form_state, array $context) {
+  public function fieldWidgetCompleteFormAlter(array &$field_widget_complete_form, FormStateInterface $form_state, array $context): void {
     $elements =& $field_widget_complete_form['widget'];
     // Do not alter the default settings form.
     if ($context['default']) {
@@ -266,7 +267,7 @@ class MediaHooks {
    * Implements hook_field_widget_single_element_form_alter().
    */
   #[Hook('field_widget_single_element_form_alter')]
-  public function fieldWidgetSingleElementFormAlter(&$element, FormStateInterface $form_state, $context) {
+  public function fieldWidgetSingleElementFormAlter(&$element, FormStateInterface $form_state, $context): void {
     // Add an attribute so that text editors plugins can pass the host entity's
     // language, allowing it to present entities in the same language.
     if (!empty($element['#type']) && $element['#type'] == 'text_format') {
@@ -278,7 +279,7 @@ class MediaHooks {
    * Implements hook_views_query_substitutions().
    */
   #[Hook('views_query_substitutions')]
-  public function viewsQuerySubstitutions(ViewExecutable $view) {
+  public function viewsQuerySubstitutions(ViewExecutable $view): array {
     $account = \Drupal::currentUser();
     return [
       '***VIEW_OWN_UNPUBLISHED_MEDIA***' => (int) $account->hasPermission('view own unpublished media'),
@@ -290,7 +291,7 @@ class MediaHooks {
    * Implements hook_field_type_category_info_alter().
    */
   #[Hook('field_type_category_info_alter')]
-  public function fieldTypeCategoryInfoAlter(&$definitions) {
+  public function fieldTypeCategoryInfoAlter(&$definitions): void {
     // The `media` field type belongs in the `general` category, so the libraries
     // need to be attached using an alter hook.
     $definitions[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY]['libraries'][] = 'media/drupal.media-icon';

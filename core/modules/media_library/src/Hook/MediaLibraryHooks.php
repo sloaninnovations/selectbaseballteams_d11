@@ -3,6 +3,7 @@
 namespace Drupal\media_library\Hook;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
@@ -77,7 +78,7 @@ class MediaLibraryHooks {
    * Implements hook_media_source_info_alter().
    */
   #[Hook('media_source_info_alter')]
-  public function mediaSourceInfoAlter(array &$sources) {
+  public function mediaSourceInfoAlter(array &$sources): void {
     if (empty($sources['audio_file']['forms']['media_library_add'])) {
       $sources['audio_file']['forms']['media_library_add'] = FileUploadForm::class;
     }
@@ -117,7 +118,7 @@ class MediaLibraryHooks {
    * Implements hook_views_pre_render().
    */
   #[Hook('views_pre_render')]
-  public function viewsPreRender(ViewExecutable $view) {
+  public function viewsPreRender(ViewExecutable $view): void {
     $add_classes = function (&$option, array $classes_to_add) {
       $classes = $option ? preg_split('/\s+/', trim($option)) : [];
       $classes = array_filter($classes);
@@ -151,7 +152,7 @@ class MediaLibraryHooks {
    * Implements hook_views_post_render().
    */
   #[Hook('views_post_render')]
-  public function viewsPostRender(ViewExecutable $view, &$output, CachePluginBase $cache) {
+  public function viewsPostRender(ViewExecutable $view, &$output, CachePluginBase $cache): void {
     if ($view->id() === 'media_library') {
       $output['#attached']['library'][] = 'media_library/view';
       if (str_starts_with($view->current_display, 'widget')) {
@@ -210,7 +211,7 @@ class MediaLibraryHooks {
    * Implements hook_field_ui_preconfigured_options_alter().
    */
   #[Hook('field_ui_preconfigured_options_alter')]
-  public function fieldUiPreconfiguredOptionsAlter(array &$options, $field_type) {
+  public function fieldUiPreconfiguredOptionsAlter(array &$options, $field_type): void {
     // If the field is not an "entity_reference"-based field, bail out.
     $class = \Drupal::service('plugin.manager.field.field_type')->getPluginClass($field_type);
     if (!is_a($class, EntityReferenceItem::class, TRUE)) {
@@ -228,7 +229,7 @@ class MediaLibraryHooks {
    * Removes tasks for the Media library if the view display no longer exists.
    */
   #[Hook('local_tasks_alter')]
-  public function localTasksAlter(&$local_tasks) {
+  public function localTasksAlter(&$local_tasks): void {
     /** @var \Symfony\Component\Routing\RouteCollection $route_collection */
     $route_collection = \Drupal::service('router')->getRouteCollection();
     foreach (['media_library.grid', 'media_library.table'] as $key) {
@@ -242,13 +243,14 @@ class MediaLibraryHooks {
    * Implements hook_ENTITY_TYPE_access().
    */
   #[Hook('image_style_access')]
-  public function imageStyleAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+  public function imageStyleAccess(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
     // Prevent the fallback 'media_library' image style from being deleted.
     // @todo Lock the image style instead of preventing delete access.
     //   https://www.drupal.org/project/drupal/issues/2247293
     if ($operation === 'delete' && $entity->id() === 'media_library') {
       return AccessResult::forbidden();
     }
+    return AccessResult::neutral();
   }
 
 }

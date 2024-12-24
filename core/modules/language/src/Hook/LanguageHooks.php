@@ -2,6 +2,7 @@
 
 namespace Drupal\language\Hook;
 
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrlFallback;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
@@ -158,7 +159,7 @@ class LanguageHooks {
    * @see \Drupal\Core\Render\Element\Select
    */
   #[Hook('element_info_alter')]
-  public function elementInfoAlter(&$type) {
+  public function elementInfoAlter(&$type): void {
     // Alter the language_select element so that it will be rendered like a select
     // field.
     if (isset($type['language_select'])) {
@@ -190,7 +191,7 @@ class LanguageHooks {
    * Implements hook_entity_base_field_info_alter().
    */
   #[Hook('entity_base_field_info_alter')]
-  public function entityBaseFieldInfoAlter(&$fields) {
+  public function entityBaseFieldInfoAlter(&$fields): void {
     foreach ($fields as $definition) {
       // Set configurable form display for language fields with display options.
       if ($definition->getType() == 'language') {
@@ -224,7 +225,7 @@ class LanguageHooks {
    */
   #[Hook('modules_installed')]
   #[Hook('modules_uninstalled')]
-  public function modulesInstalled($modules, $is_syncing) {
+  public function modulesInstalled($modules, $is_syncing): void {
     if ($is_syncing) {
       return;
     }
@@ -291,7 +292,7 @@ class LanguageHooks {
    * Implements hook_field_info_alter().
    */
   #[Hook('field_info_alter')]
-  public function fieldInfoAlter(&$info) {
+  public function fieldInfoAlter(&$info): void {
     // Change the default behavior of language field.
     $info['language']['class'] = '\Drupal\language\DefaultLanguageItem';
   }
@@ -300,7 +301,7 @@ class LanguageHooks {
    * Implements hook_entity_field_access().
    */
   #[Hook('entity_field_access')]
-  public function entityFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL) {
+  public function entityFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL): AccessResultInterface {
     // Only allow edit access on a langcode field if the entity it is attached to
     // is configured to have an alterable language. Also without items we can not
     // decide whether or not to allow access.
@@ -321,7 +322,7 @@ class LanguageHooks {
    * Implements hook_tour_tips_alter().
    */
   #[Hook('tour_tips_alter')]
-  public function tourTipsAlter(array &$tour_tips, EntityInterface $entity) {
+  public function tourTipsAlter(array &$tour_tips, EntityInterface $entity): void {
     $module_extension_list = \Drupal::service('extension.list.module');
     foreach ($tour_tips as $tour_tip) {
       if ($tour_tip->get('id') == 'language-overview') {
@@ -366,7 +367,7 @@ class LanguageHooks {
    * enabled and we can't be sure of that in the LanguageManager.
    */
   #[Hook('language_types_info_alter')]
-  public function languageTypesInfoAlter(array &$language_types) {
+  public function languageTypesInfoAlter(array &$language_types): void {
     $language_types[LanguageInterface::TYPE_CONTENT]['fixed'] = [LanguageNegotiationUI::METHOD_ID];
     $language_types[LanguageInterface::TYPE_URL]['fixed'] = [
       LanguageNegotiationUrl::METHOD_ID,

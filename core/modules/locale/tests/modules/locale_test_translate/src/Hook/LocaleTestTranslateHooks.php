@@ -20,7 +20,7 @@ class LocaleTestTranslateHooks {
    * setting the hidden status to FALSE.
    */
   #[Hook('system_info_alter')]
-  public function systemInfoAlter(&$info, Extension $file, $type) {
+  public function systemInfoAlter(&$info, Extension $file, $type): void {
     if ($file->getName() == 'locale_test_translate') {
       // Don't hide the module.
       $info['hidden'] = FALSE;
@@ -33,7 +33,7 @@ class LocaleTestTranslateHooks {
    * @see \Drupal\Tests\locale\Functional\LocaleConfigTranslationImportTest::testConfigTranslationWithForeignLanguageDefault
    */
   #[Hook('modules_installed')]
-  public function modulesInstalled($modules, $is_syncing) {
+  public function modulesInstalled($modules, $is_syncing): void {
     // Ensure that writing to configuration during install does not cause
     // \Drupal\locale\LocaleConfigSubscriber to create incorrect translations due
     // the configuration langcode and data being out-of-sync.

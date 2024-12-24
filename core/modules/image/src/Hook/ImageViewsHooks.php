@@ -19,7 +19,7 @@ class ImageViewsHooks {
    * @see views_field_default_views_data()
    */
   #[Hook('field_views_data')]
-  public function fieldViewsData(FieldStorageConfigInterface $field_storage) {
+  public function fieldViewsData(FieldStorageConfigInterface $field_storage): array {
     $data = views_field_default_views_data($field_storage);
     foreach ($data as $table_name => $table_data) {
       // Add the relationship only on the target_id field.
@@ -42,7 +42,7 @@ class ImageViewsHooks {
    * Views integration to provide reverse relationships on image fields.
    */
   #[Hook('field_views_data_views_data_alter')]
-  public function fieldViewsDataViewsDataAlter(array &$data, FieldStorageConfigInterface $field_storage) {
+  public function fieldViewsDataViewsDataAlter(array &$data, FieldStorageConfigInterface $field_storage): void {
     $entity_type_id = $field_storage->getTargetEntityTypeId();
     $field_name = $field_storage->getName();
     $entity_type_manager = \Drupal::entityTypeManager();

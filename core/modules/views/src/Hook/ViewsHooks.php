@@ -57,7 +57,7 @@ class ViewsHooks {
    * Implements hook_views_pre_render().
    */
   #[Hook('views_pre_render')]
-  public function viewsPreRender($view) {
+  public function viewsPreRender($view): void {
     // If using AJAX, send identifying data about this view.
     if ($view->ajaxEnabled() && empty($view->is_attachment) && empty($view->live_preview)) {
       $view->element['#attached']['drupalSettings']['views'] = [
@@ -78,7 +78,6 @@ class ViewsHooks {
       ];
       $view->element['#attached']['library'][] = 'views/views.ajax';
     }
-    return $view;
   }
 
   /**
@@ -224,7 +223,7 @@ class ViewsHooks {
    * Implements hook_theme_suggestions_HOOK_alter().
    */
   #[Hook('theme_suggestions_node_alter')]
-  public function themeSuggestionsNodeAlter(array &$suggestions, array $variables) {
+  public function themeSuggestionsNodeAlter(array &$suggestions, array $variables): void {
     $node = $variables['elements']['#node'];
     if (!empty($node->view) && $node->view->storage->id()) {
       $suggestions[] = 'node__view__' . $node->view->storage->id();
@@ -238,7 +237,7 @@ class ViewsHooks {
    * Implements hook_theme_suggestions_HOOK_alter().
    */
   #[Hook('theme_suggestions_comment_alter')]
-  public function themeSuggestionsCommentAlter(array &$suggestions, array $variables) {
+  public function themeSuggestionsCommentAlter(array &$suggestions, array $variables): void {
     $comment = $variables['elements']['#comment'];
     if (!empty($comment->view) && $comment->view->storage->id()) {
       $suggestions[] = 'comment__view__' . $comment->view->storage->id();
@@ -252,7 +251,7 @@ class ViewsHooks {
    * Implements hook_theme_suggestions_HOOK_alter().
    */
   #[Hook('theme_suggestions_container_alter')]
-  public function themeSuggestionsContainerAlter(array &$suggestions, array $variables) {
+  public function themeSuggestionsContainerAlter(array &$suggestions, array $variables): void {
     if (!empty($variables['element']['#type']) && $variables['element']['#type'] == 'more_link' && !empty($variables['element']['#view']) && $variables['element']['#view'] instanceof ViewExecutable) {
       $suggestions = array_merge(
             $suggestions,
@@ -330,7 +329,7 @@ class ViewsHooks {
    * add in substitutions from hook_views_query_substitutions().
    */
   #[Hook('query_views_alter')]
-  public function queryViewsAlter(AlterableInterface $query) {
+  public function queryViewsAlter(AlterableInterface $query): void {
     $substitutions = $query->getMetaData('views_substitutions');
     $tables =& $query->getTables();
     $where =& $query->conditions();
@@ -359,7 +358,7 @@ class ViewsHooks {
    * Implements hook_local_tasks_alter().
    */
   #[Hook('local_tasks_alter')]
-  public function localTasksAlter(&$local_tasks) {
+  public function localTasksAlter(&$local_tasks): void {
     $container = \Drupal::getContainer();
     $local_task = ViewsLocalTask::create($container, 'views_view');
     $local_task->alterLocalTasks($local_tasks);

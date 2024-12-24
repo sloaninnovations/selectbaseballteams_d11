@@ -38,7 +38,7 @@ class AnnouncementsFeedHooks {
    * Implements hook_toolbar().
    */
   #[Hook('toolbar')]
-  public function toolbar() {
+  public function toolbar(): array {
     if (!\Drupal::currentUser()->hasPermission('access announcements')) {
       return ['#cache' => ['contexts' => ['user.permissions']]];
     }
@@ -82,7 +82,7 @@ class AnnouncementsFeedHooks {
    * Implements hook_toolbar_alter().
    */
   #[Hook('toolbar_alter')]
-  public function toolbarAlter(&$items) {
+  public function toolbarAlter(&$items): void {
     // As the "Announcements" link is shown already in the top toolbar bar, we
     // don't need it again in the administration menu tray, so hide it.
     if (!empty($items['administration']['tray'])) {
@@ -123,7 +123,7 @@ class AnnouncementsFeedHooks {
    * Implements hook_cron().
    */
   #[Hook('cron')]
-  public function cron() {
+  public function cron(): void {
     $config = \Drupal::config('announcements_feed.settings');
     $interval = $config->get('cron_interval');
     $last_check = \Drupal::state()->get('announcements_feed.last_fetch', 0);

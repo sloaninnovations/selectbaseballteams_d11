@@ -602,7 +602,7 @@ function hook_preprocess(&$variables, $hook) {
  * @param $variables
  *   The variables array (modify in place).
  */
-function hook_preprocess_HOOK(&$variables) {
+function hook_preprocess_HOOK(&$variables): void {
   // This example is from node_preprocess_html(). It adds the node type to
   // the body classes, when on an individual node page or node preview page.
   if (($node = \Drupal::routeMatch()->getParameter('node')) || ($node = \Drupal::routeMatch()->getParameter('node_preview'))) {
@@ -773,7 +773,7 @@ function hook_theme_suggestions_HOOK_alter(array &$suggestions, array &$variable
  *
  * @see \Drupal\Core\Extension\ThemeInstallerInterface::install()
  */
-function hook_themes_installed($theme_list) {
+function hook_themes_installed($theme_list): void {
   foreach ($theme_list as $theme) {
     block_theme_initialize($theme);
   }
@@ -787,7 +787,7 @@ function hook_themes_installed($theme_list) {
  *
  * @see \Drupal\Core\Extension\ThemeInstallerInterface::uninstall()
  */
-function hook_themes_uninstalled(array $themes) {
+function hook_themes_uninstalled(array $themes): void {
   // Remove some state entries depending on the theme.
   foreach ($themes as $theme) {
     \Drupal::state()->delete('example.' . $theme);
@@ -904,7 +904,7 @@ function hook_js_alter(&$javascript, \Drupal\Core\Asset\AttachedAssetsInterface 
  * @see core.libraries.yml
  * @see hook_library_info_alter()
  */
-function hook_library_info_build() {
+function hook_library_info_build(): array {
   $libraries = [];
   // Add a library whose information changes depending on certain conditions.
   $libraries['zombie'] = [
@@ -974,7 +974,7 @@ function hook_library_info_build() {
  * The results of this hook are cached, however modules may use
  * hook_js_settings_alter() to dynamically alter settings.
  */
-function hook_js_settings_build(array &$settings, \Drupal\Core\Asset\AttachedAssetsInterface $assets) {
+function hook_js_settings_build(array &$settings, \Drupal\Core\Asset\AttachedAssetsInterface $assets): void {
   // Manipulate settings.
   if (isset($settings['dialog'])) {
     $settings['dialog']['autoResize'] = FALSE;
@@ -1093,7 +1093,7 @@ function hook_css_alter(&$css, \Drupal\Core\Asset\AttachedAssetsInterface $asset
  *
  * @see hook_page_attachments_alter()
  */
-function hook_page_attachments(array &$attachments) {
+function hook_page_attachments(array &$attachments): void {
   // Unconditionally attach an asset to the page.
   $attachments['#attached']['library'][] = 'core/drupalSettings';
 
@@ -1119,7 +1119,7 @@ function hook_page_attachments(array &$attachments) {
  *
  * @see hook_page_attachments()
  */
-function hook_page_attachments_alter(array &$attachments) {
+function hook_page_attachments_alter(array &$attachments): void {
   // Conditionally remove an asset.
   if (in_array('core/jquery', $attachments['#attached']['library'])) {
     $index = array_search('core/jquery', $attachments['#attached']['library']);
@@ -1133,7 +1133,7 @@ function hook_page_attachments_alter(array &$attachments) {
  * @param array $page_top
  *   A renderable array representing the top of the page.
  */
-function hook_page_top(array &$page_top) {
+function hook_page_top(array &$page_top): void {
   $page_top['my_module'] = ['#markup' => 'This is the top.'];
 }
 
@@ -1143,7 +1143,7 @@ function hook_page_top(array &$page_top) {
  * @param array $page_bottom
  *   A renderable array representing the bottom of the page.
  */
-function hook_page_bottom(array &$page_bottom) {
+function hook_page_bottom(array &$page_bottom): void {
   $page_bottom['my_module'] = ['#markup' => 'This is the bottom.'];
 }
 

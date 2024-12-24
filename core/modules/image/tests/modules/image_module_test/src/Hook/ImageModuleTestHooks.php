@@ -16,7 +16,7 @@ class ImageModuleTestHooks {
    * Implements hook_image_effect_info_alter().
    */
   #[Hook('image_effect_info_alter')]
-  public function imageEffectInfoAlter(&$effects) {
+  public function imageEffectInfoAlter(&$effects): void {
     $state = \Drupal::state();
     // The 'image_module_test.counter' state variable value is set and accessed
     // from the ImageEffectsTest::testImageEffectsCaching() test and used to
@@ -43,9 +43,21 @@ class ImageModuleTestHooks {
    * Implements hook_image_style_flush().
    */
   #[Hook('image_style_flush')]
-  public function imageStyleFlush($style, $path = NULL) {
+  public function imageStyleFlush($style, $path = NULL): void {
     $state = \Drupal::state();
     $state->set('image_module_test_image_style_flush.called', $path);
+  }
+
+  /**
+   * Implements hook_file_download().
+   */
+  #[Hook('file_download')]
+  public function fileDownload($uri): array {
+    $default_uri = \Drupal::state()->get('image.test_file_download', FALSE);
+    if ($default_uri == $uri) {
+      return ['X-Image-Owned-By' => 'image_module_test'];
+    }
+    return [];
   }
 
 }
