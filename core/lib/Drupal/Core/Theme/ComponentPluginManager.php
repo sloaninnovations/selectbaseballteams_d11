@@ -469,9 +469,8 @@ class ComponentPluginManager extends DefaultPluginManager {
     $path_from_root = str_starts_with($path, $this->appRoot)
       ? substr($path, strlen($this->appRoot) + 1)
       : $path;
-    if (str_starts_with(PHP_OS, 'WIN')) {
-      $path_from_root = str_replace('\\', '/', $path_from_root);
-    }
+    // Make sure this works seamlessly in every OS.
+    $path_from_root = str_replace(DIRECTORY_SEPARATOR, '/', $path_from_root);
     // The library owner is in <root>/core, so we need to go one level up to
     // find the app root.
     return '../' . $path_from_root;
