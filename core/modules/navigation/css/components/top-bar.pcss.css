@@ -55,33 +55,33 @@
     color: var(--admin-toolbar-color-white);
     background-color: var(--admin-toolbar-top-bar-action-color);
 
-  &::before {
-     position: absolute;
-     left: 10px;
-     mask-size: 90% auto;
-   }
+    &::before {
+      position: absolute;
+      left: 10px;
+      mask-size: 90% auto;
+    }
 
-  .toolbar-button__label {
-    z-index: 1;
-  }
+    .toolbar-button__label {
+      z-index: 1;
+    }
 
-  .toolbar-dropdown__link {
-    padding-right: 16px;
-    color: var(--admin-toolbar-color-white);
-    padding-inline: var(--admin-toolbar-space-40);
+    .toolbar-dropdown__link {
+      padding-right: 16px;
+      color: var(--admin-toolbar-color-white);
+      padding-inline: var(--admin-toolbar-space-40);
 
-  &:hover {
-     text-decoration: none;
-     color: inherit;
-     background-color: transparent;
-   }
-  }
+      &:hover {
+        text-decoration: none;
+        color: inherit;
+        background-color: transparent;
+      }
+    }
   }
 
   .toolbar-button--icon--kebab {
-  &::before {
-     mask-size: 210% auto;
-   }
+    &::before {
+      mask-size: 210% auto;
+    }
   }
 
   @media (--admin-toolbar-desktop) {
