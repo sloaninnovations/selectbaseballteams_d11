@@ -49,12 +49,6 @@
   display: flex;
   gap: 0.5rem;
 }
-@media (min-width: 64rem) {
-  .top-bar__actions {
-    justify-content: end;
-    gap: var(--admin-toolbar-space-4);
-  }
-}
 .top-bar__actions .toolbar-button-exposed {
   position: relative;
   padding: 0;
@@ -83,6 +77,12 @@
 }
 .top-bar__actions .toolbar-button--icon--kebab::before {
   mask-size: 210% auto;
+}
+@media (min-width: 64rem) {
+  .top-bar__actions {
+    justify-content: end;
+    gap: var(--admin-toolbar-space-4);
+  }
 }
 .top-bar__content {
   display: grid;
