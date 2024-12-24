@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\workflows\Hook;
 
 use Drupal\Core\Url;
@@ -56,6 +58,26 @@ class WorkflowsHooks {
         $output .= '<dd>' . t('Depending on the installed workflow type, additional configuration can be available in the edit form of a workflow.') . '</dd>';
         $output .= '<dl>';
         return $output;
+    }
+  }
+
+  /**
+   * Implements hook_field_widget_info_alter().
+   */
+  #[Hook('field_widget_info_alter')]
+  public function fieldWidgetInfoAlter(array &$info): void {
+    if (isset($info['options_select'])) {
+      $info['options_select']['field_types'][] = 'workflow_state';
+    }
+  }
+
+  /**
+   * Implements hook_field_formatter_info_alter().
+   */
+  #[Hook('field_formatter_info_alter')]
+  public function fieldFormatterInfoAlter(array &$info): void {
+    if (isset($info['list_default'])) {
+      $info['list_default']['field_types'][] = 'workflow_state';
     }
   }
 

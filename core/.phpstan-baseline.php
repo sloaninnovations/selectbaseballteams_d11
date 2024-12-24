@@ -52571,6 +52571,36 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
+	'message' => '#^Method Drupal\\\\workflows\\\\Plugin\\\\Field\\\\FieldType\\\\WorkflowStateItem\\:\\:setValue\\(\\) has no return type specified\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workflows/src/Plugin/Field/FieldType/WorkflowStateItem.php',
+];
+$ignoreErrors[] = [
+	// identifier: missingType.return
+	'message' => '#^Method Drupal\\\\workflows\\\\Plugin\\\\Field\\\\FieldType\\\\WorkflowStateItem\\:\\:applyTransition\\(\\) has no return type specified\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workflows/src/Plugin/Field/FieldType/WorkflowStateItem.php',
+];
+$ignoreErrors[] = [
+	// identifier: missingType.return
+	'message' => '#^Method Drupal\\\\workflows\\\\Plugin\\\\Field\\\\FieldType\\\\WorkflowStateItem\\:\\:applyTransitionById\\(\\) has no return type specified\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workflows/src/Plugin/Field/FieldType/WorkflowStateItem.php',
+];
+$ignoreErrors[] = [
+	// identifier: missingType.return
+	'message' => '#^Method Drupal\\\\workflows\\\\Plugin\\\\Field\\\\FieldType\\\\WorkflowStateItem\\:\\:preSave\\(\\) has no return type specified\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workflows/src/Plugin/Field/FieldType/WorkflowStateItem.php',
+];
+$ignoreErrors[] = [
+	// identifier: missingType.return
+	'message' => '#^Method Drupal\\\\workflows\\\\Plugin\\\\Field\\\\FieldType\\\\WorkflowStateItem\\:\\:invokeTransitionHook\\(\\) has no return type specified\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workflows/src/Plugin/Field/FieldType/WorkflowStateItem.php',
+];
+$ignoreErrors[] = [
+	// identifier: missingType.return
 	'message' => '#^Method Drupal\\\\workflows\\\\Plugin\\\\WorkflowTypeBase\\:\\:setConfiguration\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workflows/src/Plugin/WorkflowTypeBase.php',
@@ -52628,6 +52658,18 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workflows\\\\WorkflowListBuilder\\:\\:getFormId\\(\\) has no return type specified\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workflows/src/WorkflowListBuilder.php',
+];
+$ignoreErrors[] = [
+	// identifier: missingType.return
+	'message' => '#^Method Drupal\\\\workflows\\\\WorkflowStateItemInterface\\:\\:applyTransition\\(\\) has no return type specified\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workflows/src/WorkflowStateItemInterface.php',
+];
+$ignoreErrors[] = [
+	// identifier: missingType.return
+	'message' => '#^Method Drupal\\\\workflows\\\\WorkflowStateItemInterface\\:\\:applyTransitionById\\(\\) has no return type specified\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workflows/src/WorkflowStateItemInterface.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
