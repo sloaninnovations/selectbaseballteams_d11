@@ -198,29 +198,6 @@ final class NavigationRenderer {
   }
 
   /**
-   * Alter the build of any local_tasks_block plugin block.
-   *
-   * If we are showing the local tasks in the top bar, hide the local tasks
-   * from display to avoid duplicating the links.
-   *
-   * @param array $build
-   *   A renderable array representing the local_tasks_block plugin block to be
-   *   rendered.
-   * @param \Drupal\Core\Block\BlockPluginInterface $block
-   *   Block plugin object representing a local_tasks_block.
-   *
-   * @see navigation_block_build_local_tasks_block_alter()
-   */
-  public function removeLocalTasks(array &$build, BlockPluginInterface $block): void {
-    if ($block->getPluginId() !== 'local_tasks_block') {
-      return;
-    }
-    if ($this->hasLocalTasks() && $this->moduleHandler->moduleExists('navigation_top_bar')) {
-      $build['#access'] = FALSE;
-    }
-  }
-
-  /**
    * Local tasks list based on user access.
    *
    * @return array

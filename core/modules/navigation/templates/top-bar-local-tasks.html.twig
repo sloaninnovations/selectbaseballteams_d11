@@ -8,7 +8,20 @@
  */
 #}
 {% set dropdown_id = 'admin-local-tasks'|clean_unique_id %}
+
+{% for exposed_task in exposed_local_tasks %}
+  {#  The exposed_task.task is an render array and the text passed to the parent
+  component needs to be an string. Hence we are rendering the text and passing
+  it to the component.#}
+  {% include 'navigation:toolbar-button' with {
+    text: exposed_task.task|render,
+    extra_classes: ['toolbar-button-exposed'],
+    icon: exposed_task.icon,
+  } only %}
+{% endfor %}
+
 {% include 'navigation:toolbar-button' with {
+  icon: 'kebab',
   attributes: create_attribute(
     {
       'aria-expanded': 'false',
@@ -16,13 +29,8 @@
       'data-drupal-dropdown': 'true'
     }
   ),
-  text: 'More actions'|t,
-  modifiers: [
-    'expand--down',
-    'weight--400',
-    'small-offset',
-  ],
 } only %}
+
 <div class="toolbar-dropdown__menu" id={{ dropdown_id }}>
   <ul class="toolbar-dropdown__list">
     {% for local_task in local_tasks %}
