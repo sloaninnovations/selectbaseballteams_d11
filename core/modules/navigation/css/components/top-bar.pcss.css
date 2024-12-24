@@ -54,10 +54,10 @@
   }
 
   .toolbar-button-exposed {
-    list-style: none;
     position: relative;
-    color: var(--admin-toolbar-color-white);
+    list-style: none;
     padding: 0;
+    color: var(--admin-toolbar-color-white);
     background-color: var(--admin-toolbar-top-bar-action-color);
 
     &::before {
