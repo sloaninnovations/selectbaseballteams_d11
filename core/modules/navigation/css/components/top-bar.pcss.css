@@ -55,8 +55,8 @@
 
   .toolbar-button-exposed {
     position: relative;
-    list-style: none;
     padding: 0;
+    list-style: none;
     color: var(--admin-toolbar-color-white);
     background-color: var(--admin-toolbar-top-bar-action-color);
 
