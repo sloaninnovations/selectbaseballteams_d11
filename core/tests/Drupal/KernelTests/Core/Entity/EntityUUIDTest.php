@@ -110,7 +110,13 @@ class EntityUUIDTest extends EntityKernelTestBase {
           break;
 
         case 'name':
-          $this->assertEquals('UUID CRUD test entity duplicate', $entity_duplicate->label());
+          // Assert alter hooks in \Drupal\entity_test\Hook\EntityTestHooks.
+          if ($entity_type === 'entity_test') {
+            $this->assertEquals('prefix UUID CRUD test entity duplicate', $entity_duplicate->label());
+          }
+          else {
+            $this->assertEquals('UUID CRUD test entity duplicate', $entity_duplicate->label());
+          }
           $this->assertEquals('UUID CRUD test entity', $entity->label());
           break;
 
