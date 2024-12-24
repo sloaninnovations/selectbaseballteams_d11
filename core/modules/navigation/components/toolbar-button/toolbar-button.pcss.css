@@ -213,6 +213,14 @@
   --icon: url(./assets/help.svg);
 }
 
+.toolbar-button--icon--edit {
+  --icon: url(./assets/edit.svg);
+}
+
+.toolbar-button--icon--kebab {
+  --icon: url(./assets/kebab.svg);
+}
+
 .toolbar-button--icon--navigation-blocks {
   --icon: url(./assets/blocks.svg);
 }

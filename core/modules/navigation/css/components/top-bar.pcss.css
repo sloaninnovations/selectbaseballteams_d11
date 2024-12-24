@@ -2,6 +2,7 @@
 
 :root {
   --admin-toolbar-top-bar-height: calc(4 * var(--admin-toolbar-rem));
+  --admin-toolbar-top-bar-action-color: var(--drupal-admin-action-color, #0090FF);
 }
 
 .top-bar {
@@ -50,6 +51,42 @@
   @media (--admin-toolbar-desktop) {
     justify-content: end;
     gap: var(--admin-toolbar-space-4);
+  }
+
+  .toolbar-button-exposed {
+    list-style: none;
+    color: var(--admin-toolbar-color-white);
+    background-color: var(--admin-toolbar-top-bar-action-color);
+    padding: 0;
+    position: relative;
+
+    &::before {
+      position: absolute;
+      left: 10px;
+      mask-size: 90% auto;
+    }
+
+    .toolbar-button__label {
+      z-index: 1;
+    }
+
+    .toolbar-dropdown__link {
+      color: var(--admin-toolbar-color-white);
+      padding-inline: var(--admin-toolbar-space-40);
+      padding-right: 16px;
+
+      &:hover {
+        text-decoration: none;
+        color: inherit;
+        background-color: transparent;
+      }
+    }
+  }
+
+  .toolbar-button--icon--kebab {
+    &::before {
+      mask-size: 210% auto;
+    }
   }
 }
 

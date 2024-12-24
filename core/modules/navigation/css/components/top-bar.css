@@ -6,6 +6,7 @@
  */
 :root {
   --admin-toolbar-top-bar-height: calc(4 * var(--admin-toolbar-rem));
+  --admin-toolbar-top-bar-action-color: var(--drupal-admin-action-color, #0090ff);
 }
 .top-bar {
   position: relative;
@@ -53,6 +54,35 @@
     justify-content: end;
     gap: var(--admin-toolbar-space-4);
   }
+}
+.top-bar__actions .toolbar-button-exposed {
+  list-style: none;
+  color: var(--admin-toolbar-color-white);
+  background-color: var(--admin-toolbar-top-bar-action-color);
+  padding: 0;
+  position: relative;
+}
+.top-bar__actions .toolbar-button-exposed::before {
+  position: absolute;
+  left: 0.625rem;
+  mask-size: 90% auto;
+}
+.top-bar__actions .toolbar-button-exposed .toolbar-button__label {
+  z-index: 1;
+}
+.top-bar__actions .toolbar-button-exposed .toolbar-dropdown__link {
+  color: var(--admin-toolbar-color-white);
+  padding-inline: var(--admin-toolbar-space-40);
+  padding-right: 1rem;
+}
+.top-bar__actions .toolbar-button-exposed .toolbar-dropdown__link:hover {
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  color: inherit;
+  background-color: transparent;
+}
+.top-bar__actions .toolbar-button--icon--kebab::before {
+  mask-size: 210% auto;
 }
 .top-bar__content {
   display: grid;
