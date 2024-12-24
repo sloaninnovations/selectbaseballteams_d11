@@ -54,6 +54,7 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
         fn($task) => isset($task['#link']['#title']) && $task['#link']['#title'] === 'Edit'
       ));
 
+      $exposed_local_tasks = [];
       if (isset($edit_route_name) && array_key_exists($edit_route_name, $local_tasks['tasks'])) {
         $exposed_local_tasks[] = [
           'task' => $local_tasks['tasks'][$edit_route_name],

@@ -5,12 +5,10 @@ namespace Drupal\navigation\Hook;
 use Drupal\navigation\RenderCallbacks;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
-use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\navigation\TopBarItemManagerInterface;
 
 /**
  * Hook implementations for navigation.
@@ -102,7 +100,7 @@ class NavigationHooks {
     $items['menu_local_tasks__navigation'] = [
       'template' => 'menu-local-tasks--navigation',
       'path' => \Drupal::service('extension.list.module')->getPath('navigation') . '/templates',
-      'render element' => 'elements'
+      'render element' => 'elements',
     ];
     return $items;
   }
@@ -182,7 +180,6 @@ class NavigationHooks {
       $info['layout_builder']['#pre_render'][] = [RenderCallbacks::class, 'alterLayoutBuilder'];
     }
   }
-
 
   /**
    * Implements hook_theme_suggestions_HOOK_alter().

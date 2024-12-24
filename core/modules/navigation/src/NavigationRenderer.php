@@ -3,7 +3,6 @@
 namespace Drupal\navigation;
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
