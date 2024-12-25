@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\form_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -77,7 +79,7 @@ class FormTestMachineNameValidationForm extends FormBase {
       '#ajax' => [
         'callback' => '::buildAjaxSnackConfigureForm',
         'wrapper' => 'snack-config-form',
-        'method' => 'replace',
+        'method' => 'replaceWith',
         'effect' => 'fade',
       ],
     ];

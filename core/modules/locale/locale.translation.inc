@@ -2,7 +2,6 @@
 
 /**
  * @file
- * Common API for interface translation.
  */
 
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
@@ -101,7 +100,7 @@ function locale_translation_clear_cache_projects() {
  *
  * @see locale_translation_source_build()
  */
-function locale_translation_load_sources(array $projects = NULL, array $langcodes = NULL) {
+function locale_translation_load_sources(?array $projects = NULL, ?array $langcodes = NULL) {
   $sources = [];
   $projects = $projects ? $projects : array_keys(locale_translation_get_projects());
   $langcodes = $langcodes ? $langcodes : array_keys(locale_translatable_language_list());

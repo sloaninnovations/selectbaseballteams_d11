@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\EntityReference\Views;
 
 use Drupal\Component\Render\MarkupInterface;
@@ -58,6 +60,7 @@ class SelectionTest extends KernelTestBase {
     $this->installConfig(['entity_reference_test', 'filter']);
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
+    $this->installEntitySchema('entity_test');
 
     // Create test nodes.
     $type = $this->randomMachineName();
@@ -92,7 +95,7 @@ class SelectionTest extends KernelTestBase {
   /**
    * Tests the selection handler.
    */
-  public function testSelectionHandler() {
+  public function testSelectionHandler(): void {
     // Tests the selection handler.
     $this->assertResults($this->selectionHandler->getReferenceableEntities());
 
@@ -137,7 +140,7 @@ class SelectionTest extends KernelTestBase {
    * If we expect our output to not have the <a> tags, and this matches what's
    * produced by the tag-stripping method, we'll know that it's working.
    */
-  public function testAnchorTagStripping() {
+  public function testAnchorTagStripping(): void {
     $filtered_rendered_results_formatted = [];
     foreach ($this->selectionHandler->getReferenceableEntities() as $subresults) {
       $filtered_rendered_results_formatted += array_map(fn(MarkupInterface $markup): string => (string) $markup, $subresults);

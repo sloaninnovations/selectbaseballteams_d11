@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -42,7 +44,6 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
     parent::setUp();
 
     $this->installConfig(['system']);
-    /** @var \Drupal\Core\Extension\ThemeInstallerInterface $themeInstaller */
     $this->themeInstaller = $this->container->get('theme_installer');
     $this->defaultTheme = $this->config('system.theme')->get('default');
   }
@@ -50,7 +51,7 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
   /**
    * Check the blocks are correctly copied by block_themes_installed().
    */
-  public function testNewDefaultThemeBlocks() {
+  public function testNewDefaultThemeBlocks(): void {
     $default_theme = $this->defaultTheme;
     $theme_installer = $this->themeInstaller;
     $theme_installer->install([$default_theme]);
@@ -101,7 +102,7 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
     $this->assertEmpty($new_blocks);
 
     // Install a hidden base theme and ensure blocks are not copied.
-    $base_theme = 'test_basetheme';
+    $base_theme = 'test_base_theme';
     $theme_installer->install([$base_theme]);
     $new_blocks = $block_storage->getQuery()
       ->accessCheck(FALSE)
@@ -113,7 +114,7 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
   /**
    * Checks that a theme block is still created when same ID exists.
    */
-  public function testBlockCollision() {
+  public function testBlockCollision(): void {
     $default_theme = $this->defaultTheme;
     $theme_installer = $this->themeInstaller;
     $theme_installer->install([$default_theme]);
@@ -169,7 +170,7 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
     $this->assertEmpty($new_blocks);
 
     // Install a hidden base theme and ensure blocks are not copied.
-    $base_theme = 'test_basetheme';
+    $base_theme = 'test_base_theme';
     $theme_installer->install([$base_theme]);
     $new_blocks = $block_storage->getQuery()
       ->accessCheck(FALSE)

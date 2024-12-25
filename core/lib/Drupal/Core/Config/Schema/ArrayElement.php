@@ -15,6 +15,25 @@ abstract class ArrayElement extends Element implements \IteratorAggregate, Typed
   protected $elements;
 
   /**
+   * Determines if there is a translatable value.
+   *
+   * @return bool
+   *   Returns true if a translatable element is found.
+   */
+  public function hasTranslatableElements(): bool {
+    foreach ($this as $element) {
+      // Early return if found.
+      if ($element->getDataDefinition()['translatable'] === TRUE) {
+        return TRUE;
+      }
+      if ($element instanceof ArrayElement && $element->hasTranslatableElements()) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Gets valid configuration data keys.
    *
    * @return array
@@ -47,6 +66,7 @@ abstract class ArrayElement extends Element implements \IteratorAggregate, Typed
    *   Property name or index of the element.
    *
    * @return \Drupal\Core\TypedData\DataDefinitionInterface
+   *   The data definition object for the property.
    */
   abstract protected function getElementDefinition($key);
 
@@ -130,6 +150,7 @@ abstract class ArrayElement extends Element implements \IteratorAggregate, Typed
    *   The key of the contained element.
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface
+   *   A typed data object created from the given parameters.
    */
   protected function createElement($definition, $value, $key) {
     return $this->getTypedDataManager()->create($definition, $value, $key, $this);
@@ -147,6 +168,7 @@ abstract class ArrayElement extends Element implements \IteratorAggregate, Typed
    *   The key of the contained element.
    *
    * @return \Drupal\Core\TypedData\DataDefinitionInterface
+   *   A data definition object for the given parameters.
    */
   protected function buildDataDefinition($definition, $value, $key) {
     return $this->getTypedDataManager()->buildDataDefinition($definition, $value, $key, $this);

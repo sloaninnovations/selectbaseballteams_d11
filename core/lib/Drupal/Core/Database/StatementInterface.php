@@ -108,6 +108,9 @@ interface StatementInterface extends \Traversable {
    *
    * @return mixed
    *   A single field from the next record, or FALSE if there is no next record.
+   *
+   * @throws \ValueError
+   *   If there is a record and the column index is not defined.
    */
   public function fetchField($index = 0);
 
@@ -126,7 +129,7 @@ interface StatementInterface extends \Traversable {
    *   The object of specified class or \stdClass if not specified. Returns
    *   FALSE or NULL if there is no next row.
    */
-  public function fetchObject(string $class_name = NULL, array $constructor_arguments = []);
+  public function fetchObject(?string $class_name = NULL, array $constructor_arguments = []);
 
   /**
    * Fetches the next row and returns it as an associative array.

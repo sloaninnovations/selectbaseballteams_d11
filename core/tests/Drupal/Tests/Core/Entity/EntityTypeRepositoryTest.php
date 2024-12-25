@@ -61,7 +61,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
    * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
-  protected function setUpEntityTypeDefinitions($definitions = []) {
+  protected function setUpEntityTypeDefinitions($definitions = []): void {
     foreach ($definitions as $key => $entity_type) {
       // \Drupal\Core\Entity\EntityTypeInterface::getLinkTemplates() is called
       // by \Drupal\Core\Entity\EntityTypeManager::processDefinition() so it must
@@ -97,7 +97,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
    *
    * @covers ::getEntityTypeLabels
    */
-  public function testGetEntityTypeLabels() {
+  public function testGetEntityTypeLabels(): void {
     $apple = $this->prophesize(EntityTypeInterface::class);
     $apple->getLabel()->willReturn('Apple');
     $apple->getBundleOf()->willReturn(NULL);
@@ -121,7 +121,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
   /**
    * @covers ::getEntityTypeFromClass
    */
-  public function testGetEntityTypeFromClass() {
+  public function testGetEntityTypeFromClass(): void {
     $apple = $this->prophesize(EntityTypeInterface::class);
     $banana = $this->prophesize(EntityTypeInterface::class);
 
@@ -147,7 +147,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
   /**
    * @covers ::getEntityTypeFromClass
    */
-  public function testGetEntityTypeFromClassNoMatch() {
+  public function testGetEntityTypeFromClassNoMatch(): void {
     $apple = $this->prophesize(EntityTypeInterface::class);
     $banana = $this->prophesize(EntityTypeInterface::class);
 
@@ -167,7 +167,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
   /**
    * @covers ::getEntityTypeFromClass
    */
-  public function testGetEntityTypeFromClassAmbiguous() {
+  public function testGetEntityTypeFromClassAmbiguous(): void {
     $jazz = $this->prophesize(EntityTypeInterface::class);
     $jazz->getOriginalClass()->willReturn('\Drupal\apple\Entity\Apple');
     $jazz->id()->willReturn('jazz');

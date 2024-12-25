@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\EntityReference;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\EntityReferenceEntityFormatter;
+use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
@@ -127,7 +130,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   /**
    * Assert inaccessible items don't change the data of the fields.
    */
-  public function testAccess() {
+  public function testAccess(): void {
     // Revoke the 'view test entity' permission for this test.
     Role::load(RoleInterface::ANONYMOUS_ID)
       ->revokePermission('view test entity')
@@ -169,7 +172,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   /**
    * Tests the merging of cache metadata.
    */
-  public function testCustomCacheTagFormatter() {
+  public function testCustomCacheTagFormatter(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $formatter = 'entity_reference_custom_cache_tag';
@@ -182,7 +185,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   /**
    * Tests the ID formatter.
    */
-  public function testIdFormatter() {
+  public function testIdFormatter(): void {
     $formatter = 'entity_reference_entity_id';
     $build = $this->buildRenderArray([$this->referencedEntity, $this->unsavedReferencedEntity], $formatter);
 
@@ -194,7 +197,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   /**
    * Tests the entity formatter.
    */
-  public function testEntityFormatter() {
+  public function testEntityFormatter(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $formatter = 'entity_reference_entity_view';
@@ -234,7 +237,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   /**
    * Tests the recursive rendering protection of the entity formatter.
    */
-  public function testEntityFormatterRecursiveRendering() {
+  public function testEntityFormatterRecursiveRendering(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $formatter = 'entity_reference_entity_view';
@@ -298,7 +301,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   /**
    * Renders the same entity referenced from different places.
    */
-  public function testEntityReferenceRecursiveProtectionWithManyRenderedEntities() {
+  public function testEntityReferenceRecursiveProtectionWithManyRenderedEntities(): void {
     $formatter = 'entity_reference_entity_view';
     $view_builder = $this->entityTypeManager->getViewBuilder($this->entityType);
 
@@ -341,11 +344,18 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   /**
    * Tests the label formatter.
    */
-  public function testLabelFormatter() {
+  public function testLabelFormatter(): void {
     $this->installEntitySchema('entity_test_label');
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $formatter = 'entity_reference_label';
+
+    // We need to create an anonymous user for access checks in the formatter.
+    $this->createUser(values: [
+      'uid' => 0,
+      'status' => 0,
+      'name' => '',
+    ]);
 
     // The 'link' settings is TRUE by default.
     $build = $this->buildRenderArray([$this->referencedEntity, $this->unsavedReferencedEntity], $formatter);
@@ -391,9 +401,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     $this->assertEquals($this->referencedEntity->label(), $build[0]['#plain_text'], sprintf('The markup returned by the %s formatter is correct for an item with a saved entity.', $formatter));
     $this->assertEquals($this->unsavedReferencedEntity->label(), $build[1]['#plain_text'], sprintf('The markup returned by the %s formatter is correct for an item with a unsaved entity.', $formatter));
 
-    // Test an entity type that doesn't have any link templates, which means
-    // \Drupal\Core\Entity\EntityInterface::urlInfo() will throw an exception
-    // and the label formatter will output only the label instead of a link.
+    // Test an entity type that doesn't have any link templates.
     $field_storage_config = FieldStorageConfig::loadByName($this->entityType, $this->fieldName);
     $field_storage_config->setSetting('target_type', 'entity_test_label');
     $field_storage_config->save();
@@ -405,6 +413,15 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
 
     $build = $this->buildRenderArray([$referenced_entity_with_no_link_template], $formatter, ['link' => TRUE]);
     $this->assertEquals($referenced_entity_with_no_link_template->label(), $build[0]['#plain_text'], sprintf('The markup returned by the %s formatter is correct for an entity type with no valid link template.', $formatter));
+
+    // Test link visibility if the URL is not accessible.
+    $entity_with_user = EntityTest::create([
+      'name' => $this->randomMachineName(),
+      'user_id' => $this->createUser(),
+    ]);
+    $entity_with_user->save();
+    $build = $entity_with_user->get('user_id')->view(['type' => $formatter, 'settings' => ['link' => TRUE]]);
+    $this->assertEquals($build[0]['#plain_text'], $entity_with_user->get('user_id')->entity->label(), 'For inaccessible links, the label should be displayed in plain text.');
   }
 
   /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\views_test_data\Plugin\views\query;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -57,6 +59,9 @@ class QueryTest extends QueryPluginBase {
     $this->allItems = $allItems;
   }
 
+  /**
+   * Adds a simple WHERE clause to the query.
+   */
   public function addWhere($group, $field, $value = NULL, $operator = NULL) {
     $this->conditions[] = [
       'field' => $field,
@@ -66,16 +71,25 @@ class QueryTest extends QueryPluginBase {
 
   }
 
+  /**
+   * Adds a new field to a table.
+   */
   public function addField($table, $field, $alias = '', $params = []) {
     $this->fields[$field] = $field;
     return $field;
   }
 
+  /**
+   * Adds an ORDER BY clause to the query.
+   */
   public function addOrderBy($table, $field = NULL, $order = 'ASC', $alias = '', $params = []) {
     $this->orderBy = ['field' => $field, 'order' => $order];
   }
 
-  public function ensureTable($table, $relationship = NULL, JoinPluginBase $join = NULL) {
+  /**
+   * Ensures a table exists in the queue.
+   */
+  public function ensureTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL) {
     // There is no concept of joins.
   }
 

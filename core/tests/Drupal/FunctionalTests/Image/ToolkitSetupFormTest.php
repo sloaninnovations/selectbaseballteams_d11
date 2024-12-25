@@ -21,9 +21,7 @@ class ToolkitSetupFormTest extends BrowserTestBase {
   protected $adminUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'image', 'image_test'];
 
@@ -46,7 +44,7 @@ class ToolkitSetupFormTest extends BrowserTestBase {
   /**
    * Tests Image toolkit setup form.
    */
-  public function testToolkitSetupForm() {
+  public function testToolkitSetupForm(): void {
     // Get form.
     $this->drupalGet('admin/config/media/image-toolkit');
 

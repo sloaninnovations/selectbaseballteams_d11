@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\comment\Entity\CommentType;
@@ -58,7 +60,7 @@ class EntityDeriverTest extends KernelTestBase {
    *
    * @dataProvider derivativesProvider
    */
-  public function testDerivatives($data_type, $expect_exception) {
+  public function testDerivatives($data_type, $expect_exception): void {
     if ($expect_exception) {
       $this->expectException(PluginNotFoundException::class);
     }

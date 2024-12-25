@@ -53,7 +53,11 @@ class DateFormatter implements DateFormatterInterface {
    */
   protected $requestStack;
 
-  protected $country = NULL;
+  /**
+   * The available date formats.
+   *
+   * @var array
+   */
   protected $dateFormats = [];
 
   /**
@@ -117,7 +121,6 @@ class DateFormatter implements DateFormatterInterface {
     // Create a DrupalDateTime object from the timestamp and timezone.
     $create_settings = [
       'langcode' => $langcode,
-      'country' => $this->country(),
     ];
     $date = DrupalDateTime::createFromTimestamp($timestamp, $this->timezones[$timezone], $create_settings);
 
@@ -128,7 +131,7 @@ class DateFormatter implements DateFormatterInterface {
       }
     }
 
-    // Fall back to the 'medium' date format type if the format string is
+    // Fall back to the 'fallback' date format type if the format string is
     // empty, either from not finding a requested date format or being given an
     // empty custom format string.
     if (empty($format)) {
@@ -340,19 +343,6 @@ class DateFormatter implements DateFormatterInterface {
       $this->languageManager->setConfigOverrideLanguage($original_language);
     }
     return $this->dateFormats[$type][$langcode];
-  }
-
-  /**
-   * Returns the default country from config.
-   *
-   * @return string
-   *   The config setting for country.default.
-   */
-  protected function country() {
-    if ($this->country === NULL) {
-      $this->country = \Drupal::config('system.date')->get('country.default');
-    }
-    return $this->country;
   }
 
 }

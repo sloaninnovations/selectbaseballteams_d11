@@ -13,7 +13,6 @@ use Drupal\Tests\layout_builder\Traits\EnableLayoutBuilderTrait;
  * Tests the Layout Builder UI.
  *
  * @group layout_builder
- * @group #slow
  */
 class LayoutBuilderTest extends LayoutBuilderTestBase {
 
@@ -22,7 +21,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests the Layout Builder UI for an entity type without a bundle.
    */
-  public function testNonBundleEntityType() {
+  public function testNonBundleEntityType(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -56,7 +55,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests that the Layout Builder preserves entity values.
    */
-  public function testPreserverEntityValues() {
+  public function testPreserverEntityValues(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -103,7 +102,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testLayoutBuilderUi() {
+  public function testLayoutBuilderUi(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -302,7 +301,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Test decorating controller.entity_form while layout_builder is installed.
    */
-  public function testHtmlEntityFormControllerDecoration() {
+  public function testHtmlEntityFormControllerDecoration(): void {
     $assert_session = $this->assertSession();
 
     $this->drupalLogin($this->drupalCreateUser([
@@ -319,7 +318,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests that layout builder checks entity view access.
    */
-  public function testAccess() {
+  public function testAccess(): void {
     $assert_session = $this->assertSession();
 
     $this->drupalLogin($this->drupalCreateUser([
@@ -353,7 +352,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests that component's dependencies are respected during removal.
    */
-  public function testPluginDependencies() {
+  public function testPluginDependencies(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -431,7 +430,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests preview-aware templates.
    */
-  public function testPreviewAwareTemplates() {
+  public function testPreviewAwareTemplates(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -461,7 +460,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests that extra fields work before and after enabling Layout Builder.
    */
-  public function testExtraFields() {
+  public function testExtraFields(): void {
     $assert_session = $this->assertSession();
 
     $this->drupalLogin($this->drupalCreateUser([
@@ -505,7 +504,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests loading a pending revision in the Layout Builder UI.
    */
-  public function testPendingRevision() {
+  public function testPendingRevision(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -540,7 +539,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests that hook_form_alter() has access to the Layout Builder info.
    */
-  public function testFormAlter() {
+  public function testFormAlter(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -574,7 +573,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests the functionality of custom section labels.
    */
-  public function testSectionLabels() {
+  public function testSectionLabels(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -599,7 +598,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests that layouts can be context-aware.
    */
-  public function testContextAwareLayouts() {
+  public function testContextAwareLayouts(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -633,7 +632,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests that sections can provide custom attributes.
    */
-  public function testCustomSectionAttributes() {
+  public function testCustomSectionAttributes(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -655,7 +654,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests the expected breadcrumbs of the Layout Builder UI.
    */
-  public function testBreadcrumb() {
+  public function testBreadcrumb(): void {
     $page = $this->getSession()->getPage();
 
     $this->drupalPlaceBlock('system_breadcrumb_block');
@@ -695,7 +694,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
    *
    * @see \Drupal\layout_builder_test\Plugin\SectionStorage\SimpleConfigSectionStorage
    */
-  public function testSimpleConfigBasedLayout() {
+  public function testSimpleConfigBasedLayout(): void {
     $assert_session = $this->assertSession();
 
     $this->drupalLogin($this->createUser(['configure any layout']));
@@ -703,6 +702,10 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
     // Prepare an object with a pre-existing section.
     $this->container->get('config.factory')->getEditable('layout_builder_test.test_simple_config.existing')
       ->set('sections', [(new Section('layout_twocol'))->toArray()])
+      // `layout_builder_test.test_simple_config.existing.sections.0.layout_settings.label`
+      // contains a translatable label, so a `langcode` is required.
+      // @see \Drupal\Core\Config\Plugin\Validation\Constraint\LangcodeRequiredIfTranslatableValuesConstraint
+      ->set('langcode', 'en')
       ->save();
 
     // The pre-existing section is found.
@@ -718,7 +721,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests removing section without layout label configuration.
    */
-  public function testRemovingSectionWithoutLayoutLabel() {
+  public function testRemovingSectionWithoutLayoutLabel(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -782,7 +785,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
   /**
    * Tests the Layout Builder UI with a context defined at runtime.
    */
-  public function testLayoutBuilderContexts() {
+  public function testLayoutBuilderContexts(): void {
     $node_url = 'node/1';
 
     $assert_session = $this->assertSession();

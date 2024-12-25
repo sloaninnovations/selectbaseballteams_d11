@@ -5,6 +5,7 @@
  * Hooks specific to the Node module.
  */
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
@@ -39,20 +40,20 @@ use Drupal\Component\Utility\Xss;
  * access modules can also grant "view all" permission on their custom realms;
  * for example, a module could create a record in {node_access} with:
  * @code
- * $record = array(
+ * $record = [
  *   'nid' => 0,
  *   'gid' => 888,
  *   'realm' => 'example_realm',
  *   'grant_view' => 1,
  *   'grant_update' => 0,
  *   'grant_delete' => 0,
- * );
+ * ];
  * \Drupal::database()->insert('node_access')->fields($record)->execute();
  * @endcode
  * And then in its hook_node_grants() implementation, it would need to return:
  * @code
  * if ($op == 'view') {
- *   $grants['example_realm'] = array(888);
+ *   $grants['example_realm'] = [888];
  * }
  * @endcode
  * If you decide to do this, be aware that the node_access_rebuild() function
@@ -73,7 +74,8 @@ use Drupal\Component\Utility\Xss;
  * @see node_access_rebuild()
  * @ingroup node_access
  */
-function hook_node_grants(\Drupal\Core\Session\AccountInterface $account, $operation) {
+function hook_node_grants(AccountInterface $account, $operation): array {
+  $grants = [];
   if ($account->hasPermission('access private content')) {
     $grants['example'] = [1];
   }
@@ -124,14 +126,14 @@ function hook_node_grants(\Drupal\Core\Session\AccountInterface $account, $opera
  * A "deny all" grant may be used to deny all access to a particular node or
  * node translation:
  * @code
- * $grants[] = array(
+ * $grants[] = [
  *   'realm' => 'all',
  *   'gid' => 0,
  *   'grant_view' => 0,
  *   'grant_update' => 0,
  *   'grant_delete' => 0,
  *   'langcode' => 'ca',
- * );
+ * ];
  * @endcode
  * Note that another module node access module could override this by granting
  * access to one or more nodes, since grants are additive. To enforce that
@@ -142,17 +144,17 @@ function hook_node_grants(\Drupal\Core\Session\AccountInterface $account, $opera
  * @param \Drupal\node\NodeInterface $node
  *   The node that has just been saved.
  *
- * @return array|null
+ * @return array
  *   An array of grants as defined above.
  *
  * @see hook_node_access_records_alter()
  * @ingroup node_access
  */
-function hook_node_access_records(\Drupal\node\NodeInterface $node) {
+function hook_node_access_records(NodeInterface $node): array {
+  $grants = [];
   // We only care about the node if it has been marked private. If not, it is
   // treated just like any other node and we completely ignore it.
   if ($node->private->value) {
-    $grants = [];
     // Only published Catalan translations of private nodes should be viewable
     // to all users. If we fail to check $node->isPublished(), all users would be able
     // to view an unpublished node.
@@ -180,9 +182,8 @@ function hook_node_access_records(\Drupal\node\NodeInterface $node) {
         'langcode' => 'ca',
       ];
     }
-
-    return $grants;
   }
+  return $grants;
 }
 
 /**
@@ -216,7 +217,7 @@ function hook_node_access_records(\Drupal\node\NodeInterface $node) {
  * @see hook_node_grants_alter()
  * @ingroup node_access
  */
-function hook_node_access_records_alter(&$grants, \Drupal\node\NodeInterface $node) {
+function hook_node_access_records_alter(&$grants, NodeInterface $node) {
   // Our module allows editors to mark specific articles with the 'is_preview'
   // field. If the node being saved has a TRUE value for that field, then only
   // our grants are retained, and other grants are removed. Doing so ensures
@@ -261,7 +262,7 @@ function hook_node_access_records_alter(&$grants, \Drupal\node\NodeInterface $no
  * @see hook_node_access_records_alter()
  * @ingroup node_access
  */
-function hook_node_grants_alter(&$grants, \Drupal\Core\Session\AccountInterface $account, $operation) {
+function hook_node_grants_alter(&$grants, AccountInterface $account, $operation) {
   // Our sample module never allows certain roles to edit or delete
   // content. Since some other node access modules might allow this
   // permission, we expressly remove it by returning an empty $grants
@@ -300,7 +301,7 @@ function hook_node_grants_alter(&$grants, \Drupal\Core\Session\AccountInterface 
  *
  * @ingroup entity_crud
  */
-function hook_node_search_result(\Drupal\node\NodeInterface $node) {
+function hook_node_search_result(NodeInterface $node): array {
   $rating = \Drupal::database()->query('SELECT SUM([points]) FROM {my_rating} WHERE [nid] = :nid', ['nid' => $node->id()])->fetchField();
   return ['rating' => \Drupal::translation()->formatPlural($rating, '1 point', '@count points')];
 }
@@ -319,7 +320,7 @@ function hook_node_search_result(\Drupal\node\NodeInterface $node) {
  *
  * @ingroup entity_crud
  */
-function hook_node_update_index(\Drupal\node\NodeInterface $node) {
+function hook_node_update_index(NodeInterface $node) {
   $text = '';
   $ratings = \Drupal::database()->query('SELECT [title], [description] FROM {my_ratings} WHERE [nid] = :nid', [':nid' => $node->id()]);
   foreach ($ratings as $rating) {
@@ -371,10 +372,11 @@ function hook_node_update_index(\Drupal\node\NodeInterface $node) {
  *
  * @ingroup entity_crud
  */
-function hook_ranking() {
+function hook_ranking(): array {
+  $data = [];
   // If voting is disabled, we can avoid returning the array, no hard feelings.
   if (\Drupal::config('vote.settings')->get('node_enabled')) {
-    return [
+    $data += [
       'vote_average' => [
         'title' => t('Average vote'),
         // Note that we use i.sid, the search index's search item id, rather than
@@ -393,6 +395,7 @@ function hook_ranking() {
       ],
     ];
   }
+  return $data;
 }
 
 /**

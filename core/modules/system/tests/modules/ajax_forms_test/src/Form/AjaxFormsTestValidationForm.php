@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\ajax_forms_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -31,7 +33,7 @@ class AjaxFormsTestValidationForm extends FormBase {
       '#ajax' => [
         'callback' => 'ajax_forms_test_validation_form_callback',
         'wrapper' => 'message_area',
-        'method' => 'replace',
+        'method' => 'replaceWith',
       ],
       '#suffix' => '<div id="message_area"></div>',
     ];
@@ -44,7 +46,7 @@ class AjaxFormsTestValidationForm extends FormBase {
       '#ajax' => [
         'callback' => 'ajax_forms_test_validation_number_form_callback',
         'wrapper' => 'message_area_number',
-        'method' => 'replace',
+        'method' => 'replaceWith',
       ],
       '#suffix' => '<div id="message_area_number"></div>',
     ];

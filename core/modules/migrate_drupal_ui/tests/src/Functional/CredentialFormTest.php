@@ -16,6 +16,7 @@ use Drupal\Tests\migrate_drupal\Traits\CreateTestContentEntitiesTrait;
  * credentials, and incorrect file paths.
  *
  * @group migrate_drupal_ui
+ * @group #slow
  */
 class CredentialFormTest extends MigrateUpgradeTestBase {
 
@@ -31,7 +32,7 @@ class CredentialFormTest extends MigrateUpgradeTestBase {
    *
    * @dataProvider providerCredentialForm
    */
-  public function testCredentialFrom($path_to_database) {
+  public function testCredentialFrom($path_to_database): void {
     $this->loadFixture($this->getModulePath('migrate_drupal') . $path_to_database);
     $session = $this->assertSession();
 
@@ -102,7 +103,7 @@ class CredentialFormTest extends MigrateUpgradeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getSourceBasePath() {
+  protected function getSourceBasePath(): string {
     $version = $this->getLegacyDrupalVersion($this->sourceDatabase);
     return __DIR__ . '/d' . $version . '/files';
   }
@@ -110,28 +111,28 @@ class CredentialFormTest extends MigrateUpgradeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getAvailablePaths() {
+  protected function getAvailablePaths(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEntityCounts() {
+  protected function getEntityCounts(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEntityCountsIncremental() {
+  protected function getEntityCountsIncremental(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getMissingPaths() {
+  protected function getMissingPaths(): array {
     return [];
   }
 
@@ -146,7 +147,7 @@ class CredentialFormTest extends MigrateUpgradeTestBase {
    *
    * @see \Drupal\migrate_drupal_ui\Form\CredentialForm
    */
-  protected function getDestinationSiteCredentials() {
+  protected function getDestinationSiteCredentials(): array {
     $connection_options = \Drupal::database()->getConnectionOptions();
     $version = $this->getLegacyDrupalVersion($this->sourceDatabase);
     $driver = $connection_options['driver'];

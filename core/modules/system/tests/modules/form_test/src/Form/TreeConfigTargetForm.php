@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\form_test\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
@@ -42,6 +44,13 @@ class TreeConfigTargetForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => t('Nemesis'),
       '#config_target' => 'form_test.object:nemesis_vegetable',
+    ];
+    // Since form_test.object contains translatable values, it must specify a
+    // language.
+    $form['langcode'] = [
+      '#type' => 'value',
+      '#value' => 'en',
+      '#config_target' => 'form_test.object:langcode',
     ];
 
     $form['test1'] = [

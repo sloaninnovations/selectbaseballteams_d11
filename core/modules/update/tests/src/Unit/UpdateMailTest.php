@@ -7,6 +7,7 @@ namespace Drupal\Tests\update\Unit;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 use Drupal\update\UpdateManagerInterface;
+use Drupal\update\Hook\UpdateHooks;
 
 /**
  * Tests text of update email.
@@ -76,7 +77,7 @@ class UpdateMailTest extends UnitTestCase {
    *
    * @dataProvider providerTestUpdateEmail
    */
-  public function testUpdateEmail($notification_threshold, $params, $authorized, array $expected_body) {
+  public function testUpdateEmail($notification_threshold, $params, $authorized, array $expected_body): void {
     $langcode = 'en';
     $available_updates_url = 'https://example.com/admin/reports/updates';
     $update_settings_url = 'https://example.com/admin/reports/updates/settings';
@@ -147,7 +148,8 @@ class UpdateMailTest extends UnitTestCase {
     \Drupal::setContainer($this->container);
 
     // Generate the email message.
-    update_mail($key, $message, $params);
+    $updateMail = new UpdateHooks();
+    $updateMail->mail($key, $message, $params);
 
     // Confirm the subject.
     $this->assertSame("New release(s) available for $site_name", $message['subject']);

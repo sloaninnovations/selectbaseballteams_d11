@@ -9,6 +9,7 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Core\Serialization\Yaml;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -389,10 +390,32 @@ class YamlFileLoader
             $definition->addTag($name, $tag);
         }
 
-        if (isset($service['decorates'])) {
+        if (null !== $decorates = $service['decorates'] ?? null) {
+            if ('' !== $decorates && '@' === $decorates[0]) {
+                throw new InvalidArgumentException(\sprintf('The value of the "decorates" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s").', $id, $service['decorates'], substr($decorates, 1)));
+            }
+
+            $decorationOnInvalid = \array_key_exists('decoration_on_invalid', $service) ? $service['decoration_on_invalid'] : 'exception';
+            if ('exception' === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+            }
+            elseif ('ignore' === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
+            }
+            elseif (null === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
+            }
+            elseif ('null' === $decorationOnInvalid) {
+                throw new InvalidArgumentException(\sprintf('Invalid value "%s" for attribute "decoration_on_invalid" on service "%s". Did you mean null (without quotes) in "%s"?', $decorationOnInvalid, $id, $file));
+            }
+            else {
+                throw new InvalidArgumentException(\sprintf('Invalid value "%s" for attribute "decoration_on_invalid" on service "%s". Did you mean "exception", "ignore" or null in "%s"?', $decorationOnInvalid, $id, $file));
+            }
+
             $renameId = $service['decoration_inner_name'] ?? null;
             $priority = $service['decoration_priority'] ?? 0;
-            $definition->setDecoratedService($service['decorates'], $renameId, $priority);
+
+            $definition->setDecoratedService($decorates, $renameId, $priority, $invalidBehavior);
         }
 
         if (isset($service['autowire'])) {
@@ -492,6 +515,11 @@ class YamlFileLoader
 
               return $argument;
             }
+
+            if ($value->getTag() === 'service_closure') {
+                return new ServiceClosureArgument($this->resolveServices($argument));
+            }
+
         }
         if (is_array($value)) {
             $value = array_map(array($this, 'resolveServices'), $value);

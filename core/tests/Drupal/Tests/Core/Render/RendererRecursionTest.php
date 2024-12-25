@@ -10,8 +10,7 @@ namespace Drupal\Tests\Core\Render;
  */
 class RendererRecursionTest extends RendererTestBase {
 
-  protected function setUpRenderRecursionComplexElements() {
-    $complex_child_markup = '<p>Imagine this is a render array for an entity.</p>';
+  protected function setUpRenderRecursionComplexElements(): array {
     $parent_markup = '<p>Rendered!</p>';
 
     $complex_child_template = [
@@ -24,7 +23,7 @@ class RendererRecursionTest extends RendererTestBase {
       '#create_placeholder' => TRUE,
     ];
 
-    return [$complex_child_markup, $parent_markup, $complex_child_template];
+    return [$parent_markup, $complex_child_template];
   }
 
   /**
@@ -34,8 +33,8 @@ class RendererRecursionTest extends RendererTestBase {
    * @covers ::render
    * @covers ::doRender
    */
-  public function testRenderRecursionWithNestedRenderRoot() {
-    [$complex_child_markup, $parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
+  public function testRenderRecursionWithNestedRenderRoot(): void {
+    [$parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
     $renderer = $this->renderer;
     $this->setUpRequest();
 
@@ -66,8 +65,8 @@ class RendererRecursionTest extends RendererTestBase {
    * @covers ::render
    * @covers ::doRender
    */
-  public function testRenderRecursionWithNestedRender() {
-    [$complex_child_markup, $parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
+  public function testRenderRecursionWithNestedRender(): void {
+    [$parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
     $renderer = $this->renderer;
     $this->setUpRequest();
 
@@ -100,8 +99,8 @@ class RendererRecursionTest extends RendererTestBase {
    * @covers ::renderRoot
    * @covers ::renderInIsolation
    */
-  public function testRenderRecursionWithNestedRenderInIsolation() {
-    [$complex_child_markup, $parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
+  public function testRenderRecursionWithNestedRenderInIsolation(): void {
+    [$parent_markup, $complex_child_template] = $this->setUpRenderRecursionComplexElements();
     $renderer = $this->renderer;
     $this->setUpRequest();
 

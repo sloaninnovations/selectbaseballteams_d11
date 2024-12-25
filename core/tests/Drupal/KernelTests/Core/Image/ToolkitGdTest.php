@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Image;
 
 use Drupal\Core\File\FileSystemInterface;
@@ -14,7 +16,6 @@ use Drupal\KernelTests\KernelTestBase;
  *
  * @coversDefaultClass \Drupal\system\Plugin\ImageToolkit\GDToolkit
  * @group Image
- * @group #slow
  * @requires extension gd
  */
 class ToolkitGdTest extends KernelTestBase {
@@ -347,7 +348,7 @@ class ToolkitGdTest extends KernelTestBase {
 
     // Check that saved image reloads without raising PHP errors.
     $image_reloaded = $this->imageFactory->get($file_path);
-    $this->assertInstanceOf(\GDImage::class, $image_reloaded->getToolkit()->getImage());
+    $this->assertInstanceOf(\GdImage::class, $image_reloaded->getToolkit()->getImage());
   }
 
   /**
@@ -514,11 +515,9 @@ class ToolkitGdTest extends KernelTestBase {
   public function testGetRequirements(): void {
     $this->assertEquals([
       'version' => [
-        'title' => t('GD library'),
+        'title' => 'GD library',
         'value' => gd_info()['GD Version'],
-        'description' => t("Supported image file formats: %formats.", [
-          '%formats' => implode(', ', ['GIF', 'JPEG', 'PNG', 'WEBP']),
-        ]),
+        'description' => sprintf("Supported image file formats: %s.", implode(', ', ['GIF', 'JPEG', 'PNG', 'WEBP'])),
       ],
     ], $this->imageFactory->get()->getToolkit()->getRequirements());
   }

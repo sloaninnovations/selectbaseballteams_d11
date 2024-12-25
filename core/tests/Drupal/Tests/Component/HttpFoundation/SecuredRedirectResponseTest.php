@@ -23,7 +23,7 @@ class SecuredRedirectResponseTest extends TestCase {
    * @covers ::createFromRedirectResponse
    * @covers ::fromResponse
    */
-  public function testRedirectCopy() {
+  public function testRedirectCopy(): void {
     $redirect = new RedirectResponse('/magic_redirect_url', 301, ['x-cache-foobar' => 123]);
     $redirect->setProtocolVersion('2.0');
     $redirect->setCharset('ibm-943_P14A-2000');
@@ -49,7 +49,7 @@ class SecuredRedirectStub extends SecuredRedirectResponse {
   /**
    * {@inheritdoc}
    */
-  protected function isSafe($url) {
+  protected function isSafe($url): bool {
     // Empty implementation for testing.
     return TRUE;
   }

@@ -5,6 +5,7 @@ namespace Drupal\system\Plugin\ImageToolkit;
 use Drupal\Component\Utility\Color;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkit;
@@ -75,7 +76,7 @@ class GDToolkit extends ImageToolkitBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface $operation_manager
@@ -289,10 +290,10 @@ class GDToolkit extends ImageToolkitBase {
     // Move temporary local file to remote destination.
     if (isset($permanent_destination) && $success) {
       try {
-        $this->fileSystem->move($destination, $permanent_destination, FileSystemInterface::EXISTS_REPLACE);
+        $this->fileSystem->move($destination, $permanent_destination, FileExists::Replace);
         return TRUE;
       }
-      catch (FileException $e) {
+      catch (FileException) {
         return FALSE;
       }
     }

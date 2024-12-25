@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Datetime\Element;
 
+use Drupal\Component\Utility\FilterArray;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Variable;
 use Drupal\Core\Datetime\DateHelper;
@@ -68,7 +69,7 @@ class Datelist extends DateElementBase {
         try {
           $date = DrupalDateTime::createFromArray($input, $element['#date_timezone']);
         }
-        catch (\Exception $e) {
+        catch (\Exception) {
           $form_state->setError($element, t('Selected combination of day and month is not valid.'));
         }
         if ($date instanceof DrupalDateTime && !$date->hasErrors()) {
@@ -139,7 +140,7 @@ class Datelist extends DateElementBase {
    * Optional properties include:
    *   - #date_part_order: Array of date parts indicating the parts and order
    *     that should be used in the selector, optionally including 'ampm' for
-   *     12 hour time. Default is array('year', 'month', 'day', 'hour', 'minute').
+   *     12 hour time. Default is ['year', 'month', 'day', 'hour', 'minute'].
    *   - #date_text_parts: Array of date parts that should be presented as
    *     text fields instead of drop-down selectors. Default is an empty array.
    *   - #date_date_callbacks: Array of optional callbacks for the date element.
@@ -158,15 +159,15 @@ class Datelist extends DateElementBase {
    *
    * Example usage:
    * @code
-   *   $form = array(
+   *   $form = [
    *     '#type' => 'datelist',
    *     '#default_value' => new DrupalDateTime('2000-01-01 00:00:00'),
-   *     '#date_part_order' => array('month', 'day', 'year', 'hour', 'minute', 'ampm'),
-   *     '#date_text_parts' => array('year'),
+   *     '#date_part_order' => ['month', 'day', 'year', 'hour', 'minute', 'ampm'],
+   *     '#date_text_parts' => ['year'],
    *     '#date_year_range' => '2010:2020',
    *     '#date_increment' => 15,
    *     '#date_timezone' => 'Asia/Kolkata'
-   *   );
+   *   ];
    * @endcode
    *
    * @param array $element
@@ -177,6 +178,7 @@ class Datelist extends DateElementBase {
    *   The complete form structure.
    *
    * @return array
+   *   An expanded DateList element.
    */
   public static function processDatelist(&$element, FormStateInterface $form_state, &$complete_form) {
     // Load translated date part labels from the appropriate calendar plugin.
@@ -253,7 +255,6 @@ class Datelist extends DateElementBase {
       $element[$part] = [
         '#type' => in_array($part, $text_parts) ? 'textfield' : 'select',
         '#title' => $title,
-        '#title_display' => 'invisible',
         '#value' => $value,
         '#attributes' => $element['#attributes'],
         '#options' => $options,
@@ -346,7 +347,7 @@ class Datelist extends DateElementBase {
     // \Drupal\Core\Datetime\Element\Datelist::valueCallback().
     unset($input['object']);
     // Filters out empty array values, any valid value would have a string length.
-    $filtered_input = array_filter($input, 'strlen');
+    $filtered_input = FilterArray::removeEmptyStrings($input);
     return array_diff($parts, array_keys($filtered_input));
   }
 
@@ -359,6 +360,9 @@ class Datelist extends DateElementBase {
    *   The value to round to.
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime
+   *   The Drupal date time object with the minutes and seconds rounded when the
+   *   input date is a DrupalDateTime instance. Otherwise the date is returned
+   *   unchanged.
    */
   protected static function incrementRound(&$date, $increment) {
     // Round minutes and seconds, if necessary.

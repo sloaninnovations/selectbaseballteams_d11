@@ -25,7 +25,7 @@ class Mapping extends ArrayElement {
   /**
    * {@inheritdoc}
    */
-  public function __construct(DataDefinitionInterface $definition, $name = NULL, TypedDataInterface $parent = NULL) {
+  public function __construct(DataDefinitionInterface $definition, $name = NULL, ?TypedDataInterface $parent = NULL) {
     assert($definition instanceof MapDataDefinition);
     // Validate basic structure.
     foreach ($definition['mapping'] as $key => $key_definition) {
@@ -220,8 +220,6 @@ class Mapping extends ArrayElement {
    *
    * @param \Drupal\Core\TypedData\MapDataDefinition $definition
    *   The config schema definition for a `type: mapping`.
-   *
-   * @return void
    *
    * @throws \LogicException
    *   Thrown when `requiredKey: true` is specified.

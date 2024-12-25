@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Kernel;
 
 use Drupal\Component\Utility\Html;
@@ -16,9 +18,7 @@ use Drupal\Tests\system\Kernel\Token\TokenReplaceKernelTestBase;
 class NodeTokenReplaceTest extends TokenReplaceKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'filter'];
 
@@ -37,7 +37,7 @@ class NodeTokenReplaceTest extends TokenReplaceKernelTestBase {
   /**
    * Creates a node, then tests the tokens generated from it.
    */
-  public function testNodeTokenReplacement() {
+  public function testNodeTokenReplacement(): void {
     $url_options = [
       'absolute' => TRUE,
       'language' => $this->interfaceLanguage,
@@ -57,6 +57,7 @@ class NodeTokenReplaceTest extends TokenReplaceKernelTestBase {
     // Generate and test tokens.
     $tests = [];
     $tests['[node:nid]'] = $node->id();
+    $tests['[node:uuid]'] = $node->uuid();
     $tests['[node:vid]'] = $node->getRevisionId();
     $tests['[node:type]'] = 'article';
     $tests['[node:type-name]'] = 'Article';
@@ -79,6 +80,7 @@ class NodeTokenReplaceTest extends TokenReplaceKernelTestBase {
 
     $metadata_tests = [];
     $metadata_tests['[node:nid]'] = $base_bubbleable_metadata;
+    $metadata_tests['[node:uuid]'] = $base_bubbleable_metadata;
     $metadata_tests['[node:vid]'] = $base_bubbleable_metadata;
     $metadata_tests['[node:type]'] = $base_bubbleable_metadata;
     $metadata_tests['[node:type-name]'] = $base_bubbleable_metadata;

@@ -37,11 +37,6 @@ class CollectRoutesTest extends UnitTestCase {
     parent::setUp();
 
     $container = new ContainerBuilder();
-
-    $request = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Request')
-      ->disableOriginalConstructor()
-      ->getMock();
-
     $view = new View(['id' => 'test_view'], 'view');
 
     $view_executable = $this->getMockBuilder('\Drupal\views\ViewExecutable')
@@ -143,7 +138,7 @@ class CollectRoutesTest extends UnitTestCase {
   /**
    * Tests if adding a requirement to a route only modify one route.
    */
-  public function testRoutesRequirements() {
+  public function testRoutesRequirements(): void {
     $this->restExport->collectRoutes($this->routes);
 
     $requirements_1 = $this->routes->get('test_1')->getRequirements();

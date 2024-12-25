@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
@@ -46,9 +48,9 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
    * strong UI presence. For example: REST resource configuration entities and
    * entity view displays.
    *
-   * @see \Drupal\Core\Entity\EntityInterface::label()
-   *
    * @var bool
+   *
+   * @see \Drupal\Core\Entity\EntityInterface::label()
    */
   protected bool $hasLabel = TRUE;
 

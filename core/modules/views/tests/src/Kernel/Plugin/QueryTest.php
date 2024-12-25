@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\views\Views;
@@ -30,7 +32,7 @@ class QueryTest extends ViewsKernelTestBase {
   /**
    * Tests query plugins.
    */
-  public function testQuery() {
+  public function testQuery(): void {
     $this->_testInitQuery();
     $this->_testQueryExecute();
     $this->queryMethodsTests();
@@ -39,7 +41,7 @@ class QueryTest extends ViewsKernelTestBase {
   /**
    * Tests the ViewExecutable::initQuery method.
    */
-  public function _testInitQuery() {
+  public function _testInitQuery(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -47,7 +49,7 @@ class QueryTest extends ViewsKernelTestBase {
     $this->assertInstanceOf(QueryTestPlugin::class, $view->query);
   }
 
-  public function _testQueryExecute() {
+  public function _testQueryExecute(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -63,7 +65,7 @@ class QueryTest extends ViewsKernelTestBase {
    *
    * @see \Drupal\views\Plugin\views\query\QueryPluginBase
    */
-  protected function queryMethodsTests() {
+  protected function queryMethodsTests(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 

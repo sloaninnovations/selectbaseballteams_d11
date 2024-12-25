@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel;
 
 use Drupal\field\Entity\FieldStorageConfig;
@@ -45,7 +47,7 @@ class TermEntityReferenceTest extends KernelTestBase {
    * field to limit the target vocabulary to one of them, ensuring that
    * the restriction applies.
    */
-  public function testSelectionTestVocabularyRestriction() {
+  public function testSelectionTestVocabularyRestriction(): void {
     // Create two vocabularies.
     $vocabulary = Vocabulary::create([
       'name' => 'test1',

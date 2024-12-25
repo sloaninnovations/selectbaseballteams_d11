@@ -14,9 +14,10 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage;
 use Drupal\Core\Language\Language;
 use Drupal\Tests\UnitTestCase;
-use Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass \Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage
@@ -101,7 +102,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @param string $uuid_key
    *   (optional) The entity key used for the UUID. Defaults to 'uuid'.
    */
-  protected function setUpKeyValueEntityStorage($uuid_key = 'uuid') {
+  protected function setUpKeyValueEntityStorage($uuid_key = 'uuid'): void {
     $this->entityType->expects($this->atLeastOnce())
       ->method('getKey')
       ->willReturnMap([
@@ -153,7 +154,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @covers ::create
    * @covers ::doCreate
    */
-  public function testCreateWithPredefinedUuid() {
+  public function testCreateWithPredefinedUuid(): void {
     $this->entityType->expects($this->once())
       ->method('getClass')
       ->willReturn(get_class($this->getMockEntity()));
@@ -178,7 +179,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @covers ::create
    * @covers ::doCreate
    */
-  public function testCreateWithoutUuidKey() {
+  public function testCreateWithoutUuidKey(): void {
     // Set up the entity storage to expect no UUID key.
     $this->entityType->expects($this->once())
       ->method('getClass')
@@ -358,7 +359,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    *
    * @depends testSaveConfigEntity
    */
-  public function testSaveRenameConfigEntity(ConfigEntityInterface $entity) {
+  public function testSaveRenameConfigEntity(ConfigEntityInterface $entity): void {
     $this->entityType->expects($this->once())
       ->method('getClass')
       ->willReturn(get_class($entity));
@@ -397,7 +398,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @covers ::save
    * @covers ::doSave
    */
-  public function testSaveContentEntity() {
+  public function testSaveContentEntity(): void {
     $this->entityType->expects($this->any())
       ->method('getKeys')
       ->willReturn([
@@ -432,7 +433,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @covers ::save
    * @covers ::doSave
    */
-  public function testSaveInvalid() {
+  public function testSaveInvalid(): void {
     $this->setUpKeyValueEntityStorage();
 
     $entity = $this->getMockEntity('Drupal\Core\Config\Entity\ConfigEntityBase');
@@ -451,7 +452,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @covers ::save
    * @covers ::doSave
    */
-  public function testSaveDuplicate() {
+  public function testSaveDuplicate(): void {
     $this->setUpKeyValueEntityStorage();
 
     $entity = $this->getMockEntity(EntityBaseTest::class, [['id' => 'foo']]);
@@ -472,7 +473,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @covers ::load
    * @covers ::postLoad
    */
-  public function testLoad() {
+  public function testLoad(): void {
     $entity = $this->getMockEntity();
     $this->entityType->expects($this->once())
       ->method('getClass')
@@ -491,7 +492,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   /**
    * @covers ::load
    */
-  public function testLoadMissingEntity() {
+  public function testLoadMissingEntity(): void {
     $this->setUpKeyValueEntityStorage();
 
     $this->keyValueStore->expects($this->once())
@@ -508,7 +509,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @covers ::mapFromStorageRecords
    * @covers ::doLoadMultiple
    */
-  public function testLoadMultipleAll() {
+  public function testLoadMultipleAll(): void {
     $expected['foo'] = $this->getMockEntity(EntityBaseTest::class, [['id' => 'foo']]);
     $expected['bar'] = $this->getMockEntity(EntityBaseTest::class, [['id' => 'bar']]);
     $this->entityType->expects($this->once())
@@ -533,7 +534,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @covers ::mapFromStorageRecords
    * @covers ::doLoadMultiple
    */
-  public function testLoadMultipleIds() {
+  public function testLoadMultipleIds(): void {
     $entity = $this->getMockEntity(EntityBaseTest::class, [['id' => 'foo']]);
     $this->entityType->expects($this->once())
       ->method('getClass')
@@ -553,32 +554,10 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::loadRevision
-   * @group legacy
-   */
-  public function testLoadRevision() {
-    $this->expectDeprecation('Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage::loadRevision() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Entity\RevisionableStorageInterface::loadRevision instead. See https://www.drupal.org/node/3294237');
-    $this->setUpKeyValueEntityStorage();
-
-    $this->assertNull($this->entityStorage->loadRevision(1));
-  }
-
-  /**
-   * @covers ::deleteRevision
-   * @group legacy
-   */
-  public function testDeleteRevision() {
-    $this->expectDeprecation('Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage::deleteRevision() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Entity\RevisionableStorageInterface::deleteRevision instead. See https://www.drupal.org/node/3294237');
-    $this->setUpKeyValueEntityStorage();
-
-    $this->assertNull($this->entityStorage->deleteRevision(1));
-  }
-
-  /**
    * @covers ::delete
    * @covers ::doDelete
    */
-  public function testDelete() {
+  public function testDelete(): void {
     $entities['foo'] = $this->getMockEntity(EntityBaseTest::class, [['id' => 'foo']]);
     $entities['bar'] = $this->getMockEntity(EntityBaseTest::class, [['id' => 'bar']]);
     $this->setUpKeyValueEntityStorage();
@@ -609,7 +588,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @covers ::delete
    * @covers ::doDelete
    */
-  public function testDeleteNothing() {
+  public function testDeleteNothing(): void {
     $this->setUpKeyValueEntityStorage();
 
     $this->moduleHandler->expects($this->never())
@@ -626,17 +605,17 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * Creates an entity with specific methods mocked.
    *
    * @param string $class
-   *   (optional) The concrete entity class to mock. Defaults to
-   *   'Drupal\Core\Entity\EntityBase'.
+   *   (optional) The concrete entity class to mock. Defaults to a stub of
+   *   \Drupal\Core\Entity\EntityBase defined for test purposes.
    * @param array $arguments
    *   (optional) Arguments to pass to the constructor. An empty set of values
    *   and an entity type ID will be provided.
    * @param array $methods
    *   (optional) The methods to mock.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\Entity\EntityInterface&\PHPUnit\Framework\MockObject\MockObject
    */
-  public function getMockEntity($class = EntityBaseTest::class, array $arguments = [], $methods = []) {
+  protected function getMockEntity(string $class = EntityBaseTest::class, array $arguments = [], array $methods = []): EntityInterface&MockObject {
     // Ensure the entity is passed at least an array of values and an entity
     // type ID
     if (!isset($arguments[0])) {
@@ -645,7 +624,10 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     if (!isset($arguments[1])) {
       $arguments[1] = 'test_entity_type';
     }
-    return $this->getMockForAbstractClass($class, $arguments, '', TRUE, TRUE, TRUE, $methods);
+    return $this->getMockBuilder($class)
+      ->setConstructorArgs($arguments)
+      ->onlyMethods($methods)
+      ->getMock();
   }
 
 }
@@ -655,7 +637,6 @@ class EntityBaseTest extends EntityBase {
   public $langcode;
   public $uuid;
   public $label;
-  public $original;
 
 }
 

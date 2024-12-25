@@ -61,6 +61,15 @@ trait FunctionalTestSetupTrait {
   protected $apcuEnsureUniquePrefix = FALSE;
 
   /**
+   * Set to TRUE to make user 1 a super user.
+   *
+   * @var bool
+   *
+   * @see \Drupal\Core\Session\SuperUserAccessPolicy
+   */
+  protected bool $usesSuperUserAccessPolicy;
+
+  /**
    * Prepares site settings and services before installation.
    */
   protected function prepareSettings() {
@@ -69,7 +78,7 @@ trait FunctionalTestSetupTrait {
     // installation.
     // Not using File API; a potential error must trigger a PHP warning.
     $directory = DRUPAL_ROOT . '/' . $this->siteDirectory;
-    copy(DRUPAL_ROOT . '/sites/default/default.settings.php', $directory . '/settings.php');
+    copy(DRUPAL_ROOT . '/core/assets/scaffold/files/default.settings.php', $directory . '/settings.php');
 
     // The public file system path is created during installation. Additionally,
     // during tests:
@@ -127,7 +136,7 @@ trait FunctionalTestSetupTrait {
     $settings_services_file = DRUPAL_ROOT . '/' . $this->originalSite . '/testing.services.yml';
     if (!file_exists($settings_services_file)) {
       // Otherwise, use the default services as a starting point for overrides.
-      $settings_services_file = DRUPAL_ROOT . '/sites/default/default.services.yml';
+      $settings_services_file = DRUPAL_ROOT . '/core/assets/scaffold/files/default.services.yml';
     }
 
     // Put the testing-specific service overrides in place.
@@ -138,6 +147,15 @@ trait FunctionalTestSetupTrait {
     // from running during tests.
     $services = $yaml->parse($content);
     $services['parameters']['session.storage.options']['gc_probability'] = 0;
+    // Disable the super user access policy so that we are sure our tests check
+    // for the right permissions.
+    if (!isset($this->usesSuperUserAccessPolicy)) {
+      $test_file_name = (new \ReflectionClass($this))->getFileName();
+      // @todo Decide in https://www.drupal.org/project/drupal/issues/3437926
+      //   how to remove this fallback behavior.
+      $this->usesSuperUserAccessPolicy = !str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
+    }
+    $services['parameters']['security.enable_super_user'] = $this->usesSuperUserAccessPolicy;
     if ($this->strictConfigSchema) {
       // Add a listener to validate configuration schema on save.
       $test_file_name = (new \ReflectionClass($this))->getFileName();
@@ -180,7 +198,7 @@ trait FunctionalTestSetupTrait {
    *
    * @param string $name
    *   The name of the parameter.
-   * @param string $value
+   * @param string|array|bool $value
    *   The value of the parameter.
    */
   protected function setContainerParameter($name, $value) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel\Migrate\d7;
 
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
@@ -26,7 +28,7 @@ class CommentEntityTranslationCheckRequirementsTest extends MigrateDrupal7TestBa
    *
    * @dataProvider providerTestCheckRequirements
    */
-  public function testCheckRequirements($module) {
+  public function testCheckRequirements($module): void {
     // Disable the module in the source site.
     $this->sourceDatabase->update('system')
       ->condition('name', $module)

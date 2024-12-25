@@ -33,12 +33,17 @@ class CommentStatisticsTest extends CommentTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    // Add more permissions the admin user.
+    $this->adminUser->addRole($this->drupalCreateRole([
+      'administer permissions',
+      'access administration pages',
+      'administer site configuration',
+    ]))->save();
     // Create a second user to post comments.
     $this->webUser2 = $this->drupalCreateUser([
       'post comments',
       'create article content',
       'edit own comments',
-      'post comments',
       'skip comment approval',
       'access comments',
       'access content',
@@ -48,7 +53,7 @@ class CommentStatisticsTest extends CommentTestBase {
   /**
    * Tests the node comment statistics.
    */
-  public function testCommentNodeCommentStatistics() {
+  public function testCommentNodeCommentStatistics(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     // Set comments to have subject and preview disabled.
     $this->setCommentPreview(DRUPAL_DISABLED);
@@ -80,7 +85,8 @@ class CommentStatisticsTest extends CommentTestBase {
     // Prepare for anonymous comment submission (comment approval enabled).
     // Note we don't use user_role_change_permissions(), because that caused
     // random test failures.
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->adminUser);
+
     $this->drupalGet('admin/people/permissions');
     $edit = [
       'anonymous[access comments]' => 1,
@@ -109,7 +115,7 @@ class CommentStatisticsTest extends CommentTestBase {
     // Prepare for anonymous comment submission (no approval required).
     // Note we don't use user_role_change_permissions(), because that caused
     // random test failures.
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/people/permissions');
     $edit = [
       'anonymous[skip comment approval]' => 1,

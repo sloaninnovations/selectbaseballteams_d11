@@ -14,10 +14,10 @@ use Drupal\Core\Render\Element;
  *
  * Usage example:
  * @code
- * $form['copy'] = array(
+ * $form['copy'] = [
  *   '#type' => 'checkbox',
  *   '#title' => $this->t('Send me a copy'),
- * );
+ * ];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Checkboxes
@@ -61,7 +61,7 @@ class Checkbox extends FormElementBase {
     }
     else {
       // Checked checkboxes are submitted with a value (possibly '0' or ''):
-      // http://www.w3.org/TR/html401/interact/forms.html#successful-controls.
+      // https://www.w3.org/TR/html401/interact/forms.html#successful-controls.
       // For checked checkboxes, browsers submit the string version of
       // #return_value, but we return the original #return_value. For unchecked
       // checkboxes, browsers submit nothing at all, but

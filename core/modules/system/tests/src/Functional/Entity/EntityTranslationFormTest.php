@@ -18,9 +18,7 @@ use Drupal\Tests\BrowserTestBase;
 class EntityTranslationFormTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'language', 'node'];
 
@@ -29,6 +27,9 @@ class EntityTranslationFormTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The test language codes.
+   */
   protected $langcodes;
 
   /**
@@ -54,7 +55,7 @@ class EntityTranslationFormTest extends BrowserTestBase {
   /**
    * Tests entity form language.
    */
-  public function testEntityFormLanguage() {
+  public function testEntityFormLanguage(): void {
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
 
     $web_user = $this->drupalCreateUser([

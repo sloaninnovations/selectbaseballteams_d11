@@ -31,7 +31,7 @@ class TaxonomyIndexTid extends PrerenderList {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabulary_storage
@@ -57,10 +57,10 @@ class TaxonomyIndexTid extends PrerenderList {
   /**
    * {@inheritdoc}
    */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
-    // @todo: Wouldn't it be possible to use $this->base_table and no if here?
+    // @todo Wouldn't it be possible to use $this->base_table and no if here?
     if ($view->storage->get('base_table') == 'node_field_revision') {
       $this->additional_fields['nid'] = ['table' => 'node_field_revision', 'field' => 'nid'];
     }

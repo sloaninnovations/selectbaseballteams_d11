@@ -54,7 +54,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * The minimal possible value for the max_allowed_packet setting of MySQL.
    *
    * @link https://mariadb.com/kb/en/mariadb/server-system-variables/#max_allowed_packet
-   * @link https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_max_allowed_packet
+   * @link https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_max_allowed_packet
    *
    * @var int
    */
@@ -73,11 +73,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // combination mode), then MySQL doesn't interpret a double quote as an
     // identifier quote, in which case use the non-ANSI-standard backtick.
     //
-    // Because we still support MySQL 5.7, check for the deprecated combination
-    // modes as well.
-    //
-    // @see https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sqlmode_ansi_quotes
-    $ansi_quotes_modes = ['ANSI_QUOTES', 'ANSI', 'DB2', 'MAXDB', 'MSSQL', 'ORACLE', 'POSTGRESQL'];
+    // @see https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#sqlmode_ansi_quotes
+    $ansi_quotes_modes = ['ANSI_QUOTES', 'ANSI'];
     $is_ansi_quotes_mode = FALSE;
     if (isset($connection_options['init_commands']['sql_mode'])) {
       foreach ($ansi_quotes_modes as $mode) {
@@ -155,7 +152,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
             // Show message for socket connection via 'host' option.
             $message = 'Drupal was attempting to connect to the database server via a socket, but the socket file could not be found.';
             $message .= ' A Unix socket file is used if you do not specify a host name or if you specify the special host name localhost.';
-            $message .= ' To connect via TPC/IP use an IP address (127.0.0.1 for IPv4) instead of "localhost".';
+            $message .= ' To connect via TCP/IP use an IP address (127.0.0.1 for IPv4) instead of "localhost".';
             $message .= ' This message normally means that there is no MySQL server running on the system or that you are using an incorrect Unix socket file name when trying to connect to the server.';
             throw new DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
           }

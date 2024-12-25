@@ -21,9 +21,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 
@@ -67,7 +65,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
   /**
    * Verifies site maintenance mode functionality.
    */
-  public function testSiteMaintenance() {
+  public function testSiteMaintenance(): void {
 
     // Verify that permission message is displayed.
     $this->drupalGet(Url::fromRoute('system.site_maintenance_mode'));
@@ -177,7 +175,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
   /**
    * Tests responses to non-HTML requests when in maintenance mode.
    */
-  public function testNonHtmlRequest() {
+  public function testNonHtmlRequest(): void {
     $this->drupalLogout();
     \Drupal::state()->set('system.maintenance_mode', TRUE);
     $formats = ['json', 'xml', 'non-existing'];

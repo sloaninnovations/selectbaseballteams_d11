@@ -67,7 +67,7 @@ class DisplayTest extends WebDriverTestBase {
   /**
    * Tests adding a display.
    */
-  public function testAddDisplay() {
+  public function testAddDisplay(): void {
     $this->drupalGet('admin/structure/views/view/test_content_ajax');
     $page = $this->getSession()->getPage();
 
@@ -86,7 +86,7 @@ class DisplayTest extends WebDriverTestBase {
   /**
    * Tests setting the administrative title.
    */
-  public function testRenameDisplayAdminName() {
+  public function testRenameDisplayAdminName(): void {
     $titles = ['New admin title', '</title><script>alert("alert!")</script>'];
     foreach ($titles as $new_title) {
       $this->drupalGet('admin/structure/views/view/test_content_ajax');
@@ -108,7 +108,7 @@ class DisplayTest extends WebDriverTestBase {
   /**
    * Tests contextual links on Views page displays.
    */
-  public function testPageContextualLinks() {
+  public function testPageContextualLinks(): void {
     $view = View::load('test_display');
     $view->enable()->save();
     $this->container->get('router.builder')->rebuildIfNeeded();
@@ -151,7 +151,7 @@ class DisplayTest extends WebDriverTestBase {
    * @param string $selector
    *   The selector for the element that contains the contextual Rink.
    */
-  protected function toggleContextualTriggerVisibility($selector) {
+  protected function toggleContextualTriggerVisibility($selector): void {
     // Hovering over the element itself with should be enough, but does not
     // work. Manually remove the visually-hidden class.
     $this->getSession()->executeScript("jQuery('{$selector} .contextual .trigger').toggleClass('visually-hidden');");
@@ -160,7 +160,7 @@ class DisplayTest extends WebDriverTestBase {
   /**
    * Test if 'add' translations are filtered from multilingual display options.
    */
-  public function testAddDisplayBlockTranslation() {
+  public function testAddDisplayBlockTranslation(): void {
 
     // Set up an additional language (Hungarian).
     $langcode = 'hu';
@@ -190,7 +190,7 @@ class DisplayTest extends WebDriverTestBase {
   /**
    * Helper function for adding interface text translations.
    */
-  private function addTranslation($langcode, $source_string, $translation_string) {
+  private function addTranslation($langcode, $source_string, $translation_string): void {
     $storage = \Drupal::service('locale.storage');
     $string = $storage->findString(['source' => $source_string]);
     if (is_null($string)) {
