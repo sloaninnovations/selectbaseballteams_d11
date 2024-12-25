@@ -43,7 +43,7 @@ class Callbacks {
    *
    * @see \Drupal\field\Entity\FieldConfig::$default_value
    */
-  public function entityTestFieldDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition): array {
+  public static function entityTestFieldDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition): array {
     // Include the field name and entity language in the generated values to check
     // that they are correctly passed.
     $string = $definition->getName() . '_' . $entity->language()->getId();
