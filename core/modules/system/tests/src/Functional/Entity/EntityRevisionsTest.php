@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Entity;
 
 use Drupal\entity_test\Entity\EntityTestMulRev;
-use Drupal\entity_test\EntityTestTypesFilter;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -58,7 +57,7 @@ class EntityRevisionsTest extends BrowserTestBase {
   public function testRevisions(): void {
 
     // All revisable entity variations have to have the same results.
-    foreach (entity_test_entity_types(EntityTestTypesFilter::Revisable) as $entity_type) {
+    foreach (entity_test_entity_types(ENTITY_TEST_TYPES_REVISABLE) as $entity_type) {
       $this->runRevisionsTests($entity_type);
     }
   }

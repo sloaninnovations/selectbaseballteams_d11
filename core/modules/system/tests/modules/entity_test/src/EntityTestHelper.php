@@ -21,8 +21,8 @@ class EntityTestHelper {
    *   properties.
    *
    * @param int $filter
-   *   Either EntityTestTypesFilter::Revisable to only return revisable entity types or
-   *   EntityTestTypesFilter::Multilingual to only return multilingual ones. Defaults
+   *   Either ENTITY_TEST_TYPES_REVISABLE to only return revisable entity types or
+   *   ENTITY_TEST_TYPES_MULTILINGUAL to only return multilingual ones. Defaults
    *   to NULL, which returns all.
    *
    * @return array
@@ -30,18 +30,18 @@ class EntityTestHelper {
    */
   function entity_test_entity_types($filter = NULL) {
     $types = [];
-    if ($filter === NULL || $filter === EntityTestTypesFilter::Routing) {
+    if ($filter === NULL || $filter === ENTITY_TEST_TYPES_ROUTING) {
       $types[] = 'entity_test';
     }
-    if ($filter != EntityTestTypesFilter::Revisable) {
+    if ($filter != ENTITY_TEST_TYPES_REVISABLE) {
       $types[] = 'entity_test_mul';
       $types[] = 'entity_test_mul_langcode_key';
       $types[] = 'entity_test_mul_changed';
     }
-    if ($filter != EntityTestTypesFilter::Multilingual) {
+    if ($filter != ENTITY_TEST_TYPES_MULTILINGUAL) {
       $types[] = 'entity_test_rev';
     }
-    if ($filter === EntityTestTypesFilter::Routing) {
+    if ($filter === ENTITY_TEST_TYPES_ROUTING) {
       $types[] = 'entity_test_base_field_display';
       $types[] = 'entity_test_string_id';
       $types[] = 'entity_test_uuid_id';
