@@ -4,24 +4,3 @@
  * @file
  * Test module for the entity API providing several entity types for testing.
  */
-
-declare(strict_types=1);
-
-use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Form\FormStateInterface;
-
-/**
- * Filter that limits test entity list to revisable ones.
- */
-const ENTITY_TEST_TYPES_REVISABLE = 1;
-
-/**
- * Filter that limits test entity list to multilingual ones.
- */
-const ENTITY_TEST_TYPES_MULTILINGUAL = 2;
-
-/**
- * Filter that limits test entity list to ones that can be routed.
- */
-const ENTITY_TEST_TYPES_ROUTING = 3;

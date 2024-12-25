@@ -8,6 +8,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\TypedData\TranslationStatusInterface;
 use Drupal\entity_test\Entity\EntityTestMul;
 use Drupal\entity_test\Entity\EntityTestMulRev;
+use Drupal\entity_test\EntityTestTypesFilter;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -144,7 +145,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
    */
   public function testMultilingualProperties(): void {
     // Test all entity variations with data table support.
-    foreach (entity_test_entity_types(ENTITY_TEST_TYPES_MULTILINGUAL) as $entity_type) {
+    foreach (entity_test_entity_types(EntityTestTypesFilter::Multilingual) as $entity_type) {
       $this->doTestMultilingualProperties($entity_type);
     }
   }
@@ -307,7 +308,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
    */
   public function testEntityTranslationAPI(): void {
     // Test all entity variations with data table support.
-    foreach (entity_test_entity_types(ENTITY_TEST_TYPES_MULTILINGUAL) as $entity_type) {
+    foreach (entity_test_entity_types(EntityTestTypesFilter::Multilingual) as $entity_type) {
       $this->doTestEntityTranslationAPI($entity_type);
     }
   }
@@ -575,7 +576,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
    */
   public function testLanguageFallback(): void {
     // Test all entity variations with data table support.
-    foreach (entity_test_entity_types(ENTITY_TEST_TYPES_MULTILINGUAL) as $entity_type) {
+    foreach (entity_test_entity_types(EntityTestTypesFilter::Multilingual) as $entity_type) {
       $this->doTestLanguageFallback($entity_type);
     }
   }
@@ -716,7 +717,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
    */
   public function testLanguageChange(): void {
     // Test all entity variations with data table support.
-    foreach (entity_test_entity_types(ENTITY_TEST_TYPES_MULTILINGUAL) as $entity_type) {
+    foreach (entity_test_entity_types(EntityTestTypesFilter::Multilingual) as $entity_type) {
       $this->doTestLanguageChange($entity_type);
     }
   }
