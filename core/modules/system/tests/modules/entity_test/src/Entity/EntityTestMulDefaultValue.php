@@ -8,6 +8,7 @@ use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\entity_test\Callbacks;
 use Drupal\entity_test\EntityTestAccessControlHandler;
 use Drupal\entity_test\EntityTestDeleteForm;
 use Drupal\entity_test\EntityTestForm;
@@ -57,7 +58,7 @@ class EntityTestMulDefaultValue extends EntityTestMul {
     $fields['description'] = BaseFieldDefinition::create('shape')
       ->setLabel(t('Some custom description'))
       ->setTranslatable(TRUE)
-      ->setDefaultValueCallback('entity_test_field_default_value');
+      ->setDefaultValueCallback([Callbacks::class, 'entityTestFieldDefaultValue']);
 
     return $fields;
   }

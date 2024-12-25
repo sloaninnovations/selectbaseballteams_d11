@@ -547,8 +547,8 @@ class EntityTranslationTest extends EntityLanguageTestBase {
 
     // Check that per-language defaults are properly populated. The
     // 'entity_test_mul_default_value' entity type is translatable and uses
-    // entity_test_field_default_value() as a "default value callback" for its
-    // 'description' field.
+    // Drupal\entity_test\Callbacks::entityTestFieldDefaultValue() as
+    // a "default value callback" for its 'description' field.
     $entity = $this->entityTypeManager
       ->getStorage('entity_test_mul_default_value')
       ->create(['name' => $this->randomMachineName(), 'langcode' => $langcode]);
