@@ -103,19 +103,3 @@ function entity_test_delete_bundle($bundle, $entity_type = 'entity_test') {
 
   \Drupal::service('entity_bundle.listener')->onBundleDelete($bundle, $entity_type);
 }
-
-/**
- * Helper function to be used to record hook invocations.
- *
- * @param string $hook
- *   The hook name.
- * @param mixed $data
- *   Arbitrary data associated with the hook invocation.
- */
-function _entity_test_record_hooks($hook, $data) {
-  $state = \Drupal::state();
-  $key = 'entity_test.hooks';
-  $hooks = $state->get($key);
-  $hooks[$hook] = $data;
-  $state->set($key, $hooks);
-}
