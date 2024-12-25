@@ -210,6 +210,19 @@ interface ModuleHandlerInterface {
   public function hasImplementations(string $hook, $modules = NULL): bool;
 
   /**
+   * Determines whether there are implementations of a hook for a module.
+   *
+   * @param string $hook
+   *   The name of the hook (e.g. "preprocess" or "preprocess__HOOK").
+   * @param string $module
+   *   A single module to get their implementations of a hook.
+   *
+   * @return array
+   *   An array of callables for the given hook and module.
+   */
+  public function getModuleImplementations(string $hook, string $module): array;
+
+  /**
    * Executes a callback for each implementation of a hook.
    *
    * The callback is passed two arguments, a closure which executes a hook

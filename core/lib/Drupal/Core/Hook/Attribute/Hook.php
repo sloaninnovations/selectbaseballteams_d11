@@ -75,9 +75,6 @@ namespace Drupal\Core\Hook\Attribute;
  * - hook_update_last_removed()
  * - hook_update_N()
  *
- * Theme hooks:
- * - hook_preprocess_HOOK()
- *
  * @section sec_backwards_compatibility Backwards-compatibility
  *
  * To allow hook implementations to work on older versions of Drupal as well,
