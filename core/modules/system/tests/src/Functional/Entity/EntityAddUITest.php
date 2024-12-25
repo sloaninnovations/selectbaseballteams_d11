@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Functional\Entity;
 use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\entity_test\Entity\EntityTestMul;
 use Drupal\entity_test\Entity\EntityTestWithBundle;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -142,7 +143,7 @@ class EntityAddUITest extends BrowserTestBase {
     ]);
     $this->drupalLogin($admin_user);
 
-    entity_test_create_bundle('test', 'Test label', 'entity_test_mul');
+    EntityTestHelper::createBundle('test', 'Test label', 'entity_test_mul');
     // Delete the default bundle, so that we can rely on our own. The form
     // display has to be deleted first to prevent schema errors when fields
     // attached to the deleted bundle are themselves deleted, which triggers
@@ -157,7 +158,7 @@ class EntityAddUITest extends BrowserTestBase {
     $this->assertSession()->addressEquals('/entity_test_mul/add/test');
 
     // Two bundles exist, confirm both are shown.
-    entity_test_create_bundle('test2', 'Test2 label', 'entity_test_mul');
+    EntityTestHelper::createBundle('test2', 'Test2 label', 'entity_test_mul');
     $this->drupalGet('/entity_test_mul/add');
 
     $this->assertSession()->linkExists('Test label');
