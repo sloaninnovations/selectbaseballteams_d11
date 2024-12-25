@@ -20,6 +20,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\entity_test\Callbacks;
 
 /**
  * Hook implementations for entity_test.
@@ -234,12 +235,14 @@ class EntityTestHooks {
   public function formEntityTestFormAlter(&$form) : void {
     switch (\Drupal::state()->get('entity_test.form.validate.test')) {
       case 'form-level':
-        $form['#validate'][] = 'entity_test_form_entity_test_form_validate';
-        $form['#validate'][] = 'entity_test_form_entity_test_form_validate_check';
+        $callbacks = new Callbacks();
+        $form['#validate'][] = [$callbacks, 'entityTestFormValidate'];
+        $form['#validate'][] = [$callbacks, 'entityTestFormValidateCheck'];
         break;
 
       case 'button-level':
-        $form['actions']['submit']['#validate'][] = 'entity_test_form_entity_test_form_validate';
+        $callbacks = new Callbacks();
+        $form['actions']['submit']['#validate'][] = [$callbacks, 'entityTestFormValidateCheck'];
     }
   }
 

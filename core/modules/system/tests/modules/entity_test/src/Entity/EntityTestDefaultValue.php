@@ -8,6 +8,7 @@ use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\entity_test\Callbacks;
 
 /**
  * Defines a test entity class for testing default values.
@@ -33,7 +34,7 @@ class EntityTestDefaultValue extends EntityTest {
 
     $fields['description'] = BaseFieldDefinition::create('shape')
       ->setLabel(t('Some custom description'))
-      ->setDefaultValueCallback('entity_test_field_default_value');
+      ->setDefaultValueCallback([Callbacks::class, 'entityTestFieldDefaultValue']);
 
     return $fields;
   }

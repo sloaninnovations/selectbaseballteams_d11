@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\entity_test;
 
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Simple object with callbacks.
  */
@@ -12,14 +16,14 @@ class Callbacks {
   /**
    * Validation handler for the entity_test entity form.
    */
-  function entity_test_form_entity_test_form_validate(array &$form, FormStateInterface $form_state) {
+  public function entityTestFormValidate(array &$form, FormStateInterface $form_state): void {
     $form['#entity_test_form_validate'] = TRUE;
   }
 
   /**
    * Validation handler for the entity_test entity form.
    */
-  function entity_test_form_entity_test_form_validate_check(array &$form, FormStateInterface $form_state) {
+  public function entityTestFormValidateCheck(array &$form, FormStateInterface $form_state): void {
     if (!empty($form['#entity_test_form_validate'])) {
       \Drupal::state()->set('entity_test.form.validate.result', TRUE);
     }
@@ -39,7 +43,7 @@ class Callbacks {
    *
    * @see \Drupal\field\Entity\FieldConfig::$default_value
    */
-  function entity_test_field_default_value(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
+  public function entityTestFieldDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition): array {
     // Include the field name and entity language in the generated values to check
     // that they are correctly passed.
     $string = $definition->getName() . '_' . $entity->language()->getId();
