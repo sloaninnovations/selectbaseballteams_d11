@@ -121,7 +121,7 @@ class RegistryTest extends KernelTestBase {
     $suggestions = ['__kitten', '__flamingo'];
     $expected_preprocess_functions = [
       'template_preprocess',
-      'theme_test_preprocess_theme_test_preprocess_suggestions',
+      '\theme_test_preprocess_theme_test_preprocess_suggestions',
     ];
     $suggestion = '';
     $hook = 'theme_test_preprocess_suggestions';
@@ -134,7 +134,7 @@ class RegistryTest extends KernelTestBase {
 
     $expected_preprocess_functions = [
       'template_preprocess',
-      'theme_test_preprocess_theme_test_preprocess_suggestions',
+      '\theme_test_preprocess_theme_test_preprocess_suggestions',
       'test_theme_preprocess_theme_test_preprocess_suggestions',
       'test_theme_preprocess_theme_test_preprocess_suggestions__kitten',
     ];
