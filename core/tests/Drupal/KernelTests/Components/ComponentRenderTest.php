@@ -363,7 +363,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
       '#variant' => 'red',
       '#props' => [
         'text' => 'Test link',
-      ]
+      ],
     ];
     $crawler = $this->renderComponentRenderArray($build);
     $this->assertNotEmpty($crawler->filter('#sdc-wrapper a[data-component-id="sdc_test:my-cta"][data-component-variant="red"]'));

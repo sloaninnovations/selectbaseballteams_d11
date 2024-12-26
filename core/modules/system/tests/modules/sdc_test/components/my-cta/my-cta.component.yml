@@ -28,10 +28,10 @@ props:
       name: Attributes
   variants:
     default:
-        title: Default
+      title: Default
     green:
-        title: Green
+      title: Green
     blue:
-        title: Blue
+      title: Blue
     red:
-        title: Red
+      title: Red
