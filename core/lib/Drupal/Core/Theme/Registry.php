@@ -3,6 +3,7 @@
 namespace Drupal\Core\Theme;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\DiffArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DestructableInterface;
@@ -736,7 +737,7 @@ class Registry implements DestructableInterface {
     if (isset($cache[$source_hook_name]) && (!isset($cache[$source_hook_name]['incomplete preprocess functions']) || !isset($cache[$destination_hook_name]['incomplete preprocess functions']))) {
       $cache[$destination_hook_name] = $parent_hook + $cache[$source_hook_name];
       if (isset($parent_hook['preprocess functions'])) {
-        $diff = array_diff($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions']);
+        $diff = DiffArray::diffAssocRecursive($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions']);
         $cache[$destination_hook_name]['preprocess functions'] = array_merge($cache[$source_hook_name]['preprocess functions'], $diff);
       }
       // If a base hook isn't set, this is the actual base hook.
