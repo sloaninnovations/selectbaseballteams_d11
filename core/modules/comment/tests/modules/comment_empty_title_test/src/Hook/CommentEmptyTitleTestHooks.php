@@ -15,7 +15,7 @@ class CommentEmptyTitleTestHooks {
    * Implements hook_preprocess_comment().
    */
   #[Hook('preprocess_comment')]
-  function preprocessComment(&$variables): void {
+  public function preprocessComment(&$variables): void {
     $variables['title'] = '';
   }
 
