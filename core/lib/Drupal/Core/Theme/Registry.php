@@ -832,8 +832,8 @@ class Registry implements DestructableInterface {
         $preprocess_functions = $cache[$hook]['preprocess functions'];
         $deduplicated = [];
         foreach ($preprocess_functions as $item) {
-            $key = is_array($item) ? json_encode($item) : $item;
-            $deduplicated[$key] = $item;
+          $key = is_array($item) ? json_encode($item) : $item;
+          $deduplicated[$key] = $item;
         }
         $cache[$hook]['preprocess functions'] = array_values($deduplicated);
       }
