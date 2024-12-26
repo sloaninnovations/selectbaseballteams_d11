@@ -243,3 +243,15 @@ parameters:
     # This is not applicable when a queue is suspended but does not specify
     # how long to wait before attempting to resume.
     suspendMaximumWait: 30
+
+  # Configure HTTP proactive content negotiation.
+  # Read https://developer.mozilla.org/en-US/docs/Web/HTTP/Content_negotiation
+  # for more information about the topic in general.
+  content_negotiation.config:
+    # Note: These settings will only be used if `enable_content_negotiation`
+    # is set to TRUE via settings.php. After Drupal 9.0, this configuration will
+    # be used regardless.
+    enabled: true
+    # Specify the headers by which responses may vary.
+    headers:
+      accept: true

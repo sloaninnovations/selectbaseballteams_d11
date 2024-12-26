@@ -46,6 +46,8 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    *   The time service.
    * @param bool $debugCacheabilityHeaders
    *   (optional) Whether to send cacheability headers for debugging purposes.
+   * @param array $content_negotiation_config
+   *   (optional) The content negotiation configuration container parameter.
    */
   public function __construct(
     protected LanguageManagerInterface $languageManager,
@@ -55,8 +57,15 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     protected CacheContextsManager $cacheContextsManager,
     protected TimeInterface $time,
     protected bool $debugCacheabilityHeaders = FALSE,
+    protected array $content_negotiation_config = [],
   ) {
     $this->config = $config_factory->get('system.performance');
+    if ($this->content_negotiation_config === []) {
+      $this->content_negotiation_config = [
+        'enabled' => FALSE,
+        'headers' => [],
+      ];
+    }
   }
 
   /**
@@ -246,13 +255,26 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     }
     $response->setEtag($timestamp);
 
-    // Allow HTTP proxies to cache pages for anonymous users without a session
-    // cookie. The Vary header is used to indicates the set of request-header
-    // fields that fully determines whether a cache is permitted to use the
-    // response to reply to a subsequent request for a given URL without
-    // revalidation.
-    if (!$response->hasVary() && !Settings::get('omit_vary_cookie')) {
-      $response->setVary('Cookie', FALSE);
+    if (!$response->hasVary()) {
+      // Allow HTTP proxies to cache pages for anonymous users without a session
+      // cookie. The Vary header is used to indicates the set of request-header
+      // fields that fully determines whether a cache is permitted to use the
+      // response to reply to a subsequent request for a given URL without
+      // revalidation.
+      if (!Settings::get('omit_vary_cookie')) {
+        $response->setVary('Cookie', FALSE);
+      }
+      // Allow HTTP proxies to cache pages in a manner that permits proactive
+      // content negotiation.
+      // @see https://tools.ietf.org/html/rfc7231#section-3.4.1
+      if ($this->content_negotiation_config['enabled']) {
+        $content_negotiation_headers = $this->content_negotiation_config['headers'];
+        // Do not vary by the `accept` header if the request format was
+        // negotiated by query parameter.
+        $content_negotiation_headers['accept'] = $content_negotiation_headers['accept'] && !$request->query->has('_format');
+        $content_negotiation_headers = array_keys(array_filter($content_negotiation_headers));
+        $response->setVary($content_negotiation_headers, FALSE);
+      }
     }
   }
 

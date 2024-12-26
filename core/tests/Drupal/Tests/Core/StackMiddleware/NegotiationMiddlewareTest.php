@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\StackMiddleware;
 
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StackMiddleware\NegotiationMiddleware;
 use Drupal\Tests\UnitTestCase;
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,7 +52,7 @@ class NegotiationMiddlewareTest extends UnitTestCase {
   }
 
   /**
-   * Tests the specifying a format via query parameters gets used.
+   * Tests that specifying a format via query parameters gets used.
    *
    * @covers ::getContentType
    */
@@ -59,6 +61,42 @@ class NegotiationMiddlewareTest extends UnitTestCase {
     $request->query->set('_format', 'bob');
 
     $this->assertSame('bob', $this->contentNegotiation->getContentType($request));
+  }
+
+  /**
+   * Tests (conditionally) specifying a format via the Accept header.
+   *
+   * @covers ::getContentType
+   */
+  public function testFormatFromAcceptHeader() {
+    // Set mock content negotiation config.
+    $this->contentNegotiation->setContentNegotiationConfig([
+      'enabled' => TRUE,
+      'headers' => [
+        'accept' => TRUE,
+      ],
+    ]);
+    // By default, Drupal does not recognize the Accept header.
+    $request = new Request();
+    $request->headers->add(['Accept' => 'text/html, application/json']);
+    $this->assertNull($this->contentNegotiation->getContentType($request));
+    // Opt in to Accept header content negotiation.
+    new Settings(['use_http_accept_header_negotiation' => TRUE]);
+    // Must be unambiguous.
+    $this->assertNull($this->contentNegotiation->getContentType($request));
+    // The query string still takes precedence.
+    $request->query->set('_format', 'jane');
+    $this->assertSame('jane', $this->contentNegotiation->getContentType($request));
+    // Type is unambiguous but still unknown.
+    $request = new Request();
+    $request->headers->add(['Accept' => 'not/registered']);
+    $this->assertNull($this->contentNegotiation->getContentType($request));
+    // Unambiguous and valid.
+    $request = new Request();
+    $request->headers->add(['Accept' => 'application/json']);
+    $this->assertSame('json', $this->contentNegotiation->getContentType($request));
+    // Unset settings so as not to interfere with other methods.
+    new Settings([]);
   }
 
   /**
@@ -101,6 +139,7 @@ class NegotiationMiddlewareTest extends UnitTestCase {
     // Some getContentType calls we don't really care about but have to mock.
     $request_mock = $request->reveal();
     $request_mock->query = new InputBag();
+    $request_mock->headers = new HeaderBag([]);
     $request_mock->request = new InputBag();
 
     // Calling kernel app with default arguments.
