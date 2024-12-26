@@ -143,7 +143,10 @@ class HookCollectorPass implements CompilerPassInterface {
     $module_preg = '/^(?<function>(?<module>' . implode('|', $modules) . ')_(?!preprocess_)(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
     $collector = new static();
     foreach ($module_filenames as $module => $info) {
-      $skip_procedural = isset($container) ? $container->hasParameter("$module.hooks_converted") : FALSE;
+      $skip_procedural = FALSE;
+      if ($container?->hasParameter("$module.hooks_converted")) {
+        $skip_procedural = $container->getParameter("$module.hooks_converted");
+      }
       $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $module_preg, $skip_procedural);
     }
     return $collector;
@@ -382,7 +385,7 @@ class HookCollectorPass implements CompilerPassInterface {
       'hook_install_tasks_alter',
     ];
 
-    if (in_array($hook->hook, $staticDenyHooks) || preg_match('/^(post_update_|preprocess_|process_|update_\d+$)/', $hook->hook)) {
+    if (in_array($hook->hook, $staticDenyHooks) || preg_match('/^(post_update_|preprocess_|update_\d+$)/', $hook->hook)) {
       throw new \LogicException("The hook $hook->hook on class $class does not support attributes and must remain procedural.");
     }
   }
