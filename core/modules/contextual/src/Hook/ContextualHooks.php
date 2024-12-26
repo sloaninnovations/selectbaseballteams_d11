@@ -125,7 +125,7 @@ class ContextualHooks {
    * @see \Drupal\contextual\ContextualController::render()
    */
   #[Hook('preprocess')]
-  function preprocess(&$variables, $hook, $info) {
+  public function preprocess(&$variables, $hook, $info): void {
     // Determine the primary theme function argument.
     if (!empty($info['variables'])) {
       $keys = array_keys($info['variables']);
