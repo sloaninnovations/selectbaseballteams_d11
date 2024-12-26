@@ -3,13 +3,17 @@
 namespace Drupal\layout_builder\Element;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxHelperTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElementBase;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Url;
 use Drupal\layout_builder\Context\LayoutBuilderContextTrait;
 use Drupal\layout_builder\Event\PrepareLayoutEvent;
@@ -94,7 +98,65 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
    */
   public static function layoutBuilderElementGetKeys(array $element, FormStateInterface $form_state, &$form): array {
     $form['#layout_builder_element_keys'] = $element['#array_parents'];
+    $form['#pre_render'][] = [static::class, 'moveLayoutBuilderOutsideForm'];
+    $form['#post_render'][] = [static::class, 'addRenderedLayoutBuilder'];
     return $element;
+  }
+
+  /**
+   * Render API #pre_render callback that moves out layout builder element.
+   *
+   * The layout builder element gets moved to a property on the $form array
+   * that will not be rendered. The property will get rendered separately.
+   *
+   * @see ::addRenderedLayoutBuilder())
+   *
+   * @param array $form
+   *   The rendered form.
+   *
+   * @return array
+   */
+  #[TrustedCallback]
+  public static function moveLayoutBuilderOutsideForm(array $form): array {
+    if (isset($form['#layout_builder_element_keys'])) {
+      $layout_builder_element = &NestedArray::getValue($form, $form['#layout_builder_element_keys']);
+      // Render the layout builder element in its own context.
+      $context = new RenderContext();
+      $renderer = \Drupal::service('renderer');
+      // Save the rendered layout builder HTML.
+      $form['#layout_builder_markup'] = $renderer->executeInRenderContext($context, function () use ($layout_builder_element, $renderer) {
+        return $renderer->render($layout_builder_element);
+      });
+
+      // Add the cacheable metadata from the context to the form.
+      $lb_metadata = $context->pop();
+      BubbleableMetadata::createFromRenderArray($form)
+        ->merge($lb_metadata)
+        ->applyTo($form);
+
+      // Remove the layout builder child element within form array.
+      $layout_builder_element = [];
+    }
+    return $form;
+  }
+
+  /**
+   * Render API #post_render callback that adds layout builder markup to form.
+   *
+   * @param string $html
+   *   The rendered form.
+   * @param array $form
+   *   The form render array.
+   *
+   * @return string
+   */
+  #[TrustedCallback]
+  public static function addRenderedLayoutBuilder(string $html, array $form): string {
+    if (isset($form['#layout_builder_markup'])) {
+      $html .= $form['#layout_builder_markup'];
+    }
+
+    return $html;
   }
 
   /**
