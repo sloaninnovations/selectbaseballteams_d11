@@ -210,7 +210,7 @@ interface ModuleHandlerInterface {
   public function hasImplementations(string $hook, $modules = NULL): bool;
 
   /**
-   * Determines whether there are implementations of a hook for a module.
+   * Returns the implementation for a hook and module combination.
    *
    * @param string $hook
    *   The name of the hook (e.g. "preprocess" or "preprocess__HOOK").
