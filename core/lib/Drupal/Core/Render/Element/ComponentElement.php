@@ -84,7 +84,7 @@ class ComponentElement extends RenderElementBase {
    * @param string $id
    *   The component id.
    * @param string $variant
-   * *   The variant id.
+   *   The variant id.
    * @param array $slots
    *   The contents of any potential embed blocks.
    * @param array $slots_alter_callbacks
