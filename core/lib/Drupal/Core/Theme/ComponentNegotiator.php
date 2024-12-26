@@ -70,10 +70,6 @@ class ComponentNegotiator {
   private function doNegotiate(string $component_id, array $all_definitions): ?string {
     // Consider only the component definitions matching the component ID in the
     // 'replaces' key.
-    $variant = '';
-    if (strpos($component_id, Component::TEMPLATE_VARIANT_SEPARATOR) > 0) {
-      [$component_id, $variant] = explode(Component::TEMPLATE_VARIANT_SEPARATOR, $component_id);
-    }
     $matches = array_filter(
       $all_definitions,
       static fn(array $definition) => $component_id === ($definition['replaces'] ?? NULL),
@@ -161,10 +157,6 @@ class ComponentNegotiator {
    *   The cache key.
    */
   private function generateCacheKey(string $component_id): string {
-    $variant = '';
-    if (strpos($component_id, Component::TEMPLATE_VARIANT_SEPARATOR) > 0) {
-      [$component_id, $variant] = explode(Component::TEMPLATE_VARIANT_SEPARATOR, $component_id);
-    }
     return sprintf(
       'component-negotiation::%s::%s',
       $component_id,

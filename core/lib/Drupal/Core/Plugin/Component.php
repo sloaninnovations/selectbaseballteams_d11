@@ -10,8 +10,6 @@ use Drupal\Core\Render\Component\Exception\InvalidComponentException;
  */
 class Component extends PluginBase {
 
-  public const TEMPLATE_VARIANT_SEPARATOR = '--';
-
   /**
    * The component's metadata.
    *
@@ -27,18 +25,20 @@ class Component extends PluginBase {
   public readonly string $machineName;
 
   /**
+   * The Twig template for the component.
+   * The library definition to be attached with the component.
+   *
+   * @var string
+   * @var array
+   */
+  public readonly string $template;
+
+  /**
    * The library definition to be attached with the component.
    *
    * @var array
    */
   public readonly array $library;
-
-  /**
-   * The templates to be rendered with the component.
-   *
-   * @var array
-   */
-  public readonly array $templates;
 
   /**
    * Component constructor.
@@ -59,6 +59,7 @@ class Component extends PluginBase {
       );
       throw new InvalidComponentException($message);
     }
+    $this->template = $template;
     $this->machineName = $plugin_definition['machineName'];
     $this->library = $plugin_definition['library'] ?? [];
     $this->metadata = new ComponentMetadata(
@@ -66,13 +67,6 @@ class Component extends PluginBase {
       $configuration['app_root'],
       (bool) ($configuration['enforce_schemas'] ?? FALSE)
     );
-    $templates = [$template];
-    if (isset($plugin_definition['variants'])) {
-      foreach ($plugin_definition['variants'] as $variant) {
-        $templates[$variant] = $this->machineName . self::TEMPLATE_VARIANT_SEPARATOR . $variant . '.twig';
-      }
-    }
-    $this->templates = $templates;
   }
 
   /**
@@ -81,19 +75,8 @@ class Component extends PluginBase {
    * @return string|null
    *   The path to the template.
    */
-  public function getTemplatePath($variant = NULL): ?string {
-    return $this->metadata->path . DIRECTORY_SEPARATOR . $this->getTemplate($variant);
-  }
-
-  public function __get(string $name) {
-    if ($name === 'template') {
-      return $this->getTemplate('');
-    }
-    return $this->{$name};
-  }
-
-  public function getTemplate($variant): ?string {
-    return !empty($variant) ? $this->templates[$variant] : $this->templates[0] ;
+  public function getTemplatePath(): ?string {
+    return $this->metadata->path . DIRECTORY_SEPARATOR . $this->template;
   }
 
   /**

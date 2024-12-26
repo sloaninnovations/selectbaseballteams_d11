@@ -30,13 +30,6 @@ final class ComponentsTwigExtension extends AbstractExtension {
     protected ComponentValidator $componentValidator,
   ) {}
 
-
-  public function getTokenParsers() {
-    return [
-      new ComponentsEmbedParser($this->pluginManager),
-    ];
-  }
-
   /**
    * {@inheritdoc}
    */
