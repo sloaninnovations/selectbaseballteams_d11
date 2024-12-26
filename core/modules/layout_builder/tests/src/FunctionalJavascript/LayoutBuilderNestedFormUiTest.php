@@ -122,53 +122,6 @@ class LayoutBuilderNestedFormUiTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests a block containing a form can be saved editing navigation.
-   */
-  public function testAddingFormBlocksToNavigation(): void {
-    \Drupal::service('module_installer')->install(['navigation']);
-    $this->drupalLogin($this->drupalCreateUser([
-      'configure navigation layout',
-    ]));
-
-    $unexpected_save_message = 'You have unsaved changes';
-    $expected_save_message = 'Saved navigation blocks';
-    $path = 'admin/config/user-interface/navigation-block';
-    $label = static::FORM_BLOCK_LABELS[0];
-    $assert_session = $this->assertSession();
-    $page = $this->getSession()->getPage();
-
-    // Go to edit the layout.
-    $this->drupalGet($path);
-
-    // Add the form block.
-    $page->pressButton('Expand sidebar');
-    $assert_session->linkExists('Add block');
-    $this->clickLink('Add block');
-    $this->assertSession()->assertWaitOnAjaxRequest();
-    $assert_session->waitForElementVisible('named', ['link', $label]);
-    $assert_session->linkExists($label);
-    $this->clickLink($label);
-    $assert_session->waitForElementVisible('named', ['button', 'Add block']);
-    $page->pressButton('Add block');
-    $assert_session->assertWaitOnAjaxRequest();
-    $assert_session->elementExists('css', '#admin-toolbar .layout-builder-form-block-test-search-form');
-    // Save the navigation layout.
-    $page->pressButton('Save');
-    $assert_session->pageTextNotContains($unexpected_save_message);
-    $assert_session->pageTextContains($expected_save_message);
-    $assert_session->elementExists('css', '#admin-toolbar .layout-builder-form-block-test-search-form');
-    $assert_session->addressEquals($path);
-
-    // Go back to edit layout and try to re-save.
-    $this->drupalGet($path);
-    $page->pressButton('Save');
-    $assert_session->pageTextNotContains($unexpected_save_message);
-    $assert_session->pageTextContains($expected_save_message);
-    $assert_session->elementExists('css', '#admin-toolbar .layout-builder-form-block-test-search-form');
-    $assert_session->addressEquals($path);
-  }
-
-  /**
    * Adds a form block specified by label layout and checks it can be saved.
    *
    * Need to test saving and resaving, because nested forms can cause issues

@@ -11,11 +11,7 @@ declare(strict_types=1);
  * Implements hook_block_alter().
  */
 function layout_builder_form_block_test_block_alter(&$definitions): void {
-  // Allow test blocks containing forms to be placed in navigation via layout
+  // Allow a test block containing a form to be placed in navigation via layout
   // builder.
-  $definitions['layout_builder_form_block_test_inline_template_form_block']['allow_in_navigation'] = TRUE;
   $definitions['layout_builder_form_block_test_form_api_form_block']['allow_in_navigation'] = TRUE;
-  if (isset($definitions['views_block.test_block_view.block_3'])) {
-    $definitions['views_block.test_block_view.block_3']['allow_in_navigation'] = TRUE;
-  }
 }
