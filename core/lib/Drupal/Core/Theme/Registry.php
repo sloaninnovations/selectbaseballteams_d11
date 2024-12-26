@@ -616,27 +616,12 @@ class Registry implements DestructableInterface {
             // Only use non-hook-specific variable preprocessors for theming
             // hooks implemented as templates. See the @defgroup themeable
             // topic.
-            if (isset($info['template'])) {
-              if ($this->moduleHandler->hasImplementations('preprocess', $prefix)) {
-                $implementations = $this->moduleHandler->getModuleImplementations('preprocess', $prefix);
-                $info['preprocess functions'][] = reset($implementations);
-              }
-              elseif (function_exists($prefix . '_preprocess')) {
-                $info['preprocess functions'][] = $prefix . '_preprocess';
-              }
+            if (isset($info['template']) && $this->moduleHandler->hasImplementations('preprocess', [$prefix], TRUE)) {
+              $info['preprocess functions'][] = ['module' => $prefix, 'hook' => 'preprocess'];
             }
 
-            // Prefix is only template once so check other cases first.
-            if ($prefix != 'template' && $this->moduleHandler->hasImplementations('preprocess_' . $hook, $prefix)) {
-              $implementations = $this->moduleHandler->getModuleImplementations('preprocess_' . $hook, $prefix);
-              $info['preprocess functions'][] = reset($implementations);
-            }
-            elseif ($prefix == 'template' && $this->moduleHandler->hasImplementations('template_preprocess', $hook)) {
-              $implementations = $this->moduleHandler->getModuleImplementations('template_preprocess', $hook);
-              $info['preprocess functions'][] = reset($implementations);
-            }
-            elseif (function_exists($prefix . '_preprocess_' . $hook)) {
-              $info['preprocess functions'][] = $prefix . '_preprocess_' . $hook;
+            if ($this->moduleHandler->hasImplementations('preprocess_' . $hook, [$prefix], TRUE)) {
+              $info['preprocess functions'][] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
             }
           }
         }
