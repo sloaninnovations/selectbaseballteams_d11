@@ -66,6 +66,13 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected array $invokeMap = [];
 
   /**
+   * Legacy implementations.
+   *
+   * @var array
+   */
+  protected array $hasLegacyHookAttribute = [];
+
+  /**
    * Constructs a ModuleHandler object.
    *
    * @param string $root
@@ -293,9 +300,20 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasImplementations(string $hook, $modules = NULL): bool {
+  public function hasImplementations(string $hook, $modules = NULL, $legacy = FALSE): bool {
     $implementation_modules = array_keys($this->getHookListeners($hook));
-    return (bool) (isset($modules) ? array_intersect($implementation_modules, (array) $modules) : $implementation_modules);
+    $return = (bool) (isset($modules) ? array_intersect($implementation_modules, (array) $modules) : $implementation_modules);
+    if ($return) {
+      return TRUE;
+    }
+    if ($legacy && $modules) {
+      foreach ($modules as $module) {
+        if ($this->canLegacyInvoke($module, $hook)) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -346,12 +364,22 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   protected function legacyInvoke($module, $hook, array $args = []) {
     $this->load($module);
-    $function = $module . '_' . $hook;
-    if (function_exists($function) && !(new \ReflectionFunction($function))->getAttributes(LegacyHook::class)) {
+    if ($function = $this->canLegacyInvoke($module, $hook)) {
       return $function(... $args);
     }
 
     return NULL;
+  }
+
+  protected function canLegacyInvoke($module, $hook): string|FALSE {
+    $function = $module . '_' . $hook;
+    if (!function_exists($function)) {
+      return FALSE;
+    }
+    if (!isset($this->hasLegacyHookAttribute[$function])) {
+      $this->hasLegacyHookAttribute[$function] = !(new \ReflectionFunction($function))->getAttributes(LegacyHook::class);
+    }
+    return $this->hasLegacyHookAttribute[$function] ? $function : FALSE;
   }
 
   /**
@@ -568,7 +596,7 @@ class ModuleHandler implements ModuleHandlerInterface {
           else {
             $callable = $listener;
           }
-          if (isset($this->moduleList[$module])) {
+          if (isset($this->moduleList[$module]) || $module === 'template') {
             $this->invokeMap[$hook][$module][] = $callable;
           }
         }
