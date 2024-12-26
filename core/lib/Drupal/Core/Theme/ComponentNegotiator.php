@@ -4,7 +4,6 @@ namespace Drupal\Core\Theme;
 
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Plugin\Component;
 
 /**
  * Determines which component should be used.

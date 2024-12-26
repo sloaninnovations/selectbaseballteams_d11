@@ -44,10 +44,6 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
    * {@inheritdoc}
    */
   public function leaveNode(Node $node, Environment $env): ?Node {
-    if ($node instanceof EmbedNode) {
-      return $node;
-    }
-
     if (!$node instanceof ModuleNode) {
       return $node;
     }
@@ -91,6 +87,7 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
         ...$print_nodes,
       ]),
     );
+
     if ($env->isDebug()) {
       // Append the closing comment to the display_end node.
       $node->setNode(
@@ -127,17 +124,6 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
     catch (ComponentNotFoundException) {
       return NULL;
     }
-  }
-
-  protected function getVariant(Node $node) : string {
-    $templateName = $node->getTemplateName();
-    if (strpos($templateName, Component::TEMPLATE_VARIANT_SEPARATOR) !== false) {
-      [$component_id, $variant] = explode(Component::TEMPLATE_VARIANT_SEPARATOR, $templateName, 2);
-    }
-    else {
-      [$component_id, $variant] = [$templateName, ''];
-    }
-    return $variant;
   }
 
   /**
