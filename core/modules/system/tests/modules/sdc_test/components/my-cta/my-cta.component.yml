@@ -26,3 +26,12 @@ props:
     attributes:
       type: Drupal\Core\Template\Attribute
       name: Attributes
+  variants:
+    default:
+        title: Default
+    green:
+        title: Green
+    blue:
+        title: Blue
+    red:
+        title: Red
