@@ -690,8 +690,9 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     if (is_subclass_of($this->getFieldItemClass(), OptionsProviderInterface::class)) {
       try {
         $items = $entity->get($this->getName());
+        $new_field_item = \Drupal::service('plugin.manager.field.field_type')->createFieldItem($items, 0);
       }
-      catch (\InvalidArgumentException) {
+      catch (\Throwable) {
         // When a field doesn't exist, create a new field item list using a
         // temporary base field definition. This step is necessary since there
         // may not be a field configuration for the storage when creating a new
@@ -700,8 +701,9 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
         $field_storage = BaseFieldDefinition::createFromFieldStorageDefinition($this);
         $entity_adapter = EntityAdapter::createFromEntity($entity);
         $items = \Drupal::typedDataManager()->create($field_storage, name: $field_storage->getName(), parent: $entity_adapter);
+        $new_field_item = \Drupal::service('plugin.manager.field.field_type')->createFieldItem($items, 0);
       }
-      return \Drupal::service('plugin.manager.field.field_type')->createFieldItem($items, 0);
+      return $new_field_item;
     }
     // @todo Allow setting custom options provider.
     //   https://www.drupal.org/node/2002138.
