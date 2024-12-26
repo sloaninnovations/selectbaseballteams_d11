@@ -9,10 +9,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
-use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElementBase;
-use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Url;
 use Drupal\layout_builder\Context\LayoutBuilderContextTrait;
@@ -106,8 +104,8 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
   /**
    * Render API #pre_render callback that moves out layout builder element.
    *
-   * The layout builder element gets moved to a property on the $form array
-   * that will not be rendered. The property will get rendered separately.
+   * Because the layout builder element can contain components with forms, it
+   * needs to exist outside forms within the DOM, to avoid nested form tags.
    *
    * @see ::addRenderedLayoutBuilder())
    *
@@ -120,20 +118,8 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
   public static function moveLayoutBuilderOutsideForm(array $form): array {
     if (isset($form['#layout_builder_element_keys'])) {
       $layout_builder_element = &NestedArray::getValue($form, $form['#layout_builder_element_keys']);
-      // Render the layout builder element in its own context.
-      $context = new RenderContext();
-      $renderer = \Drupal::service('renderer');
-      // Save the rendered layout builder HTML.
-      $form['#layout_builder_markup'] = $renderer->executeInRenderContext($context, function () use ($layout_builder_element, $renderer) {
-        return $renderer->render($layout_builder_element);
-      });
-
-      // Add the cacheable metadata from the context to the form.
-      $lb_metadata = $context->pop();
-      BubbleableMetadata::createFromRenderArray($form)
-        ->merge($lb_metadata)
-        ->applyTo($form);
-
+      // Save the rendered layout builder HTML to a non-rendering child key.
+      $form['#layout_builder_markup'] = \Drupal::service('renderer')->render($layout_builder_element);
       // Remove the layout builder child element within form array.
       $layout_builder_element = [];
     }
