@@ -26,10 +26,8 @@ class Component extends PluginBase {
 
   /**
    * The Twig template for the component.
-   * The library definition to be attached with the component.
    *
    * @var string
-   * @var array
    */
   public readonly string $template;
 
