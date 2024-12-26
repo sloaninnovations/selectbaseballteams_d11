@@ -27,10 +27,20 @@
       }
     },
     "variantDefinition": {
-      "type": "array",
+      "type": "object",
       "patternProperties": {
         "^[a-zA-Z0-9_-]$": {
-          "type": "string"
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "title": "Title"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description"
+            }
+          }
         }
       }
     },
