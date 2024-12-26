@@ -15,7 +15,9 @@ use Drupal\field\FieldStorageConfigInterface;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\field\FieldConfigInterface;
 use Drupal\comment\Entity\CommentType;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
@@ -526,6 +528,153 @@ class CommentHooks {
     // The `comment` field type belongs in the `general` category, so the
     // libraries need to be attached using an alter hook.
     $definitions[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY]['libraries'][] = 'comment/drupal.comment-icon';
+  }
+
+  /**
+   * Prepares variables for comment templates.
+   *
+   * By default this function performs special preprocessing of some base fields
+   * so they are available as variables in the template. For example 'subject'
+   * appears as 'title'. This preprocessing is skipped if:
+   * - a module makes the field's display configurable via the field UI by means
+   *   of BaseFieldDefinition::setDisplayConfigurable()
+   * - AND the additional entity type property
+   *   'enable_base_field_custom_preprocess_skipping' has been set using
+   *   hook_entity_type_build().
+   *
+   * Default template: comment.html.twig.
+   *
+   * @param array $variables
+   *   An associative array containing:
+   *   - elements: An associative array containing the comment and entity objects.
+   *     Array keys: #comment, #commented_entity.
+   */
+  #[Hook('template_preprocess')]
+  public function templatePreprocessComment(&$variables): void {
+    /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
+    $date_formatter = \Drupal::service('date.formatter');
+    /** @var \Drupal\comment\CommentInterface $comment */
+    $comment = $variables['elements']['#comment'];
+    $commented_entity = $comment->getCommentedEntity();
+    $variables['comment'] = $comment;
+    $variables['commented_entity'] = $commented_entity;
+    $variables['threaded'] = $variables['elements']['#comment_threaded'];
+
+    $skip_custom_preprocessing = $comment->getEntityType()->get('enable_base_field_custom_preprocess_skipping');
+
+    // Make created, uid, pid and subject fields available separately. Skip this
+    // custom preprocessing if the field display is configurable and skipping has
+    // been enabled.
+    // @todo https://www.drupal.org/project/drupal/issues/3015623
+    //   Eventually delete this code and matching template lines. Using
+    //   $variables['content'] is more flexible and consistent.
+    $submitted_configurable = $comment->getFieldDefinition('created')->isDisplayConfigurable('view') || $comment->getFieldDefinition('uid')->isDisplayConfigurable('view');
+
+    if (!$skip_custom_preprocessing || !$submitted_configurable) {
+      $account = $comment->getOwner();
+      $username = [
+        '#theme' => 'username',
+        '#account' => $account,
+      ];
+      $variables['author'] = \Drupal::service('renderer')->render($username);
+      $variables['author_id'] = $comment->getOwnerId();
+      $variables['new_indicator_timestamp'] = $comment->getChangedTime();
+      $variables['created'] = $date_formatter->format($comment->getCreatedTime());
+      // Avoid calling DateFormatterInterface::format() twice on the same timestamp.
+      if ($comment->getChangedTime() == $comment->getCreatedTime()) {
+        $variables['changed'] = $variables['created'];
+      }
+      else {
+        $variables['changed'] = $date_formatter->format($comment->getChangedTime());
+      }
+
+      if (theme_get_setting('features.comment_user_picture')) {
+        // To change user picture settings (for instance, image style), edit the
+        // 'compact' view mode on the User entity.
+        $variables['user_picture'] = \Drupal::entityTypeManager()
+          ->getViewBuilder('user')
+          ->view($account, 'compact');
+      }
+      else {
+        $variables['user_picture'] = [];
+      }
+
+      $variables['submitted'] = t('Submitted by @username on @datetime', ['@username' => $variables['author'], '@datetime' => $variables['created']]);
+    }
+
+    if (isset($comment->in_preview)) {
+      $variables['permalink'] = Link::fromTextAndUrl(t('Permalink'), Url::fromRoute('<front>'))->toString();
+    }
+    else {
+      $variables['permalink'] = Link::fromTextAndUrl(t('Permalink'), $comment->permalink())->toString();
+    }
+
+    if (($comment_parent = $comment->getParentComment()) && (!$skip_custom_preprocessing || !$comment->getFieldDefinition('pid')->isDisplayConfigurable('view'))) {
+      // Fetch and store the parent comment information for use in templates.
+      $account_parent = $comment_parent->getOwner();
+      $variables['parent_comment'] = $comment_parent;
+      $username = [
+        '#theme' => 'username',
+        '#account' => $account_parent,
+      ];
+      $variables['parent_author'] = \Drupal::service('renderer')->render($username);
+      $variables['parent_created'] = $date_formatter->format($comment_parent->getCreatedTime());
+      // Avoid calling DateFormatterInterface::format() twice on same timestamp.
+      if ($comment_parent->getChangedTime() == $comment_parent->getCreatedTime()) {
+        $variables['parent_changed'] = $variables['parent_created'];
+      }
+      else {
+        $variables['parent_changed'] = $date_formatter->format($comment_parent->getChangedTime());
+      }
+      $permalink_uri_parent = $comment_parent->permalink();
+      $attributes = $permalink_uri_parent->getOption('attributes') ?: [];
+      $attributes += ['class' => ['permalink'], 'rel' => 'bookmark'];
+      $permalink_uri_parent->setOption('attributes', $attributes);
+      $variables['parent_title'] = Link::fromTextAndUrl($comment_parent->getSubject(), $permalink_uri_parent)->toString();
+      $variables['parent_permalink'] = Link::fromTextAndUrl(t('Parent permalink'), $permalink_uri_parent)->toString();
+      $variables['parent'] = t('In reply to @parent_title by @parent_username',
+          ['@parent_username' => $variables['parent_author'], '@parent_title' => $variables['parent_title']]);
+    }
+    else {
+      $variables['parent_comment'] = '';
+      $variables['parent_author'] = '';
+      $variables['parent_created'] = '';
+      $variables['parent_changed'] = '';
+      $variables['parent_title'] = '';
+      $variables['parent_permalink'] = '';
+      $variables['parent'] = '';
+    }
+
+    if (!$skip_custom_preprocessing || !$comment->getFieldDefinition('subject')->isDisplayConfigurable('view')) {
+      if (isset($comment->in_preview)) {
+        $variables['title'] = Link::fromTextAndUrl($comment->getSubject(), Url::fromRoute('<front>'))->toString();
+      }
+      else {
+        $uri = $comment->permalink();
+        $attributes = $uri->getOption('attributes') ?: [];
+        $attributes += ['class' => ['permalink'], 'rel' => 'bookmark'];
+        $uri->setOption('attributes', $attributes);
+        $variables['title'] = Link::fromTextAndUrl($comment->getSubject(), $uri)->toString();
+      }
+    }
+
+    // Helpful $content variable for templates.
+    foreach (Element::children($variables['elements']) as $key) {
+      $variables['content'][$key] = $variables['elements'][$key];
+    }
+
+    // Set status to a string representation of comment->status.
+    if (isset($comment->in_preview)) {
+      $variables['status'] = 'preview';
+    }
+    else {
+      $variables['status'] = $comment->isPublished() ? 'published' : 'unpublished';
+    }
+
+    // Add comment author user ID. Necessary for the comment-by-viewer library.
+    $variables['attributes']['data-comment-user-id'] = $comment->getOwnerId();
+    // Add anchor for each comment.
+    $variables['attributes']['id'] = 'comment-' . $comment->id();
   }
 
 }

@@ -624,7 +624,11 @@ class Registry implements DestructableInterface {
                 $info['preprocess functions'][] = $prefix . '_preprocess';
               }
             }
-            if ($this->moduleHandler->hasImplementations('preprocess_' . $hook, $prefix)) {
+            if ($prefix == 'template' && $this->moduleHandler->hasImplementations('template_preprocess', $hook)) {
+              $implementations = $this->moduleHandler->getModuleImplementations('template_preprocess', $hook);
+              $info['preprocess functions'][] = reset($implementations);
+            }
+            elseif ($prefix != 'template' && $this->moduleHandler->hasImplementations('preprocess_' . $hook, $prefix)) {
               $implementations = $this->moduleHandler->getModuleImplementations('preprocess_' . $hook, $prefix);
               $info['preprocess functions'][] = reset($implementations);
             }
