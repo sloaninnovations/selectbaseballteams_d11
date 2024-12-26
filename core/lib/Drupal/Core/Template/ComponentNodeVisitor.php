@@ -12,7 +12,6 @@ use Twig\Environment;
 use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\Nodes;
 use Twig\TwigFunction;
-use Twig\Node\EmbedNode;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FunctionExpression;
 use Twig\Node\ModuleNode;
