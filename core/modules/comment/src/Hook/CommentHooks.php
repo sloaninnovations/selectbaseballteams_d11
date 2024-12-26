@@ -549,7 +549,7 @@ class CommentHooks {
    *   - elements: An associative array containing the comment and entity objects.
    *     Array keys: #comment, #commented_entity.
    */
-  #[Hook('template_preprocess')]
+  #[Hook('preprocess_comment', module: 'template')]
   public function templatePreprocessComment(&$variables): void {
     /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
     $date_formatter = \Drupal::service('date.formatter');

@@ -250,8 +250,13 @@ class ThemeManager implements ThemeManagerInterface {
     }
     if (isset($info['preprocess functions'])) {
       foreach ($info['preprocess functions'] as $preprocessor_function) {
-        if (is_callable($preprocessor_function)) {
-          call_user_func_array($preprocessor_function, [&$variables, $hook, $info]);
+        $args = [&$variables, $hook, $info];
+        if (is_array($preprocessor_function) && count($preprocessor_function) === 2 && isset($preprocessor_function['module']) && isset($preprocessor_function['hook'])) {
+          $preprocessor_function['args'] = $args;
+          $this->moduleHandler->invoke(... $preprocessor_function);
+        }
+        elseif (is_callable($preprocessor_function)) {
+          call_user_func_array($preprocessor_function, $args);
         }
       }
       // Allow theme preprocess functions to set $variables['#attached'] and
