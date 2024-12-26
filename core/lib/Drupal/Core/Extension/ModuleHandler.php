@@ -319,14 +319,6 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getModuleImplementations(string $hook, string $module): array {
-    $implementations = $this->getHookListeners($hook);
-    return $implementations[$module] ?? [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function invokeAllWith(string $hook, callable $callback): void {
     foreach ($this->getHookListeners($hook) as $module => $listeners) {
       foreach ($listeners as $listener) {
