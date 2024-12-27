@@ -82,20 +82,6 @@ class DefaultsEntityForm extends EntityForm {
   }
 
   /**
-   * Form element #process callback.
-   *
-   * Save the layout builder element array parents as a property on the top form
-   * element so that they can be used to access the element within the whole
-   * render array later.
-   *
-   * @see \Drupal\layout_builder\Controller\LayoutBuilderHtmlEntityFormController
-   */
-  public static function layoutBuilderElementGetKeys(array $element, FormStateInterface $form_state, &$form) {
-    $form['#layout_builder_element_keys'] = $element['#array_parents'];
-    return $element;
-  }
-
-  /**
    * Renders a message to display at the top of the layout builder.
    *
    * @param \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface $entity
