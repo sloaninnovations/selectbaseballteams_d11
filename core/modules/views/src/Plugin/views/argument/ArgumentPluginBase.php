@@ -55,12 +55,24 @@ use Drupal\views\Views;
  */
 abstract class ArgumentPluginBase extends HandlerBase implements CacheableDependencyInterface {
 
+  /**
+   * The validator to use.
+   */
   public $validator = NULL;
+
+  /**
+   * The name of the argument.
+   */
   public $argument = NULL;
+
+  /**
+   * The value for the argument.
+   */
   public $value = NULL;
 
   /**
    * The table to use for the name, should it not be in the same table as the argument.
+   *
    * @var string
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing

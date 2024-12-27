@@ -186,9 +186,11 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
   public function installQuickStart($profile, $working_dir = NULL): void {
     parent::installQuickStart("$profile --no-ansi", $working_dir ?: $this->webRoot);
 
+    // Allow package_manager to be installed, since it is hidden by default.
     // Always allow test modules to be installed in the UI and, for easier
     // debugging, always display errors in their dubious glory.
     $php = <<<END
+\$settings['testing_package_manager'] = TRUE;
 \$settings['extension_discovery_scan_tests'] = TRUE;
 \$config['system.logging']['error_level'] = 'verbose';
 END;
@@ -443,12 +445,12 @@ END;
       // If this package requires any Drupal core packages, ensure it allows
       // any version.
       self::unboundCoreConstraints($requirements);
-      // In certain situations, like Drupal CI, auto_updates might be
-      // required into the code base by Composer. This may cause it to be added to
-      // the drupal/core-recommended metapackage, which can prevent the test site
-      // from being built correctly, among other deleterious effects. To prevent
-      // such shenanigans, always remove drupal/auto_updates from
-      // drupal/core-recommended.
+      // In certain situations, like specific CI environments, auto_updates
+      // might be required into the code base by Composer. This may cause it to
+      // be added to the drupal/core-recommended metapackage, which can prevent
+      // the test site from being built correctly, among other deleterious
+      // effects. To prevent such shenanigans, always remove drupal/auto_updates
+      // from drupal/core-recommended.
       if ($name === 'drupal/core-recommended') {
         unset($requirements['drupal/auto_updates']);
       }

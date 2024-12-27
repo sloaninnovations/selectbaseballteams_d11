@@ -1658,12 +1658,9 @@
  * - hook_module_implements_alter()
  *
  * Install hooks:
- * - hook_cache_flush()
  * - hook_install()
- * - hook_module_preinstall()
- * - hook_module_preuninstall()
- * - hook_modules_installed()
- * - hook_modules_uninstalled()
+ * - hook_install_tasks()
+ * - hook_install_tasks_alter()
  * - hook_post_update_NAME()
  * - hook_schema()
  * - hook_uninstall()
@@ -1672,7 +1669,6 @@
  *
  * Theme hooks:
  * - hook_preprocess_HOOK()
- * - hook_process_HOOK()
  *
  * @subsection procedural-hooks Procedural hook implementation
  *
@@ -2163,7 +2159,7 @@ function hook_mail_alter(&$message) {
  *
  * @see \Drupal\Core\Mail\MailManagerInterface::mail()
  */
-function hook_mail($key, &$message, $params) {
+function hook_mail($key, &$message, $params): void {
   $account = $params['account'];
   $context = $params['context'];
   $variables = [
@@ -2255,8 +2251,6 @@ function hook_layout_alter(&$definitions) {
 /**
  * Flush all persistent and static caches.
  *
- * Only procedural implementations are supported for this hook.
- *
  * This hook asks your module to clear all of its static caches,
  * in order to ensure a clean environment for subsequently
  * invoked data rebuilds.
@@ -2274,7 +2268,7 @@ function hook_layout_alter(&$definitions) {
  * @see drupal_flush_all_caches()
  * @see hook_rebuild()
  */
-function hook_cache_flush() {
+function hook_cache_flush(): void {
   if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'update') {
     _update_cache_clear();
   }
@@ -2295,7 +2289,7 @@ function hook_cache_flush() {
  * @see hook_cache_flush()
  * @see drupal_flush_all_caches()
  */
-function hook_rebuild() {
+function hook_rebuild(): void {
   $themes = \Drupal::service('theme_handler')->listInfo();
   foreach ($themes as $theme) {
     _block_rehash($theme->getName());

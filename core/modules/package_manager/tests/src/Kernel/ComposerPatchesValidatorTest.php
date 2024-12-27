@@ -13,6 +13,7 @@ use Drupal\package_manager\ValidationResult;
 /**
  * @covers \Drupal\package_manager\Validator\ComposerPatchesValidator
  * @group package_manager
+ * @group #slow
  * @internal
  */
 class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
@@ -204,6 +205,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
     }
     if ($in_active !== static::ABSENT) {
       $active_manipulator->commitChanges();
+      $active_manipulator->updateLock();
     }
 
     // Simulate in stage.
