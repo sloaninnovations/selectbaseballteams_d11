@@ -725,8 +725,8 @@ class Registry implements DestructableInterface {
         $source_hook_functions = $cache[$source_hook_name]['preprocess functions'];
 
         $diff = array_filter($parent_hook_functions, function ($item) use ($source_hook_functions) {
-          $normalized_source = array_map('serialize', array_map('array_values', $source_hook_functions));
-          return !in_array(serialize(array_values($item)), $normalized_source);
+          $normalized_source = array_map(fn($subItem) => json_encode(array_values((array)$subItem)), $source_hook_functions);
+          return !in_array(json_encode(array_values((array)$item)), $normalized_source);
         });
         $cache[$destination_hook_name]['preprocess functions'] = array_merge($cache[$source_hook_name]['preprocess functions'], $diff);
       }
