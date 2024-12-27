@@ -247,7 +247,7 @@ class EditorHooks {
       foreach ($languages as $langcode => $languages) {
         if ($langcode != $default_langcode) {
           $translation = $entity->getTranslation($langcode);
-          // Delete translation paragraphs usages.
+          // Delete translation entity reference revisions usages.
           $reference_revisions_entities = _editor_get_entity_reference_revisions($translation);
           foreach ($reference_revisions_entities as $reference_revisions_entity) {
             if ($reference_revisions_entity instanceof EntityInterface) {
@@ -267,7 +267,7 @@ class EditorHooks {
         }
       }
     }
-    // Delete entity paragraphs usages.
+    // Delete entity reference revisions usages.
     $reference_revisions_entities = _editor_get_entity_reference_revisions($entity);
     foreach ($reference_revisions_entities as $reference_revisions_entity) {
       if ($reference_revisions_entity instanceof EntityInterface) {
