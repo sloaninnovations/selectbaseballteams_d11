@@ -43,7 +43,17 @@ class LayoutTest extends KernelTestBase {
     $this->config('system.theme')->set('default', 'test_layout_theme')->save();
 
     $theme_definitions = $this->container->get('theme.registry')->get();
-    $this->assertContains('template_preprocess_layout', $theme_definitions['test_layout_theme']['preprocess functions']);
+    $this->assertTrue(
+      in_array(
+        [
+          "module" => "template",
+          "hook" => "preprocess_layout",
+        ],
+        $theme_definitions['test_layout_theme']['preprocess functions'],
+        TRUE
+      ),
+      'The template_preprocess_layout hook is missing.'
+    );
   }
 
   /**
