@@ -34,6 +34,8 @@ class Preprocess extends Hook {
     public string $hook,
     public string $method = '',
     public ?string $module = NULL,
-  ) {}
+  ) {
+    parent::__construct($hook, $method, $module);
+  }
 
 }

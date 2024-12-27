@@ -31,7 +31,8 @@ class TemplatePreprocess extends Hook {
   public function __construct(
     public string $hook,
     public string $method = '',
-    public ?string $module = 'template',
-  ) {}
+  ) {
+    parent::__construct($hook, $method, 'template');
+  }
 
 }
