@@ -51,7 +51,7 @@ class FileItemTest extends KernelTestBase {
     $fileUri = $file->getFileUri();
 
     // Confirm there are only two forward slashes.
-    $this->assertStringStartsWith('public://', $fileUri);
+    $this->assertMatchesRegularExpression('#^public://[^/]#', $fileUri);
   }
 
 }
