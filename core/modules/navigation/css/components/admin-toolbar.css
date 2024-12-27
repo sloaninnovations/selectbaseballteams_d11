@@ -337,6 +337,8 @@ body {
  * It is created in the template templates/navigation.html.twig.
  */
 .admin-toolbar-overlay {
+  --admin-toolbar-z-index-overlay: var(--drupal-admin-z-index-overlay, 500);
+
   position: fixed;
   z-index: var(--admin-toolbar-z-index-overlay);
   inset-block-start: 0;
