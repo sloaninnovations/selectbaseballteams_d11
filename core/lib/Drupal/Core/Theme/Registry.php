@@ -3,7 +3,6 @@
 namespace Drupal\Core\Theme;
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Component\Utility\DiffArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DestructableInterface;
@@ -725,7 +724,6 @@ class Registry implements DestructableInterface {
         $parent_hook_functions = $parent_hook['preprocess functions'];
         $source_hook_functions = $cache[$source_hook_name]['preprocess functions'];
 
-
         $diff = array_filter($parent_hook_functions, function ($item) use ($source_hook_functions) {
           $normalized_source = array_map('serialize', array_map('array_values', $source_hook_functions));
           return !in_array(serialize(array_values($item)), $normalized_source);
@@ -831,8 +829,7 @@ class Registry implements DestructableInterface {
         $preprocess_functions = $cache[$hook]['preprocess functions'];
         $deduplicated = [];
         foreach ($preprocess_functions as $item) {
-          $key = is_array($item) ? json_encode($item) : $item;
-          $deduplicated[$key] = $item;
+          $deduplicated[json_encode($item)] = $item;
         }
         $cache[$hook]['preprocess functions'] = array_values($deduplicated);
       }
