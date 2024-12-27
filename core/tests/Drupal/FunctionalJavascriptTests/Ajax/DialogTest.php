@@ -53,6 +53,7 @@ class DialogTest extends WebDriverTestBase {
     // Clicking the link triggers an AJAX request/response.
     // Opens a Dialog panel.
     $link1_dialog_div = $this->assertSession()->waitForElementVisible('css', 'div.ui-dialog');
+    $this->assertEquals('true', $link1_dialog_div->getAttribute('aria-modal'), 'Dialog modal has aria-modal attribute');
     $this->assertNotNull($link1_dialog_div, 'Link was used to open a dialog ( modal )');
 
     $link1_modal = $link1_dialog_div->find('css', '#drupal-modal');
@@ -84,6 +85,7 @@ class DialogTest extends WebDriverTestBase {
     // Test a non-modal dialog ( with target ).
     $this->clickLink('Link 3 (non-modal)');
     $non_modal_dialog = $this->assertSession()->waitForElementVisible('css', 'div.ui-dialog');
+    $this->assertNull($non_modal_dialog->getAttribute('aria-modal'), 'Dialog modal has no aria-modal attribute');
     $this->assertNotNull($non_modal_dialog, 'Link opens a non-modal dialog.');
 
     // Tests the dialog contains a target element specified in the AJAX request.
