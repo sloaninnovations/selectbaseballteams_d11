@@ -66,11 +66,11 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected array $invokeMap = [];
 
   /**
-   * Legacy implementations.
+   * Legacy hooks for hook_preprocess_HOOK and template_preprocess_HOOK.
    *
    * @var array
    */
-  protected array $hasLegacyHookAttribute = [];
+  protected array $legacyHookFunctions = [];
 
   /**
    * Constructs a ModuleHandler object.
@@ -368,10 +368,10 @@ class ModuleHandler implements ModuleHandlerInterface {
     if (!function_exists($function)) {
       return FALSE;
     }
-    if (!isset($this->hasLegacyHookAttribute[$function])) {
-      $this->hasLegacyHookAttribute[$function] = (new \ReflectionFunction($function))->getAttributes(LegacyHook::class) ? FALSE : $function;
+    if (!isset($this->legacyHookFunctions[$function])) {
+      $this->legacyHookFunctions[$function] = (new \ReflectionFunction($function))->getAttributes(LegacyHook::class) ? FALSE : $function;
     }
-    return $this->hasLegacyHookAttribute[$function];
+    return $this->legacyHookFunctions[$function];
   }
 
   /**
