@@ -100,7 +100,6 @@ class Hook {
    */
   public const string SUFFIX = '';
 
-
   /**
    * Constructs a Hook attribute object.
    *
