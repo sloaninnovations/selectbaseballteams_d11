@@ -5,19 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Core\Hook\Attribute;
 
 /**
- * Hook attribute for FormAlter.
- *
- * @see hook_form_alter().
+ * Hook attribute for Alter hooks.
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class FormAlter extends Alter {
-  public const string PREFIX = 'form';
+class Alter extends Hook {
+  public const string SUFFIX = 'alter';
 
   /**
-   * Constructs a Hook attribute object.
+   * Constructs an Alter attribute object.
    *
-   * @param string $form_id
-   *   The ID of the form that this implementation alters.
+   * @param string $hook
+   *   The short hook name being altered, without the 'hook_' prefix.
    * @param string $method
    *   (optional) The method name. If this attribute is on a method, this
    *   parameter is not required. If this attribute is on a class and this
@@ -29,11 +27,11 @@ class FormAlter extends Alter {
    *   implementation is in.
    */
   public function __construct(
-    string $form_id = '',
+    public string $hook,
     public string $method = '',
     public ?string $module = NULL,
   ) {
-    parent::__construct($form_id, $method, $module);
+    parent::__construct($hook, $method, $module);
   }
 
 }
