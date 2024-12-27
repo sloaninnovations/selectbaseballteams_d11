@@ -11,7 +11,7 @@ namespace Drupal\Core\Hook\Attribute;
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class TemplatePreprocess extends Hook {
-  public const string PREFIX = 'template_preprocess';
+  public const string PREFIX = 'preprocess';
 
   /**
    * Constructs a Hook attribute object.
@@ -31,7 +31,7 @@ class TemplatePreprocess extends Hook {
   public function __construct(
     public string $hook,
     public string $method = '',
-    public ?string $module = NULL,
+    public ?string $module = 'template',
   ) {}
 
 }
