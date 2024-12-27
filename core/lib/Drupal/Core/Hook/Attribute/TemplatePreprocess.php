@@ -23,10 +23,6 @@ class TemplatePreprocess extends Hook {
    *   parameter is not required. If this attribute is on a class and this
    *   parameter is omitted, the class must have an __invoke() method, which is
    *   taken as the hook implementation.
-   * @param string|null $module
-   *   (optional) The module this implementation is for. This allows one module to
-   *   implement a hook on behalf of another module. Defaults to the module the
-   *   implementation is in.
    */
   public function __construct(
     public string $hook,
