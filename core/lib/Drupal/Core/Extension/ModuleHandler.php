@@ -308,7 +308,7 @@ class ModuleHandler implements ModuleHandlerInterface {
     }
     if ($legacy && $modules) {
       foreach ($modules as $module) {
-        if ($this->canLegacyInvoke($module, $hook)) {
+        if ($this->getFunctionForLegacyInvoke($module, $hook)) {
           return TRUE;
         }
       }
@@ -356,22 +356,22 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   protected function legacyInvoke($module, $hook, array $args = []) {
     $this->load($module);
-    if ($function = $this->canLegacyInvoke($module, $hook)) {
+    if ($function = $this->getFunctionForLegacyInvoke($module, $hook)) {
       return $function(... $args);
     }
 
     return NULL;
   }
 
-  protected function canLegacyInvoke($module, $hook): string|FALSE {
+  protected function getFunctionForLegacyInvoke($module, $hook): string|FALSE {
     $function = $module . '_' . $hook;
     if (!function_exists($function)) {
       return FALSE;
     }
     if (!isset($this->hasLegacyHookAttribute[$function])) {
-      $this->hasLegacyHookAttribute[$function] = !(new \ReflectionFunction($function))->getAttributes(LegacyHook::class);
+      $this->hasLegacyHookAttribute[$function] = (new \ReflectionFunction($function))->getAttributes(LegacyHook::class) ? FALSE : $function;
     }
-    return $this->hasLegacyHookAttribute[$function] ? $function : FALSE;
+    return $this->hasLegacyHookAttribute[$function];
   }
 
   /**
