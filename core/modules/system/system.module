@@ -5,7 +5,6 @@
  */
 
 use Drupal\Component\FileSecurity\FileSecurity;
-use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -40,120 +39,6 @@ const REGIONS_VISIBLE = 'visible';
  * @see system_region_list()
  */
 const REGIONS_ALL = 'all';
-
-/**
- * Implements hook_theme().
- */
-function system_theme(): array {
-  return array_merge(drupal_common_theme(), [
-    // Normally theme suggestion templates are only picked up when they are in
-    // themes. We explicitly define theme suggestions here so that the block
-    // templates in core/modules/system/templates are picked up.
-    'block__system_branding_block' => [
-      'render element' => 'elements',
-      'base hook' => 'block',
-    ],
-    'block__system_messages_block' => [
-      'base hook' => 'block',
-    ],
-    'block__system_menu_block' => [
-      'render element' => 'elements',
-      'base hook' => 'block',
-    ],
-    'system_themes_page' => [
-      'variables' => [
-        'theme_groups' => [],
-        'theme_group_titles' => [],
-      ],
-      'file' => 'system.admin.inc',
-    ],
-    'system_config_form' => [
-      'render element' => 'form',
-    ],
-    'confirm_form' => [
-      'render element' => 'form',
-    ],
-    'system_modules_details' => [
-      'render element' => 'form',
-      'file' => 'system.admin.inc',
-    ],
-    'system_modules_uninstall' => [
-      'render element' => 'form',
-      'file' => 'system.admin.inc',
-    ],
-    'status_report_page' => [
-      'variables' => [
-        'counters' => [],
-        'general_info' => [],
-        'requirements' => NULL,
-      ],
-    ],
-    'status_report' => [
-      'variables' => [
-        'grouped_requirements' => NULL,
-        'requirements' => NULL,
-      ],
-    ],
-    'status_report_grouped' => [
-      'variables' => [
-        'grouped_requirements' => NULL,
-        'requirements' => NULL,
-      ],
-    ],
-    'status_report_counter' => [
-      'variables' => ['amount' => NULL, 'text' => NULL, 'severity' => NULL],
-    ],
-    'status_report_general_info' => [
-      'variables' => [
-        'drupal' => [],
-        'cron' => [],
-        'database_system' => [],
-        'database_system_version' => [],
-        'php' => [],
-        'php_memory_limit' => [],
-        'webserver' => [],
-      ],
-    ],
-    'admin_page' => [
-      'variables' => ['blocks' => NULL],
-      'file' => 'system.admin.inc',
-    ],
-    'admin_block' => [
-      'variables' => ['block' => NULL, 'attributes' => []],
-      'file' => 'system.admin.inc',
-    ],
-    'admin_block_content' => [
-      'variables' => ['content' => NULL],
-      'file' => 'system.admin.inc',
-    ],
-    'system_admin_index' => [
-      'variables' => ['menu_items' => NULL],
-      'file' => 'system.admin.inc',
-    ],
-    'entity_add_list' => [
-      'variables' => [
-        'bundles' => [],
-        'add_bundle_message' => NULL,
-      ],
-      'template' => 'entity-add-list',
-    ],
-    'off_canvas_page_wrapper' => [
-      'variables' => ['children' => NULL],
-    ],
-    'system_security_advisories_fetch_error_message' => [
-      'file' => 'system.theme.inc',
-      'variables' => ['error_message' => []],
-    ],
-    'entity_page_title' => [
-      'variables' => [
-        'attributes' => [],
-        'title' => NULL,
-        'entity' => NULL,
-        'view_mode' => NULL,
-      ],
-    ],
-  ]);
-}
 
 /**
  * Implements hook_hook_info().
@@ -418,101 +303,6 @@ function system_authorized_batch_process() {
 }
 
 /**
- * Implements hook_page_attachments().
- *
- * @see template_preprocess_maintenance_page()
- * @see \Drupal\Core\EventSubscriber\ActiveLinkResponseFilter
- */
-function _system_page_attachments(array &$page) {
-  // Ensure the same CSS is loaded in template_preprocess_maintenance_page().
-  $page['#attached']['library'][] = 'system/base';
-  if (\Drupal::service('router.admin_context')->isAdminRoute()) {
-    $page['#attached']['library'][] = 'system/admin';
-  }
-
-  // Attach libraries used by this theme.
-  $active_theme = \Drupal::theme()->getActiveTheme();
-  foreach ($active_theme->getLibraries() as $library) {
-    $page['#attached']['library'][] = $library;
-  }
-
-  // Attach favicon.
-  if (theme_get_setting('features.favicon')) {
-    $favicon = theme_get_setting('favicon.url');
-    $type = theme_get_setting('favicon.mimetype');
-    $page['#attached']['html_head_link'][][] = [
-      'rel' => 'icon',
-      'href' => UrlHelper::stripDangerousProtocols($favicon),
-      'type' => $type,
-    ];
-  }
-
-  // Get the major Drupal version.
-  [$version] = explode('.', \Drupal::VERSION);
-
-  // Attach default meta tags.
-  $meta_default = [
-    // Make sure the Content-Type comes first because the IE browser may be
-    // vulnerable to XSS via encoding attacks from any content that comes
-    // before this META tag, such as a TITLE tag.
-    'system_meta_content_type' => [
-      '#tag' => 'meta',
-      '#attributes' => [
-        'charset' => 'utf-8',
-      ],
-      // Security: This always has to be output first.
-      '#weight' => -1000,
-    ],
-    // Show Drupal and the major version number in the META GENERATOR tag.
-    'system_meta_generator' => [
-      '#type' => 'html_tag',
-      '#tag' => 'meta',
-      '#attributes' => [
-        'name' => 'Generator',
-        'content' => 'Drupal ' . $version . ' (https://www.drupal.org)',
-      ],
-    ],
-    // Attach default mobile meta tags for responsive design.
-    'MobileOptimized' => [
-      '#tag' => 'meta',
-      '#attributes' => [
-        'name' => 'MobileOptimized',
-        'content' => 'width',
-      ],
-    ],
-    'HandheldFriendly' => [
-      '#tag' => 'meta',
-      '#attributes' => [
-        'name' => 'HandheldFriendly',
-        'content' => 'true',
-      ],
-    ],
-    'viewport' => [
-      '#tag' => 'meta',
-      '#attributes' => [
-        'name' => 'viewport',
-        'content' => 'width=device-width, initial-scale=1.0',
-      ],
-    ],
-  ];
-  foreach ($meta_default as $key => $value) {
-    $page['#attached']['html_head'][] = [$value, $key];
-  }
-
-  // Handle setting the "active" class on links by:
-  // - loading the active-link library if the current user is authenticated;
-  // - applying a response filter if the current user is anonymous.
-  // @see \Drupal\Core\Link
-  // @see \Drupal\Core\Utility\LinkGenerator::generate()
-  // @see template_preprocess_links()
-  // @see \Drupal\Core\EventSubscriber\ActiveLinkResponseFilter
-  $page['#cache']['contexts'][] = 'user.roles:authenticated';
-  if (\Drupal::currentUser()->isAuthenticated()) {
-    $page['#attached']['library'][] = 'core/drupal.active-link';
-  }
-}
-
-/**
  * Implements hook_preprocess_HOOK() for block templates.
  */
 function system_preprocess_block(&$variables): void {
@@ -606,6 +396,7 @@ function system_region_list($theme, $show = REGIONS_ALL) {
   // If requested, suppress hidden regions. See block_admin_display_form().
   foreach ($info['regions'] as $name => $label) {
     if ($show == REGIONS_ALL || !isset($info['regions_hidden']) || !in_array($name, $info['regions_hidden'])) {
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $list[$name] = t($label);
     }
   }

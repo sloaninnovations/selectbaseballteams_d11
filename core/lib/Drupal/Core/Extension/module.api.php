@@ -173,7 +173,7 @@ function hook_system_info_alter(array &$info, \Drupal\Core\Extension\Extension $
  *   should be made earlier and exported so during import there's no need to
  *   do them again.
  */
-function hook_module_preinstall($module, bool $is_syncing) {
+function hook_module_preinstall($module, bool $is_syncing): void {
   my_module_cache_clear();
 }
 
@@ -201,7 +201,7 @@ function hook_module_preinstall($module, bool $is_syncing) {
  * @see \Drupal\Core\Extension\ModuleInstaller::install()
  * @see hook_install()
  */
-function hook_modules_installed($modules, $is_syncing) {
+function hook_modules_installed($modules, $is_syncing): void {
   if (in_array('lousy_module', $modules)) {
     \Drupal::state()->set('my_module.lousy_module_compatibility', TRUE);
   }
@@ -272,7 +272,7 @@ function hook_install($is_syncing): void {
  *   should be made earlier and exported so during import there's no need to
  *   do them again.
  */
-function hook_module_preuninstall($module, bool $is_syncing) {
+function hook_module_preuninstall($module, bool $is_syncing): void {
   my_module_cache_clear();
 }
 
@@ -297,7 +297,7 @@ function hook_module_preuninstall($module, bool $is_syncing) {
  *
  * @see hook_uninstall()
  */
-function hook_modules_uninstalled($modules, $is_syncing) {
+function hook_modules_uninstalled($modules, $is_syncing): void {
   if (in_array('lousy_module', $modules)) {
     \Drupal::state()->delete('my_module.lousy_module_compatibility');
   }
@@ -348,6 +348,8 @@ function hook_uninstall($is_syncing): void {
 
 /**
  * Return an array of tasks to be performed by an installation profile.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * Any tasks you define here will be run, in order, after the installer has
  * finished the site configuration step but before it has moved on to the
@@ -512,6 +514,8 @@ function hook_install_tasks(&$install_state) {
 
 /**
  * Alter the full list of installation tasks.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * You can use this hook to change or replace any part of the Drupal
  * installation process that occurs after the installation profile is selected.
@@ -1108,11 +1112,12 @@ function hook_updater_info_alter(&$updaters) {
  *     install phase, this should only be used for version numbers, do not set
  *     it if not applicable.
  *   - description: The description of the requirement/status.
- *   - severity: The requirement's result/severity level, one of:
+ *   - severity: (optional) The requirement's result/severity level, one of:
  *     - REQUIREMENT_INFO: For info only.
  *     - REQUIREMENT_OK: The requirement is satisfied.
  *     - REQUIREMENT_WARNING: The requirement failed with a warning.
  *     - REQUIREMENT_ERROR: The requirement failed with an error.
+ *     Defaults to REQUIREMENT_OK when installing, REQUIREMENT_INFO otherwise.
  */
 function hook_requirements($phase) {
   $requirements = [];
