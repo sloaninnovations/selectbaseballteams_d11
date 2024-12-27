@@ -729,6 +729,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // submitted form value appears literally, regardless of custom #tree
       // and #parents being set elsewhere.
       '#parents' => ['form_build_id'],
+      '#attributes' => ['autocomplete' => 'off'],
     ];
 
     // Add a token, based on either #token or form_id, to any form displayed to
