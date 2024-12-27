@@ -20,6 +20,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Attribute\TemplatePreprocess;
 
 /**
  * Hook implementations for comment.
@@ -549,7 +550,7 @@ class CommentHooks {
    *   - elements: An associative array containing the comment and entity objects.
    *     Array keys: #comment, #commented_entity.
    */
-  #[Hook('preprocess_comment', module: 'template')]
+  #[TemplatePreprocess('comment')]
   public function templatePreprocessComment(&$variables): void {
     /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
     $date_formatter = \Drupal::service('date.formatter');
