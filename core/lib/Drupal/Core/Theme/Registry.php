@@ -820,7 +820,7 @@ class Registry implements DestructableInterface {
       }
       // Ensure uniqueness.
       if (isset($cache[$hook]['preprocess functions'])) {
-        $cache[$hook]['preprocess functions'] = array_unique($cache[$hook]['preprocess functions'], SORT_REGULAR);
+        $cache[$hook]['preprocess functions'] = array_unique($cache[$hook]['preprocess functions'], \SORT_REGULAR);
       }
     }
   }
