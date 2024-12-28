@@ -362,6 +362,55 @@ class ModuleHandlerTest extends KernelTestBase {
   }
 
   /**
+   * Tests procedural preprocess functions.
+   */
+  public function testProceduralPreprocess(): void {
+    $this->moduleInstaller()->install(['module_test_procedural_preprocess']);
+    $preprocess_functions = [];
+    $prefix = 'module_test_procedural_preprocess';
+    $hook = 'test';
+    if ($this->moduleHandler()->hasImplementations('preprocess', [$prefix], TRUE)) {
+      $preprocess_functions[] = ['module' => $prefix, 'hook' => 'preprocess'];
+    }
+    if ($this->moduleHandler()->hasImplementations('preprocess_' . $hook, [$prefix], TRUE)) {
+      $preprocess_functions[] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
+    }
+
+    $prefix = 'template';
+    if ($this->moduleHandler()->hasImplementations('preprocess_' . $hook, [$prefix], TRUE)) {
+      $preprocess_functions[] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
+    }
+    $this->assertTrue($this->moduleHandler()->invoke(... $preprocess_functions[0], args: [TRUE]), 'Procedural hook_preprocess runs.');
+    $this->assertTrue($this->moduleHandler()->invoke(... $preprocess_functions[1], args: [TRUE]), 'Procedural hook_preprocess_HOOK runs.');
+    $this->assertTrue($this->moduleHandler()->invoke(... $preprocess_functions[2], args: [TRUE]), 'Procedural template_preprocess_test runs.');
+  }
+
+  /**
+   * Tests Oop preprocess functions.
+   */
+  public function testOopPreprocess(): void {
+    $this->moduleInstaller()->install(['module_test_oop_preprocess']);
+    $preprocess_functions = [];
+    $prefix = 'module_test_oop_preprocess';
+    $hook = 'test';
+    if ($this->moduleHandler()->hasImplementations('preprocess', [$prefix], TRUE)) {
+      $preprocess_functions[] = ['module' => $prefix, 'hook' => 'preprocess'];
+    }
+    if ($this->moduleHandler()->hasImplementations('preprocess_' . $hook, [$prefix], TRUE)) {
+      $preprocess_functions[] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
+    }
+
+    $prefix = 'template';
+    if ($this->moduleHandler()->hasImplementations('preprocess_' . $hook, [$prefix], TRUE)) {
+      $preprocess_functions[] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
+    }
+    // var_dump($preprocess_functions);
+    $this->assertTrue($this->moduleHandler()->invoke(... $preprocess_functions[0], args: [TRUE]), 'OOP hook_preprocess runs.');
+    $this->assertTrue($this->moduleHandler()->invoke(... $preprocess_functions[1], args: [TRUE]), 'OOP hook_preprocess_HOOK runs.');
+    $this->assertTrue($this->moduleHandler()->invoke(... $preprocess_functions[2], args: [TRUE]), 'OOP template_preprocess_test runs.');
+  }
+
+  /**
    * Returns the ModuleHandler.
    *
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
