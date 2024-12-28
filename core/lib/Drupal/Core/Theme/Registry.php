@@ -721,7 +721,6 @@ class Registry implements DestructableInterface {
     if (isset($cache[$source_hook_name]) && (!isset($cache[$source_hook_name]['incomplete preprocess functions']) || !isset($cache[$destination_hook_name]['incomplete preprocess functions']))) {
       $cache[$destination_hook_name] = $parent_hook + $cache[$source_hook_name];
       if (isset($parent_hook['preprocess functions'])) {
-
         $diff = array_udiff($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions'], fn ($a, $b) => json_encode($a) <=> json_encode($b));
         $cache[$destination_hook_name]['preprocess functions'] = array_merge($cache[$source_hook_name]['preprocess functions'], $diff);
       }
@@ -821,12 +820,7 @@ class Registry implements DestructableInterface {
       }
       // Ensure uniqueness.
       if (isset($cache[$hook]['preprocess functions'])) {
-        $preprocess_functions = $cache[$hook]['preprocess functions'];
-        $deduplicated = [];
-        foreach ($preprocess_functions as $item) {
-          $deduplicated[json_encode($item)] = $item;
-        }
-        $cache[$hook]['preprocess functions'] = array_values($deduplicated);
+        $cache[$hook]['preprocess functions'] = array_unique($cache[$hook]['preprocess functions'], SORT_REGULAR);
       }
     }
   }
