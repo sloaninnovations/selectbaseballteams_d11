@@ -66,7 +66,7 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected array $invokeMap = [];
 
   /**
-   * Legacy hooks for hook_preprocess_HOOK and template_preprocess_HOOK.
+   * Legacy hooks for example hook_preprocess_HOOK or template_preprocess_HOOK.
    *
    * @var array
    */
