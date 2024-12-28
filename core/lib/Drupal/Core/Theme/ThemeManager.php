@@ -252,8 +252,7 @@ class ThemeManager implements ThemeManagerInterface {
       foreach ($info['preprocess functions'] as $preprocessor_function) {
         $args = [&$variables, $hook, $info];
         if (is_array($preprocessor_function) && count($preprocessor_function) === 2 && isset($preprocessor_function['module']) && isset($preprocessor_function['hook'])) {
-          $preprocessor_function['args'] = $args;
-          $this->moduleHandler->invoke(... $preprocessor_function);
+          $this->moduleHandler->invoke(... $preprocessor_function, args: $args);
         }
         elseif (is_callable($preprocessor_function)) {
           call_user_func_array($preprocessor_function, $args);
