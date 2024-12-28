@@ -721,13 +721,8 @@ class Registry implements DestructableInterface {
     if (isset($cache[$source_hook_name]) && (!isset($cache[$source_hook_name]['incomplete preprocess functions']) || !isset($cache[$destination_hook_name]['incomplete preprocess functions']))) {
       $cache[$destination_hook_name] = $parent_hook + $cache[$source_hook_name];
       if (isset($parent_hook['preprocess functions'])) {
-        $parent_hook_functions = $parent_hook['preprocess functions'];
-        $source_hook_functions = $cache[$source_hook_name]['preprocess functions'];
 
-        $diff = array_filter($parent_hook_functions, function ($item) use ($source_hook_functions) {
-          $normalized_source = array_map(fn($subItem) => json_encode(array_values((array) $subItem)), $source_hook_functions);
-          return !in_array(json_encode(array_values((array) $item)), $normalized_source);
-        });
+        $diff = array_udiff($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions'], fn ($a, $b) => json_encode($a) <=> json_encode($b)) ;
         $cache[$destination_hook_name]['preprocess functions'] = array_merge($cache[$source_hook_name]['preprocess functions'], $diff);
       }
       // If a base hook isn't set, this is the actual base hook.
