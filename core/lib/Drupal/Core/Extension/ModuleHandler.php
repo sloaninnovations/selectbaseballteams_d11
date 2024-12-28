@@ -306,12 +306,8 @@ class ModuleHandler implements ModuleHandlerInterface {
     if ($return) {
       return TRUE;
     }
-    if ($legacy && $modules) {
-      foreach ($modules as $module) {
-        if ($this->getFunctionForLegacyInvoke($module, $hook)) {
-          return TRUE;
-        }
-      }
+    if ($legacy && is_string($modules)) {
+      return $this->getFunctionForLegacyInvoke($modules, $hook);
     }
     return FALSE;
   }
