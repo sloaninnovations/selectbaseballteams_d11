@@ -616,6 +616,7 @@ class Registry implements DestructableInterface {
             // Only use non-hook-specific variable preprocessors for theming
             // hooks implemented as templates. See the @defgroup themeable
             // topic.
+            // We know that template_preprocess exists so no need to check.
             if (isset($info['template']) && ($prefix === 'template' || $this->moduleHandler->hasImplementations('preprocess', [$prefix], TRUE))) {
               $info['preprocess functions'][] = ['module' => $prefix, 'hook' => 'preprocess'];
             }
