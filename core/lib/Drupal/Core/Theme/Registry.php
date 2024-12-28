@@ -611,11 +611,12 @@ class Registry implements DestructableInterface {
             // preprocessors.
             $prefixes[] = $name;
           }
+
           foreach ($prefixes as $prefix) {
             // Only use non-hook-specific variable preprocessors for theming
             // hooks implemented as templates. See the @defgroup themeable
             // topic.
-            if (isset($info['template']) && $this->moduleHandler->hasImplementations('preprocess', [$prefix], TRUE)) {
+            if (isset($info['template']) && ($prefix === 'template' || $this->moduleHandler->hasImplementations('preprocess', [$prefix], TRUE))) {
               $info['preprocess functions'][] = ['module' => $prefix, 'hook' => 'preprocess'];
             }
 
