@@ -27,4 +27,5 @@ class TestHooks {
   public function templatePreprocessTest($arg): mixed {
     return $arg;
   }
+
 }
