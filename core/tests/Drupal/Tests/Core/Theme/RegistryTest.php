@@ -177,7 +177,7 @@ class RegistryTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->exactly(34))
       ->method('hasImplementations')
-      ->willReturnCallback(fn (string $hook, array $modules, bool $legacy) => $hook === 'preprocess_theme_test_render_element' && $modules === ['template'] && $legacy);
+      ->willReturnCallback(fn (string $hook, string $modules, bool $legacy) => $hook === 'preprocess_theme_test_render_element' && $modules === 'template' && $legacy);
 
     $registry = $this->registry->get();
 
