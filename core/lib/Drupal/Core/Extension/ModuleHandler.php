@@ -70,7 +70,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    *
    * @var array
    */
-  protected array $legacyPreprocessFunctions = [];
+  protected array $legacyProceduralHooks = [];
 
   /**
    * Constructs a ModuleHandler object.
@@ -380,10 +380,10 @@ class ModuleHandler implements ModuleHandlerInterface {
     if (!function_exists($function)) {
       return FALSE;
     }
-    if (!isset($this->legacyPreprocessFunctions[$function])) {
-      $this->legacyPreprocessFunctions[$function] = (new \ReflectionFunction($function))->getAttributes(LegacyHook::class) ? FALSE : $function;
+    if (!isset($this->legacyProceduralHooks[$function])) {
+      $this->legacyProceduralHooks[$function] = (new \ReflectionFunction($function))->getAttributes(LegacyHook::class) ? FALSE : $function;
     }
-    return $this->legacyPreprocessFunctions[$function];
+    return $this->legacyProceduralHooks[$function];
   }
 
   /**
