@@ -175,7 +175,7 @@ class RegistryTest extends UnitTestCase {
       ->with('theme_test')
       ->willReturn('core/modules/system/tests/modules/theme_test');
 
-    $this->moduleHandler->expects($this->exactly(68))
+    $this->moduleHandler->expects($this->exactly(34))
       ->method('hasImplementations')
       ->willReturnCallback(fn (string $hook, array $modules, bool $legacy) => $hook === 'preprocess_theme_test_render_element' && $modules === ['template'] && $legacy);
 
