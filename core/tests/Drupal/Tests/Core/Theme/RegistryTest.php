@@ -187,7 +187,7 @@ class RegistryTest extends UnitTestCase {
     $this->assertArrayHasKey('theme_test_foo', $registry);
     $this->assertArrayHasKey('theme_test_render_element', $registry);
 
-    $this->assertNotContains('test_stable_preprocess_theme_test_render_element', $registry['theme_test_render_element']['preprocess functions']);
+    $this->assertArrayNotHasKey('preprocess functions', $registry['theme_test_render_element']);
 
     // The second call will initialize with the second theme. Ensure that this
     // returns a different object and the discovery for the second theme's
