@@ -137,7 +137,7 @@ class HookCollectorPass implements CompilerPassInterface {
    * * @todo Pass only $container when ModuleHandler->add is removed https://www.drupal.org/project/drupal/issues/3481778
    */
   public static function collectAllHookImplementations(array $module_filenames, ?ContainerBuilder $container = NULL): static {
-    $modules = [...array_keys($module_filenames), 'template'];
+    $modules = [... array_keys($module_filenames), 'template'];
     // Longer modules first.
     usort($modules, fn($a, $b) => strlen($b) - strlen($a));
     $module_preg = '/^(?<function>(?<module>' . implode('|', $modules) . ')_(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
