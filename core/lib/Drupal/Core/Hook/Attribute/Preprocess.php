@@ -17,6 +17,7 @@ class Preprocess extends Hook {
    * Constructs a Preprocess hook_preprocess__HOOK.
    *
    * Do not use this for hook_preprocess.
+   * hook_preprocess requires #[Hook('preprocess')]
    *
    * @param string $hook
    *   The short hook name, without the 'hook_' prefix.
