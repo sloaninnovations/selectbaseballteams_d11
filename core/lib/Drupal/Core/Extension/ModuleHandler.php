@@ -70,7 +70,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    *
    * @var array
    */
-  protected array $legacyProceduralHooks = [];
+  protected static array $legacyProceduralHooks = [];
 
   /**
    * Constructs a ModuleHandler object.
@@ -300,16 +300,9 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasImplementations(string $hook, $modules = NULL, $legacy = FALSE): bool {
+  public function hasImplementations(string $hook, $modules = NULL): bool {
     $implementation_modules = array_keys($this->getHookListeners($hook));
-    $return = (bool) (isset($modules) ? array_intersect($implementation_modules, (array) $modules) : $implementation_modules);
-    if ($return) {
-      return TRUE;
-    }
-    if ($legacy && is_string($modules)) {
-      return $this->getFunctionForLegacyInvoke($modules, $hook);
-    }
-    return FALSE;
+    return (bool) (isset($modules) ? array_intersect($implementation_modules, (array) $modules) : $implementation_modules);
   }
 
   /**
@@ -352,34 +345,37 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   protected function legacyInvoke($module, $hook, array $args = []) {
     $this->load($module);
-    if ($function = $this->getFunctionForLegacyInvoke($module, $hook)) {
+    if ($function = self::getFunctionForLegacyInvoke($module, $hook)) {
       return $function(... $args);
     }
-
     return NULL;
   }
 
   /**
    * Get a function to execute for legacy invoke.
    *
-   * @param string $module
-   *   The module to check for.
+   * This method should only be used by \Drupal\Core\Theme\Registry.
+   *
+   * @param string $extension
+   *   The module or theme to check for.
    * @param string $hook
    *   The hook to check for.
    *
    * @return string|false
    *   Return the cached function if it exists or FALSE if it does not or
    *   if it is tagged with #[LegacyHook]
+   *
+   * @internal
    */
-  protected function getFunctionForLegacyInvoke(string $module, string $hook): string|FALSE {
-    $function = $module . '_' . $hook;
+  public static function getFunctionForLegacyInvoke(string $extension, string $hook): string|FALSE {
+    $function = $extension . '_' . $hook;
     if (!function_exists($function)) {
       return FALSE;
     }
-    if (!isset($this->legacyProceduralHooks[$function])) {
-      $this->legacyProceduralHooks[$function] = (new \ReflectionFunction($function))->getAttributes(LegacyHook::class) ? FALSE : $function;
+    if (!isset(self::$legacyProceduralHooks[$function])) {
+      self::$legacyProceduralHooks[$function] = (new \ReflectionFunction($function))->getAttributes(LegacyHook::class) ? FALSE : $function;
     }
-    return $this->legacyProceduralHooks[$function];
+    return self::$legacyProceduralHooks[$function];
   }
 
   /**

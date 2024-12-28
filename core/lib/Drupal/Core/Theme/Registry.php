@@ -7,6 +7,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DestructableInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
@@ -617,11 +618,11 @@ class Registry implements DestructableInterface {
             // hooks implemented as templates. See the @defgroup themeable
             // topic.
             // template_preprocess() exists, no need to check.
-            if (isset($info['template']) && ($prefix === 'template' || $this->moduleHandler->hasImplementations('preprocess', $prefix, TRUE))) {
+            if (isset($info['template']) && ($prefix === 'template' || $this->moduleHandler->hasImplementations('preprocess', $prefix) || ModuleHandler::getFunctionForLegacyInvoke($prefix, 'preprocess'))) {
               $info['preprocess functions'][] = ['module' => $prefix, 'hook' => 'preprocess'];
             }
 
-            if ($this->moduleHandler->hasImplementations('preprocess_' . $hook, $prefix, TRUE)) {
+            if ($this->moduleHandler->hasImplementations('preprocess_' . $hook, $prefix) || ModuleHandler::getFunctionForLegacyInvoke($prefix, 'preprocess_' . $hook)) {
               $info['preprocess functions'][] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
             }
           }
@@ -655,11 +656,13 @@ class Registry implements DestructableInterface {
           }
           // Only use non-hook-specific variable preprocessors for theme hooks
           // implemented as templates. See the @defgroup themeable topic.
-          if (isset($info['template']) && function_exists($name . '_preprocess')) {
-            $cache[$hook]['preprocess functions'][] = $name . '_preprocess';
+          // While the theme is not a module, legacy invoke can call any
+          // extension not just modules.
+          if (isset($info['template']) && ModuleHandler::getFunctionForLegacyInvoke($name, 'preprocess')) {
+            $cache[$hook]['preprocess functions'][] = ['module' => $name, 'hook' => 'preprocess'];
           }
-          if (function_exists($name . '_preprocess_' . $hook)) {
-            $cache[$hook]['preprocess functions'][] = $name . '_preprocess_' . $hook;
+          if (ModuleHandler::getFunctionForLegacyInvoke($name, 'preprocess_' . $hook)) {
+            $cache[$hook]['preprocess functions'][] = ['module' => $name, 'hook' => 'preprocess_' . $hook];
             $cache[$hook]['theme path'] = $path;
           }
         }
