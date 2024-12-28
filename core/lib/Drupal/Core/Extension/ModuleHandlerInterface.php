@@ -201,15 +201,13 @@ interface ModuleHandlerInterface {
    *   (optional) A single module or multiple modules to check if they have any
    *   implementations of a hook. Use NULL to check if any enabled module has
    *   implementations.
-   * @param bool $legacy
-   *   (optional) Check for legacy hooks, used by Drupal\Core\Theme\Registry
    *
    * @return bool
    *   If $modules is provided, then TRUE if there are any implementations by
    *   the module(s) provided. Or if $modules if NULL, then TRUE if there are
    *   any implementations. Otherwise FALSE.
    */
-  public function hasImplementations(string $hook, $modules = NULL, $legacy = FALSE): bool;
+  public function hasImplementations(string $hook, $modules = NULL): bool;
 
   /**
    * Executes a callback for each implementation of a hook.
