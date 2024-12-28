@@ -14,7 +14,7 @@ class Preprocess extends Hook {
   public const string PREFIX = 'preprocess';
 
   /**
-   * Constructs a Preprocess hook_preprocess__HOOK.
+   * Constructs a Preprocess hook_preprocess_HOOK.
    *
    * Do not use this for hook_preprocess.
    * hook_preprocess requires #[Hook('preprocess')]

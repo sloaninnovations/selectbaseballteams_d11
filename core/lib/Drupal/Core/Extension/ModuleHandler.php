@@ -363,7 +363,19 @@ class ModuleHandler implements ModuleHandlerInterface {
     return NULL;
   }
 
-  protected function getFunctionForLegacyInvoke($module, $hook): string|FALSE {
+  /**
+   * Get a function to execute for legacy invoke.
+   *
+   * @param string $module
+   *   The module to check for.
+   * @param string $hook
+   *   The hook to check for.
+   *
+   * @return string|false
+   *   Return the cached function if it exists or FALSE if it does not or
+   *   if it is tagged with #[LegacyHook]
+   */
+  protected function getFunctionForLegacyInvoke(string $module, string $hook): string|FALSE {
     $function = $module . '_' . $hook;
     if (!function_exists($function)) {
       return FALSE;

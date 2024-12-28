@@ -202,7 +202,7 @@ interface ModuleHandlerInterface {
    *   implementations of a hook. Use NULL to check if any enabled module has
    *   implementations.
    * @param bool $legacy
-   *   Check for legacy hooks.
+   *   (optional) Check for legacy hooks, used by Drupal\Core\Theme\Registry
    *
    * @return bool
    *   If $modules is provided, then TRUE if there are any implementations by
