@@ -722,7 +722,7 @@ class Registry implements DestructableInterface {
       $cache[$destination_hook_name] = $parent_hook + $cache[$source_hook_name];
       if (isset($parent_hook['preprocess functions'])) {
 
-        $diff = array_udiff($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions'], fn ($a, $b) => json_encode($a) <=> json_encode($b)) ;
+        $diff = array_udiff($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions'], fn ($a, $b) => json_encode($a) <=> json_encode($b));
         $cache[$destination_hook_name]['preprocess functions'] = array_merge($cache[$source_hook_name]['preprocess functions'], $diff);
       }
       // If a base hook isn't set, this is the actual base hook.
