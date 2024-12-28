@@ -175,10 +175,6 @@ class RegistryTest extends UnitTestCase {
       ->with('theme_test')
       ->willReturn('core/modules/system/tests/modules/theme_test');
 
-    $this->moduleHandler->expects($this->exactly(34))
-      ->method('hasImplementations')
-      ->willReturnCallback(fn (string $hook, string $modules, bool $legacy) => $hook === 'preprocess_theme_test_render_element' && $modules === 'template' && $legacy);
-
     $registry = $this->registry->get();
 
     // Ensure that the registry entries from the module are found.
@@ -198,7 +194,7 @@ class RegistryTest extends UnitTestCase {
     // preprocess function worked.
     $other_registry = $this->registry->get();
     $this->assertNotSame($registry, $other_registry);
-    $this->assertContains('test_stable_preprocess_theme_test_render_element', $other_registry['theme_test_render_element']['preprocess functions']);
+    $this->assertContains(['module' => 'test_stable', 'hook' => 'preprocess_theme_test_render_element'], $other_registry['theme_test_render_element']['preprocess functions']);
   }
 
   /**
