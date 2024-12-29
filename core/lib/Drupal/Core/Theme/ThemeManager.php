@@ -257,11 +257,11 @@ class ThemeManager implements ThemeManagerInterface {
         // This is for backwards compatibility and may represent OOP
         // implementations as well.
         // Check if hook_theme_registry_alter added a manual callback.
-        if ((is_array($preprocessor_function) || !\array_key_exists($preprocessor_function, $invoke_map)) && is_callable($preprocessor_function)) {
-          call_user_func_array($preprocessor_function, [&$variables, $hook, $info]);
-        }
-        elseif ($invokeable = $invoke_map[$preprocessor_function] ?? FALSE) {
+        if (!is_array($preprocessor_function) && $invokeable = $invoke_map[$preprocessor_function] ?? FALSE) {
           $this->moduleHandler->invoke(... $invokeable, args: [&$variables, $hook, $info]);
+        }
+        elseif (is_callable($preprocessor_function)) {
+          call_user_func_array($preprocessor_function, [&$variables, $hook, $info]);
         }
       }
       // Allow theme preprocess functions to set $variables['#attached'] and
