@@ -160,8 +160,8 @@ class FieldApiDataTest extends ViewsKernelTestBase {
     $this->assertEquals('Appears in: page, article. Also known as: Content: GiraffeA&quot; label (field_string)', $data[$current_table][$field_storage_string->getName() . '_value']['help']);
 
     // Since each label is only used once,
-    // EntityFieldManagerInterface::getFieldLabels();
-    // will return a label using alphabetical sorting.
+    // EntityFieldManagerInterface::getFieldLabels(); will return a label using
+    // alphabetical sorting.
     $this->assertEquals('GiraffeA&quot; label (field_string)', $data[$current_table][$field_storage_string->getName() . '_value']['title']);
 
     // Attach the same field to a different bundle with a different label.

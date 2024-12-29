@@ -715,8 +715,8 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     if (empty($label_counter)) {
       return [$field_name, $all_labels];
     }
-    // Sort the field labels by it most used label and return the most used one.
-    // If the counts are equal, sort by the label to ensure the result is
+    // Sort the field labels by the most used label and return the most used
+    // one. If the counts are equal, sort by the label to ensure the result is
     // deterministic.
     uksort($label_counter, function ($a, $b) use ($label_counter) {
       if ($label_counter[$a] === $label_counter[$b]) {
