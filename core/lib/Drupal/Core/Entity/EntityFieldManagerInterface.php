@@ -144,9 +144,9 @@ interface EntityFieldManagerInterface {
    * Returns the labels used for a field on an entity type.
    *
    * @param string $entity_type
-   *   The type of entity to look up.
+   *   The entity type.
    * @param string $field_name
-   *   The machine name of the field to look up.
+   *   The machine name of the field.
    *
    * @return array
    *   An array whose first element is the most commonly-used label for the

@@ -700,7 +700,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
   public function getFieldLabels(string $entity_type, string $field_name): array {
     $label_counter = [];
     $all_labels = [];
-    // Count the amount of fields per label per field storage.
+    // Count the number of fields per label per field storage.
     foreach (array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type)) as $bundle) {
       $bundle_fields = array_filter($this->getFieldDefinitions($entity_type, $bundle), function ($field_definition) {
         return $field_definition instanceof FieldConfigInterface;
