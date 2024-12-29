@@ -354,7 +354,8 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * Get a function to execute for legacy invoke.
    *
-   * This method should only be used by \Drupal\Core\Theme\Registry.
+   * This method should only be used by \Drupal\Core\Theme\Registry
+   * and ModuleHandler.
    *
    * @param string $extension
    *   The module or theme to check for.
