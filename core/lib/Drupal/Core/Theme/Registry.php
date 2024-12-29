@@ -792,7 +792,7 @@ class Registry implements DestructableInterface {
           if (isset($cache[$matches[2]])) {
             $level = substr_count($matches[1], '__');
             $suggestion_level[$level][$candidate] = $matches[1];
-            $invokes[$candidate] = ['module' => $prefix, 'hook' => $matches[1]];
+            $invokes[$candidate] = ['module' => $prefix, 'hook' => 'preprocess_' . $matches[1]];
           }
         }
       }
