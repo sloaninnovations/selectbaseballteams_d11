@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\module_test_oop_preprocess\Hook;
 
-use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\Preprocess;
 use Drupal\Core\Hook\Attribute\TemplatePreprocess;
 
@@ -13,7 +12,7 @@ use Drupal\Core\Hook\Attribute\TemplatePreprocess;
  */
 class TestHooks {
 
-  #[Hook('preprocess')]
+  #[Preprocess]
   public function rootPreprocess($arg): mixed {
     return $arg;
   }

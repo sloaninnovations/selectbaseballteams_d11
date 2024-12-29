@@ -16,8 +16,7 @@ class Preprocess extends Hook {
   /**
    * Constructs a Preprocess hook_preprocess_HOOK.
    *
-   * Do not use this for hook_preprocess.
-   * hook_preprocess requires #[Hook('preprocess')]
+   * Pass no arguments for hook_preprocess #[Preprocess]
    *
    * @param string $hook
    *   The short hook name, without the 'hook_' prefix.
@@ -32,7 +31,7 @@ class Preprocess extends Hook {
    *   implementation is in.
    */
   public function __construct(
-    public string $hook,
+    public string $hook = '',
     public string $method = '',
     public ?string $module = NULL,
   ) {
