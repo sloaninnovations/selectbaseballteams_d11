@@ -14,6 +14,11 @@ use Drupal\Core\Template\Attribute;
 class ThemeManager implements ThemeManagerInterface {
 
   /**
+   * Regular expression to split a preprocess "function".
+   */
+  const string PREPROCESS = '/^(.*)_(preprocess.*)$/';
+
+  /**
    * The theme negotiator.
    *
    * @var \Drupal\Core\Theme\ThemeNegotiatorInterface
@@ -250,7 +255,8 @@ class ThemeManager implements ThemeManagerInterface {
     }
     if (isset($info['preprocess functions'])) {
       foreach ($info['preprocess functions'] as $preprocessor_function) {
-        $this->moduleHandler->invoke(... $preprocessor_function, args: [&$variables, $hook, $info]);
+        preg_match(self::PREPROCESS, $preprocessor_function, $matches);
+        $this->moduleHandler->invoke($matches[1], $matches[2], [&$variables, $hook, $info]);
       }
       // Allow theme preprocess functions to set $variables['#attached'] and
       // $variables['#cache'] and use them like the corresponding element

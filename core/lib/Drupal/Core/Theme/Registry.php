@@ -619,11 +619,11 @@ class Registry implements DestructableInterface {
             // topic.
             // template_preprocess() exists, no need to check.
             if (isset($info['template']) && ($prefix === 'template' || $this->moduleHandler->hasImplementations('preprocess', $prefix) || ModuleHandler::getFunctionForLegacyInvoke($prefix, 'preprocess'))) {
-              $info['preprocess functions'][] = ['module' => $prefix, 'hook' => 'preprocess'];
+              $info['preprocess functions'][] = $prefix . '_preprocess';
             }
 
             if ($this->moduleHandler->hasImplementations('preprocess_' . $hook, $prefix) || ModuleHandler::getFunctionForLegacyInvoke($prefix, 'preprocess_' . $hook)) {
-              $info['preprocess functions'][] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
+              $info['preprocess functions'][] = $prefix . '_preprocess_' . $hook;
             }
           }
         }
@@ -656,13 +656,11 @@ class Registry implements DestructableInterface {
           }
           // Only use non-hook-specific variable preprocessors for theme hooks
           // implemented as templates. See the @defgroup themeable topic.
-          // While the theme is not a module, legacy invoke can call any
-          // extension not just modules.
           if (isset($info['template']) && ModuleHandler::getFunctionForLegacyInvoke($name, 'preprocess')) {
-            $cache[$hook]['preprocess functions'][] = ['module' => $name, 'hook' => 'preprocess'];
+            $cache[$hook]['preprocess functions'][] = $name . '_preprocess';
           }
           if (ModuleHandler::getFunctionForLegacyInvoke($name, 'preprocess_' . $hook)) {
-            $cache[$hook]['preprocess functions'][] = ['module' => $name, 'hook' => 'preprocess_' . $hook];
+            $cache[$hook]['preprocess functions'][] = $name . '_preprocess_' . $hook;
             $cache[$hook]['theme path'] = $path;
           }
         }
@@ -726,7 +724,7 @@ class Registry implements DestructableInterface {
     if (isset($cache[$source_hook_name]) && (!isset($cache[$source_hook_name]['incomplete preprocess functions']) || !isset($cache[$destination_hook_name]['incomplete preprocess functions']))) {
       $cache[$destination_hook_name] = $parent_hook + $cache[$source_hook_name];
       if (isset($parent_hook['preprocess functions'])) {
-        $diff = array_udiff($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions'], fn ($a, $b) => json_encode($a) <=> json_encode($b));
+        $diff = array_diff($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions']);
         $cache[$destination_hook_name]['preprocess functions'] = array_merge($cache[$source_hook_name]['preprocess functions'], $diff);
       }
       // If a base hook isn't set, this is the actual base hook.
@@ -825,7 +823,7 @@ class Registry implements DestructableInterface {
       }
       // Ensure uniqueness.
       if (isset($cache[$hook]['preprocess functions'])) {
-        $cache[$hook]['preprocess functions'] = array_unique($cache[$hook]['preprocess functions'], \SORT_REGULAR);
+        $cache[$hook]['preprocess functions'] = array_unique($cache[$hook]['preprocess functions']);
       }
     }
   }
