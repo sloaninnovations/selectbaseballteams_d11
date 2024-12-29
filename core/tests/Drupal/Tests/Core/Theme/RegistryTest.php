@@ -194,7 +194,7 @@ class RegistryTest extends UnitTestCase {
     // preprocess function worked.
     $other_registry = $this->registry->get();
     $this->assertNotSame($registry, $other_registry);
-    $this->assertContains(['module' => 'test_stable', 'hook' => 'preprocess_theme_test_render_element'], $other_registry['theme_test_render_element']['preprocess functions']);
+    $this->assertContains('test_stable_preprocess_theme_test_render_element', $other_registry['theme_test_render_element']['preprocess functions']);
   }
 
   /**
