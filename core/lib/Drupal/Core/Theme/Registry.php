@@ -810,7 +810,7 @@ class Registry implements DestructableInterface {
         if (isset($cache[$hook]['preprocess functions']) && !in_array($preprocessor, $cache[$hook]['preprocess functions'])) {
           // Add missing preprocessor to existing hook.
           $cache[$hook]['preprocess functions'][] = $preprocessor;
-          $cache['preprocessor invokes'][$preprocessor] = $invokes[$preprocessor];
+          $cache['preprocess invokes'][$preprocessor] = $invokes[$preprocessor];
         }
         elseif (!isset($cache[$hook]) && strpos($hook, '__')) {
           // Process non-existing hook and register it.
@@ -818,7 +818,7 @@ class Registry implements DestructableInterface {
           // suggestion hook or the base hook.
           $this->completeSuggestion($hook, $cache);
           $cache[$hook]['preprocess functions'][] = $preprocessor;
-          $cache['preprocessor invokes'][$preprocessor] = $invokes[$preprocessor];
+          $cache['preprocess invokes'][$preprocessor] = $invokes[$preprocessor];
         }
       }
     }
