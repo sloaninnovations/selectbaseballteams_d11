@@ -619,11 +619,27 @@ class Registry implements DestructableInterface {
             // topic.
             // template_preprocess() exists, no need to check.
             if (isset($info['template']) && ($prefix === 'template' || $this->moduleHandler->hasImplementations('preprocess', $prefix) || ModuleHandler::getFunctionForLegacyInvoke($prefix, 'preprocess'))) {
-              $info['preprocess functions'][] = $prefix . '_preprocess';
+              // This stores the string resembling a procedural function for
+              // for backwards compatibility. They may represent OOP
+              // implementations. It makes the deduplication, diffing, and
+              // caching more efficient as well. Preprocess invokes is the
+              // lookup for executing the hooks whether they are procedural or
+              // OOP this map is used in ThemeManager::render.
+              $function = $prefix . '_preprocess';
+              $info['preprocess functions'][] = $function;
+              $result['preprocess invokes'][$function] = ['module' => $prefix, 'hook' => 'preprocess'];
             }
 
             if ($this->moduleHandler->hasImplementations('preprocess_' . $hook, $prefix) || ModuleHandler::getFunctionForLegacyInvoke($prefix, 'preprocess_' . $hook)) {
-              $info['preprocess functions'][] = $prefix . '_preprocess_' . $hook;
+              // This stores the string resembling a procedural function for
+              // for backwards compatibility. They may represent OOP
+              // implementations. It makes the deduplication, diffing, and
+              // caching more efficient as well. Preprocess invokes is the
+              // lookup for executing the hooks whether they are procedural or
+              // OOP this map is used in ThemeManager::render.
+              $function = $prefix . '_preprocess_' . $hook;
+              $info['preprocess functions'][] = $function;
+              $result['preprocess invokes'][$function] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
             }
           }
         }
@@ -657,10 +673,14 @@ class Registry implements DestructableInterface {
           // Only use non-hook-specific variable preprocessors for theme hooks
           // implemented as templates. See the @defgroup themeable topic.
           if (isset($info['template']) && ModuleHandler::getFunctionForLegacyInvoke($name, 'preprocess')) {
-            $cache[$hook]['preprocess functions'][] = $name . '_preprocess';
+            $function = $name . '_preprocess';
+            $cache[$hook]['preprocess functions'][] = $function;
+            $cache['preprocess invokes'][$function] = ['module' => $name, 'hook' => 'preprocess'];
           }
           if (ModuleHandler::getFunctionForLegacyInvoke($name, 'preprocess_' . $hook)) {
-            $cache[$hook]['preprocess functions'][] = $name . '_preprocess_' . $hook;
+            $function = $name . '_preprocess_' . $hook;
+            $cache[$hook]['preprocess functions'][] = $function;
+            $cache['preprocess invokes'][$function] = ['module' => $name, 'hook' => 'preprocess_' . $hook];
             $cache[$hook]['theme path'] = $path;
           }
         }

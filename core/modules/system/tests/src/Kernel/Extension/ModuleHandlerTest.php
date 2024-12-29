@@ -8,7 +8,6 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleUninstallValidatorException;
 use Drupal\Core\Extension\ProfileExtensionList;
-use Drupal\Core\Theme\ThemeManager;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 
@@ -363,28 +362,66 @@ class ModuleHandlerTest extends KernelTestBase {
   }
 
   /**
+   * Tests procedural preprocess functions.
+   */
+  public function testProceduralPreprocess(): void {
+    $this->moduleInstaller()->install(['module_test_procedural_preprocess']);
+    $preprocess_function = [];
+    $preprocess_invoke = [];
+    $prefix = 'module_test_procedural_preprocess';
+    $hook = 'test';
+    if ($this->moduleHandler()->hasImplementations('preprocess', [$prefix], TRUE)) {
+      $function = "{$prefix}_preprocess";
+      $preprocess_function[] = $function;
+      $preprocess_invoke[$function] = ['module' => $prefix, 'hook' => 'preprocess'];
+    }
+    if ($this->moduleHandler()->hasImplementations('preprocess_' . $hook, [$prefix], TRUE)) {
+      $function = "{$prefix}_preprocess_{$hook}";
+      $preprocess_function[] = $function;
+      $preprocess_invoke[$function] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
+    }
+
+    $prefix = 'template';
+    if ($this->moduleHandler()->hasImplementations('preprocess_' . $hook, [$prefix], TRUE)) {
+      $function = "{$prefix}_preprocess_{$hook}";
+      $preprocess_function[] = $function;
+      $preprocess_invoke[$function] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
+    }
+
+    foreach ($preprocess_function as $function) {
+      $this->assertTrue($this->moduleHandler()->invoke(... $preprocess_invoke[$function], args: [TRUE]), 'Procedural hook_preprocess runs.');
+    }
+  }
+
+  /**
    * Tests Oop preprocess functions.
    */
   public function testOopPreprocess(): void {
     $this->moduleInstaller()->install(['module_test_oop_preprocess']);
-    $preprocess_functions = [];
+    $preprocess_function = [];
+    $preprocess_invoke = [];
     $prefix = 'module_test_oop_preprocess';
     $hook = 'test';
-    if ($this->moduleHandler()->hasImplementations('preprocess', [$prefix])) {
-      $preprocess_functions[] = $prefix . '_preprocess';
+    if ($this->moduleHandler()->hasImplementations('preprocess', [$prefix], TRUE)) {
+      $function = "{$prefix}_preprocess";
+      $preprocess_function[] = $function;
+      $preprocess_invoke[$function] = ['module' => $prefix, 'hook' => 'preprocess'];
     }
-    if ($this->moduleHandler()->hasImplementations('preprocess_' . $hook, [$prefix])) {
-      $preprocess_functions[] = $prefix . '_preprocess_' . $hook;
+    if ($this->moduleHandler()->hasImplementations('preprocess_' . $hook, [$prefix], TRUE)) {
+      $function = "{$prefix}_preprocess_{$hook}";
+      $preprocess_function[] = $function;
+      $preprocess_invoke[$function] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
     }
 
     $prefix = 'template';
-    if ($this->moduleHandler()->hasImplementations('preprocess_' . $hook, [$prefix])) {
-      $preprocess_functions[] = $prefix . '_preprocess_' . $hook;
-
+    if ($this->moduleHandler()->hasImplementations('preprocess_' . $hook, [$prefix], TRUE)) {
+      $function = "{$prefix}_preprocess_{$hook}";
+      $preprocess_function[] = $function;
+      $preprocess_invoke[$function] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
     }
-    foreach ($preprocess_functions as $preprocess_function) {
-      preg_match(ThemeManager::PREPROCESS, $preprocess_function, $matches);
-      $this->assertTrue($this->moduleHandler()->invoke($matches[1], $matches[2], [TRUE]));
+
+    foreach ($preprocess_function as $function) {
+      $this->assertTrue($this->moduleHandler()->invoke(... $preprocess_invoke[$function], args: [TRUE]), 'Procedural hook_preprocess runs.');
     }
   }
 
