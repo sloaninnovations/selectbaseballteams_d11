@@ -21,7 +21,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * @internal
  *
  * Theme registry is expected to be used only internally since every
- * hook_theme() implementa)get new features in minor releases so this class should be
+ * hook_theme() implementation depends on the way this class is built. This
+ * class may get new features in minor releases so this class should be
  * considered internal.
  *
  * @todo Replace local $registry variables in methods with $this->registry.
