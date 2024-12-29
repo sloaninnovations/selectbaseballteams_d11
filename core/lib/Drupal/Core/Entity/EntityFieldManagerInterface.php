@@ -149,9 +149,10 @@ interface EntityFieldManagerInterface {
    *   The machine name of the field.
    *
    * @return array
-   *   An array whose first element is the most commonly-used label for the
-   *   field on this entity type (or the first in alphabetical order if there
-   *   is a tie), and whose second element is a list of all labels in use.
+   *   An array where the first element is the most commonly used label for the
+   *   field and the second element is a list of all labels in use. When more
+   *   than one label is used the same number of times then the labels are
+   *   sorted alphabetically.
    */
   public function getFieldLabels(string $entity_type, string $field_name): array;
 
