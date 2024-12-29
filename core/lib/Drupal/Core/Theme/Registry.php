@@ -44,13 +44,6 @@ class Registry implements DestructableInterface {
   protected $lock;
 
   /**
-   * Regular expression to split a preprocess "function".
-   *
-   * This is used for suggestions to ensure they are added to the invoke map.
-   */
-  const string PREPROCESS = '/^(.*)_(preprocess.*)$/';
-
-  /**
    * The complete theme registry.
    *
    * @var array
@@ -627,23 +620,17 @@ class Registry implements DestructableInterface {
             // template_preprocess() exists, no need to check.
             if (isset($info['template']) && ($prefix === 'template' || $this->moduleHandler->hasImplementations('preprocess', $prefix) || ModuleHandler::getFunctionForLegacyInvoke($prefix, 'preprocess'))) {
               // This stores the string resembling a procedural function for
-              // for backwards compatibility. They may represent OOP
+              // backwards compatibility. They may represent OOP
               // implementations. It makes the deduplication, diffing, and
               // caching more efficient as well. Preprocess invokes is the
               // lookup for executing the hooks whether they are procedural or
-              // OOP this map is used in ThemeManager::render.
+              // OOP. This map is used in ThemeManager::render.
               $function = $prefix . '_preprocess';
               $info['preprocess functions'][] = $function;
               $cache['preprocess invokes'][$function] = ['module' => $prefix, 'hook' => 'preprocess'];
             }
 
             if ($this->moduleHandler->hasImplementations('preprocess_' . $hook, $prefix) || ModuleHandler::getFunctionForLegacyInvoke($prefix, 'preprocess_' . $hook)) {
-              // This stores the string resembling a procedural function for
-              // for backwards compatibility. They may represent OOP
-              // implementations. It makes the deduplication, diffing, and
-              // caching more efficient as well. Preprocess invokes is the
-              // lookup for executing the hooks whether they are procedural or
-              // OOP this map is used in ThemeManager::render.
               $function = $prefix . '_preprocess_' . $hook;
               $info['preprocess functions'][] = $function;
               $cache['preprocess invokes'][$function] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
@@ -788,7 +775,7 @@ class Registry implements DestructableInterface {
 
     // Collect all variable preprocess functions in the correct order.
     $suggestion_level = [];
-    $matches = [];
+    $invokes = [];
     // Look for functions named according to the pattern and add them if they
     // have matching hooks in the registry.
     foreach ($prefixes as $prefix) {
@@ -805,6 +792,7 @@ class Registry implements DestructableInterface {
           if (isset($cache[$matches[2]])) {
             $level = substr_count($matches[1], '__');
             $suggestion_level[$level][$candidate] = $matches[1];
+            $invokes[$candidate] = ['module' => $prefix, 'hook' => $matches[1]];
           }
         }
       }
@@ -822,7 +810,7 @@ class Registry implements DestructableInterface {
         if (isset($cache[$hook]['preprocess functions']) && !in_array($preprocessor, $cache[$hook]['preprocess functions'])) {
           // Add missing preprocessor to existing hook.
           $cache[$hook]['preprocess functions'][] = $preprocessor;
-          $this->addInvokeMap($preprocessor, $cache);
+          $cache['preprocessor invokes'][$preprocessor] = $invokes[$preprocessor];
         }
         elseif (!isset($cache[$hook]) && strpos($hook, '__')) {
           // Process non-existing hook and register it.
@@ -830,7 +818,7 @@ class Registry implements DestructableInterface {
           // suggestion hook or the base hook.
           $this->completeSuggestion($hook, $cache);
           $cache[$hook]['preprocess functions'][] = $preprocessor;
-          $this->addInvokeMap($preprocessor, $cache);
+          $cache['preprocessor invokes'][$preprocessor] = $invokes[$preprocessor];
         }
       }
     }
@@ -927,21 +915,6 @@ class Registry implements DestructableInterface {
     }
 
     return $grouped_functions;
-  }
-
-  /**
-   * Add missing preprocess function to invoke map.
-   *
-   * @param string $preprocessor_function
-   *   The function that was added that is missing an invoke map.
-   * @param array $cache
-   *   The cache.
-   */
-  protected function addInvokeMap(string $preprocessor_function, array &$cache): void {
-    if (!array_key_exists('preprocess invokes', $cache) || !array_key_exists($preprocessor_function, $cache['preprocess invokes'])) {
-      preg_match(self::PREPROCESS, $preprocessor_function, $matches);
-      $cache['preprocess invokes'][$preprocessor_function] = ['module' => $matches[1], 'hook' => $matches[2]];
-    }
   }
 
 }

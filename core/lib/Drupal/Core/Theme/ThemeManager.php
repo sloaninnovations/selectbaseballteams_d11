@@ -251,15 +251,16 @@ class ThemeManager implements ThemeManagerInterface {
     }
     if (isset($info['preprocess functions'])) {
       foreach ($info['preprocess functions'] as $preprocessor_function) {
-        // While themes are not modules legacy invoke can can call any
-        // extension, not just modules.
         // Preprocess hooks are stored as strings resembling functions.
         // This is for backwards compatibility and may represent OOP
         // implementations as well.
-        // Check if hook_theme_registry_alter added a manual callback.
-        if (!is_array($preprocessor_function) && $invoke = $invoke_map[$preprocessor_function] ?? FALSE) {
-          $this->moduleHandler->invoke(... $invoke, args: [&$variables, $hook, $info]);
+        if (is_string($preprocessor_function) && isset($invoke_map[$preprocessor_function])) {
+          // While themes are not modules, ModuleHandlerInterface::invoke calls
+          // a legacy invoke which can can call any extension, not just
+          // modules.
+          $this->moduleHandler->invoke(... $invoke_map[$preprocessor_function], args: [&$variables, $hook, $info]);
         }
+        // Check if hook_theme_registry_alter added a manual callback.
         elseif (is_callable($preprocessor_function)) {
           call_user_func_array($preprocessor_function, [&$variables, $hook, $info]);
         }
