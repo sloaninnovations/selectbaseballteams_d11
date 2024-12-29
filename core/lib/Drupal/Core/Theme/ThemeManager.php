@@ -14,11 +14,6 @@ use Drupal\Core\Template\Attribute;
 class ThemeManager implements ThemeManagerInterface {
 
   /**
-   * Regular expression to split a preprocess "function".
-   */
-  const string PREPROCESS = '/^(.*)_(preprocess.*)$/';
-
-  /**
    * The theme negotiator.
    *
    * @var \Drupal\Core\Theme\ThemeNegotiatorInterface
@@ -180,6 +175,7 @@ class ThemeManager implements ThemeManagerInterface {
     }
 
     $info = $theme_registry->get($hook);
+    $invoke_map = $theme_registry->get('preprocess invokes');
     if (isset($info['deprecated'])) {
       @trigger_error($info['deprecated'], E_USER_DEPRECATED);
     }
@@ -255,8 +251,12 @@ class ThemeManager implements ThemeManagerInterface {
     }
     if (isset($info['preprocess functions'])) {
       foreach ($info['preprocess functions'] as $preprocessor_function) {
-        preg_match(self::PREPROCESS, $preprocessor_function, $matches);
-        $this->moduleHandler->invoke($matches[1], $matches[2], [&$variables, $hook, $info]);
+        // While themes are not modules legacy invoke can can call any
+        // any extension not just modules.
+        // Preprocess hooks are stored as strings resembling functions.
+        // This is purely for backwards compatibility and may represent OOP
+        // implementations.
+        $this->moduleHandler->invoke(... $invoke_map[$preprocessor_function], args: [&$variables, $hook, $info]);
       }
       // Allow theme preprocess functions to set $variables['#attached'] and
       // $variables['#cache'] and use them like the corresponding element
