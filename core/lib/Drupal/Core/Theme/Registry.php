@@ -21,8 +21,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * @internal
  *
  * Theme registry is expected to be used only internally since every
- * hook_theme() implementation depends on the way this class is built. This
- * class may get new features in minor releases so this class should be
+ * hook_theme() implementa)get new features in minor releases so this class should be
  * considered internal.
  *
  * @todo Replace local $registry variables in methods with $this->registry.
@@ -822,9 +821,7 @@ class Registry implements DestructableInterface {
         if (isset($cache[$hook]['preprocess functions']) && !in_array($preprocessor, $cache[$hook]['preprocess functions'])) {
           // Add missing preprocessor to existing hook.
           $cache[$hook]['preprocess functions'][] = $preprocessor;
-          if (!array_key_exists($preprocessor, $cache['preprocess invokes'])) {
-            $this->addInvokeMap($preprocessor, $cache);
-          }
+          $this->addInvokeMap($preprocessor, $cache);
         }
         elseif (!isset($cache[$hook]) && strpos($hook, '__')) {
           // Process non-existing hook and register it.
@@ -832,9 +829,7 @@ class Registry implements DestructableInterface {
           // suggestion hook or the base hook.
           $this->completeSuggestion($hook, $cache);
           $cache[$hook]['preprocess functions'][] = $preprocessor;
-          if (!array_key_exists($preprocessor, $cache['preprocess invokes'])) {
-            $this->addInvokeMap($preprocessor, $cache);
-          }
+          $this->addInvokeMap($preprocessor, $cache);
         }
       }
     }
@@ -942,8 +937,10 @@ class Registry implements DestructableInterface {
    *   The cache.
    */
   protected function addInvokeMap(string $preprocessor_function, array &$cache): void {
-    preg_match(self::PREPROCESS, $preprocessor_function, $matches);
-    $cache['preprocess invokes'][$preprocessor_function] = ['module' => $matches[1], 'hook' => $matches[2]];
+    if (!array_key_exists('preprocess invokes', $cache) || !array_key_exists($preprocessor_function, $cache['preprocess invokes'])) {
+      preg_match(self::PREPROCESS, $preprocessor_function, $matches);
+      $cache['preprocess invokes'][$preprocessor_function] = ['module' => $matches[1], 'hook' => $matches[2]];
+    }
   }
 
 }
