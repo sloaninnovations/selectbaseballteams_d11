@@ -256,14 +256,7 @@ class ThemeManager implements ThemeManagerInterface {
         // Preprocess hooks are stored as strings resembling functions.
         // This is for backwards compatibility and may represent OOP
         // implementations as well.
-        $invokable = $invoke_map[$preprocessor_function] ?? FALSE;
-        if ($invokable) {
-          $this->moduleHandler->invoke(... $invokable, args: [&$variables, $hook, $info]);
-        }
-        elseif (is_callable($preprocessor_function)) {
-          call_user_func_array($preprocessor_function, [&$variables, $hook, $info]);
-        }
-
+        $this->moduleHandler->invoke(... $invoke_map[$preprocessor_function], args: [&$variables, $hook, $info]);
       }
       // Allow theme preprocess functions to set $variables['#attached'] and
       // $variables['#cache'] and use them like the corresponding element
