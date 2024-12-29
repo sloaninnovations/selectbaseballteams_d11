@@ -281,11 +281,11 @@ class RegistryTest extends UnitTestCase {
         'preprocess invokes' => [
           'test_preprocess_test_hook__suggestion' => [
             'module' => 'test',
-            'hook' => 'preprocess_test_hook__suggestion',
+            'hook' => 'test_hook__suggestion',
           ],
           'test_preprocess_test_hook__suggestion__another' => [
             'module' => 'test',
-            'hook' => 'preprocess_test_hook__suggestion__another',
+            'hook' => 'test_hook__suggestion__another',
           ],
         ],
       ],
@@ -362,7 +362,7 @@ class RegistryTest extends UnitTestCase {
         'preprocess invokes' => [
           'test_preprocess_test_hook__suggestion' => [
             'module' => 'test',
-            'hook' => 'preprocess_test_hook__suggestion',
+            'hook' => 'test_hook__suggestion',
           ],
         ],
       ],
@@ -449,11 +449,11 @@ class RegistryTest extends UnitTestCase {
         'preprocess invokes' => [
           'test_preprocess_child_hook__suggestion' => [
             'module' => 'test',
-            'hook' => 'preprocess_child_hook__suggestion',
+            'hook' => 'child_hook__suggestion',
           ],
           'test_preprocess_child_hook__suggestion__another' => [
             'module' => 'test',
-            'hook' => 'preprocess_child_hook__suggestion__another',
+            'hook' => 'child_hook__suggestion__another',
           ],
         ],
       ],
@@ -510,7 +510,7 @@ class RegistryTest extends UnitTestCase {
         'preprocess invokes' => [
           'test_preprocess_test_hook__suggestion' => [
             'module' => 'test',
-            'hook' => 'preprocess_test_hook__suggestion',
+            'hook' => 'test_hook__suggestion',
           ],
         ],
       ],
