@@ -252,7 +252,7 @@ class ThemeManager implements ThemeManagerInterface {
     if (isset($info['preprocess functions'])) {
       foreach ($info['preprocess functions'] as $preprocessor_function) {
         // While themes are not modules legacy invoke can can call any
-        // any extension not just modules.
+        // extension, not just modules.
         // Preprocess hooks are stored as strings resembling functions.
         // This is for backwards compatibility and may represent OOP
         // implementations as well.
