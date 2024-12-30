@@ -108,6 +108,13 @@ internal.drupal.ckeditor5.table:
   dependencies:
     - core/ckeditor5.table
 
+internal.drupal.ckeditor5.table:
+  css:
+    theme:
+      css/table.css: { }
+  dependencies:
+    - core/ckeditor5.table
+
 internal.admin:
   js:
     js/ckeditor5.admin.js: { }
