@@ -12,7 +12,6 @@ use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\OrderBefore;
-use Drupal\layout_builder\Hook\LayoutBuilderHooks;
 
 /**
  * Hook implementations for layout_builder_test.
@@ -120,9 +119,7 @@ class LayoutBuilderTestHooks {
   #[Hook(
     'system_breadcrumb_alter',
     order: new OrderBefore(
-      classesAndMethods: [
-        [LayoutBuilderHooks::class, 'systemBreadcrumbAlter'],
-      ]
+      modules: ['layout_builder']
     )
   )]
   public function systemBreadcrumbAlter(Breadcrumb &$breadcrumb, RouteMatchInterface $route_match, array $context): void {
