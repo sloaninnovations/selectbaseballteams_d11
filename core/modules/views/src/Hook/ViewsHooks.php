@@ -2,7 +2,7 @@
 
 namespace Drupal\views\Hook;
 
-use Drupal\block\BlockPluginInterface;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\views\ViewsConfigUpdater;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\Plugin\Derivative\ViewsLocalTask;
