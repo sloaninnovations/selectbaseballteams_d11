@@ -52,8 +52,11 @@ class HookCollectorPassTest extends KernelTestBase {
 
   /**
    * Test that ordering works.
+   *
+   * @group legacy
    */
   public function testOrdering(): void {
+    $this->expectDeprecation('module_handler_test_all1_module_implements_alter without a #[LegacyHook] attribute is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3496788');
     $container = new ContainerBuilder();
     $module_filenames = [
       'module_handler_test_all1' => ['pathname' => "core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/module_handler_test_all1.info.yml"],
