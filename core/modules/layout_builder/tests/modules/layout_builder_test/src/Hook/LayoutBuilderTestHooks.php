@@ -11,6 +11,8 @@ use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\OrderBefore;
+use Drupal\layout_builder\Hook\LayoutBuilderHooks;
 
 /**
  * Hook implementations for layout_builder_test.
@@ -115,7 +117,14 @@ class LayoutBuilderTestHooks {
   /**
    * Implements hook_system_breadcrumb_alter().
    */
-  #[Hook('system_breadcrumb_alter')]
+  #[Hook(
+    'system_breadcrumb_alter',
+    order: new OrderBefore(
+      classesAndMethods: [
+        [LayoutBuilderHooks::class, 'systemBreadcrumbAlter'],
+      ]
+    )
+  )]
   public function systemBreadcrumbAlter(Breadcrumb &$breadcrumb, RouteMatchInterface $route_match, array $context): void {
     $breadcrumb->addLink(Link::fromTextAndUrl('External link', Url::fromUri('http://www.example.com')));
   }
