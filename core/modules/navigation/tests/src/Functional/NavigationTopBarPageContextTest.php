@@ -14,7 +14,7 @@ use Drupal\user\UserInterface;
  *
  * @group navigation
  */
-class PageContextTest extends BrowserTestBase {
+class NavigationTopBarPageContextTest extends BrowserTestBase {
 
   use ContentTypeCreationTrait;
   use NodeCreationTrait;
@@ -67,7 +67,7 @@ class PageContextTest extends BrowserTestBase {
     // Create a published node entity.
     $published_node = $this->createNode([
       'type' => 'article',
-      'title' => 'Published Node',
+      'title' => 'Arcu nulla torquent facilisi',
       'status' => 1,
       'uid' => $this->adminUser->id(),
     ]);
@@ -78,9 +78,7 @@ class PageContextTest extends BrowserTestBase {
     // Ensure the top bar exists
     $this->assertSession()->elementExists('css', '.navigation-top-bar-context');
     // Check the node title
-    $this->assertSession()->pageTextContains('Published Node');
-    // Check the published status
-    $this->assertSession()->pageTextContains('Published');
+    $this->assertSession()->pageTextContains('Arcu nulla torquent facilisi');
     // Check the CSS class for published status
     $this->assertSession()->elementContains('css', '.context-status.published', 'Published');
   }
@@ -92,7 +90,7 @@ class PageContextTest extends BrowserTestBase {
     // Create an unpublished node entity.
     $unpublished_node = $this->createNode([
       'type' => 'article',
-      'title' => 'Unpublished Node',
+      'title' => 'Iaculis quis feugiat volutpat',
       'status' => 0,
       'uid' => $this->adminUser->id(),
     ]);
@@ -103,9 +101,7 @@ class PageContextTest extends BrowserTestBase {
     // Ensure the top bar exists
     $this->assertSession()->elementExists('css', '.navigation-top-bar-context');
     // Check the node title
-    $this->assertSession()->pageTextContains('Unpublished Node');
-    // Check the unpublished status
-    $this->assertSession()->pageTextContains('Unpublished');
+    $this->assertSession()->pageTextContains('Iaculis quis feugiat volutpat');
     // Check the CSS class for unpublished status
     $this->assertSession()->elementContains('css', '.context-status.unpublished', 'Unpublished');
   }
