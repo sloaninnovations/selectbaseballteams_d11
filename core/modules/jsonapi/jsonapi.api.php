@@ -279,7 +279,7 @@ function hook_jsonapi_entity_filter_access(EntityTypeInterface $entity_type, Acc
   // by all entities of that type to users with that permission.
   if ($admin_permission = $entity_type->getAdminPermission()) {
     return ([
-      JsonApiFilter::Among_All->value => AccessResult::allowedIfHasPermission($account, $admin_permission),
+      JsonApiFilter::JSONAPI_FILTER_AMONG_ALL => AccessResult::allowedIfHasPermission($account, $admin_permission),
     ]);
   }
 }
@@ -306,9 +306,9 @@ function hook_jsonapi_entity_filter_access(EntityTypeInterface $entity_type, Acc
  */
 function hook_jsonapi_ENTITY_TYPE_filter_access(EntityTypeInterface $entity_type, AccountInterface $account): array {
   return ([
-    JsonApiFilter::Among_All->value => AccessResult::allowedIfHasPermission($account, 'administer llamas'),
-    JsonApiFilter::Among_Published->value => AccessResult::allowedIfHasPermission($account, 'view all published llamas'),
-    JsonApiFilter::Among_Own->value => AccessResult::allowedIfHasPermissions($account, ['view own published llamas', 'view own unpublished llamas'], 'AND'),
+    JsonApiFilter::JSONAPI_FILTER_AMONG_ALL => AccessResult::allowedIfHasPermission($account, 'administer llamas'),
+    JsonApiFilter::JSONAPI_FILTER_AMONG_PUBLISHED => AccessResult::allowedIfHasPermission($account, 'view all published llamas'),
+    JsonApiFilter::JSONAPI_FILTER_AMONG_OWN => AccessResult::allowedIfHasPermissions($account, ['view own published llamas', 'view own unpublished llamas'], 'AND'),
   ]);
 }
 

@@ -7,7 +7,7 @@ namespace Drupal\jsonapi;
 /**
  * JsonApi filter options.
  */
-enum JsonApiFilter: string {
+class JsonApiFilters {
 
   /**
    * Array key for denoting type-based filtering access.
@@ -19,7 +19,7 @@ enum JsonApiFilter: string {
    * @see hook_jsonapi_entity_filter_access()
    * @see hook_jsonapi_ENTITY_TYPE_filter_access()
    */
-  case Among_All = 'filter_among_all';
+  const JSONAPI_FILTER_AMONG_ALL = 'filter_among_all';
 
   /**
    * Array key for denoting type-based published-only filtering access.
@@ -33,7 +33,7 @@ enum JsonApiFilter: string {
    * @see hook_jsonapi_entity_filter_access()
    * @see hook_jsonapi_ENTITY_TYPE_filter_access()
    */
-  case Among_Published = 'filter_among_published';
+  const JSONAPI_FILTER_AMONG_PUBLISHED = 'filter_among_published';
 
   /**
    * Array key for denoting type-based enabled-only filtering access.
@@ -50,7 +50,7 @@ enum JsonApiFilter: string {
    * @see hook_jsonapi_entity_filter_access()
    * @see hook_jsonapi_ENTITY_TYPE_filter_access()
    */
-  case Among_Enabled = 'filter_among_enabled';
+  const JSONAPI_FILTER_AMONG_ENABLED = 'filter_among_enabled';
 
   /**
    * Array key for denoting type-based owned-only filtering access.
@@ -72,6 +72,6 @@ enum JsonApiFilter: string {
    * @see hook_jsonapi_entity_filter_access()
    * @see hook_jsonapi_ENTITY_TYPE_filter_access()
    */
-  case Among_Own = 'filter_among_own';
+  const JSONAPI_FILTER_AMONG_OWN = 'filter_among_own';
 
 }
