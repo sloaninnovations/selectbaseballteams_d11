@@ -83,6 +83,7 @@
     align-items: center;
     justify-content: start;
     list-style: none;
+    margin: 0;
 
     li {
       border-radius: var(--admin-toolbar-space-8);
@@ -115,6 +116,7 @@
     .navigation-top-bar-context {
       li {
         list-style: none;
+        margin: 0;
       }
     }
   }
