@@ -16,6 +16,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Order;
 
 /**
  * Hook implementations for content_translation.
@@ -134,7 +135,7 @@ class ContentTranslationHooks {
    *
    * @see \Drupal\Core\Entity\Annotation\EntityType
    */
-  #[Hook('entity_type_alter')]
+  #[Hook('entity_type_alter', order: Order::First)]
   public function entityTypeAlter(array &$entity_types) : void {
     // Provide defaults for translation info.
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
@@ -184,7 +185,7 @@ class ContentTranslationHooks {
    * @see content_translation_entity_bundle_info_alter()
    * @see \Drupal\content_translation\ContentTranslationManager::isEnabled()
    */
-  #[Hook('language_content_settings_insert')]
+  #[Hook('language_content_settings_insert', order: Order::Last)]
   public function languageContentSettingsInsert(ContentLanguageSettingsInterface $settings) {
     if ($settings->getThirdPartySetting('content_translation', 'enabled', FALSE)) {
       _content_translation_install_field_storage_definitions($settings->getTargetEntityTypeId());
