@@ -73,25 +73,21 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
 
     foreach ($this->routeMatch->getParameters() as $parameter) {
       if ($parameter instanceof EntityInterface) {
-        $title = $parameter->label();
-        $status = '';
-        $status_class = '';
-        if ($parameter instanceof EntityPublishedInterface) {
-          $status = $parameter->isPublished()
-          ? $this->t('Published')
-          : $this->t('Unpublished');
-          $status_class = $parameter->isPublished() ? 'published' : 'unpublished';
-        }
-        $items = [
-        [
-          '#markup' => $title,
+        $items[] = [
+          '#markup' => $parameter->label(),
           '#wrapper_attributes' => ['class' => ['context-title']],
-        ],
-        [
-          '#markup' => $status,
-          '#wrapper_attributes' => ['class' => ['context-status', $status_class]],
-        ],
         ];
+        try {
+          $items[] = [
+            '#markup' => $this->getStatus($parameter),
+            '#wrapper_attributes' => [
+              'class' => ['context-status', $this->getStatusClass($parameter)],
+            ],
+          ];
+        }
+        catch (\InvalidArgumentException $e) {
+          // No status to show for the given entity.
+        }
         $build = [
           '#theme' => 'item_list',
           '#items' => $items,
@@ -102,6 +98,45 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
       }
     }
     return $build;
+  }
+
+  /**
+   * Retrieves the published status of the given entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity for which the status is being retrieved.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The translated status.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown when the entity does not implement EntityPublishedInterface.
+   *   Child classes may override this method to provide more complete coverage.
+   */
+  protected function getStatus(EntityInterface $entity): TranslatableMarkup {
+    if (!$entity instanceof EntityPublishedInterface) {
+      throw new \InvalidArgumentException('Only EntityPublishedInterface are supported by navigation module.');
+    }
+    return $entity->isPublished() ? $this->t('Published') : $this->t('Unpublished');
+  }
+
+  /**
+   * Determines the CSS class to represent the status of an entity.
+   *
+   * @param EntityInterface $entity
+   *   The entity whose status class is to be determined.
+   *
+   * @return string
+   *   The CSS class representing the status of the entity.
+   * @throws \InvalidArgumentException
+   *   If the provided entity does not implement EntityPublishedInterface.
+   *   Child classes may override this method to provide more complete coverage.
+   */
+  protected function getStatusClass(EntityInterface $entity): string {
+    if (!$entity instanceof EntityPublishedInterface) {
+      throw new \InvalidArgumentException('Only EntityPublishedInterface are supported by navigation module.');
+    }
+    return $entity->isPublished() ? 'published' : 'unpublished';
   }
 
 }
