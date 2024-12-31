@@ -5,6 +5,7 @@ namespace Drupal\navigation\Hook;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Order;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\navigation\NavigationContentLinks;
@@ -47,7 +48,7 @@ class NavigationHooks {
   /**
    * Implements hook_page_top().
    */
-  #[Hook('page_top')]
+  #[Hook('page_top', order: Order::Last)]
   public function pageTop(array &$page_top): void {
     if (!\Drupal::currentUser()->hasPermission('access navigation')) {
       return;
