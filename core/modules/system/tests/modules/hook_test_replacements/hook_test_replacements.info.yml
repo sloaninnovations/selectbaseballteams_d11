@@ -1,0 +1,7 @@
+name: Hook test replacements
+type: module
+description: 'Test module used to test hook replacement.'
+package: Testing
+version: VERSION
+core_version_requirement: '*'
+hidden: true

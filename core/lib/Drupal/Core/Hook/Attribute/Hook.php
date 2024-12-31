@@ -117,12 +117,15 @@ class Hook {
    *   implementation is in.
    * @param \Drupal\Core\Hook\Order|\Drupal\Core\Hook\ComplexOrder|null $order
    *   (optional) Set the order of the implementation.
+   * @param array|null $replacements
+   *   (optional) An array keyed by modules of hook implementations to remove.
    */
   public function __construct(
     public string $hook,
     public string $method = '',
     public ?string $module = NULL,
     public Order|ComplexOrder|NULL $order = NULL,
+    public array|NULL $replacements = NULL,
   ) {}
 
   /**

@@ -72,6 +72,7 @@ class HookCollectorPass implements CompilerPassInterface {
     $orderGroups = [];
     $orderAttributes = [];
     $moduleFinder = [];
+    $allReplacements = [];
     foreach (array_keys($container->getParameter('container.modules')) as $module) {
       foreach ($collector->moduleHooks[$module] ?? [] as $class => $methods) {
         foreach ($methods as $method => $hooks) {
@@ -93,11 +94,27 @@ class HookCollectorPass implements CompilerPassInterface {
                 }
               }
             }
+            if ($hook->hook == 'help' && $hook->module == 'navigation') {
+              $test = 1;
+            }
+            if ($hook->replacements) {
+              foreach ($hook->replacements as $module_replacement => $replacements) {
+                $allReplacements[$module_replacement] = array_merge($allReplacements[$module_replacement] ?? [], $replacements);
+              }
+            }
           }
         }
       }
     }
     $orderGroups = array_map('array_unique', $orderGroups);
+    $allReplacements = array_map('array_unique', $allReplacements);
+
+    foreach ($allReplacements as $module_replacement => $replacements) {
+      foreach($replacements as $replacement) {
+        unset($implementations[$replacement][$module_replacement]);
+        unset($legacyImplementations[$replacement][$module_replacement]);
+      }
+    }
 
     // @todo investigate whether this if() is needed after ModuleHandler::add()
     // is removed.
