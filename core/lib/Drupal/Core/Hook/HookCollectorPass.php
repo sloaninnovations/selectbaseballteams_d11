@@ -423,6 +423,8 @@ class HookCollectorPass implements CompilerPassInterface {
       $this->hookInfo[] = $function;
     }
     if ($hook === 'module_implements_alter') {
+      $message = "$function without a #[LegacyHook] attribute is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3496788";
+      @trigger_error($message, E_USER_DEPRECATED);
       $this->moduleImplementsAlters[] = $function;
     }
     if ($fileinfo->getExtension() !== 'module') {
