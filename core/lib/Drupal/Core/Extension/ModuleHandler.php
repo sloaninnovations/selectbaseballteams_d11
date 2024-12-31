@@ -81,7 +81,10 @@ class ModuleHandler implements ModuleHandlerInterface {
    * @param array $groupIncludes
    *   An array of .inc files to get helpers from.
    * @param array $orderGroups
-   *   An array of hooks that have been ordered by attributes.
+   *   A multidimensional array of hooks that have been ordered and the group
+   *   of hooks they have been ordered against. This is stored separately from
+   *   $hookImplementationsMap to prevent ordering again since this group has
+   *   already been fully ordered in HookCollectorPass.
    *
    * @see \Drupal\Core\DrupalKernel
    * @see \Drupal\Core\CoreServiceProvider

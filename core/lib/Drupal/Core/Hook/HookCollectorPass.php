@@ -112,8 +112,7 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * Register hook implementations as event listeners.
    *
-   * Passes required include information to module_handler.
-   * Passes required runtime ordering information to module_handler.
+   * Passes required include and ordering information to module_handler.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
    *   The container.
@@ -122,7 +121,7 @@ class HookCollectorPass implements CompilerPassInterface {
    * @param array $implementations
    *   All implementations.
    * @param array $legacyImplementations
-   *   Modules that implement hooks.
+   *   Modules that implement legacy hooks.
    * @param array $orderGroups
    *   Groups of hooks to reorder.
    *

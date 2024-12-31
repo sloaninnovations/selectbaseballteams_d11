@@ -17,8 +17,8 @@ abstract readonly class ComplexOrder {
   /**
    * Whether the priority of this hook should be larger than others.
    *
-   * The value of this variable is the same as the constant ::VALUE, it only
-   * exists so ComplexOrder and Order types both have the same value property.
+   * This is fixed to the constant ::VALUE, it simplifies ordering by ensuring
+   * ComplexOrder and Order types both have a value property.
    *
    * @var bool
    */
