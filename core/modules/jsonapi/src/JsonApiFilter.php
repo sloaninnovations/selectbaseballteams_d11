@@ -7,7 +7,7 @@ namespace Drupal\jsonapi;
 /**
  * JsonApi filter options.
  */
-class JsonApiFilters {
+class JsonApiFilter {
 
   /**
    * Array key for denoting type-based filtering access.
