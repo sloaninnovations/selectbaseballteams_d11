@@ -1071,7 +1071,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       $ids = array_filter($ids, function ($id) {
         return is_numeric($id) && $id == (int) $id;
       });
-      $ids = array_map('intval', $ids);
+      $ids = array_map(function ($id) {
+        return (int) $id;
+
+      }, $ids);
     }
     return $ids;
   }

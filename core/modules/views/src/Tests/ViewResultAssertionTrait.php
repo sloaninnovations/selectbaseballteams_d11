@@ -91,7 +91,10 @@ trait ViewResultAssertionTrait {
           // The comparison will be done on the string representation of the
           // value.
           $field_value = $field->getValue($value, $column);
-          $row[$expected_column] = is_array($field_value) ? array_map('strval', $field_value) : (string) $field_value;
+          $row[$expected_column] = is_array($field_value) ? array_map(function ($val) {
+            return (string) $val;
+
+          }, $field_value) : (string) $field_value;
         }
       }
       $result[$key] = $row;

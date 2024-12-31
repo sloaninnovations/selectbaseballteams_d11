@@ -1133,7 +1133,9 @@ class FormState implements FormStateInterface {
           // valid, so errors for this element must be recorded. As the exploded
           // array will all be strings, we need to cast every value of the
           // section array to string.
-          if (array_slice(explode('][', $name), 0, count($section)) === array_map('strval', $section)) {
+          if (array_slice(explode('][', $name), 0, count($section)) === array_map(function ($val) {
+            return (string) $val;
+          }, $section)) {
             $record = TRUE;
             break;
           }

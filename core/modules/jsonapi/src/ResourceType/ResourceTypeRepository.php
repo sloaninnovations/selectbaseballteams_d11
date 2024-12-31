@@ -509,7 +509,10 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   protected function getAllBundlesForEntityType($entity_type_id) {
     // Ensure all keys are strings because numeric values are allowed as bundle
     // names and "array_keys()" casts "42" to 42.
-    return array_map('strval', array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id)));
+    return array_map(function ($val) {
+      return (string) $val;
+
+    }, array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id)));
   }
 
   /**

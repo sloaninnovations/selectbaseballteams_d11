@@ -263,7 +263,10 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
     $default_types = $this->languageManager->getLanguageTypes();
 
     // Ensure that the weights are integers.
-    $enabled_methods = array_map('intval', $enabled_methods);
+    $enabled_methods = array_map(function ($val) {
+      return (int) $val;
+
+    }, $enabled_methods);
 
     // Order the language negotiation method list by weight.
     asort($enabled_methods);

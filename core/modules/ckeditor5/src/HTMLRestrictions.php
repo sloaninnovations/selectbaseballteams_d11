@@ -1287,7 +1287,10 @@ final class HTMLRestrictions {
             // Ensure that all values are strings, this is necessary since PHP
             // transforms the "1" string into 1 the number when it is used as
             // an array key.
-            $value = array_map('strval', array_keys($value));
+            $value = array_map(function ($val) {
+              return (string) $val;
+
+            }, array_keys($value));
           }
           // Drupal never allows style attributes due to security concerns.
           // @see \Drupal\Component\Utility\Xss

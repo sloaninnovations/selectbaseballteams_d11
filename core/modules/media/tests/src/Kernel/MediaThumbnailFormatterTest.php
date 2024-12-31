@@ -83,7 +83,10 @@ class MediaThumbnailFormatterTest extends MediaKernelTestBase {
       'settings' => $settings,
     ]);
     $formatter = $display->getRenderer($this->mediaFieldName);
-    $actual_summary = array_map('strval', $formatter->settingsSummary());
+    $actual_summary = array_map(function ($val) {
+      return (string) $val;
+
+    }, $formatter->settingsSummary());
     $this->assertSame($expected_summary, $actual_summary);
   }
 

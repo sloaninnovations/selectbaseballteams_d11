@@ -229,7 +229,10 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
       }
       $source_id_values = $source_id_values_keyed;
     }
-    return hash('sha256', serialize(array_map('strval', $source_id_values)));
+    return hash('sha256', serialize(array_map(function ($val) {
+      return (string) $val;
+
+    }, $source_id_values)));
   }
 
   /**
