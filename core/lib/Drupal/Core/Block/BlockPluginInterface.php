@@ -74,6 +74,7 @@ interface BlockPluginInterface extends ConfigurableInterface, DependentPluginInt
    *
    * @see \Drupal\block\BlockViewBuilder
    */
+  public function build();
 
   /**
    * Whether to render blocks in a placeholder.
