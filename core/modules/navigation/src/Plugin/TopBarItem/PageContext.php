@@ -24,7 +24,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
   region: TopBarRegion::Context,
   label: new TranslatableMarkup('Page Context'),
 )]
-final class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterface {
+class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterface {
 
   use StringTranslationTrait;
 
