@@ -326,10 +326,10 @@ class TemporaryQueryGuard {
   /**
    * Gets an access condition for the allowed JSONAPI_FILTER_AMONG_* subsets.
    *
-   * If access is allowed for the JsonApiFilter::Among_All subset, then no
+   * If access is allowed for the JsonApiFilter::JSONAPI_FILTER_AMONG_ALL subset, then no
    * conditions are returned. Otherwise, if access is allowed for
-   * JsonApiFilter::Among_Published, JsonApiFilter::Among_Enabled, or
-   * JsonApiFilter::Among_Own, then a condition group is returned for the union
+   * JsonApiFilter::JSONAPI_FILTER_AMONG_PUBLISHED, JsonApiFilter::JSONAPI_FILTER_AMONG_ENABLED, or
+   * JsonApiFilter::JSONAPI_FILTER_AMONG_OWN, then a condition group is returned for the union
    * of allowed subsets. If no subsets are allowed, then static::alwaysFalse()
    * is returned.
    *

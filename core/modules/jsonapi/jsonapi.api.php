@@ -264,10 +264,10 @@ use Drupal\jsonapi\JsonApiFilter;
  *     viewable.
  *   - AccessResult::neutral() if the implementation has no opinion.
  *   The supported subsets for which an access result may be returned are:
- *   - JsonApiFilter::Among_All: all entities of the given type.
- *   - JsonApiFilter::Among_Published: all published entities of the given type.
- *   - JsonApiFilter::Among_Enabled: all enabled entities of the given type.
- *   - JsonApiFilter::Among_Own: all entities of the given type owned by the
+ *   - JsonApiFilter::JSONAPI_FILTER_AMONG_ALL: all entities of the given type.
+ *   - JsonApiFilter::JSONAPI_FILTER_AMONG_PUBLISHED: all published entities of the given type.
+ *   - JsonApiFilter::JSONAPI_FILTER_AMONG_ENABLED: all enabled entities of the given type.
+ *   - JsonApiFilter::JSONAPI_FILTER_AMONG_OWN: all entities of the given type owned by the
  *     user for whom access is being checked.
  *   See the documentation of the above constants for more information about
  *   each subset.
