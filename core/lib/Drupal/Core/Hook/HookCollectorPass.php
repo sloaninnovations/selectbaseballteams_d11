@@ -94,9 +94,6 @@ class HookCollectorPass implements CompilerPassInterface {
                 }
               }
             }
-            if ($hook->hook == 'help' && $hook->module == 'navigation') {
-              $test = 1;
-            }
             if ($hook->replacements) {
               foreach ($hook->replacements as $module_replacement => $replacements) {
                 $allReplacements[$module_replacement] = array_merge($allReplacements[$module_replacement] ?? [], $replacements);
@@ -110,7 +107,7 @@ class HookCollectorPass implements CompilerPassInterface {
     $allReplacements = array_map('array_unique', $allReplacements);
 
     foreach ($allReplacements as $module_replacement => $replacements) {
-      foreach($replacements as $replacement) {
+      foreach ($replacements as $replacement) {
         unset($implementations[$replacement][$module_replacement]);
         unset($legacyImplementations[$replacement][$module_replacement]);
       }
