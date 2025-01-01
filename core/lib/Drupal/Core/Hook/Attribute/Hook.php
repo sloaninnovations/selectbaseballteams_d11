@@ -34,8 +34,13 @@ use Drupal\Core\Hook\Order;
  *   }
  *   @endcode
  *
- * Ordering hook implementations can be done by implementing
- * hook_module_implements_alter.
+ * Ordering hook implementations can be done by using the order parameter.
+ *
+ * @see https://www.drupal.org/node/3493962
+ *
+ * Removing hook implementations can be done by using the remove parameter.
+ *
+ * @see https://www.drupal.org/node/3496786
  *
  * Classes that use this annotation on the class or on their methods are
  * automatically registered as autowired services with the class name as the
