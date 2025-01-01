@@ -138,7 +138,7 @@ class ComponentValidator {
       ...$message_parts,
       ...$missing_class_errors,
     ];
-    $message = implode("/n", $message_parts);
+    $message = implode("\n", $message_parts);
     // Throw the exception with the error message.
     throw new InvalidComponentException($message);
   }
@@ -227,7 +227,7 @@ class ComponentValidator {
       },
       $errors
     );
-    $message = implode("/n", $message_parts);
+    $message = implode("\n", $message_parts);
     throw new InvalidComponentException($message);
   }
 
@@ -282,7 +282,7 @@ class ComponentValidator {
     }
     $props_schema = $this->nullifyClassPropsSchema($props_schema, $classes_per_prop);
     if (!empty($error_messages)) {
-      $message = implode("/n", $error_messages);
+      $message = implode("\n", $error_messages);
       throw new InvalidComponentException($message);
     }
     return [$props_schema, $props_raw];
