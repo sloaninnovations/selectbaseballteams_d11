@@ -7,7 +7,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DestructableInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
@@ -501,8 +500,6 @@ class Registry implements DestructableInterface {
       'base hook' => TRUE,
     ];
 
-    $module_list = array_keys($this->moduleHandler->getModuleList());
-
     // Invoke the hook_theme() implementation, preprocess what is returned, and
     // merge it into $cache.
     $args = [$cache, $type, $theme, $path];
@@ -597,7 +594,7 @@ class Registry implements DestructableInterface {
 
             // Special handling for template prefixed preprocess functions.
             //
-            // @todo: Deprecate and handle this in a different way.
+            // @todo Deprecate and handle this in a different way.
             if (function_exists('template_preprocess_' . $hook)) {
               $info['preprocess functions'][] = 'template_preprocess_' . $hook;
             }
