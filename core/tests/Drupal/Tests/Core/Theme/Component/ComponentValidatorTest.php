@@ -190,7 +190,7 @@ class ComponentValidatorTest extends TestCase {
     yield 'missing required prop' => [
       $props_with_missing_required,
       'my-cta',
-      '[sdc_test:my-cta/text] The property text is required.'
+      '[sdc_test:my-cta/text] The property text is required.',
     ];
 
     $props_with_invalid_class = $valid_cta_properties;
@@ -198,7 +198,7 @@ class ComponentValidatorTest extends TestCase {
     yield 'attributes with invalid object class' => [
       $props_with_invalid_class,
       'my-cta',
-      'Data provided to prop "attributes" for component "sdc_test:my-cta" is not a valid instance of "Drupal\Core\Template\Attribute"'
+      'Data provided to prop "attributes" for component "sdc_test:my-cta" is not a valid instance of "Drupal\Core\Template\Attribute"',
     ];
 
     $props_with_invalid_enum = [];
@@ -206,7 +206,7 @@ class ComponentValidatorTest extends TestCase {
     yield 'ctaTarget violates the allowed properties in the enum' => [
       $props_with_invalid_enum,
       'my-banner',
-      '[sdc_test:my-banner/ctaTarget] Does not have a value in the enumeration ["","_blank"]. The provided value is: "foo".'
+      '[sdc_test:my-banner/ctaTarget] Does not have a value in the enumeration ["","_blank"]. The provided value is: "foo".',
     ];
   }
 
