@@ -132,6 +132,9 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * The name of the entity type's base table.
    *
+   * The base table is used to store single cardinality, untranslatable base
+   * fields such as the UUID or ID.
+   *
    * @var string|null
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
@@ -139,6 +142,10 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
 
   /**
    * The name of the entity type's revision data table.
+   *
+   * The revision data table stores the revision data for each base field that
+   * supports revisions per language. The table is required for translatable
+   * entity types that support revisions.
    *
    * @var string|null
    */
@@ -148,6 +155,8 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * The name of the entity type's revision table.
    *
+   * The revision table stores basic entity key revisions and revision metadata.
+   *
    * @var string|null
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
@@ -155,6 +164,9 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
 
   /**
    * The name of the entity type's data table.
+   *
+   * The data table is required for translatable entity types. The data table
+   * stores base field data per language.
    *
    * @var string|null
    */
