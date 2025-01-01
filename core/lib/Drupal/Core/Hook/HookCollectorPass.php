@@ -72,7 +72,7 @@ class HookCollectorPass implements CompilerPassInterface {
     $orderGroups = [];
     $orderAttributes = [];
     $moduleFinder = [];
-    $allReplacements = [];
+    $allRemovals = [];
     foreach (array_keys($container->getParameter('container.modules')) as $module) {
       foreach ($collector->moduleHooks[$module] ?? [] as $class => $methods) {
         foreach ($methods as $method => $hooks) {
@@ -94,9 +94,9 @@ class HookCollectorPass implements CompilerPassInterface {
                 }
               }
             }
-            if ($hook->replacements) {
-              foreach ($hook->replacements as $module_replacement => $replacements) {
-                $allReplacements[$module_replacement] = array_merge($allReplacements[$module_replacement] ?? [], $replacements);
+            if ($hook->remove) {
+              foreach ($hook->remove as $module_remove => $removals) {
+                $allRemovals[$module_remove] = array_merge($allRemovals[$module_remove] ?? [], $removals);
               }
             }
           }
@@ -104,12 +104,11 @@ class HookCollectorPass implements CompilerPassInterface {
       }
     }
     $orderGroups = array_map('array_unique', $orderGroups);
-    $allReplacements = array_map('array_unique', $allReplacements);
 
-    foreach ($allReplacements as $module_replacement => $replacements) {
-      foreach ($replacements as $replacement) {
-        unset($implementations[$replacement][$module_replacement]);
-        unset($legacyImplementations[$replacement][$module_replacement]);
+    foreach ($allRemovals as $module_remove => $removals) {
+      foreach ($removals as $removal) {
+        unset($implementations[$removal][$module_remove]);
+        unset($legacyImplementations[$removal][$module_remove]);
       }
     }
 

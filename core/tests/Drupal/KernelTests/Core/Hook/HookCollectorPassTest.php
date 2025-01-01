@@ -241,15 +241,15 @@ class HookCollectorPassTest extends KernelTestBase {
    */
   public function testHookReplacements(): void {
     $module_installer = $this->container->get('module_installer');
-    $this->assertTrue($module_installer->install(['hook_test_replacements']));
-    $this->assertFalse(isset($GLOBALS['HookShouldRunTestReplacement']));
-    $this->assertFalse(isset($GLOBALS['HookShouldNotRunTestReplacement']));
+    $this->assertTrue($module_installer->install(['hook_test_remove']));
+    $this->assertFalse(isset($GLOBALS['HookShouldRunTestRemove']));
+    $this->assertFalse(isset($GLOBALS['HookShouldNotRunTestRemove']));
     $module_handler = $this->container->get('module_handler');
     $data = ['hi'];
     $module_handler->invokeAll('custom_hook1', $data);
     $module_handler->invokeAll('custom_hook2', $data);
-    $this->assertTrue(isset($GLOBALS['HookShouldRunTestReplacement']));
-    $this->assertFalse(isset($GLOBALS['HookShouldNotRunTestReplacement']));
+    $this->assertTrue(isset($GLOBALS['HookShouldRunTestRemove']));
+    $this->assertFalse(isset($GLOBALS['HookShouldNotRunTestRemove']));
   }
 
 }

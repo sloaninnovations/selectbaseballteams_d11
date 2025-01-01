@@ -24,7 +24,7 @@ class NavigationHooks {
   /**
    * Implements hook_help().
    */
-  #[Hook('help', replacements: ['layout_builder' => ['help']])]
+  #[Hook('help', remove: ['layout_builder' => ['help']])]
   public function help($route_name, RouteMatchInterface $route_match) {
     switch ($route_name) {
       case 'help.page.navigation':

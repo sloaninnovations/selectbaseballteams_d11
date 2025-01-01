@@ -1,6 +1,6 @@
-name: Hook test replacements
+name: Hook test removal
 type: module
-description: 'Test module used to test hook replacement.'
+description: 'Test module used to test hook removal.'
 package: Testing
 version: VERSION
 core_version_requirement: '*'
