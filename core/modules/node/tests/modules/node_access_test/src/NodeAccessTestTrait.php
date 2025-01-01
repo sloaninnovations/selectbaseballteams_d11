@@ -21,7 +21,7 @@ use Drupal\node\NodeTypeInterface;
  * - node_access_test_secret_catalan: When set to TRUE and using the Catalan
  *   'ca' language code, makes all Catalan content secret.
  *
- * @see node_access_test_node_grants()
+ * @see \Drupal\node_access_test\Hook\NodeAccessTestHooks::nodeGrants()
  * @see \Drupal\Tests\node\Functional\NodeQueryAlterTest
  * @see \Drupal\Tests\node\Functional\NodeAccessBaseTableTest
  */
