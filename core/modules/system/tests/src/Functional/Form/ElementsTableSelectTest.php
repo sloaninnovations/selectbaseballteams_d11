@@ -5,20 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Core\Form\FormState;
+use Drupal\form_test\Callbacks;
 use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests the tableselect form element for expected behavior.
  *
  * @group Form
- * @group #slow
  */
 class ElementsTableSelectTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 
@@ -157,7 +155,7 @@ class ElementsTableSelectTest extends BrowserTestBase {
    */
   public function testMultipleTrueOptionChecker(): void {
 
-    [$header, $options] = _form_test_tableselect_get_data();
+    [$header, $options] = Callbacks::tableselectGetData();
 
     $form['tableselect'] = [
       '#type' => 'tableselect',
@@ -180,7 +178,7 @@ class ElementsTableSelectTest extends BrowserTestBase {
    */
   public function testMultipleFalseOptionChecker(): void {
 
-    [$header, $options] = _form_test_tableselect_get_data();
+    [$header, $options] = Callbacks::tableselectGetData();
 
     $form['tableselect'] = [
       '#type' => 'tableselect',

@@ -33,11 +33,15 @@ class Sql extends QueryPluginBase {
 
   /**
    * A list of tables in the order they should be added, keyed by alias.
+   *
+   * @var array
    */
   protected $tableQueue = [];
 
   /**
    * Holds an array of tables and counts added so that we can create aliases.
+   *
+   * @var array
    */
   public $tables = [];
 
@@ -46,6 +50,8 @@ class Sql extends QueryPluginBase {
    *
    * These are aliases of the primary table that represent different ways to
    * join the same table in.
+   *
+   * @var array
    */
   public $relationships = [];
 
@@ -54,6 +60,8 @@ class Sql extends QueryPluginBase {
    *
    * Each section is in itself an array of pieces and a flag as to whether or
    * not it should be AND or OR.
+   *
+   * @var array
    */
 
   public $where = [];
@@ -62,22 +70,30 @@ class Sql extends QueryPluginBase {
    *
    * Each section is in itself an array of pieces and a flag as to whether or
    * not it should be AND or OR.
+   *
+   * @var array
    */
   public $having = [];
 
   /**
    * A simple array of order by clauses.
+   *
+   * @var array
    */
   public $orderby = [];
 
   /**
    * A simple array of group by clauses.
+   *
+   * @var array
    */
   public $groupby = [];
 
 
   /**
    * An array of fields.
+   *
+   * @var array
    */
   public $fields = [];
 
@@ -95,16 +111,22 @@ class Sql extends QueryPluginBase {
 
   /**
    * Should this query be optimized for counts, for example no sorts.
+   *
+   * @var bool|null
    */
   protected $getCountOptimized = NULL;
 
   /**
    * An array mapping table aliases and field names to field aliases.
+   *
+   * @var array
    */
   protected $fieldAliases = [];
 
   /**
    * Query tags which will be passed over to the dbtng query object.
+   *
+   * @var array
    */
   public $tags = [];
 
@@ -139,7 +161,7 @@ class Sql extends QueryPluginBase {
   /**
    * The count field definition.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public array $count_field;
 
   /**
@@ -148,7 +170,7 @@ class Sql extends QueryPluginBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -268,6 +290,9 @@ class Sql extends QueryPluginBase {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['disable_sql_rewrite'] = [
@@ -551,6 +576,9 @@ class Sql extends QueryPluginBase {
     return $alias;
   }
 
+  /**
+   * Marks a relationship based table as included.
+   */
   protected function markTable($table, $relationship, $alias) {
     // Mark that this table has been added.
     if (empty($this->tables[$relationship][$table])) {
@@ -1735,10 +1763,16 @@ class Sql extends QueryPluginBase {
     return $entities;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function addSignature(ViewExecutable $view) {
     $view->query->addField(NULL, "'" . $view->storage->id() . ':' . $view->current_display . "'", 'view_name');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getAggregationInfo() {
     // @todo Need a way to get database specific and customized aggregation
     //   functions into here.
@@ -1820,10 +1854,16 @@ class Sql extends QueryPluginBase {
     ];
   }
 
+  /**
+   * Builds a simple SQL expression.
+   */
   public function aggregationMethodSimple($group_type, $field) {
     return strtoupper($group_type) . '(' . $field . ')';
   }
 
+  /**
+   * Builds a SQL expression using DISTINCT.
+   */
   public function aggregationMethodDistinct($group_type, $field) {
     $group_type = str_replace('_distinct', '', $group_type);
     return strtoupper($group_type) . '(DISTINCT ' . $field . ')';

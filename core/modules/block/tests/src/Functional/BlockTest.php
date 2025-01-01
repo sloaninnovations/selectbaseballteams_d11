@@ -14,7 +14,6 @@ use Drupal\user\RoleInterface;
  * Tests basic block functionality.
  *
  * @group block
- * @group #slow
  */
 class BlockTest extends BlockTestBase {
 
@@ -389,7 +388,7 @@ class BlockTest extends BlockTestBase {
    *   The machine name of the theme region to move the block to, for example
    *   'header' or 'sidebar_first'.
    */
-  public function moveBlockToRegion(array $block, $region) {
+  public function moveBlockToRegion(array $block, $region): void {
     // Set the created block to a specific region.
     $block += ['theme' => $this->config('system.theme')->get('default')];
     $edit = [];

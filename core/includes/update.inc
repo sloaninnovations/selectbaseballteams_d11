@@ -101,7 +101,8 @@ function _update_fix_missing_schema() {
       // If the module implements hook_update_last_removed() use the
       // value of that if it's higher than the schema versions found so
       // far.
-      if ($last_removed = $module_handler->invoke($module, 'update_last_removed')) {
+      $function = $module . '_update_last_removed';
+      if (function_exists($function) && ($last_removed = $function())) {
         $last_update = max($last_update, $last_removed);
       }
       $update_registry->setInstalledVersion($module, $last_update);
@@ -187,6 +188,7 @@ function update_do_one($module, $number, $dependency_map, &$context) {
       \Drupal::logger('update')->error(Error::DEFAULT_ERROR_MESSAGE, $variables);
 
       unset($variables['backtrace'], $variables['exception'], $variables['severity_level']);
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $ret['#abort'] = ['success' => FALSE, 'query' => t(Error::DEFAULT_ERROR_MESSAGE, $variables)];
     }
   }
@@ -257,6 +259,7 @@ function update_invoke_post_update($function, &$context) {
       unset($variables['backtrace'], $variables['exception'], $variables['severity_level']);
       $ret['#abort'] = [
         'success' => FALSE,
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         'query' => t(Error::DEFAULT_ERROR_MESSAGE, $variables),
       ];
     }

@@ -21,16 +21,13 @@ use PHPUnit\Framework\ExpectationFailedException;
  * Tests BrowserTestBase functionality.
  *
  * @group browsertestbase
- * @group #slow
  */
 class BrowserTestBaseTest extends BrowserTestBase {
   use PathAliasTestTrait;
   use CronRunTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'test_page_test',

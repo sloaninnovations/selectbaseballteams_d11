@@ -166,7 +166,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Database\Connection $database
@@ -274,7 +274,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     // \Drupal::request()->query->get('f') is an array that looks like this in
     // the URL: ?f[]=type:page&f[]=term:27&f[]=term:13&f[]=langcode:en
     // So $parameters['f'] looks like:
-    // array('type:page', 'term:27', 'term:13', 'langcode:en');
+    // [type:page', 'term:27', 'term:13', 'langcode:en'];
     // We need to parse this out into query conditions, some of which go into
     // the keywords string, and some of which are separate conditions.
     $parameters = $this->getParameters();

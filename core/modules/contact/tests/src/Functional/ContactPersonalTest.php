@@ -23,9 +23,7 @@ class ContactPersonalTest extends BrowserTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['contact', 'dblog', 'mail_html_test'];
 
@@ -301,7 +299,7 @@ class ContactPersonalTest extends BrowserTestBase {
    * @param bool $contact_value
    *   (optional) The value the contact field should be set too.
    */
-  protected function checkContactAccess($response, $contact_value = NULL) {
+  protected function checkContactAccess($response, $contact_value = NULL): void {
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/people/create');
     if ($this->config('contact.settings')->get('user_default_enabled', TRUE)) {

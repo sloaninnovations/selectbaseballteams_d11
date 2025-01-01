@@ -19,14 +19,11 @@ use Drupal\Tests\datetime\Functional\DateTestBase;
  * Tests Daterange field functionality.
  *
  * @group datetime
- * @group #slow
  */
 class DateRangeFieldTest extends DateTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['datetime_range'];
 
@@ -49,7 +46,7 @@ class DateRangeFieldTest extends DateTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getTestFieldType() {
+  protected function getTestFieldType(): string {
     return 'daterange';
   }
 
@@ -1462,10 +1459,10 @@ class DateRangeFieldTest extends DateTestBase {
     }
 
     $this->drupalGet('entity_test/add');
-    $this->submitForm($edit, t('Save'));
+    $this->submitForm($edit, 'Save');
     preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
-    $this->assertSession()->pageTextContains(t('entity_test @id has been created.', ['@id' => $id]));
+    $this->assertSession()->pageTextContains(sprintf('entity_test %d has been created.', $id));
 
     // Now set display options.
     $this->displayOptions = [

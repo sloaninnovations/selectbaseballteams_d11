@@ -117,7 +117,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    */
@@ -581,6 +581,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
       // translate it again.
       // @see Drupal\Core\Language::filterLanguages().
       if (!$name instanceof TranslatableMarkup) {
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $name = $this->t($name);
       }
       $list[PluginBase::VIEWS_QUERY_LANGUAGE_SITE_DEFAULT] = $name;
