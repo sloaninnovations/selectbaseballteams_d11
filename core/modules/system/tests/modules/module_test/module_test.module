@@ -95,12 +95,3 @@ function module_test_modules_uninstalled($modules) {
   // can check that the modules were uninstalled in the correct sequence.
   \Drupal::state()->set('module_test.uninstall_order', $modules);
 }
-
-/**
- * Implements hook_altered_test_hook().
- *
- * @see module_test_module_implements_alter()
- */
-function module_test_altered_test_hook(): string {
-  return __FUNCTION__;
-}
