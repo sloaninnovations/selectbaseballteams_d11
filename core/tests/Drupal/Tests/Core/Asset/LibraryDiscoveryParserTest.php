@@ -150,6 +150,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $this->assertCount(2, $library['css']);
     $this->assertCount(0, $library['dependencies']);
     $this->assertEquals($path . '/css/example.css', $library['css'][0]['data']);
+    $this->assertEquals('file', $library['css'][0]['type']);
 
     // Ensures that VERSION is replaced by the current core version.
     $this->assertEquals(\Drupal::VERSION, $library['version']);
@@ -330,6 +331,8 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
     $this->assertEquals('http://example.com/css/example_external.css', $library['css'][0]['data']);
     $this->assertEquals('http://example.com/example_external.js', $library['js'][0]['data']);
+    $this->assertEquals('external', $library['css'][0]['type']);
+    $this->assertEquals('external', $library['js'][0]['type']);
     $this->assertEquals('3.14', $library['version']);
   }
 
@@ -482,15 +485,17 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $libraries = $this->libraryDiscoveryParser->buildByExtension('data_types');
     $library = $libraries['example'];
 
-    $this->assertCount(5, $library['css']);
+    $this->assertCount(6, $library['css']);
     $this->assertEquals('external', $library['css'][0]['type']);
     $this->assertEquals('http://example.com/test.css', $library['css'][0]['data']);
-    $this->assertEquals('file', $library['css'][1]['type']);
-    $this->assertEquals('tmp/test.css', $library['css'][1]['data']);
-    $this->assertEquals('external', $library['css'][2]['type']);
-    $this->assertEquals('//cdn.com/test.css', $library['css'][2]['data']);
-    $this->assertEquals('file', $library['css'][3]['type']);
-    $this->assertEquals('public://test.css', $library['css'][3]['data']);
+    $this->assertEquals('external', $library['css'][1]['type']);
+    $this->assertEquals('https://example.com/test.css', $library['css'][1]['data']);
+    $this->assertEquals('file', $library['css'][2]['type']);
+    $this->assertEquals('tmp/test.css', $library['css'][2]['data']);
+    $this->assertEquals('external', $library['css'][3]['type']);
+    $this->assertEquals('//cdn.com/test.css', $library['css'][3]['data']);
+    $this->assertEquals('file', $library['css'][4]['type']);
+    $this->assertEquals('public://test.css', $library['css'][4]['data']);
   }
 
   /**

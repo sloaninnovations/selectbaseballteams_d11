@@ -2,8 +2,8 @@ example:
   css:
     theme:
       # External URL.
-      'http://example.com/test.css':
-        type: external
+      'http://example.com/test.css': {}
+      https://example.com/test.css: {}
       # Absolute path.
       /tmp/test.css: {}
       # Protocol free.
