@@ -101,6 +101,6 @@ function module_test_modules_uninstalled($modules) {
  *
  * @see module_test_module_implements_alter()
  */
-function module_test_altered_test_hook() {
+function module_test_altered_test_hook(): string {
   return __FUNCTION__;
 }
