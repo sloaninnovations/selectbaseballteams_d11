@@ -27,4 +27,16 @@ function module_implements_alter_test_module_implements_alter(&$implementations,
     // \Drupal\Core\Extension\ModuleHandler::buildImplementationInfo('unimplemented_test_hook').
     $implementations['module_implements_alter_test'] = FALSE;
   }
+
+  // For
+  // \Drupal::moduleHandler()->alter(['drupal_alter', 'drupal_alter_foo'], ...),
+  // make the block module implementations run after all the other modules. Note
+  // that when \Drupal::moduleHandler->alter() is called with an array of types,
+  // the first type is considered primary and controls the module order.
+  if ($hook == 'drupal_alter_alter' && isset($implementations['block'])) {
+    $group = $implementations['block'];
+    unset($implementations['block']);
+    $implementations['block'] = $group;
+  }
+
 }
