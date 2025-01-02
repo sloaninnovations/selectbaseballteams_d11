@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\batch_test;
 
+use Drupal\batch_test\BatchTestHelper;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -118,7 +119,7 @@ class BatchTestCallbacks {
   public function callback_8(bool $throw_exception): void {
     usleep(500);
     if ($throw_exception) {
-      throw new Exception('Exception in batch');
+      throw new \Exception('Exception in batch');
     }
   }
 
@@ -142,6 +143,7 @@ class BatchTestCallbacks {
    * Provides a common 'finished' callback for batches 1 to 7.
    */
   public function finishedHelper($batch_id, $success, $results, $operations, $elapsed): void {
+    $messages = [];
     if ($results) {
       foreach ($results as $op => $op_results) {
         $messages[] = 'op ' . Html::escape((string) $op) . ': processed ' . count($op_results) . ' elements';
