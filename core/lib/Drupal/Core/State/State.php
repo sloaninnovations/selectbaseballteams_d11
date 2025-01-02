@@ -94,12 +94,58 @@ class State extends CacheCollector implements StateInterface {
     // If another request had a cache miss before this request, and also hasn't
     // written to cache yet, then it may already have read this value from the
     // database and could write that value to the cache to the end of the
-    // request. To avoid this race condition, write to the cache immediately
-    // after calling parent::set(). This allows the race condition detection in
-    // CacheCollector::set() to work.
+    // request. To avoid this race condition, attempt to acquire a lock and
+    // write to the cache immediately after calling parent::set(). This allows
+    // the race condition detection in CacheCollector::updateCache() to work.
+    // We write to the cache whether or not we acquire the lock, because
+    // CacheCollector::updateCache() handles the case where there was no cache
+    // item at the beginning of the request, but one was written by another
+    // request before ::updateCache() is called - the new cache item functions
+    // as a tombstone record in this case.
     parent::set($key, $value);
     $this->persist($key);
-    static::updateCache();
+    $lock_name = $this->getCid() . ':' . CacheCollector::class;
+    $lock_acquired = $this->lock->acquire($lock_name);
+    if (!$lock_acquired) {
+      // Wait for the lock to become available for a maximum of one second, then
+      // attempt to acquire the lock again. If we can't acquire the lock, then
+      // the one second that has passed should have given most processes that
+      // were in progress time to complete anyway.
+      $this->lock->wait($lock_name, 1);
+      $lock_acquired = $this->lock->acquire($lock_name);
+    }
+    else {
+      // Cache items are stored with millisecond precision, and are compared by
+      // created time in CacheCollector. This allows for a race condition where:
+      // Process A: writes a cache item.
+      // Process B: reads the cache item.
+      // Process C: (this process) writes a new cache item (all in the same
+      // millisecond).
+      // Process B: reaches CacheCollector::destruct(), and the race condition
+      // protection logic compares the created timestamps of two different cache
+      // items and finds them the same. By sleeping for 10 milliseconds both
+      // prior to and after writing the cache item, we ensure that this
+      // situation doesn't occur as long as the lock was acquired.
+      // Only acquiring the lock isn't sufficient, because if the lock is
+      // acquired and cache item set by two processes within the same
+      // millisecond, the race condition detection won't detect that situation.
+      // @todo this still doesn't account for the case where due to a clock
+      // offset between servers, identical timestamps are recorded despite
+      // happening at different times. Consider a more unique identifier in
+      // CacheCollector.
+      usleep(10000);
+    }
+    $this->cache->set($this->getCid(), [$key => $value], CacheBackendInterface::CACHE_PERMANENT, $this->tags);
+    // Now that the cache item has been created, immediately read it back to
+    // update cacheCreated with the new timstamp, this will be compared in
+    // ::updateCache later.
+    $cached = $this->cache->get($this->getCid());
+    $this->cacheCreated = $cached->created;
+
+    // Even if we've acquired a lock, don't release it here, allow
+    // CacheCollector::updateCache() to release the lock at the end of the
+    // request. This ensures we don't delete the cache item we've just set,
+    // which would undo its utility as a tombstone record.
   }
 
   /**
@@ -110,6 +156,18 @@ class State extends CacheCollector implements StateInterface {
     foreach ($data as $key => $value) {
       parent::set($key, $value);
       $this->persist($key);
+    }
+    // If another request had a cache miss before this request, and also hasn't
+    // written to cache yet, then it may already have read this value from the
+    // database and could write that value to the cache to the end of the
+    // request. To avoid this race condition, attempt to acquire a the lock and
+    // write to the cache immediately after calling parent::set(). This allows
+    // the race condition detection in CacheCollector::updateCache() to work.
+    $lock_name = $this->getCid() . ':' . CacheCollector::class;
+    $lock_acquired = $this->lock->acquire($lock_name);
+    $this->cache->set($this->getCid(), [$data], CacheBackendInterface::CACHE_PERMANENT, $this->tags);
+    if ($lock_acquired) {
+      $this->lock->release($lock_name);
     }
   }
 
