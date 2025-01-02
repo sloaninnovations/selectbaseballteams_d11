@@ -586,11 +586,6 @@ class Registry implements DestructableInterface {
           $prefixes = [];
           if ($type == 'module') {
             $info['preprocess functions'][] = 'template_preprocess';
-            $this->moduleHandler->invokeAllWith('preprocess', function (callable $callback, string $module) use (&$cache, &$info) {
-              $function = $module . '_preprocess';
-              $info['preprocess functions'][] = $function;
-              $cache['preprocess invokes'][$function] = ['module' => $module, 'hook' => 'preprocess'];
-            });
 
             // Special handling for template prefixed preprocess functions.
             //
@@ -598,6 +593,12 @@ class Registry implements DestructableInterface {
             if (function_exists('template_preprocess_' . $hook)) {
               $info['preprocess functions'][] = 'template_preprocess_' . $hook;
             }
+
+            $this->moduleHandler->invokeAllWith('preprocess', function (callable $callback, string $module) use (&$cache, &$info) {
+              $function = $module . '_preprocess';
+              $info['preprocess functions'][] = $function;
+              $cache['preprocess invokes'][$function] = ['module' => $module, 'hook' => 'preprocess'];
+            });
 
             $this->moduleHandler->invokeAllWith('preprocess_' . $hook, function (callable $callback, string $module) use ($hook, &$cache, &$info) {
               $function = $module . '_preprocess_' . $hook;
