@@ -8,7 +8,7 @@
 (($, Drupal, once) => {
   Drupal.behaviors.claroAutoCompete = {
     attach(context) {
-      once('claroAutoComplete', 'input.form-autocomplete', context).forEach(
+      once('claroAutoComplete', 'input.js-form-autocomplete', context).forEach(
         (value) => {
           const $input = $(value);
           const classRemove = ($autoCompleteElem) => {

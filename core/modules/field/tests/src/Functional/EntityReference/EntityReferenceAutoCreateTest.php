@@ -114,6 +114,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     $this->drupalGet('node/add/' . $this->referencingType);
     $target = $this->assertSession()->fieldExists("edit-test-field-0-target-id");
     $this->assertTrue($target->hasClass("form-autocomplete"));
+    $this->assertTrue($target->hasClass("js-form-autocomplete"));
 
     $new_title = $this->randomMachineName();
 

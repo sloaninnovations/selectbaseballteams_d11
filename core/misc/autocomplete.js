@@ -209,9 +209,15 @@
   Drupal.behaviors.autocomplete = {
     attach(context) {
       // Act on textfields with the "form-autocomplete" class.
-      once('autocomplete', 'input.form-autocomplete', context).forEach(
+      once('autocomplete', 'input.form-autocomplete, input.form-autocomplete', context).forEach(
         (element) => {
           const $autocomplete = $(element);
+          if (!$autocomplete.hasClass('js-form-autocomplete')) {
+            Drupal.deprecationError({
+              message:
+                'The form-autocomplete class is deprecated. Use js-form-autocomplete instead.',
+            });
+          }
           // Allow options to be overridden per instance.
           const blacklist = $autocomplete.attr(
             'data-autocomplete-first-character-blacklist',
@@ -239,6 +245,7 @@
       if (trigger === 'unload') {
         $(
           once.remove('autocomplete', 'input.form-autocomplete', context),
+          once.remove('autocomplete', 'input.js-form-autocomplete', context),
         ).autocomplete('destroy');
       }
     },

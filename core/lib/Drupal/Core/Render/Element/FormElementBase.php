@@ -207,6 +207,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
       $metadata = BubbleableMetadata::createFromRenderArray($element);
       if ($access->isAllowed()) {
         $element['#attributes']['class'][] = 'form-autocomplete';
+        $element['#attributes']['class'][] = 'js-form-autocomplete';
         $metadata->addAttachments(['library' => ['core/drupal.autocomplete']]);
         // Provide a data attribute for the JavaScript behavior to bind to.
         $element['#attributes']['data-autocomplete-path'] = $url->getGeneratedUrl();
