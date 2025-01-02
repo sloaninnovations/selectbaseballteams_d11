@@ -124,9 +124,7 @@ class BatchTestController {
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
     $batch = [
-      'operations' => [
-        [$batch_test_helper, 'themeCallback'], [],
-      ],
+      'operations' => [[[$batch_test_helper, 'themeCallback'], []]],
     ];
     batch_set($batch);
     return batch_process('batch-test/redirect');
@@ -143,9 +141,7 @@ class BatchTestController {
     $batch_test_helper->stack(NULL, TRUE);
     $batch = [
       'title' => 'Batch Test',
-      'operations' => [
-        [$batch_test_helper, 'titleCallback', []],
-      ],
+      'operations' => [[[$batch_test_helper, 'titleCallback'], []]],
     ];
     batch_set($batch);
     return batch_process('batch-test/redirect');
