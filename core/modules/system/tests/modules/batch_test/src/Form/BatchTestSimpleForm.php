@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\batch_test\Form;
 
+use Drupal\batch_test\BatchTestHelper;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -52,11 +53,11 @@ class BatchTestSimpleForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    batch_test_stack(NULL, TRUE);
+    $batch_test_helper = new BatchTestHelper();
+    $batch_test_helper->stack(NULL, TRUE);
 
     foreach ($form_state->getValue('batch') as $batch) {
-      $function = '_batch_test_' . $batch;
-      batch_set($function());
+      batch_set($batch_test_helper->$batch());
     }
 
     $form_state->setRedirect('batch_test.redirect');
