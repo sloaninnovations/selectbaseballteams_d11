@@ -31202,18 +31202,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/options/src/Plugin/views/filter/ListField.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Function options_test_allowed_values_callback\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/options/tests/options_test/options_test.module',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function options_test_dynamic_values_callback\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/options/tests/options_test/options_test.module',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\options\\\\FunctionalJavascript\\\\OptionsFieldUIAllowedValuesTest\\:\\:assertFieldDoesNotExistOnOverview\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

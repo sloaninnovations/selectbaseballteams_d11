@@ -268,7 +268,7 @@ class FieldStorageAddForm extends FormBase {
       if (!empty($this->messenger()->messagesByType('error'))) {
         $label = $form_state->getValue('label');
         $message = explode(':', $this->messenger()->messagesByType('error')[0])[1];
-        $form_state->setErrorByName('drupal-modal', $this->t("There was a problem creating field $label: $message"));
+        $form_state->setErrorByName('drupal-modal', $this->t('There was a problem creating field @label: @message',['@label' => $form_state->getValue('label'), '@message' => explode(':', $this->messenger()->messagesByType('error')[0])[1]]));
         // We need to clear out the messenger so that we just see the message
         // on the modal and not on the page when it closes.
         $this->messenger()->deleteAll();
@@ -453,8 +453,7 @@ class FieldStorageAddForm extends FormBase {
       $field_storage_entity = $this->entityTypeManager->getStorage('field_storage_config')->create($field_storage_values);
     }
     catch (\Exception $e) {
-      $message = $e->getMessage();
-      $this->messenger()->addError($this->t("There was a problem creating field :$message"));
+      $this->messenger()->addError($this->t('There was a problem creating field :@message', ['@message' => $e->getMessage()]));
       return;
     }
 
