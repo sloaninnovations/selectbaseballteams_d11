@@ -191,10 +191,9 @@ class BatchTestCallbacks {
    *
    * Triggers 'finished' callback for batch 1.
    */
-  function finished_1($success, $results, $operations, $elapsed) {
+  function finished_1($success, $results, $operations, $elapsed): void {
     $this->finishedHelper(1, $success, $results, $operations, $elapsed);
   }
-
 
   /**
    * Implements callback_batch_finished().
