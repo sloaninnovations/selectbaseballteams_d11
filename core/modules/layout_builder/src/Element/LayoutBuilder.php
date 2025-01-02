@@ -89,12 +89,22 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
    * Form element #process callback.
    *
    * Save the layout builder element array parents as a property on the top form
-   * element so that they can be used to access the element within the whole
+   * element, so that they can be used to access the element within the form
    * render array later.
+   *
+   * @param array $element
+   *   The render array for the layout builder element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   Form state object.
+   * @param array $form
+   *   The render array for the complete form.
+   *
+   * @return array
+   *   The layout builder element render array after processing.
    *
    * @see \Drupal\layout_builder\Controller\LayoutBuilderHtmlEntityFormController
    */
-  public static function layoutBuilderElementGetKeys(array $element, FormStateInterface $form_state, &$form): array {
+  public static function layoutBuilderElementGetKeys(array $element, FormStateInterface $form_state, array &$form): array {
     $form['#layout_builder_element_keys'] = $element['#array_parents'];
     $form['#pre_render'][] = [static::class, 'moveLayoutBuilderOutsideForm'];
     $form['#post_render'][] = [static::class, 'addRenderedLayoutBuilder'];
@@ -107,7 +117,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
    * Because the layout builder element can contain components with forms, it
    * needs to exist outside forms within the DOM, to avoid nested form tags.
    *
-   * @see ::addRenderedLayoutBuilder())
+   * @see ::addRenderedLayoutBuilder()
    *
    * @param array $form
    *   The rendered form.
@@ -119,6 +129,9 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
     if (isset($form['#layout_builder_element_keys'])) {
       $layout_builder_element = &NestedArray::getValue($form, $form['#layout_builder_element_keys']);
       // Save the rendered layout builder HTML to a non-rendering child key.
+      // Since this method is a pre_render callback, it is assumed that it is
+      // called while rendering with an active render context, so that the
+      // cache metadata and attachments bubble correctly.
       $form['#layout_builder_markup'] = \Drupal::service('renderer')->render($layout_builder_element);
       // Remove the layout builder child element within form array.
       $layout_builder_element = [];
