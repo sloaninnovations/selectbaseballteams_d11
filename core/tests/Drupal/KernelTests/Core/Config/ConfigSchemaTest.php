@@ -10,6 +10,10 @@ use Drupal\Core\Config\Schema\ConfigSchemaAlterException;
 use Drupal\Core\Config\Schema\Ignore;
 use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Config\Schema\Undefined;
+use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\TypedData\DataDefinitionInterface;
+use Drupal\Core\TypedData\MapDataDefinition;
+use Drupal\Core\TypedData\Plugin\DataType\BooleanData;
 use Drupal\Core\TypedData\Plugin\DataType\StringData;
 use Drupal\Core\TypedData\Type\IntegerInterface;
 use Drupal\Core\TypedData\Type\StringInterface;
@@ -41,6 +45,21 @@ class ConfigSchemaTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installConfig(['system', 'image', 'config_schema_test']);
+  }
+
+  /**
+   * @dataProvider providerCreate
+   */
+  public function testCreate(DataDefinitionInterface $definition, string $expected_class): void {
+    $this->assertInstanceOf($expected_class, \Drupal::service('config.typed')->create($definition));
+  }
+
+  public function providerCreate(): array {
+    return [
+      'boolean' => [DataDefinition::create('boolean'), BooleanData::class],
+      'string' => [DataDefinition::create('string'), StringData::class],
+      'mapping' => [MapDataDefinition::create('mapping'), Mapping::class],
+    ];
   }
 
   /**
