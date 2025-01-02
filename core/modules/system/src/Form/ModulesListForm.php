@@ -152,22 +152,27 @@ class ModulesListForm extends FormBase {
     $form['filters'] = [
       '#type' => 'container',
       '#attributes' => [
-        'class' => ['table-filter', 'js-show'],
+        'class' => ['table-filter', 'js-show', 'container-inline'],
       ],
     ];
 
     $form['filters']['text'] = [
       '#type' => 'search',
-      '#title' => $this->t('Filter modules'),
+      '#title' => $this->t('Search modules'),
       '#title_display' => 'invisible',
       '#size' => 30,
-      '#placeholder' => $this->t('Filter by name or description'),
+      '#placeholder' => $this->t('Search by name or description'),
       '#description' => $this->t('Enter a part of the module name or description'),
       '#attributes' => [
         'class' => ['table-filter-text'],
         'data-table' => '#system-modules',
         'autocomplete' => 'off',
       ],
+    ];
+
+    $form['filters']['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Search'),
     ];
 
     // Sort all modules by their names.

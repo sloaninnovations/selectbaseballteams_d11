@@ -915,7 +915,7 @@ function claro_form_system_modules_alter(&$form, FormStateInterface $form_state)
     $form['filters']['#attributes']['class'][] = 'modules-table-filter';
     if (isset($form['filters']['text'])) {
       unset($form['filters']['text']['#title_display']);
-      $form['filters']['text']['#title'] = t('Filter');
+      $form['filters']['text']['#title'] = t('Search Module');
     }
   }
 
