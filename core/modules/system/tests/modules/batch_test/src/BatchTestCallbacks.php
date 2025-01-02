@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\batch_test;
 
-use Drupal\batch_test\BatchTestHelper;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RedirectResponse;
