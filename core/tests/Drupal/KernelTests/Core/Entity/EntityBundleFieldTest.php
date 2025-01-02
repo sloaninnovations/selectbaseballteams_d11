@@ -94,7 +94,7 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     // bundle is deleted.
     $entity = $storage->create(['type' => 'custom', 'custom_bundle_field' => 'new']);
     $entity->save();
-    entity_test_delete_bundle('custom', 'entity_test_update');
+    EntityTestHelper::deleteBundle('custom', 'entity_test_update');
 
     $table = $table_mapping->getDedicatedDataTableName($entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition(), TRUE);
     $result = $this->database->select($table, 'f')

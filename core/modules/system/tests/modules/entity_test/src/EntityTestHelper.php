@@ -54,4 +54,21 @@ class EntityTestHelper {
     return array_combine($types, $types);
   }
 
+  /**
+   * Deletes a bundle for entity_test entities.
+   *
+   * @param string $bundle
+   *   The machine-readable name of the bundle to delete.
+   * @param string $entity_type
+   *   (optional) The entity type for which the bundle is deleted. Defaults to
+   *   'entity_test'.
+   */
+  public static function deleteBundle($bundle, $entity_type = 'entity_test'): void {
+    $bundles = \Drupal::state()->get($entity_type . '.bundles', [$entity_type => ['label' => 'Entity Test Bundle']]);
+    unset($bundles[$bundle]);
+    \Drupal::state()->set($entity_type . '.bundles', $bundles);
+
+    \Drupal::service('entity_bundle.listener')->onBundleDelete($bundle, $entity_type);
+  }
+
 }

@@ -371,7 +371,7 @@ class FieldAttachStorageTest extends FieldKernelTestBase {
     $this->container->get('entity_display.repository')
       ->getFormDisplay($entity_type, $this->fieldTestData->field->getTargetBundle())
       ->delete();
-    entity_test_delete_bundle($this->fieldTestData->field->getTargetBundle(), $entity_type);
+    EntityTestHelper::deleteBundle($this->fieldTestData->field->getTargetBundle(), $entity_type);
 
     // Verify no data gets loaded
     $controller = $this->container->get('entity_type.manager')->getStorage($entity->getEntityTypeId());

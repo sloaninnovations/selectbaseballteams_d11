@@ -702,7 +702,7 @@ class ContentModerationStateTest extends KernelTestBase {
 
     // Delete the test bundle to ensure the workflow entity responds
     // appropriately.
-    entity_test_delete_bundle('test_bundle');
+    EntityTestHelper::deleteBundle('test_bundle');
 
     $workflow = Workflow::load('editorial');
     $this->assertEquals([], $workflow->getTypePlugin()->getBundlesForEntityType('entity_test'));

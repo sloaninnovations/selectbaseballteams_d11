@@ -151,7 +151,7 @@ class EntityAddUITest extends BrowserTestBase {
     $this->container->get('entity_display.repository')
       ->getFormDisplay('entity_test_mul', 'entity_test_mul')
       ->delete();
-    entity_test_delete_bundle('entity_test_mul', 'entity_test_mul');
+    EntityTestHelper::deleteBundle('entity_test_mul', 'entity_test_mul');
 
     // One bundle exists, confirm redirection to the add-form.
     $this->drupalGet('/entity_test_mul/add');

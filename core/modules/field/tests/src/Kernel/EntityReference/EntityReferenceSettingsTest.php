@@ -164,7 +164,7 @@ class EntityReferenceSettingsTest extends KernelTestBase {
     $this->assertEquals($handler_settings, $actual_handler_settings);
 
     // Delete the custom bundle.
-    entity_test_delete_bundle($this->customBundle, 'entity_test');
+    EntityTestHelper::deleteBundle($this->customBundle, 'entity_test');
 
     // Ensure that field_field_config_presave() logs the expected critical
     // error.
