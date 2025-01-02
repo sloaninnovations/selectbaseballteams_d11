@@ -73,7 +73,6 @@ class EntityOperations {
    * Implements hook_entity_presave().
    */
   #[Hook('entity_presave', order: Order::First)]
-  #[Hook('entity_presave', order: Order::Last)]
   public function entityPresave(EntityInterface $entity): void {
     if ($this->shouldSkipOperations($entity)) {
       return;
@@ -113,6 +112,16 @@ class EntityOperations {
     if (!$entity->isSyncing()) {
       $field_name = $entity->getEntityType()->getRevisionMetadataKey('workspace');
       $entity->{$field_name}->target_id = $this->workspaceManager->getActiveWorkspace()->id();
+    }
+  }
+
+  /**
+   * Implements hook_entity_presave().
+   */
+  #[Hook('entity_presave', order: Order::Last)]
+  public function entityPresaveLast(EntityInterface $entity): void {
+    if ($this->shouldSkipOperations($entity)) {
+      return;
     }
 
     // When a new published entity is inserted in a non-default workspace, we
