@@ -35078,12 +35078,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/ajax_test/src/Form/AjaxTestMessageCommandForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$messages might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/batch_test/batch_test.callbacks.inc',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\batch_test\\\\Form\\\\BatchTestChainedForm\\:\\:batchTestChainedFormSubmit1\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
