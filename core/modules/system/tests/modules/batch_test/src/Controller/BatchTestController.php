@@ -55,7 +55,7 @@ class BatchTestController {
     $batch_test_helper = new BatchTestHelper();
     // Set the batch and process it.
     $batch_builder = (new BatchBuilder())
-      ->addOperation([[$batch_test_helper, 'nestedDrupalFormSubmitCallback'], [$value]]);
+      ->addOperation([$batch_test_helper, 'nestedDrupalFormSubmitCallback'], [$value]);
     batch_set($batch_builder->toArray());
     return batch_process('batch-test/redirect');
   }

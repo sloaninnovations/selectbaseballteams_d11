@@ -191,6 +191,16 @@ class BatchTestCallbacks {
    *
    * Triggers 'finished' callback for batch 1.
    */
+  function finished_1($success, $results, $operations, $elapsed) {
+    $this->finishedHelper(1, $success, $results, $operations, $elapsed);
+  }
+
+
+  /**
+   * Implements callback_batch_finished().
+   *
+   * Triggers 'finished' callback for batch 1.
+   */
   public function finished_1_finished($success, $results, $operations, $elapsed): RedirectResponse {
     $this->finishedHelper(1, $success, $results, $operations, $elapsed);
     return new RedirectResponse(Url::fromRoute('test_page_test.test_page', [], ['absolute' => TRUE])->toString());
