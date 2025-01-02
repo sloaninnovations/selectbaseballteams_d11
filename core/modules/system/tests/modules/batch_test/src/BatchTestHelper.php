@@ -115,7 +115,7 @@ class BatchTestHelper {
     for ($i = 1; $i <= round($total / 2); $i++) {
       $batch_builder->addOperation([$batch_test_callbacks, 'callback_1'], [$i, $sleep]);
     }
-    $batch_builder->$batch_test_callbacks, 'nestedBatchCallback'], [[2]]);
+    $batch_builder->addOperation([$batch_test_callbacks, 'nestedBatchCallback'], [[2]]);
     for ($i = round($total / 2) + 1; $i <= $total; $i++) {
       $batch_builder->addOperation([$batch_test_callbacks, 'callback_1'], [$i, $sleep]);
     }
