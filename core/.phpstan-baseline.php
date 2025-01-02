@@ -19263,11 +19263,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionalJavascript/ManageFieldsTest.php',
 ];
 $ignoreErrors[] = [
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionalJavascript/ManageDisplayTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\Unit\\\\FieldUiTableTest\\:\\:providerTestReduceOrder\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
