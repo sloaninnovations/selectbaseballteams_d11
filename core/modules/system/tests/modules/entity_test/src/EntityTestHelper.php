@@ -62,6 +62,8 @@ class EntityTestHelper {
    * @param string $entity_type
    *   (optional) The entity type for which the bundle is deleted. Defaults to
    *   'entity_test'.
+   *
+   * @see \Drupal\entity_test\Hook\EntityTestHooks::entityBundleInfo()
    */
   public static function deleteBundle($bundle, $entity_type = 'entity_test'): void {
     $bundles = \Drupal::state()->get($entity_type . '.bundles', [$entity_type => ['label' => 'Entity Test Bundle']]);
