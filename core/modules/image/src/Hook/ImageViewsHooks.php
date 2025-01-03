@@ -13,8 +13,8 @@ class ImageViewsHooks {
   /**
    * Implements hook_field_views_data().
    *
-   * Views integration for image fields. Adds an image relationship to the default
-   * field data.
+   * Views integration for image fields. Adds an image relationship to the
+   * default field data.
    *
    * @see views_field_default_views_data()
    */
