@@ -69,14 +69,15 @@ class I18nQueryTraitTest extends MigrateUpgradeExecuteTestBase {
    * Tests that I18nQueryTrait is available for migrations.
    */
   public function testUpgradeStart(): void {
+    $error_log = $this->root . '/' . $this->siteDirectory . '/error.log';
     // Ensure the test error log is empty before migrate start.
-    $this->assertFileDoesNotExist($this->root . '/' . $this->siteDirectory . '/error.log', 'Error.log not empty before start.');
+    $this->assertFalse(@file($error_log), 'Error.log not empty before start.');
 
     // Start the upgrade process.
     $this->submitCredentialForm();
 
     // No fatal error after form submit.
-    $this->assertFileDoesNotExist($this->root . '/' . $this->siteDirectory . '/error.log', 'Fatal error on migrate start.');
+    $this->assertFalse(@file($error_log), 'Fatal error on migrate start.');
     $this->assertSession()->pageTextContains('Upgrade analysis report');
   }
 
