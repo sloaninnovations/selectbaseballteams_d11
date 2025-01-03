@@ -22388,13 +22388,13 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\RestJsonApiUnsupportedTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\RestJsonApiUnsupportedTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/RestJsonApiUnsupportedTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\RestJsonApiUnsupportedTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\RestJsonApiUnsupportedTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/RestJsonApiUnsupportedTest.php',
@@ -31478,6 +31478,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/path/tests/src/Kernel/Plugin/migrate/source/d7/UrlAliasTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\path_alias\\\\AliasManager\\:\\:\\$langcodePreloaded\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/path_alias/src/AliasManager.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\path_alias\\\\AliasManager\\:\\:cacheClear\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -31491,18 +31497,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\path_alias\\\\AliasManager\\:\\:pathAliasWhitelistRebuild\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/src/AliasManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\path_alias\\\\AliasManager\\:\\:setCacheKey\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/src/AliasManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\path_alias\\\\AliasManager\\:\\:writeCache\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/path_alias/src/AliasManager.php',
@@ -31686,6 +31680,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/path_alias/tests/src/Kernel/EntityAliasTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^@covers value \\\\Drupal\\\\path_alias\\\\AliasManager\\:\\:writeCache references an invalid method\\.$#',
+	'identifier' => 'phpunit.coversMethod',
+	'count' => 6,
+	'path' => __DIR__ . '/modules/path_alias/tests/src/Unit/AliasManagerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Unit\\\\AliasManagerTest\\:\\:testGetAliasByPathPrefixList\\(\\) has no return type specified\\.$#',
