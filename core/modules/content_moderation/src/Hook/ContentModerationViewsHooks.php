@@ -4,7 +4,7 @@ namespace Drupal\content_moderation\Hook;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\content_moderation\ModerationInformation;
+use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\content_moderation\ViewsData;
 
 /**
@@ -14,7 +14,7 @@ class ContentModerationViewsHooks {
 
   public function __construct(
     protected readonly EntityTypeManagerInterface $entityTypeManager,
-    protected readonly ModerationInformation $moderationInformation,
+    protected readonly ModerationInformationInterface $moderationInformation,
   ) {}
 
   /**
