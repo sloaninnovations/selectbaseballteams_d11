@@ -704,9 +704,9 @@ class EntityTestHooks {
   }
 
   /**
-   * Implements hook_entity_duplicate_alter().
+   * Implements hook_entity_duplicate().
    */
-  #[Hook('entity_duplicate_alter')]
+  #[Hook('entity_duplicate')]
   public function entityDuplicateAlter(EntityInterface $duplicate, EntityInterface $entity) : void {
     if ($duplicate instanceof ContentEntityInterface && str_contains($duplicate->label(), 'UUID CRUD test entity') && $duplicate->hasField('name')) {
       $duplicate->set('name', $duplicate->label() . ' duplicate');
@@ -714,10 +714,10 @@ class EntityTestHooks {
   }
 
   /**
-   * Implements hook_entity_duplicate_alter().
+   * Implements hook_ENTITY_TYPE_duplicate().
    */
-  #[Hook('entity_test_duplicate_alter')]
-  public function entityTestDuplicateAlter(EntityTest $duplicate, EntityTest $entity) : void {
+  #[Hook('entity_test_duplicate')]
+  public function entityTestDuplicate(EntityTest $duplicate, EntityTest $entity) : void {
     if (str_contains($duplicate->label(), 'UUID CRUD test entity') && $duplicate->hasField('name')) {
       $duplicate->set('name', 'prefix ' . $duplicate->label());
     }
