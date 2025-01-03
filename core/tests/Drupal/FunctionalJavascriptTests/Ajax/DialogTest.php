@@ -87,6 +87,8 @@ class DialogTest extends WebDriverTestBase {
     $non_modal_dialog = $this->assertSession()->waitForElementVisible('css', 'div.ui-dialog');
     $this->assertNull($non_modal_dialog->getAttribute('aria-modal'), 'Dialog modal has no aria-modal attribute');
     $this->assertNotNull($non_modal_dialog, 'Link opens a non-modal dialog.');
+    $non_modal_dialog_title = $non_modal_dialog->find('css', "h2.ui-dialog-title:contains('AJAX Dialog & contents')");
+    $this->assertNotNull($non_modal_dialog_title);
 
     // Tests the dialog contains a target element specified in the AJAX request.
     $non_modal_dialog->find('css', 'div#ajax-test-dialog-wrapper-1');
