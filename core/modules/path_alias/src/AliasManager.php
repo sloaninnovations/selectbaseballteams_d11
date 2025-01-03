@@ -183,14 +183,9 @@ class AliasManager implements AliasManagerInterface {
     }
     // This should always be true.
     if ($this->requestedPaths[$langcode]) {
-
-      // During the first call to this method per language, load the expected
-      // paths for the page from cache.
-      if (empty($this->langcodePreloaded[$langcode])) {
-        $this->lookupMap[$langcode] = array_merge($this->lookupMap[$langcode] ?? [], $this->pathAliasRepository->preloadPathAlias($this->requestedPaths[$langcode], $langcode));
-        // Keep a record of paths with no alias to avoid querying twice.
-        $this->noAlias[$langcode] = array_merge($this->noAlias[$langcode] ?? [],  array_flip(array_diff($this->requestedPaths[$langcode], array_keys($this->lookupMap[$langcode]))));
-      }
+      $this->lookupMap[$langcode] = array_merge($this->lookupMap[$langcode] ?? [], $this->pathAliasRepository->preloadPathAlias($this->requestedPaths[$langcode], $langcode));
+      // Keep a record of paths with no alias to avoid querying twice.
+      $this->noAlias[$langcode] = array_merge($this->noAlias[$langcode] ?? [],  array_flip(array_diff($this->requestedPaths[$langcode], array_keys($this->lookupMap[$langcode]))));
 
       // If we already know that there are no aliases for this path simply return.
       if (!empty($this->noAlias[$langcode][$path])) {
