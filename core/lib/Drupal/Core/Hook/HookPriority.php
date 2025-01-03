@@ -104,8 +104,6 @@ class HookPriority {
    *   hook implementation to be changed.
    * @param int $priority
    *   The new priority.
-   *
-   * @return void
    */
   public function set(string $class, int $key, int $priority): void {
     $definition = $this->container->findDefinition($class);

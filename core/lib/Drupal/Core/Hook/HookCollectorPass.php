@@ -137,8 +137,6 @@ class HookCollectorPass implements CompilerPassInterface {
    *   Modules that implement legacy hooks.
    * @param array $orderGroups
    *   Groups of hooks to reorder.
-   *
-   * @return void
    */
   protected static function registerImplementations(ContainerBuilder $container, HookCollectorPass $collector, array $implementations, array $legacyImplementations, array $orderGroups): void {
     $container->register(ProceduralCall::class, ProceduralCall::class)
@@ -202,8 +200,6 @@ class HookCollectorPass implements CompilerPassInterface {
    *   An array keyed by the class and method of a hook implementation, value
    *   is the module. This is not necessarily the same as the module the class
    *   is in because the implementation might be on behalf of another module.
-   *
-   * @return void
    */
   protected static function reOrderImplementations(ContainerBuilder $container, array $orderAttributes, array $orderGroups, array $implementations, array $moduleFinder): void {
     $hookPriority = new HookPriority($container);
