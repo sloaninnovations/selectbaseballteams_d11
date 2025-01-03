@@ -100,17 +100,13 @@ use Drupal\Core\Hook\Order;
 class Hook {
 
   /**
-   * The class the hook implementation is in.
-   *
-   * @var string
-   */
-  public string $class = '';
-
-  /**
    * Constructs a Hook attribute object.
    *
    * @param string $hook
    *   The short hook name, without the 'hook_' prefix.
+   * @param string $class
+   *   (optional) The class name. This should only be used when ordering on
+   *   behalf of another hook.
    * @param string $method
    *   (optional) The method name. If this attribute is on a method, this
    *   parameter is not required. If this attribute is on a class and this
@@ -127,6 +123,7 @@ class Hook {
    */
   public function __construct(
     public string $hook,
+    public string $class = '',
     public string $method = '',
     public ?string $module = NULL,
     public Order|ComplexOrder|NULL $order = NULL,
@@ -144,7 +141,9 @@ class Hook {
    *   The method for the hook.
    */
   public function set(string $class, string $module, string $method): void {
-    $this->class = $class;
+    if (!$this->class) {
+      $this->class = $class;
+    }
     if (!$this->module) {
       $this->module = $module;
     }

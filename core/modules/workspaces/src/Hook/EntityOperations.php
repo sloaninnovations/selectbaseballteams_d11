@@ -12,6 +12,8 @@ use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Order;
+use Drupal\Core\Hook\OrderBefore;
+use Drupal\content_moderation\Hook\ContentModerationHooks;
 use Drupal\workspaces\WorkspaceAssociationInterface;
 use Drupal\workspaces\WorkspaceInformationInterface;
 use Drupal\workspaces\WorkspaceManagerInterface;
@@ -73,6 +75,12 @@ class EntityOperations {
    * Implements hook_entity_presave().
    */
   #[Hook('entity_presave', order: Order::First)]
+  #[Hook('entity_presave',
+    module: 'content_moderation',
+    class: ContentModerationHooks::class,
+    method: 'entityPresave',
+    order: new OrderBefore(['workspaces'])
+  )]
   public function entityPresave(EntityInterface $entity): void {
     if ($this->shouldSkipOperations($entity)) {
       return;
@@ -112,16 +120,6 @@ class EntityOperations {
     if (!$entity->isSyncing()) {
       $field_name = $entity->getEntityType()->getRevisionMetadataKey('workspace');
       $entity->{$field_name}->target_id = $this->workspaceManager->getActiveWorkspace()->id();
-    }
-  }
-
-  /**
-   * Implements hook_entity_presave().
-   */
-  #[Hook('entity_presave', order: Order::Last)]
-  public function entityPresaveLast(EntityInterface $entity): void {
-    if ($this->shouldSkipOperations($entity)) {
-      return;
     }
 
     // When a new published entity is inserted in a non-default workspace, we
