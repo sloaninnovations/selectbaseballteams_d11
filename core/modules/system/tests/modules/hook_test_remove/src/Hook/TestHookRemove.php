@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\hook_test_remove\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Attribute\RemoveHook;
 
 /**
  * Add a hook here, then remove it with another attribute.
@@ -22,7 +23,8 @@ class TestHookRemove {
   /**
    * This hook should run and prevent custom_hook1.
    */
-  #[Hook('custom_hook2', remove: ['hook_test_remove' => ['custom_hook1']])]
+  #[Hook('custom_hook2')]
+  #[RemoveHook('custom_hook1', self::class, 'hook_test_remove', 'hookDoNotRun')]
   public static function hookDoRun(): void {
     $GLOBALS['HookShouldRunTestRemove'] = 'HookShouldRunTestRemove';
   }

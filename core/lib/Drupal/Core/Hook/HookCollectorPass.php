@@ -10,6 +10,8 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\Hook\Attribute\OverrideHook;
+use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -69,16 +71,21 @@ class HookCollectorPass implements CompilerPassInterface {
   public function process(ContainerBuilder $container): array {
     $collector = static::collectAllHookImplementations($container->getParameter('container.modules'), $container);
     $implementations = [];
+    $legacyImplementations = [];
     $orderGroups = [];
     $orderAttributes = [];
     $moduleFinder = [];
-    $allRemovals = [];
+    $removals = [];
     foreach (array_keys($container->getParameter('container.modules')) as $module) {
       foreach ($collector->moduleHooks[$module] ?? [] as $class => $methods) {
         foreach ($methods as $method => $hooks) {
           foreach ($hooks as $hook) {
             assert($hook instanceof Hook);
-            if ($hook->class && !class_exists($hook->class, FALSE)) {
+            if ($hook instanceof OverrideHook && !class_exists($hook->class, FALSE)) {
+              continue;
+            }
+            if ($hook instanceof RemoveHook) {
+              $removals[] = $hook;
               continue;
             }
             $hook->set(class: $class, module: $module, method: $method);
@@ -97,22 +104,15 @@ class HookCollectorPass implements CompilerPassInterface {
                 }
               }
             }
-            if ($hook->remove) {
-              foreach ($hook->remove as $module_remove => $removals) {
-                $allRemovals[$module_remove] = array_merge($allRemovals[$module_remove] ?? [], $removals);
-              }
-            }
           }
         }
       }
     }
     $orderGroups = array_map('array_unique', $orderGroups);
 
-    foreach ($allRemovals as $module_remove => $removals) {
-      foreach ($removals as $removal) {
-        unset($implementations[$removal][$module_remove]);
-        unset($legacyImplementations[$removal][$module_remove]);
-      }
+    foreach ($removals as $hook) {
+      unset($legacyImplementations[$hook->hook][$hook->module]);
+      unset($implementations[$hook->hook][$hook->module][$hook->class][$hook->method]);
     }
 
     // @todo investigate whether this if() is needed after ModuleHandler::add()
@@ -479,7 +479,7 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   protected static function getAttributeInstances(array $attributes, array $reflections): array {
     foreach ($reflections as $reflection) {
-      if ($reflection_attributes = $reflection->getAttributes()) {
+      if ($reflection_attributes = $reflection->getAttributes(Hook::class, \ReflectionAttribute::IS_INSTANCEOF)) {
         $method = $reflection instanceof \ReflectionMethod ? $reflection->getName() : '__invoke';
         $attributes[$method] = array_map(fn (\ReflectionAttribute $ra) => $ra->newInstance(), $reflection_attributes);
       }

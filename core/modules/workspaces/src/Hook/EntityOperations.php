@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Attribute\OverrideHook;
 use Drupal\Core\Hook\Order;
 use Drupal\Core\Hook\OrderBefore;
 use Drupal\content_moderation\Hook\ContentModerationHooks;
@@ -75,9 +76,9 @@ class EntityOperations {
    * Implements hook_entity_presave().
    */
   #[Hook('entity_presave', order: Order::First)]
-  #[Hook('entity_presave',
-    module: 'content_moderation',
+  #[OverrideHook('entity_presave',
     class: ContentModerationHooks::class,
+    module: 'content_moderation',
     method: 'entityPresave',
     order: new OrderBefore(['workspaces'])
   )]

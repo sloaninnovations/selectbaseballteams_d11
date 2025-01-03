@@ -100,6 +100,13 @@ use Drupal\Core\Hook\Order;
 class Hook {
 
   /**
+   * The class the hook implementation is in.
+   *
+   * @var string
+   */
+  public string $class = '';
+
+  /**
    * Constructs a Hook attribute object.
    *
    * @param string $hook
@@ -115,19 +122,12 @@ class Hook {
    *   implementation is in.
    * @param \Drupal\Core\Hook\Order|\Drupal\Core\Hook\ComplexOrder|null $order
    *   (optional) Set the order of the implementation.
-   * @param array|null $remove
-   *   (optional) An array keyed by modules of hook implementations to remove.
-   * @param string $class
-   *   (optional) The class name. This should only be used when ordering on
-   *   behalf of another hook.
    */
   public function __construct(
     public string $hook,
     public string $method = '',
     public ?string $module = NULL,
     public Order|ComplexOrder|NULL $order = NULL,
-    public array|NULL $remove = NULL,
-    public string $class = '',
   ) {}
 
   /**
