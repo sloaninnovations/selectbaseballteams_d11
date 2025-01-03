@@ -7,6 +7,7 @@
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\File\FileExists;
+use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\Url;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -14,11 +15,12 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 /**
  * Batch callback: Performs actions when the download batch is completed.
  *
- * @param $success
+ * @param bool $success
  *   TRUE if the batch operation was successful, FALSE if there were errors.
- * @param $results
+ * @param array $results
  *   An associative array of results from the batch operation.
  */
+#[StopProceduralHookScan]
 function update_manager_download_batch_finished($success, $results) {
   if (!empty($results['errors'])) {
     $item_list = [
@@ -178,7 +180,7 @@ function update_manager_archive_verify($project, $archive_file, $directory) {
  *
  * Returns the local path if the file has already been downloaded.
  *
- * @param $url
+ * @param string $url
  *   The URL of the file on the server.
  *
  * @return string|false
