@@ -26,6 +26,7 @@ class UserAdminSettingsFormTest extends ConfigFormTestBase {
     parent::setUp();
     $this->installConfig(['user']);
 
+    $this->installConfig('user');
     $this->form = AccountSettingsForm::create($this->container);
     $this->values = [
       'anonymous' => [

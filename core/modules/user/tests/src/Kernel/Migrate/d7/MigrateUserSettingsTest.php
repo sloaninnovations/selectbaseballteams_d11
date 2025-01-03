@@ -24,6 +24,7 @@ class MigrateUserSettingsTest extends MigrateDrupal7TestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installConfig('user');
     $this->executeMigrations(['d7_user_settings']);
   }
 

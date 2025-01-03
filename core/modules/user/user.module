@@ -461,6 +461,7 @@ function _user_cancel_session_regenerate() {
  */
 function user_cancel_methods() {
   $user_settings = \Drupal::config('user.settings');
+  $cancel_methods_settings = $user_settings->get('cancel_method_options');
   $anonymous_name = $user_settings->get('anonymous');
   $methods = [
     'user_cancel_block' => [
@@ -497,7 +498,12 @@ function user_cancel_methods() {
     if (isset($method['description'])) {
       $form[$name]['#confirm_description'] = $method['description'];
     }
-    if (isset($method['access'])) {
+
+    // Allow other modules to alter the access if the method is available.
+    if (isset($cancel_methods_settings[$name]) && !($cancel_methods_settings[$name])) {
+      $form[$name]['#access'] = FALSE;
+    }
+    elseif (isset($method['access'])) {
       $form[$name]['#access'] = $method['access'];
     }
   }
