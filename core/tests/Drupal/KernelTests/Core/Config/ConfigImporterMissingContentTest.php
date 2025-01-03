@@ -193,7 +193,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
    * {@inheritdoc}
    */
   public function log($level, $message, array $context = []): void {
-    $message_placeholders = $this->container->get('logger.log_message_parser')->parseMessagePlaceholders($message, $context);
+    $message_placeholders = \Drupal::service('logger.log_message_parser')->parseMessagePlaceholders($message, $context);
     $this->logMessages[] = empty($message_placeholders) ? $message : strtr($message, $message_placeholders);
   }
 
