@@ -34910,42 +34910,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/advisory_feed_test/src/AdvisoryTestClientMiddleware.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\ajax_forms_test\\\\Callbacks\\:\\:checkboxCallback\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/ajax_forms_test/src/Callbacks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\ajax_forms_test\\\\Callbacks\\:\\:checkboxGroupCallback\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/ajax_forms_test/src/Callbacks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\ajax_forms_test\\\\Callbacks\\:\\:dateCallback\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/ajax_forms_test/src/Callbacks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\ajax_forms_test\\\\Callbacks\\:\\:datetimeCallback\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/ajax_forms_test/src/Callbacks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\ajax_forms_test\\\\Callbacks\\:\\:imageButtonCallback\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/ajax_forms_test/src/Callbacks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\ajax_forms_test\\\\Callbacks\\:\\:selectCallback\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/ajax_forms_test/src/Callbacks.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\ajax_forms_test\\\\Form\\\\AjaxFormsTestAjaxElementsForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
