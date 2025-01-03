@@ -1,0 +1,5 @@
+name: "Migrate custom block translations"
+type: module
+description: "Support module to test location of i18nQueryTrait."
+package: Testing
+version: VERSION
