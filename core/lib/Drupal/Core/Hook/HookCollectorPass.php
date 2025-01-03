@@ -119,7 +119,7 @@ class HookCollectorPass implements CompilerPassInterface {
     // is removed.
     // @see https://www.drupal.org/project/drupal/issues/3481778
     if (count($container->getDefinitions()) > 1) {
-      static::registerImplementations($container, $collector, $implementations, $legacyImplementations ?? [], $orderGroups);
+      static::registerImplementations($container, $collector, $implementations, $legacyImplementations, $orderGroups);
       static::reOrderImplementations($container, $orderAttributes, $orderGroups, $implementations, $moduleFinder);
     }
     return $implementations;
