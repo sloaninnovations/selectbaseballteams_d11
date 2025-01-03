@@ -41,7 +41,7 @@ class AjaxFormsTestLazyLoadForm extends FormBase {
       '#value' => $this->t('Submit'),
       '#ajax' => [
         'wrapper' => 'ajax-forms-test-lazy-load-ajax-wrapper',
-        'callback' => [(new Callbacks()), 'lazyLoadFormAjax'],
+        'callback' => [Callbacks::class, 'lazyLoadFormAjax'],
       ],
       '#prefix' => '<div id="ajax-forms-test-lazy-load-ajax-wrapper"></div>',
     ];
