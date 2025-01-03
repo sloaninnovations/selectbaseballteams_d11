@@ -120,10 +120,7 @@ class BatchStorage implements BatchStorageInterface {
   }
 
   /**
-   * Returns a new batch id.
-   *
-   * @return int
-   *   A batch id.
+   * {@inheritdoc}
    */
   public function getId(): int {
     $try_again = FALSE;
