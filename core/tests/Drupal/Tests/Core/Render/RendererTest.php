@@ -268,7 +268,7 @@ class RendererTest extends RendererTestBase {
       '#theme_wrappers' => ['container'],
       '#attributes' => ['class' => ['baz']],
     ];
-    $setup_code_type_link = (ThemeManagerInterface&MockObject $themeManager, RendererTestBase $testCase): void {
+    $setup_code_type_link = function (ThemeManagerInterface&MockObject $themeManager, RendererTestBase $testCase): void {
       $themeManager->expects($testCase->exactly(2))
         ->method('render')
         ->with(static::logicalOr('common_test_foo', 'container'))
