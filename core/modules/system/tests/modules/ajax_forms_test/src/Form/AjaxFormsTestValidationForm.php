@@ -26,13 +26,14 @@ class AjaxFormsTestValidationForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $callbacks = new Callbacks();
     $form['driver_text'] = [
       '#title' => $this->t('AJAX-enabled textfield.'),
       '#description' => $this->t("When this one AJAX-triggers and the spare required field is empty, you should not get an error."),
       '#type' => 'textfield',
       '#default_value' => $form_state->getValue('driver_text', ''),
       '#ajax' => [
-        'callback' => [Callbacks::class, 'validationFormCallback'],
+        'callback' => [$callbacks, 'validationFormCallback'],
         'wrapper' => 'message_area',
         'method' => 'replaceWith',
       ],
@@ -45,7 +46,7 @@ class AjaxFormsTestValidationForm extends FormBase {
       '#type' => 'number',
       '#default_value' => $form_state->getValue('driver_number', ''),
       '#ajax' => [
-        'callback' => [Callbacks::class, 'validationNumberFormCallback'],
+        'callback' => [$callbacks, 'validationNumberFormCallback'],
         'wrapper' => 'message_area_number',
         'method' => 'replaceWith',
       ],
