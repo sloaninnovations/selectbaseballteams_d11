@@ -267,7 +267,7 @@ class RendererTest extends RendererTestBase {
       '#attributes' => ['class' => ['baz']],
     ];
     $setup_code_type_link = function ($themeManager) {
-      $themeManager->expects(static::exactly(2))
+      $themeManager->expects($this->exactly(2))
         ->method('render')
         ->with(static::logicalOr('common_test_foo', 'container'))
         ->willReturnCallback(function ($theme, $vars) {
@@ -294,7 +294,7 @@ class RendererTest extends RendererTestBase {
       '#title' => 'bar',
     ];
     $setup_code_type_link = function ($themeManager) {
-      $themeManager->expects(static::exactly(2))
+      $themeManager->expects($this->exactly(2))
         ->method('render')
         ->with(static::logicalOr('link', 'container'))
         ->willReturnCallback(function ($theme, $vars) {
@@ -333,7 +333,7 @@ class RendererTest extends RendererTestBase {
       ],
     ];
     $setup_code = function ($themeManager) {
-      $themeManager->expects(static::exactly(2))
+      $themeManager->expects($this->exactly(2))
         ->method('render')
         ->with('container')
         ->willReturnCallback(function ($theme, $vars) {
@@ -348,7 +348,7 @@ class RendererTest extends RendererTestBase {
       '#attributes' => ['class' => ['foo']],
     ];
     $setup_code = function ($themeManager) {
-      $themeManager->expects(static::once())
+      $themeManager->expects($this->once())
         ->method('render')
         ->with(['container'])
         ->willReturnCallback(function ($theme, $vars) {
@@ -365,7 +365,7 @@ class RendererTest extends RendererTestBase {
       '#markup' => 'foo',
     ];
     $setup_code = function ($themeManager) {
-      $themeManager->expects(static::once())
+      $themeManager->expects($this->once())
         ->method('render')
         ->with(['suggestion_not_implemented'], static::anything())
         ->willReturn(FALSE);
@@ -380,7 +380,7 @@ class RendererTest extends RendererTestBase {
       ],
     ];
     $setup_code = function ($themeManager) {
-      $themeManager->expects(static::once())
+      $themeManager->expects($this->once())
         ->method('render')
         ->with(['suggestion_not_implemented'], static::anything())
         ->willReturn(FALSE);
@@ -394,7 +394,7 @@ class RendererTest extends RendererTestBase {
     ];
     $theme_function_output = static::randomContextValue();
     $setup_code = function ($themeManager) use ($theme_function_output) {
-      $themeManager->expects(static::once())
+      $themeManager->expects($this->once())
         ->method('render')
         ->with(['common_test_empty'], static::anything())
         ->willReturn($theme_function_output);
@@ -421,7 +421,7 @@ class RendererTest extends RendererTestBase {
       'child' => ['#markup' => 'boo'],
     ];
     $setup_code = function ($themeManager) {
-      $themeManager->expects(static::once())
+      $themeManager->expects($this->once())
         ->method('render')
         ->with('common_test_foo', static::anything())
         ->willReturn('foobar');
@@ -440,7 +440,7 @@ class RendererTest extends RendererTestBase {
       ],
     ];
     $setup_code = function ($themeManager) {
-      $themeManager->expects(static::never())
+      $themeManager->expects($this->never())
         ->method('render');
     };
     $data[] = [$build, 'boo', $setup_code];
@@ -456,7 +456,7 @@ class RendererTest extends RendererTestBase {
       ],
     ];
     $setup_code = function ($themeManager) {
-      $themeManager->expects(static::never())
+      $themeManager->expects($this->never())
         ->method('render');
     };
     $data[] = [$build, 'baz', $setup_code];
@@ -475,7 +475,7 @@ class RendererTest extends RendererTestBase {
       ],
     ];
     $setup_code = function ($themeManager) {
-      $themeManager->expects(static::never())
+      $themeManager->expects($this->never())
         ->method('render');
     };
     $data[] = [$build, 'kitten', $setup_code];
