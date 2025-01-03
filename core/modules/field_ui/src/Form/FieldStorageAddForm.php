@@ -158,14 +158,15 @@ class FieldStorageAddForm extends FormBase {
           ],
         ];
         foreach ($unique_definitions[$selected_field_type] as $option_key => $option) {
+          $description = !is_array($option['description']) ? $option['description'] : [
+            '#theme' => 'item_list',
+            '#items' => $option['description'],
+          ];
           $radio_element = [
             '#type' => 'radio',
             '#theme_wrappers' => ['form_element__new_storage_type'],
             '#title' => $option['label'],
-            '#description' => [
-              '#theme' => 'item_list',
-              '#items' => $unique_definitions[$selected_field_type][$option_key]['description'],
-            ],
+            '#description' => $description,
             '#id' => Html::getClass($option['unique_identifier']),
             '#weight' => $option['weight'],
             '#parents' => ['field_options_wrapper'],
