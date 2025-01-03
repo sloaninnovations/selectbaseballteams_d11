@@ -394,7 +394,7 @@ class HookCollectorPass implements CompilerPassInterface {
    *   The name of function implementing the hook.
    */
   protected function addProceduralImplementation(\SplFileInfo $fileinfo, string $hook, string $module, string $function): void {
-    $this->moduleHooks[$module][ProceduralCall::class][$function] = [new Hook($hook, $module . '_' . $hook)];
+    $this->moduleHooks[$module][ProceduralCall::class][$function] = [new Hook($hook, method: $module . '_' . $hook)];
     if ($hook === 'hook_info') {
       $this->hookInfo[] = $function;
     }

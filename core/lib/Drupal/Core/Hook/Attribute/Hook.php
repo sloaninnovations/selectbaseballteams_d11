@@ -104,9 +104,6 @@ class Hook {
    *
    * @param string $hook
    *   The short hook name, without the 'hook_' prefix.
-   * @param string $class
-   *   (optional) The class name. This should only be used when ordering on
-   *   behalf of another hook.
    * @param string $method
    *   (optional) The method name. If this attribute is on a method, this
    *   parameter is not required. If this attribute is on a class and this
@@ -120,14 +117,17 @@ class Hook {
    *   (optional) Set the order of the implementation.
    * @param array|null $remove
    *   (optional) An array keyed by modules of hook implementations to remove.
+   * @param string $class
+   *   (optional) The class name. This should only be used when ordering on
+   *   behalf of another hook.
    */
   public function __construct(
     public string $hook,
-    public string $class = '',
     public string $method = '',
     public ?string $module = NULL,
     public Order|ComplexOrder|NULL $order = NULL,
     public array|NULL $remove = NULL,
+    public string $class = '',
   ) {}
 
   /**
