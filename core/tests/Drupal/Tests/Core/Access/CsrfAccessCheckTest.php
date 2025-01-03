@@ -89,7 +89,7 @@ class CsrfAccessCheckTest extends UnitTestCase {
    * @covers ::access
    */
   public function testCsrfTokenInvalid(): void {
-    $this->csrfToken->expects($this->once())
+    $this->csrfToken
       ->method('validate')
       ->with('test_query', 'test-path')
       ->willReturn(FALSE);
@@ -98,7 +98,7 @@ class CsrfAccessCheckTest extends UnitTestCase {
       ->method('all')
       ->willReturn([]);
 
-    $this->routeMatch->expects($this->once())
+    $this->routeMatch
       ->method('getRawParameters')
       ->willReturn($this->parameterBag);
 
@@ -112,7 +112,7 @@ class CsrfAccessCheckTest extends UnitTestCase {
    * @covers ::access
    */
   public function testCsrfTokenMissing(): void {
-    $this->csrfToken->expects($this->once())
+    $this->csrfToken
       ->method('validate')
       ->with('', 'test-path')
       ->willReturn(FALSE);
@@ -121,13 +121,54 @@ class CsrfAccessCheckTest extends UnitTestCase {
       ->method('all')
       ->willReturn([]);
 
-    $this->routeMatch->expects($this->once())
+    $this->routeMatch
       ->method('getRawParameters')
       ->willReturn($this->parameterBag);
 
     $route = new Route('/test-path', [], ['_csrf_token' => 'TRUE']);
     $request = Request::create('/test-path');
     $this->assertEquals(AccessResult::forbidden("'csrf_token' URL query argument is missing.")->setCacheMaxAge(0), $this->accessCheck->access($route, $request, $this->routeMatch));
+  }
+
+  /**
+   * Tests the access() method with a previously valid token.
+   *
+   * After a change in https://www.drupal.org/project/drupal/issues/2031149 CSRF tokens
+   * are now validated against a slightly different processed route path. We must ensure
+   * that previously valid CSRF tokens are still valid.
+   *
+   * @covers ::access
+   * @see https://www.drupal.org/project/drupal/issues/2031149
+   */
+  public function testLegacyAccessTokenPass(): void {
+
+    $this->parameterBag
+      ->method('all')
+      ->willReturn(['node' => 42]);
+
+    $this->routeMatch->expects($this->exactly(2))
+      ->method('getRawParameters')
+      ->willReturn($this->parameterBag);
+
+    $token = 'test_token';
+
+    $route = new Route('/test-path/{node}/{optional}', ['optional' => ''], ['_csrf_token' => 'TRUE']);
+    $request = Request::create('/test-path/42?token=' . $token);
+
+    $path = $this->accessCheck->generateRoutePath($route, $this->parameterBag->all());
+    $legacyPath = $this->accessCheck->generateLegacyRoutePath($route, $this->parameterBag->all());
+
+    // Mock a CSRF token validation that passes only for the legacy path
+    // and check that the validate method is called two times
+    // (one with the path and other with the legacy path).
+    $this->csrfToken->expects($this->exactly(2))
+      ->method('validate')
+      ->willReturnMap([
+        [$token, $path, FALSE],
+        [$token, $legacyPath, TRUE],
+      ]);
+
+    $this->assertEquals(AccessResult::allowed()->setCacheMaxAge(0), $this->accessCheck->access($route, $request, $this->routeMatch));
   }
 
 }
