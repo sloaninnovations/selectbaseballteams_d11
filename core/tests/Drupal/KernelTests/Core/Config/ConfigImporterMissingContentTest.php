@@ -11,6 +11,7 @@ use Drupal\Core\Block\Plugin\Block\Broken;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Logger\LogMessageParserInterface;
 use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
@@ -32,6 +33,13 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
    * @var string[]
    */
   protected $logMessages = [];
+
+  /**
+   * The message's placeholders parser.
+   *
+   * @var \Drupal\Core\Logger\LogMessageParserInterface
+   */
+  protected LogMessageParserInterface $parser;
 
   /**
    * Config Importer object used for testing.
@@ -93,6 +101,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
       $this->container->get('extension.list.module'),
       $this->container->get('extension.list.theme')
     );
+    $this->parser = $this->container->get('logger.log_message_parser');
   }
 
   /**
@@ -193,7 +202,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
    * {@inheritdoc}
    */
   public function log($level, $message, array $context = []): void {
-    $message_placeholders = $this->container->get('logger.log_message_parser')->parseMessagePlaceholders($message, $context);
+    $message_placeholders = $this->parser->parseMessagePlaceholders($message, $context);
     $this->logMessages[] = empty($message_placeholders) ? $message : strtr($message, $message_placeholders);
   }
 
