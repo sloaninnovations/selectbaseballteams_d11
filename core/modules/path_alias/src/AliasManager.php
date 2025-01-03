@@ -181,37 +181,35 @@ class AliasManager implements AliasManagerInterface {
       unset($this->requestedPaths[$langcode][$path]);
       return $this->lookupMap[$langcode][$path];
     }
-    // This should always be true.
-    if ($this->requestedPaths[$langcode]) {
-      $this->lookupMap[$langcode] = array_merge($this->lookupMap[$langcode] ?? [], $this->pathAliasRepository->preloadPathAlias($this->requestedPaths[$langcode], $langcode));
-      // Keep a record of paths with no alias to avoid querying twice.
-      $this->noAlias[$langcode] = array_merge($this->noAlias[$langcode] ?? [],  array_flip(array_diff($this->requestedPaths[$langcode], array_keys($this->lookupMap[$langcode]))));
 
-      // If we already know that there are no aliases for this path simply return.
-      if (!empty($this->noAlias[$langcode][$path])) {
-        unset($this->requestedPaths[$langcode][$path]);
-        return $path;
-      }
+    $this->lookupMap[$langcode] = array_merge($this->lookupMap[$langcode] ?? [], $this->pathAliasRepository->preloadPathAlias($this->requestedPaths[$langcode], $langcode));
+    // Keep a record of paths with no alias to avoid querying twice.
+    $this->noAlias[$langcode] = array_merge($this->noAlias[$langcode] ?? [],  array_flip(array_diff($this->requestedPaths[$langcode], array_keys($this->lookupMap[$langcode]))));
 
-      // If the alias has already been loaded, return it from static cache.
-      if (isset($this->lookupMap[$langcode][$path])) {
-        unset($this->requestedPaths[$langcode][$path]);
-        return $this->lookupMap[$langcode][$path];
-      }
-
-      // Try to load alias from storage.
-      if ($path_alias = $this->pathAliasRepository->lookupBySystemPath($path, $langcode)) {
-        // This should never happen.
-        throw new \Exception('boo');
-        $this->lookupMap[$langcode][$path] = $path_alias['alias'];
-        return $path_alias['alias'];
-      }
-
-      // We can't record anything into $this->lookupMap because we didn't find any
-      // aliases for this path. Thus cache to $this->noAlias.
-      $this->noAlias[$langcode][$path] = TRUE;
+    // If we already know that there are no aliases for this path simply return.
+    if (!empty($this->noAlias[$langcode][$path])) {
+      unset($this->requestedPaths[$langcode][$path]);
       return $path;
     }
+
+    // If the alias has already been loaded, return it from static cache.
+    if (isset($this->lookupMap[$langcode][$path])) {
+      unset($this->requestedPaths[$langcode][$path]);
+      return $this->lookupMap[$langcode][$path];
+    }
+
+    // Try to load alias from storage.
+    if ($path_alias = $this->pathAliasRepository->lookupBySystemPath($path, $langcode)) {
+      // This should never happen.
+      throw new \Exception('boo');
+      $this->lookupMap[$langcode][$path] = $path_alias['alias'];
+      return $path_alias['alias'];
+    }
+
+    // We can't record anything into $this->lookupMap because we didn't find any
+    // aliases for this path. Thus cache to $this->noAlias.
+    $this->noAlias[$langcode][$path] = TRUE;
+    return $path;
   }
 
   /**
