@@ -155,7 +155,6 @@ class AliasManager implements AliasManagerInterface {
     }
     $this->noPath = [];
     $this->noAlias = [];
-    $this->langcodePreloaded = [];
     $this->pathAliasPrefixListRebuild($source);
   }
 
