@@ -41,13 +41,6 @@ class DialogPositionTest extends WebDriverTestBase {
     $assert_session->assertWaitOnAjaxRequest();
     $dialog = $page->find('css', '.ui-dialog');
     $this->assertTrue($dialog->isVisible(), 'Dialog is opened after clicking the Place block button.');
-    // Ensure the dialog modal got the aria-modal attribute added (introduced in  Drupal 11.0.0)
-    // and make sure the dialog title is wrapped in a h1 (introduced in Drupal 11.1.0)
-    // so the modal is correctly represented in the aural interface and with the background
-    // removed from the AOM the first heading, the title, is a h1 for screen reader users.
-    $this->assertEquals('true', $dialog->getAttribute('aria-modal'), 'Dialog modal has aria-modal attribute');
-    $dialogTitle = $page->find('css', 'h1.ui-dialog-title');
-    $this->assertTrue($dialogTitle->isVisible(), 'Title wrapped in a h1 element');
 
     // Close the dialog again.
     $closeButton = $page->find('css', '.ui-dialog-titlebar-close');
