@@ -28,12 +28,6 @@ abstract class ConfirmFormBase extends FormBase implements ConfirmFormInterface 
     return $this->t('Cancel');
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getFormName() {
-    return 'confirm';
-  }
 
   /**
    * {@inheritdoc}
@@ -43,7 +37,6 @@ abstract class ConfirmFormBase extends FormBase implements ConfirmFormInterface 
 
     $form['#attributes']['class'][] = 'confirmation';
     $form['description'] = ['#markup' => $this->getDescription()];
-    $form[$this->getFormName()] = ['#type' => 'hidden', '#value' => 1];
 
     $form['actions'] = ['#type' => 'actions'];
     $form['actions']['submit'] = [
