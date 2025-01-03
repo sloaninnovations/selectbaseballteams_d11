@@ -85,8 +85,8 @@ function form_select_options($element, $choices = NULL) {
     unset($choices['#sort_start']);
   }
 
-  // array_key_exists() accommodates the rare event where $element['#value'] is NULL.
-  // isset() fails in this situation.
+  // array_key_exists() accommodates the rare event where $element['#value'] is
+  // NULL. isset() fails in this situation.
   $value_valid = \array_key_exists('#value', $element);
   $value_is_array = $value_valid && is_array($element['#value']);
   // Check if the element is multiple select and no value has been selected.
@@ -952,7 +952,8 @@ function batch_process($redirect = NULL, ?Url $url = NULL, $redirect_callback = 
       // Store the batch.
       \Drupal::service(BatchStorageInterface::class)->create($batch);
 
-      // Set the batch number in the session to guarantee that it will stay alive.
+      // Set the batch number in the session to guarantee that it will stay
+      // alive.
       $session = \Drupal::request()->getSession();
       $batches = $session->get('batches', []);
       $batches[$batch['id']] = TRUE;

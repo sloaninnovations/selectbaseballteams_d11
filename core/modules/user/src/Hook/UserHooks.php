@@ -110,9 +110,9 @@ class UserHooks {
    */
   #[Hook('js_settings_alter')]
   public function jsSettingsAlter(&$settings, AttachedAssetsInterface $assets): void {
-    // Provide the user ID in drupalSettings to allow JavaScript code to customize
-    // the experience for the end user, rather than the server side, which would
-    // break the render cache.
+    // Provide the user ID in drupalSettings to allow JavaScript code to
+    // customize the experience for the end user, rather than the server side,
+    // which would break the render cache.
     // Similarly, provide a permissions hash, so that permission-dependent data
     // can be reliably cached on the client side.
     $user = \Drupal::currentUser();
@@ -189,8 +189,8 @@ class UserHooks {
       foreach (Element::children($build['user_picture']) as $key) {
         if (!isset($build['user_picture'][$key]['#item']) || !$build['user_picture'][$key]['#item'] instanceof ImageItem) {
           // User picture field is provided by standard profile install. If the
-          // display is configured to use a different formatter, the #item render
-          // key may not exist, or may not be an image field.
+          // display is configured to use a different formatter, the #item
+          // render key may not exist, or may not be an image field.
           continue;
         }
         /** @var \Drupal\image\Plugin\Field\FieldType\ImageItem $item */
@@ -212,7 +212,8 @@ class UserHooks {
   public function templatePreprocessDefaultVariablesAlter(&$variables): void {
     $user = \Drupal::currentUser();
     $variables['user'] = clone $user;
-    // Remove password and session IDs, since themes should not need nor see them.
+    // Remove password and session IDs, since themes should not need nor see
+    // them.
     unset($variables['user']->pass, $variables['user']->sid, $variables['user']->ssid);
     $variables['is_admin'] = $user->hasPermission('access administration pages');
     $variables['logged_in'] = $user->isAuthenticated();
@@ -223,8 +224,8 @@ class UserHooks {
    */
   #[Hook('user_login')]
   public function userLogin(UserInterface $account): void {
-    // Reset static cache of default variables in template_preprocess() to reflect
-    // the new user.
+    // Reset static cache of default variables in template_preprocess() to
+    // reflect the new user.
     drupal_static_reset('template_preprocess');
     // If the user has a NULL time zone, notify them to set a time zone.
     $config = \Drupal::config('system.date');
@@ -243,8 +244,8 @@ class UserHooks {
    */
   #[Hook('user_logout')]
   public function userLogout(AccountInterface $account): void {
-    // Reset static cache of default variables in template_preprocess() to reflect
-    // the new user.
+    // Reset static cache of default variables in template_preprocess() to
+    // reflect the new user.
     drupal_static_reset('template_preprocess');
   }
 
@@ -413,9 +414,9 @@ class UserHooks {
         ],
         '#create_placeholder' => TRUE,
         '#lazy_builder_preview' => [
-                // Add a line of whitespace to the placeholder to ensure the icon is
-                // positioned in the same place it will be when the lazy loaded content
-                // appears.
+        // Add a line of whitespace to the placeholder to ensure the icon is
+        // positioned in the same place it will be when the lazy loaded content
+        // appears.
           '#markup' => '&nbsp;',
         ],
       ];
@@ -447,8 +448,8 @@ class UserHooks {
     $form['timezone']['configurable_timezones_wrapper'] = [
       '#type' => 'container',
       '#states' => [
-              // Hide the user configured timezone settings when users are forced to use
-              // the default setting.
+        // Hide the user configured timezone settings when users are forced to
+        // use the default setting.
         'invisible' => [
           'input[name="configurable_timezones"]' => [
             'checked' => FALSE,

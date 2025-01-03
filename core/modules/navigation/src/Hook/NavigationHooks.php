@@ -58,10 +58,10 @@ class NavigationHooks {
       $navigation_renderer->buildTopBar($page_top);
       return;
     }
-    // But if in layout mode, add an empty element to leave space. We need to use
-    // an empty .admin-toolbar element because the css uses the adjacent sibling
-    // selector. The actual rendering of the navigation blocks/layout occurs in
-    // the layout form.
+    // But if in layout mode, add an empty element to leave space. We need to
+    // use an empty .admin-toolbar element because the css uses the adjacent
+    // sibling selector. The actual rendering of the navigation blocks/layout
+    // occurs in the layout form.
     $page_top['navigation'] = [
       '#type' => 'html_tag',
       '#tag' => 'aside',
@@ -162,7 +162,8 @@ class NavigationHooks {
     array_walk($definitions, function (&$definition, $block_id) {
       [$base_plugin_id] = explode(PluginBase::DERIVATIVE_SEPARATOR, $block_id);
 
-      // Add the allow_in_navigation attribute to those blocks valid for Navigation.
+      // Add the allow_in_navigation attribute to those blocks valid for
+      // Navigation.
       // @todo Refactor to use actual block Attribute once
       //   https://www.drupal.org/project/drupal/issues/3443882 is merged.
       $allow_in_navigation = [
