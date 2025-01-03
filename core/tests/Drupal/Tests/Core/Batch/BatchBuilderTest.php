@@ -115,7 +115,7 @@ class BatchBuilderTest extends UnitTestCase {
    * @covers ::setFile
    */
   public function testSetFile(): void {
-    $filename = dirname(__DIR__, 6) . '/core/modules/system/tests/modules/batch_test/batch_test.set_file.inc';
+    $filename = $this->root . '/core/modules/system/tests/modules/batch_test/batch_test.set_file.inc';
     $this->assertIsNotCallable('_batch_test_set_file_callback_1');
     $this->assertIsNotCallable('_batch_test_set_file_finished_1');
 
