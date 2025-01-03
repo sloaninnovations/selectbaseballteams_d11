@@ -10,7 +10,7 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use Drupal\node_access_test\NodeAccessTestTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
 
@@ -22,7 +22,7 @@ use Drupal\user\Entity\User;
 class UserCancelTest extends BrowserTestBase {
 
   use CommentTestTrait;
-  use NodeAccessTestTrait;
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}

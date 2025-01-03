@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional\Views;
 
 use Drupal\node\Entity\NodeType;
-use Drupal\node_access_test\NodeAccessTestTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 
 /**
  * Tests the node_access filter handler.
@@ -15,7 +15,7 @@ use Drupal\node_access_test\NodeAccessTestTrait;
  */
 class FilterNodeAccessTest extends NodeTestBase {
 
-  use NodeAccessTestTrait;
+  use NodeAccessTrait;
 
   /**
    * An array of users.

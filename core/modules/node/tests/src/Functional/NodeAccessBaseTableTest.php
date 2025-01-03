@@ -7,7 +7,7 @@ namespace Drupal\Tests\node\Functional;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\Entity\NodeType;
-use Drupal\node_access_test\NodeAccessTestTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 
@@ -19,7 +19,7 @@ use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 class NodeAccessBaseTableTest extends NodeTestBase {
 
   use EntityReferenceFieldCreationTrait;
-  use NodeAccessTestTrait;
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}

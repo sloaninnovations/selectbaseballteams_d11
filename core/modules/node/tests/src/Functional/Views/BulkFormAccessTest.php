@@ -6,7 +6,7 @@ namespace Drupal\Tests\node\Functional\Views;
 
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use Drupal\node_access_test\NodeAccessTestTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 
 /**
  * Tests if entity access is respected on a node bulk operations form.
@@ -19,7 +19,7 @@ use Drupal\node_access_test\NodeAccessTestTrait;
  */
 class BulkFormAccessTest extends NodeTestBase {
 
-  use NodeAccessTestTrait;
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}

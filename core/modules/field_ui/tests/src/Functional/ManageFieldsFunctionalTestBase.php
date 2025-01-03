@@ -6,7 +6,7 @@ namespace Drupal\Tests\field_ui\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\Entity\NodeType;
-use Drupal\node_access_test\NodeAccessTestTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
@@ -19,7 +19,7 @@ class ManageFieldsFunctionalTestBase extends BrowserTestBase {
 
   use EntityReferenceFieldCreationTrait;
   use FieldUiTestTrait;
-  use NodeAccessTestTrait;
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}

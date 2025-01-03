@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Module;
 
 use Drupal\node\Entity\NodeType;
-use Drupal\node_access_test\NodeAccessTestTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 
@@ -17,7 +17,7 @@ use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 class PrepareUninstallTest extends BrowserTestBase {
 
   use TaxonomyTestTrait;
-  use NodeAccessTestTrait;
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}

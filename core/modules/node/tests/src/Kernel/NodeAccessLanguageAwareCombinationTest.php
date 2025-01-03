@@ -10,7 +10,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\NodeType;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\node_access_test\NodeAccessTestTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 
 /**
  * Tests node access with multiple languages and two node access modules.
@@ -19,7 +19,7 @@ use Drupal\node_access_test\NodeAccessTestTrait;
  */
 class NodeAccessLanguageAwareCombinationTest extends NodeAccessTestBase {
 
-  use NodeAccessTestTrait;
+  use NodeAccessTrait;
 
   /**
    * Enable language and two node access modules.

@@ -8,7 +8,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\NodeType;
-use Drupal\node_access_test\NodeAccessTestTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 
 /**
  * Tests multilingual node access with a module that is not language-aware.
@@ -17,7 +17,7 @@ use Drupal\node_access_test\NodeAccessTestTrait;
  */
 class NodeAccessLanguageTest extends NodeAccessTestBase {
 
-  use NodeAccessTestTrait;
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}

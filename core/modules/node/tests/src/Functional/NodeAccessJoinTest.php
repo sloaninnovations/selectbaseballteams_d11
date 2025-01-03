@@ -7,7 +7,7 @@ namespace Drupal\Tests\node\Functional;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
-use Drupal\node_access_test\NodeAccessTestTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\user\UserInterface;
 use Drupal\views\Tests\ViewTestData;
 
@@ -18,7 +18,7 @@ use Drupal\views\Tests\ViewTestData;
  */
 class NodeAccessJoinTest extends NodeTestBase {
 
-  use NodeAccessTestTrait;
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\node\Entity\NodeType;
-use Drupal\node_access_test\NodeAccessTestTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 
 /**
  * Tests permission access control around nodes.
@@ -14,7 +14,7 @@ use Drupal\node_access_test\NodeAccessTestTrait;
  */
 class NodeAccessTest extends ModerationStateTestBase {
 
-  use NodeAccessTestTrait;
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}

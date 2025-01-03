@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\node\Entity\NodeType;
-use Drupal\node_access_test\NodeAccessTestTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 
 /**
  * Tests node access rebuild functions with multiple node access modules.
@@ -14,7 +14,7 @@ use Drupal\node_access_test\NodeAccessTestTrait;
  */
 class NodeAccessRebuildNodeGrantsTest extends NodeTestBase {
 
-  use NodeAccessTestTrait;
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}

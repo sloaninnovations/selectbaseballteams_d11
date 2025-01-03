@@ -6,7 +6,7 @@ namespace Drupal\Tests\file\Functional;
 
 use Drupal\file\Entity\File;
 use Drupal\node\Entity\NodeType;
-use Drupal\node_access_test\NodeAccessTestTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\user\RoleInterface;
 
 /**
@@ -16,7 +16,7 @@ use Drupal\user\RoleInterface;
  */
 class FilePrivateTest extends FileFieldTestBase {
 
-  use NodeAccessTestTrait;
+  use NodeAccessTrait;
 
   /**
    * {@inheritdoc}
