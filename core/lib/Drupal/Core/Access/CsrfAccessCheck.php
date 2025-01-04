@@ -31,7 +31,7 @@ class CsrfAccessCheck implements RoutingAccessInterface {
    *
    * @var \Drupal\Core\Access\CsrfTokenGenerator
    */
-  protected $csrfToken;
+  protected CsrfTokenGenerator $csrfToken;
 
   /**
    * Constructs a CsrfAccessCheck object.
@@ -62,6 +62,8 @@ class CsrfAccessCheck implements RoutingAccessInterface {
       $result = AccessResult::allowed();
     }
     else {
+      // Allow access also for "legacy" CSRF tokens (those that were created from
+      // a partially wrong built route path and were valid before the bugfix).
       $path = $this->generateLegacyRoutePath($route, $route_match->getRawParameters()->all());
       if ($this->csrfToken->validate($request->query->get('token', ''), $path)) {
         $result = AccessResult::allowed();

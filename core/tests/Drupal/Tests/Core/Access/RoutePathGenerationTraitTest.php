@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Access;
 
 use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Access\CsrfAccessCheck;
+use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Access\RouteProcessorCsrf;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Tests\UnitTestCase;
@@ -23,27 +24,30 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
   /**
    * The mock CSRF token generator.
    *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Access\CsrfTokenGenerator
    */
-  protected $csrfToken;
+  protected CsrfTokenGenerator $csrfToken;
 
   /**
    * The route processor.
    *
    * @var \Drupal\Core\Access\RouteProcessorCsrf
    */
-  protected $processor;
+  protected RouteProcessorCsrf $processor;
 
   /**
    * The CSRF access checker.
    *
    * @var \Drupal\Core\Access\CsrfAccessCheck
    */
-  protected $accessCheck;
+  protected CsrfAccessCheck $accessCheck;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
-    $this->csrfToken = $this->getMockBuilder('Drupal\Core\Access\CsrfTokenGenerator')
+    $this->csrfToken = $this->getMockBuilder(CsrfTokenGenerator::class)
       ->disableOriginalConstructor()
       ->getMock();
     // Make CsrfTokenGenerator mock use a simple hash of the value
@@ -73,7 +77,6 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
       ->method('getPath')
       ->willReturn('test/example/{param}');
     $route
-      ->expects($this->any())
       ->method('hasRequirement')
       ->with('_csrf_token')
       ->willReturn(TRUE);
@@ -106,6 +109,11 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
     $this->assertInstanceOf(AccessResultAllowed::class, $this->accessCheck->access($route, $request, $routeMatch));
   }
 
+  /**
+   * Data provider for testCsrfTokenCompleteLifeCycle().
+   *
+   * @returns array
+   */
   public static function providerTestCsrfTokenCompleteLifeCycle(): array {
     return [
       [['param' => 'value']],

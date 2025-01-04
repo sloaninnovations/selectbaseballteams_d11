@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Access;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\CsrfTokenGenerator;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
@@ -20,30 +22,30 @@ class CsrfAccessCheckTest extends UnitTestCase {
   /**
    * The mock CSRF token generator.
    *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Access\CsrfTokenGenerator
    */
-  protected $csrfToken;
+  protected CsrfTokenGenerator $csrfToken;
 
   /**
    * The access checker.
    *
    * @var \Drupal\Core\Access\CsrfAccessCheck
    */
-  protected $accessCheck;
+  protected CsrfAccessCheck $accessCheck;
 
   /**
    * The mock route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RouteMatchInterface
    */
-  protected $routeMatch;
+  protected RouteMatchInterface $routeMatch;
 
   /**
    * The mock parameter bag.
    *
-   * @var \Symfony\Component\HttpFoundation\ParameterBag
+   * @var \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface
    */
-  protected $parameterBag;
+  protected ParameterBagInterface $parameterBag;
 
   /**
    * {@inheritdoc}
@@ -51,13 +53,13 @@ class CsrfAccessCheckTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->csrfToken = $this->getMockBuilder('Drupal\Core\Access\CsrfTokenGenerator')
+    $this->csrfToken = $this->getMockBuilder(CsrfTokenGenerator::class)
       ->disableOriginalConstructor()
       ->getMock();
 
     $this->parameterBag = $this->createMock(ParameterBagInterface::class);
 
-    $this->routeMatch = $this->createMock('Drupal\Core\Routing\RouteMatchInterface');
+    $this->routeMatch = $this->createMock(RouteMatchInterface::class);
 
     $this->accessCheck = new CsrfAccessCheck($this->csrfToken);
   }
@@ -133,12 +135,11 @@ class CsrfAccessCheckTest extends UnitTestCase {
   /**
    * Tests the access() method with a previously valid token.
    *
-   * After a change in https://www.drupal.org/project/drupal/issues/2031149 CSRF tokens
-   * are now validated against a slightly different processed route path. We must ensure
-   * that previously valid CSRF tokens are still valid.
+   * After a bug fix, CSRF tokens are now validated against a fully processed route path,
+   * with all parameters replaced (optional ones as well). To maintain backward compatibility,
+   * we need to ensure that previously valid CSRF tokens remain valid.
    *
    * @covers ::access
-   * @see https://www.drupal.org/project/drupal/issues/2031149
    */
   public function testLegacyAccessTokenPass(): void {
 
