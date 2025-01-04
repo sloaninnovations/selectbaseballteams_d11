@@ -274,7 +274,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     // \Drupal::request()->query->get('f') is an array that looks like this in
     // the URL: ?f[]=type:page&f[]=term:27&f[]=term:13&f[]=langcode:en
     // So $parameters['f'] looks like:
-    // array('type:page', 'term:27', 'term:13', 'langcode:en');
+    // [type:page', 'term:27', 'term:13', 'langcode:en'];
     // We need to parse this out into query conditions, some of which go into
     // the keywords string, and some of which are separate conditions.
     $parameters = $this->getParameters();
@@ -434,7 +434,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
   /**
    * Adds the configured rankings to the search query.
    *
-   * @param $query
+   * @param \Drupal\Core\Database\Query\SelectExtender $query
    *   A query object that has been extended with the Search DB Extender.
    */
   protected function addNodeRankings(SelectExtender $query) {

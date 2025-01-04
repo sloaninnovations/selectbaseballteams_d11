@@ -91,7 +91,7 @@ class DateTimePlusTest extends TestCase {
   public function testInvalidDateDiff($input1, $input2, $absolute): void {
     $this->expectException(\BadMethodCallException::class);
     $this->expectExceptionMessage('Method Drupal\Component\Datetime\DateTimePlus::diff expects parameter 1 to be a \DateTime or \Drupal\Component\Datetime\DateTimePlus object');
-    $interval = $input1->diff($input2, $absolute);
+    $input1->diff($input2, $absolute);
   }
 
   /**
@@ -923,11 +923,11 @@ class DateTimePlusTest extends TestCase {
 
     // Test retrieving a cloned copy of the wrapped \DateTime object, and that
     // altering it does not change the DateTimePlus object.
-    $datetimeplus = DateTimePlus::createFromFormat('Y-m-d H:i:s', '2017-07-13 22:40:00', $new_york, ['langcode' => 'en']);
-    $this->assertEquals(1500000000, $datetimeplus->getTimestamp());
-    $this->assertEquals('America/New_York', $datetimeplus->getTimezone()->getName());
+    $date_time_plus = DateTimePlus::createFromFormat('Y-m-d H:i:s', '2017-07-13 22:40:00', $new_york, ['langcode' => 'en']);
+    $this->assertEquals(1500000000, $date_time_plus->getTimestamp());
+    $this->assertEquals('America/New_York', $date_time_plus->getTimezone()->getName());
 
-    $datetime = $datetimeplus->getPhpDateTime();
+    $datetime = $date_time_plus->getPhpDateTime();
     $this->assertInstanceOf('DateTime', $datetime);
     $this->assertEquals(1500000000, $datetime->getTimestamp());
     $this->assertEquals('America/New_York', $datetime->getTimezone()->getName());
@@ -935,8 +935,8 @@ class DateTimePlusTest extends TestCase {
     $datetime->setTimestamp(1400000000)->setTimezone($berlin);
     $this->assertEquals(1400000000, $datetime->getTimestamp());
     $this->assertEquals('Europe/Berlin', $datetime->getTimezone()->getName());
-    $this->assertEquals(1500000000, $datetimeplus->getTimestamp());
-    $this->assertEquals('America/New_York', $datetimeplus->getTimezone()->getName());
+    $this->assertEquals(1500000000, $date_time_plus->getTimestamp());
+    $this->assertEquals('America/New_York', $date_time_plus->getTimezone()->getName());
   }
 
 }

@@ -660,6 +660,8 @@ class FormState implements FormStateInterface {
    * have side-effects, such as persisting $form_state changes.
    *
    * @return bool
+   *   TRUE if the request method is considered a safe HTTP method. Otherwise
+   *   FALSE.
    *
    * @see \Symfony\Component\HttpFoundation\Request::isMethodSafe()
    * @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
@@ -1285,7 +1287,7 @@ class FormState implements FormStateInterface {
       // at the end of the iteration. Initially, $values will contain a
       // reference to self::getValues(), but in the iteration we move the
       // reference to self::getValue('foo'), and finally to
-      // self::getValue(array('foo', 'bar')), which is the level where we
+      // self::getValue(['foo', 'bar']), which is the level where we
       // can unset 'baz' (that is stored in $last_parent).
       $parents = $button['#parents'];
       $last_parent = array_pop($parents);
