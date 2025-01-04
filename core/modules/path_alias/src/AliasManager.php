@@ -100,14 +100,27 @@ class AliasManager implements AliasManagerInterface {
       return $path;
     }
 
+    // If we already know that there are no aliases for this path simply return.
+    if (!empty($this->noAlias[$langcode][$path])) {
+      return $path;
+    }
+    // If the alias has already been loaded, return it from static cache.
+    if (isset($this->lookupMap[$langcode][$path])) {
+      return $this->lookupMap[$langcode][$path];
+    }
+
+    // Add the path to the list of requested paths.
     $this->requestedPaths[$langcode][$path] = $path;
 
+    // If we're inside a Fiber, suspend now, this allows other fibers to collect
+    // more requested paths.
     $fiber = \Fiber::getCurrent();
     if ($fiber !== NULL) {
       $fiber->suspend();
     }
-
-    // If we already know that there are no aliases for this path simply return.
+    // If we reach here, then either there are no other Fibers, or none of them
+    // have aliases left to look up. Check the static caches in case the path
+    // we're looking for was looked up in the meantime.
     if (!empty($this->noAlias[$langcode][$path])) {
       unset($this->requestedPaths[$langcode][$path]);
       return $path;
