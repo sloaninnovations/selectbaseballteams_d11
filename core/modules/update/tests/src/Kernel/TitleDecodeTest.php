@@ -60,7 +60,7 @@ class TitleDecodeTest extends KernelTestBase {
   }
 
   /**
-   * Tests the project_status of the project.
+   * Tests the correct encoding of project title.
    */
   public function testTitleDecode(): void {
     $fixture = '/../../fixtures/release-history/aaa_update_test.title-test.xml';
