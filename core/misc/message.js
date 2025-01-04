@@ -231,6 +231,26 @@
   };
 
   /**
+   * Behavior to add colon after labels and .label elements.
+   */
+
+  const translatedColon = Drupal.t(':');
+
+  // Select all labels and elements with class 'label' within elements having class 'container-inline'
+  const inlineContainerLabel = document.querySelectorAll(
+    '.container-inline label, .container-inline .label',
+  );
+  inlineContainerLabel.forEach((element) => {
+    if (!element.classList.contains('colon-added')) {
+      const colonElement = document.createElement('span');
+      colonElement.textContent = translatedColon;
+      colonElement.classList.add('colon');
+      element.appendChild(colonElement);
+      element.classList.add('colon-added');
+    }
+  });
+
+  /**
    * Theme function for a message.
    *
    * @param {object} message

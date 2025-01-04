@@ -3,10 +3,6 @@
  * Inline items.
  */
 
-.container-inline label::after,
-.container-inline .label::after {
-  content: ":";
-}
 .form-type-radios .container-inline label::after,
 .form-type-checkboxes .container-inline label::after {
   content: "";
