@@ -261,13 +261,13 @@ class HookCollectorPassTest extends KernelTestBase {
     $this->assertTrue($module_installer->install(['hook_order_last_alphabetically']));
     $this->assertFalse(isset($GLOBALS['HookRanTestingReOrderHookFirstAlpha']));
     $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingReOrderHook']));
-    $this->assertFalse(isset($GLOBALS['HookRanTestingReOrderHookSecondAlpha']));
+    $this->assertFalse(isset($GLOBALS['HookRanTestingReOrderHookLastAlpha']));
     $module_handler = $this->container->get('module_handler');
     $data = ['hi'];
     $module_handler->invokeAll('custom_hook_override', $data);
     $this->assertTrue(isset($GLOBALS['HookRanTestingReOrderHookFirstAlpha']));
     $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingReOrderHook']));
-    $this->assertTrue(isset($GLOBALS['HookRanTestingReOrderHookSecondAlpha']));
+    $this->assertTrue(isset($GLOBALS['HookRanTestingReOrderHookLastAlpha']));
   }
 
 }

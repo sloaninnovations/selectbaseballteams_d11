@@ -7,7 +7,7 @@ namespace Drupal\hook_order_first_alphabetically\Hook;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\OrderAfter;
 use Drupal\Core\Hook\Attribute\ReOrderHook;
-use Drupal\hook_order_last_alphabetically\Hook\TestHookReOrderHookSecond;
+use Drupal\hook_order_last_alphabetically\Hook\TestHookReOrderHookLast;
 
 /**
  * Hook implementations for verifying ordering hooks by attributes.
@@ -29,7 +29,7 @@ class TestHookReOrderHookFirst {
   #[Hook('custom_hook_override')]
   #[ReOrderHook(
     'custom_hook_override',
-    class: TestHookReOrderHookSecond::class,
+    class: TestHookReOrderHookLast::class,
     method: 'customHookOverride',
     order: new OrderAfter(
       classesAndMethods: [[TestHookReOrderHookFirst::class, 'customHookOverride']],

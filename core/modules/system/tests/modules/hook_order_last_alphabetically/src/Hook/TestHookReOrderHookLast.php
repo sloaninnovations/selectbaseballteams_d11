@@ -19,7 +19,7 @@ use Drupal\Core\Hook\Order;
  *
  * Each method pair tests one hook ordering permutation.
  */
-class TestHookReOrderHookSecond {
+class TestHookReOrderHookLast {
 
   /**
    * This pair tests ReOrderHook.
@@ -33,7 +33,7 @@ class TestHookReOrderHookSecond {
     if (!isset($GLOBALS['HookRanTestingReOrderHookFirstAlpha'])) {
       $GLOBALS['HookOutOfOrderTestingReOrderHook'] = 'HookOutOfOrderTestingReOrderHook';
     }
-    $GLOBALS['HookRanTestingReOrderHookSecondAlpha'] = 'HookRanTestingReOrderHookSecondAlpha';
+    $GLOBALS['HookRanTestingReOrderHookLastAlpha'] = 'HookRanTestingReOrderHookLastAlpha';
   }
 
 }
