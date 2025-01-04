@@ -77,6 +77,8 @@ class HookCollectorPass implements CompilerPassInterface {
     $moduleFinder = [];
     /** @var \Drupal\Core\Hook\Attribute\RemoveHook[] $removals */
     $removals = [];
+    /** @var \Drupal\Core\Hook\Attribute\OverrideHook[] $overrides */
+    $overrides = [];
     foreach (array_keys($container->getParameter('container.modules')) as $module) {
       foreach ($collector->moduleHooks[$module] ?? [] as $class => $methods) {
         foreach ($methods as $method => $hooks) {
@@ -86,17 +88,13 @@ class HookCollectorPass implements CompilerPassInterface {
               $removals[] = $hook;
               continue;
             }
-            if ($hook->order) {
-              $orderAttributes[] = $hook;
-              if ($hook->order instanceof ComplexOrder && ($group = $hook->order->group)) {
-                $group[] = $hook->hook;
-                foreach ($group as $extraHook) {
-                  $orderGroups[$extraHook] = array_merge($orderGroups[$extraHook] ?? [], $group);
-                }
-              }
-            }
             if ($hook instanceof OverrideHook) {
+              // Gather overrides to ensure these can run last.
+              $overrides[] = $hook;
               continue;
+            }
+            if ($hook->order) {
+              $this->gatherOrderInformation($hook, $orderAttributes, $orderGroups);
             }
             if ($class !== ProceduralCall::class) {
               self::checkForProceduralOnlyHooks($hook);
@@ -118,6 +116,11 @@ class HookCollectorPass implements CompilerPassInterface {
       }
     }
 
+    foreach ($overrides as $hook) {
+      // Append overrides last.
+      $this->gatherOrderInformation($hook, $orderAttributes, $orderGroups);
+    }
+
     // @todo investigate whether this if() is needed after ModuleHandler::add()
     // is removed.
     // @see https://www.drupal.org/project/drupal/issues/3481778
@@ -126,6 +129,26 @@ class HookCollectorPass implements CompilerPassInterface {
       static::reOrderImplementations($container, $orderAttributes, $orderGroups, $implementations, $moduleFinder);
     }
     return $implementations;
+  }
+
+  /**
+   * Gather ordering information.
+   *
+   * @param \Drupal\Core\Hook\Attributes\Hook $hook
+   *   The hook with ordering information.
+   * @param array $orderAttributes
+   *   All attributes related to ordering.
+   * @param array $orderGroups
+   *   Groups to order by.
+   */
+  protected function gatherOrderInformation(Hook $hook, array &$orderAttributes, array &$orderGroups): void {
+    $orderAttributes[] = $hook;
+    if ($hook->order instanceof ComplexOrder && ($group = $hook->order->group)) {
+      $group[] = $hook->hook;
+      foreach ($group as $extraHook) {
+        $orderGroups[$extraHook] = array_merge($orderGroups[$extraHook] ?? [], $group);
+      }
+    }
   }
 
   /**
