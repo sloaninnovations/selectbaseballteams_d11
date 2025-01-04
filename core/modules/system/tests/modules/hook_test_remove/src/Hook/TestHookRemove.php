@@ -24,7 +24,11 @@ class TestHookRemove {
    * This hook should run and prevent custom_hook1.
    */
   #[Hook('custom_hook2')]
-  #[RemoveHook('custom_hook1', self::class, 'hook_test_remove', 'hookDoNotRun')]
+  #[RemoveHook(
+    'custom_hook1',
+    class: TestHookRemove::class,
+    method: 'hookDoNotRun'
+  )]
   public static function hookDoRun(): void {
     $GLOBALS['HookShouldRunTestRemove'] = 'HookShouldRunTestRemove';
   }

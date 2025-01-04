@@ -237,9 +237,9 @@ class HookCollectorPassTest extends KernelTestBase {
   }
 
   /**
-   * Tests hook replacements.
+   * Tests hook remove.
    */
-  public function testHookReplacements(): void {
+  public function testHookRemove(): void {
     $module_installer = $this->container->get('module_installer');
     $this->assertTrue($module_installer->install(['hook_test_remove']));
     $this->assertFalse(isset($GLOBALS['HookShouldRunTestRemove']));
@@ -250,6 +250,24 @@ class HookCollectorPassTest extends KernelTestBase {
     $module_handler->invokeAll('custom_hook2', $data);
     $this->assertTrue(isset($GLOBALS['HookShouldRunTestRemove']));
     $this->assertFalse(isset($GLOBALS['HookShouldNotRunTestRemove']));
+  }
+
+  /**
+   * Tests hook override.
+   */
+  public function testHookOverride(): void {
+    $module_installer = $this->container->get('module_installer');
+    $this->assertTrue($module_installer->install(['hook_order_first_alphabetically']));
+    $this->assertTrue($module_installer->install(['hook_order_last_alphabetically']));
+    $this->assertFalse(isset($GLOBALS['HookRanTestingOverrideHookFirstAlpha']));
+    $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingOverrideHook']));
+    $this->assertFalse(isset($GLOBALS['HookRanTestingOverrideHookSecondAlpha']));
+    $module_handler = $this->container->get('module_handler');
+    $data = ['hi'];
+    $module_handler->invokeAll('custom_hook_override', $data);
+    $this->assertTrue(isset($GLOBALS['HookRanTestingOverrideHookFirstAlpha']));
+    $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingOverrideHook']));
+    $this->assertTrue(isset($GLOBALS['HookRanTestingOverrideHookSecondAlpha']));
   }
 
 }
