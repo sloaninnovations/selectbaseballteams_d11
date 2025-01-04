@@ -83,13 +83,9 @@ class ContentTranslationDeleteAccess implements AccessInterface {
 
     $entity_type_id = $entity->getEntityTypeId();
     $result->addCacheableDependency($entity);
-    // Add the cache dependencies used by
-    // ContentTranslationManager::isPendingRevisionSupportEnabled().
-    if (\Drupal::moduleHandler()->moduleExists('content_moderation')) {
-      foreach (Workflow::loadMultipleByType('content_moderation') as $workflow) {
-        $result->addCacheableDependency($workflow);
-      }
-    }
+    // The information about workflows is stored in entity bundle info, depend
+    // on that cache tag.
+    $result->addCacheTags(['entity_bundles']);
     if (!ContentTranslationManager::isPendingRevisionSupportEnabled($entity_type_id, $entity->bundle())) {
       return $result;
     }
