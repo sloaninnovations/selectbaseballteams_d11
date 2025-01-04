@@ -483,8 +483,12 @@ class UserHooks {
   public function filterFormatDisable(FilterFormatInterface $filter_format): void {
     // Remove the permission from any roles.
     $permission = $filter_format->getPermissionName();
+
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $role_storage */
+    $role_storage = \Drupal::entityTypeManager()->getStorage('user_role');
+
     /** @var \Drupal\user\Entity\Role $role */
-    foreach (Role::loadMultiple() as $role) {
+    foreach ($role_storage->loadMultipleOverrideFree() as $role) {
       if ($role->hasPermission($permission)) {
         $role->revokePermission($permission)->save();
       }
