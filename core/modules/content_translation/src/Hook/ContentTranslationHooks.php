@@ -16,6 +16,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\workflows\Entity\Workflow;
 
 /**
  * Hook implementations for content_translation.
@@ -225,10 +226,23 @@ class ContentTranslationHooks {
         $bundle_info['translatable'] = $content_translation_manager->isEnabled($entity_type_id, $bundle);
         if ($bundle_info['translatable'] && $content_translation_manager instanceof BundleTranslationSettingsInterface) {
           $settings = $content_translation_manager->getBundleTranslationSettings($entity_type_id, $bundle);
-          // If pending revision support is enabled for this bundle, we need to
-          // hide untranslatable field widgets, otherwise changes in pending
-          // revisions might be overridden by changes in later default revisions.
-          $bundle_info['untranslatable_fields.default_translation_affected'] = !empty($settings['untranslatable_fields_hide']) || ContentTranslationManager::isPendingRevisionSupportEnabled($entity_type_id, $bundle);
+          $bundle_info['untranslatable_fields.default_translation_affected'] = !empty($settings['untranslatable_fields_hide']);
+        }
+      }
+    }
+
+    // Always hide untranslatable field widgets if pending revision support is
+    // enabled otherwise changes in pending
+    // revisions might be overridden by changes in later default revisions.
+    // This can't use
+    // ContentTranslationManager::isPendingRevisionSupportEnabled() since that
+    // depends on entity bundle information to be completely built.
+    foreach (Workflow::loadMultipleByType('content_moderation') as $workflow) {
+      /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration $plugin */
+      $plugin = $workflow->getTypePlugin();
+      foreach ($plugin->getEntityTypes() as $entity_type_id) {
+        foreach ($plugin->getBundlesForEntityType($entity_type_id) as $bundle_id) {
+          $bundles[$entity_type_id][$bundle_id]['untranslatable_fields.default_translation_affected'] = TRUE;
         }
       }
     }
