@@ -6,6 +6,8 @@ namespace Drupal\KernelTests\Core\Test;
 
 use Drupal\Core\Test\TestDiscovery;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\TextUI\Configuration\Builder;
+use PHPUnit\TextUI\Configuration\TestSuiteBuilder;
 use Symfony\Component\Process\Process;
 
 /**
@@ -53,7 +55,21 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
    * Tests equality of test discovery between run-tests.sh and PHPUnit CLI.
    */
   public function testPhpUnitTestDiscoveryEqualsInternal(): void {
-    // PHPUnit's own test discovery.
+    // Drupal's test discovery, used by run-tests.sh.
+    $testDiscovery = new TestDiscovery(
+      $this->container->getParameter('app.root'),
+      $this->container->get('class_loader')
+    );
+    $internalList = [];
+    foreach ($testDiscovery->getTestClasses() as $group) {
+      foreach (array_keys($group) as $class) {
+        $internalList[] = $class;
+      }
+    }
+    $internalList = array_unique($internalList);
+    asort($internalList);
+
+    // PHPUnit's test discovery - via CLI execution.
     $process = new Process([
       'vendor/bin/phpunit',
       '--configuration',
@@ -73,27 +89,29 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
 
     $phpUnitXmlList = new \DOMDocument();
     $phpUnitXmlList->loadXML(file_get_contents($this->xmlOutputFile));
-    $phpUnitList = [];
+    $phpUnitClientList = [];
     foreach ($phpUnitXmlList->getElementsByTagName('testCaseClass') as $node) {
-      $phpUnitList[] = $node->getAttribute('name');
+      $phpUnitClientList[] = $node->getAttribute('name');
     }
-    asort($phpUnitList);
+    asort($phpUnitClientList);
 
-    // Drupal's own test discovery, used by run-tests.sh.
-    $testDiscovery = new TestDiscovery(
-      $this->container->getParameter('app.root'),
-      $this->container->get('class_loader')
-    );
-    $internalList = [];
-    foreach ($testDiscovery->getTestClasses() as $group) {
-      foreach (array_keys($group) as $class) {
-        $internalList[] = $class;
+    // Check against Drupal's discovery.
+    $this->assertEquals(implode("\n", $phpUnitClientList), implode("\n", $internalList));
+
+    // PHPUnit's test discovery - via API.
+    $phpUnitConfiguration = (new Builder())->build(['--configuration', 'core']);
+    $phpUnitTestSuite = (new TestSuiteBuilder())->build($phpUnitConfiguration);
+    $phpUnitApiList = [];
+    foreach ($phpUnitTestSuite->tests() as $testSuite) {
+      foreach ($testSuite->tests() as $test) {
+        $phpUnitApiList[] = $test->name();
       }
     }
-    $internalList = array_unique($internalList);
-    asort($internalList);
+    asort($phpUnitApiList);
 
-    $this->assertEquals(array_values($phpUnitList), array_values($internalList));
+    // Check against Drupal's discovery.
+    $this->assertEquals(implode("\n", $phpUnitApiList), implode("\n", $internalList));
+
   }
 
 }
