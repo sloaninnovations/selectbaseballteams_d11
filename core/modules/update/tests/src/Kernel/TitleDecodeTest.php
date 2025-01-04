@@ -23,7 +23,7 @@ class TitleDecodeTest extends KernelTestBase {
    *
    * @var \GuzzleHttp\Client
    */
-  protected $client;
+  protected Client $client;
 
   /**
    * {@inheritdoc}
