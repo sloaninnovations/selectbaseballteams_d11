@@ -3,7 +3,6 @@
 namespace Drupal\user\Hook;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\user\Entity\Role;
 use Drupal\filter\FilterFormatInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\system\Entity\Action;
