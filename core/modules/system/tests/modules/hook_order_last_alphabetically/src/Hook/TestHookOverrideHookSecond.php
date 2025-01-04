@@ -19,21 +19,21 @@ use Drupal\Core\Hook\Order;
  *
  * Each method pair tests one hook ordering permutation.
  */
-class TestHookOverrideHookSecond {
+class TestHookReOrderHookSecond {
 
   /**
-   * This pair tests OverrideHook.
+   * This pair tests ReOrderHook.
    */
   #[Hook('custom_hook_override', order: Order::First)]
   public static function customHookOverride(): void {
     // This normally would run second.
     // We override that order here with Order::First.
     // We override, that order in hook_order_first_alphabetically with
-    // OverrideHook.
-    if (!isset($GLOBALS['HookRanTestingOverrideHookFirstAlpha'])) {
-      $GLOBALS['HookOutOfOrderTestingOverrideHook'] = 'HookOutOfOrderTestingOverrideHook';
+    // ReOrderHook.
+    if (!isset($GLOBALS['HookRanTestingReOrderHookFirstAlpha'])) {
+      $GLOBALS['HookOutOfOrderTestingReOrderHook'] = 'HookOutOfOrderTestingReOrderHook';
     }
-    $GLOBALS['HookRanTestingOverrideHookSecondAlpha'] = 'HookRanTestingOverrideHookSecondAlpha';
+    $GLOBALS['HookRanTestingReOrderHookSecondAlpha'] = 'HookRanTestingReOrderHookSecondAlpha';
   }
 
 }

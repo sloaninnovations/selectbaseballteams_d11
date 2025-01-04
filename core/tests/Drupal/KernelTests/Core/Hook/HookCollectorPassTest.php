@@ -259,15 +259,15 @@ class HookCollectorPassTest extends KernelTestBase {
     $module_installer = $this->container->get('module_installer');
     $this->assertTrue($module_installer->install(['hook_order_first_alphabetically']));
     $this->assertTrue($module_installer->install(['hook_order_last_alphabetically']));
-    $this->assertFalse(isset($GLOBALS['HookRanTestingOverrideHookFirstAlpha']));
-    $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingOverrideHook']));
-    $this->assertFalse(isset($GLOBALS['HookRanTestingOverrideHookSecondAlpha']));
+    $this->assertFalse(isset($GLOBALS['HookRanTestingReOrderHookFirstAlpha']));
+    $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingReOrderHook']));
+    $this->assertFalse(isset($GLOBALS['HookRanTestingReOrderHookSecondAlpha']));
     $module_handler = $this->container->get('module_handler');
     $data = ['hi'];
     $module_handler->invokeAll('custom_hook_override', $data);
-    $this->assertTrue(isset($GLOBALS['HookRanTestingOverrideHookFirstAlpha']));
-    $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingOverrideHook']));
-    $this->assertTrue(isset($GLOBALS['HookRanTestingOverrideHookSecondAlpha']));
+    $this->assertTrue(isset($GLOBALS['HookRanTestingReOrderHookFirstAlpha']));
+    $this->assertFalse(isset($GLOBALS['HookOutOfOrderTestingReOrderHook']));
+    $this->assertTrue(isset($GLOBALS['HookRanTestingReOrderHookSecondAlpha']));
   }
 
 }

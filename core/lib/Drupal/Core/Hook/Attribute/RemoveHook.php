@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Hook\Attribute;
 
 /**
- * Attribute for removing another implementation.
+ * Attribute for removing an implementation.
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class RemoveHook extends Hook {

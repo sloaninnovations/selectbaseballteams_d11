@@ -6,8 +6,8 @@ namespace Drupal\hook_order_first_alphabetically\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\OrderAfter;
-use Drupal\Core\Hook\Attribute\OverrideHook;
-use Drupal\hook_order_last_alphabetically\Hook\TestHookOverrideHookSecond;
+use Drupal\Core\Hook\Attribute\ReOrderHook;
+use Drupal\hook_order_last_alphabetically\Hook\TestHookReOrderHookSecond;
 
 /**
  * Hook implementations for verifying ordering hooks by attributes.
@@ -21,25 +21,25 @@ use Drupal\hook_order_last_alphabetically\Hook\TestHookOverrideHookSecond;
  *
  * Each method pair tests one hook ordering permutation.
  */
-class TestHookOverrideHookFirst {
+class TestHookReOrderHookFirst {
 
   /**
-   * This pair tests OverrideHook.
+   * This pair tests ReOrderHook.
    */
   #[Hook('custom_hook_override')]
-  #[OverrideHook(
+  #[ReOrderHook(
     'custom_hook_override',
-    class: TestHookOverrideHookSecond::class,
+    class: TestHookReOrderHookSecond::class,
     method: 'customHookOverride',
     order: new OrderAfter(
-      classesAndMethods: [[TestHookOverrideHookFirst::class, 'customHookOverride']],
+      classesAndMethods: [[TestHookReOrderHookFirst::class, 'customHookOverride']],
     )
   )]
   public static function customHookOverride(): void {
     // This normally would run first.
     // We override that order in hook_order_second_alphabetically.
-    // We override, that order here with OverrideHook.
-    $GLOBALS['HookRanTestingOverrideHookFirstAlpha'] = 'HookRanTestingOverrideHookFirstAlpha';
+    // We override, that order here with ReOrderHook.
+    $GLOBALS['HookRanTestingReOrderHookFirstAlpha'] = 'HookRanTestingReOrderHookFirstAlpha';
   }
 
 }

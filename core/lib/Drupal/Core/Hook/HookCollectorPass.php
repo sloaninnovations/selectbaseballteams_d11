@@ -10,7 +10,7 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\LegacyHook;
-use Drupal\Core\Hook\Attribute\OverrideHook;
+use Drupal\Core\Hook\Attribute\ReOrderHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -75,26 +75,19 @@ class HookCollectorPass implements CompilerPassInterface {
     $orderGroups = [];
     $orderAttributes = [];
     $moduleFinder = [];
-    /** @var \Drupal\Core\Hook\Attribute\RemoveHook[] $removals */
-    $removals = [];
-    /** @var \Drupal\Core\Hook\Attribute\OverrideHook[] $overrides */
-    $overrides = [];
+    // These need to be processed after normal hooks.
+    $process_after = [
+      RemoveHook::class => [],
+      ReOrderHook::class => [],
+    ];
     foreach (array_keys($container->getParameter('container.modules')) as $module) {
       foreach ($collector->moduleHooks[$module] ?? [] as $class => $methods) {
         foreach ($methods as $method => $hooks) {
           foreach ($hooks as $hook) {
             assert($hook instanceof Hook);
-            if ($hook instanceof RemoveHook) {
-              $removals[] = $hook;
+            if (isset($process_after[get_class($hook)])) {
+              $process_after[get_class($hook)][] = $hook;
               continue;
-            }
-            if ($hook instanceof OverrideHook) {
-              // Gather overrides to ensure these can run last.
-              $overrides[] = $hook;
-              continue;
-            }
-            if ($hook->order) {
-              $this->gatherOrderInformation($hook, $orderAttributes, $orderGroups);
             }
             if ($class !== ProceduralCall::class) {
               self::checkForProceduralOnlyHooks($hook);
@@ -103,23 +96,25 @@ class HookCollectorPass implements CompilerPassInterface {
             $legacyImplementations[$hook->hook][$hook->module] = '';
             $implementations[$hook->hook][$hook->module][$class][$hook->method] = $hook->method;
             $moduleFinder[$class][$hook->method] = $hook->module;
+            if ($hook->order) {
+              $this->gatherOrderInformation($hook, $orderAttributes, $orderGroups);
+            }
           }
         }
       }
     }
-    $orderGroups = array_map('array_unique', $orderGroups);
 
-    foreach ($removals as $hook) {
+    foreach ($process_after[RemoveHook::class] as $hook) {
       if ($module = ($moduleFinder[$hook->class][$hook->method] ?? '')) {
         unset($legacyImplementations[$hook->hook][$module]);
         unset($implementations[$hook->hook][$module][$hook->class][$hook->method]);
       }
     }
 
-    foreach ($overrides as $hook) {
-      // Append overrides last.
+    foreach ($process_after[ReOrderHook::class] as $hook) {
       $this->gatherOrderInformation($hook, $orderAttributes, $orderGroups);
     }
+    $orderGroups = array_map('array_unique', $orderGroups);
 
     // @todo investigate whether this if() is needed after ModuleHandler::add()
     // is removed.

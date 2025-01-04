@@ -8,13 +8,10 @@ use Drupal\Core\Hook\ComplexOrder;
 use Drupal\Core\Hook\Order;
 
 /**
- * Attribute for overriding the order of another Hook.
- *
- * When another hook needs to be ordered provide an OverrideHook attribute
- * that specifies the new ordering attribute.
+ * Set the order of an already existing implementation.
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class OverrideHook extends Hook {
+class ReOrderHook extends Hook {
 
   /**
    * Constructs a Hook attribute object.
