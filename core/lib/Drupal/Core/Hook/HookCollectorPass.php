@@ -75,26 +75,17 @@ class HookCollectorPass implements CompilerPassInterface {
     $orderGroups = [];
     $orderAttributes = [];
     $moduleFinder = [];
+    /** @var \Drupal\Core\Hook\Attribute\RemoveHook[] $removals */
     $removals = [];
     foreach (array_keys($container->getParameter('container.modules')) as $module) {
       foreach ($collector->moduleHooks[$module] ?? [] as $class => $methods) {
         foreach ($methods as $method => $hooks) {
           foreach ($hooks as $hook) {
             assert($hook instanceof Hook);
-            if ($hook instanceof OverrideHook && !class_exists($hook->class, FALSE)) {
-              continue;
-            }
             if ($hook instanceof RemoveHook) {
               $removals[] = $hook;
               continue;
             }
-            $hook->set(class: $class, module: $module, method: $method);
-            if ($hook->class !== ProceduralCall::class) {
-              self::checkForProceduralOnlyHooks($hook);
-            }
-            $legacyImplementations[$hook->hook][$hook->module] = '';
-            $implementations[$hook->hook][$hook->module][$hook->class][$hook->method] = $hook->method;
-            $moduleFinder[$hook->class][$method] = $hook->module;
             if ($hook->order) {
               $orderAttributes[] = $hook;
               if ($hook->order instanceof ComplexOrder && ($group = $hook->order->group)) {
@@ -104,6 +95,16 @@ class HookCollectorPass implements CompilerPassInterface {
                 }
               }
             }
+            if ($hook instanceof OverrideHook) {
+              continue;
+            }
+            if ($class !== ProceduralCall::class) {
+              self::checkForProceduralOnlyHooks($hook);
+            }
+            $hook->set(... compact('class', 'method', 'module'));
+            $legacyImplementations[$hook->hook][$hook->module] = '';
+            $implementations[$hook->hook][$hook->module][$class][$hook->method] = $hook->method;
+            $moduleFinder[$class][$hook->method] = $hook->module;
           }
         }
       }
@@ -111,8 +112,10 @@ class HookCollectorPass implements CompilerPassInterface {
     $orderGroups = array_map('array_unique', $orderGroups);
 
     foreach ($removals as $hook) {
-      unset($legacyImplementations[$hook->hook][$hook->module]);
-      unset($implementations[$hook->hook][$hook->module][$hook->class][$hook->method]);
+      if ($module = ($moduleFinder[$hook->class][$hook->method] ?? '')) {
+        unset($legacyImplementations[$hook->hook][$module]);
+        unset($implementations[$hook->hook][$module][$hook->class][$hook->method]);
+      }
     }
 
     // @todo investigate whether this if() is needed after ModuleHandler::add()
