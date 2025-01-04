@@ -318,7 +318,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
           $languages[$data['id']] = new Language($data);
         }
         Language::sort($languages);
-        \Drupal::cache('discovery')->set($cid, $languages, Cache::PERMANENT, ['configurable_language_list']);
+        \Drupal::cache('discovery')->set($cid, $languages, Cache::PERMANENT, ['config:configurable_language_list']);
       }
 
       // Filter the full list of languages based on the value of $flags.
