@@ -34,10 +34,6 @@ tr .form-item,
   font-weight: bold;
   line-height: var(--line-height-form-label);
 
-  &[for] {
-    cursor: pointer;
-  }
-
   &.option {
     display: inline;
     font-weight: normal;
