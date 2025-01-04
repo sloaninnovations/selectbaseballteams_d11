@@ -245,7 +245,7 @@ class UpdateProcessor implements UpdateProcessorInterface {
     foreach ($xml as $k => $v) {
       $data[$k] = (string) $v;
     }
-    // Decode entities from XML - see #3493742.
+    // Decode entities from XML.
     $data['title'] = html_entity_decode($data['title'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
     $data['releases'] = [];
