@@ -11,7 +11,6 @@ use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
-use Drupal\workflows\Entity\Workflow;
 
 /**
  * Access check for entity translation deletion.
