@@ -715,7 +715,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @covers ::mapFromStorageRecords
    * @covers ::doLoadMultiple
    */
-  public function testLoadOverrideFree() {
+  public function testLoadOverrideFree(): void {
     $config_object = $this->prophesize(ImmutableConfig::class);
     $config_object->getOriginal(NULL, FALSE)->willReturn(['id' => 'foo']);
     $config_object->get('id')->willReturn('foo');

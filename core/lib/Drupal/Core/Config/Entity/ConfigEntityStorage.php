@@ -335,7 +335,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   /**
    * {@inheritdoc}
    */
-  public function resetCache(array $ids = NULL) {
+  public function resetCache(?array $ids = NULL) {
     if ($this->entityType->isStaticallyCacheable()) {
       // Always invalidate through the cache tag, since config entities may
       // be cached under different cache keys depending on the override flag.
