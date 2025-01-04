@@ -78,7 +78,6 @@ class EntityOperations {
   #[Hook('entity_presave', order: Order::First)]
   #[OverrideHook('entity_presave',
     class: ContentModerationHooks::class,
-    module: 'content_moderation',
     method: 'entityPresave',
     order: new OrderBefore(['workspaces'])
   )]
