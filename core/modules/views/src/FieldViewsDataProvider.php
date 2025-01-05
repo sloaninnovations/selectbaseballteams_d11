@@ -47,7 +47,7 @@ class FieldViewsDataProvider {
     }
 
     // Check whether the entity type storage is supported.
-    $storage = $this->getEntityTypeStorage($field_storage);
+    $storage = $this->getSqlStorageForField($field_storage);
     if (!$storage) {
       return $data;
     }
@@ -506,7 +506,7 @@ class FieldViewsDataProvider {
    * @return \Drupal\Core\Entity\Sql\SqlContentEntityStorage|bool
    *   Returns the entity type storage if supported.
    */
-  public function getEntityTypeStorage(FieldStorageConfigInterface $field_storage): SqlContentEntityStorage|bool {
+  public function getSqlStorageForField(FieldStorageConfigInterface $field_storage): SqlContentEntityStorage|bool {
     $result = FALSE;
     if ($this->entityTypeManager->hasDefinition($field_storage->getTargetEntityTypeId())) {
       $storage = $this->entityTypeManager->getStorage($field_storage->getTargetEntityTypeId());

@@ -170,7 +170,7 @@ class ViewsViewsHooks {
     if ($entity_type_manager->hasDefinition('field_storage_config')) {
       /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
       foreach ($entity_type_manager->getStorage('field_storage_config')->loadMultiple() as $field_storage) {
-        if (\Drupal::service('views.field_data_provider')->getEntityTypeStorage($field_storage)) {
+        if (\Drupal::service('views.field_data_provider')->getSqlStorageForField($field_storage)) {
           $provider = $field_storage->getTypeProvider();
           $result = (array) $module_handler->invoke($provider === 'core' ? 'views' : $provider, 'field_views_data', [$field_storage]);
           if (empty($result)) {
@@ -202,7 +202,7 @@ class ViewsViewsHooks {
     }
     /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
     foreach ($entity_type_manager->getStorage('field_storage_config')->loadMultiple() as $field_storage) {
-      if (\Drupal::service('views.field_data_provider')->getEntityTypeStorage($field_storage)) {
+      if (\Drupal::service('views.field_data_provider')->getSqlStorageForField($field_storage)) {
         \Drupal::moduleHandler()->invoke($field_storage->getTypeProvider(), 'field_views_data_views_data_alter', [&$data, $field_storage]);
       }
     }
