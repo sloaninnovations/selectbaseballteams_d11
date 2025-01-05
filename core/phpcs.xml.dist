@@ -190,6 +190,8 @@
     <include-pattern>*/Plugin/*</include-pattern>
     <include-pattern>*/ListBuilder/*</include-pattern>
     <include-pattern>*/tests/*/Form/*</include-pattern>
+    <include-pattern>./core/modules/*</include-pattern>
+    <exclude-pattern>./core/modules/*/Hook/*</exclude-pattern>
   </rule>
 
   <!-- Generic sniffs -->
