@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Command;
 
-// thisshouldbefound. Temp change to trigger spelling not from cache.
-
 use Drupal\Component\Utility\Variable;
 use Drupal\Core\Database\Connection;
 use Symfony\Component\Console\Input\InputInterface;
