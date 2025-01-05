@@ -862,31 +862,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected function initializeContainer() {
     $this->containerNeedsDumping = FALSE;
-    $session_started = FALSE;
-    $all_messages = [];
     if (isset($this->container)) {
-      // Save the id of the currently logged in user.
-      if ($this->container->initialized('current_user')) {
-        $current_user_id = $this->container->get('current_user')->id();
-      }
       // After rebuilding the container some objects will have stale services.
       // Record a map of objects to service IDs prior to rebuilding the
       // container in order to ensure
       // \Drupal\Core\DependencyInjection\DependencySerializationTrait works as
       // expected.
       $this->container->get(ReverseContainer::class)->recordContainer();
-
-      // If there is a session, close and save it.
-      if ($this->container->initialized('session')) {
-        $session = $this->container->get('session');
-        if ($session->isStarted()) {
-          $session_started = TRUE;
-          $session->save();
-        }
-        unset($session);
-      }
-
-      $all_messages = $this->container->get('messenger')->all();
     }
 
     // If the module list hasn't already been set in updateModules and we are
@@ -913,6 +895,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->containerNeedsRebuild = FALSE;
 
     // Only create a new class if we have a container definition.
+    $container = null;
     if (isset($container_definition)) {
       // Drupal provides two dynamic parameters to access specific paths that
       // are determined from the request.
@@ -922,39 +905,19 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $container = new $class($container_definition);
     }
 
-    $this->attachSynthetic($container);
-
-    $this->container = $container;
-    if ($session_started) {
-      $this->container->get('session')->start();
+    if (isset($container)) {
+      $this->attachSynthetic($container);
+      $this->restoreServiceState($container);
+      $this->container = $container;
     }
-
-    // The request stack is preserved across container rebuilds. Re-inject the
-    // new session into the main request if one was present before.
-    if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
-      if ($request = $request_stack->getMainRequest()) {
-        $subrequest = TRUE;
-        $request->setSession($this->container->get('session'));
-      }
-    }
-
-    if (!empty($current_user_id)) {
-      $this->container->get('current_user')->setInitialAccountId($current_user_id);
-    }
-
-    // Re-add messages.
-    foreach ($all_messages as $type => $messages) {
-      foreach ($messages as $message) {
-        $this->container->get('messenger')->addMessage($message, $type);
-      }
-    }
-
     \Drupal::setContainer($this->container);
 
-    // Allow other parts of the codebase to react on container initialization in
-    // subrequest.
-    if (!empty($subrequest)) {
-      $this->container->get('event_dispatcher')->dispatch(new Event(), self::CONTAINER_INITIALIZE_SUBREQUEST_FINISHED);
+    // The request stack is preserved across container rebuilds. Allow other
+    // parts of the codebase to react on container initialization in subrequest.
+    if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
+      if ($request_stack->getMainRequest()) {
+        $this->container->get('event_dispatcher')->dispatch(new Event(), self::CONTAINER_INITIALIZE_SUBREQUEST_FINISHED);
+      }
     }
 
     // If needs dumping flag was set, dump the container.
@@ -1110,33 +1073,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Returns service instances to persist from an old container to a new one.
-   */
-  protected function getServicesToPersist(ContainerInterface $container) {
-    $persist = [];
-    foreach ($container->getParameter('persist_ids') as $id) {
-      // It's pointless to persist services not yet initialized.
-      if ($container->initialized($id)) {
-        $persist[$id] = $container->get($id);
-      }
-    }
-    return $persist;
-  }
-
-  /**
-   * Moves persistent service instances into a new container.
-   */
-  protected function persistServices(ContainerInterface $container, array $persist) {
-    foreach ($persist as $id => $object) {
-      // Do not override services already set() on the new container, for
-      // example 'service_container'.
-      if (!$container->initialized($id)) {
-        $container->set($id, $object);
-      }
-    }
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function rebuildContainer() {
@@ -1187,9 +1123,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $all_messages = $this->container->get('messenger')->all();
 
-    $persist = $this->getServicesToPersist($this->container);
     $this->container->reset();
-    $this->persistServices($this->container, $persist);
 
     $this->container->set('kernel', $this);
 
@@ -1261,12 +1195,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   The container object with the kernel and the class loader added.
    */
   protected function attachSynthetic(ContainerInterface $container) {
-    $persist = [];
-    if (isset($this->container)) {
-      $persist = $this->getServicesToPersist($this->container);
-    }
-    $this->persistServices($container, $persist);
-
     // All namespaces must be registered before we attempt to use any service
     // from the container.
     $this->classLoaderAddMultiplePsr4($container->getParameter('container.namespaces'));
@@ -1276,6 +1204,70 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Set the class loader which was registered as a synthetic service.
     $container->set('class_loader', $this->classLoader);
     return $container;
+  }
+
+  /**
+   * Transfers state from services on the existing container to a new one.
+   *
+   * When rebuilding the container mid-request it is necessary to transfer the
+   * state of some services from the previous instance to the new one. This is
+   * required for services wrapping around PHP globals such as the request stack
+   * and the session.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   Container object
+   */
+  protected function restoreServiceState(ContainerInterface $container) {
+    if (!isset($this->container)) {
+      return;
+    }
+
+    // If a session was started, close and save it and then start it again.
+    $new_session = $container->get('session');
+    if ($this->container->initialized('session')) {
+      $session = $this->container->get('session');
+      if ($session->isStarted()) {
+        $session->save();
+        $new_session->start();
+      }
+    }
+
+    // Restore request stack and request context.
+    $requests = [];
+    if ($this->container->initialized('request_stack')) {
+      $original_request_stack = $this->container->get('request_stack');
+      while ($request = $original_request_stack->pop()) {
+        array_unshift($requests, $request);
+      }
+
+      // Rebuild the request stack bottom up.
+      $new_request_stack = $container->get('request_stack');
+      foreach ($requests as $request) {
+        if ($request->hasSession()) {
+          $request->setSession($new_session);
+        }
+        $original_request_stack->push($request);
+        $new_request_stack->push($request);
+        $container->get('router.request_context')->fromRequest($request);
+      }
+    }
+
+    // Save the id of the currently logged in user.
+    if ($this->container->initialized('current_user')) {
+      $current_user_id = $this->container->get('current_user')->id();
+      $container->get('current_user')->setInitialAccountId($current_user_id);
+    }
+
+    // Re-add messages.
+    if ($this->container->initialized('messenger')) {
+      $all_messages = $this->container->get('messenger')->all();
+      $messenger = $container->get('messenger');
+      foreach ($all_messages as $type => $messages) {
+        foreach ($messages as $message) {
+          $messenger->addMessage($message, $type);
+        }
+      }
+    }
   }
 
   /**
@@ -1363,20 +1355,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $provider->register($container);
       }
     }
-
-    // Identify all services whose instances should be persisted when rebuilding
-    // the container during the lifetime of the kernel (e.g., during a kernel
-    // reboot). Include synthetic services, because by definition, they cannot
-    // be automatically re-instantiated. Also include services tagged to
-    // persist.
-    $persist_ids = [];
-    foreach ($container->getDefinitions() as $id => $definition) {
-      // It does not make sense to persist the container itself, exclude it.
-      if ($id !== 'service_container' && ($definition->isSynthetic() || $definition->getTag('persist'))) {
-        $persist_ids[] = $id;
-      }
-    }
-    $container->setParameter('persist_ids', $persist_ids);
 
     $container->setParameter('app.root', $this->getAppRoot());
     $container->setParameter('site.path', $this->getSitePath());

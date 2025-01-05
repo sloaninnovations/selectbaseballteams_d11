@@ -145,11 +145,6 @@ class DrupalKernelTest extends KernelTestBase {
     $modules = $container->getParameter('container.modules');
     $module_extension_list = $container->get('extension.list.module');
     $this->assertEquals(['type' => 'module', 'pathname' => $module_extension_list->getPathname('service_provider_test'), 'filename' => NULL], $modules['service_provider_test']);
-
-    // Check that the container itself is not among the persist IDs because it
-    // does not make sense to persist the container itself.
-    $persist_ids = $container->getParameter('persist_ids');
-    $this->assertNotContains('service_container', $persist_ids);
   }
 
   /**
