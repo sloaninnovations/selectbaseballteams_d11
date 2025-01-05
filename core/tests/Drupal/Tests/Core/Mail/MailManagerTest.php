@@ -130,10 +130,10 @@ class MailManagerTest extends UnitTestCase {
       ],
     ]);
     $logger_factory = $this->createMock('\Drupal\Core\Logger\LoggerChannelFactoryInterface');
-    $string_translation = $this->getStringTranslationStub();
     $this->renderer = $this->createMock(RendererInterface::class);
+    $this->requestStack = $this->createMock('\Symfony\Component\HttpFoundation\RequestStack');
     // Construct the manager object and override its discovery.
-    $this->mailManager = new TestMailManager(new \ArrayObject(), $this->cache, $this->moduleHandler, $this->configFactory, $logger_factory, $string_translation, $this->renderer);
+    $this->mailManager = new TestMailManager(new \ArrayObject(), $this->cache, $this->moduleHandler, $this->configFactory, $logger_factory, $this->renderer, $this->requestStack);
     $this->mailManager->setDiscovery($this->discovery);
 
     $this->request = new Request();

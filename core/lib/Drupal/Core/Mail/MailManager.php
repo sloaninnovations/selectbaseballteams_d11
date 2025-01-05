@@ -16,7 +16,7 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\MailboxHeader;
 
@@ -31,27 +31,6 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
 
   use MessengerTrait;
   use StringTranslationTrait;
-
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The logger factory.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
-   */
-  protected $loggerFactory;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
 
   /**
    * List of already instantiated mail plugins.
@@ -70,23 +49,27 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
    *   Cache backend instance to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The configuration factory.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $loggerFactory
    *   The logger channel factory.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack used to retrieve the current request.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, TranslationInterface $string_translation, RendererInterface $renderer) {
+  public function __construct(
+    \Traversable $namespaces,
+    CacheBackendInterface $cache_backend,
+    ModuleHandlerInterface $module_handler,
+    protected ConfigFactoryInterface $configFactory,
+    protected LoggerChannelFactoryInterface $loggerFactory,
+    protected RendererInterface $renderer,
+    protected RequestStack $requestStack,
+  ) {
     parent::__construct('Plugin/Mail', $namespaces, $module_handler, 'Drupal\Core\Mail\MailInterface', Mail::class, 'Drupal\Core\Annotation\Mail');
     $this->alterInfo('mail_backend_info');
     $this->setCacheBackend($cache_backend, 'mail_backend_plugins');
-    $this->configFactory = $config_factory;
-    $this->loggerFactory = $logger_factory;
-    $this->stringTranslation = $string_translation;
-    $this->renderer = $renderer;
   }
 
   /**
@@ -282,7 +265,7 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
     // Attempt to convert relative URLs to absolute.
     foreach ($message['body'] as &$body_part) {
       if ($body_part instanceof MarkupInterface) {
-        $body_part = Markup::create(Html::transformRootRelativeUrlsToAbsolute((string) $body_part, \Drupal::request()->getSchemeAndHttpHost()));
+        $body_part = Markup::create(Html::transformRootRelativeUrlsToAbsolute((string) $body_part, $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost()));
       }
     }
 
