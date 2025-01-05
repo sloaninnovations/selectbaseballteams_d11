@@ -70,8 +70,8 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     }, 'umamiFrontAndRecipePagesEditor');
     $this->assertSame(6, $performance_data->getStylesheetCount());
     $this->assertLessThan(312000, $performance_data->getStylesheetBytes());
-    $this->assertSame(4, $performance_data->getScriptCount());
-    $this->assertLessThan(418000, $performance_data->getScriptBytes());
+    $this->assertSame(5, $performance_data->getScriptCount());
+    $this->assertLessThan(338000, $performance_data->getScriptBytes());
   }
 
   /**
