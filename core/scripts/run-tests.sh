@@ -34,8 +34,9 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Version;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Process\Process;
 
-// cspell:ignore exitcode wwwrun
+// cspell:ignore exitcode testbots wwwrun
 
 // Define some colors for display.
 // A nice calming green.
@@ -478,23 +479,34 @@ function simpletest_script_init() {
   $host = 'localhost';
   $path = '';
   $port = '80';
+  $php = "";
 
   // Determine location of php command automatically, unless a command line
   // argument is supplied.
-  if (!empty($args['php'])) {
-    $php = $args['php'];
-  }
-  elseif ($php_env = getenv('_')) {
+  if ($php_env = getenv('_')) {
     // '_' is an environment variable set by the shell. It contains the command
     // that was executed.
     $php = $php_env;
   }
-  elseif ($sudo = getenv('SUDO_COMMAND')) {
+
+  if ($sudo = getenv('SUDO_COMMAND')) {
     // 'SUDO_COMMAND' is an environment variable set by the sudo program.
-    // Extract only the PHP interpreter, not the rest of the command.
-    [$php] = explode(' ', $sudo, 2);
+    // This will be set if the script is run directly by sudo or if the
+    // script is run under a shell started by sudo.
+    if (str_contains($sudo, basename(__FILE__))) {
+      // This script may have been directly run by sudo. $php may have the
+      // path to sudo from getenv('_') if run with the -E option.
+      // Extract what may be the PHP interpreter.
+      [$php] = explode(' ', $sudo, 2);
+    }
   }
-  else {
+
+  if (!empty($args['php'])) {
+    // Caller has specified path to php. Override auto-detection.
+    $php = $args['php'];
+  }
+
+  if ($php == "") {
     simpletest_script_print_error('Unable to automatically determine the path to the PHP interpreter. Supply the --php command line argument.');
     simpletest_script_help();
     exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
@@ -754,9 +766,12 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
       $test_class = array_shift($test_classes);
       // Fork a child process.
       $command = simpletest_script_command($test_run, $test_class);
-      $process = proc_open($command, [], $pipes, NULL, NULL, ['bypass_shell' => TRUE]);
-
-      if (!is_resource($process)) {
+      try {
+        $process = new Process($command);
+        $process->start();
+      }
+      catch (\Exception $e) {
+        echo get_class($e) . ": " . $e->getMessage() . "\n";
         echo "Unable to fork test process. Aborting.\n";
         exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
       }
@@ -766,7 +781,6 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
         'process' => $process,
         'test_run' => $test_run,
         'class' => $test_class,
-        'pipes' => $pipes,
       ];
     }
 
@@ -775,15 +789,18 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
 
     // Check if some children finished.
     foreach ($children as $cid => $child) {
-      $status = proc_get_status($child['process']);
-      if (empty($status['running'])) {
-        // The child exited, unregister it.
-        proc_close($child['process']);
-        if ($status['exitcode'] === SIMPLETEST_SCRIPT_EXIT_FAILURE) {
-          $total_status = max($status['exitcode'], $total_status);
+      if ($child['process']->isTerminated()) {
+        // The child exited.
+        echo $child['process']->getOutput();
+        $errorOutput = $child['process']->getErrorOutput();
+        if ($errorOutput) {
+          echo 'ERROR: ' . $errorOutput;
         }
-        elseif ($status['exitcode']) {
-          $message = 'FATAL ' . $child['class'] . ': test runner returned a non-zero error code (' . $status['exitcode'] . ').';
+        if ($child['process']->getExitCode() === SIMPLETEST_SCRIPT_EXIT_FAILURE) {
+          $total_status = max($child['process']->getExitCode(), $total_status);
+        }
+        elseif ($child['process']->getExitCode()) {
+          $message = 'FATAL ' . $child['class'] . ': test runner returned a non-zero error code (' . $child['process']->getExitCode() . ').';
           echo $message . "\n";
           // @todo Return SIMPLETEST_SCRIPT_EXIT_EXCEPTION instead, when
           // DrupalCI supports this.
@@ -823,9 +840,11 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
  * Run a PHPUnit-based test.
  */
 function simpletest_script_run_phpunit(TestRun $test_run, $class) {
+  global $args;
+
   $runner = PhpUnitTestRunner::create(\Drupal::getContainer());
   $start = microtime(TRUE);
-  $results = $runner->execute($test_run, $class, $status);
+  $results = $runner->execute($test_run, $class, $status, $args['color']);
   $time = microtime(TRUE) - $start;
 
   $runner->processPhpUnitResults($test_run, $results);
@@ -866,29 +885,38 @@ function simpletest_script_run_one_test(TestRun $test_run, $test_class) {
  * @param string $test_class
  *   The name of the test class to run.
  *
- * @return string
- *   The assembled command string.
+ * @return list<string>
+ *   The list of command-line elements.
  */
-function simpletest_script_command(TestRun $test_run, $test_class) {
+function simpletest_script_command(TestRun $test_run, string $test_class): array {
   global $args, $php;
 
-  $command = escapeshellarg($php) . ' ' . escapeshellarg('./core/scripts/' . $args['script']);
-  $command .= ' --url ' . escapeshellarg($args['url']);
+  $command = [];
+  $command[] = $php;
+  $command[] = './core/scripts/' . $args['script'];
+  $command[] = '--url';
+  $command[] = $args['url'];
   if (!empty($args['sqlite'])) {
-    $command .= ' --sqlite ' . escapeshellarg($args['sqlite']);
+    $command[] = '--sqlite';
+    $command[] = $args['sqlite'];
   }
   if (!empty($args['dburl'])) {
-    $command .= ' --dburl ' . escapeshellarg($args['dburl']);
+    $command[] = '--dburl';
+    $command[] = $args['dburl'];
   }
-  $command .= ' --php ' . escapeshellarg($php);
-  $command .= " --test-id {$test_run->id()}";
+  $command[] = '--php';
+  $command[] = $php;
+  $command[] = '--test-id';
+  $command[] = $test_run->id();
   foreach (['verbose', 'keep-results', 'color', 'die-on-fail', 'suppress-deprecations'] as $arg) {
     if ($args[$arg]) {
-      $command .= ' --' . $arg;
+      $command[] = '--' . $arg;
     }
   }
   // --execute-test and class name needs to come last.
-  $command .= ' --execute-test ' . escapeshellarg($test_class);
+  $command[] = '--execute-test';
+  $command[] = $test_class;
+
   return $command;
 }
 
@@ -929,16 +957,16 @@ function simpletest_script_get_test_list() {
     foreach ($groups as $group => $tests) {
       $not_slow_tests = array_merge($not_slow_tests, array_keys($tests));
     }
-    // Filter slow tests out of the not slow tests since they may appear in more
-    // than one group.
-    $not_slow_tests = array_diff($not_slow_tests, $slow_tests);
+    // Filter slow tests out of the not slow tests and ensure a unique list
+    // since tests may appear in more than one group.
+    $not_slow_tests = array_unique(array_diff($not_slow_tests, $slow_tests));
 
     // If the tests are not being run in parallel, then ensure slow tests run
     // all together first.
     if ((int) $args['ci-parallel-node-total'] <= 1 ) {
       sort_tests_by_type_and_methods($slow_tests);
       sort_tests_by_type_and_methods($not_slow_tests);
-      $test_list = array_unique(array_merge($slow_tests, $not_slow_tests));
+      $test_list = array_merge($slow_tests, $not_slow_tests);
     }
     else {
       // Sort all tests by the number of public methods on the test class.
@@ -959,7 +987,7 @@ function simpletest_script_get_test_list() {
       // And the same for the rest of the tests.
       $binned_other_tests = place_tests_into_bins($not_slow_tests, $bin_count);
       $other_tests_for_job = $binned_other_tests[$args['ci-parallel-node-index'] - 1];
-      $test_list = array_unique(array_merge($slow_tests_for_job, $other_tests_for_job));
+      $test_list = array_merge($slow_tests_for_job, $other_tests_for_job);
     }
   }
   else {
@@ -1130,7 +1158,7 @@ function get_test_class_method_count(string $class): int {
  * @return array
  *   An associative array of bins and the test class names in each bin.
  */
- function place_tests_into_bins(array $tests, int $bin_count) {
+function place_tests_into_bins(array $tests, int $bin_count) {
   // Create a bin corresponding to each parallel test job.
   $bins = array_fill(0, $bin_count, []);
   // Go through each test and add them to one bin at a time.
@@ -1144,7 +1172,7 @@ function get_test_class_method_count(string $class): int {
  * Initialize the reporter.
  */
 function simpletest_script_reporter_init() {
-  global $args, $test_list, $results_map;
+  global $args, $test_list, $results_map, $php;
 
   $results_map = [
     'pass' => 'Pass',
@@ -1154,6 +1182,7 @@ function simpletest_script_reporter_init() {
 
   echo "\n";
   echo "Drupal test run\n";
+  echo "Using PHP Binary: $php\n";
   echo "---------------\n";
   echo "\n";
 
@@ -1234,7 +1263,7 @@ function simpletest_script_reporter_write_xml_results(TestRunResultsStorageInter
         }
         $test_class = $result->test_class;
         if (!isset($xml_files[$test_class])) {
-          $doc = new DomDocument('1.0');
+          $doc = new DOMDocument('1.0');
           $root = $doc->createElement('testsuite');
           $root = $doc->appendChild($root);
           $xml_files[$test_class] = ['doc' => $doc, 'suite' => $root];
@@ -1354,7 +1383,7 @@ function simpletest_script_format_result($result) {
   if ($args['non-html']) {
     $message = Html::decodeEntities($message);
   }
-  $lines = explode("\n", wordwrap($message), 76);
+  $lines = explode("\n", $message);
   foreach ($lines as $line) {
     echo "    $line\n";
   }

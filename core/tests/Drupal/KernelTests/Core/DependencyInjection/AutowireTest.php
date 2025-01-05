@@ -57,7 +57,7 @@ class AutowireTest extends KernelTestBase {
     $filenames = array_map(fn($module) => "core/modules/{$module[0]}/{$module[0]}.services.yml", $this->coreModuleListDataProvider());
     $filenames[] = 'core/core.services.yml';
     foreach (array_filter($filenames, 'file_exists') as $filename) {
-      foreach (Yaml::decode(file_get_contents($filename))['services'] as $id => $service) {
+      foreach ((Yaml::decode(file_get_contents($filename))['services'] ?? []) as $id => $service) {
         if (is_string($service)) {
           $aliases[$id] = substr($service, 1);
         }
@@ -104,6 +104,11 @@ class AutowireTest extends KernelTestBase {
         continue;
       }
 
+      // Skip IDs that are interfaces already.
+      if (interface_exists($id)) {
+        continue;
+      }
+
       // Expect standalone classes to be aliased.
       $implements = class_implements($class);
       if (!$implements) {
@@ -132,13 +137,12 @@ class AutowireTest extends KernelTestBase {
    * Tests that core controllers are autowired where possible.
    */
   public function testCoreControllerAutowiring(): void {
-    $services = [];
     $aliases = [];
 
     $filenames = array_map(fn($module) => "core/modules/{$module[0]}/{$module[0]}.services.yml", $this->coreModuleListDataProvider());
     $filenames[] = 'core/core.services.yml';
     foreach (array_filter($filenames, 'file_exists') as $filename) {
-      foreach (Yaml::decode(file_get_contents($filename))['services'] as $id => $service) {
+      foreach ((Yaml::decode(file_get_contents($filename))['services'] ?? []) as $id => $service) {
         if (is_string($service)) {
           $aliases[$id] = substr($service, 1);
         }
@@ -168,7 +172,7 @@ class AutowireTest extends KernelTestBase {
         continue;
       }
       $constructor = new \ReflectionMethod($controller, '__construct');
-      foreach ($constructor->getParameters() as $pos => $parameter) {
+      foreach ($constructor->getParameters() as $parameter) {
         $interface = (string) $parameter->getType();
         if (!isset($aliases[$interface])) {
           continue 2;

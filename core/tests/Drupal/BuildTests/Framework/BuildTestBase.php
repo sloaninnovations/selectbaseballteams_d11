@@ -23,6 +23,14 @@ use Symfony\Component\Process\Process;
 /**
  * Provides a workspace to test build processes.
  *
+ * Module tests extending BuildTestBase must exist in the
+ * Drupal\Tests\your_module\Build namespace and live in the
+ * modules/your_module/tests/src/Build directory.
+ *
+ * Tests for core/lib/Drupal classes extending BuildTestBase must exist in the
+ * \Drupal\BuildTests namespace and live in the core/tests/Drupal/BuildTests
+ * directory.
+ *
  * If you need to build a file system and then run a command from the command
  * line then this is the test framework for you.
  *
@@ -498,7 +506,7 @@ abstract class BuildTestBase extends TestCase {
   /**
    * Checks whether a port is available.
    *
-   * @param $port
+   * @param int $port
    *   A number between 1024 and 65536.
    *
    * @return bool

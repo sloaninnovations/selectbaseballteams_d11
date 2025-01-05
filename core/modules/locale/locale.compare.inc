@@ -2,10 +2,10 @@
 
 /**
  * @file
- * The API for comparing project translation status with available translation.
  */
 
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\Utility\ProjectInfo;
 
 /**
@@ -18,6 +18,7 @@ require_once __DIR__ . '/locale.translation.inc';
 /**
  * Clear the project data table.
  */
+#[StopProceduralHookScan]
 function locale_translation_flush_projects() {
   \Drupal::service('locale.project')->deleteAll();
 }

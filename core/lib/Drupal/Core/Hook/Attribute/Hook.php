@@ -30,9 +30,8 @@ namespace Drupal\Core\Hook\Attribute;
  *   }
  *   @endcode
  *
- * Ordering hook implementations can be done by specifying the 'priority' on the
- * attribute, or by manipulating the kernel listeners in service alter
- * providers. See \Drupal\Core\Hook\HookOrder for details.
+ * Ordering hook implementations can be done by implementing
+ * hook_module_implements_alter.
  *
  * Classes that use this annotation on the class or on their methods are
  * automatically registered as autowired services with the class name as the
@@ -53,7 +52,7 @@ namespace Drupal\Core\Hook\Attribute;
  *   form ID without modifying any existing implementations.
  *
  * The following hooks may not have multiple implementations by a single module:
- * - hook_library_build_info()
+ * - hook_library_info_build()
  * - hook_mail()
  * - hook_help()
  * - hook_node_update_index()
@@ -62,12 +61,14 @@ namespace Drupal\Core\Hook\Attribute;
  *
  * The following hooks can only have procedural hook implementations:
  *
+ * Legacy meta hooks:
+ * - hook_hook_info()
+ * - hook_module_implements_alter()
+ *
  * Install hooks:
  * - hook_install()
- * - hook_module_preinstall()
- * - hook_module_preuninstall()
- * - hook_modules_installed()
- * - hook_modules_uninstalled()
+ * - hook_install_tasks()
+ * - hook_install_tasks_alter()
  * - hook_post_update_NAME()
  * - hook_schema()
  * - hook_uninstall()
@@ -76,7 +77,6 @@ namespace Drupal\Core\Hook\Attribute;
  *
  * Theme hooks:
  * - hook_preprocess_HOOK()
- * - hook_process_HOOK()
  *
  * @section sec_backwards_compatibility Backwards-compatibility
  *
@@ -100,11 +100,6 @@ class Hook {
    *   parameter is not required. If this attribute is on a class and this
    *   parameter is omitted, the class must have an __invoke() method, which is
    *   taken as the hook implementation.
-   * @param int|null $priority
-   *   (optional) The priority of this implementation relative to other
-   *   implementations of this hook. Hook implementations with higher priority
-   *   are executed first. If omitted, the module order is used to order the
-   *   hook implementations.
    * @param string|null $module
    *   (optional) The module this implementation is for. This allows one module to
    *   implement a hook on behalf of another module. Defaults to the module the
@@ -113,7 +108,6 @@ class Hook {
   public function __construct(
     public string $hook,
     public string $method = '',
-    public ?int $priority = NULL,
     public ?string $module = NULL,
   ) {}
 

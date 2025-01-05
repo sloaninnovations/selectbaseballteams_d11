@@ -42,7 +42,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @var string
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $base_table;
 
   /**
@@ -67,7 +67,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @var array
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $validated_views = [];
 
   /**
@@ -106,7 +106,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @var array
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $filter_defaults = [
     'id' => NULL,
     'expose' => ['operator' => FALSE],
@@ -502,18 +502,18 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
-   * @param $parents
+   * @param array $parents
    *   An array of parent keys that point to the part of the submitted form
    *   values that are expected to contain the element's value (in the case where
    *   this form element was actually submitted). In a simple case (assuming
    *   #tree is TRUE throughout the form), if the select element is located in
    *   $form['wrapper']['select'], so that the submitted form values would
-   *   normally be found in $form_state->getValue(array('wrapper', 'select')),
-   *   you would pass array('wrapper', 'select') for this parameter.
-   * @param $default_value
+   *   normally be found in $form_state->getValue(['wrapper', 'select']),
+   *   you would pass ['wrapper', 'select'] for this parameter.
+   * @param array|string $default_value
    *   The default value to return if the #select element does not currently have
    *   a proper value set based on the submitted input.
-   * @param $element
+   * @param array $element
    *   An array representing the current version of the #select element within
    *   the form.
    *

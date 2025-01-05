@@ -62,7 +62,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    *
    * @var bool
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $limit_values;
 
   /**
@@ -70,7 +70,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    *
    * @var string
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public $base_table;
 
   /**
@@ -139,7 +139,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   /**
    * The fields that we are actually grouping on.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public array $group_fields;
 
   /**
@@ -714,6 +714,9 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitGroupByForm(&$form, FormStateInterface $form_state) {
     parent::submitGroupByForm($form, $form_state);
     $item = &$form_state->get('handler')->options;
@@ -966,10 +969,16 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     return $processed_entity;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function render_item($count, $item) {
     return $this->renderer->render($item['rendered']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function documentSelfTokens(&$tokens) {
     $field = $this->getFieldDefinition();
     foreach ($field->getColumns() as $id => $column) {
@@ -977,6 +986,9 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function addSelfTokens(&$tokens, $item) {
     $field = $this->getFieldDefinition();
     foreach ($field->getColumns() as $id => $column) {
