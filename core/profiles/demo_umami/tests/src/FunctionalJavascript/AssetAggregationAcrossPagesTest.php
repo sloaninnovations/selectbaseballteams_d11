@@ -40,7 +40,6 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
    */
   public function testFrontAndRecipesPagesAuthenticated(): void {
     $user = $this->createUser();
-    $user->save();
     $this->drupalLogin($user);
     sleep(2);
     $performance_data = $this->collectPerformanceData(function () {
