@@ -9,7 +9,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\content_translation\ContentTranslationManager;
 use Drupal\content_translation\BundleTranslationSettingsInterface;
 use Drupal\language\ContentLanguageSettingsInterface;
 use Drupal\Core\Language\LanguageInterface;
@@ -235,8 +234,8 @@ class ContentTranslationHooks {
     // enabled otherwise changes in pending
     // revisions might be overridden by changes in later default revisions.
     // This can't use
-    // ContentTranslationManager::isPendingRevisionSupportEnabled() since that
-    // depends on entity bundle information to be completely built.
+    // Drupal\content_translation\ContentTranslationManager::isPendingRevisionSupportEnabled()
+    // since that depends on entity bundle information to be completely built.
     foreach (Workflow::loadMultipleByType('content_moderation') as $workflow) {
       /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration $plugin */
       $plugin = $workflow->getTypePlugin();
