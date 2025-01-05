@@ -159,7 +159,7 @@ class ComposerValidatorTest extends PackageManagerKernelTestBase {
     $this->enableModules(['help']);
     (new ActiveFixtureManipulator())->addConfig($config)->commitChanges();
 
-    $result = ValidationResult::createError($expected_messages, $this->$this->t("Composer settings don't satisfy Package Manager's requirements."));
+    $result = ValidationResult::createError($expected_messages, $this->t("Composer settings don't satisfy Package Manager's requirements."));
     $this->assertStatusCheckResults([$result]);
   }
 
