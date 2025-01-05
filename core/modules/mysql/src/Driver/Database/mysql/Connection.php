@@ -93,15 +93,17 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // @see https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sqlmode_ansi_quotes
     $ansi_quotes_modes = ['ANSI_QUOTES', 'ANSI', 'DB2', 'MAXDB', 'MSSQL', 'ORACLE', 'POSTGRESQL'];
     $is_ansi_quotes_mode = FALSE;
-    if (isset($connection_options['init_commands']['sql_mode'])) {
-      foreach ($ansi_quotes_modes as $mode) {
-        // None of the modes in $ansi_quotes_modes are substrings of other modes
-        // that are not in $ansi_quotes_modes, so a simple stripos() does not
-        // return false positives.
-        if (stripos($connection_options['init_commands']['sql_mode'], $mode) !== FALSE) {
-          $is_ansi_quotes_mode = TRUE;
-          break;
-        }
+    foreach ($ansi_quotes_modes as $mode) {
+      // None of the modes in $ansi_quotes_modes are substrings of other modes
+      // that are not in $ansi_quotes_modes, so a simple stripos() does not
+      // return false positives.
+      if (isset($connection_options['init_commands']['sql_mode']) && stripos($connection_options['init_commands']['sql_mode'], $mode) !== FALSE) {
+        $is_ansi_quotes_mode = TRUE;
+        break;
+      }
+      if (!empty($connection_options['sql_mode_options'][$mode])) {
+        $is_ansi_quotes_mode = TRUE;
+        break;
       }
     }
 
@@ -212,9 +214,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       'init_commands' => [],
     ];
 
-    $connection_options['init_commands'] += [
-      'sql_mode' => "SET sql_mode = 'ANSI,TRADITIONAL'",
-    ];
     if (!empty($connection_options['isolation_level'])) {
       $connection_options['init_commands'] += [
         'isolation_level' => 'SET SESSION TRANSACTION ISOLATION LEVEL ' . strtoupper($connection_options['isolation_level']),
@@ -224,6 +223,33 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // Execute initial commands.
     foreach ($connection_options['init_commands'] as $sql) {
       $pdo->exec($sql);
+    }
+
+    // Set MySQL sql_mode options to defaults, unless the legacy property
+    // 'sql_mode' is already defined.
+    if (isset($connection_options['init_commands']['sql_mode'])) {
+      @trigger_error("The 'sql_mode' database command is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use an array of options in 'sql_mode_options' instead. See https://www.drupal.org/node/3403416", E_USER_DEPRECATED);
+    }
+    else {
+      $sql_mode_defaults = [
+        // An option may be removed by setting it to FALSE in the
+        // sql_mode_options array.
+        'ANSI' => TRUE,
+        'TRADITIONAL' => TRUE,
+      ];
+
+      $connection_options += [
+        'sql_mode_options' => [],
+      ];
+      $connection_options['sql_mode_options'] += $sql_mode_defaults;
+
+      $sql_mode_options = implode(',', array_keys(array_filter($connection_options['sql_mode_options'])));
+      // Don't set the sql_mode command into the init_commands array, as
+      // otherwise the $connection_options variable which is passed by reference
+      // gets polluted with it.
+      $sql_mode_command = "SET sql_mode = '{$sql_mode_options}'";
+
+      $pdo->exec($sql_mode_command);
     }
 
     return $pdo;
