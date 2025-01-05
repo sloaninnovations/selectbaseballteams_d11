@@ -24,6 +24,7 @@ use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Psr\Log\LoggerInterface;
 
 /**
  * @coversDefaultClass \Drupal\layout_builder\Section
@@ -67,6 +68,13 @@ class SectionRenderTest extends UnitTestCase {
   protected $eventDispatcher;
 
   /**
+   * The logger instance.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -78,9 +86,10 @@ class SectionRenderTest extends UnitTestCase {
     $this->contextRepository = $this->prophesize(ContextRepositoryInterface::class);
     // @todo Refactor this into some better tests in https://www.drupal.org/node/2942605.
     $this->eventDispatcher = (new \ReflectionClass(EventDispatcher::class))->newInstanceWithoutConstructor();
+    $this->logger = $this->prophesize(LoggerInterface::class);
 
     $this->account = $this->prophesize(AccountInterface::class);
-    $subscriber = new BlockComponentRenderArray($this->account->reveal());
+    $subscriber = new BlockComponentRenderArray($this->account->reveal(), $this->logger->reveal());
     $this->eventDispatcher->addSubscriber($subscriber);
 
     $layout = $this->prophesize(LayoutInterface::class);
@@ -95,6 +104,7 @@ class SectionRenderTest extends UnitTestCase {
     $container->set('context.handler', $this->contextHandler->reveal());
     $container->set('context.repository', $this->contextRepository->reveal());
     $container->set('event_dispatcher', $this->eventDispatcher);
+    $container->set('logger.channel.layout_builder', $this->logger->reveal());
     \Drupal::setContainer($container);
   }
 
