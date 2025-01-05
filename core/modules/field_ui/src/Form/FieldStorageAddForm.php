@@ -255,6 +255,7 @@ class FieldStorageAddForm extends FormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#size' => 30,
+      '#required' => TRUE,
     ];
     $field_prefix = $this->config('field_ui.settings')->get('field_prefix');
     $form['new_storage_wrapper']['field_name'] = [
