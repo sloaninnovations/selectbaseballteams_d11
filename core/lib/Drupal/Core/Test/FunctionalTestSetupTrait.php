@@ -547,6 +547,7 @@ trait FunctionalTestSetupTrait {
     unset($formInput['autoload']);
     unset($formInput['pdo']);
     unset($formInput['init_commands']);
+    unset($formInput['sql_mode_options']);
     unset($formInput['isolation_level']);
     // Remove database connection info that is not used by SQLite.
     if ($driverName === "sqlite") {
