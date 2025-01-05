@@ -236,12 +236,14 @@ class ContentTranslationHooks {
     // This can't use
     // Drupal\content_translation\ContentTranslationManager::isPendingRevisionSupportEnabled()
     // since that depends on entity bundle information to be completely built.
-    foreach (Workflow::loadMultipleByType('content_moderation') as $workflow) {
-      /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration $plugin */
-      $plugin = $workflow->getTypePlugin();
-      foreach ($plugin->getEntityTypes() as $entity_type_id) {
-        foreach ($plugin->getBundlesForEntityType($entity_type_id) as $bundle_id) {
-          $bundles[$entity_type_id][$bundle_id]['untranslatable_fields.default_translation_affected'] = TRUE;
+    if (\Drupal::moduleHandler()->moduleExists('content_moderation')) {
+      foreach (Workflow::loadMultipleByType('content_moderation') as $workflow) {
+        /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration $plugin */
+        $plugin = $workflow->getTypePlugin();
+        foreach ($plugin->getEntityTypes() as $entity_type_id) {
+          foreach ($plugin->getBundlesForEntityType($entity_type_id) as $bundle_id) {
+            $bundles[$entity_type_id][$bundle_id]['untranslatable_fields.default_translation_affected'] = TRUE;
+          }
         }
       }
     }
