@@ -2,6 +2,7 @@
 
 namespace Drupal\image\Hook;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
@@ -9,6 +10,8 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for image.
  */
 class ImageViewsHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_field_views_data().
@@ -28,7 +31,7 @@ class ImageViewsHooks {
         'base' => 'file_managed',
         'entity type' => 'file',
         'base field' => 'fid',
-        'label' => t('image from @field_name', [
+        'label' => $this->t('image from @field_name', [
           '@field_name' => $field_storage->getName(),
         ]),
       ];
@@ -52,14 +55,14 @@ class ImageViewsHooks {
     $table_mapping = $entity_type_manager->getStorage($entity_type_id)->getTableMapping();
     [$label] = views_entity_field_label($entity_type_id, $field_name);
     $data['file_managed'][$pseudo_field_name]['relationship'] = [
-      'title' => t('@entity using @field', [
+      'title' => $this->t('@entity using @field', [
         '@entity' => $entity_type->getLabel(),
         '@field' => $label,
       ]),
-      'label' => t('@field_name', [
+      'label' => $this->t('@field_name', [
         '@field_name' => $field_name,
       ]),
-      'help' => t('Relate each @entity with a @field set to the image.', [
+      'help' => $this->t('Relate each @entity with a @field set to the image.', [
         '@entity' => $entity_type->getLabel(),
         '@field' => $label,
       ]),
