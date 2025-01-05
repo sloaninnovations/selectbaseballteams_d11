@@ -4,7 +4,6 @@
     "allowCompoundWords": false,
     "globRoot": ".",
     "ignorePaths": [
-      "temporary/change/to/this/file",
       "**/.*.json",
       ".*ignore",
       "composer.lock",
@@ -72,6 +71,7 @@
       "ist",
       "please",
       "queuing",
+      "unusual",
       "writeable"
     ],
     "overrides": [
