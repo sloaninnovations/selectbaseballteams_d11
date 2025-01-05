@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\comment_test\Hook;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\comment\CommentInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -12,6 +13,8 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for comment_test.
  */
 class CommentTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_entity_type_alter().
@@ -46,7 +49,7 @@ class CommentTestHooks {
       ],
       '#links' => [
         'comment-report' => [
-          'title' => t('Report'),
+          'title' => $this->t('Report'),
           'url' => Url::fromRoute('comment_test.report', [
             'comment' => $entity->id(),
           ], [

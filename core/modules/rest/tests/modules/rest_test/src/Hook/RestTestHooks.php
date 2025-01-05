@@ -12,11 +12,14 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Hook implementations for rest_test.
  */
 class RestTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_entity_field_access().
@@ -68,7 +71,7 @@ class RestTestHooks {
   #[Hook('entity_base_field_info')]
   public function entityBaseFieldInfo(EntityTypeInterface $entity_type) {
     $fields = [];
-    $fields['rest_test_validation'] = BaseFieldDefinition::create('string')->setLabel(t('REST test validation field'))->setDescription(t('A text field with some special validations attached used for testing purposes'))->addConstraint('rest_test_validation');
+    $fields['rest_test_validation'] = BaseFieldDefinition::create('string')->setLabel($this->t('REST test validation field'))->setDescription($this->t('A text field with some special validations attached used for testing purposes'))->addConstraint('rest_test_validation');
     return $fields;
   }
 

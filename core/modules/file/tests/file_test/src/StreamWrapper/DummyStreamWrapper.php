@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\file_test\StreamWrapper;
 
 use Drupal\Core\StreamWrapper\LocalStream;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Helper class for testing the stream wrapper registry.
@@ -13,18 +14,20 @@ use Drupal\Core\StreamWrapper\LocalStream;
  */
 class DummyStreamWrapper extends LocalStream {
 
+  use StringTranslationTrait;
+
   /**
    * {@inheritdoc}
    */
   public function getName() {
-    return t('Dummy files');
+    return $this->t('Dummy files');
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription() {
-    return t('Dummy wrapper for testing.');
+    return $this->t('Dummy wrapper for testing.');
   }
 
   public function getDirectoryPath() {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\file_test\StreamWrapper;
 
 use Drupal\Core\StreamWrapper\PublicStream;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Helper class for testing the stream wrapper registry.
@@ -15,18 +16,20 @@ use Drupal\Core\StreamWrapper\PublicStream;
  */
 class DummyRemoteStreamWrapper extends PublicStream {
 
+  use StringTranslationTrait;
+
   /**
    * {@inheritdoc}
    */
   public function getName() {
-    return t('Dummy files (remote)');
+    return $this->t('Dummy files (remote)');
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription() {
-    return t('Dummy wrapper for testing (remote).');
+    return $this->t('Dummy wrapper for testing (remote).');
   }
 
   public function realpath() {

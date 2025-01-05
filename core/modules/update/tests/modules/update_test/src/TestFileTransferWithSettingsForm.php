@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\update_test;
 
 use Drupal\Core\FileTransfer\Local;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Provides an object to test the settings form functionality.
@@ -16,6 +17,8 @@ use Drupal\Core\FileTransfer\Local;
  * @see \Drupal\update\Tests\FileTransferAuthorizeFormTest
  */
 class TestFileTransferWithSettingsForm extends Local {
+
+  use StringTranslationTrait;
 
   /**
    * Returns a Drupal\update_test\TestFileTransferWithSettingsForm object.
@@ -34,7 +37,7 @@ class TestFileTransferWithSettingsForm extends Local {
     $form = [];
     $form['update_test_username'] = [
       '#type' => 'textfield',
-      '#title' => t('Update Test Username'),
+      '#title' => $this->t('Update Test Username'),
     ];
     return $form;
   }

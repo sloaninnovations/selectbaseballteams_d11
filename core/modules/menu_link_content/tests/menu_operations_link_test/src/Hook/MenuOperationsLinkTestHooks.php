@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\menu_operations_link_test\Hook;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Core\Entity\EntityInterface;
@@ -14,6 +15,8 @@ use Drupal\Core\Hook\Attribute\Hook;
  */
 class MenuOperationsLinkTestHooks {
 
+  use StringTranslationTrait;
+
   /**
    * Implements hook_entity_operation_alter().
    */
@@ -23,7 +26,7 @@ class MenuOperationsLinkTestHooks {
       return;
     }
     // Alter the title of the edit link appearing in operations menu.
-    $operations['edit']['title'] = t('Altered Edit Title');
+    $operations['edit']['title'] = $this->t('Altered Edit Title');
   }
 
   /**
@@ -35,7 +38,7 @@ class MenuOperationsLinkTestHooks {
       return [];
     }
     $operations['custom_operation'] = [
-      'title' => t('Custom Home'),
+      'title' => $this->t('Custom Home'),
       'weight' => 20,
       'url' => Url::fromRoute('<front>'),
     ];

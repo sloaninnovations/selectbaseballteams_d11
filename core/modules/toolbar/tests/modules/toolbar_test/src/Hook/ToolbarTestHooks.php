@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\toolbar_test\Hook;
 
 use Drupal\Core\Link;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Hook\Attribute\Hook;
 
@@ -12,6 +13,8 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for toolbar_test.
  */
 class ToolbarTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_toolbar().
@@ -22,34 +25,34 @@ class ToolbarTestHooks {
       '#type' => 'toolbar_item',
       'tab' => [
         '#type' => 'link',
-        '#title' => t('Test tab'),
+        '#title' => $this->t('Test tab'),
         '#url' => Url::fromRoute('<front>'),
         '#options' => [
           'attributes' => [
             'id' => 'toolbar-tab-testing',
-            'title' => t('Test tab'),
+            'title' => $this->t('Test tab'),
           ],
         ],
       ],
       'tray' => [
-        '#heading' => t('Test tray'),
+        '#heading' => $this->t('Test tray'),
         '#wrapper_attributes' => [
           'id' => 'toolbar-tray-testing',
         ],
         'content' => [
           '#theme' => 'item_list',
           '#items' => [
-            Link::fromTextAndUrl(t('link 1'), Url::fromRoute('<front>', [], [
+            Link::fromTextAndUrl($this->t('link 1'), Url::fromRoute('<front>', [], [
               'attributes' => [
                 'title' => 'Test link 1 title',
               ],
             ]))->toRenderable(),
-            Link::fromTextAndUrl(t('link 2'), Url::fromRoute('<front>', [], [
+            Link::fromTextAndUrl($this->t('link 2'), Url::fromRoute('<front>', [], [
               'attributes' => [
                 'title' => 'Test link 2 title',
               ],
             ]))->toRenderable(),
-            Link::fromTextAndUrl(t('link 3'), Url::fromRoute('<front>', [], [
+            Link::fromTextAndUrl($this->t('link 3'), Url::fromRoute('<front>', [], [
               'attributes' => [
                 'title' => 'Test link 3 title',
               ],

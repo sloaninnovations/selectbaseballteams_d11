@@ -6,6 +6,7 @@ namespace Drupal\file_test\StreamWrapper;
 
 use Drupal\Core\StreamWrapper\ReadOnlyStream;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Helper class for testing the stream wrapper registry.
@@ -13,6 +14,8 @@ use Drupal\Core\StreamWrapper\StreamWrapperInterface;
  * Dummy external stream wrapper implementation (dummy-external-readonly://).
  */
 class DummyExternalReadOnlyWrapper extends ReadOnlyStream {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -25,14 +28,14 @@ class DummyExternalReadOnlyWrapper extends ReadOnlyStream {
    * {@inheritdoc}
    */
   public function getName() {
-    return t('Dummy external stream wrapper (readonly)');
+    return $this->t('Dummy external stream wrapper (readonly)');
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription() {
-    return t('Dummy external read-only stream wrapper for testing.');
+    return $this->t('Dummy external read-only stream wrapper for testing.');
   }
 
   /**

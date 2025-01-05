@@ -6,11 +6,14 @@ namespace Drupal\update_test\Hook;
 
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Hook implementations for update_test.
  */
 class UpdateTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_system_info_alter().
@@ -72,7 +75,7 @@ class UpdateTestHooks {
     // environment in which the update manager tests are run).
     return [
       'system_test' => [
-        'title' => t('Update Test FileTransfer'),
+        'title' => $this->t('Update Test FileTransfer'),
         'class' => 'Drupal\update_test\TestFileTransferWithSettingsForm',
         'weight' => -20,
       ],

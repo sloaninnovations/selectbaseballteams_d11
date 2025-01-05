@@ -9,11 +9,14 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Hook implementations for contact_storage_test.
  */
 class ContactStorageTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_entity_base_field_info().
@@ -22,7 +25,7 @@ class ContactStorageTestHooks {
   public function entityBaseFieldInfo(EntityTypeInterface $entity_type) {
     if ($entity_type->id() == 'contact_message') {
       $fields = [];
-      $fields['id'] = BaseFieldDefinition::create('integer')->setLabel(t('Message ID'))->setDescription(t('The message ID.'))->setReadOnly(TRUE)->setSetting('unsigned', TRUE);
+      $fields['id'] = BaseFieldDefinition::create('integer')->setLabel($this->t('Message ID'))->setDescription($this->t('The message ID.'))->setReadOnly(TRUE)->setSetting('unsigned', TRUE);
       return $fields;
     }
   }
@@ -51,8 +54,8 @@ class ContactStorageTestHooks {
     $contact_form = $form_state->getFormObject()->getEntity();
     $form['send_a_pony'] = [
       '#type' => 'checkbox',
-      '#title' => t('Send submitters a voucher for a free pony.'),
-      '#description' => t('Enable to send an additional email with a free pony voucher to anyone who submits the form.'),
+      '#title' => $this->t('Send submitters a voucher for a free pony.'),
+      '#description' => $this->t('Enable to send an additional email with a free pony voucher to anyone who submits the form.'),
       '#default_value' => $contact_form->getThirdPartySetting('contact_storage_test', 'send_a_pony', FALSE),
     ];
     $form['#entity_builders'][] = [$this, 'contactFormBuilder'];

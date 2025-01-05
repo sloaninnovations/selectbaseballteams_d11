@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\content_moderation_test_views\Hook;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -12,6 +13,8 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for content_moderation_test_views.
  */
 class ContentModerationTestViewsHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_views_query_alter().
@@ -36,16 +39,16 @@ class ContentModerationTestViewsHooks {
   public function viewsDataAlter(array &$data): void {
     if (isset($data['users_field_data'])) {
       $data['users_field_data']['uid_revision_test'] = [
-        'help' => t('Relate the content revision to the user who created it.'),
+        'help' => $this->t('Relate the content revision to the user who created it.'),
         'real field' => 'uid',
         'relationship' => [
-          'title' => t('Content revision authored'),
-          'help' => t('Relate the content revision to the user who created it. This relationship will create one record for each content revision item created by the user.'),
+          'title' => $this->t('Content revision authored'),
+          'help' => $this->t('Relate the content revision to the user who created it. This relationship will create one record for each content revision item created by the user.'),
           'id' => 'standard',
           'base' => 'node_field_revision',
           'base field' => 'uid',
           'field' => 'uid',
-          'label' => t('node revisions'),
+          'label' => $this->t('node revisions'),
         ],
       ];
     }
