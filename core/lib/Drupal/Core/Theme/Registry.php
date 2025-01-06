@@ -657,7 +657,8 @@ class Registry implements DestructableInterface {
         else {
           $preprocess_functions = [];
           foreach ($info['preprocess functions'] as $function) {
-            $prefix = explode('preprocess', $function, 2)[0];
+            [$prefix, $hook] = explode('_preprocess_', $function, 2);
+            $cache['preprocess invokes'][$function] = ['module' => $prefix, 'hook' => 'preprocess_' . $hook];
             $preprocess_functions[$prefix][] = $function;
           }
           $info['preprocess functions'] = $preprocess_functions;
