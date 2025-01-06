@@ -13,7 +13,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 class ConfigTestHooksHooks {
 
   /**
-   * Implements hook_config_test_load().
+   * Implements hook_ENTITY_TYPE_load().
    */
   #[Hook('config_test_load')]
   public function configTestLoad() {
@@ -32,46 +32,46 @@ class ConfigTestHooksHooks {
   }
 
   /**
-   * Implements hook_config_test_presave().
+   * Implements hook_ENTITY_TYPE_presave().
    */
   #[Hook('config_test_presave')]
-  public function configTestPresave(ConfigTest $config_test) {
+  public function configTestPresave(ConfigTest $config_test): void {
     $GLOBALS['hook_config_test']['presave'] = 'config_test_config_test_presave';
     $this->updateIsSyncingStore('presave', $config_test);
   }
 
   /**
-   * Implements hook_config_test_insert().
+   * Implements hook_ENTITY_TYPE_insert().
    */
   #[Hook('config_test_insert')]
-  public function configTestInsert(ConfigTest $config_test) {
+  public function configTestInsert(ConfigTest $config_test): void {
     $GLOBALS['hook_config_test']['insert'] = 'config_test_config_test_insert';
     $this->updateIsSyncingStore('insert', $config_test);
   }
 
   /**
-   * Implements hook_config_test_update().
+   * Implements hook_ENTITY_TYPE_update().
    */
   #[Hook('config_test_update')]
-  public function configTestUpdate(ConfigTest $config_test) {
+  public function configTestUpdate(ConfigTest $config_test): void {
     $GLOBALS['hook_config_test']['update'] = 'config_test_config_test_update';
     $this->updateIsSyncingStore('update', $config_test);
   }
 
   /**
-   * Implements hook_config_test_predelete().
+   * Implements hook_ENTITY_TYPE_predelete().
    */
   #[Hook('config_test_predelete')]
-  public function configTestPredelete(ConfigTest $config_test) {
+  public function configTestPredelete(ConfigTest $config_test): void {
     $GLOBALS['hook_config_test']['predelete'] = 'config_test_config_test_predelete';
     $this->updateIsSyncingStore('predelete', $config_test);
   }
 
   /**
-   * Implements hook_config_test_delete().
+   * Implements hook_ENTITY_TYPE_delete().
    */
   #[Hook('config_test_delete')]
-  public function configTestDelete(ConfigTest $config_test) {
+  public function configTestDelete(ConfigTest $config_test): void {
     $GLOBALS['hook_config_test']['delete'] = 'config_test_config_test_delete';
     $this->updateIsSyncingStore('delete', $config_test);
   }
