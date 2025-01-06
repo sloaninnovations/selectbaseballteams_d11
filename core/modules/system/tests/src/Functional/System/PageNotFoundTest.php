@@ -18,9 +18,7 @@ class PageNotFoundTest extends BrowserTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system_test'];
 
@@ -29,6 +27,9 @@ class PageNotFoundTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The test user.
+   */
   protected $adminUser;
 
   /**

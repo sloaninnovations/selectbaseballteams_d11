@@ -105,6 +105,10 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function readMultiple(array $names) {
+    if (empty($names)) {
+      return [];
+    }
+
     $list = [];
     try {
       $list = $this->connection->query('SELECT [name], [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] IN ( :names[] )', [':collection' => $this->collection, ':names[]' => $names], $this->options)->fetchAllKeyed();
@@ -149,6 +153,7 @@ class DatabaseStorage implements StorageInterface {
    *   The config data, already dumped to a string.
    *
    * @return bool
+   *   TRUE when the write was successful, FALSE otherwise.
    */
   protected function doWrite($name, $data) {
     return (bool) $this->connection->merge($this->table, $this->options)

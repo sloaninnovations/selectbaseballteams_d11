@@ -62,6 +62,8 @@ use Drupal\Core\Utility\UpdateException;
 /**
  * Defines one or more hooks that are exposed by a module.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * Normally hooks do not need to be explicitly defined. However, by declaring a
  * hook explicitly, a module may define a "group" for it. Modules that implement
  * a hook may then place their implementation in either $module.module or in
@@ -94,6 +96,8 @@ function hook_hook_info() {
 /**
  * Alter the registry of modules implementing a hook.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * This hook is invoked in \Drupal::moduleHandler()->getImplementationInfo().
  * A module may implement this hook in order to reorder the implementing
  * modules, which are otherwise ordered by the module's system weight.
@@ -107,11 +111,11 @@ function hook_hook_info() {
  * you will have to change the order of hook_form_alter() implementation in
  * hook_module_implements_alter().
  *
- * @param $implementations
+ * @param array $implementations
  *   An array keyed by the module's name. The value of each item corresponds
  *   to a $group, which is usually FALSE, unless the implementation is in a
  *   file named $module.$group.inc.
- * @param $hook
+ * @param string $hook
  *   The name of the module hook being implemented.
  */
 function hook_module_implements_alter(&$implementations, $hook) {
@@ -169,7 +173,7 @@ function hook_system_info_alter(array &$info, \Drupal\Core\Extension\Extension $
  *   should be made earlier and exported so during import there's no need to
  *   do them again.
  */
-function hook_module_preinstall($module, bool $is_syncing) {
+function hook_module_preinstall($module, bool $is_syncing): void {
   my_module_cache_clear();
 }
 
@@ -184,7 +188,7 @@ function hook_module_preinstall($module, bool $is_syncing) {
  *
  * This hook should be implemented in a .module file, not in an .install file.
  *
- * @param $modules
+ * @param string[] $modules
  *   An array of the modules that were installed.
  * @param bool $is_syncing
  *   TRUE if the module is being installed as part of a configuration import. In
@@ -197,7 +201,7 @@ function hook_module_preinstall($module, bool $is_syncing) {
  * @see \Drupal\Core\Extension\ModuleInstaller::install()
  * @see hook_install()
  */
-function hook_modules_installed($modules, $is_syncing) {
+function hook_modules_installed($modules, $is_syncing): void {
   if (in_array('lousy_module', $modules)) {
     \Drupal::state()->set('my_module.lousy_module_compatibility', TRUE);
   }
@@ -208,6 +212,8 @@ function hook_modules_installed($modules, $is_syncing) {
 
 /**
  * Perform setup tasks when the module is installed.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * If the module implements hook_schema(), the database tables will
  * be created before this hook is fired.
@@ -249,7 +255,7 @@ function hook_modules_installed($modules, $is_syncing) {
  * @see hook_uninstall()
  * @see hook_modules_installed()
  */
-function hook_install($is_syncing) {
+function hook_install($is_syncing): void {
   // Set general module variables.
   \Drupal::state()->set('my_module.foo', 'bar');
 }
@@ -266,7 +272,7 @@ function hook_install($is_syncing) {
  *   should be made earlier and exported so during import there's no need to
  *   do them again.
  */
-function hook_module_preuninstall($module, bool $is_syncing) {
+function hook_module_preuninstall($module, bool $is_syncing): void {
   my_module_cache_clear();
 }
 
@@ -280,7 +286,7 @@ function hook_module_preuninstall($module, bool $is_syncing) {
  * It is recommended that you implement this hook if your module stores
  * data that may have been set by other modules.
  *
- * @param $modules
+ * @param string[] $modules
  *   An array of the modules that were uninstalled.
  * @param bool $is_syncing
  *   TRUE if the module is being uninstalled as part of a configuration import.
@@ -291,7 +297,7 @@ function hook_module_preuninstall($module, bool $is_syncing) {
  *
  * @see hook_uninstall()
  */
-function hook_modules_uninstalled($modules, $is_syncing) {
+function hook_modules_uninstalled($modules, $is_syncing): void {
   if (in_array('lousy_module', $modules)) {
     \Drupal::state()->delete('my_module.lousy_module_compatibility');
   }
@@ -303,6 +309,8 @@ function hook_modules_uninstalled($modules, $is_syncing) {
 
 /**
  * Remove any information that the module sets.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * The information that the module should remove includes:
  * - state that the module has set using \Drupal::state()
@@ -333,13 +341,15 @@ function hook_modules_uninstalled($modules, $is_syncing) {
  * @see hook_modules_uninstalled()
  * @see \Drupal\Core\Extension\ModuleUninstallValidatorInterface
  */
-function hook_uninstall($is_syncing) {
+function hook_uninstall($is_syncing): void {
   // Delete remaining general module variables.
   \Drupal::state()->delete('my_module.foo');
 }
 
 /**
  * Return an array of tasks to be performed by an installation profile.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * Any tasks you define here will be run, in order, after the installer has
  * finished the site configuration step but before it has moved on to the
@@ -505,16 +515,18 @@ function hook_install_tasks(&$install_state) {
 /**
  * Alter the full list of installation tasks.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * You can use this hook to change or replace any part of the Drupal
  * installation process that occurs after the installation profile is selected.
  *
  * This hook is invoked on the install profile in install_tasks().
  *
- * @param $tasks
+ * @param string[] $tasks
  *   An array of all available installation tasks, including those provided by
  *   Drupal core. You can modify this array to change or replace individual
  *   steps within the installation process.
- * @param $install_state
+ * @param array $install_state
  *   An array of information about the current installation state.
  *
  * @see hook_install_tasks()
@@ -528,6 +540,8 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
 
 /**
  * Perform a single update between minor versions.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * Modules should use hook hook_update_N() to update between minor or major
  * versions of the module. Sites upgrading from Drupal 6 or 7 to any higher
@@ -822,6 +836,8 @@ function hook_update_N(&$sandbox) {
 /**
  * Executes an update which is intended to update data, like entities.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * These implementations have to be placed in a MODULE.post_update.php file or
  * a THEME.post_update.php file.
  *
@@ -902,7 +918,7 @@ function hook_post_update_NAME(&$sandbox) {
  *
  * @see hook_post_update_NAME()
  */
-function hook_removed_post_updates() {
+function hook_removed_post_updates(): array {
   return [
     'my_module_post_update_foo' => '8.x-2.0',
     'my_module_post_update_bar' => '8.x-3.0',
@@ -960,6 +976,8 @@ function hook_update_dependencies() {
 /**
  * Return a number which is no longer available as hook_update_N().
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * If you remove some update functions from your my_module.install file, you
  * should notify Drupal of those missing functions. This way, Drupal can
  * ensure that no update is accidentally skipped.
@@ -975,7 +993,7 @@ function hook_update_dependencies() {
  *
  * @see hook_update_N()
  */
-function hook_update_last_removed() {
+function hook_update_last_removed(): int {
   // We've removed the 8.x-1.x version of my_module, including database updates.
   // The next update function is my_module_update_8200().
   return 8103;
@@ -1078,7 +1096,7 @@ function hook_updater_info_alter(&$updaters) {
  * Moreover, any requirement with a severity of REQUIREMENT_ERROR severity will
  * result in a notice on the administration configuration page.
  *
- * @param $phase
+ * @param string $phase
  *   The phase in which requirements are checked:
  *   - install: The module is being installed.
  *   - update: The module is enabled and update.php is run.
@@ -1094,11 +1112,12 @@ function hook_updater_info_alter(&$updaters) {
  *     install phase, this should only be used for version numbers, do not set
  *     it if not applicable.
  *   - description: The description of the requirement/status.
- *   - severity: The requirement's result/severity level, one of:
+ *   - severity: (optional) The requirement's result/severity level, one of:
  *     - REQUIREMENT_INFO: For info only.
  *     - REQUIREMENT_OK: The requirement is satisfied.
  *     - REQUIREMENT_WARNING: The requirement failed with a warning.
  *     - REQUIREMENT_ERROR: The requirement failed with an error.
+ *     Defaults to REQUIREMENT_OK when installing, REQUIREMENT_INFO otherwise.
  */
 function hook_requirements($phase) {
   $requirements = [];

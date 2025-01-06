@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\batch_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -24,12 +26,12 @@ class BatchTestMockForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['test_value'] = [
-      '#title' => t('Test value'),
+      '#title' => $this->t('Test value'),
       '#type' => 'textfield',
     ];
     $form['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Submit'),
+      '#value' => $this->t('Submit'),
     ];
 
     return $form;

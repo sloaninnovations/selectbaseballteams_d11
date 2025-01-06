@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\jsonapi_test_data_type;
 
 /**
@@ -7,6 +9,9 @@ namespace Drupal\jsonapi_test_data_type;
  */
 class TraversableObject implements \IteratorAggregate {
 
+  /**
+   * The test data.
+   */
   public $property = "value";
 
   /**

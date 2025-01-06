@@ -13,8 +13,14 @@ use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
  */
 class MigrateSystemConfigurationTest extends MigrateDrupal7TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['file', 'system'];
 
+  /**
+   * The expected configuration after migration.
+   */
   protected $expectedConfig = [
     'system.authorize' => [],
     'system.cron' => [

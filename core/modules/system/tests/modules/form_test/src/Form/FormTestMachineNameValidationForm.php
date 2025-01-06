@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\form_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -120,7 +122,7 @@ class FormTestMachineNameValidationForm extends FormBase {
   /**
    * Loading stub for machine name.
    *
-   * @param $machine_name
+   * @param string $machine_name
    *   The machine name.
    *
    * @return bool

@@ -2,6 +2,7 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
+use Drupal\Component\Utility\FilterArray;
 use Drupal\Core\Database\Connection as DatabaseConnection;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
@@ -28,6 +29,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * A map of condition operators to SQLite operators.
    *
    * We don't want to override any of the defaults.
+   *
+   * @var string[][]
    */
   protected static $sqliteConditionOperatorMap = [
     'LIKE' => ['postfix' => " ESCAPE '\\'"],
@@ -244,7 +247,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public static function sqlFunctionLeast() {
     // Remove all NULL, FALSE and empty strings values but leaves 0 (zero) values.
-    $values = array_filter(func_get_args(), 'strlen');
+    $values = FilterArray::removeEmptyStrings(func_get_args());
 
     return count($values) < 1 ? NULL : min($values);
   }
@@ -344,6 +347,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return preg_match('/^' . $pattern . '$/', $subject);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function queryRange($query, $from, $count, array $args = [], array $options = []) {
     return $this->query($query . ' LIMIT ' . (int) $from . ', ' . (int) $count, $args, $options);
   }
@@ -364,10 +370,16 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return 'temp.' . $tablename;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function driver() {
     return 'sqlite';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function databaseType() {
     return 'sqlite';
   }
@@ -388,6 +400,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function mapConditionOperator($operator) {
     return static::$sqliteConditionOperatorMap[$operator] ?? NULL;
   }

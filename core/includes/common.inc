@@ -212,7 +212,7 @@ function base_path() {
  * MenuForm::BuildOverviewForm for an example creating a table
  * containing parent relationships.
  *
- * @param $element
+ * @param array $element
  *   A form element to attach the tableDrag behavior to.
  * @param array $options
  *   These options are used to generate JavaScript settings necessary to
@@ -290,7 +290,7 @@ function drupal_attach_tabledrag(&$element, array $options) {
  * is rendered for the first time, as it will have no effect on subsequent
  * renderings of the parent tree.
  *
- * @param $element
+ * @param array $element
  *   The element to be hidden.
  *
  * @return array
@@ -320,7 +320,7 @@ function hide(&$element) {
  * is rendered for the first time, as it will have no effect on subsequent
  * renderings of the parent tree.
  *
- * @param $element
+ * @param array $element
  *   The element to be shown.
  *
  * @return array
@@ -438,6 +438,9 @@ function drupal_flush_all_caches($kernel = NULL) {
 
   // Rebuild module data that is stored in state.
   \Drupal::service('extension.list.module')->reset();
+
+  // Reload modules.
+  \Drupal::moduleHandler()->reload();
 
   // Rebuild all information based on new module data.
   \Drupal::moduleHandler()->invokeAll('rebuild');

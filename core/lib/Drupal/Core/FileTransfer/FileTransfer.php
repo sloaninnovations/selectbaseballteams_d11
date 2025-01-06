@@ -59,7 +59,7 @@ abstract class FileTransfer {
   /**
    * Constructs a Drupal\Core\FileTransfer\FileTransfer object.
    *
-   * @param $jail
+   * @param string $jail
    *   The full path where all file operations performed by this object will
    *   be restricted to. This prevents the FileTransfer classes from being
    *   able to touch other parts of the filesystem.
@@ -88,6 +88,7 @@ abstract class FileTransfer {
    *
    * @throws \Drupal\Core\FileTransfer\FileTransferException
    */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
   public static function factory($jail, $settings) {
     throw new FileTransferException('FileTransfer::factory() static method not overridden by FileTransfer subclass.');
   }

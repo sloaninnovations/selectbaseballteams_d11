@@ -42,10 +42,12 @@ class BatchStorage implements BatchStorageInterface {
     // Ensure that a session is started before using the CSRF token generator.
     $this->session->start();
     try {
-      $batch = $this->connection->query("SELECT [batch] FROM {batch} WHERE [bid] = :bid AND [token] = :token", [
-        ':bid' => $id,
-        ':token' => $this->csrfToken->get($id),
-      ])->fetchField();
+      $batch = $this->connection->select('batch', 'b')
+        ->fields('b', ['batch'])
+        ->condition('bid', $id)
+        ->condition('token', $this->csrfToken->get($id))
+        ->execute()
+        ->fetchField();
     }
     catch (\Exception $e) {
       $this->catchException($e);
@@ -186,7 +188,7 @@ class BatchStorage implements BatchStorageInterface {
    * yet the query failed, then the batch is stale and the exception needs to
    * propagate.
    *
-   * @param $e
+   * @param \Exception $e
    *   The exception.
    *
    * @throws \Exception

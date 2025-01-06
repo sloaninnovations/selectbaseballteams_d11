@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Datetime\Element;
 
+use Drupal\Component\Utility\FilterArray;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Variable;
 use Drupal\Core\Datetime\DateHelper;
@@ -177,6 +178,7 @@ class Datelist extends DateElementBase {
    *   The complete form structure.
    *
    * @return array
+   *   An expanded DateList element.
    */
   public static function processDatelist(&$element, FormStateInterface $form_state, &$complete_form) {
     // Load translated date part labels from the appropriate calendar plugin.
@@ -345,19 +347,22 @@ class Datelist extends DateElementBase {
     // \Drupal\Core\Datetime\Element\Datelist::valueCallback().
     unset($input['object']);
     // Filters out empty array values, any valid value would have a string length.
-    $filtered_input = array_filter($input, 'strlen');
+    $filtered_input = FilterArray::removeEmptyStrings($input);
     return array_diff($parts, array_keys($filtered_input));
   }
 
   /**
    * Rounds minutes and seconds to nearest requested value.
    *
-   * @param $date
+   * @param mixed $date
    *   The date.
-   * @param $increment
+   * @param int $increment
    *   The value to round to.
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime
+   *   The Drupal date time object with the minutes and seconds rounded when the
+   *   input date is a DrupalDateTime instance. Otherwise the date is returned
+   *   unchanged.
    */
   protected static function incrementRound(&$date, $increment) {
     // Round minutes and seconds, if necessary.

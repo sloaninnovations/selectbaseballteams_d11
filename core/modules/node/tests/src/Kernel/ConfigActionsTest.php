@@ -21,6 +21,9 @@ class ConfigActionsTest extends KernelTestBase {
    */
   protected static $modules = ['field', 'node', 'system', 'text', 'user'];
 
+  /**
+   * The configuration action manager.
+   */
   private readonly ConfigActionManager $configActionManager;
 
   /**
@@ -28,6 +31,8 @@ class ConfigActionsTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+
+    $this->installEntitySchema('node');
     $this->installConfig('node');
     $this->configActionManager = $this->container->get('plugin.manager.config_action');
   }

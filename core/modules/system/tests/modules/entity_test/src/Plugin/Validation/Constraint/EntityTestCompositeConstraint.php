@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\entity_test\Plugin\Validation\Constraint;
 
 use Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase;
@@ -16,6 +18,9 @@ use Drupal\Core\Validation\Attribute\Constraint;
 )]
 class EntityTestCompositeConstraint extends CompositeConstraintBase {
 
+  /**
+   * The default violation message.
+   */
   public $message = 'Multiple fields are validated';
 
   /**

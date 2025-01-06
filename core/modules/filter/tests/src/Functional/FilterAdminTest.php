@@ -17,7 +17,6 @@ use Drupal\user\RoleInterface;
  * Thoroughly test the administrative interface of the filter module.
  *
  * @group filter
- * @group #slow
  */
 class FilterAdminTest extends BrowserTestBase {
 
@@ -268,8 +267,8 @@ class FilterAdminTest extends BrowserTestBase {
     $this->assertSession()->checkboxChecked('roles[' . RoleInterface::AUTHENTICATED_ID . ']');
     $this->assertSession()->checkboxChecked('filters[' . $second_filter . '][status]');
     $this->assertSession()->checkboxChecked('filters[' . $first_filter . '][status]');
-    /** @var \Drupal\user\Entity\Role $role */
     \Drupal::entityTypeManager()->getStorage('user_role')->resetCache([RoleInterface::AUTHENTICATED_ID]);
+    /** @var \Drupal\user\Entity\Role $role */
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
     $this->assertTrue($role->hasPermission($format->getPermissionName()), 'The authenticated role has permission to use the filter.');
 

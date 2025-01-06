@@ -17,9 +17,7 @@ use Drupal\Tests\BrowserTestBase;
 class PageTitleTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'test_page_test', 'form_test', 'block'];
 
@@ -28,6 +26,9 @@ class PageTitleTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'starterkit_theme';
 
+  /**
+   * The test user.
+   */
   protected $contentUser;
   protected $savedTitle;
 

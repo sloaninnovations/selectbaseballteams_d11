@@ -37,7 +37,7 @@ class DrupalKernelTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function bootKernel() {
+  protected function bootKernel(): void {
     // Do not boot the kernel, because we are testing aspects of this process.
   }
 
@@ -51,7 +51,7 @@ class DrupalKernelTest extends KernelTestBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   A request object to use in booting the kernel.
    * @param array $modules_enabled
-   *   A list of modules to enable on the kernel.
+   *   A list of modules to install on the kernel.
    *
    * @return \Drupal\Core\DrupalKernel
    *   New kernel for testing.
@@ -203,6 +203,7 @@ class DrupalKernelTest extends KernelTestBase {
 
   /**
    * Data provider for self::testClassLoaderAutoDetect.
+   *
    * @return array
    */
   public static function providerClassLoaderAutoDetect() {
@@ -317,7 +318,7 @@ class DrupalKernelTest extends KernelTestBase {
     // Test environment locale should be UTF-8.
     $this->assertSame($utf8_string, escapeshellcmd($utf8_string));
     $request = Request::createFromGlobals();
-    $kernel = $this->getTestKernel($request);
+    $this->getTestKernel($request);
     // Kernel environment locale should be UTF-8.
     $this->assertSame($utf8_string, escapeshellcmd($utf8_string));
   }

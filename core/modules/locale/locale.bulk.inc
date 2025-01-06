@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Mass import-export and batch import functionality for Gettext .po files.
  */
 
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
@@ -37,6 +37,7 @@ use Drupal\locale\Gettext;
  *   l10n_update functionality to feed in translation files alike.
  *   https://www.drupal.org/node/1191488
  */
+#[StopProceduralHookScan]
 function locale_translate_batch_import_files(array $options, $force = FALSE) {
   $options += [
     'overwrite_options' => [],
@@ -205,7 +206,7 @@ function locale_translate_batch_import($file, array $options, &$context) {
           'seek' => 0,
         ];
       }
-      // Update the seek and the number of items in the $options array().
+      // Update the seek and the number of items in the $options array.
       $options['seek'] = $context['sandbox']['parse_state']['seek'];
       $options['items'] = $context['sandbox']['parse_state']['chunk_size'];
       $report = Gettext::fileToDatabase($file, $options);
@@ -572,7 +573,7 @@ function locale_config_batch_update_components(array $options, array $langcodes 
  * @return array
  *   The batch definition.
  *
- * @see locale_config_batch_refresh_name()
+ * @see locale_config_batch_update_config_translations()
  */
 function locale_config_batch_build(array $names, array $langcodes, array $options = [], bool $update_default_config_langcodes = FALSE) {
   $options += ['finish_feedback' => TRUE];
@@ -583,7 +584,7 @@ function locale_config_batch_build(array $names, array $langcodes, array $option
     ->setErrorMessage(t('Error updating configuration translations'));
 
   if ($update_default_config_langcodes && \Drupal::languageManager()->getDefaultLanguage()->getId() !== 'en') {
-    $batch_builder->addOperation('locale_config_batch_set_config_langcodes');
+    $batch_builder->addOperation('locale_config_batch_update_default_config_langcodes');
   }
 
   // Chunking the array of names into batches of 20 for better performance.
@@ -594,7 +595,7 @@ function locale_config_batch_build(array $names, array $langcodes, array $option
     // it is very expensive to initialize the \Drupal::config() object on each
     // request. We batch a small number of configuration object upgrades
     // together to improve the overall performance of the process.
-    $batch_builder->addOperation('locale_config_batch_refresh_name', [$chunk, $langcodes]);
+    $batch_builder->addOperation('locale_config_batch_update_config_translations', [$chunk, $langcodes]);
   }
 
   if (!empty($options['finish_feedback'])) {
@@ -611,10 +612,28 @@ function locale_config_batch_build(array $names, array $langcodes, array $option
  * @param array|\ArrayAccess $context
  *   The batch context.
  */
-function locale_config_batch_set_config_langcodes(&$context) {
+function locale_config_batch_update_default_config_langcodes(&$context): void {
   \Drupal::service('locale.config_manager')->updateDefaultConfigLangcodes();
   $context['finished'] = 1;
   $context['message'] = t('Updated default configuration to %langcode', ['%langcode' => \Drupal::languageManager()->getDefaultLanguage()->getId()]);
+}
+
+/**
+ * Implements callback_batch_operation().
+ *
+ * Updates default configuration when new modules or themes are installed.
+ *
+ * @param array|\ArrayAccess $context
+ *   The batch context.
+ *
+ * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
+ * locale_config_batch_update_default_config_langcodes(&$context) instead.
+ *
+ * @see https://www.drupal.org/node/3475054
+ */
+function locale_config_batch_set_config_langcodes(&$context): void {
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use locale_config_batch_update_default_config_langcodes() instead. See https://www.drupal.org/node/3475054', E_USER_DEPRECATED);
+  locale_config_batch_update_default_config_langcodes($context);
 }
 
 /**
@@ -631,7 +650,7 @@ function locale_config_batch_set_config_langcodes(&$context) {
  *
  * @see locale_config_batch_build()
  */
-function locale_config_batch_refresh_name(array $names, array $langcodes, &$context) {
+function locale_config_batch_update_config_translations(array $names, array $langcodes, &$context): void {
   if (!isset($context['results']['stats']['config'])) {
     $context['results']['stats']['config'] = 0;
   }
@@ -642,6 +661,28 @@ function locale_config_batch_refresh_name(array $names, array $langcodes, &$cont
   }
   $context['results']['langcodes'] = $langcodes;
   $context['finished'] = 1;
+}
+
+/**
+ * Implements callback_batch_operation().
+ *
+ * Performs configuration translation refresh.
+ *
+ * @param array $names
+ *   An array of names of configuration objects to update.
+ * @param array $langcodes
+ *   (optional) Array of language codes to update. Defaults to all languages.
+ * @param array|\ArrayAccess $context
+ *   Contains a list of files imported.
+ *
+ * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
+ * locale_config_batch_update_config_translations($names, $langcodes, $context) instead.
+ *
+ * @see https://www.drupal.org/node/3475054
+ */
+function locale_config_batch_refresh_name(array $names, array $langcodes, &$context): void {
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use locale_config_batch_update_config_translations() instead. See https://www.drupal.org/node/3475054', E_USER_DEPRECATED);
+  locale_config_batch_update_config_translations($names, $langcodes, $context);
 }
 
 /**

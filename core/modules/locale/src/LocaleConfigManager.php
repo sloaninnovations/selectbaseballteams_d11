@@ -78,9 +78,9 @@ class LocaleConfigManager {
   /**
    * Whether or not configuration translations are being updated from locale.
    *
-   * @see self::isUpdatingFromLocale()
-   *
    * @var bool
+   *
+   * @see self::isUpdatingFromLocale()
    */
   protected $isUpdatingFromLocale = FALSE;
 
@@ -180,6 +180,7 @@ class LocaleConfigManager {
         if (isset($definition['translation context'])) {
           $options['context'] = $definition['translation context'];
         }
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         return new TranslatableMarkup($value, [], $options);
       }
     }

@@ -15,9 +15,10 @@ use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\media\Entity\Media;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
-// cspell:ignore alternatif hurlant layercake tatou texte zartan
+// cspell:ignore alternatif drupalelementstyle hurlant layercake tatou texte
+// cspell:ignore zartan
 
 /**
  * @coversDefaultClass \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Media
@@ -116,7 +117,7 @@ class MediaTest extends MediaTestBase {
     $filter_format->save();
 
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -170,7 +171,7 @@ class MediaTest extends MediaTestBase {
     ]);
     $filter_format->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -595,7 +596,7 @@ class MediaTest extends MediaTestBase {
     // Ensure that by default the "Break text" alignment option is selected.
     $this->click('.ck-widget.drupal-media');
     $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
-    $this->assertTrue(($align_button = $this->getBalloonButton('Break text'))->hasClass('ck-on'));
+    $this->assertTrue($this->getBalloonButton('Break text')->hasClass('ck-on'));
     $editor_dom = $this->getEditorDataAsDom();
     $drupal_media_element = $editor_dom->getElementsByTagName('drupal-media')
       ->item(0);
@@ -710,7 +711,7 @@ class MediaTest extends MediaTestBase {
     $editor->save();
 
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(

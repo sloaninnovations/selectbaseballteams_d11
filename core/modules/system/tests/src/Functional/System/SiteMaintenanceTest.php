@@ -21,9 +21,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node'];
 
@@ -32,6 +30,9 @@ class SiteMaintenanceTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The test user.
+   */
   protected $adminUser;
 
   /**

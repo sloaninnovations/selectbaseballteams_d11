@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\menu_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -84,6 +86,7 @@ class MenuTestController extends ControllerBase {
    */
   public function titleCallback(array $_title_arguments = [], $_title = '') {
     $_title_arguments += ['case_number' => '2', 'title' => $_title];
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     return t($_title_arguments['title']) . ' - Case ' . $_title_arguments['case_number'];
   }
 

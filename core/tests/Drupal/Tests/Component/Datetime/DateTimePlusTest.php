@@ -91,7 +91,7 @@ class DateTimePlusTest extends TestCase {
   public function testInvalidDateDiff($input1, $input2, $absolute): void {
     $this->expectException(\BadMethodCallException::class);
     $this->expectExceptionMessage('Method Drupal\Component\Datetime\DateTimePlus::diff expects parameter 1 to be a \DateTime or \Drupal\Component\Datetime\DateTimePlus object');
-    $interval = $input1->diff($input2, $absolute);
+    $input1->diff($input2, $absolute);
   }
 
   /**
@@ -683,38 +683,38 @@ class DateTimePlusTest extends TestCase {
         'expected' => $positive_18_hours,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600, new \DateTimeZone('America/Los_Angeles')),
-        'input2' => DateTimePlus::createFromFormat('U', 0, new \DateTimeZone('UTC')),
+        'input1' => DateTimePlus::createFromFormat('U', '3600', new \DateTimeZone('America/Los_Angeles')),
+        'input2' => DateTimePlus::createFromTimestamp(0, new \DateTimeZone('UTC')),
         'absolute' => FALSE,
         'expected' => $negative_1_hour,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600),
-        'input2' => DateTimePlus::createFromFormat('U', 0),
+        'input1' => DateTimePlus::createFromTimestamp(3600),
+        'input2' => DateTimePlus::createFromTimestamp(0),
         'absolute' => FALSE,
         'expected' => $negative_1_hour,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600),
+        'input1' => DateTimePlus::createFromTimestamp(3600),
         'input2' => \DateTime::createFromFormat('U', '0'),
         'absolute' => FALSE,
         'expected' => $negative_1_hour,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600),
-        'input2' => DateTimePlus::createFromFormat('U', 0),
+        'input1' => DateTimePlus::createFromTimestamp(3600),
+        'input2' => DateTimePlus::createFromTimestamp(0),
         'absolute' => TRUE,
         'expected' => $positive_1_hour,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600),
+        'input1' => DateTimePlus::createFromTimestamp(3600),
         'input2' => \DateTime::createFromFormat('U', '0'),
         'absolute' => TRUE,
         'expected' => $positive_1_hour,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 0),
-        'input2' => DateTimePlus::createFromFormat('U', 0),
+        'input1' => DateTimePlus::createFromTimestamp(0),
+        'input2' => DateTimePlus::createFromTimestamp(0),
         'absolute' => FALSE,
         'expected' => $empty_interval,
       ],
@@ -733,12 +733,12 @@ class DateTimePlusTest extends TestCase {
   public static function providerTestInvalidDateDiff() {
     return [
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600),
+        'input1' => DateTimePlus::createFromTimestamp(3600),
         'input2' => '1970-01-01 00:00:00',
         'absolute' => FALSE,
       ],
       [
-        'input1' => DateTimePlus::createFromFormat('U', 3600),
+        'input1' => DateTimePlus::createFromTimestamp(3600),
         'input2' => NULL,
         'absolute' => FALSE,
       ],
@@ -923,11 +923,11 @@ class DateTimePlusTest extends TestCase {
 
     // Test retrieving a cloned copy of the wrapped \DateTime object, and that
     // altering it does not change the DateTimePlus object.
-    $datetimeplus = DateTimePlus::createFromFormat('Y-m-d H:i:s', '2017-07-13 22:40:00', $new_york, ['langcode' => 'en']);
-    $this->assertEquals(1500000000, $datetimeplus->getTimestamp());
-    $this->assertEquals('America/New_York', $datetimeplus->getTimezone()->getName());
+    $date_time_plus = DateTimePlus::createFromFormat('Y-m-d H:i:s', '2017-07-13 22:40:00', $new_york, ['langcode' => 'en']);
+    $this->assertEquals(1500000000, $date_time_plus->getTimestamp());
+    $this->assertEquals('America/New_York', $date_time_plus->getTimezone()->getName());
 
-    $datetime = $datetimeplus->getPhpDateTime();
+    $datetime = $date_time_plus->getPhpDateTime();
     $this->assertInstanceOf('DateTime', $datetime);
     $this->assertEquals(1500000000, $datetime->getTimestamp());
     $this->assertEquals('America/New_York', $datetime->getTimezone()->getName());
@@ -935,8 +935,8 @@ class DateTimePlusTest extends TestCase {
     $datetime->setTimestamp(1400000000)->setTimezone($berlin);
     $this->assertEquals(1400000000, $datetime->getTimestamp());
     $this->assertEquals('Europe/Berlin', $datetime->getTimezone()->getName());
-    $this->assertEquals(1500000000, $datetimeplus->getTimestamp());
-    $this->assertEquals('America/New_York', $datetimeplus->getTimezone()->getName());
+    $this->assertEquals(1500000000, $date_time_plus->getTimestamp());
+    $this->assertEquals('America/New_York', $date_time_plus->getTimezone()->getName());
   }
 
 }
