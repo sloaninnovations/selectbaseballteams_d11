@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\batch_test\Form;
 
+use Drupal\batch_test\BatchTestDefinititions;
 use Drupal\batch_test\BatchTestHelper;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -56,6 +57,7 @@ class BatchTestChainedForm extends FormBase {
    * Form submission handler #1 for batch_test_chained_form.
    */
   public static function batchTestChainedFormSubmit1($form, FormStateInterface $form_state) {
+    $batch_test_definitions = new BatchTestDefinititions();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
     $batch_test_helper->stack('submit handler 1');
@@ -63,7 +65,7 @@ class BatchTestChainedForm extends FormBase {
 
     $value = &$form_state->getValue('value');
     $value++;
-    batch_set($batch_test_helper->batch_1());
+    batch_set($batch_test_definitions->batch_1());
 
     $form_state->setRedirect('batch_test.redirect');
   }
@@ -72,13 +74,14 @@ class BatchTestChainedForm extends FormBase {
    * Form submission handler #2 for batch_test_chained_form.
    */
   public static function batchTestChainedFormSubmit2($form, FormStateInterface $form_state) {
+    $batch_test_definitions = new BatchTestDefinititions();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack('submit handler 2');
     $batch_test_helper->stack('value = ' . $form_state->getValue('value'));
 
     $value = &$form_state->getValue('value');
     $value++;
-    batch_set($batch_test_helper->batch_2());
+    batch_set($batch_test_definitions->batch_2());
 
     $form_state->setRedirect('batch_test.redirect');
   }
@@ -101,13 +104,14 @@ class BatchTestChainedForm extends FormBase {
    * Form submission handler #4 for batch_test_chained_form.
    */
   public static function batchTestChainedFormSubmit4($form, FormStateInterface $form_state) {
+    $batch_test_definitions = new BatchTestDefinititions();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack('submit handler 4');
     $batch_test_helper->stack('value = ' . $form_state->getValue('value'));
 
     $value = &$form_state->getValue('value');
     $value++;
-    batch_set($batch_test_helper->batch_3());
+    batch_set($batch_test_definitions->batch_3());
 
     $form_state->setRedirect('batch_test.redirect');
   }

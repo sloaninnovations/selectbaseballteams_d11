@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\batch_test\Controller;
 
 use Drupal\batch_test\BatchTestCallbacks;
+use Drupal\batch_test\BatchTestDefinititions;
 use Drupal\batch_test\BatchTestHelper;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Form\FormState;
@@ -35,10 +36,11 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value otherwise.
    */
   public function testLargePercentage() {
+    $batch_test_definitions = new BatchTestDefinititions();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
 
-    batch_set($batch_test_helper->batch_5());
+    batch_set($batch_test_definitions->batch_5());
     return batch_process('batch-test/redirect');
   }
 
@@ -67,9 +69,10 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value otherwise.
    */
   public function testNoForm() {
+    $batch_test_definitions = new BatchTestDefinititions();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
-    batch_set($batch_test_helper->batch_1());
+    batch_set($batch_test_definitions->batch_1());
     return batch_process('batch-test/redirect');
 
   }
@@ -81,10 +84,11 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value otherwise.
    */
   public function testFinishRedirect() {
+    $batch_test_definitions = new BatchTestDefinititions();
     $batch_test_callbacks = new BatchTestCallbacks();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
-    $batch = $batch_test_helper->batch_1();
+    $batch = $batch_test_definitions->batch_1();
     $batch['finished'] = [$batch_test_callbacks, 'finished_1_finished'];
     batch_set($batch);
     return batch_process('batch-test/redirect');
@@ -121,10 +125,11 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value otherwise.
    */
   public function testThemeBatch() {
+    $batch_test_callbacks = new BatchTestCallbacks();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
     $batch = [
-      'operations' => [[[$batch_test_helper, 'themeCallback'], []]],
+      'operations' => [[[$batch_test_callbacks, 'themeCallback'], []]],
     ];
     batch_set($batch);
     return batch_process('batch-test/redirect');
@@ -137,11 +142,12 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value otherwise.
    */
   public function testTitleBatch() {
+    $batch_test_callbacks = new BatchTestCallbacks();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
     $batch = [
       'title' => 'Batch Test',
-      'operations' => [[[$batch_test_helper, 'titleCallback'], []]],
+      'operations' => [[[$batch_test_callbacks, 'titleCallback'], []]],
     ];
     batch_set($batch);
     return batch_process('batch-test/redirect');
