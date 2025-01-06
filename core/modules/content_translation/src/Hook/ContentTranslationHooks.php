@@ -242,7 +242,9 @@ class ContentTranslationHooks {
         $plugin = $workflow->getTypePlugin();
         foreach ($plugin->getEntityTypes() as $entity_type_id) {
           foreach ($plugin->getBundlesForEntityType($entity_type_id) as $bundle_id) {
-            $bundles[$entity_type_id][$bundle_id]['untranslatable_fields.default_translation_affected'] = TRUE;
+            if (isset($bundles[$entity_type_id][$bundle_id])) {
+              $bundles[$entity_type_id][$bundle_id]['untranslatable_fields.default_translation_affected'] = TRUE;
+            }
           }
         }
       }
