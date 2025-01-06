@@ -5,7 +5,6 @@ namespace Drupal\workspaces;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Drupal\Core\Update\UpdateKernel;
-use Drupal\workspaces\TempStore\WorkspacesSharedTempStoreFactory;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -37,16 +36,6 @@ class WorkspacesServiceProvider extends ServiceProviderBase {
       if (!$definition->isDeprecated()) {
         $definition
           ->setClass(WorkspacesAliasRepository::class)
-          ->addMethodCall('setWorkspacesManager', [new Reference('workspaces.manager')]);
-      }
-    }
-
-    // Replace the class of the 'path_alias.repository' service.
-    if ($container->hasDefinition('tempstore.shared')) {
-      $definition = $container->getDefinition('tempstore.shared');
-      if (!$definition->isDeprecated()) {
-        $definition
-          ->setClass(WorkspacesSharedTempStoreFactory::class)
           ->addMethodCall('setWorkspacesManager', [new Reference('workspaces.manager')]);
       }
     }
