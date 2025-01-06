@@ -190,6 +190,7 @@ class SystemManager {
     $manipulators = [
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+      ['callable' => 'menu.default_tree_manipulators:bubbleUpPromotedItems'],
     ];
     $tree = $this->menuTree->transform($tree, $manipulators);
     foreach ($tree as $key => $element) {
@@ -207,6 +208,7 @@ class SystemManager {
       $content[$key]['options'] = $link->getOptions();
       $content[$key]['description'] = $link->getDescription();
       $content[$key]['url'] = $link->getUrlObject();
+      $content[$key]['promoted'] = $link->isPromoted();
     }
     ksort($content);
     return $content;
