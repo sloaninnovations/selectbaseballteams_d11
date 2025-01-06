@@ -1,5 +1,5 @@
 parameters:
-  settings_tray.hooks_converted: true
+  settings_tray.hooks_converted: false
 
 services:
   _defaults:

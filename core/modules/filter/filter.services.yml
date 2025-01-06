@@ -1,5 +1,5 @@
 parameters:
-  filter.hooks_converted: true
+  filter.hooks_converted: false
 
 services:
   _defaults:

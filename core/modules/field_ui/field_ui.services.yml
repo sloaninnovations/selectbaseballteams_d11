@@ -1,5 +1,5 @@
 parameters:
-  field_ui.hooks_converted: true
+  field_ui.hooks_converted: false
 
 services:
   _defaults:

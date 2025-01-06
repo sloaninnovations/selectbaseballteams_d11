@@ -1,5 +1,5 @@
 parameters:
-  comment.hooks_converted: true
+  comment.hooks_converted: false
 
 services:
   _defaults:

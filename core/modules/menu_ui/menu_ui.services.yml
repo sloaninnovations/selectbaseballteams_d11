@@ -1,5 +1,5 @@
 parameters:
-  menu_ui.hooks_converted: true
+  menu_ui.hooks_converted: false
 
 services:
   _defaults:

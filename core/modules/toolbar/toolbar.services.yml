@@ -1,5 +1,5 @@
 parameters:
-  toolbar.hooks_converted: true
+  toolbar.hooks_converted: false
 
 services:
   _defaults:

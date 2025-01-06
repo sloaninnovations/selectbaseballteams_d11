@@ -1,5 +1,5 @@
 parameters:
-  block_content.hooks_converted: true
+  block_content.hooks_converted: false
 
 services:
   _defaults:

@@ -1,5 +1,5 @@
 parameters:
-  media_library.hooks_converted: true
+  media_library.hooks_converted: false
 
 services:
   _defaults:

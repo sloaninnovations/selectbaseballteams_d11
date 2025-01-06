@@ -1,5 +1,5 @@
 parameters:
-  content_moderation.hooks_converted: true
+  content_moderation.hooks_converted: false
 
 services:
   _defaults:
