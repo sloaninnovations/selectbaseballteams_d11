@@ -556,16 +556,12 @@ class GDToolkit extends ImageToolkitBase {
     }
 
     $tempFile = $this->fileSystem->tempnam('temporary://', 'avif');
-    try {
-      imageavif(imagecreatetruecolor(1, 1), $tempFile);
-      $supported = file_exists($tempFile) && filesize($tempFile) > 0;
-    }
-    catch (\Throwable $t) {
-      $this->logger->error("The image toolkit '@toolkit' failed creating image '@image'. Reported error: @class - @message", [
+    $success = imageavif(imagecreatetruecolor(1, 1), $tempFile);
+    $supported = file_exists($tempFile) && filesize($tempFile) > 0;
+    if (!$success) {
+      $this->logger->error("The image toolkit '@toolkit' failed creating image '@image'.", [
         '@toolkit' => $this->getPluginId(),
         '@image' => $tempFile,
-        '@class' => get_class($t),
-        '@message' => $t->getMessage(),
       ]);
       $supported = FALSE;
     }
