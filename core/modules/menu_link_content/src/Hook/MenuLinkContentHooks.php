@@ -52,10 +52,10 @@ class MenuLinkContentHooks {
   }
 
   /**
-   * Implements hook_menu_delete().
+   * Implements hook_ENTITY_TYPE_delete().
    */
   #[Hook('menu_delete')]
-  public function menuDelete(MenuInterface $menu) {
+  public function menuDelete(MenuInterface $menu): void {
     $storage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
     $menu_links = $storage->loadByProperties(['menu_name' => $menu->id()]);
     $storage->delete($menu_links);
