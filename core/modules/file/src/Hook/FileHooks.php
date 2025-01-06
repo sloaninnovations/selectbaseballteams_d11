@@ -119,13 +119,13 @@ class FileHooks {
    * Implements hook_file_download().
    */
   #[Hook('file_download')]
-  public function fileDownload($uri) {
+  public function fileDownload($uri): mixed {
     // Get the file record based on the URI. If not in the database just return.
     /** @var \Drupal\file\FileRepositoryInterface $file_repository */
     $file_repository = \Drupal::service('file.repository');
     $file = $file_repository->loadByUri($uri);
     if (!$file) {
-      return;
+      return NULL;
     }
     // Find out if a temporary file is still used in the system.
     if ($file->isTemporary()) {
@@ -148,7 +148,7 @@ class FileHooks {
     // an image preview on a node/add form) in which case, allow download by the
     // file's owner.
     if (empty($references) && ($file->isPermanent() || $file->getOwnerId() != \Drupal::currentUser()->id())) {
-      return;
+      return NULL;
     }
     if (!$file->access('download')) {
       return -1;
