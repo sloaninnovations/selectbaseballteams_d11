@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\link_test_base_field\Hook;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\link\LinkItemInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -15,6 +16,8 @@ use Drupal\Core\Hook\Attribute\Hook;
  */
 class LinkTestBaseFieldHooks {
 
+  use StringTranslationTrait;
+
   /**
    * Implements hook_entity_base_field_info().
    */
@@ -22,7 +25,7 @@ class LinkTestBaseFieldHooks {
   public function entityBaseFieldInfo(EntityTypeInterface $entity_type) {
     $fields = [];
     if ($entity_type->id() === 'entity_test') {
-      $fields['links'] = BaseFieldDefinition::create('link')->setLabel(t('Links'))->setRevisionable(TRUE)->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)->setDescription(t('Add links to the entity.'))->setRequired(FALSE)->setSettings([
+      $fields['links'] = BaseFieldDefinition::create('link')->setLabel($this->t('Links'))->setRevisionable(TRUE)->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)->setDescription($this->t('Add links to the entity.'))->setRequired(FALSE)->setSettings([
         'link_type' => LinkItemInterface::LINK_GENERIC,
         'title' => DRUPAL_REQUIRED,
       ])->setDisplayOptions('form', ['type' => 'link_default', 'weight' => 49]);

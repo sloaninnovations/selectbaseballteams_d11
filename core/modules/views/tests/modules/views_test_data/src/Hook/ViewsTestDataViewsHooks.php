@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\views_test_data\Hook;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\Analyzer;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -12,6 +13,8 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for views_test_data.
  */
 class ViewsTestDataViewsHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_views_data().
@@ -47,9 +50,9 @@ class ViewsTestDataViewsHooks {
   public function viewsAnalyze(ViewExecutable $view): array {
     \Drupal::state()->set('views_hook_test_views_analyze', TRUE);
     $ret = [];
-    $ret[] = Analyzer::formatMessage(t('Test ok message'), 'ok');
-    $ret[] = Analyzer::formatMessage(t('Test warning message'), 'warning');
-    $ret[] = Analyzer::formatMessage(t('Test error message'), 'error');
+    $ret[] = Analyzer::formatMessage($this->t('Test ok message'), 'ok');
+    $ret[] = Analyzer::formatMessage($this->t('Test warning message'), 'warning');
+    $ret[] = Analyzer::formatMessage($this->t('Test error message'), 'error');
     return $ret;
   }
 

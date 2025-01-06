@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\field_test\Hook;
 
 use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -17,6 +18,8 @@ use Drupal\field\FieldStorageConfigInterface;
  * Hook implementations for field_test.
  */
 class FieldTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_entity_display_build_alter().
@@ -110,7 +113,7 @@ class FieldTestHooks {
       $fields[$field_name]->setPropertyConstraints('value', [
         'TestField' => [
           'value' => -2,
-          'message' => t('%name does not accept the value @value.', [
+          'message' => $this->t('%name does not accept the value @value.', [
             '%name' => $field_name,
             '@value' => -2,
           ]),

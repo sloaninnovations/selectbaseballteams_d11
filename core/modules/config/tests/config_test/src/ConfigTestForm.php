@@ -8,6 +8,7 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Form controller for the test config edit forms.
@@ -15,6 +16,8 @@ use Drupal\Core\Language\LanguageInterface;
  * @internal
  */
 class ConfigTestForm extends EntityForm {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -81,7 +84,7 @@ class ConfigTestForm extends EntityForm {
     ];
     $form['size_wrapper']['size_submit'] = [
       '#type' => 'submit',
-      '#value' => t('Change size'),
+      '#value' => $this->t('Change size'),
       '#attributes' => [
         'class' => ['js-hide'],
       ],
@@ -101,7 +104,7 @@ class ConfigTestForm extends EntityForm {
 
     $form['langcode'] = [
       '#type' => 'language_select',
-      '#title' => t('Language'),
+      '#title' => $this->t('Language'),
       '#languages' => LanguageInterface::STATE_ALL,
       '#default_value' => $entity->language()->getId(),
     ];

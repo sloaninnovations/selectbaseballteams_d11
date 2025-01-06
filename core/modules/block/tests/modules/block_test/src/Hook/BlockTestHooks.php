@@ -7,11 +7,14 @@ namespace Drupal\block_test\Hook;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Hook implementations for block_test.
  */
 class BlockTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_block_alter().
@@ -19,7 +22,7 @@ class BlockTestHooks {
   #[Hook('block_alter')]
   public function blockAlter(&$block_info): void {
     if (\Drupal::state()->get('block_test_info_alter') && isset($block_info['test_block_instantiation'])) {
-      $block_info['test_block_instantiation']['category'] = t('Custom category');
+      $block_info['test_block_instantiation']['category'] = $this->t('Custom category');
     }
   }
 

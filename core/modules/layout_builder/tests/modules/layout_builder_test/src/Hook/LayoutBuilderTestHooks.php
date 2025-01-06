@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\layout_builder_test\Hook;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -16,6 +17,8 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for layout_builder_test.
  */
 class LayoutBuilderTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_plugin_filter_TYPE__CONSUMER_alter().
@@ -47,13 +50,13 @@ class LayoutBuilderTestHooks {
   #[Hook('entity_extra_field_info')]
   public function entityExtraFieldInfo() {
     $extra['node']['bundle_with_section_field']['display']['layout_builder_test'] = [
-      'label' => t('Extra label'),
-      'description' => t('Extra description'),
+      'label' => $this->t('Extra label'),
+      'description' => $this->t('Extra description'),
       'weight' => 0,
     ];
     $extra['node']['bundle_with_section_field']['display']['layout_builder_test_2'] = [
-      'label' => t('Extra Field 2'),
-      'description' => t('Extra Field 2 description'),
+      'label' => $this->t('Extra Field 2'),
+      'description' => $this->t('Extra Field 2 description'),
       'weight' => 0,
       'visible' => FALSE,
     ];

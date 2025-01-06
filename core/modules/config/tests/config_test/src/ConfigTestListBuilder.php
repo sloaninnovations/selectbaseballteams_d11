@@ -6,6 +6,7 @@ namespace Drupal\config_test;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Defines a class to build a listing of ConfigTest entities.
@@ -14,12 +15,14 @@ use Drupal\Core\Entity\EntityInterface;
  */
 class ConfigTestListBuilder extends ConfigEntityListBuilder {
 
+  use StringTranslationTrait;
+
   /**
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['label'] = t('Label');
-    $header['id'] = t('Machine name');
+    $header['label'] = $this->t('Label');
+    $header['id'] = $this->t('Machine name');
     return $header + parent::buildHeader();
   }
 

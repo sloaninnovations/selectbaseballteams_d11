@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
@@ -15,6 +16,8 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for node_test.
  */
 class NodeTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_ENTITY_TYPE_view() for node entities.
@@ -28,13 +31,13 @@ class NodeTestHooks {
       // Add RSS elements and namespaces when building the RSS feed.
       $node->rss_elements[] = [
         'key' => 'testElement',
-        'value' => t('Value of testElement RSS element for node @nid.', [
+        'value' => $this->t('Value of testElement RSS element for node @nid.', [
           '@nid' => $node->id(),
         ]),
       ];
       // Add content that should be displayed only in the RSS feed.
       $build['extra_feed_content'] = [
-        '#markup' => '<p>' . t('Extra data that should appear only in the RSS feed for node @nid.', [
+        '#markup' => '<p>' . $this->t('Extra data that should appear only in the RSS feed for node @nid.', [
           '@nid' => $node->id(),
         ]) . '</p>',
         '#weight' => 10,
@@ -43,7 +46,7 @@ class NodeTestHooks {
     if ($view_mode != 'rss') {
       // Add content that should NOT be displayed in the RSS feed.
       $build['extra_non_feed_content'] = [
-        '#markup' => '<p>' . t('Extra data that should appear everywhere except the RSS feed for node @nid.', [
+        '#markup' => '<p>' . $this->t('Extra data that should appear everywhere except the RSS feed for node @nid.', [
           '@nid' => $node->id(),
         ]) . '</p>',
       ];

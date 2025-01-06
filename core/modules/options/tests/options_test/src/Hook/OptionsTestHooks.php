@@ -6,11 +6,14 @@ namespace Drupal\options_test\Hook;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Hook implementations for options_test.
  */
 class OptionsTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_form_FORM_ID_alter().
@@ -18,7 +21,7 @@ class OptionsTestHooks {
   #[Hook('form_entity_test_entity_test_form_alter')]
   public function formEntityTestEntityTestFormAlter(&$form, FormStateInterface $form_state, $form_id) : void {
     if (\Drupal::state()->get('options_test.form_alter_enable', FALSE)) {
-      $form['card_1']['widget']['#required_error'] = t('This is custom message for required field.');
+      $form['card_1']['widget']['#required_error'] = $this->t('This is custom message for required field.');
     }
   }
 

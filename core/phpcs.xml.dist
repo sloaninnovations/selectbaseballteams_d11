@@ -190,6 +190,12 @@
     <include-pattern>*/Plugin/*</include-pattern>
     <include-pattern>*/ListBuilder/*</include-pattern>
     <include-pattern>*/tests/*/Form/*</include-pattern>
+    <include-pattern>*/tests/modules/*</include-pattern>
+    <include-pattern>*/modules/config/tests/config_test/*</include-pattern>
+    <include-pattern>*/modules/file/tests/file_test/*</include-pattern>
+    <include-pattern>*/modules/language/tests/language_test/*</include-pattern>
+    <include-pattern>*/modules/menu_link_content/tests/menu_operations_link_test/*</include-pattern>
+    <include-pattern>*/modules/options/tests/options_test/*</include-pattern>
   </rule>
 
   <!-- Generic sniffs -->

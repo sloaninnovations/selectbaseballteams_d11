@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\views_test_data\Hook;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\ViewEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -13,12 +14,14 @@ use Drupal\Core\Hook\Attribute\Hook;
  */
 class ViewsTestDataHooks {
 
+  use StringTranslationTrait;
+
   /**
    * Implements hook_form_BASE_FORM_ID_alter().
    */
   #[Hook('form_views_form_test_form_multiple_default_alter')]
   public function formViewsFormTestFormMultipleDefaultAlter(&$form, FormStateInterface $form_state, $form_id) : void {
-    \Drupal::messenger()->addStatus(t('Test base form ID with Views forms and arguments.'));
+    \Drupal::messenger()->addStatus($this->t('Test base form ID with Views forms and arguments.'));
   }
 
   /**

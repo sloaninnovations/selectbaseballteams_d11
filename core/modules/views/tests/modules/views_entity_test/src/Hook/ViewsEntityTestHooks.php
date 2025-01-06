@@ -12,11 +12,14 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Hook implementations for views_entity_test.
  */
 class ViewsEntityTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_entity_base_field_info().
@@ -24,7 +27,7 @@ class ViewsEntityTestHooks {
   #[Hook('entity_base_field_info')]
   public function entityBaseFieldInfo(EntityTypeInterface $entity_type) {
     if ($entity_type->id() == 'entity_test') {
-      $definitions['test_text_access'] = BaseFieldDefinition::create('string')->setLabel(t('Test access'))->setTranslatable(FALSE)->setSetting('max_length', 64)->setDisplayOptions('form', ['type' => 'string_textfield', 'weight' => 10]);
+      $definitions['test_text_access'] = BaseFieldDefinition::create('string')->setLabel($this->t('Test access'))->setTranslatable(FALSE)->setSetting('max_length', 64)->setDisplayOptions('form', ['type' => 'string_textfield', 'weight' => 10]);
       return $definitions;
     }
   }

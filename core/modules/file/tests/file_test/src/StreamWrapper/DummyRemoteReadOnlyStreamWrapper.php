@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Drupal\file_test\StreamWrapper;
 
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Dummy read-only remote stream wrapper (dummy-remote-readonly://).
  */
 class DummyRemoteReadOnlyStreamWrapper extends DummyRemoteStreamWrapper {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -22,14 +25,14 @@ class DummyRemoteReadOnlyStreamWrapper extends DummyRemoteStreamWrapper {
    * {@inheritdoc}
    */
   public function getName() {
-    return t('Dummy remote read-only files');
+    return $this->t('Dummy remote read-only files');
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription() {
-    return t('Dummy remote read-only stream wrapper for testing.');
+    return $this->t('Dummy remote read-only stream wrapper for testing.');
   }
 
 }
