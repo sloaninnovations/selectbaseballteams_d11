@@ -126,4 +126,45 @@ class NodeAccessFieldTest extends NodeTestBase {
     $this->assertSession()->responseContains($default);
   }
 
+  /**
+   * Tests revisions access control.
+   */
+  public function testRevisionAccess() {
+    $customUser = $this->drupalCreateUser([
+      'access content',
+      'edit any page content',
+      'administer content types',
+      'administer node fields',
+      'view all revisions',
+      'revert all revisions',
+      'administer permissions',
+    ]);
+    $this->drupalLogin($customUser);
+    // Create a new node.
+    $node = $this->drupalCreateNode([$this->fieldName => 'custom_test']);
+
+    $node->setNewRevision();
+    $node->setRevisionLogMessage('a new node revision');
+    $node->setTitle('new title');
+    $node->save();
+
+    // Log in as a restricted user and assert that we don't have the checkbox
+    // but have a revision log message text area.
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->assertSession()->pageTextContains('Revision log message');
+    $this->assertFalse(str_contains($this->getSession()->getPage()->find('css', '#edit-revision-information')->getText(), 'Create new revision'));
+    $this->drupalGet('node/' . $node->id() . '/revisions');
+    $this->assertSession()->linkExists('Revert');
+
+    // Provide additional permissions and assert the checkbox is visible.
+    $edit = [
+      'authenticated[administer nodes]' => TRUE,
+    ];
+    $this->drupalGet('/admin/people/permissions');
+    $this->submitForm($edit, 'Save permissions');
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->assertTrue(str_contains($this->getSession()->getPage()->find('css', '#edit-revision-information')->getText(), 'Create new revision'));
+    $this->assertSession()->pageTextContains('Revision information');
+  }
+
 }

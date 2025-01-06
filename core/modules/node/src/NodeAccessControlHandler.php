@@ -244,7 +244,7 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
   protected function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL) {
     // Only users with the administer nodes permission can edit administrative
     // fields.
-    $administrative_fields = ['uid', 'status', 'created', 'promote', 'sticky'];
+    $administrative_fields = ['uid', 'status', 'created', 'promote', 'sticky', 'vid'];
     if ($operation == 'edit' && in_array($field_definition->getName(), $administrative_fields, TRUE)) {
       return AccessResult::allowedIfHasPermission($account, 'administer nodes');
     }

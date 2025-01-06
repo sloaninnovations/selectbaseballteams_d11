@@ -27,6 +27,7 @@ abstract class NodeResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected static $patchProtectedFieldNames = [
+    'vid' => "The 'administer nodes' permission is required.",
     'revision_timestamp' => NULL,
     'revision_uid' => NULL,
     'created' => "The 'administer nodes' permission is required.",

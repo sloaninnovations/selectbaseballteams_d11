@@ -412,6 +412,8 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
     $entity_type = $this->entity->getEntityType();
 
     $new_revision_default = $this->getNewRevisionDefault();
+    // Get log message field's key from definition.
+    $log_message_field = $entity_type->getRevisionMetadataKey('revision_log_message');
 
     // Add a log field if the "Create new revision" option is checked, or if the
     // current user has the ability to check that option.
@@ -422,7 +424,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
       '#open' => $new_revision_default,
       '#group' => 'advanced',
       '#weight' => 20,
-      '#access' => $new_revision_default || $this->entity->get($entity_type->getKey('revision'))->access('update'),
+      '#access' => array_key_exists($log_message_field, $this->entity->getFields()) ? $this->entity->get($log_message_field)->access('edit') || $this->entity->get($entity_type->getKey('revision'))->access('edit') : $this->entity->get($entity_type->getKey('revision'))->access('edit'),
       '#optional' => TRUE,
       '#attributes' => [
         'class' => ['entity-content-form-revision-information'],
@@ -436,11 +438,9 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
       '#type' => 'checkbox',
       '#title' => $this->t('Create new revision'),
       '#default_value' => $new_revision_default,
-      '#access' => !$this->entity->isNew() && $this->entity->get($entity_type->getKey('revision'))->access('update'),
+      '#access' => !$this->entity->isNew() && $this->entity->get($entity_type->getKey('revision'))->access('edit'),
       '#group' => 'revision_information',
     ];
-    // Get log message field's key from definition.
-    $log_message_field = $entity_type->getRevisionMetadataKey('revision_log_message');
     if ($log_message_field && isset($form[$log_message_field])) {
       $form[$log_message_field] += [
         '#group' => 'revision_information',
@@ -450,6 +450,8 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
           ],
         ],
       ];
+      // Add identifier class.
+      $form[$log_message_field]['#attributes']['class'][] = "js-revision-log";
     }
   }
 

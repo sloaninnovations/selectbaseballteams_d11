@@ -39,7 +39,7 @@ class CollapsedSummariesTest extends WebDriverTestBase {
       'type' => 'page',
     ]);
 
-    $this->drupalLogin($this->createUser(['edit any page content']));
+    $this->drupalLogin($this->createUser(['edit any page content', 'administer nodes']));
   }
 
   /**
@@ -53,9 +53,10 @@ class CollapsedSummariesTest extends WebDriverTestBase {
     // form.
     $this->getSession()->resizeWindow(1200, 1200);
     $this->drupalGet('node/1/edit');
+    $this->clickLink('Revision information');
 
     $assert_session->waitForText("New revision");
-    $summary = $assert_session->waitForElement('css', '.vertical-tabs__menu-item-summary');
+    $summary = $assert_session->waitForLink('Revision information')->find('css', '.vertical-tabs__menu-item-summary');
     $this->assertNotNull($summary);
     $this->assertTrue($summary->isVisible());
     $this->assertEquals('New revision', $summary->getText());
@@ -68,7 +69,7 @@ class CollapsedSummariesTest extends WebDriverTestBase {
     $this->getSession()->resizeWindow(600, 1200);
     $this->drupalGet('node/1/edit');
 
-    $summary = $assert_session->waitForElement('css', 'span.summary');
+    $summary = $assert_session->waitForButton('Revision information')->find('css', 'span.summary');
     $this->assertNotNull($summary);
     $this->assertTrue($summary->isVisible());
     $page->uncheckField('revision');

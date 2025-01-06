@@ -273,6 +273,7 @@ class InlineBlockTest extends InlineBlockTestBase {
    */
   public function testInlineBlocksRevisioningIntegrity(): void {
     $this->drupalLogin($this->drupalCreateUser([
+      'administer nodes',
       'access contextual links',
       'configure any layout',
       'administer node display',
