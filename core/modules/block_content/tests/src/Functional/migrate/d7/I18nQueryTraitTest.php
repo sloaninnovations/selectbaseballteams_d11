@@ -76,7 +76,7 @@ class I18nQueryTraitTest extends MigrateUpgradeExecuteTestBase {
     $this->submitCredentialForm();
 
     // No fatal error after form submit.
-    $this->assertFalse($this->getErrors(), 'Fatal error during migrate.');
+    $this->assertFalse($this->getErrors());
     $this->assertSession()->pageTextContains('Upgrade analysis report');
   }
 
