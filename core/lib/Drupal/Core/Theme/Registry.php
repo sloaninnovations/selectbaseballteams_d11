@@ -644,6 +644,9 @@ class Registry implements DestructableInterface {
               $cache['preprocess invokes'][$function] = ['module' => $prefix, 'hook' => 'preprocess'];
             }
 
+            // This gathers any template functions outside of modules and
+            // functions that are defined by a theme that implements
+            // hook_theme.
             if (ModuleHandler::getFunctionForLegacyInvoke($prefix, 'preprocess_' . $hook)) {
               $function = $prefix . '_preprocess_' . $hook;
               $info['preprocess functions'][$prefix][] = $function;
