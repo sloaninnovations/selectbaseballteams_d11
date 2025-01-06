@@ -61417,7 +61417,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/themes/claro/src/ClaroPreRender.php',
 ];
 $ignoreErrors[] = [
-	// identifier: missingType.return
 	'message' => '#^Function twig_extension\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
