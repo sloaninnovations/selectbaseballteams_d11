@@ -4,6 +4,7 @@ namespace Drupal\migrate\Event;
 
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\migrate\Plugin\MigrationInterface;
 
 /**
  * Wraps a migrate map delete event for event listeners.
@@ -25,16 +26,26 @@ class MigrateMapDeleteEvent extends Event {
   protected $sourceId;
 
   /**
+   * Migration entity.
+   *
+   * @var \Drupal\migrate\Plugin\MigrationInterface
+   */
+  protected $migration;
+
+  /**
    * Constructs a migration map delete event object.
    *
    * @param \Drupal\migrate\Plugin\MigrateIdMapInterface $map
    *   Map plugin.
    * @param array $source_id
    *   Array of source ID fields representing the object being deleted from the map.
-   */
-  public function __construct(MigrateIdMapInterface $map, array $source_id) {
+   * @param \Drupal\migrate\Plugin\MigrationInterface|null $migration
+   *   Migration entity.
+   */    
+  public function __construct(MigrateIdMapInterface $map, array $source_id, ?MigrationInterface $migration = NULL) {
     $this->map = $map;
     $this->sourceId = $source_id;
+    $this->migration = $migration;
   }
 
   /**
@@ -55,6 +66,16 @@ class MigrateMapDeleteEvent extends Event {
    */
   public function getSourceId() {
     return $this->sourceId;
+  }
+
+  /**
+   * Gets the migration entity.
+   *
+   * @return \Drupal\migrate\Plugin\MigrationInterface
+   *   The migration entity involved.
+   */
+  public function getMigration() {
+    return $this->migration;
   }
 
 }
