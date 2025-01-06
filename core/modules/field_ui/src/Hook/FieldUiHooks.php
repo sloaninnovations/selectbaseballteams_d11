@@ -138,7 +138,7 @@ class FieldUiHooks {
    * Implements hook_entity_bundle_create().
    */
   #[Hook('entity_bundle_create')]
-  public function entityBundleCreate($entity_type, $bundle) {
+  public function entityBundleCreate($entity_type, $bundle): void {
     // When a new bundle is created, the menu needs to be rebuilt to add our
     // menu item tabs.
     \Drupal::service('router.builder')->setRebuildNeeded();

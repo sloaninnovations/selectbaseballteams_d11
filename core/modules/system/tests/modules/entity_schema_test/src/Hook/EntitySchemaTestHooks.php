@@ -84,7 +84,7 @@ class EntitySchemaTestHooks {
    * Implements hook_entity_bundle_create().
    */
   #[Hook('entity_bundle_create')]
-  public function entityBundleCreate($entity_type_id, $bundle) {
+  public function entityBundleCreate($entity_type_id, $bundle): void {
     if ($entity_type_id == 'entity_test_update' && $bundle == 'custom') {
       $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions($entity_type_id, $bundle);
       // Notify the entity storage that we just created a new field.

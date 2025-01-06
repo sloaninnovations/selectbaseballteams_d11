@@ -58,7 +58,7 @@ class JsonapiHooks {
    * Implements hook_entity_bundle_create().
    */
   #[Hook('entity_bundle_create')]
-  public function entityBundleCreate() {
+  public function entityBundleCreate(): void {
     Routes::rebuild();
   }
 

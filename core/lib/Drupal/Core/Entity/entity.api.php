@@ -917,9 +917,9 @@ function hook_entity_bundle_info_alter(&$bundles) {
  * @param string $bundle
  *   The name of the bundle.
  *
- * @see entity_crud
+ * @ingroup entity_crud
  */
-function hook_entity_bundle_create($entity_type_id, $bundle) {
+function hook_entity_bundle_create($entity_type_id, $bundle): void {
   // When a new bundle is created, the menu needs to be rebuilt to add the
   // Field UI menu item tabs.
   \Drupal::service('router.builder')->setRebuildNeeded();
