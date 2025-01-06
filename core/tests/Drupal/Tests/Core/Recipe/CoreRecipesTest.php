@@ -11,6 +11,7 @@ use Symfony\Component\Finder\Finder;
  * Tests that all core recipes have a generic test.
  *
  * @group Recipe
+ * @group #slow
  */
 class CoreRecipesTest extends UnitTestCase {
 
