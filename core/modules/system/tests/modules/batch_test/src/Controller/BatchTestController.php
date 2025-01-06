@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\batch_test\Controller;
 
 use Drupal\batch_test\BatchTestCallbacks;
-use Drupal\batch_test\BatchTestDefinititions;
+use Drupal\batch_test\BatchTestDefinitions;
 use Drupal\batch_test\BatchTestHelper;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Form\FormState;
@@ -36,7 +36,7 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value otherwise.
    */
   public function testLargePercentage() {
-    $batch_test_definitions = new BatchTestDefinititions();
+    $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
 
@@ -69,7 +69,7 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value otherwise.
    */
   public function testNoForm() {
-    $batch_test_definitions = new BatchTestDefinititions();
+    $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
     batch_set($batch_test_definitions->batch_1());
@@ -84,7 +84,7 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value otherwise.
    */
   public function testFinishRedirect() {
-    $batch_test_definitions = new BatchTestDefinititions();
+    $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_callbacks = new BatchTestCallbacks();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);

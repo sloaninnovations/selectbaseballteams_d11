@@ -163,7 +163,7 @@ class BatchTestCallbacks {
    * Performs a batch operation setting up its own batch(es).
    */
   public function nestedBatchCallback(array $batches = []): void {
-    $batch_test_definitions = new BatchTestDefinititions();
+    $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_helper = new BatchTestHelper();
     foreach ($batches as $batch) {
       $batch_test_helper->stack("setting up batch $batch");

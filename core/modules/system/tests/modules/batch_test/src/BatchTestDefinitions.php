@@ -6,7 +6,7 @@ namespace Drupal\batch_test;
 
 use Drupal\Core\Batch\BatchBuilder;
 
-class BatchTestDefinititions {
+class BatchTestDefinitions {
 
   /**
    * Batch 0: Does nothing.
