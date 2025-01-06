@@ -125,11 +125,8 @@ final class RecipeRunner {
       foreach ($config->config['actions'] as $config_name => $actions) {
         // If this config name contains an input value, it must begin with the
         // config prefix of a known entity type.
-        if (str_contains($config_name, '${')) {
-          $entity_type = $config_manager->getEntityTypeIdByName($config_name);
-          if (empty($entity_type)) {
-            throw new ConfigActionException("The entity type for the config name '$config_name' could not be identified.");
-          }
+        if (str_contains($config_name, '${') && empty($config_manager->getEntityTypeIdByName($config_name))) {
+          throw new ConfigActionException("The entity type for the config name '$config_name' could not be identified.");
         }
         $config_name = str_replace($keys, $replace, $config_name);
 
