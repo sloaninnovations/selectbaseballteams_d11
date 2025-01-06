@@ -5,6 +5,7 @@
  */
 
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\Updater\UpdaterException;
 use Drupal\Core\Url;
 
@@ -14,10 +15,10 @@ use Drupal\Core\Url;
  * Callback for system_authorized_init() in
  * update_manager_update_ready_form_submit().
  *
- * @param $filetransfer
+ * @param \Drupal\Core\FileTransfer\FileTransfer $filetransfer
  *   The FileTransfer object created by authorize.php for use during this
  *   operation.
- * @param $projects
+ * @param array $projects
  *   A nested array of projects to install into the live webroot, keyed by
  *   project name. Each subarray contains the following keys:
  *   - project: The canonical project short name.
@@ -30,6 +31,7 @@ use Drupal\Core\Url;
  *   an instance of \Symfony\Component\HttpFoundation\Response the calling code
  *   should use that response for the current page request.
  */
+#[StopProceduralHookScan]
 function update_authorize_run_update($filetransfer, $projects) {
   $batch_builder = (new BatchBuilder())
     ->setFile(\Drupal::service('extension.list.module')->getPath('update') . '/update.authorize.inc')
@@ -138,9 +140,9 @@ function update_authorize_batch_copy_project($project, $updater_name, $local_url
  * authorize.php will render a report. Also responsible for putting the site
  * back online and clearing the update status storage after a successful update.
  *
- * @param $success
+ * @param bool $success
  *   TRUE if the batch operation was successful; FALSE if there were errors.
- * @param $results
+ * @param array $results
  *   An associative array of results from the batch operation.
  */
 function update_authorize_update_batch_finished($success, $results) {
