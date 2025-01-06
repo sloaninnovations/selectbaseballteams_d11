@@ -13,6 +13,26 @@ use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
 
 /**
+ * Prepares variables for last time update data was checked templates.
+ *
+ * Default template: update-last-check.html.twig.
+ *
+ * In addition to properly formatting the given timestamp, this function also
+ * provides a "Check manually" link that refreshes the available update and
+ * redirects back to the same page.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - last: The timestamp when the site last checked for available updates.
+ *
+ * @see theme_update_report()
+ */
+function template_preprocess_update_last_check(&$variables): void {
+  $variables['time'] = \Drupal::service('date.formatter')->formatTimeDiffSince($variables['last']);
+  $variables['link'] = Link::fromTextAndUrl(t('Check manually'), Url::fromRoute('update.manual_status', [], ['query' => \Drupal::destination()->getAsArray()]))->toString();
+}
+
+/**
  * Resolves if the current user can access updater menu items.
  *
  * It both enforces the 'administer software updates' permission and the global
@@ -255,26 +275,6 @@ function _update_project_status_sort($a, $b) {
   $a_status = $a['status'] > 0 ? $a['status'] : (-10 * $a['status']);
   $b_status = $b['status'] > 0 ? $b['status'] : (-10 * $b['status']);
   return $a_status - $b_status;
-}
-
-/**
- * Prepares variables for last time update data was checked templates.
- *
- * Default template: update-last-check.html.twig.
- *
- * In addition to properly formatting the given timestamp, this function also
- * provides a "Check manually" link that refreshes the available update and
- * redirects back to the same page.
- *
- * @param array $variables
- *   An associative array containing:
- *   - last: The timestamp when the site last checked for available updates.
- *
- * @see theme_update_report()
- */
-function template_preprocess_update_last_check(&$variables): void {
-  $variables['time'] = \Drupal::service('date.formatter')->formatTimeDiffSince($variables['last']);
-  $variables['link'] = Link::fromTextAndUrl(t('Check manually'), Url::fromRoute('update.manual_status', [], ['query' => \Drupal::destination()->getAsArray()]))->toString();
 }
 
 /**
