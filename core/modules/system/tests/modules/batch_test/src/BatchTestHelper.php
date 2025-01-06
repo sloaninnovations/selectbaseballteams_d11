@@ -8,7 +8,7 @@ use Drupal\Core\Form\FormState;
 
 class BatchTestHelper {
 
-   /**
+  /**
    * Batch operation: Submits form_test_mock_form().
    */
   public function nestedDrupalFormSubmitCallback($value): void {
