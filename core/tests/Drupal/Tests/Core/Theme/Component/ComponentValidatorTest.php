@@ -159,11 +159,11 @@ class ComponentValidatorTest extends TestCase {
    *
    * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
    */
-  public function testValidatePropsInvalid(array $context, string $component_id, string $expected_exception_message): void {
+  public function testValidatePropsInvalid(array $context, string $component_id, array $definition, string $expected_exception_message): void {
     $component = new Component(
       ['app_root' => '/fake/path/root'],
       'sdc_test:' . $component_id,
-      static::loadComponentDefinitionFromFs($component_id)
+      $definition
     );
     $this->expectException(InvalidComponentException::class);
     $this->expectExceptionMessage($expected_exception_message);
@@ -175,38 +175,38 @@ class ComponentValidatorTest extends TestCase {
   /**
    * Data provider with invalid component props.
    *
-   * @return \Generator
+   * @return array
    *   Returns the generator with the invalid properties.
    */
-  public static function dataProviderValidatePropsInvalid(): \Generator {
-    $valid_cta_properties = [
-      'text' => 'Can Pica',
-      'href' => 'https://www.drupal.org',
-      'target' => '_blank',
-      'attributes' => new Attribute(['key' => 'value']),
-    ];
-    $props_with_missing_required = $valid_cta_properties;
-    unset($props_with_missing_required['text']);
-    yield 'missing required prop' => [
-      $props_with_missing_required,
-      'my-cta',
-      '[sdc_test:my-cta/text] The property text is required.',
-    ];
-
-    $props_with_invalid_class = $valid_cta_properties;
-    $props_with_invalid_class['attributes'] = new \stdClass();
-    yield 'attributes with invalid object class' => [
-      $props_with_invalid_class,
-      'my-cta',
-      'Data provided to prop "attributes" for component "sdc_test:my-cta" is not a valid instance of "Drupal\Core\Template\Attribute"',
-    ];
-
-    $props_with_invalid_enum = [];
-    $props_with_invalid_enum['ctaTarget'] = 'foo';
-    yield 'ctaTarget violates the allowed properties in the enum' => [
-      $props_with_invalid_enum,
-      'my-banner',
-      '[sdc_test:my-banner/ctaTarget] Does not have a value in the enumeration ["","_blank"]. The provided value is: "foo".',
+  public static function dataProviderValidatePropsInvalid(): array {
+    return [
+      'missing required prop' => [
+        [
+          'href' => 'https://www.drupal.org',
+          'target' => '_blank',
+          'attributes' => new Attribute(['key' => 'value']),
+        ],
+        'my-cta',
+        static::loadComponentDefinitionFromFs('my-cta'),
+        '[sdc_test:my-cta/text] The property text is required.',
+      ],
+      'attributes with invalid object class' => [
+        [
+          'text' => 'Can Pica',
+          'href' => 'https://www.drupal.org',
+          'target' => '_blank',
+          'attributes' => new \stdClass(),
+        ],
+        'my-cta',
+        static::loadComponentDefinitionFromFs('my-cta'),
+        'Data provided to prop "attributes" for component "sdc_test:my-cta" is not a valid instance of "Drupal\Core\Template\Attribute"',
+      ],
+      'ctaTarget violates the allowed properties in the enum' => [
+        ['ctaTarget' => 'foo'],
+        'my-banner',
+        static::loadComponentDefinitionFromFs('my-banner'),
+        '[sdc_test:my-banner/ctaTarget] Does not have a value in the enumeration ["","_blank"]. The provided value is: "foo".',
+      ],
     ];
   }
 
