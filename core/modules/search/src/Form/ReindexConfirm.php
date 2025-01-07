@@ -59,7 +59,8 @@ class ReindexConfirm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    if ($form['confirm']) {
+    $confirm = $form_state->hasValue('confirm') ? $form_state->getValue('confirm') : NULL;
+    if ($confirm) {
       // Ask each active search page to mark itself for re-index.
       $search_page_repository = \Drupal::service('search.search_page_repository');
       foreach ($search_page_repository->getIndexableSearchPages() as $entity) {
