@@ -100,7 +100,7 @@ class LruMemoryCache extends MemoryCache {
     // Move the item to the least recently used position if it's not already
     // there. This cannot use array_unshift() because it would reindex an array
     // with numeric cache IDs.
-    if (isset($this->cache[$cid])) {
+    if (isset($this->cache[$cid]) && $cid !== array_key_first($this->cache)) {
       $item = $this->cache[$cid];
       $this->cache = [$cid => $item] + $this->cache;
     }
@@ -110,8 +110,16 @@ class LruMemoryCache extends MemoryCache {
    * {@inheritdoc}
    */
   public function invalidateMultiple(array $cids): void {
+    $items = [];
     foreach ($cids as $cid) {
-      $this->invalidate($cid);
+      if (isset($this->cache[$cid])) {
+        $items[$cid] = $this->cache[$cid];
+      }
+    }
+    // Move the items to the least recently used positions. This cannot use
+    // array_unshift() because it would reindex an array with numeric cache IDs.
+    if (!empty($items)) {
+      $this->cache = $items + $this->cache;
     }
   }
 
