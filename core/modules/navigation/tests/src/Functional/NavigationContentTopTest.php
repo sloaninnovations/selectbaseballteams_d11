@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\navigation\Functional;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 
@@ -45,11 +46,11 @@ class NavigationContentTopTest extends BrowserTestBase {
     $this->drupalGet($test_page_url);
     $this->assertSession()->elementNotExists('css', '.admin-toolbar__content-top');
     \Drupal::keyValue('navigation_test')->set('content_top', 1);
-    drupal_flush_all_caches();
+    Cache::invalidateTags(['navigation_test']);
     $this->drupalGet($test_page_url);
     $this->assertSession()->elementTextContains('css', '.admin-toolbar__content-top', 'foobarbaz');
     \Drupal::keyValue('navigation_test')->set('content_top_alter', 1);
-    drupal_flush_all_caches();
+    Cache::invalidateTags(['navigation_test']);
     $this->drupalGet($test_page_url);
     $this->assertSession()->elementTextContains('css', '.admin-toolbar__content-top', 'baznew bar');
   }

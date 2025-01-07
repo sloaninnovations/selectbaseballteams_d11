@@ -41,6 +41,9 @@ class NavigationTestHooks {
   public function navigationContentTop(): array {
     if (\Drupal::keyValue('navigation_test')->get('content_top')) {
       return [
+        '#cache' => [
+          'tags' => ['navigation_test'],
+        ],
         'navigation_foo' => [
           '#markup' => 'foo',
         ],
@@ -53,7 +56,11 @@ class NavigationTestHooks {
       ];
     }
     else {
-      return [];
+      return [
+        '#cache' => [
+          'tags' => ['navigation_test'],
+        ],
+      ];
     }
   }
 
