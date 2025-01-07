@@ -49,7 +49,7 @@ class LruMemoryCache extends MemoryCache {
    * {@inheritdoc}
    */
   public function set($cid, $data, $expire = Cache::PERMANENT, array $tags = []): void {
-    // If the item is already in the cache, just move it to the first position.
+    // If the item is already in the cache, move it to end of the array.
     if (isset($this->cache[$cid])) {
       unset($this->cache[$cid]);
       parent::set($cid, $data, $expire, $tags);
@@ -73,6 +73,10 @@ class LruMemoryCache extends MemoryCache {
    */
   public function setMultiple(array $items = []): void {
     foreach ($items as $cid => $item) {
+      // If the item is already in the cache, move it to end of the array.
+      if (isset($this->cache[$cid])) {
+        unset($this->cache[$cid]);
+      }
       parent::set($cid, $item['data'], $item['expire'] ?? CacheBackendInterface::CACHE_PERMANENT, $item['tags'] ?? []);
     }
 
