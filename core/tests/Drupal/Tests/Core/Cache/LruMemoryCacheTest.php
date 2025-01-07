@@ -23,7 +23,7 @@ class LruMemoryCacheTest extends UnitTestCase {
    * @covers ::getMultiple
    */
   public function testGetSetDelete(): void {
-    $memory_cache = $this->getLruMemoryCache(3);
+    $lru_cache = $this->getLruMemoryCache(3);
 
     $cids = [
       ['sparrow', 'sparrow'],
@@ -31,37 +31,37 @@ class LruMemoryCacheTest extends UnitTestCase {
       ['crow', 'crow'],
     ];
     foreach ($cids as $items) {
-      $memory_cache->set($items[0], $items[1]);
+      $lru_cache->set($items[0], $items[1]);
     }
-    $this->assertCids($memory_cache, [
+    $this->assertCids($lru_cache, [
       ['sparrow', 'sparrow'],
       ['pidgin', 'pidgin'],
       ['crow', 'crow'],
     ]);
 
-    $memory_cache->set('cuckoo', 'cuckoo');
-    $this->assertCids($memory_cache, [
+    $lru_cache->set('cuckoo', 'cuckoo');
+    $this->assertCids($lru_cache, [
       ['pidgin', 'pidgin'],
       ['crow', 'crow'],
       ['cuckoo', 'cuckoo'],
     ]);
 
     // Now bring pidgin to the most recently used spot.
-    $memory_cache->get('pidgin');
-    $memory_cache->set('bigger_cuckoo', 'bigger_cuckoo');
-    $this->assertCids($memory_cache, [
+    $lru_cache->get('pidgin');
+    $lru_cache->set('bigger_cuckoo', 'bigger_cuckoo');
+    $this->assertCids($lru_cache, [
       ['cuckoo', 'cuckoo'],
       ['pidgin', 'pidgin'],
       ['bigger_cuckoo', 'bigger_cuckoo'],
     ]);
 
     // Confirm that setting the same item multiple times only uses one slot.
-    $memory_cache->set('bigger_cuckoo', 'bigger_cuckoo');
-    $memory_cache->set('bigger_cuckoo', 'bigger_cuckoo');
-    $memory_cache->set('bigger_cuckoo', 'bigger_cuckoo');
-    $memory_cache->set('bigger_cuckoo', 'bigger_cuckoo');
-    $memory_cache->set('bigger_cuckoo', 'bigger_cuckoo');
-    $this->assertCids($memory_cache, [
+    $lru_cache->set('bigger_cuckoo', 'bigger_cuckoo');
+    $lru_cache->set('bigger_cuckoo', 'bigger_cuckoo');
+    $lru_cache->set('bigger_cuckoo', 'bigger_cuckoo');
+    $lru_cache->set('bigger_cuckoo', 'bigger_cuckoo');
+    $lru_cache->set('bigger_cuckoo', 'bigger_cuckoo');
+    $this->assertCids($lru_cache, [
       ['cuckoo', 'cuckoo'],
       ['pidgin', 'pidgin'],
       ['bigger_cuckoo', 'bigger_cuckoo'],
@@ -69,34 +69,34 @@ class LruMemoryCacheTest extends UnitTestCase {
 
     // Confirm that deleting the same item multiple times only frees up one
     // slot.
-    $memory_cache->delete('bigger_cuckoo');
-    $memory_cache->delete('bigger_cuckoo');
-    $memory_cache->delete('bigger_cuckoo');
-    $memory_cache->delete('bigger_cuckoo');
-    $memory_cache->delete('bigger_cuckoo');
-    $memory_cache->delete('bigger_cuckoo');
-    $memory_cache->set('bigger_cuckoo', 'bigger_cuckoo');
-    $this->assertCids($memory_cache, [
+    $lru_cache->delete('bigger_cuckoo');
+    $lru_cache->delete('bigger_cuckoo');
+    $lru_cache->delete('bigger_cuckoo');
+    $lru_cache->delete('bigger_cuckoo');
+    $lru_cache->delete('bigger_cuckoo');
+    $lru_cache->delete('bigger_cuckoo');
+    $lru_cache->set('bigger_cuckoo', 'bigger_cuckoo');
+    $this->assertCids($lru_cache, [
       ['cuckoo', 'cuckoo'],
       ['pidgin', 'pidgin'],
       ['bigger_cuckoo', 'bigger_cuckoo'],
     ]);
-    $memory_cache->set('crow', 'crow');
+    $lru_cache->set('crow', 'crow');
 
-    $this->assertCids($memory_cache, [
+    $this->assertCids($lru_cache, [
       ['pidgin', 'pidgin'],
       ['bigger_cuckoo', 'bigger_cuckoo'],
       ['crow', 'crow'],
     ]);
 
     $cids = ['crow', 'pidgin'];
-    $memory_cache->getMultiple($cids);
+    $lru_cache->getMultiple($cids);
     // @todo This result suggests the order of the arguments in the
     //   \Drupal\Core\Cache\MemoryBackend::getMultiple() array_intersect_key()
     //   should be swapped as this order of the cache items returned should
     //   probably be in the same order as the passed in $cids. I.e. pidgin
     //   should be at the ends of the array and not crow.
-    $this->assertCids($memory_cache, [
+    $this->assertCids($lru_cache, [
       ['bigger_cuckoo', 'bigger_cuckoo'],
       ['pidgin', 'pidgin'],
       ['crow', 'crow'],
@@ -110,7 +110,7 @@ class LruMemoryCacheTest extends UnitTestCase {
    * @covers ::set
    */
   public function testSetNumericKeys(): void {
-    $memory_cache = $this->getLruMemoryCache(3);
+    $lru_cache = $this->getLruMemoryCache(3);
 
     $cids = [
       [4, 'sparrow'],
@@ -118,19 +118,19 @@ class LruMemoryCacheTest extends UnitTestCase {
       [7, 'crow'],
     ];
     foreach ($cids as $item) {
-      $memory_cache->set($item[0], $item[1]);
+      $lru_cache->set($item[0], $item[1]);
     }
-    $this->assertCids($memory_cache, $cids);
+    $this->assertCids($lru_cache, $cids);
 
-    $memory_cache->set(1, 'cuckoo');
-    $this->assertCids($memory_cache, [
+    $lru_cache->set(1, 'cuckoo');
+    $this->assertCids($lru_cache, [
       [10, 'pidgin'],
       [7, 'crow'],
       [1, 'cuckoo'],
     ]);
 
-    $memory_cache->set(7, 'crow');
-    $this->assertCids($memory_cache, [
+    $lru_cache->set(7, 'crow');
+    $this->assertCids($lru_cache, [
       [10, 'pidgin'],
       [1, 'cuckoo'],
       [7, 'crow'],
@@ -144,45 +144,45 @@ class LruMemoryCacheTest extends UnitTestCase {
    * @covers ::setMultiple
    */
   public function testSetMultiple(): void {
-    $memory_cache = $this->getLruMemoryCache(3);
+    $lru_cache = $this->getLruMemoryCache(3);
 
-    $memory_cache->setMultiple([
+    $lru_cache->setMultiple([
       'sparrow' => ['data' => 'sparrow'],
       'pidgin' => ['data' => 'pidgin'],
       'crow' => ['data' => 'crow'],
     ]);
-    $this->assertCids($memory_cache, [
+    $this->assertCids($lru_cache, [
       ['sparrow', 'sparrow'],
       ['pidgin', 'pidgin'],
       ['crow', 'crow'],
     ]);
 
-    $memory_cache->setMultiple([
+    $lru_cache->setMultiple([
       'sparrow' => ['data' => 'sparrow2'],
       'bluejay' => ['data' => 'bluejay'],
     ]);
-    $this->assertCids($memory_cache, [
+    $this->assertCids($lru_cache, [
       ['crow', 'crow'],
       ['sparrow', 'sparrow2'],
       ['bluejay', 'bluejay'],
     ]);
 
-    $memory_cache->setMultiple([
+    $lru_cache->setMultiple([
       3 => ['data' => 'pidgin'],
       2 => ['data' => 'eagle'],
       1 => ['data' => 'wren'],
     ]);
-    $this->assertCids($memory_cache, [
+    $this->assertCids($lru_cache, [
       [3, 'pidgin'],
       [2, 'eagle'],
       [1, 'wren'],
     ]);
 
-    $memory_cache->setMultiple([
+    $lru_cache->setMultiple([
       2 => ['data' => 'eagle2'],
       4 => ['data' => 'cuckoo'],
     ]);
-    $this->assertCids($memory_cache, [
+    $this->assertCids($lru_cache, [
       [1, 'wren'],
       [2, 'eagle2'],
       [4, 'cuckoo'],
@@ -196,7 +196,7 @@ class LruMemoryCacheTest extends UnitTestCase {
    * @covers ::invalidateMultiple
    */
   public function testInvalidate(): void {
-    $memory_cache = $this->getLruMemoryCache(3);
+    $lru_cache = $this->getLruMemoryCache(3);
 
     $cids = [
       ['sparrow', 'sparrow'],
@@ -204,58 +204,58 @@ class LruMemoryCacheTest extends UnitTestCase {
       ['crow', 'crow'],
     ];
     foreach ($cids as $items) {
-      $memory_cache->set($items[0], $items[1]);
+      $lru_cache->set($items[0], $items[1]);
     }
-    $this->assertCids($memory_cache, [
+    $this->assertCids($lru_cache, [
       ['sparrow', 'sparrow'],
       ['pidgin', 'pidgin'],
       ['crow', 'crow'],
     ]);
-    $memory_cache->invalidate('crow');
-    $this->assertCids($memory_cache, [
+    $lru_cache->invalidate('crow');
+    $this->assertCids($lru_cache, [
       ['crow', 'crow'],
       ['sparrow', 'sparrow'],
       ['pidgin', 'pidgin'],
     ]);
-    $this->assertFalse($memory_cache->get('crow'));
+    $this->assertFalse($lru_cache->get('crow'));
     // Ensure that getting an invalid cache does not move it to the end of the
     // array.
-    $this->assertSame('crow', $memory_cache->get('crow', TRUE)->data);
-    $this->assertCids($memory_cache, [
+    $this->assertSame('crow', $lru_cache->get('crow', TRUE)->data);
+    $this->assertCids($lru_cache, [
       ['crow', 'crow'],
       ['sparrow', 'sparrow'],
       ['pidgin', 'pidgin'],
     ]);
-    $memory_cache->set('cuckoo', 'cuckoo', LruMemoryCache::CACHE_PERMANENT, ['cuckoo']);
-    $this->assertCids($memory_cache, [
+    $lru_cache->set('cuckoo', 'cuckoo', LruMemoryCache::CACHE_PERMANENT, ['cuckoo']);
+    $this->assertCids($lru_cache, [
       ['sparrow', 'sparrow'],
       ['pidgin', 'pidgin'],
       ['cuckoo', 'cuckoo'],
     ]);
-    $memory_cache->invalidateTags(['cuckoo']);
-    $this->assertFalse($memory_cache->get('cuckoo'));
-    $this->assertSame('cuckoo', $memory_cache->get('cuckoo', TRUE)->data);
-    $memory_cache->set('crow', 'crow');
-    $this->assertCids($memory_cache, [
+    $lru_cache->invalidateTags(['cuckoo']);
+    $this->assertFalse($lru_cache->get('cuckoo'));
+    $this->assertSame('cuckoo', $lru_cache->get('cuckoo', TRUE)->data);
+    $lru_cache->set('crow', 'crow');
+    $this->assertCids($lru_cache, [
       ['sparrow', 'sparrow'],
       ['pidgin', 'pidgin'],
       ['crow', 'crow'],
     ]);
 
-    $memory_cache->invalidateMultiple(['pidgin', 'crow']);
+    $lru_cache->invalidateMultiple(['pidgin', 'crow']);
     $cids = ['pidgin', 'crow'];
-    $this->assertEmpty($memory_cache->getMultiple($cids));
+    $this->assertEmpty($lru_cache->getMultiple($cids));
     $this->assertSame(['pidgin', 'crow'], $cids);
-    $this->assertCount(2, $memory_cache->getMultiple($cids, TRUE));
+    $this->assertCount(2, $lru_cache->getMultiple($cids, TRUE));
     $this->assertSame([], $cids);
-    $this->assertCids($memory_cache, [
+    $this->assertCids($lru_cache, [
       ['pidgin', 'pidgin'],
       ['crow', 'crow'],
       ['sparrow', 'sparrow'],
     ]);
-    $memory_cache->set('duck', 'duck');
-    $memory_cache->set('chicken', 'chicken');
-    $this->assertCids($memory_cache, [
+    $lru_cache->set('duck', 'duck');
+    $lru_cache->set('chicken', 'chicken');
+    $this->assertCids($lru_cache, [
       ['sparrow', 'sparrow'],
       ['duck', 'duck'],
       ['chicken', 'chicken'],
@@ -265,19 +265,19 @@ class LruMemoryCacheTest extends UnitTestCase {
   /**
    * Assert that the given cache ID's match the given value in the memory cache.
    *
-   * @param \Drupal\Core\Cache\MemoryCache\LruMemoryCache $memory_cache
+   * @param \Drupal\Core\Cache\MemoryCache\LruMemoryCache $lru_cache
    *   The LRU cache under test.
    * @param array $cids
    *   Array whose first element is the cache ID and whose second element is
    *   the value to check. This should contain all the keys in the cache and in
    *   the expected order.
    */
-  protected function assertCids(LruMemoryCache $memory_cache, array $cids): void {
+  protected function assertCids(LruMemoryCache $lru_cache, array $cids): void {
     // Use reflection to access data because using ::get() affects the LRU
     // cache.
-    $reflectedClass = new \ReflectionClass($memory_cache);
+    $reflectedClass = new \ReflectionClass($lru_cache);
     $reflection = $reflectedClass->getProperty('cache');
-    $cache = $reflection->getValue($memory_cache);
+    $cache = $reflection->getValue($lru_cache);
 
     $keys = [];
     foreach ($cids as $item) {
