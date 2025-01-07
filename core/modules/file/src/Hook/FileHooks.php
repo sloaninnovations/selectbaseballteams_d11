@@ -7,8 +7,6 @@ use Drupal\file\Entity\File;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\file\FileInterface;
 
 /**
  * Hook implementations for file.
@@ -113,88 +111,6 @@ class FileHooks {
         ],
       ],
     ];
-  }
-
-  /**
-   * Implements hook_file_download().
-   */
-  #[Hook('file_download')]
-  public function fileDownload($uri): mixed {
-    // Get the file record based on the URI. If not in the database just return.
-    /** @var \Drupal\file\FileRepositoryInterface $file_repository */
-    $file_repository = \Drupal::service('file.repository');
-    $file = $file_repository->loadByUri($uri);
-    if (!$file) {
-      return NULL;
-    }
-    // Find out if a temporary file is still used in the system.
-    if ($file->isTemporary()) {
-      $usage = \Drupal::service('file.usage')->listUsage($file);
-      if (empty($usage) && $file->getOwnerId() != \Drupal::currentUser()->id()) {
-        // Deny access to temporary files without usage that are not owned by the
-        // same user. This prevents the security issue that a private file that
-        // was protected by field permissions becomes available after its usage
-        // was removed and before it is actually deleted from the file system.
-        // Modules that depend on this behavior should make the file permanent
-        // instead.
-        return -1;
-      }
-    }
-    // Find out which (if any) fields of this type contain the file.
-    $references = file_get_file_references($file, NULL, EntityStorageInterface::FIELD_LOAD_CURRENT, NULL);
-    // Stop processing if there are no references in order to avoid returning
-    // headers for files controlled by other modules. Make an exception for
-    // temporary files where the host entity has not yet been saved (for example,
-    // an image preview on a node/add form) in which case, allow download by the
-    // file's owner.
-    if (empty($references) && ($file->isPermanent() || $file->getOwnerId() != \Drupal::currentUser()->id())) {
-      return NULL;
-    }
-    if (!$file->access('download')) {
-      return -1;
-    }
-    // Access is granted.
-    $headers = $file->getDownloadHeaders();
-    return $headers;
-  }
-
-  /**
-   * Implements hook_cron().
-   */
-  #[Hook('cron')]
-  public function cron(): void {
-    $age = \Drupal::config('system.file')->get('temporary_maximum_age');
-    $file_storage = \Drupal::entityTypeManager()->getStorage('file');
-    /** @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager */
-    $stream_wrapper_manager = \Drupal::service('stream_wrapper_manager');
-    // Only delete temporary files if older than $age. Note that automatic cleanup
-    // is disabled if $age set to 0.
-    if ($age) {
-      $fids = \Drupal::entityQuery('file')->accessCheck(FALSE)->condition('status', FileInterface::STATUS_PERMANENT, '<>')->condition('changed', \Drupal::time()->getRequestTime() - $age, '<')->range(0, 100)->execute();
-      $files = $file_storage->loadMultiple($fids);
-      foreach ($files as $file) {
-        $references = \Drupal::service('file.usage')->listUsage($file);
-        if (empty($references)) {
-          if (!file_exists($file->getFileUri())) {
-            if (!$stream_wrapper_manager->isValidUri($file->getFileUri())) {
-              \Drupal::logger('file system')->warning('Temporary file "%path" that was deleted during garbage collection did not exist on the filesystem. This could be caused by a missing stream wrapper.', ['%path' => $file->getFileUri()]);
-            }
-            else {
-              \Drupal::logger('file system')->warning('Temporary file "%path" that was deleted during garbage collection did not exist on the filesystem.', ['%path' => $file->getFileUri()]);
-            }
-          }
-          // Delete the file entity. If the file does not exist, this will
-          // generate a second notice in the watchdog.
-          $file->delete();
-        }
-        else {
-          \Drupal::logger('file system')->info('Did not delete temporary file "%path" during garbage collection because it is in use by the following modules: %modules.', [
-            '%path' => $file->getFileUri(),
-            '%modules' => implode(', ', array_keys($references)),
-          ]);
-        }
-      }
-    }
   }
 
   /**
