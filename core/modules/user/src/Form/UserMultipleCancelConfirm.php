@@ -200,7 +200,6 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
 
     // Clear out the accounts from the temp store.
     $this->tempStoreFactory->get('user_user_operations_cancel')->delete($current_user_id);
-    if ($form_state->getValue('confirm')) {
       foreach ($form_state->getValue('accounts') as $uid => $value) {
         // Prevent programmatic form submissions from cancelling user 1.
         if ($uid <= 1) {
@@ -224,7 +223,6 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
           user_cancel($form_state->getValues(), $uid, $form_state->getValue('user_cancel_method'));
         }
       }
-    }
     $form_state->setRedirect('entity.user.collection');
   }
 
