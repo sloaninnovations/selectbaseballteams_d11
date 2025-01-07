@@ -52,12 +52,14 @@ class LruMemoryCache extends MemoryCache {
    */
   public function getMultiple(&$cids, $allow_invalid = FALSE) {
     $ret = parent::getMultiple($cids, $allow_invalid);
+    $last_key = array_key_last($this->cache);
     foreach ($ret as $cid => $cached) {
-      if ($cached->valid) {
+      if ($cached->valid && $cid !== $last_key) {
         // Move valid items to the end of the array, so they will be removed
         // last.
         unset($this->cache[$cid]);
         $this->cache[$cid] = $cached;
+        $last_key = $cid;
       }
     }
     return $ret;
