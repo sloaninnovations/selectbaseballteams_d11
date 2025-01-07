@@ -80,6 +80,40 @@ class LruMemoryCacheTest extends UnitTestCase {
   }
 
   /**
+   * Tests setting multiple items in the LRU memory cache.
+   *
+   * @covers ::setMultiple
+   */
+  public function testSetMultiple(): void {
+    $this->memoryCache = new LruMemoryCache(
+      $this->createMock(TimeInterface::class),
+      3,
+    );
+
+    $this->memoryCache->setMultiple([
+      'sparrow' => ['data' => 'sparrow'],
+      'pidgin' => ['data' => 'pidgin'],
+      'crow' => ['data' => 'crow'],
+    ]);
+    $this->assertCids([
+      ['sparrow', 'sparrow'],
+      ['pidgin', 'pidgin'],
+      ['crow', 'crow'],
+    ]);
+
+    $this->memoryCache->setMultiple([
+      'sparrow' => ['data' => 'sparrow2'],
+      'bluejay' => ['data' => 'bluejay'],
+    ]);
+    $this->assertCids([
+      ['crow', 'crow'],
+      ['sparrow', 'sparrow2'],
+      ['bluejay', 'bluejay'],
+    ]);
+
+  }
+
+  /**
    * Tests invalidation from the LRU memory cache.
    *
    * @covers ::invalidate
