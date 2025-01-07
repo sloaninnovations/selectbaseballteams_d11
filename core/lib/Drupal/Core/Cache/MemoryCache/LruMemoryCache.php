@@ -53,14 +53,12 @@ class LruMemoryCache extends MemoryCache {
       // If the item is already in the cache, move it to end of the array.
       unset($this->cache[$cid]);
     }
-    else {
+    elseif (count($this->cache) > $this->allowedSlots - 1) {
       // Remove one item from the cache to ensure we remain within the allowed
       // number of slots. Avoid using array_slice() because it makes a copy of the
       // array, and avoid using array_splice() or array_shift() because they
       // re-index numeric keys.
-      if (count($this->cache) > $this->allowedSlots - 1) {
-        unset($this->cache[array_key_first($this->cache)]);
-      }
+      unset($this->cache[array_key_first($this->cache)]);
     }
 
     parent::set($cid, $data, $expire, $tags);
