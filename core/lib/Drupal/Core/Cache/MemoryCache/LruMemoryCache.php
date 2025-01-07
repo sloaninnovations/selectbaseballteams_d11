@@ -37,7 +37,7 @@ class LruMemoryCache extends MemoryCache {
    */
   public function get($cid, $allow_invalid = FALSE) {
     if ($cached = parent::get($cid, $allow_invalid)) {
-      if ($cached->valid) {
+      if ($cached->valid && $cid !== array_key_last($this->cache)) {
         // Move valid items to the end of the array, so they will be removed
         // last.
         unset($this->cache[$cid]);
