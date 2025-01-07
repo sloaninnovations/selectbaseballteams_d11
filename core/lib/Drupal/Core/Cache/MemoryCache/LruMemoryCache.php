@@ -49,23 +49,21 @@ class LruMemoryCache extends MemoryCache {
    * {@inheritdoc}
    */
   public function set($cid, $data, $expire = Cache::PERMANENT, array $tags = []): void {
-    // If the item is already in the cache, move it to end of the array.
     if (isset($this->cache[$cid])) {
+      // If the item is already in the cache, move it to end of the array.
       unset($this->cache[$cid]);
-      parent::set($cid, $data, $expire, $tags);
-      return;
+    }
+    else {
+      // Remove one item from the cache to ensure we remain within the allowed
+      // number of slots. Avoid using array_slice() because it makes a copy of the
+      // array, and avoid using array_splice() or array_shift() because they
+      // re-index numeric keys.
+      if (count($this->cache) > $this->allowedSlots - 1) {
+        unset($this->cache[array_key_first($this->cache)]);
+      }
     }
 
     parent::set($cid, $data, $expire, $tags);
-
-    // Remove one item from the cache to ensure we remain within the allowed
-    // number of slots. Avoid using array_slice() because it makes a copy of the
-    // array, and avoid using array_splice() or array_shift() because they
-    // re-index numeric keys.
-    if (count($this->cache) > $this->allowedSlots) {
-      $first_key = array_key_first($this->cache);
-      unset($this->cache[$first_key]);
-    }
   }
 
   /**
@@ -86,8 +84,7 @@ class LruMemoryCache extends MemoryCache {
     // numeric keys.
     $diff = count($this->cache) - $this->allowedSlots;
     while ($diff > 0) {
-      $first_key = array_key_first($this->cache);
-      unset($this->cache[$first_key]);
+      unset($this->cache[array_key_first($this->cache)]);
       $diff--;
     }
   }
@@ -101,8 +98,7 @@ class LruMemoryCache extends MemoryCache {
     // there. This cannot use array_unshift() because it would reindex an array
     // with numeric cache IDs.
     if (isset($this->cache[$cid]) && $cid !== array_key_first($this->cache)) {
-      $item = $this->cache[$cid];
-      $this->cache = [$cid => $item] + $this->cache;
+      $this->cache = [$cid => $this->cache[$cid]] + $this->cache;
     }
   }
 
