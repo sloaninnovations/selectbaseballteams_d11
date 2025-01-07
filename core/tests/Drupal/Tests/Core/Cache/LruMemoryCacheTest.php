@@ -27,12 +27,11 @@ class LruMemoryCacheTest extends UnitTestCase {
    * @covers ::get
    * @covers ::set
    * @covers ::delete
+   * @covers ::getMultiple
    */
   public function testGetSetDelete(): void {
-    $this->memoryCache = new LruMemoryCache(
-      $this->createMock(TimeInterface::class),
-      3,
-    );
+    $this->memoryCache = $this->getLruMemoryCache(3);
+
     $cids = [
       ['sparrow', 'sparrow'],
       ['pidgin', 'pidgin'],
@@ -96,6 +95,20 @@ class LruMemoryCacheTest extends UnitTestCase {
       ['bigger_cuckoo', 'bigger_cuckoo'],
       ['crow', 'crow'],
     ]);
+
+    $cids = ['crow', 'pidgin'];
+    $this->memoryCache->getMultiple($cids);
+    // @todo This result suggests the order of the arguments in the
+    //   \Drupal\Core\Cache\MemoryBackend::getMultiple() array_intersect_key()
+    //   should be swapped as this order of the cache items returned should
+    //   probably be in the same order as the passed in $cids. I.e. pidgin
+    //   should be at the ends of the array and not crow.
+    $this->assertCids([
+      ['bigger_cuckoo', 'bigger_cuckoo'],
+      ['pidgin', 'pidgin'],
+      ['crow', 'crow'],
+    ]);
+
   }
 
   /**
@@ -104,10 +117,8 @@ class LruMemoryCacheTest extends UnitTestCase {
    * @covers ::set
    */
   public function testSetNumericKeys(): void {
-    $this->memoryCache = new LruMemoryCache(
-      $this->createMock(TimeInterface::class),
-      3,
-    );
+    $this->memoryCache = $this->getLruMemoryCache(3);
+
     $cids = [
       [4, 'sparrow'],
       [10, 'pidgin'],
@@ -140,10 +151,7 @@ class LruMemoryCacheTest extends UnitTestCase {
    * @covers ::setMultiple
    */
   public function testSetMultiple(): void {
-    $this->memoryCache = new LruMemoryCache(
-      $this->createMock(TimeInterface::class),
-      3,
-    );
+    $this->memoryCache = $this->getLruMemoryCache(3);
 
     $this->memoryCache->setMultiple([
       'sparrow' => ['data' => 'sparrow'],
@@ -195,10 +203,8 @@ class LruMemoryCacheTest extends UnitTestCase {
    * @covers ::invalidateMultiple
    */
   public function testInvalidate(): void {
-    $this->memoryCache = new LruMemoryCache(
-      $this->createMock(TimeInterface::class),
-      3,
-    );
+    $this->memoryCache = $this->getLruMemoryCache(3);
+
     $cids = [
       ['sparrow', 'sparrow'],
       ['pidgin', 'pidgin'],
@@ -213,6 +219,20 @@ class LruMemoryCacheTest extends UnitTestCase {
       ['crow', 'crow'],
     ]);
     $this->memoryCache->invalidate('crow');
+    $this->assertCids([
+      ['crow', 'crow'],
+      ['sparrow', 'sparrow'],
+      ['pidgin', 'pidgin'],
+    ]);
+    $this->assertFalse($this->memoryCache->get('crow'));
+    // Ensure that getting an invalid cache does not move it to the end of the
+    // array.
+    $this->assertSame('crow', $this->memoryCache->get('crow', TRUE)->data);
+    $this->assertCids([
+      ['crow', 'crow'],
+      ['sparrow', 'sparrow'],
+      ['pidgin', 'pidgin'],
+    ]);
     $this->memoryCache->set('cuckoo', 'cuckoo', LruMemoryCache::CACHE_PERMANENT, ['cuckoo']);
     $this->assertCids([
       ['sparrow', 'sparrow'],
@@ -220,6 +240,8 @@ class LruMemoryCacheTest extends UnitTestCase {
       ['cuckoo', 'cuckoo'],
     ]);
     $this->memoryCache->invalidateTags(['cuckoo']);
+    $this->assertFalse($this->memoryCache->get('cuckoo'));
+    $this->assertSame('cuckoo', $this->memoryCache->get('cuckoo', TRUE)->data);
     $this->memoryCache->set('crow', 'crow');
     $this->assertCids([
       ['sparrow', 'sparrow'],
@@ -228,6 +250,16 @@ class LruMemoryCacheTest extends UnitTestCase {
     ]);
 
     $this->memoryCache->invalidateMultiple(['pidgin', 'crow']);
+    $cids = ['pidgin', 'crow'];
+    $this->assertEmpty($this->memoryCache->getMultiple($cids));
+    $this->assertSame(['pidgin', 'crow'], $cids);
+    $this->assertCount(2, $this->memoryCache->getMultiple($cids, TRUE));
+    $this->assertSame([], $cids);
+    $this->assertCids([
+      ['pidgin', 'pidgin'],
+      ['crow', 'crow'],
+      ['sparrow', 'sparrow'],
+    ]);
     $this->memoryCache->set('duck', 'duck');
     $this->memoryCache->set('chicken', 'chicken');
     $this->assertCids([
@@ -261,6 +293,27 @@ class LruMemoryCacheTest extends UnitTestCase {
     // Ensure the cache only contains the supply keys and the order is as
     // expected.
     $this->assertSame($keys, array_keys($cache));
+  }
+
+  /**
+   * Creates a LRU cache for testing.
+   *
+   * @param int $slots
+   *   The number of slots in the LRU cache.
+   *
+   * @return \Drupal\Core\Cache\MemoryCache\LruMemoryCache
+   *   The LRU cache.
+   */
+  private function getLruMemoryCache(int $slots): LruMemoryCache {
+    $time_mock = $this->createMock(TimeInterface::class);
+    $time_mock->expects($this->any())
+      ->method('getRequestTime')
+      ->willReturnCallback('time');
+    return new LruMemoryCache(
+      $time_mock,
+      $slots,
+    );
+
   }
 
 }
