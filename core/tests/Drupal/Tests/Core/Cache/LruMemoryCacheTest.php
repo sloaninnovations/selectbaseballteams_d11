@@ -111,6 +111,26 @@ class LruMemoryCacheTest extends UnitTestCase {
       ['bluejay', 'bluejay'],
     ]);
 
+    $this->memoryCache->setMultiple([
+      3 => ['data' => 'pidgin'],
+      2 => ['data' => 'eagle'],
+      1 => ['data' => 'wren'],
+    ]);
+    $this->assertCids([
+      [3, 'pidgin'],
+      [2, 'eagle'],
+      [1, 'wren'],
+    ]);
+
+    $this->memoryCache->setMultiple([
+      2 => ['data' => 'eagle2'],
+      4 => ['data' => 'cuckoo'],
+    ]);
+    $this->assertCids([
+      [1, 'wren'],
+      [2, 'eagle2'],
+      [4, 'cuckoo'],
+    ]);
   }
 
   /**
