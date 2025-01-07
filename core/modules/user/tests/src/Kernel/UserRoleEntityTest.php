@@ -54,10 +54,10 @@ class UserRoleEntityTest extends KernelTestBase {
       ->save();
     $log_message = \Drupal::service(BufferingLogger::class)->cleanLogs()[0];
     $this->assertSame(RfcLogLevel::ERROR, $log_message[0]);
-    $this->assertSame('Adding non-existent permission(s) to a role is not allowed. Invalid permission(s): @permissions. Role: @label (@id).', $log_message[1]);
-    $this->assertSame('does not exist', $log_message[2]['@permissions']);
+    $this->assertSame('Non-existent permission(s) assigned to role "@label" (@id) were removed. Invalid permission(s): @permissions.', $log_message[1]);
     $this->assertSame('Test role', $log_message[2]['@label']);
     $this->assertSame('test_role', $log_message[2]['@id']);
+    $this->assertSame('does not exist', $log_message[2]['@permissions']);
 
     // Multiple permissions that do not exist.
     $role->grantPermission('does not exist')
@@ -65,10 +65,12 @@ class UserRoleEntityTest extends KernelTestBase {
       ->save();
     $log_message = \Drupal::service(BufferingLogger::class)->cleanLogs()[0];
     $this->assertSame(RfcLogLevel::ERROR, $log_message[0]);
-    $this->assertSame('Adding non-existent permission(s) to a role is not allowed. Invalid permission(s): @permissions. Role: @label (@id).', $log_message[1]);
-    $this->assertSame('does not exist, also does not exist', $log_message[2]['@permissions']);
+    $this->assertSame('Non-existent permission(s) assigned to role "@label" (@id) were removed. Invalid permission(s): @permissions.', $log_message[1]);
     $this->assertSame('Test role', $log_message[2]['@label']);
     $this->assertSame('test_role', $log_message[2]['@id']);
+    $this->assertSame('does not exist, also does not exist', $log_message[2]['@permissions']);
+    $permissions = $role->getPermissions();
+    $this->assertEmpty(array_intersect(['does not exist', 'also does not exist'], $permissions));
   }
 
   public function testPermissionRevokeAndConfigSync(): void {
