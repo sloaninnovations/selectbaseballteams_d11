@@ -218,7 +218,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
       ]);
     }
     foreach ($valid_permissions as $permission) {
-      // Depend on the module that is providing this permissions.
+      // Depend on the module that is providing this permission.
       $this->addDependency('module', $permission_definitions[$permission]['provider']);
       // Depend on any other dependencies defined by permissions granted to
       // this role.
