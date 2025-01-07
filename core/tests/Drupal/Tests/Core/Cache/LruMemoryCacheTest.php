@@ -101,7 +101,6 @@ class LruMemoryCacheTest extends UnitTestCase {
       ['pidgin', 'pidgin'],
       ['crow', 'crow'],
     ]);
-
   }
 
   /**
@@ -135,7 +134,6 @@ class LruMemoryCacheTest extends UnitTestCase {
       [1, 'cuckoo'],
       [7, 'crow'],
     ]);
-
   }
 
   /**
@@ -308,7 +306,6 @@ class LruMemoryCacheTest extends UnitTestCase {
       $time_mock,
       $slots,
     );
-
   }
 
 }
