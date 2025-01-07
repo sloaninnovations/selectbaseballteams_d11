@@ -65,12 +65,12 @@ class LruMemoryCacheTest extends UnitTestCase {
 
     // Confirm that deleting the same item multiple times only frees up one
     // slot.
-    $this->memoryCache->delete('bigger_cuckoo', 'bigger_cuckoo');
-    $this->memoryCache->delete('bigger_cuckoo', 'bigger_cuckoo');
-    $this->memoryCache->delete('bigger_cuckoo', 'bigger_cuckoo');
-    $this->memoryCache->delete('bigger_cuckoo', 'bigger_cuckoo');
-    $this->memoryCache->delete('bigger_cuckoo', 'bigger_cuckoo');
-    $this->memoryCache->delete('bigger_cuckoo', 'bigger_cuckoo');
+    $this->memoryCache->delete('bigger_cuckoo');
+    $this->memoryCache->delete('bigger_cuckoo');
+    $this->memoryCache->delete('bigger_cuckoo');
+    $this->memoryCache->delete('bigger_cuckoo');
+    $this->memoryCache->delete('bigger_cuckoo');
+    $this->memoryCache->delete('bigger_cuckoo');
     $this->memoryCache->set('bigger_cuckoo', 'bigger_cuckoo');
     $this->assertCids($cids);
     $this->memoryCache->set('crow', 'crow');
