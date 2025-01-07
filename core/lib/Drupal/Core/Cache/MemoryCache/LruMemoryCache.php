@@ -37,11 +37,30 @@ class LruMemoryCache extends MemoryCache {
    */
   public function get($cid, $allow_invalid = FALSE) {
     if ($cached = parent::get($cid, $allow_invalid)) {
-      // Move the item to the end of the array, so that it will be removed last.
-      unset($this->cache[$cid]);
-      $this->cache[$cid] = $cached;
+      if ($cached->valid) {
+        // Move valid items to the end of the array, so they will be removed
+        // last.
+        unset($this->cache[$cid]);
+        $this->cache[$cid] = $cached;
+      }
     }
     return $cached;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMultiple(&$cids, $allow_invalid = FALSE) {
+    $ret = parent::getMultiple($cids, $allow_invalid);
+    foreach ($ret as $cid => $cached) {
+      if ($cached->valid) {
+        // Move valid items to the end of the array, so they will be removed
+        // last.
+        unset($this->cache[$cid]);
+        $this->cache[$cid] = $cached;
+      }
+    }
+    return $ret;
   }
 
   /**
@@ -84,6 +103,7 @@ class LruMemoryCache extends MemoryCache {
     foreach ($cids as $cid) {
       if (isset($this->cache[$cid])) {
         $items[$cid] = $this->cache[$cid];
+        parent::invalidate($cid);
       }
     }
     // Move the items to the least recently used positions. This cannot use
