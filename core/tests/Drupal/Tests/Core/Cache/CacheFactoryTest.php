@@ -8,6 +8,8 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Cache\CacheFactory;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
+use Drupal\Core\Cache\CacheFactoryInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 
 /**
  * @coversDefaultClass \Drupal\Core\Cache\CacheFactory
@@ -139,6 +141,68 @@ class CacheFactoryTest extends UnitTestCase {
 
     $render_bin = $this->createMock('\Drupal\Core\Cache\CacheBackendInterface');
     $custom_render_backend_factory->expects($this->once())
+      ->method('get')
+      ->with('render')
+      ->willReturn($render_bin);
+
+    $actual_bin = $cache_factory->get('render');
+    $this->assertSame($render_bin, $actual_bin);
+  }
+
+  /**
+   * Tests cache factory that specified bin service does not exist.
+   *
+   * @covers ::__construct
+   * @covers ::get
+   */
+  public function testCacheFactoryBinBackendServiceExist(): void {
+    $settings = new Settings([
+      'cache' => [
+        'bins' => [
+          'render' => 'cache.backend.custom',
+        ],
+      ],
+    ]);
+    $cache_factory = new CacheFactory($settings);
+
+    $container = new ContainerBuilder();
+    $cache_factory->setContainer($container);
+
+    $builtin_default_backend_factory = $this->createMock(CacheFactoryInterface::class);
+    $container->set('cache.backend.database', $builtin_default_backend_factory);
+
+    $render_bin = $this->createMock(CacheBackendInterface::class);
+    $builtin_default_backend_factory->expects($this->once())
+      ->method('get')
+      ->with('render')
+      ->willReturn($render_bin);
+
+    $actual_bin = $cache_factory->get('render');
+    $this->assertSame($render_bin, $actual_bin);
+  }
+
+  /**
+   * Tests cache factory that specified default bin service does not exist.
+   *
+   * @covers ::__construct
+   * @covers ::get
+   */
+  public function testCacheFactoryBinBackendDefaultServiceExist(): void {
+    $settings = new Settings([
+      'cache' => [
+        'default' => 'cache.backend.custom',
+      ],
+    ]);
+    $cache_factory = new CacheFactory($settings);
+
+    $container = new ContainerBuilder();
+    $cache_factory->setContainer($container);
+
+    $builtin_default_backend_factory = $this->createMock(CacheFactoryInterface::class);
+    $container->set('cache.backend.database', $builtin_default_backend_factory);
+
+    $render_bin = $this->createMock(CacheBackendInterface::class);
+    $builtin_default_backend_factory->expects($this->once())
       ->method('get')
       ->with('render')
       ->willReturn($render_bin);
