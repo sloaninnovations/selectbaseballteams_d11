@@ -88,12 +88,14 @@ class LruMemoryCache extends MemoryCache {
    * {@inheritdoc}
    */
   public function invalidate($cid): void {
-    parent::invalidate($cid);
-    // Move the item to the least recently used position if it's not already
-    // there. This cannot use array_unshift() because it would reindex an array
-    // with numeric cache IDs.
-    if (isset($this->cache[$cid]) && $cid !== array_key_first($this->cache)) {
-      $this->cache = [$cid => $this->cache[$cid]] + $this->cache;
+    if (isset($this->cache[$cid])) {
+      parent::invalidate($cid);
+      // Move the item to the least recently used position if it's not already
+      // there. This cannot use array_unshift() because it would reindex an array
+      // with numeric cache IDs.
+      if ($cid !== array_key_first($this->cache)) {
+        $this->cache = [$cid => $this->cache[$cid]] + $this->cache;
+      }
     }
   }
 
