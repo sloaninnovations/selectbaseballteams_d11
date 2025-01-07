@@ -127,10 +127,17 @@ class LruMemoryCache extends MemoryCache {
    * {@inheritdoc}
    */
   public function invalidateTags(array $tags): void {
+    $items = [];
     foreach ($this->cache as $cid => $item) {
       if (array_intersect($tags, $item->tags)) {
-        $this->invalidate($cid);
+        parent::invalidate($cid);
+        $items[$cid] = $this->cache[$cid];
       }
+    }
+    // Move the items to the least recently used positions. This cannot use
+    // array_unshift() because it would reindex an array with numeric cache IDs.
+    if (!empty($items)) {
+      $this->cache = $items + $this->cache;
     }
   }
 
