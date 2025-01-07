@@ -16,8 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @internal
  */
-class UserMultipleCancelConfirm extends ConfirmFormBase
-{
+class UserMultipleCancelConfirm extends ConfirmFormBase {
 
   /**
    * The temp store factory.
@@ -50,8 +49,7 @@ class UserMultipleCancelConfirm extends ConfirmFormBase
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct(PrivateTempStoreFactory $temp_store_factory, UserStorageInterface $user_storage, EntityTypeManagerInterface $entity_type_manager)
-  {
+  public function __construct(PrivateTempStoreFactory $temp_store_factory, UserStorageInterface $user_storage, EntityTypeManagerInterface $entity_type_manager) {
     $this->tempStoreFactory = $temp_store_factory;
     $this->userStorage = $user_storage;
     $this->entityTypeManager = $entity_type_manager;
@@ -60,8 +58,7 @@ class UserMultipleCancelConfirm extends ConfirmFormBase
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container)
-  {
+  public static function create(ContainerInterface $container) {
     return new static(
       $container->get('tempstore.private'),
       $container->get('entity_type.manager')->getStorage('user'),
@@ -72,48 +69,42 @@ class UserMultipleCancelConfirm extends ConfirmFormBase
   /**
    * {@inheritdoc}
    */
-  public function getFormId()
-  {
+  public function getFormId() {
     return 'user_multiple_cancel_confirm';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getQuestion()
-  {
+  public function getQuestion() {
     return $this->t('Are you sure you want to cancel these user accounts?');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCancelUrl()
-  {
+  public function getCancelUrl() {
     return new Url('entity.user.collection');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getConfirmText()
-  {
+  public function getConfirmText() {
     return $this->t('Confirm');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getDescription()
-  {
+  public function getDescription() {
     return '';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state)
-  {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     // Retrieve the accounts to be canceled from the temp store.
     /** @var \Drupal\user\Entity\User[] $accounts */
     $accounts = $this->tempStoreFactory
@@ -204,8 +195,7 @@ class UserMultipleCancelConfirm extends ConfirmFormBase
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state)
-  {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $current_user_id = $this->currentUser()->id();
 
     // Clear out the accounts from the temp store.
@@ -215,7 +205,8 @@ class UserMultipleCancelConfirm extends ConfirmFormBase
       if ($uid <= 1) {
         continue;
       }
-      // Prevent user administrators from deleting themselves without confirmation.
+      // Prevent user administrators from deleting themselves without
+      // confirmation.
       if ($uid == $current_user_id) {
         $admin_form_mock = [];
         $admin_form_state = $form_state;
@@ -228,10 +219,12 @@ class UserMultipleCancelConfirm extends ConfirmFormBase
         // Calling this directly required to init form object with $account.
         $admin_form->buildForm($admin_form_mock, $admin_form_state);
         $admin_form->submitForm($admin_form_mock, $admin_form_state);
-      } else {
+      }
+      else {
         user_cancel($form_state->getValues(), $uid, $form_state->getValue('user_cancel_method'));
       }
     }
     $form_state->setRedirect('entity.user.collection');
   }
+
 }

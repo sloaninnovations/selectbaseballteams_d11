@@ -28,7 +28,6 @@ abstract class ConfirmFormBase extends FormBase implements ConfirmFormInterface 
     return $this->t('Cancel');
   }
 
-
   /**
    * {@inheritdoc}
    */
