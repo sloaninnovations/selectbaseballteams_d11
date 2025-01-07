@@ -39,7 +39,7 @@ class NavigationTestHooks {
    */
   #[Hook('navigation_content_top')]
   public function navigationContentTop(): array {
-    if (\Drupal::state()->get('navigation_content_top')) {
+    if (\Drupal::keyValue('navigation_test')->get('content_top')) {
       return [
         'navigation_foo' => [
           '#markup' => 'foo',
@@ -62,7 +62,7 @@ class NavigationTestHooks {
    */
   #[Hook('navigation_content_top_alter')]
   public function navigationContentTopAlter(&$content_top): void {
-    if (\Drupal::state()->get('navigation_content_top_alter')) {
+    if (\Drupal::keyValue('navigation_test')->get('content_top_alter')) {
       unset($content_top['navigation_foo']);
       $content_top['navigation_bar']['#markup'] = 'new bar';
       $content_top['navigation_baz']['#weight'] = '-100';
