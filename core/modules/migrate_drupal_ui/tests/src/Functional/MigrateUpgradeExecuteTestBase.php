@@ -30,13 +30,6 @@ abstract class MigrateUpgradeExecuteTestBase extends MigrateUpgradeTestBase {
   protected string $migratedAdminUserName = 'admin';
 
   /**
-   * The number of expected logged errors of type migrate_drupal_ui.
-   *
-   * @var int
-   */
-  protected int $expectedLoggedErrors = 0;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -143,9 +136,12 @@ abstract class MigrateUpgradeExecuteTestBase extends MigrateUpgradeTestBase {
   }
 
   /**
-   * Asserts log errors.
+   * Asserts log errors with a specific count.
+   *
+   * @param int $expected
+   *   The expected number of log errors.
    */
-  public function assertLogError(): void {
+  public function assertLogErrorCount(int $expected): void {
     $db = \Drupal::service('database');
     $num_errors = $db->select('watchdog', 'w')
       ->fields('w')
@@ -154,7 +150,7 @@ abstract class MigrateUpgradeExecuteTestBase extends MigrateUpgradeTestBase {
       ->countQuery()
       ->execute()
       ->fetchField();
-    $this->assertSame($this->expectedLoggedErrors, (int) $num_errors);
+    $this->assertSame($expected, (int) $num_errors);
   }
 
   /**
