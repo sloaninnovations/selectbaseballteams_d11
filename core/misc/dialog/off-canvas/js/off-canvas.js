@@ -229,6 +229,7 @@
           my: `${Drupal.offCanvas.getEdge()} top`,
           at: `${Drupal.offCanvas.getEdge()} top${topPosition}`,
           of: window,
+          collision: 'fit',
         },
       };
 
