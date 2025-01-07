@@ -297,12 +297,23 @@ class UrlConversionTest extends UnitTestCase {
     return [
       ['foo', '', "Missing scheme in URL 'foo'"],
       ['foo', 'bar', "Missing scheme in URL 'foo'"],
-      ['foo://', 'bar', "Can not convert 'foo://' to a database connection, the module providing the driver 'foo' is not specified"],
-      ['foo://bar', 'baz', "Can not convert 'foo://bar' to a database connection, the module providing the driver 'foo' is not specified"],
-      ['foo://bar:port', 'baz', "Can not convert 'foo://bar:port' to a database connection, the module providing the driver 'foo' is not specified"],
       ['foo/bar/baz', 'bar2', "Missing scheme in URL 'foo/bar/baz'"],
-      ['foo://bar:baz@test1', 'test2', "Can not convert 'foo://bar:baz@test1' to a database connection, the module providing the driver 'foo' is not specified"],
     ];
+  }
+
+  /**
+   * Tests that the exception for having no module setting is not thrown.
+   */
+  public function testNoModuleIsSpecifiedExceptionIsRemoved(): void {
+    // Testing that for all database drivers, when the module setting is not
+    // set, that it defaults to the driver name is not possible. We are
+    // therefore testing that the exception is no longer being thrown. For non
+    // core database driver the next exception that will be thrown is that for
+    // the module that does not exist.
+    $this->expectException(UnknownExtensionException::class);
+    $this->expectExceptionMessage('The database_driver Drupal\mongodb\Driver\Database\mongodb does not exist.');
+    $url = 'mongodb://test_user:test_pass@test_host/test_database';
+    Database::convertDbUrlToConnectionInfo($url, $this->root);
   }
 
   /**

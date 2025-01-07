@@ -521,13 +521,9 @@ abstract class Database {
     $url_component_query = $url_components['query'] ?? '';
     parse_str($url_component_query, $query);
 
-    // Add the module key for core database drivers when the module key is not
-    // set.
-    if (!isset($query['module']) && in_array($driverName, ['mysql', 'pgsql', 'sqlite'], TRUE)) {
-      $query['module'] = $driverName;
-    }
+    // Add the module key for database drivers when the module key is not set.
     if (!isset($query['module'])) {
-      throw new \InvalidArgumentException("Can not convert '$url' to a database connection, the module providing the driver '{$driverName}' is not specified");
+      $query['module'] = $driverName;
     }
 
     $driverNamespace = "Drupal\\{$query['module']}\\Driver\\Database\\{$driverName}";
