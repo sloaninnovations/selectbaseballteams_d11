@@ -211,8 +211,11 @@ class Role extends ConfigEntityBase implements RoleInterface {
     $valid_permissions = array_intersect($this->permissions, array_keys($permission_definitions));
     $invalid_permissions = array_diff($this->permissions, $valid_permissions);
     if (!empty($invalid_permissions)) {
-      \Drupal::logger('role')->error('Adding non-existent permissions to a role is not allowed. The incorrect permissions are "' . implode('", "', $invalid_permissions) . '".');
-      $this->permissions = $valid_permissions;
+      \Drupal::logger('user')->error('Adding non-existent permission(s) to a role is not allowed. Invalid permission(s): @permissions. Role: @label (@id).', [
+        '@permissions' => implode(', ', $invalid_permissions),
+        '@label' => $this->label(),
+        '@id' => $this->id(),
+      ]);
     }
     foreach ($valid_permissions as $permission) {
       // Depend on the module that is providing this permissions.
