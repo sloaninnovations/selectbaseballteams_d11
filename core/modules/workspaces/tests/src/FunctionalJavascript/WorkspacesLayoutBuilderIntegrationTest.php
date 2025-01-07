@@ -27,6 +27,9 @@ class WorkspacesLayoutBuilderIntegrationTest extends InlineBlockTestBase {
    */
   protected $defaultTheme = 'starterkit_theme';
 
+  /**
+   * The default user that is getting logged in during setup.
+   */
   protected UserInterface $defaultUser;
 
   /**
@@ -185,11 +188,11 @@ class WorkspacesLayoutBuilderIntegrationTest extends InlineBlockTestBase {
   }
 
   /**
-   * Tests workspace specific data in shared tempstore.
+   * Tests workspace specific layout tempstore data.
    *
-   * @see WorkspacesLayoutTempstoreRepository.php
+   * @covers \Drupal\workspaces\WorkspacesLayoutTempstoreRepository::getKey
    */
-  public function testWorkspacesTempstore(): void {
+  public function testWorkspacesLayoutTempstore(): void {
     $assert_session = $this->assertSession();
     $this->drupalGet('node/1');
     $assert_session->pageTextContains('The DEFAULT block body');
@@ -242,6 +245,5 @@ class WorkspacesLayoutBuilderIntegrationTest extends InlineBlockTestBase {
     $assert_session->pageTextNotContains($workspace_block_body);
     $assert_session->pageTextContains('The DEFAULT block body');
   }
-
 
 }

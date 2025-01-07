@@ -100,5 +100,5 @@ services:
   workspaces.layout_builder.tempstore_repository:
     decorates: layout_builder.tempstore_repository
     class: Drupal\workspaces\WorkspacesLayoutTempstoreRepository
+    public: false
     arguments: ['@tempstore.shared', '@workspaces.manager']
-  Drupal\layout_builder\LayoutTempstoreRepositoryInterface: '@workspaces.layout_builder.tempstore_repository'
