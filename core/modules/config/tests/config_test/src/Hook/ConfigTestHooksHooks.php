@@ -16,7 +16,7 @@ class ConfigTestHooksHooks {
    * Implements hook_ENTITY_TYPE_load().
    */
   #[Hook('config_test_load')]
-  public function configTestLoad() {
+  public function configTestLoad(): void {
     $GLOBALS['hook_config_test']['load'] = 'config_test_config_test_load';
   }
 
