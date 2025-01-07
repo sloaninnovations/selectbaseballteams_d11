@@ -11,7 +11,7 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 /**
  * Tests menu link localized translation source plugin.
  *
- * @covers \Drupal\menu_link_content\Plugin\migrate\source\d7\MenuLinkTranslation
+ * @covers \Drupal\migrate_drupal\Plugin\migrate\source\d7\MenuLinkTranslation
  * @group menu_link_content
  */
 class MenuLinkTranslationTest extends MigrateSqlSourceTestBase {
