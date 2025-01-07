@@ -48,7 +48,7 @@ class LruMemoryCache extends MemoryCache {
   /**
    * {@inheritdoc}
    */
-  public function set($cid, $data, $expire = Cache::PERMANENT, array $tags = []) {
+  public function set($cid, $data, $expire = Cache::PERMANENT, array $tags = []): void {
     // If the item is already in the cache, just move it to the first position.
     if (isset($this->cache[$cid])) {
       unset($this->cache[$cid]);
@@ -71,7 +71,7 @@ class LruMemoryCache extends MemoryCache {
   /**
    * {@inheritdoc}
    */
-  public function setMultiple(array $items = []) {
+  public function setMultiple(array $items = []): void {
     foreach ($items as $cid => $item) {
       parent::set($cid, $item['data'], $item['expire'] ?? CacheBackendInterface::CACHE_PERMANENT, $item['tags'] ?? []);
     }
@@ -91,7 +91,7 @@ class LruMemoryCache extends MemoryCache {
   /**
    * {@inheritdoc}
    */
-  public function invalidate($cid) {
+  public function invalidate($cid): void {
     parent::invalidate($cid);
     // Move the item to the least recently used position if it's not already
     // there. This cannot use array_unshift() because it would reindex an array
@@ -105,7 +105,7 @@ class LruMemoryCache extends MemoryCache {
   /**
    * {@inheritdoc}
    */
-  public function invalidateMultiple(array $cids) {
+  public function invalidateMultiple(array $cids): void {
     foreach ($cids as $cid) {
       $this->invalidate($cid);
     }
@@ -114,7 +114,7 @@ class LruMemoryCache extends MemoryCache {
   /**
    * {@inheritdoc}
    */
-  public function invalidateTags(array $tags) {
+  public function invalidateTags(array $tags): void {
     foreach ($this->cache as $cid => $item) {
       if (array_intersect($tags, $item->tags)) {
         $this->invalidate($cid);
