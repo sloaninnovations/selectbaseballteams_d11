@@ -101,4 +101,27 @@ class HookCollectorPassTest extends KernelTestBase {
     $this->assertTrue(isset($GLOBALS['on_behalf_procedural']));
   }
 
+  /**
+   * Test procedural hooks for a module are skipped when skip is set..
+   */
+  public function testProceduralHooksSkippedWhenConfigured(): void {
+    $module_installer = $this->container->get('module_installer');
+    $this->assertTrue($module_installer->install(['hook_collector_skip_procedural']));
+    $this->assertTrue($module_installer->install(['hook_collector_on_behalf_procedural']));
+    $this->assertTrue($module_installer->install(['hook_collector_skip_procedural_attribute']));
+    $this->assertTrue($module_installer->install(['hook_collector_on_behalf']));
+    $this->assertFalse(isset($GLOBALS['skip_procedural_all']));
+    $this->assertFalse(isset($GLOBALS['procedural_attribute_skip_has_attribute']));
+    $this->assertFalse(isset($GLOBALS['procedural_attribute_skip_after_attribute']));
+    $this->assertFalse(isset($GLOBALS['procedural_attribute_skip_find']));
+    $this->assertFalse(isset($GLOBALS['skipped_procedural_oop_cache_flush']));
+    drupal_flush_all_caches();
+    $this->assertFalse(isset($GLOBALS['skip_procedural_all']));
+    $this->assertFalse(isset($GLOBALS['procedural_attribute_skip_has_attribute']));
+    $this->assertFalse(isset($GLOBALS['procedural_attribute_skip_after_attribute']));
+    $this->assertTrue(isset($GLOBALS['procedural_attribute_skip_find']));
+    $this->assertTrue(isset($GLOBALS['skipped_procedural_oop_cache_flush']));
+
+  }
+
 }
