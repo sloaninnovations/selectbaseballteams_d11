@@ -85,7 +85,7 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
             ],
           ];
         }
-        catch (\InvalidArgumentException $e) {
+        catch (\InvalidArgumentException) {
           // No status to show for the given entity.
         }
         $build = [
@@ -123,11 +123,12 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
   /**
    * Determines the CSS class to represent the status of an entity.
    *
-   * @param EntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity whose status class is to be determined.
    *
    * @return string
    *   The CSS class representing the status of the entity.
+   *
    * @throws \InvalidArgumentException
    *   If the provided entity does not implement EntityPublishedInterface.
    *   Child classes may override this method to provide more complete coverage.
