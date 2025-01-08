@@ -24,7 +24,7 @@ function hook_navigation_content_top(): array {
       '#markup' => \Drupal::config('system.site')->get('name'),
       '#cache' => [
         'tags' => ['config:system.site'],
-      ]
+      ],
     ],
     'navigation_bar' => [
       '#markup' => 'bar',
