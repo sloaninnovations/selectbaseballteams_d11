@@ -470,6 +470,9 @@ class DefaultPluginManagerTest extends UnitTestCase {
 
 }
 
+/**
+ * Plugin manager test class with defaults assigned.
+ */
 class TestPluginManagerWithDefaults extends TestPluginManager {
 
   /**
@@ -485,6 +488,9 @@ class TestPluginManagerWithDefaults extends TestPluginManager {
 
 }
 
+/**
+ * Plugin form test class.
+ */
 class TestPluginForm implements PluginFormInterface {
 
   /**
@@ -507,6 +513,10 @@ class TestPluginForm implements PluginFormInterface {
   }
 
 }
+
+/**
+ * Stub class for plugin definition.
+ */
 class ObjectDefinition extends PluginDefinition {
 
   /**

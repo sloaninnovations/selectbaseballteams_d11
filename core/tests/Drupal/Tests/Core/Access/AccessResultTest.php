@@ -972,6 +972,9 @@ class AccessResultTest extends UnitTestCase {
 
 }
 
+/**
+ * Stub class for testing AccessResult.
+ */
 class UncacheableTestAccessResult implements AccessResultInterface {
 
   /**
