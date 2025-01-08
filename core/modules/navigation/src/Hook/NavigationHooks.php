@@ -97,11 +97,6 @@ class NavigationHooks {
       ],
     ];
     $items['menu_region__footer'] = ['variables' => ['items' => [], 'title' => NULL, 'menu_name' => NULL]];
-    $items['menu_local_tasks__navigation'] = [
-      'template' => 'menu-local-tasks--navigation',
-      'path' => \Drupal::service('extension.list.module')->getPath('navigation') . '/templates',
-      'render element' => 'elements',
-    ];
     return $items;
   }
 

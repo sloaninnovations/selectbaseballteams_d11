@@ -58,16 +58,16 @@
 }
 .top-bar__actions .toolbar-button-exposed::before {
   position: absolute;
-  left: 0.625rem;
-  mask-size: 90% auto;
+  inset-inline-start: var(--admin-toolbar-space-12);
+  inline-size: var(--admin-toolbar-space-16);
+  block-size: var(--admin-toolbar-space-16);
 }
 .top-bar__actions .toolbar-button-exposed .toolbar-button__label {
   z-index: 1;
 }
 .top-bar__actions .toolbar-button-exposed .toolbar-dropdown__link {
-  padding-right: 1rem;
   color: var(--admin-toolbar-color-white);
-  padding-inline: var(--admin-toolbar-space-40);
+  padding-inline: var(--admin-toolbar-space-36) var(--admin-toolbar-space-12);
 }
 .top-bar__actions .toolbar-button-exposed .toolbar-dropdown__link:hover {
   -webkit-text-decoration: none;

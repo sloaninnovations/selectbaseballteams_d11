@@ -57,8 +57,9 @@
 
     &::before {
       position: absolute;
-      left: 10px;
-      mask-size: 90% auto;
+      inset-inline-start: var(--admin-toolbar-space-12);
+      inline-size: var(--admin-toolbar-space-16);
+      block-size: var(--admin-toolbar-space-16);
     }
 
     .toolbar-button__label {
@@ -66,9 +67,8 @@
     }
 
     .toolbar-dropdown__link {
-      padding-right: 16px;
       color: var(--admin-toolbar-color-white);
-      padding-inline: var(--admin-toolbar-space-40);
+      padding-inline: var(--admin-toolbar-space-36) var(--admin-toolbar-space-12);
 
       &:hover {
         text-decoration: none;
