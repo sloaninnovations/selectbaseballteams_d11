@@ -37,6 +37,8 @@ class NavigationHooks {
    *   The navigation renderer.
    * @param \Drupal\Core\Config\Action\ConfigActionManager $configActionManager
    *   The config action manager.
+   * @param \Drupal\navigation\TopBarItemManagerInterface $topBarItemManager
+   *   The Top Bar Item manager.
    */
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
@@ -45,6 +47,7 @@ class NavigationHooks {
     protected NavigationRenderer $navigationRenderer,
     #[Autowire('@plugin.manager.config_action')]
     protected ConfigActionManager $configActionManager,
+    protected TopBarItemManagerInterface $topBarItemManager,
   ) {
   }
 
@@ -148,12 +151,10 @@ class NavigationHooks {
    */
   #[Hook('block_build_local_tasks_block_alter')]
   public function blockBuildLocalTasksBlockAlter(array &$build, BlockPluginInterface $block): void {
-    $navigation_renderer = \Drupal::service('navigation.renderer');
-    assert($navigation_renderer instanceof NavigationRenderer);
-    if (\Drupal::currentUser()->hasPermission('access navigation') &&
-      array_key_exists('page_actions', \Drupal::service(TopBarItemManagerInterface::class)->getDefinitions())
+    if ($this->currentUser->hasPermission('access navigation') &&
+      array_key_exists('page_actions', $this->topBarItemManager->getDefinitions())
     ) {
-      $navigation_renderer->removeLocalTasks($build, $block);
+      $this->navigationRenderer->removeLocalTasks($build, $block);
     }
   }
 
