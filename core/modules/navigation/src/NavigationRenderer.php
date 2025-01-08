@@ -129,6 +129,7 @@ final class NavigationRenderer {
     if ($storage) {
       foreach ($storage->getSections() as $delta => $section) {
         $build[$delta] = $section->toRenderArray([]);
+        $build[$delta]['#cache']['contexts'] = ['user.permissions', 'theme', 'languages:language_interface'];
       }
     }
     // The render array is built based on decisions made by SectionStorage
@@ -136,7 +137,6 @@ final class NavigationRenderer {
     // cacheability of those decisions.
     $cacheability->addCacheableDependency($logo_settings)
       ->addCacheableDependency($this->configFactory->get('navigation.block_layout'));
-    $cacheability->applyTo($build);
 
     $module_path = $this->requestStack->getCurrentRequest()->getBasePath() . '/' . $this->moduleExtensionList->getPath('navigation');
     $asset_url = $module_path . '/assets/fonts/inter-var.woff2';
@@ -159,9 +159,9 @@ final class NavigationRenderer {
     $build[0] = NestedArray::mergeDeepArray([$build[0], $defaults]);
 
     $content_top = $this->getContentTop();
-    if (!empty($content_top)) {
-      $build[0]['content_top'] = $content_top;
-    }
+    $cacheability->addCacheableDependency(CacheableMetadata::createFromRenderArray($content_top));
+    unset($content_top['#cache']);
+    $build[0]['content_top'] = $content_top;
 
     if ($logo_provider === self::LOGO_PROVIDER_CUSTOM) {
       $logo_path = $logo_settings->get('logo.path');
@@ -175,7 +175,7 @@ final class NavigationRenderer {
         }
       }
     }
-    $build[0]['#cache']['contexts'] = ['user.permissions', 'theme', 'languages:language_interface'];
+    $cacheability->applyTo($build);
     return $build;
   }
 
