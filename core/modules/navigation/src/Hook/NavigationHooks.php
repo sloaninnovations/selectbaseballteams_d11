@@ -15,6 +15,7 @@ use Drupal\navigation\NavigationRenderer;
 use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
 use Drupal\navigation\RenderCallbacks;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Drupal\navigation\TopBarItemManagerInterface;
 
 /**
  * Hook implementations for navigation.
@@ -147,7 +148,13 @@ class NavigationHooks {
    */
   #[Hook('block_build_local_tasks_block_alter')]
   public function blockBuildLocalTasksBlockAlter(array &$build, BlockPluginInterface $block): void {
-    $this->navigationRenderer->removeLocalTasks($build, $block);
+    $navigation_renderer = \Drupal::service('navigation.renderer');
+    assert($navigation_renderer instanceof NavigationRenderer);
+    if (\Drupal::currentUser()->hasPermission('access navigation') &&
+      array_key_exists('page_actions', \Drupal::service(TopBarItemManagerInterface::class)->getDefinitions())
+    ) {
+      $navigation_renderer->removeLocalTasks($build, $block);
+    }
   }
 
   /**

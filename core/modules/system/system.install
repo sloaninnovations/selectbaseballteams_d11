@@ -24,6 +24,7 @@ use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Update\EquivalentUpdate;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\Error;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -705,6 +706,7 @@ function system_requirements($phase) {
       if (!file_exists($htaccess_file) || !($contents = @file_get_contents($htaccess_file)) || !str_contains($contents, 'Drupal_Security_Do_Not_Remove_See_SA_2013_003')) {
         $url = 'https://www.drupal.org/SA-CORE-2013-003';
         $requirements[$htaccess_file] = [
+          // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
           'title' => new TranslatableMarkup($protected_dir->getTitle()),
           'value' => t('Not fully protected'),
           'severity' => REQUIREMENT_ERROR,
@@ -1666,13 +1668,6 @@ function system_update_last_removed(): int {
 }
 
 /**
- * Invalidate container because the module handler has changed.
- */
-function system_update_11100(): void {
-  \Drupal::service('kernel')->invalidateContainer();
-}
-
-/**
  * Display requirements from security advisories.
  *
  * @param array[] $requirements
@@ -1724,6 +1719,13 @@ function _system_advisories_requirements(array &$requirements): void {
 }
 
 /**
+ * Invalidate container because the module handler has changed.
+ */
+function system_update_11100(): void {
+  \Drupal::service('kernel')->invalidateContainer();
+}
+
+/**
  * Update length of menu_tree fields url and route_param_key from 255 to 2048.
  */
 function system_update_11001(): void {
@@ -1743,4 +1745,18 @@ function system_update_11001(): void {
     'length' => 2048,
   ];
   $schema->changeField('menu_tree', 'route_param_key', 'route_param_key', $spec);
+}
+
+/**
+ * Equivalent update to 10400.
+ */
+function system_update_11102(): TranslatableMarkup|null {
+  // This is a no-op that exists to prevent an upgrade from 10.4+ to 11.0. That
+  // path is actually a downgrade.
+  $equivalent_update = \Drupal::service('update.update_hook_registry')
+    ->getEquivalentUpdate();
+  if ($equivalent_update instanceof EquivalentUpdate) {
+    return $equivalent_update->toSkipMessage();
+  }
+  return NULL;
 }

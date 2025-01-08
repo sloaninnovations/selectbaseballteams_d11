@@ -183,7 +183,6 @@ default:
     _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "mysql-8"
     PERFORMANCE_TEST: $PERFORMANCE_TEST
-    OTEL_COLLECTOR: $OTEL_COLLECTOR
   # Run on MR, schedule, push, parent pipeline and performance test.
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
@@ -263,6 +262,12 @@ default:
   variables:
     _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "sqlite-3"
+
+'PHP 8.4 MySQL 8.4':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.4-ubuntu"
+    _TARGET_DB: "mysql-8.4"
 
 # Jobs running on commits.
 # The value set in the "needs" property will determine the order in the sequence.

@@ -55,12 +55,24 @@ use Drupal\views\Views;
  */
 abstract class ArgumentPluginBase extends HandlerBase implements CacheableDependencyInterface {
 
+  /**
+   * The validator to use.
+   */
   public $validator = NULL;
+
+  /**
+   * The name of the argument.
+   */
   public $argument = NULL;
+
+  /**
+   * The value for the argument.
+   */
   public $value = NULL;
 
   /**
    * The table to use for the name, should it not be in the same table as the argument.
+   *
    * @var string
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
@@ -978,7 +990,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    *
    * The base variant of this is usually adequate.
    *
-   * @param $order
+   * @param string $order
    *   The order selected in the UI.
    * @param string|null $by
    *   (optional) This parameter sets the direction for which to order.
@@ -994,7 +1006,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    * This will be called once per row of a summary, and used as part of
    * $view->getUrl().
    *
-   * @param $data
+   * @param array $data
    *   The query results for the row.
    */
   public function summaryArgument($data) {
@@ -1004,7 +1016,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
   /**
    * Provides the name to use for the summary, defaults to the name field.
    *
-   * @param $data
+   * @param array $data
    *   The query results for the row.
    */
   public function summaryName($data) {
