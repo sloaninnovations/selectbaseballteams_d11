@@ -66,6 +66,7 @@ abstract class ArrayElement extends Element implements \IteratorAggregate, Typed
    *   Property name or index of the element.
    *
    * @return \Drupal\Core\TypedData\DataDefinitionInterface
+   *   The data definition object for the property.
    */
   abstract protected function getElementDefinition($key);
 
@@ -149,6 +150,7 @@ abstract class ArrayElement extends Element implements \IteratorAggregate, Typed
    *   The key of the contained element.
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface
+   *   A typed data object created from the given parameters.
    */
   protected function createElement($definition, $value, $key) {
     return $this->getTypedDataManager()->create($definition, $value, $key, $this);
@@ -160,12 +162,13 @@ abstract class ArrayElement extends Element implements \IteratorAggregate, Typed
    * @param array $definition
    *   The base type definition array, for which a data definition should be
    *   created.
-   * @param $value
+   * @param mixed $value
    *   The value of the configuration element.
    * @param string $key
    *   The key of the contained element.
    *
    * @return \Drupal\Core\TypedData\DataDefinitionInterface
+   *   A data definition object for the given parameters.
    */
   protected function buildDataDefinition($definition, $value, $key) {
     return $this->getTypedDataManager()->buildDataDefinition($definition, $value, $key, $this);

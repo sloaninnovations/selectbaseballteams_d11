@@ -6,6 +6,7 @@
 
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
@@ -36,6 +37,7 @@ use Drupal\locale\Gettext;
  *   l10n_update functionality to feed in translation files alike.
  *   https://www.drupal.org/node/1191488
  */
+#[StopProceduralHookScan]
 function locale_translate_batch_import_files(array $options, $force = FALSE) {
   $options += [
     'overwrite_options' => [],
@@ -204,7 +206,7 @@ function locale_translate_batch_import($file, array $options, &$context) {
           'seek' => 0,
         ];
       }
-      // Update the seek and the number of items in the $options array().
+      // Update the seek and the number of items in the $options array.
       $options['seek'] = $context['sandbox']['parse_state']['seek'];
       $options['items'] = $context['sandbox']['parse_state']['chunk_size'];
       $report = Gettext::fileToDatabase($file, $options);

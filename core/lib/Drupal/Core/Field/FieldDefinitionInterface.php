@@ -185,7 +185,8 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
    *
    * @return array
    *   The default value for the field, as a numerically indexed array of items,
-   *   each item being a property/value array (array() for no default value).
+   *   each item being a property/value array. An empty array when there is no
+   *   default value.
    *
    * @see FieldDefinitionInterface::getDefaultValue()
    * @see FieldDefinitionInterface::getDefaultValueCallback()
@@ -220,7 +221,8 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
    *
    * @return array
    *   The default value for the field, as a numerically indexed array of items,
-   *   each item being a property/value array (array() for no default value).
+   *   each item being a property/value array. An empty array when there is no
+   *    default value.
    *
    * @see FieldDefinitionInterface::getDefaultValueLiteral()
    * @see FieldDefinitionInterface::getDefaultValueCallback()
@@ -256,6 +258,7 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
    *   The bundle to get the configurable field for.
    *
    * @return \Drupal\Core\Field\FieldConfigInterface
+   *   The configuration entity for the field.
    */
   public function getConfig($bundle);
 
@@ -263,6 +266,7 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
    * Returns a unique identifier for the field.
    *
    * @return string
+   *   The unique ID for the field.
    */
   public function getUniqueIdentifier();
 

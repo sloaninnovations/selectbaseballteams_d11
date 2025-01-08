@@ -22,7 +22,6 @@ use Drupal\Composer\Composer;
  * This is because Composer only uses the packages.json file to resolve the
  * project template and not any other dependencies.
  *
- * @group #slow
  * @group Template
  */
 class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
@@ -32,7 +31,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
    *
    * @see https://getcomposer.org/doc/04-schema.md#minimum-stability
    */
-  protected const MINIMUM_STABILITY = 'RC';
+  protected const MINIMUM_STABILITY = 'stable';
 
   /**
    * The order of stability strings from least stable to most stable.

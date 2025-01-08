@@ -249,8 +249,8 @@ class EntityFieldTest extends EntityKernelTestBase {
     $this->assertFalse(isset($entity->name[0]->value), "$entity_type: Name is not set.");
     $this->assertFalse(isset($entity->name->value), "$entity_type: Name is not set.");
 
-    // Test emptying a field by assigning an empty value. NULL and array()
-    // behave the same.
+    // Test emptying a field by assigning an empty value, NULL and an empty
+    // array behave the same.
     foreach ([NULL, [], 'unset'] as $empty) {
       // Make sure a value is present
       $entity->name->value = 'a value';
@@ -753,7 +753,7 @@ class EntityFieldTest extends EntityKernelTestBase {
       ->setLabel('Test entity')
       ->setSetting('target_type', 'node')
       ->setSetting('handler_settings', ['target_bundles' => ['article' => 'article']]);
-    $reference_field = \Drupal::TypedDataManager()->create($definition);
+    $reference_field = \Drupal::typedDataManager()->create($definition);
     $reference_field->appendItem(['entity' => $node]);
     $violations = $reference_field->validate();
     $this->assertEquals(1, $violations->count());
@@ -884,7 +884,7 @@ class EntityFieldTest extends EntityKernelTestBase {
 
     // Test \Drupal\Core\TypedData\ComputedItemListTrait::getIterator().
     $entity = EntityTestComputedField::create([]);
-    foreach ($entity->computed_string_field as $delta => $item) {
+    foreach ($entity->computed_string_field as $item) {
       $this->assertSame('foo computed', $item->value);
     }
 
