@@ -173,7 +173,6 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
     $this->drupalGet('admin/config/search/pages');
     $this->submitForm([], 'Re-index site');
     $this->submitForm([], 'Re-index site');
-
     $this->assertIndexCounts(8, 8, 'after reindex');
     $this->assertDatabaseCounts(8, 0, 'after reindex');
     $this->plugin->updateIndex();
