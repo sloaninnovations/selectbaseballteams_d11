@@ -37,12 +37,7 @@ class LruMemoryCache extends MemoryCache {
    */
   public function get($cid, $allow_invalid = FALSE) {
     if ($cached = parent::get($cid, $allow_invalid)) {
-      if ($cached->valid && $cid !== array_key_last($this->cache)) {
-        // Move valid items to the end of the array, so they will be removed
-        // last.
-        unset($this->cache[$cid]);
-        $this->cache[$cid] = $cached;
-      }
+      $this->handleCacheHits([$cid => $cached]);
     }
     return $cached;
   }
@@ -52,8 +47,19 @@ class LruMemoryCache extends MemoryCache {
    */
   public function getMultiple(&$cids, $allow_invalid = FALSE) {
     $ret = parent::getMultiple($cids, $allow_invalid);
+    $this->handleCacheHits($ret);
+    return $ret;
+  }
+
+  /**
+   * Moves an array of cache items to the most recently used positions.
+   *
+   * @param array $items
+   *   An array of cache items keyed by cid.
+   */
+  private function handleCacheHits(array $items): void {
     $last_key = array_key_last($this->cache);
-    foreach ($ret as $cid => $cached) {
+    foreach ($items as $cid => $cached) {
       if ($cached->valid && $cid !== $last_key) {
         // Move valid items to the end of the array, so they will be removed
         // last.
@@ -62,7 +68,6 @@ class LruMemoryCache extends MemoryCache {
         $last_key = $cid;
       }
     }
-    return $ret;
   }
 
   /**
