@@ -103,10 +103,6 @@ body {
   }
 }
 
-.admin-toolbar__content-top:empty {
-  display: none;
-}
-
 .admin-toolbar__back-button {
   display: none;
   flex-grow: 0;
