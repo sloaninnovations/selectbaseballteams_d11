@@ -261,6 +261,38 @@ class LruMemoryCacheTest extends UnitTestCase {
   }
 
   /**
+   * Tests invalidation with numeric keys from the LRU memory cache.
+   *
+   * @covers ::invalidate
+   * @covers ::invalidateMultiple
+   */
+  public function testInvalidateNumeric(): void {
+    $lru_cache = $this->getLruMemoryCache(3);
+
+    $cids = [
+      [3, 'sparrow'],
+      [10, 'pidgin'],
+      [5, 'crow'],
+    ];
+    foreach ($cids as $items) {
+      $lru_cache->set($items[0], $items[1]);
+    }
+    $this->assertCids($lru_cache, [
+      [3, 'sparrow'],
+      [10, 'pidgin'],
+      [5, 'crow'],
+    ]);
+    $lru_cache->invalidate(10);
+    $this->assertCids($lru_cache, [
+      [10, 'pidgin'],
+      [3, 'sparrow'],
+      [5, 'crow'],
+    ]);
+    $this->assertFalse($lru_cache->get(10));
+    $this->assertSame('pidgin', $lru_cache->get(10, TRUE)->data);
+  }
+
+  /**
    * Assert that the given cache ID's match the given value in the memory cache.
    *
    * @param \Drupal\Core\Cache\MemoryCache\LruMemoryCache $lru_cache
