@@ -48,11 +48,10 @@ class LruMemoryCacheTest extends UnitTestCase {
 
     // Now bring pigeon to the most recently used spot.
     $lru_cache->get('pigeon');
-    $lru_cache->set('bigger_cuckoo', 'bigger_cuckoo');
     $this->assertCacheData($lru_cache, [
+      ['crow', 'crow'],
       ['cuckoo', 'cuckoo'],
       ['pigeon', 'pigeon'],
-      ['bigger_cuckoo', 'bigger_cuckoo'],
     ]);
 
     // Confirm that setting the same item multiple times only uses one slot.
@@ -75,25 +74,23 @@ class LruMemoryCacheTest extends UnitTestCase {
     $lru_cache->delete('bigger_cuckoo');
     $lru_cache->delete('bigger_cuckoo');
     $lru_cache->delete('bigger_cuckoo');
-    $lru_cache->set('bigger_cuckoo', 'bigger_cuckoo');
     $this->assertCacheData($lru_cache, [
       ['cuckoo', 'cuckoo'],
       ['pigeon', 'pigeon'],
-      ['bigger_cuckoo', 'bigger_cuckoo'],
     ]);
     $lru_cache->set('crow', 'crow');
 
     $this->assertCacheData($lru_cache, [
+      ['cuckoo', 'cuckoo'],
       ['pigeon', 'pigeon'],
-      ['bigger_cuckoo', 'bigger_cuckoo'],
       ['crow', 'crow'],
     ]);
 
     // Ensure nothing changes on cache miss for ::get().
     $this->assertFalse($lru_cache->get('dodo'));
     $this->assertCacheData($lru_cache, [
+      ['cuckoo', 'cuckoo'],
       ['pigeon', 'pigeon'],
-      ['bigger_cuckoo', 'bigger_cuckoo'],
       ['crow', 'crow'],
     ]);
 
@@ -101,23 +98,23 @@ class LruMemoryCacheTest extends UnitTestCase {
     $cids = ['dodo', 'great_auk'];
     $this->assertEmpty($lru_cache->getMultiple($cids));
     $this->assertCacheData($lru_cache, [
+      ['cuckoo', 'cuckoo'],
       ['pigeon', 'pigeon'],
-      ['bigger_cuckoo', 'bigger_cuckoo'],
       ['crow', 'crow'],
     ]);
     $this->assertSame(['dodo', 'great_auk'], $cids);
 
-    $cids = ['crow', 'pigeon'];
+    $cids = ['pigeon', 'cuckoo'];
     $lru_cache->getMultiple($cids);
     // @todo This result suggests the order of the arguments in the
     //   \Drupal\Core\Cache\MemoryBackend::getMultiple() array_intersect_key()
     //   should be swapped as this order of the cache items returned should
-    //   probably be in the same order as the passed in $cache_data. I.e. pigeon
+    //   probably be in the same order as the passed in $cache_data. I.e. cuckoo
     //   should be at the ends of the array and not crow.
     $this->assertCacheData($lru_cache, [
-      ['bigger_cuckoo', 'bigger_cuckoo'],
-      ['pigeon', 'pigeon'],
       ['crow', 'crow'],
+      ['cuckoo', 'cuckoo'],
+      ['pigeon', 'pigeon'],
     ]);
     $this->assertEmpty($cids);
   }
