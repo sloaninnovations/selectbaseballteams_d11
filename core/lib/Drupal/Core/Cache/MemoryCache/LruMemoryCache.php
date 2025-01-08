@@ -102,11 +102,7 @@ class LruMemoryCache extends MemoryCache {
         parent::invalidate($cid);
       }
     }
-    // Move the items to the least recently used positions. This cannot use
-    // array_unshift() because it would reindex an array with numeric cache IDs.
-    if (!empty($items)) {
-      $this->cache = $items + $this->cache;
-    }
+    $this->moveItemsToLeastRecentlyUsed($items);
   }
 
   /**
@@ -120,8 +116,18 @@ class LruMemoryCache extends MemoryCache {
         $items[$cid] = $this->cache[$cid];
       }
     }
-    // Move the items to the least recently used positions. This cannot use
-    // array_unshift() because it would reindex an array with numeric cache IDs.
+    $this->moveItemsToLeastRecentlyUsed($items);
+  }
+
+  /**
+   * Moves items to the least recently used positions.
+   *
+   * @param array $items
+   *   An array of items to move to the least recently used positions.
+   */
+  private function moveItemsToLeastRecentlyUsed(array $items): void {
+    // This cannot use array_unshift() because it would reindex an array with
+    // numeric cache IDs.
     if (!empty($items)) {
       $this->cache = $items + $this->cache;
     }
