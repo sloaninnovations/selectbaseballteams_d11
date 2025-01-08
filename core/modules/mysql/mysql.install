@@ -30,6 +30,10 @@ function mysql_requirements($phase) {
       $tables_missing_primary_key = [];
       $tables = $connection->schema()->findTables('%');
       foreach ($tables as $table) {
+        $is_view = $connection->query("SELECT table_type FROM information_schema.tables WHERE table_name = :table", [':table' => $table])->fetchField();
+        if ($is_view == 'VIEW') {
+          continue;
+        }
         $primary_key_column = Database::getConnection()->query("SHOW KEYS FROM {" . $table . "} WHERE Key_name = 'PRIMARY'")->fetchAllAssoc('Column_name');
         if (empty($primary_key_column)) {
           $tables_missing_primary_key[] = $table;
