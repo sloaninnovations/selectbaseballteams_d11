@@ -67,7 +67,7 @@ class NavigationTopBarPageContextTest extends BrowserTestBase {
     // Create a published node entity.
     $published_node = $this->createNode([
       'type' => 'article',
-      'title' => 'Arcu nulla torquent facilisi',
+      'title' => 'No easy twist on the bow',
       'status' => 1,
       'uid' => $this->adminUser->id(),
     ]);
@@ -78,7 +78,7 @@ class NavigationTopBarPageContextTest extends BrowserTestBase {
     // Ensure the top bar exists
     $this->assertSession()->elementExists('css', '.navigation-top-bar-context');
     // Check the node title
-    $this->assertSession()->pageTextContains('Arcu nulla torquent facilisi');
+    $this->assertSession()->pageTextContains('No easy twist on the bow');
     // Check the CSS class for published status
     $this->assertSession()->elementContains('css', '.context-status.published', 'Published');
   }
@@ -90,7 +90,7 @@ class NavigationTopBarPageContextTest extends BrowserTestBase {
     // Create an unpublished node entity.
     $unpublished_node = $this->createNode([
       'type' => 'article',
-      'title' => 'Iaculis quis feugiat volutpat',
+      'title' => 'Precision and agility in navigating challenges',
       'status' => 0,
       'uid' => $this->adminUser->id(),
     ]);
@@ -101,7 +101,7 @@ class NavigationTopBarPageContextTest extends BrowserTestBase {
     // Ensure the top bar exists
     $this->assertSession()->elementExists('css', '.navigation-top-bar-context');
     // Check the node title
-    $this->assertSession()->pageTextContains('Iaculis quis feugiat volutpat');
+    $this->assertSession()->pageTextContains('Precision and agility in navigating challenges');
     // Check the CSS class for unpublished status
     $this->assertSession()->elementContains('css', '.context-status.unpublished', 'Unpublished');
   }
