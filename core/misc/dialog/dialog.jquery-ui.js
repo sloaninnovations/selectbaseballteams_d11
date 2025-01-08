@@ -148,5 +148,69 @@
       }
       $(hasFocus).eq(0).trigger('focus');
     },
+    _createWrapper() {
+      this.uiDialog = $('<div>')
+        .hide()
+        .attr({
+          // Setting tabIndex makes the div focusable
+          tabIndex: -1,
+          role: 'dialog',
+        })
+        .appendTo(this._appendTo());
+
+      this._addClass(
+        this.uiDialog,
+        'ui-dialog',
+        'ui-widget ui-widget-content ui-front',
+      );
+      this._on(this.uiDialog, {
+        keydown(event) {
+          if (
+            this.options.closeOnEscape &&
+            !event.isDefaultPrevented() &&
+            event.keyCode &&
+            event.keyCode === $.ui.keyCode.ESCAPE
+          ) {
+            event.preventDefault();
+            this.close(event);
+            return;
+          }
+
+          // Prevent tabbing out of dialogs
+          if (
+            event.keyCode !== $.ui.keyCode.TAB ||
+            event.isDefaultPrevented()
+          ) {
+            return;
+          }
+          const tabbableElements = tabbable.tabbable(this.uiDialog[0]);
+          const first = tabbableElements.first();
+          const last = tabbableElements.last();
+
+          if (
+            (event.target === last[0] || event.target === this.uiDialog[0]) &&
+            !event.shiftKey
+          ) {
+            this._delay(function () {
+              first.trigger('focus');
+            });
+            event.preventDefault();
+          } else if (
+            (event.target === first[0] || event.target === this.uiDialog[0]) &&
+            event.shiftKey
+          ) {
+            this._delay(function () {
+              last.trigger('focus');
+            });
+            event.preventDefault();
+          }
+        },
+        mousedown(event) {
+          if (this._moveToTop(event)) {
+            this._focusTabbable();
+          }
+        },
+      });
+    },
   });
 })(jQuery, window.tabbable);
