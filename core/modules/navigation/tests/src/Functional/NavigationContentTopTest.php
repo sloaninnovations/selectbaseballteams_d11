@@ -44,7 +44,7 @@ class NavigationContentTopTest extends BrowserTestBase {
   public function testNavigationContentTop(): void {
     $test_page_url = Url::fromRoute('test_page_test.test_page');
     $this->drupalGet($test_page_url);
-    $this->assertSession()->elementTextContains('css', '.admin-toolbar__content-top', '');
+    $this->assertSession()->elementNotExists('css', '.admin-toolbar__content-top');
     \Drupal::keyValue('navigation_test')->set('content_top', 1);
     Cache::invalidateTags(['navigation_test']);
     $this->drupalGet($test_page_url);

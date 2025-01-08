@@ -19,6 +19,7 @@ use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Menu\LocalTaskManagerInterface;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Session\AccountInterface;
@@ -183,9 +184,23 @@ final class NavigationRenderer {
    *   The content_top section content.
    */
   protected function getContentTop(): array {
-    $content_top = $this->moduleHandler->invokeAll('navigation_content_top');
-    $this->moduleHandler->alter('navigation_content_top', $content_top);
-    uasort($content_top, [SortArray::class, 'sortByWeightElement']);
+    $content_top = [
+      '#theme' => 'navigation_content_top',
+    ];
+    $content_top_items = $this->moduleHandler->invokeAll('navigation_content_top');
+    $this->moduleHandler->alter('navigation_content_top', $content_top_items);
+    uasort($content_top_items, [SortArray::class, 'sortByWeightElement']);
+    // Filter out empty items, taking care to merge any cacheability metadata.
+    $cacheability = new CacheableMetadata();
+    $content_top_items = array_filter($content_top_items, function ($item) use (&$cacheability) {
+      if (Element::isEmpty($item)) {
+        $cacheability = $cacheability->merge(CacheableMetadata::createFromRenderArray($item));
+        return FALSE;
+      }
+      return TRUE;
+    });
+    $cacheability->applyTo($content_top);
+    $content_top['#items'] = $content_top_items;
     return $content_top;
   }
 
