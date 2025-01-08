@@ -96,9 +96,3 @@ services:
     public: false
     arguments: ['@.inner', '@workspaces.manager', '@workspaces.information', '@typed_data_manager']
   Drupal\workspaces\Controller\WorkspacesHtmlEntityFormController: '@workspaces.controller.entity_form'
-
-  workspaces.layout_builder.tempstore_repository:
-    decorates: layout_builder.tempstore_repository
-    class: Drupal\workspaces\WorkspacesLayoutTempstoreRepository
-    public: false
-    arguments: ['@tempstore.shared', '@workspaces.manager']

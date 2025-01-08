@@ -12,11 +12,24 @@ use Drupal\layout_builder\SectionStorageInterface;
  */
 class WorkspacesLayoutTempstoreRepository extends LayoutTempstoreRepository {
 
-  public function __construct(
-    protected $tempStoreFactory,
-    protected readonly WorkspaceManagerInterface $workspaceManager,
-  ) {
-    parent::__construct($tempStoreFactory);
+  /**
+   * The workspace manager.
+   *
+   * @var \Drupal\workspaces\WorkspaceManagerInterface
+   */
+  protected WorkspaceManagerInterface $workspaceManager;
+
+  /**
+   * Sets the workspace manager.
+   *
+   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
+   *   The workspace manager service.
+   *
+   * @return $this
+   */
+  public function setWorkspacesManager(WorkspaceManagerInterface $workspace_manager) {
+    $this->workspaceManager = $workspace_manager;
+    return $this;
   }
 
   /**
