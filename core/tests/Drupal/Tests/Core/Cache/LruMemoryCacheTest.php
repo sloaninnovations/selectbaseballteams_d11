@@ -89,6 +89,24 @@ class LruMemoryCacheTest extends UnitTestCase {
       ['crow', 'crow'],
     ]);
 
+    // Ensure nothing changes on cache miss for ::get().
+    $this->assertFalse($lru_cache->get('dodo'));
+    $this->assertCids($lru_cache, [
+      ['pidgin', 'pidgin'],
+      ['bigger_cuckoo', 'bigger_cuckoo'],
+      ['crow', 'crow'],
+    ]);
+
+    // Ensure nothing changes on cache miss for ::getMultiple().
+    $cids = ['dodo', 'great_auk'];
+    $this->assertEmpty($lru_cache->getMultiple($cids));
+    $this->assertCids($lru_cache, [
+      ['pidgin', 'pidgin'],
+      ['bigger_cuckoo', 'bigger_cuckoo'],
+      ['crow', 'crow'],
+    ]);
+    $this->assertSame(['dodo', 'great_auk'], $cids);
+
     $cids = ['crow', 'pidgin'];
     $lru_cache->getMultiple($cids);
     // @todo This result suggests the order of the arguments in the
@@ -101,6 +119,7 @@ class LruMemoryCacheTest extends UnitTestCase {
       ['pidgin', 'pidgin'],
       ['crow', 'crow'],
     ]);
+    $this->assertEmpty($cids);
   }
 
   /**
@@ -192,6 +211,7 @@ class LruMemoryCacheTest extends UnitTestCase {
    *
    * @covers ::invalidate
    * @covers ::invalidateMultiple
+   * @covers ::invalidateTags
    */
   public function testInvalidate(): void {
     $lru_cache = $this->getLruMemoryCache(3);
@@ -265,6 +285,7 @@ class LruMemoryCacheTest extends UnitTestCase {
    *
    * @covers ::invalidate
    * @covers ::invalidateMultiple
+   * @covers ::invalidateTags
    */
   public function testInvalidateNumeric(): void {
     $lru_cache = $this->getLruMemoryCache(3);
@@ -275,13 +296,22 @@ class LruMemoryCacheTest extends UnitTestCase {
       [5, 'crow'],
     ];
     foreach ($cids as $items) {
-      $lru_cache->set($items[0], $items[1]);
+      $lru_cache->set($items[0], $items[1], tags: ['bird']);
     }
     $this->assertCids($lru_cache, [
       [3, 'sparrow'],
       [10, 'pidgin'],
       [5, 'crow'],
     ]);
+
+    // Invalidate something not in the cache and ensure nothing changes.
+    $lru_cache->invalidate(0);
+    $this->assertCids($lru_cache, [
+      [3, 'sparrow'],
+      [10, 'pidgin'],
+      [5, 'crow'],
+    ]);
+
     $lru_cache->invalidate(10);
     $this->assertCids($lru_cache, [
       [10, 'pidgin'],
@@ -290,6 +320,29 @@ class LruMemoryCacheTest extends UnitTestCase {
     ]);
     $this->assertFalse($lru_cache->get(10));
     $this->assertSame('pidgin', $lru_cache->get(10, TRUE)->data);
+
+    $lru_cache->invalidateTags(['mammal']);
+    $this->assertCids($lru_cache, [
+      [10, 'pidgin'],
+      [3, 'sparrow'],
+      [5, 'crow'],
+    ]);
+    $this->assertSame('sparrow', $lru_cache->get(3)->data);
+    $this->assertCids($lru_cache, [
+      [10, 'pidgin'],
+      [5, 'crow'],
+      [3, 'sparrow'],
+    ]);
+
+    $lru_cache->invalidateTags(['mammal', 'bird']);
+    $this->assertFalse($lru_cache->get(3));
+    $this->assertFalse($lru_cache->get(10));
+    $this->assertFalse($lru_cache->get(5));
+    $this->assertCids($lru_cache, [
+      [10, 'pidgin'],
+      [5, 'crow'],
+      [3, 'sparrow'],
+    ]);
   }
 
   /**
