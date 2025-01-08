@@ -101,7 +101,6 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Are you sure you want to re-index the site');
     $this->drupalGet('admin/config/search/pages/reindex');
     $this->submitForm([], 'Re-index site');
-    $this->submitForm(['confirm' => TRUE], 'Re-index site');
     $this->assertSession()->statusMessageContains('All search indexes will be rebuilt', 'status');
     $this->drupalGet('admin/config/search/pages');
     $this->assertSession()->pageTextContains('There is 1 item left to index.');
