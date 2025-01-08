@@ -9,6 +9,7 @@ use Drupal\Core\Config\Entity\ConfigEntityUpdater;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\media\MediaConfigUpdater;
 use Drupal\media\MediaTypeInterface;
+use Drupal\system\Entity\Action;
 
 /**
  * Implements hook_removed_post_updates().
@@ -73,4 +74,19 @@ function media_post_update_remove_mappings_targeting_source_field(?array &$sandb
 
       return FALSE;
     });
+}
+
+/**
+ * Install the 'Update metadata' action.
+ */
+function media_post_update_install_update_metadata_action() {
+  if (!Action::load('media_update_metadata')) {
+    Action::create([
+      'id' => 'media_update_metadata',
+      'label' => 'Update metadata',
+      'type' => 'media',
+      'plugin' => 'media_update_metadata',
+    ])
+      ->save();
+  }
 }
