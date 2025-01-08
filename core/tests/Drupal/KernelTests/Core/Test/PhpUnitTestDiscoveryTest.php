@@ -28,6 +28,12 @@ use Symfony\Component\Process\Process;
  */
 class PhpUnitTestDiscoveryTest extends KernelTestBase {
 
+  private const TEST_LIST_MISMATCH_MESSAGE =
+    "The list of test classes to be executed misses some files, see below. Make sure to:\n" .
+    "1) give test classes a name that ends with a *Test suffix, and that the file is named accordingly;\n" .
+    "2) the file of the test class is reachable by the directories specified in the <testsuites> section of the phpunit.xml file;\n" .
+    "3) your version of the phpunit.xml configuration file is aligned with the PHPUnit and Drupal versions being used in testing.\n";
+
   /**
    * The filepath to the XML file to be used for dumping the test list.
    */
@@ -96,7 +102,7 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
     asort($phpUnitClientList);
 
     // Check against Drupal's discovery.
-    $this->assertEquals(implode("\n", $phpUnitClientList), implode("\n", $internalList));
+    $this->assertEquals(implode("\n", $phpUnitClientList), implode("\n", $internalList), self::TEST_LIST_MISMATCH_MESSAGE);
 
     // PHPUnit's test discovery - via API.
     $phpUnitConfiguration = (new Builder())->build(['--configuration', 'core']);
@@ -110,7 +116,7 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
     asort($phpUnitApiList);
 
     // Check against Drupal's discovery.
-    $this->assertEquals(implode("\n", $phpUnitApiList), implode("\n", $internalList));
+    $this->assertEquals(implode("\n", $phpUnitApiList), implode("\n", $internalList), self::TEST_LIST_MISMATCH_MESSAGE);
 
   }
 
