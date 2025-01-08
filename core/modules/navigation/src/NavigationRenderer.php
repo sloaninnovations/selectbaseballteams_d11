@@ -161,7 +161,7 @@ final class NavigationRenderer {
     $content_top = $this->getContentTop();
     $cacheability->addCacheableDependency(CacheableMetadata::createFromRenderArray($content_top));
     unset($content_top['#cache']);
-    $build[0]['content_top'] = $content_top;
+    $build[0]['content_top'] = empty($content_top) ? NULL : $content_top;
 
     if ($logo_provider === self::LOGO_PROVIDER_CUSTOM) {
       $logo_path = $logo_settings->get('logo.path');
