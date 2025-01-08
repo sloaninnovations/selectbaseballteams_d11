@@ -9,6 +9,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Url;
 use Drupal\form_test\Form\FormTestDisabledElementsForm;
 use Drupal\Tests\BrowserTestBase;
@@ -125,22 +126,22 @@ class FormTest extends BrowserTestBase {
           // so we bypass it by setting the token to FALSE.
           $form['#token'] = FALSE;
           \Drupal::formBuilder()->prepareForm($form_id, $form, $form_state);
-          \Drupal::formBuilder()->processForm($form_id, $form, $form_state);
+          /** @var \Drupal\Core\Render\RendererInterface $renderer */
+          $renderer = $this->container->get('renderer');
+          $renderer->executeInRenderContext(new RenderContext(), function () use ($form_id, &$form, &$form_state) {
+            \Drupal::formBuilder()->processForm($form_id, $form, $form_state);
+          });
           $errors = $form_state->getErrors();
           $form_output = \Drupal::service('renderer')->renderRoot($form);
           if ($required) {
             // Make sure we have a form error for this element.
             $this->assertTrue(isset($errors[$element]), "Check empty($key) '$type' field '$element'");
-            if (!empty($form_output)) {
-              // Make sure the form element is marked as required.
-              $this->assertMatchesRegularExpression($required_marker_preg, (string) $form_output, "Required '$type' field is marked as required");
-            }
+            // Make sure the form element is marked as required.
+            $this->assertMatchesRegularExpression($required_marker_preg, (string) $form_output, "Required '$type' field is marked as required");
           }
           else {
-            if (!empty($form_output)) {
-              // Make sure the form element is *not* marked as required.
-              $this->assertDoesNotMatchRegularExpression($required_marker_preg, (string) $form_output, "Optional '$type' field is not marked as required");
-            }
+            // Make sure the form element is *not* marked as required.
+            $this->assertDoesNotMatchRegularExpression($required_marker_preg, (string) $form_output, "Optional '$type' field is not marked as required");
             if ($type == 'select') {
               // Select elements are going to have validation errors with empty
               // input, since those are not allowed choices. Just make sure the
@@ -311,7 +312,7 @@ class FormTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('The form has become outdated.');
     $this->assertSession()->fieldValueEquals('integer_step', 5);
 
-    // Check a form with a URL field
+    // Check a form with a URL field.
     $this->drupalGet(Url::fromRoute('form_test.url'));
     $this->assertSession()
       ->elementExists('css', 'input[name="form_token"]')
