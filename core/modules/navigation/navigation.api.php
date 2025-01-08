@@ -21,7 +21,10 @@
 function hook_navigation_content_top(): array {
   return [
     'navigation_foo' => [
-      '#markup' => 'foo',
+      '#markup' => \Drupal::config('system.site')->get('name'),
+      '#cache' => [
+        'tags' => ['config:system.site'],
+      ]
     ],
     'navigation_bar' => [
       '#markup' => 'bar',
