@@ -346,7 +346,7 @@ class LruMemoryCacheTest extends UnitTestCase {
   }
 
   /**
-   * Assert that the given cache ID's match the given value in the memory cache.
+   * Asserts that the given cache data matches the data in the memory cache.
    *
    * @param \Drupal\Core\Cache\MemoryCache\LruMemoryCache $lru_cache
    *   The LRU cache under test.
