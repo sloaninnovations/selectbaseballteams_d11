@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\navigation_test\Hook;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\State\StateInterface;
 
@@ -40,10 +41,7 @@ class NavigationTestHooks {
   #[Hook('navigation_content_top')]
   public function navigationContentTop(): array {
     if (\Drupal::keyValue('navigation_test')->get('content_top')) {
-      return [
-        '#cache' => [
-          'tags' => ['navigation_test'],
-        ],
+      $items = [
         'navigation_foo' => [
           '#markup' => 'foo',
         ],
@@ -56,12 +54,22 @@ class NavigationTestHooks {
       ];
     }
     else {
-      return [
-        '#cache' => [
-          'tags' => ['navigation_test'],
-        ],
+      $items = [
+        'navigation_foo' => [],
+        'navigation_bar' => [],
+        'navigation_baz' => [],
       ];
     }
+    // Add cache tags to our items to express a made up dependency to test
+    // cacheability. Note that as we're always returning the same items,
+    // sometimes only with cacheability metadata. By doing this we're testing
+    // conditional rendering of content_top items.
+    foreach ($items as &$element) {
+      CacheableMetadata::createFromRenderArray($element)
+        ->addCacheTags(['navigation_test'])
+        ->applyTo($element);
+    }
+    return $items;
   }
 
   /**
