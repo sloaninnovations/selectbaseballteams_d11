@@ -158,10 +158,7 @@ final class NavigationRenderer {
     ];
     $build[0] = NestedArray::mergeDeepArray([$build[0], $defaults]);
 
-    $content_top = $this->getContentTop();
-    $cacheability->addCacheableDependency(CacheableMetadata::createFromRenderArray($content_top));
-    unset($content_top['#cache']);
-    $build[0]['content_top'] = empty($content_top) ? NULL : $content_top;
+    $build[0]['content_top'] = $this->getContentTop();
 
     if ($logo_provider === self::LOGO_PROVIDER_CUSTOM) {
       $logo_path = $logo_settings->get('logo.path');

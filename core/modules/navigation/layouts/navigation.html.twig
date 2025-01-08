@@ -70,12 +70,10 @@
         } only %}
       </div>
 
-      {# Include the content_top region if has content. #}
-      {% if content.content_top is not empty %}
-        <div class="admin-toolbar__content-top">
-          {{ content.content_top }}
-        </div>
-      {% endif %}
+
+      <div class="admin-toolbar__content-top">
+        {{ content.content_top }}
+      </div>
       {{ content.content }}
     </nav>
 
