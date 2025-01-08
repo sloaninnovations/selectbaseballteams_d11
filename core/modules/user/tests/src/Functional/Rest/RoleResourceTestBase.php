@@ -7,6 +7,9 @@ namespace Drupal\Tests\user\Functional\Rest;
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 use Drupal\user\Entity\Role;
 
+/**
+ * Resource test base for the user_role entity.
+ */
 abstract class RoleResourceTestBase extends ConfigEntityResourceTestBase {
 
   /**

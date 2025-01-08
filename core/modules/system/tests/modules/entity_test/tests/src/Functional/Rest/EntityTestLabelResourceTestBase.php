@@ -8,6 +8,9 @@ use Drupal\entity_test\Entity\EntityTestLabel;
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 use Drupal\user\Entity\User;
 
+/**
+ * Resource test base for the entity_test_label entity.
+ */
 abstract class EntityTestLabelResourceTestBase extends ConfigEntityResourceTestBase {
 
   /**
