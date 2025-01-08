@@ -58,7 +58,6 @@
  * @see template_preprocess_node()
  */
 #}
-
 {% set layout = layout ? 'layout--' ~ layout|clean_class %}
 
 {%
@@ -75,7 +74,7 @@
 <article{{ attributes.addClass(classes) }}>
   <header class="{{ layout }}">
     {{ title_prefix }}
-      {% if label and not page %}
+      {% if label and view_mode == "full" %}
       <h2{{ title_attributes.addClass('node__title') }}>
         <a href="{{ url }}" rel="bookmark">{{ label }}</a>
       </h2>

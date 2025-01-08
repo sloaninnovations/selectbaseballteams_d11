@@ -62,7 +62,7 @@
 <article{{ attributes }}>
 
   {{ title_prefix }}
-  {% if label and not page %}
+  {% if label and not view_mode == "full" %}
     <h2{{ title_attributes }}>
       <a href="{{ url }}" rel="bookmark">{{ label }}</a>
     </h2>
