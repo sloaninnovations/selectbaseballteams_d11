@@ -97,7 +97,6 @@ class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
 
     $route = 'search.view_' . $entity_id;
     $form['#action'] = Url::fromRoute($route)->toString();
-    $form['#method'] = 'get';
 
     $form['keys'] = [
       '#type' => 'search',
@@ -112,8 +111,6 @@ class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Search'),
-      // Prevent op from showing up in the query string.
-      '#name' => '',
     ];
 
     return $form;
@@ -123,7 +120,9 @@ class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    // This form submits to the search page, so processing happens there.
+    // Redirect to the search page, so that processing happens there.
+    $entity_id = $form_state->getBuildInfo()['args'][0] !== '' ? $form_state->getBuildInfo()['args'][0] : 'node_search';
+    $form_state->setRedirect('search.view_' . $entity_id, ['keys' => $form_state->getValue('keys')]);
   }
 
 }
