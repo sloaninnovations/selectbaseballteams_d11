@@ -269,7 +269,7 @@ class RenderElementTypesTest extends KernelTestBase {
         'value' => [
           '#type' => 'link',
           '#title' => 'title',
-          '#url' => Url::fromUri('https://www.drupal.org')->setOption('class', ['url-option-class']),
+          '#url' => Url::fromUri('https://www.drupal.org'),
           '#attributes' => [],
           '#options' => [
             'attributes' => [
@@ -284,7 +284,7 @@ class RenderElementTypesTest extends KernelTestBase {
         'value' => [
           '#type' => 'link',
           '#title' => 'title',
-          '#url' => Url::fromUri('https://www.drupal.org')->setOption('class', ['url-option-class']),
+          '#url' => Url::fromUri('https://www.drupal.org'),
           '#attributes' => [
             'class' => ['attributes-class'],
           ],
@@ -301,7 +301,7 @@ class RenderElementTypesTest extends KernelTestBase {
         'value' => [
           '#type' => 'link',
           '#title' => 'title',
-          '#url' => Url::fromUri('https://www.drupal.org')->setOption('class', ['url-option-class']),
+          '#url' => Url::fromUri('https://www.drupal.org'),
           '#attributes' => [
             'class' => 'attributes-class',
           ],
@@ -312,6 +312,17 @@ class RenderElementTypesTest extends KernelTestBase {
           ],
         ],
         'expected' => '//a[@href="https://www.drupal.org" and @class="options-attributes-class attributes-class" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in Url object ['#options']['attributes'] which are ignored",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org')->setOption('attributes', ['class' => 'url-options-attributes-class']),
+          '#attributes' => [],
+          '#options' => [],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and not(@class) and text()="title"]',
       ],
     ];
     foreach ($elements as $element) {
