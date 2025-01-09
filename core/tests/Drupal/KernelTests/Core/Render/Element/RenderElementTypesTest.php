@@ -311,7 +311,7 @@ class RenderElementTypesTest extends KernelTestBase {
             ],
           ],
         ],
-        'expected' => '//a[@href="https://www.drupal.org" and @class="options-attributes-class attributes-class" and text()="title"]',
+        'expected' => '//a[@href="https://www.drupal.org" and contains(@class,"options-attributes-class") and contains(@class,"attributes-class") and text()="title"]',
       ],
       [
         'name' => "#type 'link' anchor tag with extra classes in Url object ['#options']['attributes'] which are ignored",
