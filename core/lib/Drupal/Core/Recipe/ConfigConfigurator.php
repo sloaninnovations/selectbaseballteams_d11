@@ -19,6 +19,8 @@ final class ConfigConfigurator {
    */
   public readonly ?string $recipeConfigDirectory;
 
+  private readonly bool|array $strict;
+
   /**
    * Indicates how the shipped and active config are compared.
    */
