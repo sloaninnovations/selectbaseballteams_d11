@@ -191,7 +191,7 @@ interface StreamWrapperManagerInterface {
    *
    * The following actions are taken:
    * - Remove trailing slashes from target
-   * - Trim erroneous leading slashes from target. 
+   * - Trim erroneous leading slashes from target.
    *   e.g. "https://example.com///path" becomes "https://example.com/path".
    * - Converting schemes (http to https or vice versa).
    *
