@@ -138,7 +138,6 @@ class UserCancelForm extends ContentEntityConfirmFormBase {
     // attempt to cancel the own account.
     if (!$form_state->isValueEmpty('access') && $form_state->isValueEmpty('user_cancel_confirm') && $this->entity->id() != $this->currentUser()->id()) {
       user_cancel($form_state->getValues(), $this->entity->id(), $form_state->getValue('user_cancel_method'));
-
       $form_state->setRedirectUrl($this->entity->toUrl('collection'));
     }
     else {
@@ -149,8 +148,15 @@ class UserCancelForm extends ContentEntityConfirmFormBase {
       $this->entity->user_cancel_notify = $form_state->getValue('user_cancel_notify');
       $this->entity->save();
       _user_mail_notify('cancel_confirm', $this->entity);
-      $this->messenger()->addStatus($this->t('A confirmation request to cancel your account has been sent to your email address.'));
       $this->logger('user')->info('Sent account cancellation request to %name %email.', ['%name' => $this->entity->label(), '%email' => '<' . $this->entity->getEmail() . '>']);
+
+      $messenger = $this->messenger();
+      if ($this->entity->id() == $this->currentUser()) {
+        $messenger->addStatus($this->t('A confirmation request to cancel your account has been sent to your email address.'));
+      }
+      else {
+        $messenger->addStatus($this->t("A confirmation request to cancel the account %name has been sent to the user's email address.", ['%name' => $this->entity->label()]));
+      }
 
       $form_state->setRedirect(
         'entity.user.canonical',
