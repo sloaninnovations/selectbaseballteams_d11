@@ -64,3 +64,10 @@ function views_post_update_views_data_argument_plugin_id(?array &$sandbox = NULL
     return $view_config_updater->needsEntityArgumentUpdate($view);
   });
 }
+
+/**
+ * Clear caches to allow empty field texts to be translatable.
+ */
+function views_post_update_make_empty_field_text_translatable() {
+  // Empty post-update hook.
+}
