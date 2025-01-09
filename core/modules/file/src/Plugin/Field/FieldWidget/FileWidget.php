@@ -243,7 +243,7 @@ class FileWidget extends WidgetBase {
       '#entity_type' => $items->getEntity()->getEntityTypeId(),
       '#display_field' => (bool) $field_settings['display_field'],
       '#display_default' => $field_settings['display_default'],
-      '#description_field' => $field_settings['description_field'],
+      '#description_field' => $field_settings['description_field'] ?? NULL,
       '#cardinality' => $cardinality,
     ];
 
