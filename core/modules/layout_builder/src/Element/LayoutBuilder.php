@@ -106,16 +106,18 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
    */
   public static function layoutBuilderElementGetKeys(array $element, FormStateInterface $form_state, array &$form): array {
     $form['#layout_builder_element_keys'] = $element['#array_parents'];
-    $form['#pre_render'][] = [static::class, 'moveLayoutBuilderOutsideForm'];
+    $form['#pre_render'][] = [static::class, 'renderLayoutBuilderAfterForm'];
     $form['#post_render'][] = [static::class, 'addRenderedLayoutBuilder'];
     return $element;
   }
 
   /**
-   * Render API #pre_render callback that moves out layout builder element.
+   * Render API #pre_render callback for form containing layout builder element.
    *
    * Because the layout builder element can contain components with forms, it
    * needs to exist outside forms within the DOM, to avoid nested form tags.
+   * The layout builder element is rendered to markup here and saved, and later
+   * the saved markup will be appended after the form markup.
    *
    * @see ::addRenderedLayoutBuilder()
    *
@@ -125,7 +127,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
    * @return array
    */
   #[TrustedCallback]
-  public static function moveLayoutBuilderOutsideForm(array $form): array {
+  public static function renderLayoutBuilderAfterForm(array $form): array {
     if (isset($form['#layout_builder_element_keys'])) {
       $layout_builder_element = &NestedArray::getValue($form, $form['#layout_builder_element_keys']);
       // Save the rendered layout builder HTML to a non-rendering child key.
