@@ -24,7 +24,6 @@ class SearchMultilingualTest extends ViewTestBase {
   protected static $modules = [
     'node',
     'search',
-    'language',
     'content_translation',
   ];
 
