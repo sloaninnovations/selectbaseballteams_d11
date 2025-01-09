@@ -16,7 +16,7 @@ class VocabularyStorage extends ConfigEntityStorage implements VocabularyStorage
     $tids = \Drupal::entityQuery('taxonomy_term')
       ->accessCheck(TRUE)
       ->condition('vid', $vids, 'IN')
-      ->condition('parent.target_id', 0)
+      ->condition('parent.target_id', TermInterface::ID_ROOT)
       ->execute();
 
     return array_values($tids);

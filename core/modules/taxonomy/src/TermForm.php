@@ -54,7 +54,7 @@ class TermForm extends ContentEntityForm {
       $tree = $taxonomy_storage->loadTree($vocabulary->id());
       $options = ['<' . $this->t('root') . '>'];
       if (empty($parent)) {
-        $parent = [0];
+        $parent = [TermInterface::ROOT_TERM_ID];
       }
 
       foreach ($tree as $item) {
@@ -65,7 +65,7 @@ class TermForm extends ContentEntityForm {
     }
     else {
       $options = ['<' . $this->t('root') . '>'];
-      $parent = [0];
+      $parent = [TermInterface::ROOT_TERM_ID];
     }
 
     if ($this->getRequest()->query->has('parent')) {

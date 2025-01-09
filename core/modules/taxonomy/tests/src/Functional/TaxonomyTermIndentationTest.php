@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional;
 
+use Drupal\taxonomy\TermInterface;
+
 /**
  * Ensure that the term indentation works properly.
  *
@@ -81,7 +83,7 @@ class TaxonomyTermIndentationTest extends TaxonomyTestBase {
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->get('vid') . '/overview');
     $hidden_edit = [
       'terms[tid:' . $term2->id() . ':0][term][tid]' => 2,
-      'terms[tid:' . $term2->id() . ':0][term][parent]' => 0,
+      'terms[tid:' . $term2->id() . ':0][term][parent]' => TermInterface::ROOT_TERM_ID,
       'terms[tid:' . $term2->id() . ':0][term][depth]' => 0,
     ];
     // Because we can't post hidden form elements, we have to change them in

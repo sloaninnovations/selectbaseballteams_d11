@@ -7,6 +7,7 @@ namespace Drupal\Tests\taxonomy\Functional\Views;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\taxonomy\TermInterface;
 use Drupal\Tests\views_ui\Functional\UITestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Entity\View;
@@ -84,7 +85,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
         $this->terms[$i][$j] = $term = Term::create([
           'vid' => 'tags',
           'name' => "Term $i.$j",
-          'parent' => isset($this->terms[$i][0]) ? $this->terms[$i][0]->id() : 0,
+          'parent' => isset($this->terms[$i][0]) ? $this->terms[$i][0]->id() : TermInterface::ROOT_TERM_ID,
         ]);
         $term->save();
       }

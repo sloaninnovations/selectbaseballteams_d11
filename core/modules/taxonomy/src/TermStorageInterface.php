@@ -50,8 +50,8 @@ interface TermStorageInterface extends ContentEntityStorageInterface {
    * @param string $vid
    *   Vocabulary ID to retrieve terms for.
    * @param int $parent
-   *   The term ID under which to generate the tree. If 0, generate the tree
-   *   for the entire vocabulary.
+   *   The term ID under which to generate the tree. If TermInterface::ROOT_TERM_ID,
+   *   generate the tree for the entire vocabulary.
    * @param int $max_depth
    *   The number of levels of the tree to return. Leave NULL to return all
    *   levels.
@@ -65,7 +65,7 @@ interface TermStorageInterface extends ContentEntityStorageInterface {
    *   A numerically indexed array of term objects that are the children of the
    *   vocabulary $vid.
    */
-  public function loadTree($vid, $parent = 0, $max_depth = NULL, $load_entities = FALSE);
+  public function loadTree($vid, $parent = TermInterface::ID_ROOT, $max_depth = NULL, $load_entities = FALSE);
 
   /**
    * Count the number of nodes in a given vocabulary ID.

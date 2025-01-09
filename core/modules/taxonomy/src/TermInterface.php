@@ -13,6 +13,13 @@ use Drupal\Core\Entity\RevisionLogInterface;
 interface TermInterface extends ContentEntityInterface, EntityChangedInterface, EntityPublishedInterface, RevisionLogInterface {
 
   /**
+   * ID of the Root Term, i.e. <root>.
+   *
+   * @var int
+   */
+  const ID_ROOT = 0;
+
+  /**
    * Gets the term description.
    *
    * @return string

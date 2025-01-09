@@ -138,7 +138,7 @@ class Term extends EditorialContentEntityBase implements TermInterface {
     parent::preSave($storage);
     // Terms with no parents are mandatory children of <root>.
     if (!$this->get('parent')->count()) {
-      $this->parent->target_id = 0;
+      $this->parent->target_id = self::ID_ROOT;
     }
   }
 

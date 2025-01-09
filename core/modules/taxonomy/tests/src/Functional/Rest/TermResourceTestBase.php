@@ -7,6 +7,7 @@ namespace Drupal\Tests\taxonomy\Functional\Rest;
 use Drupal\Core\Cache\Cache;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\taxonomy\TermInterface;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\Before;
@@ -114,7 +115,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
 
     $expected_parent_normalization = FALSE;
     switch ($parent_term_ids) {
-      case [0]:
+      case [TermInterface::ROOT_TERM_ID]:
         $expected_parent_normalization = [
           [
             'target_id' => NULL,
@@ -133,7 +134,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
         ];
         break;
 
-      case [0, 2]:
+      case [TermInterface::ROOT_TERM_ID, 2]:
         $expected_parent_normalization = [
           [
             'target_id' => NULL,
@@ -337,7 +338,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
   }
 
   /**
-   * Tests GETting a term with a parent term other than the default <root> (0).
+   * Tests GETting a term with a parent term other than the default <root> (TermInterface::ROOT_TERM_ID).
    *
    * @see ::getExpectedNormalizedEntity()
    *
@@ -371,14 +372,14 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
 
   public static function providerTestGetTermWithParent() {
     return [
-      'root parent: [0] (= no parent)' => [
-        [0],
+      'root parent: [' . TermInterface::ROOT_TERM_ID . '] (= no parent)' => [
+        [TermInterface::ROOT_TERM_ID],
       ],
       'non-root parent: [2]' => [
         [2],
       ],
-      'multiple parents: [0,2] (root + non-root parent)' => [
-        [0, 2],
+      'multiple parents: [' . TermInterface::ROOT_TERM_ID . ',2] (root + non-root parent)' => [
+        [TermInterface::ROOT_TERM_ID, 2],
       ],
       'multiple parents: [3,2] (both non-root parents)' => [
         [3, 2],

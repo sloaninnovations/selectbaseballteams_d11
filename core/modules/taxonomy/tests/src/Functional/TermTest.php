@@ -285,7 +285,7 @@ class TermTest extends TaxonomyTestBase {
     ];
     // Explicitly set the parents field to 'root', to ensure that
     // TermForm::save() handles the invalid term ID correctly.
-    $edit['parent[]'] = [0];
+    $edit['parent[]'] = [TermInterface::ROOT_TERM_ID];
 
     // Create the term to edit.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
@@ -450,7 +450,7 @@ class TermTest extends TaxonomyTestBase {
     // Fetch the created terms in the default alphabetical order, i.e. term1
     // precedes term2 alphabetically, and term2 precedes term3.
     $taxonomy_storage->resetCache();
-    [$term1, $term2, $term3] = $taxonomy_storage->loadTree($this->vocabulary->id(), 0, NULL, TRUE);
+    [$term1, $term2, $term3] = $taxonomy_storage->loadTree($this->vocabulary->id(), TermInterface::ROOT_TERM_ID, NULL, TRUE);
 
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
 
@@ -460,13 +460,13 @@ class TermTest extends TaxonomyTestBase {
     // setting the parent and depth properties, and update all hidden fields.
     $hidden_edit = [
       'terms[tid:' . $term2->id() . ':0][term][tid]' => $term2->id(),
-      'terms[tid:' . $term2->id() . ':0][term][parent]' => 0,
+      'terms[tid:' . $term2->id() . ':0][term][parent]' => TermInterface::ROOT_TERM_ID,
       'terms[tid:' . $term2->id() . ':0][term][depth]' => 0,
       'terms[tid:' . $term3->id() . ':0][term][tid]' => $term3->id(),
       'terms[tid:' . $term3->id() . ':0][term][parent]' => $term2->id(),
       'terms[tid:' . $term3->id() . ':0][term][depth]' => 1,
       'terms[tid:' . $term1->id() . ':0][term][tid]' => $term1->id(),
-      'terms[tid:' . $term1->id() . ':0][term][parent]' => 0,
+      'terms[tid:' . $term1->id() . ':0][term][parent]' => TermInterface::ROOT_TERM_ID,
       'terms[tid:' . $term1->id() . ':0][term][depth]' => 0,
     ];
     // Because we can't post hidden form elements, we have to change them in
@@ -497,7 +497,7 @@ class TermTest extends TaxonomyTestBase {
     $this->assertSession()->addressEquals('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
 
     $taxonomy_storage->resetCache();
-    $terms = $taxonomy_storage->loadTree($this->vocabulary->id(), 0, NULL, TRUE);
+    $terms = $taxonomy_storage->loadTree($this->vocabulary->id(), TermInterface::ROOT_TERM_ID, NULL, TRUE);
     $this->assertEquals($term1->id(), $terms[0]->id(), 'Term 1 was moved to back above term 2.');
     $this->assertEquals($term2->id(), $terms[1]->id(), 'Term 2 was moved to back below term 1.');
     $this->assertEquals($term3->id(), $terms[2]->id(), 'Term 3 is still below term 2.');
@@ -517,7 +517,7 @@ class TermTest extends TaxonomyTestBase {
     $edit = [
       'name[0][value]' => $this->randomMachineName(12),
       'description[0][value]' => $this->randomMachineName(100),
-      'parent[]' => [0, 1],
+      'parent[]' => [TermInterface::ROOT_TERM_ID, 1],
     ];
     // Save the new term.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
@@ -530,7 +530,7 @@ class TermTest extends TaxonomyTestBase {
     $this->assertEquals($edit['description[0][value]'], $term->getDescription(), 'Term description was successfully saved.');
 
     // Check that we have the expected parents.
-    $this->assertEquals([0, 1], $this->getParentTids($term), 'Term parents (root plus one) were successfully saved.');
+    $this->assertEquals([TermInterface::ROOT_TERM_ID, 1], $this->getParentTids($term), 'Term parents (root plus one) were successfully saved.');
 
     // Load the edit form and save again to ensure parent are preserved.
     // Generate a new name, so we know that the term really is saved.
@@ -546,7 +546,7 @@ class TermTest extends TaxonomyTestBase {
 
     // Check that we still have the expected parents.
     $term = $this->reloadTermByName($edit['name[0][value]']);
-    $this->assertEquals([0, 1], $this->getParentTids($term), 'Term parents (root plus one) were successfully saved again.');
+    $this->assertEquals([TermInterface::ROOT_TERM_ID, 1], $this->getParentTids($term), 'Term parents (root plus one) were successfully saved again.');
 
     // Save with two real parents. i.e., not including <root>.
     $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');
@@ -625,7 +625,7 @@ class TermTest extends TaxonomyTestBase {
    *   The term.
    *
    * @return array
-   *   A sorted array of tids and 0 if the root is a parent.
+   *   A sorted array of tids and TermInterface::ROOT_TERM_ID if the root is a parent.
    */
   private function getParentTids($term): array {
     $parent_tids = [];
@@ -674,7 +674,7 @@ class TermTest extends TaxonomyTestBase {
     $edit = [
       'name[0][value]' => $this->randomMachineName(14),
       'description[0][value]' => $this->randomMachineName(100),
-      'parent[]' => [0],
+      'parent[]' => [TermInterface::ROOT_TERM_ID],
     ];
 
     // Create the term.

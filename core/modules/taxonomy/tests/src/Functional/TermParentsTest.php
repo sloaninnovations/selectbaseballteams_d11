@@ -70,7 +70,7 @@ class TermParentsTest extends BrowserTestBase {
 
     // Create a term without any parents.
     $term_1 = $this->submitAddTermForm('Test term 1');
-    $expected = [['target_id' => 0]];
+    $expected = [['target_id' => TermInterface::ID_ROOT]];
     $this->assertEquals($expected, $term_1->get('parent')->getValue());
 
     // Explicitly selecting <root> should have the same effect as not selecting

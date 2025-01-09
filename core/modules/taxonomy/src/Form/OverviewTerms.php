@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
+use Drupal\taxonomy\TermInterface;
 use Drupal\taxonomy\VocabularyInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -218,7 +219,7 @@ class OverviewTerms extends FormBase {
         $form['#first_tid'] = $raw_term->tid;
       }
       // Keep a variable to make sure at least 2 root elements are displayed.
-      if ($raw_term->parents[0] == 0) {
+      if ($raw_term->parents[0] == TermInterface::ID_ROOT) {
         $root_entries++;
       }
       $current_page[$key] = $raw_term;
@@ -516,7 +517,7 @@ class OverviewTerms extends FormBase {
     $changed_terms = [];
     // Terms are not loaded to avoid excessive memory consumption for large
     // vocabularies. Needed terms are loaded explicitly afterward.
-    $tree = $this->storageController->loadTree($vocabulary->id(), 0, NULL, FALSE);
+    $tree = $this->storageController->loadTree($vocabulary->id(), TermInterface::ROOT_TERM_ID, NULL, FALSE);
 
     if (empty($tree)) {
       return;
@@ -526,6 +527,14 @@ class OverviewTerms extends FormBase {
     $weight = 0;
     $raw_term = $tree[0];
     $term_weights = [];
+    while ($raw_term->tid != $form['#first_tid']) {
+      if ($raw_term->parents[0] == TermInterface::ROOT_TERM_ID && $raw_term->weight != $weight) {
+        $term_weights[$raw_term->tid] = $weight;
+      }
+      $weight++;
+      $raw_term = $tree[$weight];
+    }
+
     while ($raw_term->tid != $form['#first_tid']) {
       if ($raw_term->parents[0] == 0 && $raw_term->weight != $weight) {
         $term_weights[$raw_term->tid] = $weight;
@@ -540,12 +549,12 @@ class OverviewTerms extends FormBase {
       if (isset($form['terms'][$tid]['#term'])) {
         $term = $form['terms'][$tid]['#term'];
         // Give terms at the root level a weight in sequence with terms on previous pages.
-        if ($values['term']['parent'] == 0 && $term->getWeight() != $weight) {
+        if ($values['term']['parent'] == TermInterface::ID_ROOT && $term->getWeight() != $weight) {
           $term->setWeight($weight);
           $changed_terms[$term->id()] = $term;
         }
         // Terms not at the root level can safely start from 0 because they're all on this page.
-        elseif ($values['term']['parent'] > 0) {
+        elseif ($values['term']['parent'] > TermInterface::ID_ROOT) {
           $level_weights[$values['term']['parent']] = isset($level_weights[$values['term']['parent']]) ? $level_weights[$values['term']['parent']] + 1 : 0;
           if ($level_weights[$values['term']['parent']] != $term->getWeight()) {
             $term->setWeight($level_weights[$values['term']['parent']]);
@@ -564,7 +573,7 @@ class OverviewTerms extends FormBase {
     // Build a list of all terms that need to be updated on following pages.
     for ($weight; $weight < count($tree); $weight++) {
       $raw_term = $tree[$weight];
-      if ($raw_term->parents[0] == 0 && $raw_term->weight != $weight) {
+      if ($raw_term->parents[0] == TermInterface::ROOT_TERM_ID && $raw_term->weight != $weight) {
         $term_weights[$raw_term->tid] = $weight;
       }
     }

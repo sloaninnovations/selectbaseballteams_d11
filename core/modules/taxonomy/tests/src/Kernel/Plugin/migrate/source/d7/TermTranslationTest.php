@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Kernel\Plugin\migrate\source\d7;
 
+use Drupal\taxonomy\TermInterface;
+
 // cspell:ignore tsid
 
 /**
@@ -94,15 +96,15 @@ class TermTranslationTest extends TermTest {
     $tests[0]['source_data']['taxonomy_term_hierarchy'] = [
       [
         'tid' => 1,
-        'parent' => 0,
+        'parent' => TermInterface::ROOT_TERM_ID,
       ],
       [
         'tid' => 2,
-        'parent' => 0,
+        'parent' => TermInterface::ROOT_TERM_ID,
       ],
       [
         'tid' => 3,
-        'parent' => 0,
+        'parent' => TermInterface::ROOT_TERM_ID,
       ],
       [
         'tid' => 4,
@@ -122,7 +124,7 @@ class TermTranslationTest extends TermTest {
       ],
       [
         'tid' => 7,
-        'parent' => 0,
+        'parent' => TermInterface::ROOT_TERM_ID,
       ],
     ];
 
