@@ -144,8 +144,8 @@ class HookCollectorPass implements CompilerPassInterface {
     $collector = new static();
     foreach ($module_filenames as $module => $info) {
       $skip_procedural = FALSE;
-      if ($container?->hasParameter("$module.hooks_converted")) {
-        $skip_procedural = $container->getParameter("$module.hooks_converted");
+      if ($container?->hasParameter("$module.skip_procedural_hook_scan")) {
+        $skip_procedural = $container->getParameter("$module.skip_procedural_hook_scan");
       }
       $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $module_preg, $skip_procedural);
     }

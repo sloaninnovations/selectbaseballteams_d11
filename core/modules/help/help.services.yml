@@ -1,5 +1,5 @@
 parameters:
-  help.hooks_converted: false
+  help.skip_procedural_hook_scan: false
 
 services:
   _defaults:

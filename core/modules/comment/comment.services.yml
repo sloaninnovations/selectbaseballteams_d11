@@ -1,5 +1,5 @@
 parameters:
-  comment.hooks_converted: false
+  comment.skip_procedural_hook_scan: false
 
 services:
   _defaults:

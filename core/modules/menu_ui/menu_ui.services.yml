@@ -1,5 +1,5 @@
 parameters:
-  menu_ui.hooks_converted: false
+  menu_ui.skip_procedural_hook_scan: false
 
 services:
   _defaults:
