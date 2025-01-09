@@ -126,7 +126,7 @@ class UpdateSettingsForm extends ConfigFormBase {
    *   The value to be stored in config.
    */
   public static function multiLineStringToArray(string $value): array {
-    return array_map('trim', explode("\n", trim($value)));
+    return array_filter(array_map('trim', explode("\n", trim($value))));
   }
 
   /**
