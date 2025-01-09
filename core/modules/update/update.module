@@ -5,7 +5,7 @@
  */
 
 use Drupal\Core\File\Exception\FileException;
-use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
+use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\Site\Settings;
@@ -42,7 +42,7 @@ function template_preprocess_update_last_check(&$variables): void {
  *   TRUE if the current user can access the updater menu items; FALSE
  *   otherwise.
  */
-#[StopProceduralHookScan]
+#[ProceduralHookScanStop]
 function _update_manager_access() {
   return Settings::get('allow_authorize_operations', TRUE) && \Drupal::currentUser()->hasPermission('administer software updates');
 }

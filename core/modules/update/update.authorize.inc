@@ -5,7 +5,7 @@
  */
 
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
+use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Updater\UpdaterException;
 use Drupal\Core\Url;
 
@@ -31,7 +31,7 @@ use Drupal\Core\Url;
  *   an instance of \Symfony\Component\HttpFoundation\Response the calling code
  *   should use that response for the current page request.
  */
-#[StopProceduralHookScan]
+#[ProceduralHookScanStop]
 function update_authorize_run_update($filetransfer, $projects) {
   $batch_builder = (new BatchBuilder())
     ->setFile(\Drupal::service('extension.list.module')->getPath('update') . '/update.authorize.inc')
