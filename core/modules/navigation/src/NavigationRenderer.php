@@ -138,6 +138,7 @@ final class NavigationRenderer {
     // cacheability of those decisions.
     $cacheability->addCacheableDependency($logo_settings)
       ->addCacheableDependency($this->configFactory->get('navigation.block_layout'));
+    $cacheability->applyTo($build);
 
     $module_path = $this->requestStack->getCurrentRequest()->getBasePath() . '/' . $this->moduleExtensionList->getPath('navigation');
     $asset_url = $module_path . '/assets/fonts/inter-var.woff2';
@@ -173,7 +174,6 @@ final class NavigationRenderer {
         }
       }
     }
-    $cacheability->applyTo($build);
     return $build;
   }
 
