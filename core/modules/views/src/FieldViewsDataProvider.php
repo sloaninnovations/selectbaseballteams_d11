@@ -504,7 +504,7 @@ class FieldViewsDataProvider {
    *   The field storage definition.
    *
    * @return \Drupal\Core\Entity\Sql\SqlContentEntityStorage|bool
-   *   Returns the entity type storage if supported.
+   *   Returns the entity type storage if supported and FALSE otherwise.
    */
   public function getSqlStorageForField(FieldStorageConfigInterface $field_storage): SqlContentEntityStorage|bool {
     $result = FALSE;
