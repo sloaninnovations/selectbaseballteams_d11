@@ -647,7 +647,7 @@ $settings['update_free_access'] = FALSE;
  */
 # $settings['locale_custom_strings_en'][''] = [
 #   'Home' => 'Front page',
-#   '@count min' => '@count minutes',
+#   'Enter your @s username.' => 'Enter your fantastic @s username.',
 # ];
 
 /**
