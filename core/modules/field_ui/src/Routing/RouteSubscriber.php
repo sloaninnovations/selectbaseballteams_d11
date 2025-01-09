@@ -95,7 +95,7 @@ class RouteSubscriber extends RouteSubscriberBase {
           "$path/fields/add-field",
           [
             '_form' => '\Drupal\field_ui\Form\FieldStorageAddForm',
-            '_title' => 'Add field',
+            '_title' => 'Step 1 of 2 - Add field',
           ] + $defaults,
           ['_permission' => 'administer ' . $entity_type_id . ' fields'],
           $options
