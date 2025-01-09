@@ -237,4 +237,88 @@ class RenderElementTypesTest extends KernelTestBase {
     $this->assertNotEmpty($result, '"' . $element['name'] . '" is rendered correctly.');
   }
 
+  /**
+   * Tests system #type 'link'.
+   */
+  public function testLink(): void {
+    $elements = [
+      [
+        'name' => "#type 'link' simple anchor tag",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org'),
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in ['#attributes']",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org'),
+          '#attributes' => [
+            'class' => ['attributes-class'],
+          ],
+          '#options' => [],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and @class="attributes-class" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in ['#options']['attributes']",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org')->setOption('class', ['url-option-class']),
+          '#attributes' => [],
+          '#options' => [
+            'attributes' => [
+              'class' => ['options-attributes-class'],
+            ],
+          ],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and @class="options-attributes-class" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in both ['#attributes'] and ['#options']['attributes']",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org')->setOption('class', ['url-option-class']),
+          '#attributes' => [
+            'class' => ['attributes-class'],
+          ],
+          '#options' => [
+            'attributes' => [
+              'class' => ['options-attributes-class'],
+            ],
+          ],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and @class="options-attributes-class attributes-class" and text()="title"]',
+      ],
+      [
+        'name' => "#type 'link' anchor tag with extra classes in both ['#attributes'] and ['#options']['attributes'] as strings",
+        'value' => [
+          '#type' => 'link',
+          '#title' => 'title',
+          '#url' => Url::fromUri('https://www.drupal.org')->setOption('class', ['url-option-class']),
+          '#attributes' => [
+            'class' => 'attributes-class',
+          ],
+          '#options' => [
+            'attributes' => [
+              'class' => 'options-attributes-class',
+            ],
+          ],
+        ],
+        'expected' => '//a[@href="https://www.drupal.org" and @class="options-attributes-class attributes-class" and text()="title"]',
+      ],
+    ];
+    foreach ($elements as $element) {
+      $xml = new \SimpleXMLElement((string) \Drupal::service('renderer')->renderRoot($element['value']));
+      $result = $xml->xpath($element['expected']);
+      $this->assertNotEmpty($result, '"' . $element['name'] . '" input rendered correctly.');
+    }
+  }
+
 }
