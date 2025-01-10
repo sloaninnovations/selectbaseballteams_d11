@@ -21,7 +21,7 @@ function _menu_ui_node_save(NodeInterface $node, array $values) {
   /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
   $needs_save = FALSE;
   if (!empty($values['entity_id'])) {
-    $entity = MenuLinkContent::load($values['entity_id']);
+    $entity = \Drupal::service('entity.repository')->getActive('menu_link_content', $values['entity_id']);
     if ($entity->isTranslatable() && $node->isTranslatable()) {
       if (!$entity->hasTranslation($node->language()->getId())) {
         $entity = $entity->addTranslation($node->language()->getId(), $entity->toArray());
@@ -69,8 +69,15 @@ function _menu_ui_node_save(NodeInterface $node, array $values) {
     $entity->set('weight', $values['weight']);
     $needs_save = TRUE;
   }
-  if ($needs_save) {
+
+  if ($entity->isDefaultRevision() != !$node->isDefaultRevision()) {
     $entity->isDefaultRevision($node->isDefaultRevision());
+    if (!$entity->isDefaultRevision()) {
+      $entity->setNewRevision(TRUE);
+    }
+    $needs_save = TRUE;
+  }
+  if ($needs_save) {
     $entity->save();
   }
 }
@@ -118,8 +125,7 @@ function menu_ui_get_menu_link_defaults(NodeInterface $node) {
       $id = (!empty($result)) ? reset($result) : FALSE;
     }
     if ($id) {
-      $menu_link = MenuLinkContent::load($id);
-      $menu_link = \Drupal::service('entity.repository')->getTranslationFromContext($menu_link);
+      $menu_link = \Drupal::service('entity.repository')->getActive('menu_link_content', $id);
       $defaults = [
         'entity_id' => $menu_link->id(),
         'id' => $menu_link->getPluginId(),
@@ -173,7 +179,7 @@ function menu_ui_form_node_form_submit($form, FormStateInterface $form_state) {
     $values = $form_state->getValue('menu');
     if (empty($values['enabled'])) {
       if ($values['entity_id']) {
-        $entity = MenuLinkContent::load($values['entity_id']);
+        $entity = \Drupal::service('entity.repository')->getActive('menu_link_content', $values['entity_id']);
         $entity->delete();
       }
     }
