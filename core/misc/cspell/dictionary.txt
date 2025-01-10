@@ -545,6 +545,7 @@ touchevents
 trackback
 transferthick
 translatables
+translit
 trayblock
 trgm
 truecolor
