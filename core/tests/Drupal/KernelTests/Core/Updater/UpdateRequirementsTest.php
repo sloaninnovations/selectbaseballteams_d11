@@ -23,7 +23,7 @@ class UpdateRequirementsTest extends KernelTestBase {
     $testRequirements = [
       'title' => t('UpdateError'),
       'value' => t('None'),
-      'description' => t("Update Error."),
+      'description' => t('Update Error.'),
       'severity' => REQUIREMENT_ERROR,
     ];
     $requirements = update_check_requirements()['test.update.error'];
