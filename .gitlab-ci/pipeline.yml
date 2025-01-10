@@ -277,7 +277,7 @@ variables:
   when: manual
   allow_failure: true
   variables:
-    REPEAT_TEST_CLASS: 'Drupal\Tests\Change\Me'
+    REPEAT_TEST_CLASS: 'Drupal\Tests\page_cache\Functional\PageCacheTest::testFormImmutability'
   services:
     - <<: *with-database
 
