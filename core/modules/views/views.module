@@ -820,3 +820,38 @@ function views_view_presave(ViewEntityInterface $view) {
   $config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
   $config_updater->updateAll($view);
 }
+
+/**
+ * Add an Entity Reference filter for a given Entity Reference Views Table Data.
+ *
+ * Helper function, multiple usage.
+ *
+ * @param string $field_name
+ *   The name of the field to add new  entity reference filter for.
+ * @param $field_table_data
+ *   A Views table data array for an entity reference field to add the new
+ *   Entity Reference filter data.
+ */
+function _views_add_entity_reference_filter_data(string $field_name, array &$field_table_data) {
+  // Copy the field data.
+  $entity_reference = $field_table_data[$field_name];
+  if (isset($entity_reference['filter']) && $entity_reference['filter']['id'] != 'entity_reference') {
+    // Remove the handler options for all but the filter handler.
+    $handler_types = Views::getHandlerTypes();
+    foreach (array_keys($handler_types) as $handler_type) {
+      unset($entity_reference[$handler_type]);
+    }
+
+    // Build the views filter data.
+    $entity_reference['filter'] = $field_table_data[$field_name]['filter'];
+    $entity_reference['filter']['id'] = 'entity_reference';
+    $entity_reference['title'] = $entity_reference['title'] . ' ' . t('as a Reference filter');
+    if (!isset($entity_reference['filter']['field'])) {
+      $entity_reference['filter']['field'] = $field_name;
+    }
+
+    // Create separate views data to allow use of the entity_reference
+    // filter.
+    $field_table_data[$field_name . '_reference'] = $entity_reference;
+  }
+}

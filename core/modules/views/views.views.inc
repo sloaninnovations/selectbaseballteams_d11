@@ -767,10 +767,11 @@ function views_field_default_views_data(FieldStorageConfigInterface $field_stora
 /**
  * Implements hook_field_views_data().
  *
- * The function implements the hook on behalf of 'core' because it adds a
- * relationship and a reverse relationship to entity_reference field type, which
- * is provided by core. This function also provides an argument plugin for
- * entity_reference fields that handles title token replacement.
+ * The function implements the hook in behalf of 'core' because it updates
+ * filters to use the entity_reference handler, adds a relationship and a
+ * reverse relationship to entity_reference field type, which is provided by
+ * core. This function also provides an argument plugin for entity_reference
+ * fields that handles title token replacement.
  */
 function core_field_views_data(FieldStorageConfigInterface $field_storage) {
   $data = views_field_default_views_data($field_storage);
@@ -795,6 +796,17 @@ function core_field_views_data(FieldStorageConfigInterface $field_storage) {
     $field_name = $field_storage->getName();
 
     if ($target_entity_type instanceof ContentEntityTypeInterface) {
+      foreach ($table_data as $table_field_name => $table_field_data) {
+        if (isset($table_field_data['filter']) && $table_field_name != 'delta') {
+          // Create separate views data to allow use of the entity_reference
+          // filter. Numeric filter should still be available for use.
+          $entity_reference = $data[$table_name][$table_field_name];
+          $entity_reference['filter']['id'] = 'entity_reference';
+          $entity_reference['title'] = $entity_reference['title'] . ' ' . t('as a Reference filter');
+          $data[$table_name][$table_field_name . '_reference'] = $entity_reference;
+        }
+      }
+
       // Provide a relationship for the entity type with the entity reference
       // field.
       $args = [

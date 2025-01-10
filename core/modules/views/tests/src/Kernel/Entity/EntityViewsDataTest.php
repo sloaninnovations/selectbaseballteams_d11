@@ -54,6 +54,7 @@ class EntityViewsDataTest extends KernelTestBase {
     'field',
     'text',
     'filter',
+    'views',
   ];
 
   /**

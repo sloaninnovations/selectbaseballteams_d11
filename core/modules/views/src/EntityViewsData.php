@@ -452,6 +452,11 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
       $table_data[$schema_field_name] = NestedArray::mergeDeep($table_data[$schema_field_name], $this->mapSingleFieldViewsData($table, $field_name, $field_definition_type, $field_column_name, $field_schema['columns'][$field_column_name]['type'], $first, $field_definition));
       $table_data[$schema_field_name]['entity field'] = $field_name;
       $first = FALSE;
+
+      if ($field_definition_type === 'entity_reference') {
+        // Add "entity_reference" filter.
+        _views_add_entity_reference_filter_data($schema_field_name, $table_data);
+      }
     }
   }
 
