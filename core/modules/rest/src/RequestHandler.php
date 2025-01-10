@@ -260,9 +260,12 @@ class RequestHandler implements ContainerInjectionInterface {
       }
     }
 
-    if (in_array($request->getMethod(), ['PATCH', 'POST'], TRUE)) {
+    if (in_array($request->getMethod(), ['PATCH', 'POST', 'PUT', 'DELETE'], TRUE)) {
       if (is_object($unserialized)) {
-        $upcasted_route_arguments['entity'] = $unserialized;
+        // Methods PATCH and POST may contain entity in the request body.
+        if (in_array($request->getMethod(), ['PATCH', 'POST'], TRUE)) {
+          $upcasted_route_arguments['entity'] = $unserialized;
+        }
         $upcasted_route_arguments['data'] = $unserialized;
         $upcasted_route_arguments['unserialized'] = $unserialized;
       }
@@ -270,7 +273,14 @@ class RequestHandler implements ContainerInjectionInterface {
         $raw_route_arguments['data'] = $unserialized;
         $raw_route_arguments['unserialized'] = $unserialized;
       }
-      $upcasted_route_arguments['original_entity'] = $route_arguments_entity;
+      // Entity from route parameters should be passed as $original_entity to
+      // methods patch and post, but as $entity to method delete.
+      if (in_array($request->getMethod(), ['PATCH', 'POST'], TRUE)) {
+        $upcasted_route_arguments['original_entity'] = $route_arguments_entity;
+      }
+      elseif ($request->getMethod() === 'DELETE') {
+        $upcasted_route_arguments['entity'] = $route_arguments_entity;
+      }
     }
     else {
       $upcasted_route_arguments['entity'] = $route_arguments_entity;
