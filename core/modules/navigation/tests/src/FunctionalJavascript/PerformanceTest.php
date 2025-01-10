@@ -76,7 +76,7 @@ class PerformanceTest extends PerformanceTestBase {
     $this->assertSame(2, $performance_data->getCacheSetCount());
     $this->assertSame(0, $performance_data->getCacheDeleteCount());
     $this->assertSame(2, $performance_data->getCacheTagChecksumCount());
-    $this->assertSame(29, $performance_data->getCacheTagIsValidCount());
+    $this->assertSame(28, $performance_data->getCacheTagIsValidCount());
     $this->assertSame(0, $performance_data->getCacheTagInvalidationCount());
     $this->assertSame(1, $performance_data->getStyleSheetCount());
     $this->assertSame(2, $performance_data->getScriptCount());
