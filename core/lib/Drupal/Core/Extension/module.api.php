@@ -1190,7 +1190,6 @@ function hook_requirements_alter(array &$requirements): void {
 /**
  * Check requirements before running database updates.
  *
- *
  * This hook is invoked when update.php is run and when database updates are
  * triggered via the CLI.
  *
