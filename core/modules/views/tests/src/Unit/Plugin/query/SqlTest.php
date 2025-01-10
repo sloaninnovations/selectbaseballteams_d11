@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\query\DateSqlInterface;
@@ -36,8 +37,9 @@ class SqlTest extends UnitTestCase {
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     $date_sql = $this->prophesize(DateSqlInterface::class);
     $messenger = $this->prophesize(MessengerInterface::class);
+    $logger = $this->prophesize(LoggerChannelInterface::class);
 
-    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal());
+    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal(), $logger->reveal());
     $query->view = $view;
 
     $result = [];
@@ -84,8 +86,9 @@ class SqlTest extends UnitTestCase {
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     $date_sql = $this->prophesize(DateSqlInterface::class);
     $messenger = $this->prophesize(MessengerInterface::class);
+    $logger = $this->prophesize(LoggerChannelInterface::class);
 
-    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal());
+    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal(), $logger->reveal());
     $query->view = $view;
 
     $view->result = [];
@@ -259,8 +262,9 @@ class SqlTest extends UnitTestCase {
     $entity_type_manager = $this->setupEntityTypes();
     $date_sql = $this->prophesize(DateSqlInterface::class);
     $messenger = $this->prophesize(MessengerInterface::class);
+    $logger = $this->prophesize(LoggerChannelInterface::class);
 
-    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal());
+    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal(), $logger->reveal());
     $query->view = $view;
 
     $result = [];
@@ -289,8 +293,9 @@ class SqlTest extends UnitTestCase {
     $entity_type_manager = $this->setupEntityTypes($entities);
     $date_sql = $this->prophesize(DateSqlInterface::class);
     $messenger = $this->prophesize(MessengerInterface::class);
+    $logger = $this->prophesize(LoggerChannelInterface::class);
 
-    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal());
+    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal(), $logger->reveal());
     $query->view = $view;
 
     $result = [];
@@ -310,6 +315,145 @@ class SqlTest extends UnitTestCase {
     $query->loadEntities($result);
 
     $this->assertSame($entities['first'][1], $result[0]->_entity);
+    $this->assertSame($entities['first'][2], $result[1]->_entity);
+    $this->assertSame($entities['first'][2], $result[2]->_entity);
+  }
+
+  /**
+   * @covers ::loadEntities
+   * @covers ::assignEntitiesToResult
+   */
+  public function testLoadEntitiesWithMissingEntity(): void {
+    $view = $this->prophesize(ViewExecutable::class)->reveal();
+    $this->setupViewWithRelationships($view);
+
+    $view_entity = $this->prophesize(ViewEntityInterface::class);
+    $view_entity->get('base_table')->willReturn('entity_first');
+    $view_entity->get('base_field')->willReturn('id');
+    $view_entity->id()->willReturn('test');
+    $view->storage = $view_entity->reveal();
+
+    $entities = [
+      'first' => [
+        2 => $this->prophesize(EntityInterface::class)->reveal(),
+      ],
+      'second' => [
+        3 => $this->prophesize(EntityInterface::class)->reveal(),
+      ],
+    ];
+
+    $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
+    $entity_type_first = new EntityType([
+      'label' => 'First',
+      'id' => 'first',
+      'base_table' => 'entity_first',
+      'revision_table' => 'entity_first__revision',
+      'entity_keys' => [
+        'id' => 'id',
+        'revision' => 'vid',
+      ],
+    ]);
+    $entity_type_second = new EntityType([
+      'label' => 'second',
+      'id' => 'second',
+      'base_table' => 'entity_second',
+      'revision_table' => 'entity_second__revision',
+      'entity_keys' => [
+        'id' => 'id',
+        'revision' => 'vid',
+      ],
+    ]);
+
+    $entity_type_manager->getDefinitions()->willReturn([
+      'first' => $entity_type_first,
+      'second' => $entity_type_second,
+    ]);
+
+    $entity_type_manager->getDefinition('first')->willReturn($entity_type_first);
+    $entity_type_manager->getDefinition('second')->willReturn($entity_type_second);
+
+    // Setup the views data corresponding to the entity types.
+    $views_data = $this->prophesize(ViewsData::class);
+    $views_data->get('entity_first')->willReturn([
+      'table' => [
+        'entity type' => 'first',
+        'entity revision' => FALSE,
+      ],
+    ]);
+    $views_data->get('entity_first__revision')->willReturn([
+      'table' => [
+        'entity type' => 'first',
+        'entity revision' => TRUE,
+      ],
+    ]);
+    $views_data->get('entity_first_field_data')->willReturn([
+      'table' => [
+        'entity type' => 'first',
+        'entity revision' => FALSE,
+      ],
+    ]);
+    $views_data->get('entity_second')->willReturn([
+      'table' => [
+        'entity type' => 'second',
+        'entity revision' => FALSE,
+      ],
+    ]);
+    $views_data->get('entity_second__revision')->willReturn([
+      'table' => [
+        'entity type' => 'second',
+        'entity revision' => TRUE,
+      ],
+    ]);
+    $this->setupViewsData($views_data->reveal());
+
+    // Setup the loading of entities.
+    $entity_storage_first = $this->prophesize(EntityStorageInterface::class);
+    $entity_storage_first->load(1)->willReturn(NULL);
+    $entity_storage_first->load(2)->willReturn($entities['first'][2]);
+    $entity_storage_first->loadMultiple([1, 2])->willReturn($entities['first']);
+    $entity_type_manager->getStorage('first')->willReturn($entity_storage_first);
+
+    $entity_storage_second = $this->prophesize(EntityStorageInterface::class);
+    $entity_storage_second->load(3)->willReturn($entities['second'][3]);
+    $entity_storage_second->loadMultiple([3])->willReturn($entities['second']);
+
+    $entity_type_manager->getStorage('second')->willReturn($entity_storage_second);
+
+    $this->setupEntityTypeManager($entity_type_manager->reveal());
+
+    $date_sql = $this->prophesize(DateSqlInterface::class);
+    $messenger = $this->prophesize(MessengerInterface::class);
+    $logger = $this->prophesize(LoggerChannelInterface::class);
+    $logger->warning('Failed to load entity @id for view @view. If this warning persists then it indicates that the database has inconsistent entity data.', [
+      '@id' => 1,
+      '@view' => 'test',
+    ]);
+
+    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal(), $logger->reveal());
+    $query->view = $view;
+
+    $result = [];
+    $result[] = new ResultRow([
+      'id' => 1,
+      'entity_second__id' => 3,
+    ]);
+    // Note: Let the same entity be returned multiple times, for example to
+    // support the translation use case.
+    $result[] = new ResultRow([
+      'id' => 2,
+      'entity_second__id' => 3,
+    ]);
+    $result[] = new ResultRow([
+      'id' => 2,
+      'entity_second__id' => 3,
+    ]);
+
+    $query->addField('entity_first', 'id', 'id');
+    $query->addField('entity_second', 'id', 'entity_second__id');
+    $query->loadEntities($result);
+
+    $this->assertCount(2, $result);
+    $this->assertFalse(isset($result[0]));
     $this->assertSame($entities['first'][2], $result[1]->_entity);
     $this->assertSame($entities['first'][2], $result[2]->_entity);
   }
@@ -354,8 +498,9 @@ class SqlTest extends UnitTestCase {
     $entity_type_manager = $this->setupEntityTypes($entities);
     $date_sql = $this->prophesize(DateSqlInterface::class);
     $messenger = $this->prophesize(MessengerInterface::class);
+    $logger = $this->prophesize(LoggerChannelInterface::class);
 
-    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal());
+    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal(), $logger->reveal());
     $query->view = $view;
 
     $result = [];
@@ -410,8 +555,9 @@ class SqlTest extends UnitTestCase {
     $entity_type_manager = $this->setupEntityTypes($entities);
     $date_sql = $this->prophesize(DateSqlInterface::class);
     $messenger = $this->prophesize(MessengerInterface::class);
+    $logger = $this->prophesize(LoggerChannelInterface::class);
 
-    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal());
+    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal(), $logger->reveal());
     $query->view = $view;
 
     $result = [];
@@ -462,8 +608,9 @@ class SqlTest extends UnitTestCase {
     $entity_type_manager = $this->setupEntityTypes([], $entity_revisions);
     $date_sql = $this->prophesize(DateSqlInterface::class);
     $messenger = $this->prophesize(MessengerInterface::class);
+    $logger = $this->prophesize(LoggerChannelInterface::class);
 
-    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal());
+    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal(), $logger->reveal());
     $query->view = $view;
 
     $result = [];
@@ -517,8 +664,9 @@ class SqlTest extends UnitTestCase {
     $entity_type_manager = $this->setupEntityTypes($entity, $entity_revisions);
     $date_sql = $this->prophesize(DateSqlInterface::class);
     $messenger = $this->prophesize(MessengerInterface::class);
+    $logger = $this->prophesize(LoggerChannelInterface::class);
 
-    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal());
+    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal(), $logger->reveal());
     $query->view = $view;
 
     $result = [];
@@ -576,8 +724,9 @@ class SqlTest extends UnitTestCase {
     $entity_type_manager = $this->setupEntityTypes($entities, $entity_revisions);
     $date_sql = $this->prophesize(DateSqlInterface::class);
     $messenger = $this->prophesize(MessengerInterface::class);
+    $logger = $this->prophesize(LoggerChannelInterface::class);
 
-    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal());
+    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal(), $logger->reveal());
     $query->view = $view;
 
     $result = [];
