@@ -1,0 +1,8 @@
+<a href="{{ url }}"{{ attributes.addClass('icon-link') }}>
+  <span class="icon-link__label">
+    {{ title }}
+  </span>
+  <span class="icon-link__icon" aria-hidden="true">
+    {{ include (componentMetadata.path ~ '/icons/' ~ icon ~ '.svg') }}
+  </span>
+</a>

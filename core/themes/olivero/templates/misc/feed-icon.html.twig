@@ -12,13 +12,9 @@
  */
 #}
 
-{{ attach_library('olivero/feed') }}
-
-<a href="{{ url }}"{{ attributes.addClass('feed-icon') }}>
-  <span class="feed-icon__label">
-    {{ title }}
-  </span>
-  <span class="feed-icon__icon" aria-hidden="true">
-    {% include "@olivero/../images/rss.svg" %}
-  </span>
-</a>
+{{ include('olivero:icon-link', {
+  attributes: attributes,
+  icon: 'rss',
+  title: title,
+  url: url,
+}) }}
