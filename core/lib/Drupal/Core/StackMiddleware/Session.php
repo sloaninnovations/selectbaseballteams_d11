@@ -48,6 +48,9 @@ class Session implements HttpKernelInterface {
     // session initialized and started in DrupalKernel::preHandle().
     if ($type === self::MAIN_REQUEST && PHP_SAPI !== 'cli') {
       $this->initializePersistentSession($request);
+      if ($request->getSession()->isStarted()) {
+        $request->getSession()->save();
+      }
     }
 
     $result = $this->httpKernel->handle($request, $type, $catch);
