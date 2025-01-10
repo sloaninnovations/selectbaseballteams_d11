@@ -113,7 +113,7 @@ final class NavigationUserBlock extends BlockBase implements ContainerFactoryPlu
     return [
       'menu_name' => 'navigation-user-links',
       'route_name' => 'user.page',
-      'title' => $this->t('User'),
+      'title' => $this->t('My Account'),
       'description' => '',
       'options' => [],
       'provider' => 'navigation',
