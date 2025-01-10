@@ -9,7 +9,7 @@ use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Authentication\Provider\Cookie;
-use Drupal\user\UserAuth;
+use Drupal\user\UserAuthentication;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * @coversDefaultClass \Drupal\user\UserAuth
+ * @coversDefaultClass \Drupal\user\UserAuthentication
  * @group user
  */
 class UserAuthTest extends UnitTestCase {
@@ -44,9 +44,9 @@ class UserAuthTest extends UnitTestCase {
   protected $testUser;
 
   /**
-   * The user auth object under test.
+   * The user authentication object under test.
    *
-   * @var \Drupal\user\UserAuth
+   * @var \Drupal\user\UserAuthentication
    */
   protected $userAuth;
 
@@ -86,7 +86,7 @@ class UserAuthTest extends UnitTestCase {
       ->onlyMethods(['id', 'setPassword', 'save', 'getPassword'])
       ->getMock();
 
-    $this->userAuth = new UserAuth($entity_type_manager, $this->passwordService);
+    $this->userAuth = new UserAuthentication($entity_type_manager, $this->passwordService);
   }
 
   /**
