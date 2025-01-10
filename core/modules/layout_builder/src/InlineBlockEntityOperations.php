@@ -2,6 +2,7 @@
 
 namespace Drupal\layout_builder;
 
+use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -42,6 +43,13 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
   protected $entityTypeManager;
 
   /**
+   * The block plugin manager.
+   *
+   * @var \Drupal\Core\Block\BlockManagerInterface
+   */
+  protected $blockManager;
+
+  /**
    * Constructs a new EntityOperations object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
@@ -50,12 +58,19 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
    *   Inline block usage tracking service.
    * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
    *   The section storage manager.
+   * @param \Drupal\Core\Block\BlockManagerInterface|null $block_manager
+   *   (optional) The block manager;
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager, InlineBlockUsageInterface $usage, SectionStorageManagerInterface $section_storage_manager) {
+  public function __construct(EntityTypeManagerInterface $entityTypeManager, InlineBlockUsageInterface $usage, SectionStorageManagerInterface $section_storage_manager, BlockManagerInterface $block_manager = NULL) {
     $this->entityTypeManager = $entityTypeManager;
     $this->blockContentStorage = $entityTypeManager->getStorage('block_content');
     $this->usage = $usage;
     $this->sectionStorageManager = $section_storage_manager;
+    if ($block_manager === NULL) {
+      @trigger_error('The plugin.manager.block service must be passed to \Drupal\layout_builder\InlineBlockEntityOperations::__construct(). It was added in Drupal 10.3.0 and will be required before Drupal 10.0.0.', E_USER_DEPRECATED);
+      $block_manager = \Drupal::service('plugin.manager.block');
+    }
+    $this->blockManager = $block_manager;
   }
 
   /**
@@ -65,7 +80,8 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('inline_block.usage'),
-      $container->get('plugin.manager.layout_builder.section_storage')
+      $container->get('plugin.manager.layout_builder.section_storage'),
+      $container->get('plugin.manager.block')
     );
   }
 
@@ -163,8 +179,17 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
       // revisions, when a block is modified, it must always result in the
       // creation of a new block revision.
       $new_revision = $entity instanceof RevisionableInterface;
+      $section_storage = $this->getSectionStorageForEntity($entity);
       foreach ($this->getInlineBlockComponents($sections) as $component) {
-        $this->saveInlineBlockComponent($entity, $component, $new_revision, $duplicate_blocks);
+        if (static::isTranslation($section_storage)) {
+          $translated_component_configuration = $section_storage->getTranslatedComponentConfiguration($component->getUuid());
+          if (isset($translated_component_configuration['block_serialized'])) {
+            $this->saveTranslatedInlineBlock($entity, $component->getUuid(), $translated_component_configuration, $new_revision);
+          }
+        }
+        else {
+          $this->saveInlineBlockComponent($entity, $component, $new_revision, $duplicate_blocks);
+        }
       }
     }
     $this->removeUnusedForEntityOnSave($entity);
@@ -236,6 +261,39 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
       $this->usage->addUsage($post_save_configuration['block_id'], $entity);
     }
     $component->setConfiguration($post_save_configuration);
+  }
+
+  /**
+   * Saves a translated inline block.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity with the layout.
+   * @param string $component_uuid
+   *   The component UUID.
+   * @param array $translated_component_configuration
+   *   The translated component configuration.
+   * @param bool $new_revision
+   *   Whether a new revision of the block should be created.
+   */
+  protected function saveTranslatedInlineBlock(EntityInterface $entity, $component_uuid, array $translated_component_configuration, $new_revision) {
+    /** @var \Drupal\block_content\BlockContentInterface $block */
+    $block = unserialize($translated_component_configuration['block_serialized']);
+    // Create a InlineBlock plugin from the translated configuration in order to
+    // save the block.
+    /** @var \Drupal\layout_builder\Plugin\Block\InlineBlock $plugin */
+    $plugin = $this->blockManager->createInstance('inline_block:' . $block->bundle(), $translated_component_configuration);
+    $plugin->saveBlockContent($new_revision);
+    // Remove serialized block after the block has been saved.
+    unset($translated_component_configuration['block_serialized']);
+
+    // Update the block_revision_id in the translated configuration which may
+    // have changed after saving the block.
+    $configuration = $plugin->getConfiguration();
+    $translated_component_configuration['block_revision_id'] = $configuration['block_revision_id'];
+
+    /** @var \Drupal\layout_builder\TranslatableSectionStorageInterface $section_storage */
+    $section_storage = $this->getSectionStorageForEntity($entity);
+    $section_storage->setTranslatedComponentConfiguration($component_uuid, $translated_component_configuration);
   }
 
 }

@@ -8,7 +8,11 @@
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\TimestampFormatter;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
+use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
+use Drupal\layout_builder\SectionComponent;
 
 /**
  * Implements hook_removed_post_updates().
@@ -34,6 +38,63 @@ function layout_builder_removed_post_updates() {
     'layout_builder_post_update_section_storage_context_mapping' => '10.0.0',
     'layout_builder_post_update_tempstore_route_enhancer' => '10.0.0',
   ];
+}
+
+/**
+ * Adds the layout translation settings field.
+ */
+function layout_builder_post_update_add_translation_field() {
+  /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
+  $field_manager = \Drupal::service('entity_field.manager');
+  $field_map = $field_manager->getFieldMap();
+  foreach ($field_map as $entity_type_id => $field_infos) {
+    if (isset($field_infos[OverridesSectionStorage::FIELD_NAME]['bundles'])) {
+      foreach ($field_infos[OverridesSectionStorage::FIELD_NAME]['bundles'] as $bundle) {
+        // The field map can contain stale information. If the field does not
+        // exist, ignore it. The field map will be rebuilt when the cache is
+        // cleared at the end of the update process.
+        if (!FieldConfig::loadByName($entity_type_id, $bundle, OverridesSectionStorage::FIELD_NAME)) {
+          continue;
+        }
+        _layout_builder_add_translation_field($entity_type_id, $bundle);
+
+      }
+    }
+
+  }
+}
+
+/**
+ * Adds a layout translation field to a given bundle.
+ *
+ * @param string $entity_type_id
+ *   The entity type ID.
+ * @param string $bundle
+ *   The bundle.
+ */
+function _layout_builder_add_translation_field($entity_type_id, $bundle) {
+  $field_name = OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME;
+  $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_name);
+  if (!$field) {
+    $field_storage = FieldStorageConfig::loadByName($entity_type_id, $field_name);
+    if (!$field_storage) {
+      $field_storage = FieldStorageConfig::create([
+        'entity_type' => $entity_type_id,
+        'field_name' => $field_name,
+        'type' => 'layout_translation',
+        'locked' => TRUE,
+      ]);
+      $field_storage->setTranslatable(TRUE);
+      $field_storage->save();
+    }
+
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => $bundle,
+      'label' => t('Layout Labels'),
+    ]);
+    $field->save();
+  }
 }
 
 /**
@@ -75,4 +136,46 @@ function layout_builder_post_update_timestamp_formatter(?array &$sandbox = NULL)
  */
 function layout_builder_post_update_enable_expose_field_block_feature_flag(): void {
   \Drupal::service('module_installer')->install(['layout_builder_expose_all_field_blocks']);
+}
+
+/**
+ * Add third_party_settings key to all section components.
+ */
+function layout_builder_post_update_section_component_third_party(?array &$sandbox = NULL): void {
+  $config_entity_updater = \Drupal::classResolver(ConfigEntityUpdater::class);
+
+  $callback = function (EntityViewDisplayInterface $display) {
+    $needs_update = FALSE;
+
+    // Only update entity view displays where Layout Builder is enabled.
+    if ($display instanceof LayoutEntityDisplayInterface && $display->isLayoutBuilderEnabled()) {
+      foreach ($display->getSections() as $section) {
+        // Add a third_party_settings element to each section component.
+        $components = $section->getComponents();
+        foreach ($components as $delta => $component) {
+          $components[$delta] = new SectionComponent(
+            $component->getUuid(),
+            $component->getRegion(),
+            $component->getConfiguration(),
+            $component->toArray()['additional']
+          );
+          // Depending on the state of the configuration of a site and when this
+          // update is run, there might already be third party settings on a
+          // section component. Retain them, if they exist.
+          $tps_providers = $component->getThirdPartyProviders();
+          foreach ($tps_providers as $provider) {
+            foreach ($component->getThirdPartySettings($provider) as $key => $value) {
+              $component->setThirdPartySetting($provider, $key, $value);
+            }
+          }
+          // Flag this display as needing to be updated.
+          $needs_update = TRUE;
+        }
+      }
+    }
+
+    return $needs_update;
+  };
+
+  $config_entity_updater->update($sandbox, 'entity_view_display', $callback);
 }

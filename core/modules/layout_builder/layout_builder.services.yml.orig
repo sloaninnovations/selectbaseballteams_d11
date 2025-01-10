@@ -1,6 +1,4 @@
 services:
-  _defaults:
-    autoconfigure: true
   layout_builder.tempstore_repository:
     class: Drupal\layout_builder\LayoutTempstoreRepository
     arguments: ['@tempstore.shared']
@@ -9,10 +7,6 @@ services:
     class: Drupal\layout_builder\Access\LayoutBuilderAccessCheck
     tags:
       - { name: access_check, applies_to: _layout_builder_access }
-  access_check.entity.layout_builder_translation_access:
-    class: Drupal\layout_builder\Access\LayoutBuilderTranslationAccessCheck
-    tags:
-      - { name: access_check, applies_to: _layout_builder_translation_access }
   plugin.manager.layout_builder.section_storage:
     class: Drupal\layout_builder\SectionStorage\SectionStorageManager
     parent: default_plugin_manager
@@ -21,6 +15,8 @@ services:
   layout_builder.routes:
     class: Drupal\layout_builder\Routing\LayoutBuilderRoutes
     arguments: ['@plugin.manager.layout_builder.section_storage']
+    tags:
+      - { name: event_subscriber }
   layout_builder.tempstore.route_enhancer:
     class: Drupal\layout_builder\Routing\LayoutTempstoreRouteEnhancer
     arguments: ['@layout_builder.tempstore_repository']
@@ -54,9 +50,8 @@ services:
   layout_builder.render_block_component_subscriber:
     class: Drupal\layout_builder\EventSubscriber\BlockComponentRenderArray
     arguments: ['@current_user']
-  layout_builder.translate_block_component_subscriber:
-    class: Drupal\layout_builder\EventSubscriber\ComponentPluginTranslate
-    arguments: ['@language_manager', '@current_route_match']
+    tags:
+      - { name: event_subscriber }
   logger.channel.layout_builder:
     parent: logger.channel_base
     arguments: ['layout_builder']
@@ -75,3 +70,5 @@ services:
   layout_builder.element.prepare_layout:
     class: Drupal\layout_builder\EventSubscriber\PrepareLayout
     arguments: ['@layout_builder.tempstore_repository', '@messenger']
+    tags:
+      - { name: event_subscriber }
