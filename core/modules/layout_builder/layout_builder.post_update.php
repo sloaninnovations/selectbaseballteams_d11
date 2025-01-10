@@ -9,6 +9,7 @@ use Drupal\Core\Config\Entity\ConfigEntityUpdater;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\TimestampFormatter;
 use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
+use Drupal\layout_builder\SectionComponent;
 
 /**
  * Implements hook_removed_post_updates().
@@ -75,4 +76,46 @@ function layout_builder_post_update_timestamp_formatter(?array &$sandbox = NULL)
  */
 function layout_builder_post_update_enable_expose_field_block_feature_flag(): void {
   \Drupal::service('module_installer')->install(['layout_builder_expose_all_field_blocks']);
+}
+
+/**
+ * Add third_party_settings key to all section components.
+ */
+function layout_builder_post_update_section_component_third_party(?array &$sandbox = NULL): void {
+  $config_entity_updater = \Drupal::classResolver(ConfigEntityUpdater::class);
+
+  $callback = function (EntityViewDisplayInterface $display) {
+    $needs_update = FALSE;
+
+    // Only update entity view displays where Layout Builder is enabled.
+    if ($display instanceof LayoutEntityDisplayInterface && $display->isLayoutBuilderEnabled()) {
+      foreach ($display->getSections() as $section) {
+        // Add a third_party_settings element to each section component.
+        $components = $section->getComponents();
+        foreach ($components as $delta => $component) {
+          $components[$delta] = new SectionComponent(
+            $component->getUuid(),
+            $component->getRegion(),
+            $component->getConfiguration(),
+            $component->toArray()['additional']
+          );
+          // Depending on the state of the configuration of a site and when this
+          // update is run, there might already be third party settings on a
+          // section component. Retain them, if they exist.
+          $tps_providers = $component->getThirdPartyProviders();
+          foreach ($tps_providers as $provider) {
+            foreach ($component->getThirdPartySettings($provider) as $key => $value) {
+              $component->setThirdPartySetting($provider, $key, $value);
+            }
+          }
+          // Flag this display as needing to be updated.
+          $needs_update = TRUE;
+        }
+      }
+    }
+
+    return $needs_update;
+  };
+
+  $config_entity_updater->update($sandbox, 'entity_view_display', $callback);
 }

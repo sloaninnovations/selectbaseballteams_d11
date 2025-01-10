@@ -3,6 +3,7 @@
 namespace Drupal\layout_builder;
 
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent;
 
@@ -18,7 +19,7 @@ use Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent;
  * @see \Drupal\layout_builder\Section
  * @see \Drupal\layout_builder\SectionStorageInterface
  */
-class SectionComponent {
+class SectionComponent implements ThirdPartySettingsInterface {
 
   /**
    * The UUID of the component.
@@ -52,8 +53,29 @@ class SectionComponent {
    * Any additional properties and values.
    *
    * @var mixed[]
+   *
+   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0.
+   * Additional component properties should be set via ::setThirdPartySetting().
+   *
+   * @see https://www.drupal.org/node/3100177
    */
   protected $additional = [];
+
+  /**
+   * Third party settings.
+   *
+   * An array of key/value pairs keyed by provider.
+   *
+   * @var mixed[]
+   */
+  protected $thirdPartySettings = [];
+
+  /**
+   * The legacy additional module key created dynamically.
+   *
+   * @var mixed
+   */
+  protected $legacyAdditionalModuleKey;
 
   /**
    * Constructs a new SectionComponent.
@@ -65,13 +87,24 @@ class SectionComponent {
    * @param mixed[] $configuration
    *   The plugin configuration.
    * @param mixed[] $additional
-   *   An additional values.
+   *   (optional) Additional values.
+   * @param array[] $third_party_settings
+   *   (optional) Any third party settings.
+   *
+   * @todo Remove $additional argument in
+   *   https://www.drupal.org/project/drupal/issues/3160644 in drupal:11.0.x.
    */
-  public function __construct($uuid, $region, array $configuration = [], array $additional = []) {
+  public function __construct($uuid, $region, array $configuration = [], array $additional = [], array $third_party_settings = []) {
     $this->uuid = $uuid;
     $this->region = $region;
     $this->configuration = $configuration;
+    // @todo Remove below $additional code when the drupal:11.0.x branch is opened.
+    // @see https://www.drupal.org/project/drupal/issues/3160644
     $this->additional = $additional;
+    if ($additional !== []) {
+      @trigger_error('Setting additional properties is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Additional component properties should be set via ::setThirdPartySetting(). See https://www.drupal.org/node/3100177', E_USER_DEPRECATED);
+    }
+    $this->thirdPartySettings = $third_party_settings;
   }
 
   /**
@@ -99,6 +132,11 @@ class SectionComponent {
    * @param string $property
    *   The property to retrieve.
    *
+   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0.
+   * Additional properties should be gotten via ::getThirdPartySetting().
+   *
+   * @see https://www.drupal.org/node/3100177
+   *
    * @return mixed
    *   The value for that property, or NULL if the property does not exist.
    */
@@ -109,6 +147,7 @@ class SectionComponent {
     else {
       $value = $this->additional[$property] ?? NULL;
     }
+    @trigger_error('Getting additional properties is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Additional component properties should be gotten via ::getThirdPartySetting(). See https://www.drupal.org/node/3100177', E_USER_DEPRECATED);
     return $value;
   }
 
@@ -120,6 +159,11 @@ class SectionComponent {
    * @param mixed $value
    *   The value to set.
    *
+   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0.
+   * Additional properties should be set via ::setThirdPartySetting().
+   *
+   * @see https://www.drupal.org/node/3100177
+   *
    * @return $this
    */
   public function set($property, $value) {
@@ -129,6 +173,7 @@ class SectionComponent {
     else {
       $this->additional[$property] = $value;
     }
+    @trigger_error('Setting random section component properties is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Component properties should be set via dedicated setters. See https://www.drupal.org/node/3100177', E_USER_DEPRECATED);
     return $this;
   }
 
@@ -187,7 +232,7 @@ class SectionComponent {
    * @return mixed[]
    *   The component plugin configuration.
    */
-  protected function getConfiguration() {
+  public function getConfiguration() {
     return $this->configuration;
   }
 
@@ -293,7 +338,10 @@ class SectionComponent {
       'region' => $this->getRegion(),
       'configuration' => $this->getConfiguration(),
       'weight' => $this->getWeight(),
+      // @todo Remove below key/value when the drupal:11.0.x branch is opened.
+      // @see https://www.drupal.org/project/drupal/issues/3160644
       'additional' => $this->additional,
+      'third_party_settings' => $this->thirdPartySettings,
     ];
   }
 
@@ -309,12 +357,70 @@ class SectionComponent {
    *   The section component object.
    */
   public static function fromArray(array $component) {
+    // Ensure expected array keys are present.
+    $component += [
+      'uuid' => '',
+      'region' => '',
+      'configuration' => [],
+      // @todo Remove below key/value when the drupal:11.0.x branch is opened.
+      // @see https://www.drupal.org/project/drupal/issues/3160644
+      'additional' => [],
+      'third_party_settings' => [],
+    ];
     return (new static(
       $component['uuid'],
       $component['region'],
       $component['configuration'],
-      $component['additional']
+      // @todo Remove below argument when the drupal:11.0.x branch is opened.
+      // @see https://www.drupal.org/project/drupal/issues/3160644
+      $component['additional'],
+      $component['third_party_settings']
     ))->setWeight($component['weight']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getThirdPartySetting($provider, $key, $default = NULL) {
+    return $this->thirdPartySettings[$provider][$key] ?? $default;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getThirdPartySettings($provider) {
+    return $this->thirdPartySettings[$provider] ?? [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setThirdPartySetting($provider, $key, $value) {
+    $this->thirdPartySettings[$provider][$key] = $value;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function unsetThirdPartySetting($provider, $key) {
+    unset($this->thirdPartySettings[$provider][$key]);
+    // If the third party is no longer storing any information, completely
+    // remove the array holding the settings for this provider.
+    if (empty($this->thirdPartySettings[$provider])) {
+      unset($this->thirdPartySettings[$provider]);
+    }
+    return $this;
+  }
+
+  /**
+   * Gets the list of third parties that store information.
+   *
+   * @return array
+   *   The list of third parties.
+   */
+  public function getThirdPartyProviders() {
+    return array_keys($this->thirdPartySettings);
   }
 
 }

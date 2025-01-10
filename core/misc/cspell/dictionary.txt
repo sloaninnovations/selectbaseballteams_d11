@@ -114,6 +114,7 @@ checkboxifier
 checkboxify
 checkboxradio
 chocolatiers
+chotchkies
 chromedriver
 chtext
 chumillas
@@ -312,6 +313,7 @@ imagecache
 imagetextalternative
 indexname
 inited
+initech
 inno
 instantiator
 interactable
@@ -365,6 +367,7 @@ loquesea
 lrdd
 lstitle
 ltitle
+lumbergh
 lzma
 mainpage
 mank
@@ -788,6 +791,7 @@ versionless
 vfsstream
 viewports
 vocabs
+waddams
 wcag
 wcprops
 webassert
