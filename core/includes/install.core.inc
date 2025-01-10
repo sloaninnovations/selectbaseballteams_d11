@@ -16,6 +16,7 @@ use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormState;
@@ -42,6 +43,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\user\Entity\User;
 
 /**
@@ -439,9 +441,7 @@ function install_begin_request($class_loader, &$install_state) {
   }
   /** @var \Drupal\Core\File\FileSystemInterface $file_system */
   $file_system = $container->get('file_system');
-  $container->set('string_translator.file_translation', new FileTranslation($directory, $file_system));
-  $container->get('string_translation')
-    ->addTranslator($container->get('string_translator.file_translation'));
+  set_container_string_translation($container, $directory, $file_system);
 
   // Add list of all available profiles to the installation state.
   $listing = new ExtensionDiscovery($container->getParameter('app.root'));
@@ -493,14 +493,24 @@ function install_begin_request($class_loader, &$install_state) {
     \Drupal::translation()->setDefaultLangcode($install_state['parameters']['langcode']);
   }
 
-  // Override the module list with a minimal set of modules.
+  // Ensure system and the install profile is available.
   $module_handler = \Drupal::moduleHandler();
+  $app_root = dirname(__DIR__, 2);
+  $module_filenames = [];
   if (!$module_handler->moduleExists('system')) {
-    $module_handler->addModule('system', 'core/modules/system');
+    $module_filenames['system'] = new Extension($app_root, 'module', 'core/modules/system/system.info.yml', 'system.module');
   }
   if ($profile && !$module_handler->moduleExists($profile)) {
-    $module_handler->addProfile($profile, $install_state['profiles'][$profile]->getPath());
+    $module_filenames[$profile] = $install_state['profiles'][$profile];
   }
+  if ($module_filenames) {
+    $kernel->updateModules($module_filenames, $module_filenames);
+  }
+
+  // Get the new version of the container from the kernel.
+  $container = $kernel->getContainer();
+  // Set string translation since updateModules can remove it.
+  set_container_string_translation($container, $directory, $file_system);
 
   // Load all modules and perform request related initialization.
   $kernel->preHandle($request);
@@ -2655,4 +2665,23 @@ function install_recipe_batch(&$install_state) {
   }
 
   return $batch_builder->toArray();
+}
+
+/**
+ * Sets string translation on the container.
+ *
+ * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+ *   The container to add string translation to.
+ * @param string $directory
+ *   The directory.
+ * @param \Drupal\Core\File\FileSystemInterface $file_system
+ *   The Filesystem.
+ *
+ * @internal
+ *   This is a helper to enable string translation.
+ */
+function set_container_string_translation(ContainerInterface &$container, string $directory, FileSystemInterface $file_system): void {
+  $container->set('string_translator.file_translation', new FileTranslation($directory, $file_system));
+  $container->get('string_translation')
+    ->addTranslator($container->get('string_translator.file_translation'));
 }
