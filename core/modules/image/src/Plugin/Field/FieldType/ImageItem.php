@@ -323,24 +323,41 @@ class ImageItem extends FileItem {
   /**
    * {@inheritdoc}
    */
-  public function preSave() {
-    parent::preSave();
-
-    $width = $this->width;
-    $height = $this->height;
+  public function onChange($property_name, $notify = TRUE) {
+    parent::onChange($property_name, $notify);
 
     // Determine the dimensions if necessary.
-    if ($this->entity && $this->entity instanceof EntityInterface) {
-      if (empty($width) || empty($height)) {
-        $image = \Drupal::service('image.factory')->get($this->entity->getFileUri());
-        if ($image->isValid()) {
-          $this->width = $image->getWidth();
-          $this->height = $image->getHeight();
-        }
-      }
+    if (!$this->entity instanceof EntityInterface) {
+      return;
     }
-    else {
-      $this->getLogger('image')->warning("Missing file with ID %id.", ['%id' => $this->target_id]);
+
+    if ($property_name === 'width' || $property_name === 'height') {
+      return;
+    }
+
+    $width = $this->get('width')->getValue();
+    $height = $this->get('height')->getValue();
+
+    if ($width !== NULL && $height !== NULL) {
+      return;
+    }
+
+    $image = \Drupal::service('image.factory')->get($this->entity->getFileUri());
+    if (!$image->isValid()) {
+      return;
+    }
+
+    $this->set('width', $image->getWidth());
+    $this->set('height', $image->getHeight());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave() {
+    parent::preSave();
+    if (!$this->entity instanceof EntityInterface) {
+      trigger_error(sprintf("Missing file with ID %s.", $this->target_id), E_USER_WARNING);
     }
   }
 
