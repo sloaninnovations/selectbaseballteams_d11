@@ -6,6 +6,8 @@ namespace Drupal\Tests\system\Kernel\Theme;
 
 use Drupal\KernelTests\KernelTestBase;
 
+// cspell:ignore endapply
+
 /**
  * Tests Drupal's Twig filters.
  *
