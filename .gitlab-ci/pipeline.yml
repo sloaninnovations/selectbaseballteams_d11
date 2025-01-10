@@ -18,7 +18,8 @@ default:
       - runner_system_failure
       - scheduler_failure
   image:
-    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:production
+#    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:production
+    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:dev
   before_script:
     - |
       [[ $_TARGET_DB == sqlite* ]] && export SIMPLETEST_DB=sqlite://localhost/$CI_PROJECT_DIR/sites/default/files/db.sqlite?module=sqlite
@@ -73,6 +74,7 @@ variables:
 
 .with-database: &with-database
   name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:production
+#  name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:dev
   alias: database
 
 .with-chrome: &with-chrome
