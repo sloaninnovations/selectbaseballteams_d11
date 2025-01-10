@@ -32,4 +32,7 @@
   .js-show {
     display: block;
   }
+  [data-drupal-initially-hidden]:not([data-once*="states"]) {
+    display: none;
+  }
 }
