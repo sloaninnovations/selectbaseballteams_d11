@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Updater;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -13,6 +14,8 @@ use Drupal\KernelTests\KernelTestBase;
  */
 class UpdateRequirementsTest extends KernelTestBase {
 
+  use StringTranslationTrait;
+
   /**
    * Tests hook_update_requirements().
    */
@@ -21,18 +24,18 @@ class UpdateRequirementsTest extends KernelTestBase {
 
     \Drupal::service('module_installer')->install(['module_update_requirements']);
     $testRequirements = [
-      'title' => t('UpdateError'),
-      'value' => t('None'),
-      'description' => t('Update Error.'),
+      'title' => $this->t('UpdateError'),
+      'value' => $this->t('None'),
+      'description' => $this->t('Update Error.'),
       'severity' => REQUIREMENT_ERROR,
     ];
     $requirements = update_check_requirements()['test.update.error'];
     $this->assertEquals($testRequirements, $requirements);
 
     $testAlterRequirements = [
-      'title' => t('UpdateWarning'),
-      'value' => t('None'),
-      'description' => t('Update Warning.'),
+      'title' => $this->t('UpdateWarning'),
+      'value' => $this->t('None'),
+      'description' => $this->t('Update Warning.'),
       'severity' => REQUIREMENT_WARNING,
     ];
     $alterRequirements = update_check_requirements()['test.update.error.alter'];
