@@ -1,4 +1,4 @@
-name: 'Test hook_module_implements_alter'
+name: 'Module for testing LegacyModuleImplementsAlter'
 type: module
 description: 'Support module for module system testing.'
 package: Testing

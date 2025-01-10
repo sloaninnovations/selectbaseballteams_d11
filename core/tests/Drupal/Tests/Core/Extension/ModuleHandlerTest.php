@@ -83,7 +83,7 @@ class ModuleHandlerTest extends UnitTestCase {
    * @group legacy
    */
   public function testLoadAllModules(): void {
-    $this->expectDeprecation('module_handler_test_all1_module_implements_alter without a #[LegacyHook] attribute is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3496788');
+    $this->expectDeprecation('module_handler_test_all1_module_implements_alter without a #[LegacyModuleImplementsAlter] attribute is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3496788');
     $module_handler = $this->getModuleHandler();
     $module_handler->addModule('module_handler_test_all1', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1');
     $module_handler->addModule('module_handler_test_all2', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2');
@@ -333,7 +333,7 @@ class ModuleHandlerTest extends UnitTestCase {
    * @group legacy
    */
   public function testInvokeAll(): void {
-    $this->expectDeprecation('module_handler_test_all1_module_implements_alter without a #[LegacyHook] attribute is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3496788');
+    $this->expectDeprecation('module_handler_test_all1_module_implements_alter without a #[LegacyModuleImplementsAlter] attribute is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3496788');
     $module_handler = $this->getModuleHandler();
     $module_handler->addModule('module_handler_test_all1', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1');
     $module_handler->addModule('module_handler_test_all2', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2');

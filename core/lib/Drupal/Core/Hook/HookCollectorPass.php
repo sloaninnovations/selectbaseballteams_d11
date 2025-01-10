@@ -10,6 +10,7 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\Hook\Attribute\LegacyModuleImplementsAlter;
 use Drupal\Core\Hook\Attribute\ReOrderHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
@@ -366,7 +367,7 @@ class HookCollectorPass implements CompilerPassInterface {
             if (StaticReflectionParser::hasAttribute($attributes, StopProceduralHookScan::class)) {
               break;
             }
-            if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && preg_match($module_preg, $function, $matches)) {
+            if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && preg_match($module_preg, $function, $matches) && !StaticReflectionParser::hasAttribute($attributes, LegacyModuleImplementsAlter::class)) {
               $implementations[] = ['function' => $function, 'module' => $matches['module'], 'hook' => $matches['hook']];
             }
           }
@@ -423,7 +424,7 @@ class HookCollectorPass implements CompilerPassInterface {
       $this->hookInfo[] = $function;
     }
     if ($hook === 'module_implements_alter') {
-      $message = "$function without a #[LegacyHook] attribute is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3496788";
+      $message = "$function without a #[LegacyModuleImplementsAlter] attribute is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3496788";
       @trigger_error($message, E_USER_DEPRECATED);
       $this->moduleImplementsAlters[] = $function;
     }
