@@ -1188,25 +1188,25 @@ function hook_requirements_alter(array &$requirements): void {
 }
 
 /**
- * Check update requirements.
+ * Check requirements before running database updates.
  *
- * This is checked when update.php is run
+ *
+ * This hook is invoked when update.php is run and when database updates are
+ * triggered via the CLI.
  *
  * @return array
  *   An associative array where the keys are arbitrary but must be unique (it
  *   is suggested to use the module short name as a prefix) and the values are
  *   themselves associative arrays with the following elements:
  *   - title: The name of the requirement.
- *   - value: The current value (e.g., version, time, level, etc). During
- *     install phase, this should only be used for version numbers, do not set
- *     it if not applicable.
+ *   - value: The current value (e.g., version, time, level, etc).
  *   - description: The description of the requirement/status.
  *   - severity: (optional) The requirement's result/severity level, one of:
  *     - REQUIREMENT_INFO: For info only.
  *     - REQUIREMENT_OK: The requirement is satisfied.
  *     - REQUIREMENT_WARNING: The requirement failed with a warning.
  *     - REQUIREMENT_ERROR: The requirement failed with an error.
- *     Defaults to REQUIREMENT_OK when installing, REQUIREMENT_INFO otherwise.
+ *     Defaults to REQUIREMENT_INFO.
  */
 function hook_update_requirements() {
   $requirements = [];
@@ -1225,11 +1225,11 @@ function hook_update_requirements() {
 }
 
 /**
- * Alters requirements data.
+ * Alters update requirements data.
  *
  * Implementations are able to alter the title, value, description or the
- * severity of certain requirements defined by hook_requirements()
- * implementations or even remove such entries.
+ * severity of certain requirements defined by hook_requirements() and
+ * hook_update_requirements() implementations, or even remove such entries.
  *
  * @param array $requirements
  *   The requirements data to be altered.

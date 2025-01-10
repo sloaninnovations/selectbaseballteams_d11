@@ -7,14 +7,14 @@ namespace Drupal\KernelTests\Core\Updater;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
- * Tests Update Requirements Hook.
+ * Tests hook_update_requirements() and hook_update_requirements_alter().
  *
  * @group Hooks
  */
 class UpdateRequirementsTest extends KernelTestBase {
 
   /**
-   * Tests hook_update_requirements.
+   * Tests hook_update_requirements().
    */
   public function testUpdateRequirements(): void {
     require_once 'core/includes/update.inc';
@@ -40,7 +40,7 @@ class UpdateRequirementsTest extends KernelTestBase {
     $testRequirements = [
       'title' => t('UpdateWarning'),
       'value' => t('None'),
-      'description' => t("Update Warning."),
+      'description' => t('Update Warning.'),
       'severity' => REQUIREMENT_WARNING,
     ];
     $requirements = update_check_requirements()['test.update.error.alter'];

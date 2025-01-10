@@ -20,13 +20,13 @@ class ModuleUpdateRequirementsHooks {
       'test.update.error' => [
         'title' => t('UpdateError'),
         'value' => t('None'),
-        'description' => t("Update Error."),
+        'description' => t('Update Error.'),
         'severity' => REQUIREMENT_ERROR,
       ],
       'test.update.error.alter' => [
         'title' => t('UpdateError'),
         'value' => t('None'),
-        'description' => t("Update Error."),
+        'description' => t('Update Error.'),
         'severity' => REQUIREMENT_ERROR,
       ],
     ];
@@ -40,7 +40,7 @@ class ModuleUpdateRequirementsHooks {
     $requirements['test.update.error.alter'] = [
       'title' => t('UpdateWarning'),
       'value' => t('None'),
-      'description' => t("Update Warning."),
+      'description' => t('Update Warning.'),
       'severity' => REQUIREMENT_WARNING,
     ];
   }
