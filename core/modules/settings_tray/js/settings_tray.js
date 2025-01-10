@@ -168,7 +168,7 @@
           instance.options.data.dialogOptions = {};
         }
         instance.options.data.dialogOptions.settingsTrayActiveEditableId =
-          closestSettingsTray.id;
+          closestSettingsTray ? closestSettingsTray.id : undefined;
         instance.progress = { type: 'fullscreen' };
       });
   }
