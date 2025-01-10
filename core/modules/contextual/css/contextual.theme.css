@@ -91,6 +91,7 @@
 }
 .contextual-region .contextual .contextual-links a {
   display: block;
+  font-weight: normal;
   margin: 0.25em 0;
   padding: 0.4em 0.6em;
   color: #333;
