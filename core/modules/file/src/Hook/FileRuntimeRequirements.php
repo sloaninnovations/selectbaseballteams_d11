@@ -3,11 +3,14 @@
 namespace Drupal\file\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * RuntimeRequirements for file.
  */
 class FileRuntimeRequirements {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_runtime_requirements().
@@ -24,26 +27,26 @@ class FileRuntimeRequirements {
 
     // Check the uploadprogress extension is loaded.
     if (extension_loaded('uploadprogress')) {
-      $value = t('Enabled (<a href="http://pecl.php.net/package/uploadprogress">PECL uploadprogress</a>)');
+      $value = $this->t('Enabled (<a href="http://pecl.php.net/package/uploadprogress">PECL uploadprogress</a>)');
       $description = NULL;
     }
     else {
-      $value = t('Not enabled');
-      $description = t('Your server is capable of displaying file upload progress, but does not have the required libraries. It is recommended to install the <a href="http://pecl.php.net/package/uploadprogress">PECL uploadprogress library</a>.');
+      $value = $this->t('Not enabled');
+      $description = $this->t('Your server is capable of displaying file upload progress, but does not have the required libraries. It is recommended to install the <a href="http://pecl.php.net/package/uploadprogress">PECL uploadprogress library</a>.');
     }
 
     // Adjust the requirement depending on what the server supports.
     if (!$is_apache && !$is_nginx) {
-      $value = t('Not enabled');
-      $description = t('Your server is not capable of displaying file upload progress. File upload progress requires an Apache server running PHP with mod_php or Nginx with PHP-FPM.');
+      $value = $this->t('Not enabled');
+      $description = $this->t('Your server is not capable of displaying file upload progress. File upload progress requires an Apache server running PHP with mod_php or Nginx with PHP-FPM.');
     }
     elseif ($fastcgi) {
-      $value = t('Not enabled');
-      $description = t('Your server is not capable of displaying file upload progress. File upload progress requires PHP be run with mod_php or PHP-FPM and not as FastCGI.');
+      $value = $this->t('Not enabled');
+      $description = $this->t('Your server is not capable of displaying file upload progress. File upload progress requires PHP be run with mod_php or PHP-FPM and not as FastCGI.');
     }
 
     $requirements['file_progress'] = [
-      'title' => t('Upload progress'),
+      'title' => $this->t('Upload progress'),
       'value' => $value,
       'description' => $description,
     ];
