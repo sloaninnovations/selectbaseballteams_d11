@@ -7,6 +7,7 @@
 
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
 use Drupal\taxonomy\VocabularyInterface;
+use Drupal\Core\Site\Settings;
 
 /**
  * Implements hook_removed_post_updates().
@@ -42,4 +43,55 @@ function taxonomy_post_update_set_vocabulary_description_to_null(array &$sandbox
       // @see taxonomy_taxonomy_vocabulary_presave()
       return trim($vocabulary->getDescription()) === '';
     });
+}
+
+/**
+ * Populate taxonomy index new langcode column.
+ */
+function taxonomy_post_update_populate_taxonomy_index_langcode(&$sandbox = NULL) {
+  /** @var \Drupal\node\NodeStorageInterface $node_storage */
+  $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+  $database = \Drupal::database();
+
+  if (!isset($sandbox['max'])) {
+    $sandbox['max'] = $database->select('taxonomy_index')
+      ->fields('taxonomy_index', ['nid'])
+      ->distinct()
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $sandbox['progress'] = 0;
+    $sandbox['limit'] = Settings::get('entity_update_batch_size', 50);
+
+    // Handle the case of 0 node to process.
+    if ($sandbox['max'] == 0) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
+  }
+
+  // Retrieve the next group.
+  $entity_ids = $database->select('taxonomy_index')
+    ->fields('taxonomy_index', ['nid'])
+    ->orderBy('nid')
+    ->distinct()
+    ->range($sandbox['progress'], $sandbox['limit'])
+    ->execute()
+    ->fetchCol();
+  $nodes = $node_storage->loadMultiple($entity_ids);
+
+  foreach ($nodes as $node) {
+    taxonomy_delete_node_index($node);
+    taxonomy_build_node_index($node);
+
+    // Update our progress information.
+    $sandbox['progress']++;
+  }
+
+  if ($sandbox['progress'] != $sandbox['max']) {
+    $sandbox['#finished'] = ($sandbox['progress'] >= $sandbox['max']);
+  }
+  else {
+    $sandbox['#finished'] = 1;
+  }
 }

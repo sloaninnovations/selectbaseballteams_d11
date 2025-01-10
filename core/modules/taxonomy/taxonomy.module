@@ -10,6 +10,7 @@ use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
+use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\VocabularyInterface;
 
@@ -111,7 +112,7 @@ function taxonomy_local_tasks_alter(&$local_tasks) {
  *       'full' or 'teaser'.
  *   - attributes: HTML attributes for the containing element.
  */
-function template_preprocess_taxonomy_term(&$variables) {
+function template_preprocess_taxonomy_term(array &$variables) {
   $variables['view_mode'] = $variables['elements']['#view_mode'];
   $variables['term'] = $variables['elements']['#taxonomy_term'];
   /** @var \Drupal\taxonomy\TermInterface $term */
@@ -208,40 +209,45 @@ function taxonomy_node_insert(EntityInterface $node) {
  * @param \Drupal\node\Entity\Node $node
  *   The node entity.
  */
-function taxonomy_build_node_index($node) {
+function taxonomy_build_node_index(Node $node) {
   // We maintain a denormalized table of term/node relationships, containing
   // only data for current, published nodes.
   if (!\Drupal::config('taxonomy.settings')->get('maintain_index_table') || !(\Drupal::entityTypeManager()->getStorage('node') instanceof SqlContentEntityStorage)) {
     return;
   }
 
-  $status = $node->isPublished();
   $sticky = (int) $node->isSticky();
   // We only maintain the taxonomy index for published nodes.
-  if ($status && $node->isDefaultRevision()) {
-    // Collect a unique list of all the term IDs from all node fields.
-    $tid_all = [];
-    $entity_reference_class = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
-    foreach ($node->getFieldDefinitions() as $field) {
-      $field_name = $field->getName();
-      $class = $field->getItemDefinition()->getClass();
-      $is_entity_reference_class = ($class === $entity_reference_class) || is_subclass_of($class, $entity_reference_class);
-      if ($is_entity_reference_class && $field->getSetting('target_type') == 'taxonomy_term') {
-        foreach ($node->getTranslationLanguages() as $language) {
-          foreach ($node->getTranslation($language->getId())->$field_name as $item) {
-            if (!$item->isEmpty()) {
-              $tid_all[$item->target_id] = $item->target_id;
-            }
+  // Collect a unique list of all the term IDs from all node fields.
+  $tid_all = [];
+  $entity_reference_class = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
+  foreach ($node->getFieldDefinitions() as $field) {
+    $field_name = $field->getName();
+    $class = $field->getItemDefinition()->getClass();
+    $is_entity_reference_class = ($class === $entity_reference_class) || is_subclass_of($class, $entity_reference_class);
+    if ($is_entity_reference_class && $field->getSetting('target_type') == 'taxonomy_term') {
+      foreach ($node->getTranslationLanguages() as $language) {
+        foreach ($node->getTranslation($language->getId())->$field_name as $item) {
+          if (!$item->isEmpty()) {
+            $tid_all[$item->target_id][$language->getId()] = $item->target_id;
           }
         }
       }
     }
+  }
+
+  if (!empty($tid_all)) {
     // Insert index entries for all the node's terms.
-    if (!empty($tid_all)) {
-      $connection = \Drupal::database();
-      foreach ($tid_all as $tid) {
+    $connection = \Drupal::database();
+    foreach ($tid_all as $tid_info) {
+      foreach ($tid_info as $langcode => $tid) {
         $connection->merge('taxonomy_index')
-          ->keys(['nid' => $node->id(), 'tid' => $tid, 'status' => $node->isPublished()])
+          ->keys([
+            'nid' => $node->id(),
+            'tid' => $tid,
+            'status' => (int) $node->getTranslation($langcode)->isPublished(),
+            'langcode' => $langcode,
+          ])
           ->fields(['sticky' => $sticky, 'created' => $node->getCreatedTime()])
           ->execute();
       }
@@ -278,7 +284,13 @@ function taxonomy_node_predelete(EntityInterface $node) {
  */
 function taxonomy_delete_node_index(EntityInterface $node) {
   if (\Drupal::config('taxonomy.settings')->get('maintain_index_table')) {
-    \Drupal::database()->delete('taxonomy_index')->condition('nid', $node->id())->execute();
+    // Since taxonomy_node_update() will handle the deletions of specific
+    // translations, we only need to handle the case where the whole node is
+    // deleted.
+    \Drupal::database()
+      ->delete('taxonomy_index')
+      ->condition('nid', $node->id())
+      ->execute();
   }
 }
 
