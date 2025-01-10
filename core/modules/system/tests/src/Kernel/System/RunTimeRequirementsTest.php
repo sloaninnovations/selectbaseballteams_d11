@@ -19,7 +19,7 @@ class RunTimeRequirementsTest extends KernelTestBase {
   protected static $modules = ['system'];
 
   /**
-   * Tests that hook_runtime_requirements is loaded in SystemManager.
+   * Tests hook_runtime_requirements() and hook_runtime_requirements_alter().
    */
   public function testRuntimeRequirements(): void {
     // Enable the test module.
@@ -27,27 +27,20 @@ class RunTimeRequirementsTest extends KernelTestBase {
     $testRequirements = [
       'title' => t('RuntimeError'),
       'value' => t('None'),
-      'description' => t("Runtime Error."),
+      'description' => t('Runtime Error.'),
       'severity' => REQUIREMENT_ERROR,
     ];
     $requirements = \Drupal::service('system.manager')->listRequirements()['test.runtime.error'];
     $this->assertEquals($testRequirements, $requirements);
-  }
 
-  /**
-   * Tests that hook_runtime_requirements_alter is loaded in SystemManager.
-   */
-  public function testRuntimeRequirementsAlter(): void {
-    // Enable the test module.
-    \Drupal::service('module_installer')->install(['module_runtime_requirements']);
     $testRequirementsAlter = [
       'title' => t('RuntimeWarning'),
       'value' => t('None'),
-      'description' => t("Runtime Warning."),
+      'description' => t('Runtime Warning.'),
       'severity' => REQUIREMENT_WARNING,
     ];
-    $requirements = \Drupal::service('system.manager')->listRequirements()['test.runtime.error.alter'];
-    $this->assertEquals($testRequirementsAlter, $requirements);
+    $requirementsAlter = \Drupal::service('system.manager')->listRequirements()['test.runtime.error.alter'];
+    $this->assertEquals($testRequirementsAlter, $requirementsAlter);
   }
 
 }

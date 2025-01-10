@@ -1205,8 +1205,7 @@ function hook_requirements_alter(array &$requirements): void {
  *   is suggested to use the module short name as a prefix) and the values are
  *   themselves associative arrays with the following elements:
  *   - title: The name of the requirement.
- *   - value: The current value (e.g., version, time, level, etc). Do not set
- *     it if not applicable.
+ *   - value: The current value (e.g., version, time, level, etc).
  *   - description: The description of the requirement/status.
  *   - severity: (optional) The requirement's result/severity level, one of:
  *     - REQUIREMENT_INFO: For info only.
@@ -1260,8 +1259,8 @@ function hook_runtime_requirements(): array {
  * Alters runtime requirements data.
  *
  * Implementations are able to alter the title, value, description or the
- * severity of certain requirements defined by hook_runtime_requirements()
- * implementations or even remove such entries.
+ * severity of certain requirements defined by hook_requirements() and
+ * hook_runtime_requirements() implementations, or even remove such entries.
  *
  * @param array $requirements
  *   The requirements data to be altered.
