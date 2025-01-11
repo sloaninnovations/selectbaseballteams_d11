@@ -121,6 +121,13 @@ class MenuLinkParent extends ProcessPluginBase implements ContainerFactoryPlugin
   protected $menuLinkStorage;
 
   /**
+   * The migration IDs to use for looking up the parent link.
+   *
+   * @var string[]
+   */
+  protected array $lookup_migrations;
+
+  /**
    * Constructs a MenuLinkParent object.
    *
    * @param array $configuration
@@ -145,11 +152,7 @@ class MenuLinkParent extends ProcessPluginBase implements ContainerFactoryPlugin
     $this->migrateLookup = $migrate_lookup;
     $this->menuLinkManager = $menu_link_manager;
     $this->menuLinkStorage = $menu_link_storage;
-
-    $lookup_migrations = $this->configuration['lookup_migrations'] ?? NULL;
-    if ($lookup_migrations !== NULL && !is_array($lookup_migrations)) {
-      throw new \InvalidArgumentException('If provided, "lookup_migrations" must be an array or null.');
-    }
+    $this->lookup_migrations = $this->configuration['lookup_migrations'] ?? [$this->migration->id()];
   }
 
   /**
@@ -180,8 +183,7 @@ class MenuLinkParent extends ProcessPluginBase implements ContainerFactoryPlugin
       return '';
     }
 
-    $lookup_migrations = $this->configuration['lookup_migrations'] ?? [$this->migration->id()];
-    foreach ($lookup_migrations as $migration_id) {
+    foreach ($this->lookup_migrations as $migration_id) {
       $lookup_result = $this->migrateLookup->lookup($migration_id, [$parent_id]);
       if ($lookup_result) {
         $already_migrated_id = $lookup_result[0]['id'];
