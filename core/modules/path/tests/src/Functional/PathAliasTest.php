@@ -66,21 +66,31 @@ class PathAliasTest extends PathTestBase {
 
     // Check the path alias prefix list cache.
     $prefix_list = \Drupal::cache('bootstrap')->get('path_alias_prefix_list');
-    $this->assertTrue($prefix_list->data['node']);
-    $this->assertFalse($prefix_list->data['admin']);
+    $this->assertNull($prefix_list->data['node']);
+    $this->assertFalse($prefix_list->data['user']);
+    $this->assertNull($prefix_list->data['admin']);
 
     // Visit the system path for the node and confirm a cache entry is
     // created.
     \Drupal::cache('data')->deleteAll();
-    // Make sure the path is not converted to the alias.
     $this->drupalGet(trim($edit['path[0][value]'], '/'), ['alias' => TRUE]);
+    $prefix_list = \Drupal::cache('bootstrap')->get('path_alias_prefix_list');
+    $this->assertNull($prefix_list->data['node']);
+    $this->assertFalse($prefix_list->data['user']);
+    $this->assertNull($prefix_list->data['admin']);
     $this->assertNotEmpty(\Drupal::cache('data')->get('preload-paths:' . $edit['path[0][value]']), 'Cache entry was created.');
 
     // Visit the alias for the node and confirm a cache entry is created.
     \Drupal::cache('data')->deleteAll();
-    // @todo Remove this once https://www.drupal.org/node/2480077 lands.
     Cache::invalidateTags(['rendered']);
     $this->drupalGet(trim($edit['alias[0][value]'], '/'));
+    $prefix_list = \Drupal::cache('bootstrap')->get('path_alias_prefix_list');
+
+    // Now that the node alias has been requested, it should be recorded in the
+    // prefix list.
+    $this->assertTrue($prefix_list->data['node']);
+    $this->assertFalse($prefix_list->data['user']);
+    $this->assertNull($prefix_list->data['admin']);
     $this->assertNotEmpty(\Drupal::cache('data')->get('preload-paths:' . $edit['path[0][value]']), 'Cache entry was created.');
   }
 

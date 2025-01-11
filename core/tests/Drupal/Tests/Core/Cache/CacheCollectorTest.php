@@ -328,9 +328,9 @@ class CacheCollectorTest extends UnitTestCase {
   }
 
   /**
-   * Tests updating the cache after a delete.
+   * Tests deleting the cache after a delete.
    */
-  public function testUpdateCacheDelete(): void {
+  public function testDeleteCacheAfterDelete(): void {
     $key = $this->randomMachineName();
     $value = $this->randomMachineName();
 
@@ -351,14 +351,14 @@ class CacheCollectorTest extends UnitTestCase {
     $this->collector->delete($key);
 
     // Set up mock objects for the expected calls, first a lock acquire, then
-    // a cache set and finally the lock is released again.
+    // a cache delete and finally the lock is released again.
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with($this->cid . ':Drupal\Core\Cache\CacheCollector')
       ->willReturn(TRUE);
     $this->cacheBackend->expects($this->once())
-      ->method('set')
-      ->with($this->cid, [], Cache::PERMANENT, []);
+      ->method('delete')
+      ->with($this->cid);
     $this->lock->expects($this->once())
       ->method('release')
       ->with($this->cid . ':Drupal\Core\Cache\CacheCollector');
