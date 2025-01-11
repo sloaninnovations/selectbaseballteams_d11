@@ -20,7 +20,6 @@ class InstallRequirementsTest extends KernelTestBase {
     require_once 'core/includes/install.inc';
 
     $this->assertFalse(isset($GLOBALS['module_install_requirements']));
-    \Drupal::service('module_installer')->install(['module_install_requirements']);
     drupal_check_module('module_install_requirements');
     $this->assertTrue(isset($GLOBALS['module_install_requirements']));
   }

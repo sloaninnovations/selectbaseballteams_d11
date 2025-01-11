@@ -43,6 +43,6 @@ interface InstallRequirementsInterface {
    *     - REQUIREMENT_ERROR: The requirement failed with an error.
    *     Defaults to REQUIREMENT_OK when installing.
    */
-  public function getRequirements(): array;
+  public static function getRequirements(): array;
 
 }

@@ -11,7 +11,7 @@ class ModuleInstallRequirementsRequirements implements InstallRequirementsInterf
   /**
    * {@inheritdoc}
    */
-  public function getRequirements(): array {
+  public static function getRequirements(): array {
     $GLOBALS['module_install_requirements'] = 'module_install_requirements';
 
     return [];

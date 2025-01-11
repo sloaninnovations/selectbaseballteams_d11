@@ -812,19 +812,19 @@ function install_profile_info($profile, $langcode = 'en') {
  *
  * @return array
  *   The requirements.
+ *
+ * @internal
  */
 function check_class_requirements(string $module, string $module_path = ''): array {
   $requirements = [];
   $camelized = ContainerBuilder::camelize($module);
   $name = "{$camelized}Requirements";
-  if ($module_path) {
-    \Drupal::service('class_loader')->addPsr4('Drupal\\' . $module . '\\', \Drupal::root() . "/$module_path/src");
-  }
+  $requirements_path = \Drupal::root() . "/$module_path/src/Install/$name.php";
+  if (is_file($requirements_path)) {
+    require_once $requirements_path;
 
-  $class = "Drupal\\{$module}\\Install\\$name";
-  if (class_exists($class)) {
-    $requirementsGet = new $class();
-    $requirements = $requirementsGet->getRequirements();
+    $class_name = "Drupal\\$module\\Install\\$name";
+    $requirements = $class_name::getRequirements();
   }
 
   return $requirements;
