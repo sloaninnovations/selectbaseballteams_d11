@@ -118,6 +118,11 @@ class PathWorkspacesTest extends BrowserTestBase {
     // Publish the workspace and check that the alias can be accessed in Live.
     $stage->publish();
     $this->assertAccessiblePaths([$path]);
+
+    // The \Drupal\path_alias\AliasWhitelist service performs cache clears after
+    // Drupal has flushed the response to the client; wait for this to finish.
+    sleep(1);
+
     $this->assertNotEmpty(\Drupal::cache('data')->get('preload-paths:/node/1'));
   }
 
@@ -162,6 +167,11 @@ class PathWorkspacesTest extends BrowserTestBase {
 
     $this->drupalLogout();
     $this->assertAccessiblePaths([$path]);
+
+    // The \Drupal\path_alias\AliasWhitelist service performs cache clears after
+    // Drupal has flushed the response to the client; wait for this to finish.
+    sleep(1);
+
     $this->assertNotEmpty(\Drupal::cache('data')->get('preload-paths:/node/1'));
   }
 
