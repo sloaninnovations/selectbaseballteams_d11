@@ -12,7 +12,7 @@ use Drupal\migrate\Plugin\migrate\source\ContentEntity as MigrateContentEntity;
  *
  * @see https://www.drupal.org/node/3498916
  */
-class ContentEntity extends SourcePluginBase extends MigrateContentEntity {
+class ContentEntity extends MigrateContentEntity {
 
   /**
    * {@inheritdoc}
