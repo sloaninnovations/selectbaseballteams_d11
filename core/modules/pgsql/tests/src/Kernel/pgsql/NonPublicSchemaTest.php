@@ -294,7 +294,8 @@ class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
     $this->testingFakeConnection->schema()->addUniqueKey('faking_table', 'test_field', ['test_field']);
 
     // This should work, but currently indexExist() only searches for keys that end with idx.
-    // @todo remove comments when: https://www.drupal.org/project/drupal/issues/3325358 is committed.
+    // @todo remove comments when:
+    //   https://www.drupal.org/project/drupal/issues/3325358 is committed.
     // $this->assertTrue($this->testingFakeConnection->schema()->indexExists('faking_table', 'test_field'));
 
     $results = $this->testingFakeConnection->query("SELECT * FROM pg_indexes WHERE indexname = :indexname", [':indexname' => $this->testingFakeConnection->getPrefix() . 'faking_table__test_field__key'])->fetchAll();
@@ -308,7 +309,8 @@ class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
     $this->testingFakeConnection->schema()->dropUniqueKey('faking_table', 'test_field');
 
     // This function will not work due to a the fact that indexExist() does not search for keys without idx tag.
-    // @todo remove comments when: https://www.drupal.org/project/drupal/issues/3325358 is committed.
+    // @todo remove comments when:
+    //   https://www.drupal.org/project/drupal/issues/3325358 is committed.
     // $this->assertFalse($this->testingFakeConnection->schema()->indexExists('faking_table', 'test_field'));
   }
 
