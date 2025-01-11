@@ -156,7 +156,6 @@ interface CacheBackendInterface {
   /**
    * Deletes all cache items in a bin.
    *
-   * @see \Drupal\Core\Cache\CacheBackendInterface::invalidateAll()
    * @see \Drupal\Core\Cache\CacheBackendInterface::delete()
    * @see \Drupal\Core\Cache\CacheBackendInterface::deleteMultiple()
    */
@@ -173,7 +172,6 @@ interface CacheBackendInterface {
    *
    * @see \Drupal\Core\Cache\CacheBackendInterface::delete()
    * @see \Drupal\Core\Cache\CacheBackendInterface::invalidateMultiple()
-   * @see \Drupal\Core\Cache\CacheBackendInterface::invalidateAll()
    */
   public function invalidate($cid);
 
@@ -188,7 +186,6 @@ interface CacheBackendInterface {
    *
    * @see \Drupal\Core\Cache\CacheBackendInterface::deleteMultiple()
    * @see \Drupal\Core\Cache\CacheBackendInterface::invalidate()
-   * @see \Drupal\Core\Cache\CacheBackendInterface::invalidateAll()
    */
   public function invalidateMultiple(array $cids);
 
@@ -197,6 +194,9 @@ interface CacheBackendInterface {
    *
    * Invalid items may be returned in later calls to get(), if the $allow_invalid
    * argument is TRUE.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   CacheBackendInterface::deleteAll() or cache tag invalidation instead.
    *
    * @see \Drupal\Core\Cache\CacheBackendInterface::deleteAll()
    * @see \Drupal\Core\Cache\CacheBackendInterface::invalidate()

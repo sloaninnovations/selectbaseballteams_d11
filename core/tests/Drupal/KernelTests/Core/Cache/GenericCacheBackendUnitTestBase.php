@@ -636,6 +636,8 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
 
   /**
    * Tests Drupal\Core\Cache\CacheBackendInterface::invalidateAll().
+   *
+   * @group legacy
    */
   public function testInvalidateAll(): void {
     $backend_a = $this->getCacheBackend();
