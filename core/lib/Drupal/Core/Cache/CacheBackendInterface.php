@@ -198,9 +198,7 @@ interface CacheBackendInterface {
    * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
    *   CacheBackendInterface::deleteAll() or cache tag invalidation instead.
    *
-   * @see \Drupal\Core\Cache\CacheBackendInterface::deleteAll()
-   * @see \Drupal\Core\Cache\CacheBackendInterface::invalidate()
-   * @see \Drupal\Core\Cache\CacheBackendInterface::invalidateMultiple()
+   * @see https://www.drupal.org/node/3498947
    */
   public function invalidateAll();
 
