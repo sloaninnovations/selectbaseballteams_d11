@@ -36,6 +36,7 @@ class CommentNonNodeTest extends BrowserTestBase {
     'field_ui',
     'entity_test',
     'block',
+    'dblog',
   ];
 
   /**
