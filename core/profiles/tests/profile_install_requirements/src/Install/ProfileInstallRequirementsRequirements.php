@@ -11,7 +11,7 @@ class ProfileInstallRequirementsRequirements implements InstallRequirementsInter
   /**
    * {@inheritdoc}
    */
-  public function getRequirements(): array {
+  public static function getRequirements(): array {
     $requirements['testing_requirements'] = [
       'title' => t('Testing requirements'),
       'severity' => REQUIREMENT_ERROR,
