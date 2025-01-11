@@ -45,7 +45,17 @@ exports.command = function drupalCreateRole(
 
     await Promise.all(
       permissions.map(async (permission) =>
-        this.click(`input[name="${machineName}[${permission}]"]`),
+        this
+          // Use JavaScript to click the permission to avoid the sticky header
+          // or the toolbar intercepting the click.
+          .executeScript(
+            `document.querySelector('input[name="${machineName}[${permission}]"]').click()`,
+          )
+          .assert.attributeEquals(
+            `input[name="${machineName}[${permission}]`,
+            'checked',
+            'true',
+          ),
       ),
     );
 
