@@ -218,6 +218,31 @@ class CommentInterfaceTest extends CommentTestBase {
     // Disable comment form on node page.
     $this->drupalLogout();
     $this->setCommentForm(FALSE);
+
+    // Check the subject max length works for either single-byte and multibyte chars.
+    $this->drupalLogin($this->webUser);
+    $this->setCommentSubject(TRUE);
+    $comment_field_definitions = $this->container->get('entity_field.manager')->getBaseFieldDefinitions('comment');
+    $subject_max_length = $comment_field_definitions['subject']->getItemDefinition()->getSetting('max_length');
+
+    // Create a comment with a maximum length single-byte subject.
+    $subject_text = str_repeat('a', $subject_max_length);
+    $comment_text = $this->randomString();
+    $comment = $this->postComment($this->node, $comment_text, $subject_text, TRUE);
+    $this->assertTrue($this->commentExists($comment), 'Comment found.');
+
+    // Create a comment with a maximum length multibyte subject.
+    $subject_text = str_repeat('ñ', $subject_max_length);
+    $comment_text = $this->randomString();
+    $comment = $this->postComment($this->node, $comment_text, $subject_text, TRUE);
+    $this->assertTrue($this->commentExists($comment), 'Comment found.');
+
+    // Create a comment with a too long single-byte subject.
+    $subject_text = str_repeat('a', $subject_max_length + 1);
+    $comment_text = $this->randomString();
+    $comment = $this->postComment($this->node, $comment_text, $subject_text, TRUE);
+    $this->assertNull($comment);
+    $this->assertSession()->pageTextContains(sprintf('Subject cannot be longer than %s characters', $subject_max_length));
   }
 
   /**
