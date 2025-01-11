@@ -202,14 +202,16 @@ class UserPermissionsForm extends FormBase {
         // Fill in default values for the permission.
         $perm_item += [
           'description' => '',
+          'machine_name' => $perm,
           'restrict access' => FALSE,
           'warning' => !empty($perm_item['restrict access']) ? $this->t('Warning: Give to trusted roles only; this permission has security implications.') : '',
         ];
         $form['permissions'][$perm]['description'] = [
           '#type' => 'inline_template',
-          '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span>{% if description or warning %}<div class="description">{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
+          '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span><br/><span class="machine-name">Machine Name: <em>{{ machine_name }}</em></span>{% if description or warning %}<div class="description">{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
           '#context' => [
             'title' => $perm_item['title'],
+            'machine_name' => $perm_item['machine_name'],
           ],
         ];
         // Show the permission description.
@@ -217,6 +219,7 @@ class UserPermissionsForm extends FormBase {
           $form['permissions'][$perm]['description']['#context']['description'] = $perm_item['description'];
           $form['permissions'][$perm]['description']['#context']['warning'] = $perm_item['warning'];
         }
+
         foreach ($role_names as $rid => $name) {
           $form['permissions'][$perm][$rid] = [
             '#title' => $name . ': ' . $perm_item['title'],
