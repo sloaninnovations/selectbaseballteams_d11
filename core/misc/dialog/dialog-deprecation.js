@@ -9,7 +9,7 @@
       handle($event) {
         const $element = $($event.target);
         const event = $event.originalEvent;
-        const dialog = event.dialog;
+        const dialog = $event.dialog;
         const dialogArguments = [$event, dialog, $element, event?.settings];
         $event.handleObj.handler.apply(this, dialogArguments);
       },
