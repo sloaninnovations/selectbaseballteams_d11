@@ -91,7 +91,8 @@ class MenuUiHooks {
    */
   #[Hook('form_node_form_alter')]
   public function formNodeFormAlter(&$form, FormStateInterface $form_state) : void {
-    // Generate a list of possible parents (not including this link or descendants).
+    // Generate a list of possible parents (not including this link or
+    // descendants).
     // @todo This must be handled in a #process handler.
     $node = $form_state->getFormObject()->getEntity();
     $defaults = menu_ui_get_menu_link_defaults($node);
