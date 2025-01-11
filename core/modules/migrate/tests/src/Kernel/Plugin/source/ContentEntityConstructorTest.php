@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\migrate_drupal\Kernel\Plugin\migrate\source;
+namespace Drupal\Tests\migrate\Kernel\Plugin\source;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\Plugin\MigrationInterface;
-use Drupal\migrate_drupal\Plugin\migrate\source\ContentEntity;
+use Drupal\migrate\Plugin\migrate\source\ContentEntity;
 
 /**
  * Tests the constructor of the entity content source plugin.
  *
- * @group migrate_drupal
+ * @group migrate
  */
 class ContentEntityConstructorTest extends KernelTestBase {
 
@@ -21,7 +21,6 @@ class ContentEntityConstructorTest extends KernelTestBase {
    */
   protected static $modules = [
     'migrate',
-    'migrate_drupal',
     'node',
     'system',
     'user',
