@@ -7,33 +7,21 @@ namespace Drupal\KernelTests\Core\Config;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Block\Plugin\Block\Broken;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
-use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Logger\RfcLoggerTrait;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
-use Psr\Log\LoggerInterface;
 
 /**
  * Tests importing configuration which has missing content dependencies.
  *
  * @group config
  */
-class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerInterface {
+class ConfigImporterMissingContentTest extends KernelTestBase {
   use BlockCreationTrait;
-  use RfcLoggerTrait;
-
-  /**
-   * The logged messages.
-   *
-   * @var string[]
-   */
-  protected $logMessages = [];
 
   /**
    * Config Importer object used for testing.
@@ -52,15 +40,6 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
     'config_test',
     'config_import_test',
   ];
-
-  /**
-   * {@inheritdoc}
-   */
-  public function register(ContainerBuilder $container): void {
-    parent::register($container);
-    $container->register('logger.ConfigImporterMissingContentTest', __CLASS__)->addTag('logger');
-    $container->set('logger.ConfigImporterMissingContentTest', $this);
-  }
 
   /**
    * {@inheritdoc}
@@ -179,23 +158,16 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
     $block_content_type->delete();
 
     // Import.
-    $this->logMessages = [];
+    $this->expectNoLogsAsSevereAs(RfcLogLevel::WARNING);
     $config_importer = $this->configImporter();
     $config_importer->import();
-    $this->assertNotContains('The "block_content:6376f337-fcbf-4b28-b30e-ed5b6932e692" block plugin was not found', $this->logMessages);
+    $this->assertLogExpectationsMet();
 
     // Ensure the expected message is generated when creating an instance of the
     // block.
+    $this->expectLog(RfcLogLevel::WARNING, 'system', 'The "block_content:6376f337-fcbf-4b28-b30e-ed5b6932e692" block plugin was not found');
     $instance = $this->container->get('plugin.manager.block')->createInstance($plugin_id);
-    $this->assertContains('The "block_content:6376f337-fcbf-4b28-b30e-ed5b6932e692" block plugin was not found', $this->logMessages);
     $this->assertInstanceOf(Broken::class, $instance);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function log($level, $message, array $context = []): void {
-    $this->logMessages[] = PlainTextOutput::renderFromHtml(new FormattableMarkup($message, $context));
   }
 
 }

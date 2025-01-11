@@ -19,6 +19,7 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
 use Drupal\Core\Test\TestDatabase;
+use Drupal\Tests\Traits\Core\LoggingTrait;
 use Drupal\Tests\ConfigTestTrait;
 use Drupal\Tests\ExtensionListTestTrait;
 use Drupal\Tests\RandomGeneratorTrait;
@@ -103,6 +104,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   use PhpUnitCompatibilityTrait;
   use ProphecyTrait;
   use ExpectDeprecationTrait;
+  use LoggingTrait;
 
   /**
    * {@inheritdoc}
@@ -207,6 +209,11 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * @see \Drupal\Core\Session\SuperUserAccessPolicy
    */
   protected bool $usesSuperUserAccessPolicy;
+
+  /**
+   * @var \Drupal\KernelTests\AssertableLogger
+   */
+  protected AssertableLogger $assertableLogger;
 
   /**
    * {@inheritdoc}
@@ -595,6 +602,12 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $route_provider_definition->setPublic(TRUE);
     $container->setDefinition($id, $route_provider_definition);
 
+    $container
+      ->register('kernel_test.assertable_logger', AssertableLogger::class)
+      ->setSynthetic(TRUE)
+      ->addTag('logger');
+    $container->set('kernel_test.assertable_logger', $this->getAssertableLogger());
+
     // Remove the stored configuration importer so if used again it will be
     // built with up-to-date services.
     $this->configImporter = NULL;
@@ -623,6 +636,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * {@inheritdoc}
    */
   protected function assertPostConditions(): void {
+    $this->assertLogExpectationsMet();
+
     // Execute registered Drupal shutdown functions prior to tearing down.
     // @see _drupal_shutdown_function()
     $callbacks = &drupal_register_shutdown_function();
@@ -1007,6 +1022,16 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    */
   public function __sleep(): array {
     return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getAssertableLogger(): AssertableLogger {
+    if (!isset($this->assertableLogger)) {
+      $this->assertableLogger = new AssertableLogger();
+    }
+    return $this->assertableLogger;
   }
 
 }

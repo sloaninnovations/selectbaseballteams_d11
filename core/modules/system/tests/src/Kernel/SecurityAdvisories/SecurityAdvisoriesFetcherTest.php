@@ -6,7 +6,6 @@ namespace Drupal\Tests\system\Kernel\SecurityAdvisories;
 
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\KernelTests\KernelTestBase;
 use GuzzleHttp\Client;
@@ -16,30 +15,13 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * @coversDefaultClass \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher
  *
  * @group system
  */
-class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInterface {
-
-  use RfcLoggerTrait;
-
-  /**
-   * The error messages.
-   *
-   * @var string[]
-   */
-  protected $errorMessages = [];
-
-  /**
-   * The log error log messages.
-   *
-   * @var string[]
-   */
-  protected $logErrorMessages = [];
+class SecurityAdvisoriesFetcherTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
@@ -62,7 +44,6 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
   protected function setUp(): void {
     parent::setUp();
     $this->installConfig('system');
-    $this->container->get('logger.factory')->addLogger($this);
   }
 
   /**
@@ -596,17 +577,20 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
       $non_json_response,
       $json_response,
     ]);
+    $this->expectLog(RfcLogLevel::ERROR, 'system', 'The security advisory JSON feed from Drupal.org could not be decoded.');
     $this->assertNull($this->getAdvisories());
     $this->assertCount(1, $this->history);
-    $this->assertServiceAdvisoryLoggedErrors(['The security advisory JSON feed from Drupal.org could not be decoded.']);
+    $this->assertLogExpectationsMet();
 
     // Confirm that previous non-JSON response was not stored.
+    $this->expectLog(RfcLogLevel::ERROR, 'system', 'The security advisory JSON feed from Drupal.org could not be decoded.');
     $this->assertNull($this->getAdvisories());
     $this->assertCount(2, $this->history);
-    $this->assertServiceAdvisoryLoggedErrors(['The security advisory JSON feed from Drupal.org could not be decoded.']);
+    $this->assertLogExpectationsMet();
 
     // Confirm that if $allow_http_request is set to FALSE a new request will
     // not be attempted.
+    $this->expectNoLogsAsSevereAs(RfcLogLevel::INFO);
     $this->assertNull($this->getAdvisories(FALSE));
     $this->assertCount(2, $this->history);
 
@@ -618,7 +602,6 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
     // the stored response and not make another 'http_client' request.
     $this->assertCount(0, $this->getAdvisories());
     $this->assertCount(3, $this->history);
-    $this->assertServiceAdvisoryLoggedErrors([]);
   }
 
   /**
@@ -639,6 +622,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
       new Response(500, [], 'HTTPS failed'),
       new Response(200, [], json_encode([$feed_item])),
     ]);
+    $this->expectLog(RfcLogLevel::ERROR, 'system', "Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n");
     $advisories = $this->getAdvisories();
 
     // There should be two request / response pairs.
@@ -660,7 +644,6 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
     $this->assertCount(1, $advisories);
     $this->assertSame('http://example.com', $advisories[0]->getUrl());
     $this->assertSame('SA title', $advisories[0]->getTitle());
-    $this->assertSame(["Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n"], $this->errorMessages);
   }
 
   /**
@@ -724,34 +707,8 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
     // service without these changes.
     $this->container->get('kernel')->rebuildContainer();
     $this->container = $this->container->get('kernel')->getContainer();
-    $this->container->get('logger.factory')->addLogger($this);
     $this->container->set('http_client', new Client(['handler' => $handler_stack]));
     $this->container->setAlias(ClientInterface::class, 'http_client');
-  }
-
-  /**
-   * Asserts the expected error messages were logged.
-   *
-   * @param string[] $expected_messages
-   *   The expected error messages.
-   *
-   * @internal
-   */
-  protected function assertServiceAdvisoryLoggedErrors(array $expected_messages): void {
-    $this->assertSame($expected_messages, $this->logErrorMessages);
-    $this->logErrorMessages = [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function log($level, $message, array $context = []): void {
-    if (isset($context['@message'])) {
-      $this->errorMessages[] = $context['@message'];
-    }
-    if ($level === RfcLogLevel::ERROR) {
-      $this->logErrorMessages[] = $message;
-    }
   }
 
 }
