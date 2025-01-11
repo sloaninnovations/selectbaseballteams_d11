@@ -9,6 +9,7 @@ use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermStorageInterface;
 use Drupal\taxonomy\VocabularyStorageInterface;
 use Drupal\views\Attribute\ViewsFilter;
+use Drupal\views\FilterOptionsCacheTrait;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\filter\ManyToOne;
@@ -21,6 +22,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 #[ViewsFilter("taxonomy_index_tid")]
 class TaxonomyIndexTid extends ManyToOne {
+
+  use FilterOptionsCacheTrait;
 
   /**
    * Stores the exposed input for this filter.
@@ -192,40 +195,48 @@ class TaxonomyIndexTid extends ManyToOne {
       }
     }
     else {
-      if (!empty($this->options['hierarchy']) && $this->options['limit']) {
-        $tree = $this->termStorage->loadTree($vocabulary->id(), 0, NULL, TRUE);
-        $options = [];
+      $this->optionsCacheAddContext(['user.permissions']);
+      $options = $this->optionsCacheGet();
+      if (!$options) {
+        if (!empty($this->options['hierarchy']) && $this->options['limit']) {
 
-        if ($tree) {
-          foreach ($tree as $term) {
-            if (!$term->isPublished() && !$this->currentUser->hasPermission('administer taxonomy')) {
-              continue;
+          $tree = $this->termStorage->loadTree($vocabulary->id(), 0, NULL, TRUE);
+          $options = [];
+          if ($tree) {
+            foreach ($tree as $term) {
+              if (!$term->isPublished() && !$this->currentUser->hasPermission('administer taxonomy')) {
+                continue;
+              }
+              $choice = new \stdClass();
+              $choice->option = [$term->id() => str_repeat('-', $term->depth) . \Drupal::service('entity.repository')->getTranslationFromContext($term)->label()];
+              $options[] = $choice;
+              $this->optionsCacheAddTags($term->getCacheTags());
             }
-            $choice = new \stdClass();
-            $choice->option = [$term->id() => str_repeat('-', $term->depth) . \Drupal::service('entity.repository')->getTranslationFromContext($term)->label()];
-            $options[] = $choice;
           }
         }
-      }
-      else {
-        $options = [];
-        $query = \Drupal::entityQuery('taxonomy_term')
-          ->accessCheck(TRUE)
-          // @todo Sorting on vocabulary properties -
-          //   https://www.drupal.org/node/1821274.
-          ->sort('weight')
-          ->sort('name')
-          ->addTag('taxonomy_term_access');
-        if (!$this->currentUser->hasPermission('administer taxonomy')) {
-          $query->condition('status', 1);
+        else {
+          $options = [];
+          $query = \Drupal::entityQuery('taxonomy_term')
+            ->accessCheck(TRUE)
+            // @todo Sorting on vocabulary properties -
+            //   https://www.drupal.org/node/1821274.
+            ->sort('weight')
+            ->sort('name')
+            ->addTag('taxonomy_term_access');
+          if (!$this->currentUser->hasPermission('administer taxonomy')) {
+            $query->condition('status', 1);
+          }
+          if ($this->options['limit']) {
+            $query->condition('vid', $vocabulary->id());
+          }
+          $terms = Term::loadMultiple($query->execute());
+          foreach ($terms as $term) {
+            $options[$term->id()] = \Drupal::service('entity.repository')->getTranslationFromContext($term)->label();
+            $this->optionsCacheAddTags($term->getCacheTags());
+          }
         }
-        if ($this->options['limit']) {
-          $query->condition('vid', $vocabulary->id());
-        }
-        $terms = Term::loadMultiple($query->execute());
-        foreach ($terms as $term) {
-          $options[$term->id()] = \Drupal::service('entity.repository')->getTranslationFromContext($term)->label();
-        }
+        $this->optionsCacheAddTags(['taxonomy_term_list:' . $this->options['vid']]);
+        $this->optionsCacheSet($options);
       }
 
       $default_value = (array) $this->value;
