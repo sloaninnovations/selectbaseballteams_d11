@@ -257,7 +257,7 @@ class Term extends EditorialContentEntityBase implements TermInterface {
    * {@inheritdoc}
    */
   public function getName() {
-    return $this->label() ?? '';
+    return $this->name->value ?? '';
   }
 
   /**

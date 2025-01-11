@@ -125,8 +125,8 @@ class TokenReplaceTest extends KernelTestBase {
     /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
     $date_formatter = $this->container->get('date.formatter');
     $tests['[term:changed:since]'] = $date_formatter->formatTimeDiffSince($term1->getChangedTime(), ['langcode' => $language_interface->getId()]);
-    $tests['[term:vocabulary:name]'] = $this->vocabulary->label();
-    $tests['[term:vocabulary]'] = $this->vocabulary->label();
+    $tests['[term:vocabulary:name]'] = $this->vocabulary->getName();
+    $tests['[term:vocabulary]'] = $this->vocabulary->getName();
 
     $base_bubbleable_metadata = BubbleableMetadata::createFromObject($term1);
 
@@ -161,7 +161,7 @@ class TokenReplaceTest extends KernelTestBase {
     $tests['[term:parent:url]'] = $term1->toUrl('canonical', ['absolute' => TRUE])->toString();
     $tests['[term:parent:parent:name]'] = '[term:parent:parent:name]';
     $tests['[term:changed:since]'] = $date_formatter->formatTimeDiffSince($term2->getChangedTime(), ['langcode' => $language_interface->getId()]);
-    $tests['[term:vocabulary:name]'] = $this->vocabulary->label();
+    $tests['[term:vocabulary:name]'] = $this->vocabulary->getName();
 
     // Test to make sure that we generated something for each token.
     $this->assertNotContains(0, array_map('strlen', $tests), 'No empty tokens generated.');

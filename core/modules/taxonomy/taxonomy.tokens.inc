@@ -121,7 +121,7 @@ function taxonomy_tokens($type, $tokens, array $data, array $options, Bubbleable
           break;
 
         case 'name':
-          $replacements[$original] = $term->label();
+          $replacements[$original] = $term->getName();
           break;
 
         case 'description':
@@ -145,7 +145,7 @@ function taxonomy_tokens($type, $tokens, array $data, array $options, Bubbleable
         case 'vocabulary':
           $vocabulary = Vocabulary::load($term->bundle());
           $bubbleable_metadata->addCacheableDependency($vocabulary);
-          $replacements[$original] = $vocabulary->label();
+          $replacements[$original] = $vocabulary->getName();
           break;
 
         case 'parent':
@@ -193,7 +193,7 @@ function taxonomy_tokens($type, $tokens, array $data, array $options, Bubbleable
           break;
 
         case 'name':
-          $replacements[$original] = $vocabulary->label();
+          $replacements[$original] = $vocabulary->getName();
           break;
 
         case 'description':
