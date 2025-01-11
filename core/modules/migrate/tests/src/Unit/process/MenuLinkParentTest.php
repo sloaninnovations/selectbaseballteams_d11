@@ -92,7 +92,7 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
   public function testConstructorException(array $configuration, bool $is_valid): void {
     if (!$is_valid) {
       $this->expectException('TypeError');
-      $this->expectExceptionMessage('Cannot assign string to property ' . MenuLinkParent::class . '::$lookup_migrations of type array');
+      $this->expectExceptionMessage('Cannot assign string to property ' . MenuLinkParent::class . '::$lookupMigrations of type array');
     }
     $plugin = new MenuLinkParent($configuration, 'map', [], $this->migrateLookup->reveal(), $this->menuLinkManager->reveal(), $this->menuLinkStorage->reveal(), $this->migration->reveal());
     if ($is_valid) {
