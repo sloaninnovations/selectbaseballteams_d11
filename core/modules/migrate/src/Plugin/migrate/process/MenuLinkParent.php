@@ -125,7 +125,7 @@ class MenuLinkParent extends ProcessPluginBase implements ContainerFactoryPlugin
    *
    * @var string[]
    */
-  protected array $lookup_migrations;
+  protected array $lookupMigrations;
 
   /**
    * Constructs a MenuLinkParent object.
@@ -152,7 +152,7 @@ class MenuLinkParent extends ProcessPluginBase implements ContainerFactoryPlugin
     $this->migrateLookup = $migrate_lookup;
     $this->menuLinkManager = $menu_link_manager;
     $this->menuLinkStorage = $menu_link_storage;
-    $this->lookup_migrations = $this->configuration['lookup_migrations'] ?? [$this->migration->id()];
+    $this->lookupMigrations = $this->configuration['lookup_migrations'] ?? [$this->migration->id()];
   }
 
   /**
@@ -183,7 +183,7 @@ class MenuLinkParent extends ProcessPluginBase implements ContainerFactoryPlugin
       return '';
     }
 
-    foreach ($this->lookup_migrations as $migration_id) {
+    foreach ($this->lookupMigrations as $migration_id) {
       $lookup_result = $this->migrateLookup->lookup($migration_id, [$parent_id]);
       if ($lookup_result) {
         $already_migrated_id = $lookup_result[0]['id'];
