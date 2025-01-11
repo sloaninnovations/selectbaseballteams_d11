@@ -2,6 +2,7 @@
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\migrate\Plugin\migrate\source\ContentEntityDeriver as MigrateContentEntityDeriver;
 
 /**
