@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook;
 
-use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
-use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
+use PhpParser\Node\Stmt\Function_;
+use PhpParser\NodeFinder;
+use PhpParser\ParserFactory;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -166,6 +167,9 @@ class HookCollectorPass implements CompilerPassInterface {
    *   Skip the procedural check for the current module.
    */
   protected function collectModuleHookImplementations($dir, $module, $module_preg, bool $skip_procedural): void {
+    $parser = (new ParserFactory())->createForNewestSupportedVersion();
+    $node_finder = new NodeFinder();
+
     $hook_file_cache = FileCacheFactory::get('hook_implementations');
     $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . $module_preg);
 
@@ -209,15 +213,22 @@ class HookCollectorPass implements CompilerPassInterface {
       elseif (!$skip_procedural) {
         $implementations = $procedural_hook_file_cache->get($filename);
         if ($implementations === NULL) {
-          $finder = MockFileFinder::create($filename);
-          $parser = new StaticReflectionParser('', $finder);
+          $statements = $parser->parse(file_get_contents($filename));
+          $functions = $node_finder->findInstanceOf($statements, Function_::class);
           $implementations = [];
-          foreach ($parser->getMethodAttributes() as $function => $attributes) {
-            if (StaticReflectionParser::hasAttribute($attributes, StopProceduralHookScan::class)) {
-              break;
+          foreach ($functions as $function) {
+            foreach ($function->getAttrGroups() as $group) {
+              foreach ($group->attrs as $attr) {
+                if ($attr->name->name == StopProceduralHookScan::class) {
+                  break 3;
+                }
+                if ($attr->name->name == LegacyHook::class) {
+                  continue 3;
+                }
+              }
             }
-            if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && preg_match($module_preg, $function, $matches)) {
-              $implementations[] = ['function' => $function, 'module' => $matches['module'], 'hook' => $matches['hook']];
+            if (preg_match($module_preg, $function->name->name, $matches)) {
+              $implementations[] = ['function' => $function->name->name, 'module' => $matches['module'], 'hook' => $matches['hook']];
             }
           }
           $procedural_hook_file_cache->set($filename, $implementations);
