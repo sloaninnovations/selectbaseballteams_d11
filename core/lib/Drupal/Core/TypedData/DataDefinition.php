@@ -72,7 +72,7 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    * {@inheritdoc}
    */
   public function getLabel() {
-    return $this->definition['label'] ?? NULL;
+    return $this->definition['label'] ?? $this->getTypedDataManager()->getDefinition($this->getDataType())['label'];
   }
 
   /**
