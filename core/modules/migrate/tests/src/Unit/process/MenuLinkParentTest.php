@@ -103,7 +103,7 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
   /**
    * Provides data for testConstructorException().
    */
-  public static function providerConstructorException() {
+  public static function providerConstructorException(): array {
     // The parent ID does not for the following tests.
     return [
       'default configuration is valid' => [
@@ -319,7 +319,7 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
   /**
    * Provides data for testLookupMigrations().
    */
-  public static function providerLookupMigrations() {
+  public static function providerLookupMigrations(): array {
     return [
       'default configuration' => [
         'plid' => 1,
