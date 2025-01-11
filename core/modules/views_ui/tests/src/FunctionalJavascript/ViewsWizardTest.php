@@ -43,16 +43,19 @@ class ViewsWizardTest extends WebDriverTestBase {
   public function testCreateViewWizard(): void {
     $this->drupalGet('admin/structure/views/add');
     $page = $this->getSession()->getPage();
+    $driver = $this->getSession()->getDriver();
 
     // Set a view name, this should be used to prepopulate a number of other
     // fields when creating displays.
     $label_value = 'test view';
-    $search_input = $page->findField('label');
-    $search_input->setValue($label_value);
+    $page->fillField('edit-label', $label_value);
+    $driver->wait(5000, 'false == true');
+    $page->checkField('edit-page-create');
 
-    $page->findField('page[create]')->click();
-
+    // Wait for the ajax page title to show up:
+    $this->assertNotNull($this->assertSession()->waitForElementVisible('css', '#edit-page-title'));
     // Test if the title and path have been populated.
+    $this->assertNotNull($driver->wait(5000, 'document.getElementById("edit-page-title").value == "' . $label_value . '"'));
     $this->assertEquals($label_value, $page->findField('page[title]')->getValue());
     $this->assertEquals(str_replace(' ', '-', $label_value), $page->findField('page[path]')->getValue());
 
@@ -61,7 +64,7 @@ class ViewsWizardTest extends WebDriverTestBase {
     $this->assertEquals($label_value, $page->findField('page[link_properties][title]')->getValue());
 
     // Wait for conditional field to show.
-    $this->assertSession()->waitForElementVisible('named', ['select', 'page[link_properties][parent]']);
+    $this->assertNotNull($this->assertSession()->waitForElementVisible('named', ['select', 'page[link_properties][parent]']));
 
     // Assert a menu can be selected as a parent.
     $this->assertSession()->optionExists('page[link_properties][parent]', 'admin:');
