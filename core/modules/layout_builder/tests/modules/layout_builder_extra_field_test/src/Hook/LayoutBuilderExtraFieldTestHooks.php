@@ -29,7 +29,7 @@ class LayoutBuilderExtraFieldTestHooks {
   /**
    * Implements hook_node_view().
    */
-  public function nodeView(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  public function nodeView(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
     if ($display->getComponent('layout_builder_extra_field_test')) {
       $build['layout_builder_extra_field_test'] = [
         '#markup' => 'A new extra field.',
