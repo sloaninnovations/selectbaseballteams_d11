@@ -5,7 +5,9 @@
  * Post update functions for Taxonomy.
  */
 
+use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\VocabularyInterface;
 
 /**
@@ -42,4 +44,58 @@ function taxonomy_post_update_set_vocabulary_description_to_null(array &$sandbox
       // @see taxonomy_taxonomy_vocabulary_presave()
       return trim($vocabulary->getDescription()) === '';
     });
+}
+
+/**
+ * Update views filters to use UUIDs for term IDs instead of entity IDs.
+ */
+function taxonomy_post_update_convert_term_views_filters_to_uuids(&$sandbox = NULL) {
+  if (!\Drupal::moduleHandler()->moduleExists('views')) {
+    return;
+  }
+
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function ($view) {
+    /** @var \Drupal\views\ViewEntityInterface $view */
+    $displays = $view->get('display');
+
+    foreach ($displays as &$display) {
+      $filters = $display['display_options']['filters'] ?? [];
+      foreach ($filters as $id => $filter) {
+        if ($filter['plugin_id'] === 'taxonomy_index_tid' && isset($filter['value'])) {
+          $filters[$id]['value'] = taxonomy_convert_entity_ids_to_uuids($filters[$id]['value']);
+        }
+      }
+
+      $display['display_options']['filters'] = $filters;
+    }
+    $view->set('display', $displays);
+    return TRUE;
+  });
+}
+
+/**
+ * Convert entity IDs to UUIDs.
+ *
+ * @param array $entity_ids
+ *   Entity IDs to retrieve UUIDs for.
+ *
+ * @return array
+ *   UUIDs for the given entity IDs.
+ */
+function taxonomy_convert_entity_ids_to_uuids(array $entity_ids) {
+  $uuids = [];
+
+  foreach ($entity_ids as $entity_id) {
+    if (Uuid::isValid($entity_id)) {
+      // This ID is already a UUID.
+      $uuids[] = $entity_id;
+      continue;
+    }
+    $term = Term::load($entity_id);
+    if ($term) {
+      $uuids[] = $term->uuid();
+    }
+  }
+
+  return $uuids;
 }

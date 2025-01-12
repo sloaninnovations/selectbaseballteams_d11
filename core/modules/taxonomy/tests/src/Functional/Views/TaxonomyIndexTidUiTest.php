@@ -145,9 +145,6 @@ class TaxonomyIndexTidUiTest extends UITestBase {
       'config' => [
         'taxonomy.vocabulary.tags',
       ],
-      'content' => [
-        'taxonomy_term:tags:' . Term::load(2)->uuid(),
-      ],
       'module' => [
         'node',
         'taxonomy',
@@ -155,6 +152,12 @@ class TaxonomyIndexTidUiTest extends UITestBase {
       ],
     ];
     $this->assertSame($expected, $view->calculateDependencies()->getDependencies());
+
+    // Tests that the configuration saved has the uuid of the term, not the ID
+    // after saving.
+    $view_config = $this->config('views.view.test_filter_taxonomy_index_tid');
+    $values = $view_config->get('display.default.display_options.filters.tid.value');
+    $this->assertSame(['3dec3e87-5e46-455d-b49c-1695fb74b756'], $values);
   }
 
   /**
@@ -179,6 +182,12 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     $node4 = $this->drupalCreateNode([
       $field_name => [['target_id' => $this->terms[2][0]->id()]],
     ]);
+
+    // Set the selected term to Term 1.0.
+    $this->drupalGet('admin/structure/views/nojs/handler/test_filter_taxonomy_index_tid/default/filter/tid');
+    $this->submitForm(['options[value][]' => [2]], 'Apply');
+    // Save the view.
+    $this->submitForm([], 'Save');
 
     // Only the nodes with the selected term should be shown.
     $this->drupalGet('test-filter-taxonomy-index-tid');
