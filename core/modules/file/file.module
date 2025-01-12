@@ -1063,7 +1063,7 @@ function template_preprocess_file_link(&$variables) {
   $file_url_generator = \Drupal::service('file_url_generator');
   $url = $file_url_generator->generate($file->getFileUri());
 
-  $mime_type = $file->getMimeType();
+  $mime_type = $file->getMimeType() ?? '';
   $options['attributes']['type'] = $mime_type;
 
   // Use the description as the link text if available.
