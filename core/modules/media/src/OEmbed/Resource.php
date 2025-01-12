@@ -309,6 +309,11 @@ class Resource implements CacheableDependencyInterface {
       throw new \InvalidArgumentException('The resource must provide an HTML representation.');
     }
 
+    if ((empty($thumbnail_width) || empty($thumbnail_height))
+        && ($thumbnail_url && file_get_contents($thumbnail_url))) {
+      list($thumbnail_width, $thumbnail_height) = getimagesize($thumbnail_url);
+    }
+
     $resource = new static($provider, $title, $author_name, $author_url, $cache_age, $thumbnail_url, $thumbnail_width, $thumbnail_height);
     $resource->type = self::TYPE_RICH;
     $resource->html = $html;
