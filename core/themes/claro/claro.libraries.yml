@@ -55,7 +55,7 @@ global-styling:
       css/components/system-status-report.css: {}
       css/components/system-status-report-counters.css: {}
       css/components/system-status-counter.css: {}
-      css/components/tableselect.css: {}
+      # css/components/tableselect.css: {}
       css/components/tabs.css: {}
     theme:
       css/theme/colors.css: {}

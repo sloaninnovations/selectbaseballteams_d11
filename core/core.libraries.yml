@@ -684,7 +684,7 @@ drupal.tableheader:
 drupal.tableresponsive:
   version: VERSION
   js:
-    misc/tableresponsive.js: {}
+    https://www.unpkg.com/@zachleat/table-saw@1.0.2/table-saw.js: { attributes: { type: module } }
   dependencies:
     - core/jquery
     - core/drupal
