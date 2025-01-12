@@ -161,10 +161,10 @@ class MediaLibraryHooks {
           $query = MediaLibraryState::fromRequest($view->getRequest())->all();
         }
         catch (\InvalidArgumentException $e) {
-          // MediaLibraryState::fromRequest() will throw an exception if the view
-          // is being previewed, since not all required query parameters will be
-          // present. In a preview, however, this can be omitted since we're
-          // merely previewing.
+          // MediaLibraryState::fromRequest() will throw an exception if the
+          // view is being previewed, since not all required query parameters
+          // will be present. In a preview, however, this can be omitted since
+          // we're merely previewing.
           // @todo Use the views API for checking for the preview mode when it
           //   lands. https://www.drupal.org/project/drupal/issues/3060855
           if (empty($view->preview) && empty($view->live_preview)) {
@@ -172,9 +172,10 @@ class MediaLibraryHooks {
           }
         }
         // If the current query contains any parameters we use to contextually
-        // filter the view, ensure they persist across AJAX rebuilds.
-        // The ajax_path is shared for all AJAX views on the page, but our query
-        // parameters are prefixed and should not interfere with any other views.
+        // filter the view, ensure they persist across AJAX rebuilds. The
+        // ajax_path is shared for all AJAX views on the page, but our query
+        // parameters are prefixed and should not interfere with any other
+        // views.
         // @todo Rework or remove this in https://www.drupal.org/node/2983451
         if (!empty($query)) {
           $ajax_path =& $output['#attached']['drupalSettings']['views']['ajax_path'];

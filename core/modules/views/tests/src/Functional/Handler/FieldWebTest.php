@@ -436,7 +436,8 @@ class FieldWebTest extends ViewTestBase {
     // Tests the element wrapper classes/element.
     $random_class = $this->randomMachineName();
 
-    // Set some common wrapper element types and see whether they appear with and without a custom class set.
+    // Set some common wrapper element types and see whether they appear with
+    // and without a custom class set.
     foreach (['h1', 'span', 'p', 'div'] as $element_type) {
       $id_field->options['element_wrapper_type'] = $element_type;
 
@@ -456,7 +457,8 @@ class FieldWebTest extends ViewTestBase {
 
     // Tests the label class/element.
 
-    // Set some common label element types and see whether they appear with and without a custom class set.
+    // Set some common label element types and see whether they appear with and
+    // without a custom class set.
     foreach (['h1', 'span', 'p', 'div'] as $element_type) {
       $id_field->options['element_label_type'] = $element_type;
 
@@ -476,7 +478,8 @@ class FieldWebTest extends ViewTestBase {
 
     // Tests the element classes/element.
 
-    // Set some common element types and see whether they appear with and without a custom class set.
+    // Set some common element types and see whether they appear with and
+    // without a custom class set.
     foreach (['h1', 'span', 'p', 'div'] as $element_type) {
       $id_field->options['element_type'] = $element_type;
 

@@ -371,7 +371,8 @@ function views_field_default_views_data(FieldStorageConfigInterface $field_stora
   foreach ($field_columns as $column => $attributes) {
     $allow_sort = TRUE;
 
-    // Identify likely filters and arguments for each column based on field type.
+    // Identify likely filters and arguments for each column based on field
+    // type.
     switch ($attributes['type']) {
       case 'int':
       case 'mediumint':
@@ -430,8 +431,8 @@ function views_field_default_views_data(FieldStorageConfigInterface $field_stora
         'help' => t('Appears in: @bundles.', ['@bundles' => implode(', ', $bundles_names)]),
       ];
 
-      // Go through and create a list of aliases for all possible combinations of
-      // entity type + name.
+      // Go through and create a list of aliases for all possible combinations
+      // of entity type + name.
       $aliases = [];
       $also_known = [];
       foreach ($all_labels as $label_name => $true) {

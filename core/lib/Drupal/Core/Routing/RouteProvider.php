@@ -304,7 +304,8 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
         continue;
       }
       elseif ($i < (1 << $length)) {
-        // We have exhausted the masks of a given length, so decrease the length.
+        // We have exhausted the masks of a given length, so decrease the
+        // length.
         --$length;
       }
       $current = '';

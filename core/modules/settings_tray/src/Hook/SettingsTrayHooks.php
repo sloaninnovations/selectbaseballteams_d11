@@ -74,8 +74,8 @@ class SettingsTrayHooks {
   #[Hook('block_view_alter')]
   public function blockViewAlter(array &$build): void {
     if (isset($build['#contextual_links']['block'])) {
-      // Ensure that contextual links vary by whether the block has config overrides
-      // or not.
+      // Ensure that contextual links vary by whether the block has config
+      // overrides or not.
       // @see _contextual_links_to_id()
       $build['#contextual_links']['block']['metadata']['has_overrides'] = _settings_tray_has_block_overrides($build['#block']) ? 1 : 0;
     }
@@ -112,7 +112,8 @@ class SettingsTrayHooks {
       $items['contextual']['#weight'] = -1000;
       $items['contextual']['#attached']['library'][] = 'settings_tray/drupal.settings_tray';
       $items['contextual']['tab']['#attributes']['data-drupal-settingstray'] = 'toggle';
-      // Set a class on items to mark whether they should be active in edit mode.
+      // Set a class on items to mark whether they should be active in edit
+      // mode.
       // @todo Create a dynamic method for modules to set their own items.
       //   https://www.drupal.org/node/2784589.
       $edit_mode_items = ['contextual'];

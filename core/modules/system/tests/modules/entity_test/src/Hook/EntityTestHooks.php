@@ -112,8 +112,8 @@ class EntityTestHooks {
     if ($entity_type->id() == 'entity_test' && $state->get('entity_test.remove_name_field')) {
       unset($fields['name']);
     }
-    // In 8001 we are assuming that a new definition with multiple cardinality has
-    // been deployed.
+    // In 8001 we are assuming that a new definition with multiple cardinality
+    // has been deployed.
     // @todo Remove this if we end up using state definitions at runtime. See
     //   https://www.drupal.org/node/2554235.
     if ($entity_type->id() == 'entity_test' && $state->get('entity_test.db_updates.entity_definition_updates') == 8001) {
@@ -211,9 +211,9 @@ class EntityTestHooks {
   public function entityExtraFieldInfo() {
     $extra['entity_test']['bundle_with_extra_fields'] = [
       'display' => [
-              // Note: those extra fields do not currently display anything, they are
-              // just used in \Drupal\Tests\field_ui\Kernel\EntityDisplayTest to test
-              // the behavior of entity display objects.
+        // Note: those extra fields do not currently display anything, they are
+        // just used in \Drupal\Tests\field_ui\Kernel\EntityDisplayTest to test
+        // the behavior of entity display objects.
         'display_extra_field' => [
           'label' => $this->t('Display extra field'),
           'description' => $this->t('An extra field on the display side.'),

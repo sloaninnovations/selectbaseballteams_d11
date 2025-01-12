@@ -269,9 +269,9 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     // Some form elements belong in a fieldset for presentation, but can't
-    // be moved into one because of the $form_state->getValues() hierarchy. Those
-    // elements can add a #fieldset => 'fieldset_name' property, and they'll
-    // be moved to their fieldset during pre_render.
+    // be moved into one because of the $form_state->getValues() hierarchy.
+    // Those elements can add a #fieldset => 'fieldset_name' property, and
+    // they'll be moved to their fieldset during pre_render.
     $form['#pre_render'][] = [static::class, 'preRenderAddFieldsetMarkup'];
   }
 
@@ -418,8 +418,8 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
       ];
 
       // Currently you cannot attach assets to tokens with
-      // Renderer::renderInIsolation(). This may be unnecessarily limiting. Consider
-      // using Renderer::executeInRenderContext() instead.
+      // Renderer::renderInIsolation(). This may be unnecessarily limiting.
+      // Consider using Renderer::executeInRenderContext() instead.
       // @todo https://www.drupal.org/node/2566621
       return (string) $this->getRenderer()->renderInIsolation($build);
     }
