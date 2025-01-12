@@ -620,7 +620,7 @@ function drupal_check_profile($profile) {
         $requirements = array_merge($requirements, $function('install'));
       }
 
-      $requirements = array_merge($requirements, check_class_requirements($module));
+      $requirements = array_merge($requirements, install_check_class_requirements($module));
     }
   }
 
@@ -631,7 +631,7 @@ function drupal_check_profile($profile) {
   }
 
   $profile_path = \Drupal::service('extension.list.profile')->getPath($profile);
-  $requirements = array_merge($requirements, check_class_requirements($profile, $profile_path));
+  $requirements = array_merge($requirements, install_check_class_requirements($profile, $profile_path));
 
   return $requirements;
 }
@@ -675,9 +675,9 @@ function drupal_check_module($module) {
   }
   // Check requirements
   $requirements = \Drupal::moduleHandler()->invoke($module, 'requirements', ['install']) ?? [];
-  $requirements = array_merge($requirements, check_class_requirements($module, $module_path));
+  $requirements = array_merge($requirements, install_check_class_requirements($module, $module_path));
 
-  if (is_array($requirements) && !empty($requirements) && drupal_requirements_severity($requirements) == REQUIREMENT_ERROR) {
+  if (!empty($requirements) && drupal_requirements_severity($requirements) == REQUIREMENT_ERROR) {
     // Print any error messages
     foreach ($requirements as $requirement) {
       if (isset($requirement['severity']) && $requirement['severity'] == REQUIREMENT_ERROR) {
@@ -815,7 +815,7 @@ function install_profile_info($profile, $langcode = 'en') {
  *
  * @internal
  */
-function check_class_requirements(string $module, string $module_path = ''): array {
+function install_check_class_requirements(string $module, string $module_path = ''): array {
   $requirements = [];
   $camelized = ContainerBuilder::camelize($module);
   $name = "{$camelized}Requirements";
