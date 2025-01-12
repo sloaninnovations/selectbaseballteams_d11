@@ -258,6 +258,11 @@ final class NavigationRenderer {
       // the render array, namely the #link, and #access properties, using
       // them to render a simple link.
       // @see \Drupal\Core\Menu\LocalTaskManager::getTasksBuild()
+      if (!isset($local_task['#link']) || !isset($local_task['#access'])) {
+        // Skip this task if necessary properties are missing.
+        continue;
+      }
+
       $link = $local_task['#link'];
       $link['localized_options'] += [
         'set_active_class' => TRUE,
