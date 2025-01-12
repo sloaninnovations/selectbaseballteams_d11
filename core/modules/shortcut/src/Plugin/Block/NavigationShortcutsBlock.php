@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\navigation\Plugin\Block;
+namespace Drupal\shortcut\Plugin\Block;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Defines a shortcuts navigation block class.
  *
  * @internal
- *
- * @todo Move to Shortcut module as part of the core MR process.
  */
 #[Block(
   id: 'navigation_shortcuts',
@@ -66,9 +64,8 @@ final class NavigationShortcutsBlock extends BlockBase implements ContainerFacto
    * {@inheritdoc}
    */
   public function build(): array {
-    // This navigation block requires shortcut module. Once the plugin is moved
-    // to the module, this should not be necessary.
-    if (!$this->moduleHandler->moduleExists('shortcut')) {
+    // This navigation shortcuts block requires navigation module.
+    if (!$this->moduleHandler->moduleExists('navigation')) {
       return [];
     }
     return [
