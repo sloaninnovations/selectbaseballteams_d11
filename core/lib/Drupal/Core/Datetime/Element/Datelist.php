@@ -346,7 +346,7 @@ class Datelist extends DateElementBase {
     // \Drupal\Core\Datetime\Element\Datelist::valueCallback().
     unset($input['object']);
     // Filters out empty array values, any valid value would have a string length.
-    $filtered_input = array_filter($input, 'strlen');
+    $filtered_input = array_filter($input ?? [], 'strlen');
     return array_diff($parts, array_keys($filtered_input));
   }
 
