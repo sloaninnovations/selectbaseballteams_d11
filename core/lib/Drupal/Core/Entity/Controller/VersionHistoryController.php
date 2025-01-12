@@ -248,8 +248,9 @@ class VersionHistoryController extends ControllerBase {
       ],
     ];
 
+    $current_revision_displayed = FALSE;
     foreach ($this->loadRevisions($entity) as $revision) {
-      $build['entity_revisions_table']['#rows'][$revision->getRevisionId()] = $this->buildRow($revision);
+      $build['entity_revisions_table']['#rows'][$revision->getRevisionId()] = $this->buildRow($revision, $current_revision_displayed);
     }
 
     $build['pager'] = ['#type' => 'pager'];
@@ -268,11 +269,13 @@ class VersionHistoryController extends ControllerBase {
    *
    * @param \Drupal\Core\Entity\RevisionableInterface $revision
    *   An entity revision.
+   * @param bool $current_revision_displayed
+   *   Whether the current revision has been displayed or not.
    *
    * @return array
    *   A table row.
    */
-  protected function buildRow(RevisionableInterface $revision): array {
+  protected function buildRow(RevisionableInterface $revision, bool &$current_revision_displayed): array {
     $row = [];
     $rowAttributes = [];
 
@@ -280,9 +283,12 @@ class VersionHistoryController extends ControllerBase {
     $row['operations']['data'] = [];
 
     // Revision status.
-    if ($revision->isDefaultRevision()) {
+    if ($revision->isDefaultRevision() || (!$current_revision_displayed && $revision->wasDefaultRevision())) {
       $rowAttributes['class'][] = 'revision-current';
       $row['operations']['data']['status']['#markup'] = $this->t('<em>Current revision</em>');
+      $current_revision_displayed = TRUE;
+
+      return ['data' => $row] + $rowAttributes;
     }
 
     // Operation links.
