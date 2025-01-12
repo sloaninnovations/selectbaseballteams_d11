@@ -173,6 +173,10 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    * {@inheritdoc}
    */
   public function onConfigSave(ConfigCrudEvent $event) {
+    if (\Drupal::isConfigSyncing()) {
+      return;
+    }
+
     $config = $event->getConfig();
     $name = $config->getName();
     foreach (\Drupal::languageManager()->getLanguages() as $language) {
@@ -187,6 +191,10 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    * {@inheritdoc}
    */
   public function onConfigRename(ConfigRenameEvent $event) {
+    if (\Drupal::isConfigSyncing()) {
+      return;
+    }
+
     $config = $event->getConfig();
     $name = $config->getName();
     $old_name = $event->getOldName();
@@ -205,6 +213,10 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    * {@inheritdoc}
    */
   public function onConfigDelete(ConfigCrudEvent $event) {
+    if (\Drupal::isConfigSyncing()) {
+      return;
+    }
+
     $config = $event->getConfig();
     $name = $config->getName();
     foreach (\Drupal::languageManager()->getLanguages() as $language) {
