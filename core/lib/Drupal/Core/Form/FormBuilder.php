@@ -601,18 +601,17 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       if ($form_state->isProgrammed()) {
         return;
       }
-
-      // If $form_state->isRebuilding() has been set and input has been
-      // processed without validation errors, we are in a multi-step workflow
-      // that is not yet complete. A new $form needs to be constructed based on
-      // the changes made to $form_state during this request. Normally, a submit
-      // handler sets $form_state->isRebuilding() if a fully executed form
-      // requires another step. However, for forms that have not been fully
-      // executed (e.g., Ajax submissions triggered by non-buttons), there is no
-      // submit handler to set $form_state->isRebuilding(). It would not make
-      // sense to redisplay the identical form without an error for the user to
-      // correct, so we also rebuild error-free non-executed forms, regardless
-      // of $form_state->isRebuilding().
+      // If 'rebuild' has been set to TRUE and input has been processed without
+      // validation errors, we are in a multi-step workflow that is not yet
+      // complete. A new $form needs to be constructed based on the changes made
+      // to $form_state during this request. Normally, a submit handler will set
+      // 'rebuild' to TRUE if a fully executed form requires another step.
+      // However, for forms that have not been fully executed (e.g., Ajax
+      // submissions triggered by non-buttons), there is no submit handler to
+      // set 'rebuild' to TRUE. It would not make sense to redisplay the
+      // identical form without an error for the user to correct, so we also
+      // rebuild error-free non-executed forms, regardless of the current state
+      // of 'rebuild'.
       // @todo Simplify this logic; considering Ajax and non-HTML front-ends,
       //   along with element-level #submit properties, it makes no sense to
       //   have divergent form execution based on whether the triggering element
