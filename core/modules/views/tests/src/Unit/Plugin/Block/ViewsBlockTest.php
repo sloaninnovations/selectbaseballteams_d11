@@ -168,13 +168,13 @@ class ViewsBlockTest extends UnitTestCase {
   }
 
   /**
-   * Tests that the build method bubbles cacheable metadata from the view.
+   * Tests that cacheable metadata is retrieved from the view and merged with block cacheable metadata.
    *
-   * @dataProvider providerTestBuildCacheableMetadata
+   * @dataProvider providerTestCacheableMetadata
    *
    * @see \Drupal\views\Plugin\block\ViewsBlock::build()
    */
-  public function testBuildCacheableMetadata(int $blockCacheMaxAge, int $viewCacheMaxAge, int $expectedCacheMaxAge): void {
+  public function testCacheableMetadata(int $blockCacheMaxAge, int $viewCacheMaxAge, int $expectedCacheMaxAge): void {
 
     $blockCacheTags = ['block-cachetag-1', 'block-cachetag-2'];
     $blockCacheContexts = ['block-cache-context-1', 'block-cache-context-2'];
@@ -225,9 +225,9 @@ class ViewsBlockTest extends UnitTestCase {
   }
 
   /**
-   * Data provider for ::testBuildCacheableMetadata()
+   * Data provider for ::testCacheableMetadata()
    */
-  public static function providerTestBuildCacheableMetadata(): array {
+  public static function providerTestCacheableMetadata(): array {
     return [
       'View expires before' => [500, 1000, 500],
       'Block expires before' => [1000, 500, 500],
