@@ -141,21 +141,23 @@
      *   Root margin for the Intersection Observer options object.
      */
     function getRootMargin() {
-      let rootMarginTop = 72;
-      const { body } = document;
+      document.addEventListener('DOMContentLoaded', function () {
+        let rootMarginTop = 72;
+        const { body } = document;
 
-      if (body.classList.contains('toolbar-fixed')) {
-        rootMarginTop -= 39;
-      }
+        if (body.classList.contains('toolbar-fixed')) {
+          rootMarginTop -= 39;
+        }
 
-      if (
-        body.classList.contains('toolbar-horizontal') &&
-        body.classList.contains('toolbar-tray-open')
-      ) {
-        rootMarginTop -= 40;
-      }
+        if (
+          body.classList.contains('toolbar-horizontal') &&
+          body.classList.contains('toolbar-tray-open')
+        ) {
+          rootMarginTop -= 40;
+        }
 
-      return `${rootMarginTop}px 0px 0px 0px`;
+        return `${rootMarginTop}px 0px 0px 0px`;
+      });
     }
 
     /**
