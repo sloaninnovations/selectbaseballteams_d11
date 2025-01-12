@@ -464,6 +464,15 @@ class FormValidatorTest extends UnitTestCase {
       ],
       [
         [
+          '#type' => 'textfield',
+          '#maxlength' => 10,
+          '#value' => ['foo'],
+        ],
+        'The submitted value type <em class="placeholder">array</em> in the <em class="placeholder">Test</em> element is not allowed.',
+        FALSE,
+      ],
+      [
+        [
           '#type' => 'select',
           '#options' => [
             'foo' => 'Foo',

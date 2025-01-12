@@ -328,9 +328,17 @@ class FormValidator implements FormValidatorInterface {
    *   not be repeated in the submission step.
    */
   protected function performRequiredValidation(&$elements, FormStateInterface &$form_state) {
-    // Verify that the value is not longer than #maxlength.
-    if (isset($elements['#maxlength']) && mb_strlen($elements['#value']) > $elements['#maxlength']) {
-      $form_state->setError($elements, $this->t('@name cannot be longer than %max characters but is currently %length characters long.', ['@name' => empty($elements['#title']) ? $elements['#parents'][0] : $elements['#title'], '%max' => $elements['#maxlength'], '%length' => mb_strlen($elements['#value'])]));
+    if (isset($elements['#maxlength'])) {
+      $name = empty($elements['#title']) ? $elements['#parents'][0] : $elements['#title'];
+
+      // Verify that $elements['#value'] is a string, if it is supposed to be one:
+      if (!is_string($elements['#value'])) {
+        $form_state->setError($elements, $this->t('The submitted value type %type in the %name element is not allowed.', ['%type' => gettype($elements['#value']), '%name' => $name]));
+      }
+      // Verify that the value is not longer than #maxlength.
+      elseif (mb_strlen($elements['#value']) > $elements['#maxlength']) {
+        $form_state->setError($elements, $this->t('@name cannot be longer than %max characters but is currently %length characters long.', ['@name' => $name, '%max' => $elements['#maxlength'], '%length' => mb_strlen($elements['#value'])]));
+      }
     }
 
     if (isset($elements['#options']) && isset($elements['#value'])) {
