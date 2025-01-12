@@ -10,7 +10,8 @@ administer users:
   description: 'Manage all user accounts. This includes editing all user information, changes of email addresses and passwords, issuing emails to users and blocking and deleting user accounts.'
   restrict access: true
 access user profiles:
-  title: 'View user information'
+  title: 'Access Any User Profile'
+  description: 'Allows users belonging to roles with this permission to view profiles of other users registered on the site. Users with this permission can access information of other users that they have chosen to share.'
 view user email addresses:
   title: 'View user email addresses'
   description: 'Users without this permission will not have access to email addresses on user pages or other places where they might be shown, such as Views and JSON:API responses.'

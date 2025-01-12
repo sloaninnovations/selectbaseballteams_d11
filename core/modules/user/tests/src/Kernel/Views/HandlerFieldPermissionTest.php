@@ -39,7 +39,7 @@ class HandlerFieldPermissionTest extends UserKernelTestBase {
     $expected_permissions[$this->users[2]->id()][] = 'Administer roles and permissions';
     // View user profiles comes first, because we sort by the permission
     // machine name.
-    $expected_permissions[$this->users[3]->id()][] = 'View user information';
+    $expected_permissions[$this->users[3]->id()][] = 'Access Any User Profile';
     $expected_permissions[$this->users[3]->id()][] = 'Administer roles and permissions';
     $expected_permissions[$this->users[3]->id()][] = 'Administer users';
 
