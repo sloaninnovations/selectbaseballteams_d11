@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
+use Drupal\layout_builder\LayoutReusableBlockDiscardChanges;
 use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
 use Drupal\layout_builder\SectionStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -44,16 +45,26 @@ class DefaultsEntityForm extends EntityForm {
   protected $sectionStorage;
 
   /**
+   * The shared tempstore factory.
+   *
+   * @var \Drupal\layout_builder\LayoutReusableBlockDiscardChanges
+   */
+  protected $layoutReusableBlockDiscardChanges;
+
+  /**
    * Constructs a new DefaultsEntityForm.
    *
    * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore repository.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info service.
+   * @param \Drupal\layout_builder\LayoutReusableBlockDiscardChanges $layout_reusable_block_discard_changes
+   *   The layout reusable block discard change service.
    */
-  public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
+  public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, LayoutReusableBlockDiscardChanges $layout_reusable_block_discard_changes) {
     $this->layoutTempstoreRepository = $layout_tempstore_repository;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
+    $this->layoutReusableBlockDiscardChanges = $layout_reusable_block_discard_changes;
   }
 
   /**
@@ -62,7 +73,8 @@ class DefaultsEntityForm extends EntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('layout_builder.tempstore_repository'),
-      $container->get('entity_type.bundle.info')
+      $container->get('entity_type.bundle.info'),
+      $container->get('layout_builder.reusable_block_discard_changes')
     );
   }
 
@@ -156,6 +168,8 @@ class DefaultsEntityForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    // Delete all reusable block tempStorage for this node.
+    $this->layoutReusableBlockDiscardChanges->deleteReusableBlockTemporaryStorage($this->sectionStorage);
     $return = $this->sectionStorage->save();
     $this->saveTasks($form_state, $this->t('The layout has been saved.'));
     return $return;

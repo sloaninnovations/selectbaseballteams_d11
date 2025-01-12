@@ -5,6 +5,9 @@ services:
     class: Drupal\layout_builder\LayoutTempstoreRepository
     arguments: ['@tempstore.shared']
   Drupal\layout_builder\LayoutTempstoreRepositoryInterface: '@layout_builder.tempstore_repository'
+  layout_builder.reusable_block_discard_changes:
+    class: Drupal\layout_builder\LayoutReusableBlockDiscardChanges
+    arguments: ['@tempstore.shared', '@entity.repository']
   access_check.entity.layout_builder_access:
     class: Drupal\layout_builder\Access\LayoutBuilderAccessCheck
     tags:

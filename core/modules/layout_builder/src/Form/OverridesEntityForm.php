@@ -15,6 +15,7 @@ use Drupal\layout_builder\OverridesSectionStorageInterface;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\SectionStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\layout_builder\LayoutReusableBlockDiscardChanges;
 
 /**
  * Provides a form containing the Layout Builder UI for overrides.
@@ -43,6 +44,13 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
   protected $sectionStorage;
 
   /**
+   * The shared tempstore factory.
+   *
+   * @var \Drupal\layout_builder\LayoutReusableBlockDiscardChanges
+   */
+  protected $layoutReusableBlockDiscardChanges;
+
+  /**
    * Constructs a new OverridesEntityForm.
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
@@ -53,10 +61,13 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
    *   The time service.
    * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore repository.
+   * @param \Drupal\layout_builder\LayoutReusableBlockDiscardChanges $layout_reusable_block_discard_changes
+   *   The layout The layout reusable block discard change service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, LayoutTempstoreRepositoryInterface $layout_tempstore_repository) {
+  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, LayoutTempstoreRepositoryInterface $layout_tempstore_repository, LayoutReusableBlockDiscardChanges $layout_reusable_block_discard_changes) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->layoutTempstoreRepository = $layout_tempstore_repository;
+    $this->layoutReusableBlockDiscardChanges = $layout_reusable_block_discard_changes;
   }
 
   /**
@@ -67,7 +78,8 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
       $container->get('entity.repository'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
-      $container->get('layout_builder.tempstore_repository')
+      $container->get('layout_builder.tempstore_repository'),
+      $container->get('layout_builder.reusable_block_discard_changes')
     );
   }
 
@@ -154,6 +166,8 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
    */
   public function save(array $form, FormStateInterface $form_state) {
     $return = parent::save($form, $form_state);
+    // @todo put call to deleteReusableBlockTemporaryStorage in the trait?
+    $this->layoutReusableBlockDiscardChanges->deleteReusableBlockTemporaryStorage($this->getSectionStorage());
     $this->saveTasks($form_state, $this->t('The layout override has been saved.'));
     return $return;
   }

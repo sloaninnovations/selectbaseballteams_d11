@@ -4,6 +4,9 @@ configure any layout:
 create and edit custom blocks:
   title: 'Create and edit content blocks'
   description: 'Manage the single-use blocks within the Layout Builder'
+create reusable blocks:
+  title: 'Create reusable blocks'
+  description: 'Create reusable blocks which can be used in different layouts'
 
 permission_callbacks:
   - \Drupal\layout_builder\LayoutBuilderOverridesPermissions::permissions
