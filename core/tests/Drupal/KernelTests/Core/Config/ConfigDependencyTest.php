@@ -351,10 +351,10 @@ class ConfigDependencyTest extends EntityKernelTestBase {
     $this->assertSame(['config' => [$entity_1->getConfigDependencyName()], 'content' => [], 'module' => ['node'], 'theme' => []], $called[$entity_4->id()]);
     $this->assertSame(['config' => [$entity_1->getConfigDependencyName()], 'content' => [], 'module' => [], 'theme' => []], $called[$entity_5->id()]);
 
-    $this->assertEquals($entity_1->uuid(), $config_entities['delete'][1]->uuid(), 'Entity 1 will be deleted.');
+    $this->assertEquals($entity_1->uuid(), $config_entities['delete'][2]->uuid(), 'Entity 1 will be deleted.');
     $this->assertEquals($entity_2->uuid(), $config_entities['update'][0]->uuid(), 'Entity 2 will be updated.');
     $this->assertEquals($entity_3->uuid(), reset($config_entities['unchanged'])->uuid(), 'Entity 3 is not changed.');
-    $this->assertEquals($entity_4->uuid(), $config_entities['delete'][0]->uuid(), 'Entity 4 will be deleted.');
+    $this->assertEquals($entity_4->uuid(), $config_entities['delete'][1]->uuid(), 'Entity 4 will be deleted.');
     $this->assertEquals($entity_5->uuid(), $config_entities['update'][1]->uuid(), 'Entity 5 is updated.');
 
     // Perform the uninstall.
@@ -458,7 +458,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
     }
     $expected = [
       'update' => [$entity_1->id(), $entity_2->id()],
-      'delete' => [$entity_4->id()],
+      'delete' => ['node.body', $entity_4->id()],
       'unchanged' => [$entity_3->id()],
     ];
     $this->assertSame($expected, $config_entity_ids);
