@@ -451,11 +451,15 @@ function template_preprocess_file_link(&$variables): void {
   // Classes to add to the file field for icons.
   $classes = [
     'file',
-    // Add a specific class for each and every mime type.
-    'file--mime-' . strtr($mime_type, ['/' => '-', '.' => '-']),
-    // Add a more general class for groups of well known MIME types.
-    'file--' . IconMimeTypes::getIconClass($mime_type),
   ];
+
+  if (!empty($mime_type)) {
+    // Add a specific class for each and every mime type.
+    $classes[] = 'file--mime-' . strtr($mime_type, ['/' => '-', '.' => '-']);
+
+    // Add a more general class for groups of well known MIME types.
+    $classes[] = 'file--' . IconMimeTypes::getIconClass($mime_type);
+  }
 
   // Set file classes to the options array.
   $variables['attributes'] = new Attribute($variables['attributes']);
