@@ -7,6 +7,8 @@ namespace Drupal\ckeditor5_drupalelementstyle_test\Hook;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
 use Drupal\Core\Hook\Attribute\Hook;
 
+// cspell:ignore drupalelementstyle
+
 /**
  * Hook implementations for ckeditor5_drupalelementstyle_test.
  */
