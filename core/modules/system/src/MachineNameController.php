@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpFoundation\Exception\UnexpectedValueException;
 
 /**
  * Controller routines for machine name transliteration routes.
@@ -69,12 +71,17 @@ class MachineNameController implements ContainerInjectionInterface {
    */
   public function transliterate(Request $request) {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3367037', E_USER_DEPRECATED);
-    $text = $request->query->get('text');
-    $langcode = $request->query->get('langcode');
-    $replace_pattern = $request->query->get('replace_pattern');
-    $replace_token = $request->query->get('replace_token');
-    $replace = $request->query->get('replace');
-    $lowercase = $request->query->get('lowercase');
+    try {
+      $text = $request->query->get('text');
+      $langcode = $request->query->get('langcode');
+      $replace_pattern = $request->query->get('replace_pattern');
+      $replace_token = $request->query->get('replace_token');
+      $replace = $request->query->get('replace');
+      $lowercase = $request->query->get('lowercase');
+    }
+    catch (UnexpectedValueException $e) {
+      throw new BadRequestException($e->getMessage(), $e->getCode(), $e);
+    }
 
     $transliterated = $this->transliteration->transliterate($text, $langcode, '_');
     if ($lowercase) {
