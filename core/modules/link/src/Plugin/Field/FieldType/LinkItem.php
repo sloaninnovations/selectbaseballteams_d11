@@ -16,6 +16,8 @@ use Drupal\link\LinkItemInterface;
 
 /**
  * Plugin implementation of the 'link' field type.
+ *
+ * @property string $link
  */
 #[FieldType(
   id: "link",

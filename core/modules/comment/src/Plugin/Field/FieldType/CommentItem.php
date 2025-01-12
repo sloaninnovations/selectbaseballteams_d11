@@ -18,6 +18,8 @@ use Drupal\Core\Url;
 
 /**
  * Plugin implementation of the 'comment' field type.
+ *
+ * @property string $commentItem
  */
 #[FieldType(
   id: "comment",
