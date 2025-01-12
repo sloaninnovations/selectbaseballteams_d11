@@ -21,30 +21,11 @@ class DrupalSelenium2Driver extends Selenium2Driver {
    */
   public function __construct($browserName = 'firefox', $desiredCapabilities = NULL, $wdHost = 'http://localhost:4444/wd/hub') {
     parent::__construct($browserName, $desiredCapabilities, $wdHost);
-    ServiceFactory::getInstance()->setServiceClass('service.curl', WebDriverCurlService::class);
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setCookie($name, $value = NULL) {
-    if ($value === NULL) {
-      $this->getWebDriverSession()->deleteCookie($name);
-      return;
+    $is_w3c = $desiredCapabilities['goog:chromeOptions']['w3c'] ?? $desiredCapabilities['w3c'] ?? FALSE;
+    if (!$is_w3c) {
+      ServiceFactory::getInstance()->setServiceClass('service.curl', WebDriverCurlService::class);
     }
-
-    $cookieArray = [
-      'name' => $name,
-      'value' => urlencode($value),
-      'secure' => FALSE,
-      // Unlike \Behat\Mink\Driver\Selenium2Driver::setCookie we set a domain
-      // and an expire date, as otherwise cookies leak from one test site into
-      // another.
-      'domain' => parse_url($this->getWebDriverSession()->url(), PHP_URL_HOST),
-      'expires' => time() + 80000,
-    ];
-
-    $this->getWebDriverSession()->setCookie($cookieArray);
   }
 
   /**
