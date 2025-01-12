@@ -1,0 +1,9 @@
+<div class="wrapper">
+  <h2 class="wrapper__title">{{ text }}</h2>
+  <div class="wrapper__include">
+    {% include 'sdc_test:no-props' only %}
+  </div>
+  <div class="wrapper__embed">
+    {% embed 'sdc_test:no-props' only %}{% endembed %}
+  </div>
+</div>

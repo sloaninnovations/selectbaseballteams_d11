@@ -369,4 +369,27 @@ class ComponentRenderTest extends ComponentKernelTestBase {
     $this->assertNotEmpty($definition['documentation']);
   }
 
+  /**
+   * Tests the component that uses other components inside.
+   */
+  public function testWrapperComponent(): void {
+    $build = [
+      '#type' => 'inline_template',
+      '#template' => "{% embed 'sdc_test:wrapper' with { text: 'Test' } only %}{% endembed %}",
+    ];
+    $crawler = $this->renderComponentRenderArray($build);
+    $this->assertEquals(
+      $crawler->filter('.wrapper__title')->innerText(),
+      'Test',
+    );
+    $this->assertEquals(
+      $crawler->filter('.wrapper__include')->innerText(),
+      'This is a test string.',
+    );
+    $this->assertEquals(
+      $crawler->filter('.wrapper__embed')->innerText(),
+      'This is a test string.',
+    );
+  }
+
 }
