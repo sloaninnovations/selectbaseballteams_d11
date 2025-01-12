@@ -96,18 +96,6 @@ services:
     class: Drupal\serialization\Encoder\XmlEncoder
     tags:
       - { name: encoder, format: xml }
-  serializer.entity_resolver:
-    class: Drupal\serialization\EntityResolver\ChainEntityResolver
-  Drupal\serialization\EntityResolver\ChainEntityResolverInterface: '@serializer.entity_resolver'
-  serializer.entity_resolver.uuid:
-    class: Drupal\serialization\EntityResolver\UuidResolver
-    tags:
-      - { name: entity_resolver}
-    arguments: ['@entity.repository']
-  serialization.entity_resolver.target_id:
-    class: Drupal\serialization\EntityResolver\TargetIdResolver
-    tags:
-      - { name: entity_resolver}
   serialization.exception.default:
     class: Drupal\serialization\EventSubscriber\DefaultExceptionSubscriber
     arguments: ['@serializer', '%serializer.formats%']
