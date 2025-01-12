@@ -750,14 +750,6 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       $entity->updateLoadedRevisionId();
     }
 
-    if ($entity->isNew() && !$entity->isDefaultRevision()) {
-      throw new EntityStorageException("A new entity of type '{$this->entityTypeId}' must be created as the default revision..");
-    }
-
-    if ($entity->wasDefaultRevision() && !$entity->isDefaultRevision() && $entity->wasDefaultRevision() && !$entity->isNewRevision()) {
-      throw new EntityStorageException("Saving an existing default revision '{$this->entityTypeId}' must not be changed to a non-default revision.");
-    }
-
     // Use the loaded revision instead of default one to check for data change.
     if (!$entity->isNew() && !$entity->getOriginal() && !$entity->wasDefaultRevision()) {
       $original = $this->loadRevision($entity->getLoadedRevisionId());
@@ -765,6 +757,14 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     }
 
     $id = parent::doPreSave($entity);
+
+    if ($entity->isNew() && !$entity->isDefaultRevision()) {
+      throw new EntityStorageException("A new entity of type '{$this->entityTypeId}' must be created as the default revision..");
+    }
+
+    if ($entity->wasDefaultRevision() && !$entity->isDefaultRevision() && $entity->wasDefaultRevision() && !$entity->isNewRevision()) {
+      throw new EntityStorageException("Saving an existing default revision '{$this->entityTypeId}' must not be changed to a non-default revision.");
+    }
 
     if (!$entity->isNew()) {
       // If the ID changed then original can't be loaded, throw an exception
