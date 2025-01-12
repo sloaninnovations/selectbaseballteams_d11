@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\link\Unit;
 
+use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -30,6 +31,7 @@ class LinkFormatterTest extends UnitTestCase {
    */
   public function testFormatterLinkItemUrlMalformed(): void {
     $entity = $this->createMock(EntityInterface::class);
+    $expectedUrl = Url::fromUri('route:<none>');
 
     $linkItem = $this->createMock(LinkItemInterface::class);
     $exception = new \InvalidArgumentException();
@@ -41,8 +43,10 @@ class LinkFormatterTest extends UnitTestCase {
       ->willThrowException($exception);
     $linkItem->expects($this->any())
       ->method('__get')
-      ->with('options')
-      ->willReturn([]);
+      ->willReturnCallback(fn (string $property) => match (TRUE) {
+        $property === 'options' => [],
+        $property === '_url' => $expectedUrl,
+      });
     $fieldDefinition = $this->createMock(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
@@ -62,7 +66,9 @@ class LinkFormatterTest extends UnitTestCase {
     $fieldList->setValue([$linkItem]);
 
     $pathValidator = $this->createMock(PathValidatorInterface::class);
-    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator);
+    $accessManager = $this->createMock(AccessManagerInterface::class);
+    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator, $accessManager);
+    $linkFormatter->prepareView([$fieldList]);
     $elements = $linkFormatter->viewElements($fieldList, 'es');
     $this->assertEquals('link', $elements[0]['#type']);
   }
@@ -72,6 +78,7 @@ class LinkFormatterTest extends UnitTestCase {
    */
   public function testFormatterLinkItemUrlUnexpectedException(): void {
     $exception = new \Exception('Unexpected!!!');
+    $expectedUrl = Url::fromUri('route:<none>');
 
     $linkItem = $this->createMock(LinkItemInterface::class);
     $entity = $this->createMock(EntityInterface::class);
@@ -83,8 +90,10 @@ class LinkFormatterTest extends UnitTestCase {
       ->willThrowException($exception);
     $linkItem->expects($this->any())
       ->method('__get')
-      ->with('options')
-      ->willReturn([]);
+      ->willReturnCallback(fn (string $property) => match (TRUE) {
+        $property === 'options' => [],
+        $property === '_url' => $expectedUrl,
+      });
     $fieldDefinition = $this->createMock(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
@@ -98,9 +107,11 @@ class LinkFormatterTest extends UnitTestCase {
     $fieldList->setValue([$linkItem]);
 
     $pathValidator = $this->createMock(PathValidatorInterface::class);
-    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator);
+    $accessManager = $this->createMock(AccessManagerInterface::class);
+    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator, $accessManager);
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage('Unexpected!!!');
+    $linkFormatter->prepareView([$fieldList]);
     $linkFormatter->viewElements($fieldList, 'fr');
   }
 
@@ -120,8 +131,10 @@ class LinkFormatterTest extends UnitTestCase {
       ->willReturn($expectedUrl);
     $linkItem->expects($this->any())
       ->method('__get')
-      ->with('options')
-      ->willReturn([]);
+      ->willReturnCallback(fn (string $property) => match (TRUE) {
+        $property === 'options' => [],
+        $property === '_url' => $expectedUrl,
+      });
     $fieldDefinition = $this->createMock(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
@@ -141,7 +154,9 @@ class LinkFormatterTest extends UnitTestCase {
     $fieldList->setValue([$linkItem]);
 
     $pathValidator = $this->createMock(PathValidatorInterface::class);
-    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator);
+    $accessManager = $this->createMock(AccessManagerInterface::class);
+    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator, $accessManager);
+    $linkFormatter->prepareView([$fieldList]);
     $elements = $linkFormatter->viewElements($fieldList, 'zh');
     $this->assertEquals([
       [
