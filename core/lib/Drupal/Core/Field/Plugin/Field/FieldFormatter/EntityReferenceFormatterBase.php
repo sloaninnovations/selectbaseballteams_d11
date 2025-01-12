@@ -144,7 +144,15 @@ abstract class EntityReferenceFormatterBase extends FormatterBase {
     foreach ($entities_items as $items) {
       foreach ($items as $item) {
         if (isset($target_entities[$item->target_id])) {
-          $item->entity = $target_entities[$item->target_id];
+          if ($target_entities[$item->target_id]->getEntityType()->isRevisionable()) {
+            /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+            $storage = \Drupal::entityTypeManager()->getStorage($target_entities[$item->target_id]->getEntityTypeId());
+            // Load the current revision.
+            $item->entity = $storage->loadRevision($item->get('target_revision_id')->getString());
+          }
+          else {
+            $item->entity = $target_entities[$item->target_id];
+          }
           $item->_loaded = TRUE;
         }
         elseif ($item->hasNewEntity()) {
