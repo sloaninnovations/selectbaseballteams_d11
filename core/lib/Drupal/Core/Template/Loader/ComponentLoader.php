@@ -5,7 +5,6 @@ namespace Drupal\Core\Template\Loader;
 use Drupal\Component\Discovery\YamlDirectoryDiscovery;
 use Drupal\Core\Render\Component\Exception\ComponentNotFoundException;
 use Drupal\Core\Theme\ComponentPluginManager;
-use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
 use Twig\Error\LoaderError;
 use Twig\Loader\LoaderInterface;
@@ -73,8 +72,7 @@ class ComponentLoader implements LoaderInterface {
       $this->pluginManager->find($name);
       return TRUE;
     }
-    catch (ComponentNotFoundException $e) {
-      Error::logException($this->logger, $e);
+    catch (ComponentNotFoundException) {
       return FALSE;
     }
   }
