@@ -155,9 +155,6 @@ trait UserCreationTrait {
     $rid = FALSE;
     if ($permissions) {
       $rid = $this->createRole($permissions);
-      if (!$rid) {
-        return FALSE;
-      }
     }
 
     // Create a user assigned to that role.
@@ -237,6 +234,11 @@ trait UserCreationTrait {
    *
    * @return string|false
    *   Role ID of newly created role, or FALSE if role creation failed.
+   *
+   * @throws \InvalidArgumentException
+   *   If one or more of the specified permissions do not exist.
+   * @throws \RuntimeException
+   *   If the user role could not be created.
    */
   protected function createRole(array $permissions, $rid = NULL, $name = NULL, $weight = NULL): string|false {
     // Generate a random, lowercase machine name if none was passed.
@@ -248,11 +250,6 @@ trait UserCreationTrait {
       // In the role UI role names are trimmed and random string can start or
       // end with a space.
       $name = trim($this->randomString(8));
-    }
-
-    // Check the all the permissions strings are valid.
-    if (!$this->checkPermissions($permissions)) {
-      return FALSE;
     }
 
     // Create new role.
@@ -278,7 +275,7 @@ trait UserCreationTrait {
       return $role->id();
     }
     else {
-      return FALSE;
+      throw new \RuntimeException('Unable to create new user role.');
     }
   }
 
@@ -289,18 +286,16 @@ trait UserCreationTrait {
    *   The permission names to check.
    *
    * @return bool
-   *   TRUE if the permissions are valid, FALSE otherwise.
+   *   TRUE if the permissions are valid, fails a test otherwise.
    */
   protected function checkPermissions(array $permissions): bool {
     $available = array_keys(\Drupal::service('user.permissions')->getPermissions());
-    $valid = TRUE;
     foreach ($permissions as $permission) {
       if (!in_array($permission, $available)) {
         $this->fail("Invalid permission $permission.");
-        $valid = FALSE;
       }
     }
-    return $valid;
+    return TRUE;
   }
 
   /**
