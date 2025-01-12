@@ -77,6 +77,13 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
         ->keys(['sid' => Crypt::hashBase64($sid)])
         ->fields($fields)
         ->execute();
+    // A user may be newly assigned to a session, and a subsequent request made
+    // almost instantaneously using that session ID. If this statement is
+    // only committed when the transaction is terminated, it may be too late
+    // to be valid for the next request.
+    if ($this->connection->inTransaction()) {
+      $this->connection->commitAll();
+    }
     try {
       $doWrite();
     }
