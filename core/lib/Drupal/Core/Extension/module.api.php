@@ -96,6 +96,13 @@ function hook_hook_info() {
 /**
  * Alter the registry of modules implementing a hook.
  *
+ * This hook will be removed in 12.0.0.
+ * It has been intentionally not deprecated because custom code and contributed
+ * modules will still need to maintain implementations with the #[LegacyHook]
+ * attribute in order to support drupal versions older than 11.2.0.
+ *
+ * @see https://www.drupal.org/node/3496788
+ *
  * Only procedural implementations are supported for this hook.
  *
  * This hook is invoked in \Drupal::moduleHandler()->getImplementationInfo().
@@ -117,6 +124,8 @@ function hook_hook_info() {
  *   file named $module.$group.inc.
  * @param string $hook
  *   The name of the module hook being implemented.
+ *
+ * @see https://www.drupal.org/node/3496788
  */
 function hook_module_implements_alter(&$implementations, $hook) {
   if ($hook == 'form_alter') {
