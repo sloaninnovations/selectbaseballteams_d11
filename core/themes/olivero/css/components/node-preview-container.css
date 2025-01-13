@@ -39,3 +39,17 @@
   margin-inline-start: 0;
   margin-inline-end: auto;
 }
+
+@media (min-width: 75rem) {
+  /* Adjustments when admin toolbar is present. */
+  [data-admin-toolbar="expanded"] .node-preview-container {
+    padding-inline-start: calc(var(--sp0-5) + var(--drupal-displace-offset-left, 0rem));
+  }
+
+  [data-admin-toolbar="expanded"] .node-preview-container .node-preview-form-select {
+    margin-left: 0;
+  }
+  [data-admin-toolbar="collapsed"] .node-preview-container .node-preview-form-select {
+    margin-inline-start: var(--sp4);
+  }
+}
