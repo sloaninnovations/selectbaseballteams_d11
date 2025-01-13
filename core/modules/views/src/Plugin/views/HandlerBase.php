@@ -837,7 +837,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
     $str = trim($str, " \n\r\t\v\0,+");
     if ($str !== '') {
       // Check for 'or' operators (plus signs or spaces) along with a comma.
-      if ((strpos($str, '+') || strpos($str, ' ')) && strpos($str, ',') === false) {
+      if ((strpos($str, '+') || strpos($str, ' ')) && strpos($str, ',') === FALSE) {
         $operator = 'or';
         // Replace plus signs with spaces and split.
         $value = explode(' ', str_replace('+', ' ', $str));
