@@ -62,6 +62,9 @@ class BooleanCheckboxWidget extends WidgetBase {
       '#default_value' => !empty($items[0]->value),
     ];
 
+    // Add our custom validator.
+    $element['value']['#element_validate'][] = [static::class, 'validateElement'];
+
     // Override the title from the incoming $element.
     if ($this->getSetting('display_label')) {
       $element['value']['#title'] = $this->fieldDefinition->getLabel();
@@ -71,6 +74,31 @@ class BooleanCheckboxWidget extends WidgetBase {
     }
 
     return $element;
+  }
+
+  /**
+   * Form validation handler for widget elements.
+   *
+   * @param array $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
+  public static function validateElement(array $element, FormStateInterface $form_state) {
+    if ($element['#required'] && $element['#value'] === 0) {
+      if (isset($element['#required_error'])) {
+        $form_state->setError($element, $element['#required_error']);
+      }
+      else {
+        $form_state->setError(
+          $element,
+          new TranslatableMarkup(
+            '@name field is required.',
+            ['@name' => $element['#title']]
+          )
+        );
+      }
+    }
   }
 
 }
