@@ -111,7 +111,11 @@ class NavigationHooks {
         'attributes' => [],
       ],
     ];
-
+    $items['navigation_content_top'] = [
+      'variables' => [
+        'items' => [],
+      ],
+    ];
     return $items;
   }
 
