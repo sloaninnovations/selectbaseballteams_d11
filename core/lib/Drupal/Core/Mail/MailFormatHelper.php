@@ -188,11 +188,11 @@ class MailFormatHelper {
             break;
 
           case 'h3':
-            $indent[] = '.... ';
+            $indent[] = '---- ';
             break;
 
           case 'h4':
-            $indent[] = '.. ';
+            $indent[] = '-- ';
             break;
 
           case '/blockquote':
