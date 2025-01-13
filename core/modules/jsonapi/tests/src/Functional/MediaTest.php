@@ -223,6 +223,7 @@ class MediaTest extends ResourceTestBase {
                 'width' => 180,
                 'height' => 180,
                 'title' => NULL,
+                'display' => NULL,
               ],
               'type' => 'file--file',
             ],
@@ -378,6 +379,7 @@ class MediaTest extends ResourceTestBase {
           'width' => 180,
           'height' => 180,
           'title' => NULL,
+          'display' => NULL,
         ] + $data['meta'];
         return $data;
 

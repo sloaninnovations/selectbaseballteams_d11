@@ -361,6 +361,7 @@ class RelationshipNormalizerTest extends JsonapiKernelTestBase {
               'width' => NULL,
               'height' => NULL,
               'drupal_internal__target_id' => static::$imageUids[0],
+              'display' => NULL,
             ],
           ],
         ],
@@ -378,6 +379,7 @@ class RelationshipNormalizerTest extends JsonapiKernelTestBase {
                 'height' => NULL,
                 'arity' => 0,
                 'drupal_internal__target_id' => static::$imageUids[0],
+                'display' => NULL,
               ],
             ],
             [
@@ -390,6 +392,7 @@ class RelationshipNormalizerTest extends JsonapiKernelTestBase {
                 'height' => NULL,
                 'arity' => 1,
                 'drupal_internal__target_id' => static::$imageUids[0],
+                'display' => NULL,
               ],
             ],
           ],
@@ -408,6 +411,7 @@ class RelationshipNormalizerTest extends JsonapiKernelTestBase {
                 'height' => NULL,
                 'arity' => 0,
                 'drupal_internal__target_id' => static::$imageUids[0],
+                'display' => NULL,
               ],
             ],
             [
@@ -420,6 +424,7 @@ class RelationshipNormalizerTest extends JsonapiKernelTestBase {
                 'height' => NULL,
                 'arity' => 1,
                 'drupal_internal__target_id' => static::$imageUids[0],
+                'display' => NULL,
               ],
             ],
             [
@@ -432,6 +437,7 @@ class RelationshipNormalizerTest extends JsonapiKernelTestBase {
                 'height' => NULL,
                 'arity' => 2,
                 'drupal_internal__target_id' => static::$imageUids[0],
+                'display' => NULL,
               ],
             ],
           ],

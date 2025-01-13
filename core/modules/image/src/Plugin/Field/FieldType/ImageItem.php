@@ -111,6 +111,13 @@ class ImageItem extends FileItem {
           'type' => 'int',
           'unsigned' => TRUE,
         ],
+        'display' => [
+          'description' => 'Flag to control whether this file should be displayed when viewing content.',
+          'type' => 'int',
+          'size' => 'tiny',
+          'unsigned' => TRUE,
+          'default' => 1,
+        ],
         'alt' => [
           'description' => "Alternative image text, for the image's 'alt' attribute.",
           'type' => 'varchar',
@@ -150,7 +157,6 @@ class ImageItem extends FileItem {
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties = parent::propertyDefinitions($field_definition);
 
-    unset($properties['display']);
     unset($properties['description']);
 
     $properties['alt'] = DataDefinition::create('string')
@@ -185,6 +191,24 @@ class ImageItem extends FileItem {
    */
   public function storageSettingsForm(array &$form, FormStateInterface $form_state, $has_data) {
     $element = [];
+
+    $element['display_field'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable <em>Display</em> field'),
+      '#default_value' => $this->getSetting('display_field'),
+      '#description' => $this->t('The display option allows users to choose if a file should be shown when viewing the content.'),
+    ];
+    $element['display_default'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Files displayed by default'),
+      '#default_value' => $this->getSetting('display_default'),
+      '#description' => $this->t('This setting only has an effect if the display option is enabled.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="settings[display_field]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
 
     // We need the field-level 'default_image' setting, and $this->getSettings()
     // will only provide the instance-level one, so we need to explicitly fetch
@@ -409,6 +433,7 @@ class ImageItem extends FileItem {
       'title' => $random->sentences(4),
       'width' => $width,
       'height' => $height,
+      'display' => (int) $settings['display_default'],
     ];
     return $values;
   }
@@ -521,7 +546,9 @@ class ImageItem extends FileItem {
    * {@inheritdoc}
    */
   public function isDisplayed() {
-    // Image items do not have per-item visibility settings.
+    if ($this->getSetting('display_field')) {
+      return (bool) $this->display;
+    }
     return TRUE;
   }
 
