@@ -104,14 +104,32 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
         }
       }
 
-      // @todo This is crazy. Find a way to remove the override functionality.
-      $plugin_id = $override ?: $definition['id'];
-      // Try to use the overridden handler.
-      $handler = $this->createInstance($plugin_id, $definition);
-      if ($override && method_exists($handler, 'broken') && $handler->broken()) {
-        $handler = $this->createInstance($definition['id'], $definition);
+      // First priority is to use the override.
+      // When aggregation is enabled, particular plugins need to be
+      // replaced in order to override the query with a query that
+      // can run the aggregate counts, sums, or averages for example.
+      // @see Drupal\views\Plugin\views\query\Sql::getAggregationInfo()
+      // for example which aggressively overrides any filter used
+      // by a number of mathematical-type queries regardless of the
+      // original filter.
+      if ($override) {
+        $handler = $this->createInstance($override, $definition);
+        if (!method_exists($handler, 'broken') || !$handler->broken()) {
+          return $handler;
+        }
       }
-      return $handler;
+
+      // Then try the configuration provided for the handler.
+      if (isset($item['plugin_id'])) {
+        $handler = $this->createInstance($item['plugin_id'], $definition);
+        if (!method_exists($handler, 'broken') || !$handler->broken()) {
+          return $handler;
+        }
+      }
+
+      // Finally, fall back to the default configuration suggested
+      // by the view data.
+      return $this->createInstance($definition['id'], $definition);
     }
 
     // Finally, use the 'broken' handler.
