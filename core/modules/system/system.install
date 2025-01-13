@@ -1768,14 +1768,18 @@ function system_update_11201(): void {
   $schema = \Drupal::database()->schema();
 
   if ($schema->tableExists('router')) {
-    $spec = [
+    $field_spec = [
       'description' => 'The alias of the route, if applicable.',
       'type' => 'varchar_ascii',
       'length' => 255,
     ];
+    $keys_spec = [
+      'indexes' => [
+        'alias' => ['alias'],
+      ],
+    ];
     if (!$schema->fieldExists('router', 'alias')) {
-      $schema->addField('router', 'alias', $spec);
-      $schema->addIndex('router', 'alias', ['alias'], ['alias' => $spec]);
+      $schema->addField('router', 'alias', $field_spec, $keys_spec);
     }
   }
 }
