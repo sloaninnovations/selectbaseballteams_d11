@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\DatabaseBackend;
 
 /**
@@ -65,7 +66,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
     // Set multiple items to test exceeding the chunk size.
     $backend->deleteAll();
     $items = [];
-    for ($i = 0; $i <= DatabaseBackend::MAX_ITEMS_PER_CACHE_SET; $i++) {
+    for ($i = 0; $i < DatabaseBackend::MAX_ITEMS_PER_CACHE_SET; $i++) {
       $items["test$i"]['data'] = $i;
     }
     $backend->setMultiple($items);
@@ -121,7 +122,33 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   }
 
   /**
-   * Test that the service "cache_tags.invalidator.checksum" is backend overridable.
+   * Tests getting a FALSE when requesting a corrupt cache item.
+   */
+  public function testCorruptCacheReturnsFalse() {
+    $corrupt_backend = $this->getCacheBackend('corrupt');
+    // Gets the CacheTagsChecksum tag validator.
+    $cache_tags_checksum = $this->container->get('cache_tags.invalidator.checksum');
+
+    // All DatabaseBackend cache tables should be prefixed with 'cache_'. As
+    // specified on \Drupal\Core\Cache\DatabaseBackend::__construct.
+    $cid = $this->randomMachineName();
+
+    // We insert a corrupted cache item into the cache table.
+    \Drupal::database()->insert('cache_corrupt')->fields([
+      'cid' => $cid,
+      'created' => round(microtime(TRUE), 3),
+      'data' => substr(serialize($this->randomObject()), 0, -5),
+      'expire' => CacheBackendInterface::CACHE_PERMANENT,
+      'tags' => '',
+      'serialized' => 1,
+      'checksum' => $cache_tags_checksum->getCurrentChecksum([]),
+    ])->execute();
+
+    $this->assertFalse($corrupt_backend->get($cid), "Returns a FALSE when requesting the corrupt object.");
+  }
+
+  /**
+   * Test the service "cache_tags.invalidator.checksum" is backend overridable.
    */
   public function testCacheTagsInvalidatorChecksumIsBackendOverridable(): void {
     $definition = $this->container->getDefinition('cache_tags.invalidator.checksum');
