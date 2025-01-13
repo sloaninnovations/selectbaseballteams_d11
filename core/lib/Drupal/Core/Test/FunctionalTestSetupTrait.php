@@ -123,6 +123,14 @@ trait FunctionalTestSetupTrait {
       'value' => FALSE,
       'required' => TRUE,
     ];
+    // Allow installing hidden modules, which are often used for tests.
+    // Hidden modules have `hidden: true` in their info.yml file and by default
+    // not visible in Drupal at all.
+    // @see https://www.drupal.org/docs/develop/creating-modules/let-drupal-know-about-your-module-with-an-infoyml-file
+    $settings['settings']['extension_discovery_scan_tests'] = (object) [
+      'value' => TRUE,
+      'required' => TRUE,
+    ];
     $this->writeSettings($settings);
     // Allow for test-specific overrides.
     $settings_testing_file = DRUPAL_ROOT . '/' . $this->originalSite . '/settings.testing.php';
