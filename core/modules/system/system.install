@@ -1774,9 +1774,8 @@ function system_update_11201(): void {
       'length' => 255,
     ];
     if (!$schema->fieldExists('router', 'alias')) {
-      $schema->addField('router', 'alias', $spec, [
-        'indexes' => ['alias' => ['alias']],
-      ]);
+      $schema->addField('router', 'alias', $spec);
+      $schema->addIndex('router', 'alias', ['alias'], ['alias' => $spec]);
     }
   }
 }
