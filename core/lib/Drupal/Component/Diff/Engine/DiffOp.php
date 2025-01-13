@@ -31,7 +31,7 @@ class DiffOp {
    */
   public function norig() {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3337942', E_USER_DEPRECATED);
-    return $this->orig ? sizeof($this->orig) : 0;
+    return $this->orig ? count($this->orig) : 0;
   }
 
   /**
@@ -42,7 +42,7 @@ class DiffOp {
    */
   public function nclosing() {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3337942', E_USER_DEPRECATED);
-    return $this->closing ? sizeof($this->closing) : 0;
+    return $this->closing ? count($this->closing) : 0;
   }
 
 }

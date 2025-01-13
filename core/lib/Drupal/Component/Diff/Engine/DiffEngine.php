@@ -29,6 +29,7 @@ namespace Drupal\Component\Diff\Engine;
  *   sebastianbergmann/diff instead.
  *
  * @see https://www.drupal.org/node/3337942
+ * phpcs:disable Drupal.Commenting.DocComment.ShortSingleLine
  */
 #[\AllowDynamicProperties]
 class DiffEngine {
@@ -43,8 +44,8 @@ class DiffEngine {
 
   public function diff($from_lines, $to_lines) {
 
-    $n_from = sizeof($from_lines);
-    $n_to = sizeof($to_lines);
+    $n_from = count($from_lines);
+    $n_to = count($to_lines);
 
     $this->xchanged = $this->ychanged = [];
     $this->xv = $this->yv = [];
@@ -94,7 +95,7 @@ class DiffEngine {
     }
 
     // Find the LCS.
-    $this->_compareseq(0, sizeof($this->xv), 0, sizeof($this->yv));
+    $this->_compareseq(0, count($this->xv), 0, count($this->yv));
 
     // Merge edits when possible
     $this->_shift_boundaries($from_lines, $this->xchanged, $this->ychanged);
@@ -109,7 +110,7 @@ class DiffEngine {
 
       // Skip matching "snake".
       $copy = [];
-      while ( $xi < $n_from && $yi < $n_to && !$this->xchanged[$xi] && !$this->ychanged[$yi]) {
+      while ($xi < $n_from && $yi < $n_to && !$this->xchanged[$xi] && !$this->ychanged[$yi]) {
         $copy[] = $from_lines[$xi++];
         ++$yi;
       }
@@ -149,7 +150,6 @@ class DiffEngine {
       return $line;
     }
   }
-
 
   /**
    * Divide the Largest Common Subsequence (LCS) of the sequences
@@ -202,7 +202,7 @@ class DiffEngine {
         }
       }
 
-      $x1 = $xoff + (int)(($numer + ($xlim - $xoff) * $chunk) / $nchunks);
+      $x1 = $xoff + (int) (($numer + ($xlim - $xoff) * $chunk) / $nchunks);
       for (; $x < $x1; $x++) {
         $line = $flip ? $this->yv[$x] : $this->xv[$x];
         if (empty($ymatches[$line])) {
@@ -241,7 +241,7 @@ class DiffEngine {
     $seps[] = $flip ? [$yoff, $xoff] : [$xoff, $yoff];
     $ymid = $ymids[$this->lcs];
     for ($n = 0; $n < $nchunks - 1; $n++) {
-      $x1 = $xoff + (int)(($numer + ($xlim - $xoff) * $n) / $nchunks);
+      $x1 = $xoff + (int) (($numer + ($xlim - $xoff) * $n) / $nchunks);
       $y1 = $ymid[$n] + 1;
       $seps[] = $flip ? [$y1, $x1] : [$x1, $y1];
     }
@@ -261,7 +261,7 @@ class DiffEngine {
 
     $beg = 1;
     while ($beg < $end) {
-      $mid = (int)(($beg + $end) / 2);
+      $mid = (int) (($beg + $end) / 2);
       if ($ypos > $this->seq[$mid]) {
         $beg = $mid + 1;
       }
@@ -309,8 +309,8 @@ class DiffEngine {
     }
     else {
       // This is ad hoc but seems to work well.
-      //$nchunks = sqrt(min($xlim - $xoff, $ylim - $yoff) / 2.5);
-      //$nchunks = max(2, min(8, (int)$nchunks));
+      // $nchunks = sqrt(min($xlim - $xoff, $ylim - $yoff) / 2.5);
+      // $nchunks = max(2, min(8, (int)$nchunks));
       $nchunks = min(7, $xlim - $xoff, $ylim - $yoff) + 1;
       [$lcs, $seps] = $this->_diag($xoff, $xlim, $yoff, $ylim, $nchunks);
     }
@@ -330,7 +330,7 @@ class DiffEngine {
       reset($seps);
       $pt1 = $seps[0];
       while ($pt2 = next($seps)) {
-        $this->_compareseq ($pt1[0], $pt2[0], $pt1[1], $pt2[1]);
+        $this->_compareseq($pt1[0], $pt2[0], $pt1[1], $pt2[1]);
         $pt1 = $pt2;
       }
     }
@@ -353,9 +353,9 @@ class DiffEngine {
     $i = 0;
     $j = 0;
 
-    $this::USE_ASSERTS && assert(sizeof($lines) == sizeof($changed));
-    $len = sizeof($lines);
-    $other_len = sizeof($other_changed);
+    $this::USE_ASSERTS && assert(count($lines) == count($changed));
+    $len = count($lines);
+    $other_len = count($other_changed);
 
     while (1) {
       /*
@@ -373,7 +373,7 @@ class DiffEngine {
         $j++;
       }
       while ($i < $len && !$changed[$i]) {
-        $this::USE_ASSERTS && assert($j < $other_len && ! $other_changed[$j]);
+        $this::USE_ASSERTS && assert($j < $other_len && !$other_changed[$j]);
         $i++;
         $j++;
         while ($j < $other_len && $other_changed[$j]) {
@@ -436,7 +436,7 @@ class DiffEngine {
           while ($i < $len && $changed[$i]) {
             $i++;
           }
-          $this::USE_ASSERTS && assert($j < $other_len && ! $other_changed[$j]);
+          $this::USE_ASSERTS && assert($j < $other_len && !$other_changed[$j]);
           $j++;
           if ($j < $other_len && $other_changed[$j]) {
             $corresponding = $i;
