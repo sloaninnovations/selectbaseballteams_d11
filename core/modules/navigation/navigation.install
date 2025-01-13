@@ -8,7 +8,7 @@
 /**
  * Implements hook_install().
  */
-function navigation_install($is_syncing): void {
+function navigation_install(bool $is_syncing): void {
   // Do not modify config during sync. Config should be already consolidated.
   if ($is_syncing) {
     return;
