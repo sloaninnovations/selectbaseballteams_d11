@@ -183,7 +183,7 @@ class Views {
    * Gets enabled display extenders.
    */
   public static function getEnabledDisplayExtenders() {
-    $enabled = array_filter((array) \Drupal::config('views.settings')->get('display_extenders'));
+    $enabled = (array) \Drupal::config('views.settings')->get('display_extenders');
 
     return array_combine($enabled, $enabled);
   }

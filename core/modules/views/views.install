@@ -18,3 +18,18 @@ function views_install(): void {
 function views_update_last_removed(): int {
   return 8500;
 }
+
+/**
+ * Remove disabled display extenders from views settings.
+ */
+function views_update_11001(): void {
+  $config = \Drupal::configFactory()->getEditable('views.settings');
+  $display_extenders = $config->get('display_extenders');
+  if ($display_extenders) {
+    $new_display_extenders = array_filter($display_extenders);
+    if (count($display_extenders) != count($new_display_extenders)) {
+      $config->set('display_extenders', $new_display_extenders);
+      $config->save();
+    }
+  }
+}

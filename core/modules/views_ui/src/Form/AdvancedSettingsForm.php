@@ -84,7 +84,7 @@ class AdvancedSettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->config('views.settings')
       ->set('sql_signature', $form_state->getValue('sql_signature'))
-      ->set('display_extenders', $form_state->getValue('display_extenders', []))
+      ->set('display_extenders', array_filter($form_state->getValue('display_extenders', [])))
       ->save();
 
     parent::submitForm($form, $form_state);

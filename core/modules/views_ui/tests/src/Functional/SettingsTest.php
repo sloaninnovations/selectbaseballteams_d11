@@ -158,6 +158,10 @@ class SettingsTest extends UITestBase {
     $this->drupalGet('admin/structure/views/settings/advanced');
     $this->submitForm($edit, 'Save configuration');
 
+    // Check that the display extenders does not contain any disabled extenders.
+    $display_extenders = $this->config('views.settings')->get('display_extenders');
+    $this->assertSameSize($display_extenders, array_filter($display_extenders));
+
     $this->assertSession()->checkboxChecked('edit-sql-signature');
 
     // Test the "Clear Views' cache" button.
