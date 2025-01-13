@@ -407,6 +407,14 @@ drupal.announce:
     - core/drupal
     - core/drupal.debounce
 
+focus-trap:
+  version: VERSION
+  js:
+    misc/focus-trap.js: {}
+  dependencies:
+    - core/drupal
+    - core/tabbable
+
 loadjs:
   remote: https://github.com/muicss/loadjs
   version: "4.3.0"

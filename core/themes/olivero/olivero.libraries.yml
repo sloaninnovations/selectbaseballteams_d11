@@ -222,6 +222,7 @@ navigation-primary:
     js/second-level-navigation.js: {}
     js/nav-resize.js: {}
   dependencies:
+    - core/focus-trap
     - olivero/navigation-base
 
 navigation-secondary:

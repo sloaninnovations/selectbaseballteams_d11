@@ -31,6 +31,12 @@
     props.body.classList.toggle('is-overlay-active', value);
     props.body.classList.toggle('is-fixed', value);
     props.navWrapper.classList.toggle('is-active', value);
+
+    if (value) {
+      Drupal.focusTrap.add([props.navButton, props.navWrapper]);
+    } else {
+      Drupal.focusTrap.remove();
+    }
   }
 
   /**
@@ -64,35 +70,6 @@
 
     props.overlay.addEventListener('touchstart', () => {
       toggleNav(props, false);
-    });
-
-    // Focus trap. This is added to the header element because the navButton
-    // element is not a child element of the navWrapper element, and the keydown
-    // event would not fire if focus is on the navButton element.
-    props.header.addEventListener('keydown', (e) => {
-      if (e.key === 'Tab' && isNavOpen(props.navWrapper)) {
-        const tabbableNavElements = tabbable.tabbable(props.navWrapper);
-        tabbableNavElements.unshift(props.navButton);
-        const firstTabbableEl = tabbableNavElements[0];
-        const lastTabbableEl =
-          tabbableNavElements[tabbableNavElements.length - 1];
-
-        if (e.shiftKey) {
-          if (
-            document.activeElement === firstTabbableEl &&
-            !props.olivero.isDesktopNav()
-          ) {
-            lastTabbableEl.focus();
-            e.preventDefault();
-          }
-        } else if (
-          document.activeElement === lastTabbableEl &&
-          !props.olivero.isDesktopNav()
-        ) {
-          firstTabbableEl.focus();
-          e.preventDefault();
-        }
-      }
     });
 
     // Remove overlays when browser is resized and desktop nav appears.

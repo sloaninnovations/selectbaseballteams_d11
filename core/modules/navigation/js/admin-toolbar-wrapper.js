@@ -60,6 +60,13 @@
                 newState ? 'expanded' : 'collapsed',
               );
 
+              if (newState) {
+                const element = document.querySelector('.admin-toolbar');
+                Drupal.focusTrap.add([element]);
+              } else {
+                Drupal.focusTrap.remove();
+              }
+
               // Set [data-admin-toolbar-body-scroll='locked']
               // See css/components/body-scroll-lock.pcss.css.
 

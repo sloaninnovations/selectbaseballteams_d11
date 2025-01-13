@@ -20,6 +20,7 @@ internal.navigation:
   dependencies:
     - core/drupal.displace
     - core/once
+    - core/focus-trap
     - core/tabbable
     - navigation/admin-reset-styles
     - navigation/body-scroll-lock
