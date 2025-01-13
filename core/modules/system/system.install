@@ -92,13 +92,15 @@ function system_requirements($phase) {
     $profile = \Drupal::installProfile();
     if ($profile != 'standard' && !empty($profile)) {
       $info = $module_extension_list->getExtensionInfo($profile);
+      if ($info['version']) {
+        $value = t('%profile_name (%profile-%version)', ['%profile_name' => $info['name'], '%profile' => $profile, '%version' => $info['version']]);
+      }
+      else {
+        $value = t('%profile_name (%profile)', ['%profile_name' => $info['name'], '%profile' => $profile]);
+      }
       $requirements['install_profile'] = [
         'title' => t('Installation profile'),
-        'value' => t('%profile_name (%profile-%version)', [
-          '%profile_name' => $info['name'],
-          '%profile' => $profile,
-          '%version' => $info['version'],
-        ]),
+        'value' => $value,
         'severity' => REQUIREMENT_INFO,
         'weight' => -9,
       ];
