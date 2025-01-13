@@ -1,18 +1,32 @@
 core.extension:
   type: config_object
   label: 'Extension settings'
+  constraints:
+    FullyValidatable: ~
   mapping:
     module:
       type: sequence
       label: 'Enabled modules'
+      constraints:
+        SequenceKeys:
+          constraints:
+            NotBlank: []
+            ExtensionName: []
+            ExtensionExists: module
       sequence:
-        type: integer
+        type: weight
         label: 'Weight'
     theme:
       type: sequence
       label: 'Installed themes'
+      constraints:
+        SequenceKeys:
+          constraints:
+            NotBlank: []
+            ExtensionName: []
+            ExtensionExists: theme
       sequence:
-        type: integer
+        type: weight
         label: 'Weight'
     profile:
       type: string
@@ -23,3 +37,7 @@ core.extension:
       # will be removed.
       requiredKey: false
       label: 'Install profile'
+      constraints:
+        NotBlank: []
+        ExtensionName: []
+        ExtensionExists: profile
