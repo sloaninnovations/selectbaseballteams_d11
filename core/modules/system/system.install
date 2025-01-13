@@ -1767,7 +1767,7 @@ function system_update_11102(): TranslatableMarkup|null {
 function system_update_11201(): void {
   $schema = \Drupal::database()->schema();
 
-  if ($schema->tableExists('router')) {
+  if ($schema->tableExists('router') && !$schema->fieldExists('router', 'alias')) {
     $spec = [
       'fields' => [
         'alias' => [
@@ -1776,12 +1776,8 @@ function system_update_11201(): void {
           'length' => 255,
         ],
       ],
-      'indexes' => [
-        'alias' => ['alias'],
-      ],
     ];
-    if (!$schema->fieldExists('router', 'alias')) {
-      $schema->addField('router', 'alias', $spec['fields']['alias'], $spec);
-    }
+    $schema->addField('router', 'alias', $spec['fields']['alias']);
+    $schema->addIndex('router', 'alias', ['alias'], $spec);
   }
 }
