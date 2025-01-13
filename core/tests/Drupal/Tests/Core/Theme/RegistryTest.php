@@ -157,19 +157,21 @@ class RegistryTest extends UnitTestCase {
     include_once $this->root . '/core/modules/system/tests/modules/theme_test/theme_test.module';
     include_once $this->root . '/core/tests/fixtures/test_stable/test_stable.theme';
     $themeTestTheme = new ThemeTestHooks();
-    $this->moduleHandler->expects($this->atLeastOnce())
+    $this->moduleHandler->expects($this->exactly(2))
       ->method('invoke')
       ->with('theme_test', 'theme')
       ->willReturn($themeTestTheme->theme(NULL, NULL, NULL, NULL));
-    $this->moduleHandler->expects($this->atLeastOnce())
+    $this->moduleHandler->expects($this->exactly(38))
       ->method('invokeAllWith')
-      ->with('theme')
-      ->willReturnCallback(function (string $hook, callable $callback) {
-        $callback(function () {}, 'theme_test');
-      });
-    $this->moduleHandler->expects($this->atLeastOnce())
+      // $callback is documented on ModuleHandlerInterface::invokeAllWith().
+      // The first argument expects a callable, but it doesn't matter what it
+      // is, use pi() as a canary in case code changes, and it begins to use it.
+      // The second argument is the module name and for that theme_test is
+      // always correct here.
+      ->willReturnCallback(fn (string $hook, callable $callback) => $callback('pi', 'theme_test'));
+    $this->moduleHandler->expects($this->exactly(2))
       ->method('getModuleList')
-      ->willReturn([]);
+      ->willReturn(['theme_test' => NULL]);
     $this->moduleList->expects($this->exactly(2))
       ->method('getPath')
       ->with('theme_test')
@@ -278,6 +280,16 @@ class RegistryTest extends UnitTestCase {
           ],
           'base hook' => 'test_hook',
         ],
+        'preprocess invokes' => [
+          'test_preprocess_test_hook__suggestion' => [
+            'module' => 'test',
+            'hook' => 'preprocess_test_hook__suggestion',
+          ],
+          'test_preprocess_test_hook__suggestion__another' => [
+            'module' => 'test',
+            'hook' => 'preprocess_test_hook__suggestion__another',
+          ],
+        ],
       ],
     ];
 
@@ -348,6 +360,12 @@ class RegistryTest extends UnitTestCase {
             'explicit_preprocess_test_hook__suggestion__another',
           ],
           'base hook' => 'test_hook',
+        ],
+        'preprocess invokes' => [
+          'test_preprocess_test_hook__suggestion' => [
+            'module' => 'test',
+            'hook' => 'preprocess_test_hook__suggestion',
+          ],
         ],
       ],
     ];
@@ -430,6 +448,16 @@ class RegistryTest extends UnitTestCase {
           ],
           'base hook' => 'test_hook',
         ],
+        'preprocess invokes' => [
+          'test_preprocess_child_hook__suggestion' => [
+            'module' => 'test',
+            'hook' => 'preprocess_child_hook__suggestion',
+          ],
+          'test_preprocess_child_hook__suggestion__another' => [
+            'module' => 'test',
+            'hook' => 'preprocess_child_hook__suggestion__another',
+          ],
+        ],
       ],
     ];
 
@@ -480,6 +508,12 @@ class RegistryTest extends UnitTestCase {
             'explicit_preprocess_test_hook__suggestion__another',
           ],
           'base hook' => 'alternate_base_hook',
+        ],
+        'preprocess invokes' => [
+          'test_preprocess_test_hook__suggestion' => [
+            'module' => 'test',
+            'hook' => 'preprocess_test_hook__suggestion',
+          ],
         ],
       ],
     ];
