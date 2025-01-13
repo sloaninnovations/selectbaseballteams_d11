@@ -49,6 +49,11 @@
     outline: 2px dashed #fedb60;
     background-color: #ffd;
   }
+
+  & .layout-builder__section_links a.layout-builder__link:not(:first-child,:last-child)::after {
+    content: " | ";
+  }
+
 }
 
 .layout-builder__region {

@@ -39,6 +39,32 @@ layout_builder.configure_section:
       section_storage:
         layout_builder_tempstore: TRUE
 
+layout_builder.change_section_layout:
+  path: '/layout_builder/change_layout/section/{section_storage_type}/{section_storage}/{delta}'
+  defaults:
+    _controller: '\Drupal\layout_builder\Controller\ChangeSectionLayoutController::build'
+    _title: 'Change layout for this section'
+  requirements:
+    _layout_builder_access: 'view'
+  options:
+    _admin_route: TRUE
+    parameters:
+      section_storage:
+        layout_builder_tempstore: TRUE
+
+layout_builder.configure_changed_section_layout:
+  path: '/layout_builder/map_regions/section/{section_storage_type}/{section_storage}/{delta}/{plugin_id}'
+  defaults:
+    _title: 'Configure new layout'
+    _form: '\Drupal\layout_builder\Form\ConfigureNewSectionLayoutForm'
+  requirements:
+    _layout_builder_access: 'view'
+  options:
+    _admin_route: TRUE
+    parameters:
+      section_storage:
+        layout_builder_tempstore: TRUE
+
 layout_builder.remove_section:
   path: '/layout_builder/remove/section/{section_storage_type}/{section_storage}/{delta}'
   defaults:

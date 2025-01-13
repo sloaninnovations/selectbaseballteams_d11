@@ -288,8 +288,10 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
 
     $expected_labels = [
       'My Cool Section',
+      'Administration links for My Cool Section',
       'Content region in My Cool Section',
       'Section 2',
+      'Administration links for Section 2',
       'Content region in Section 2',
     ];
     $labels = [];
@@ -649,7 +651,177 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
     $page->clickLink('Layout Builder Test Plugin');
     $page->pressButton('Add section');
     // See \Drupal\layout_builder_test\Plugin\Layout\LayoutBuilderTestPlugin::build().
-    $assert_session->elementExists('css', '.go-birds');
+    $assert_session->elementExists('css', 'div[aria-label="Section 1"] .go-birds');
+  }
+
+  /**
+   * Tests that editing sections keep custom attributes.
+   */
+  public function testEditingSectionWithCustomAttributes() {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+    ]));
+
+    $this->drupalGet('admin/structure/types/manage/bundle_with_section_field/display/default');
+    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
+    $page->clickLink('Manage layout');
+    $page->clickLink('Add section');
+    $page->clickLink('Layout Builder Test Plugin');
+    $page->pressButton('Add section');
+    // See \Drupal\layout_builder_test\Plugin\Layout\LayoutBuilderTestPlugin::build().
+    $assert_session->elementExists('css', 'div[aria-label="Section 1"] .go-birds');
+
+    $page->clickLink('Change layout for Section 1');
+    $page->clickLink('Two column');
+    $page->pressButton('Update');
+    // TODO: Should we notify user?
+    $assert_session->elementExists('css', 'div[aria-label="Section 1"] .layout--twocol-section');
+    $assert_session->elementNotExists('css', 'div[aria-label="Section 1"] .go-birds');
+  }
+
+  /**
+   * Tests the usage of placeholders for empty blocks.
+   *
+   * @see \Drupal\Core\Render\PreviewFallbackInterface::getPreviewFallbackString()
+   * @see \Drupal\layout_builder\EventSubscriber\BlockComponentRenderArray::onBuildRender()
+   */
+  public function testBlockPlaceholder() {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+    ]));
+
+    $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
+    $this->drupalGet("{$field_ui_prefix}/display/default");
+    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
+
+    // Customize the default view mode.
+    $this->drupalGet("$field_ui_prefix/display/default/layout");
+
+    // Add a block whose content is controlled by state and is empty by default.
+    $this->clickLink('Add block');
+    $this->clickLink('Test block caching');
+    $page->fillField('settings[label]', 'The block label');
+    $page->pressButton('Add block');
+
+    $block_content = 'I am content';
+    $placeholder_content = 'Placeholder for the "The block label" block';
+
+    // The block placeholder is displayed and there is no content.
+    $assert_session->pageTextContains($placeholder_content);
+    $assert_session->pageTextNotContains($block_content);
+
+    // Set block content and reload the page.
+    \Drupal::state()->set('block_test.content', $block_content);
+    $this->getSession()->reload();
+
+    // The block placeholder is no longer displayed and the content is visible.
+    $assert_session->pageTextNotContains($placeholder_content);
+    $assert_session->pageTextContains($block_content);
+  }
+
+  /**
+   * Tests the ability to use a specified block label for field blocks.
+   */
+  public function testFieldBlockLabel() {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+    ]));
+
+    $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
+    $this->drupalGet("$field_ui_prefix/display/default");
+    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
+
+    // Customize the default view mode.
+    $this->drupalGet("$field_ui_prefix/display/default/layout");
+
+    // Add a body block whose label will be overridden.
+    $this->clickLink('Add block');
+    $this->clickLink('Body');
+
+    // Enable the Label Display and set the Label to a modified field
+    // block label.
+    $modified_field_block_label = 'Modified Field Block Label';
+    $page->checkField('settings[label_display]');
+    $page->fillField('settings[label]', $modified_field_block_label);
+
+    // Save the block and layout.
+    $page->pressButton('Add block');
+    $page->pressButton('Save layout');
+
+    // Revisit the default layout view mode page.
+    $this->drupalGet("$field_ui_prefix/display/default/layout");
+
+    // The modified field block label is displayed.
+    $assert_session->pageTextContains($modified_field_block_label);
+  }
+
+  /**
+   * Tests a custom alter of the overrides form.
+   */
+  public function testOverridesFormAlter() {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+      'administer nodes',
+    ]));
+
+    $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
+    // Enable overrides.
+    $this->drupalGet("{$field_ui_prefix}/display/default");
+    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
+    $this->drupalGet("{$field_ui_prefix}/display/default");
+    $this->submitForm(['layout[allow_custom]' => TRUE], 'Save');
+    $this->drupalGet('node/1');
+
+    // The status checkbox should be checked by default.
+    $page->clickLink('Layout');
+    $assert_session->checkboxChecked('status[value]');
+    $page->pressButton('Save layout');
+    $assert_session->pageTextContains('The layout override has been saved.');
+
+    // Unchecking the status checkbox will unpublish the entity.
+    $page->clickLink('Layout');
+    $page->uncheckField('status[value]');
+    $page->pressButton('Save layout');
+    $assert_session->statusCodeEquals(403);
+    $assert_session->pageTextContains('The layout override has been saved.');
+  }
+
+  /**
+   * Tests the Block UI when Layout Builder is installed.
+   */
+  public function testBlockUiListing() {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer blocks',
+    ]));
+
+    $this->drupalGet('admin/structure/block');
+    $page->clickLink('Place block');
+
+    // Ensure that blocks expected to appear are available.
+    $assert_session->pageTextContains('Test HTML block');
+    $assert_session->pageTextContains('Block test');
+    // Ensure that blocks not expected to appear are not available.
+    $assert_session->pageTextNotContains('Body');
+    $assert_session->pageTextNotContains('Content fields');
   }
 
   /**

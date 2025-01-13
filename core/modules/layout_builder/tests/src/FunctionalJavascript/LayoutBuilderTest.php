@@ -226,6 +226,31 @@ class LayoutBuilderTest extends WebDriverTestBase {
     $page->pressButton('Save layout');
     $assert_session->elementExists('css', '.layout');
 
+    // Test editing the section
+    $this->drupalGet($layout_url);
+    $this->markCurrentPage();
+    $assert_session->linkExists('Change layout for Section 2');
+    $this->clickLink('Change layout for Section 2');
+    $assert_session->addressEquals($layout_url);
+    $this->assertPageNotReloaded();
+
+    $this->assertNotEmpty($assert_session->waitForElementVisible('named', ['link', 'Two column']));
+
+    $this->clickLink('Two column');
+    $this->assertOffCanvasFormAfterWait('layout_builder_configure_new_section_layout');
+    $assert_session->pageTextContains('Configure new layout');
+    $page->pressButton('Update');
+    $assert_session->assertWaitOnAjaxRequest();
+
+    $assert_session->elementExists('css', 'div[aria-label="Second region in Section 2"]');
+    $this->sortableTo('.block-field-blocknodebundle-with-section-fieldbody',
+      'div[aria-label="First region in Section 2"].layout__region--first',
+      'div[aria-label="Second region in Section 2"].layout__region--second');
+    $assert_session->assertWaitOnAjaxRequest();
+
+    $assert_session->elementExists('css', 'div[aria-label="Second region in Section 2"].layout__region--second .block-field-blocknodebundle-with-section-fieldbody');
+    $assert_session->elementTextContains('css', 'div[aria-label="Second region in Section 2"].layout__region--second', 'The node body');
+
     // Test deriver-based blocks.
     $this->drupalGet($layout_url);
     $this->markCurrentPage();

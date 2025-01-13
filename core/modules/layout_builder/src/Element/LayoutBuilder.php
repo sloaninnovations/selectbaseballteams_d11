@@ -332,47 +332,73 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
         'role' => 'group',
         'aria-label' => $section_label,
       ],
-      'remove' => [
-        '#type' => 'link',
-        '#title' => $this->t('Remove @section', ['@section' => $section_label]),
-        '#url' => Url::fromRoute('layout_builder.remove_section', [
-          'section_storage_type' => $storage_type,
-          'section_storage' => $storage_id,
-          'delta' => $delta,
-        ]),
+      'section_links' => [
+        '#type' => 'container',
         '#attributes' => [
-          'class' => [
-            'use-ajax',
-            'layout-builder__link',
-            'layout-builder__link--remove',
-          ],
-          'data-dialog-type' => 'dialog',
-          'data-dialog-renderer' => 'off_canvas',
+          'class' => ['layout-builder__section_links'],
+          'role' => 'group',
+          'aria-label' => $this->t('Administration links for @section', ['@section' => $section_label]),
         ],
-      ],
-      // The section label is added to sections without a "Configure section"
-      // link, and is only visible when the move block dialog is open.
-      'section_label' => [
-        '#markup' => $this->t('<span class="layout-builder__section-label" aria-hidden="true">@section</span>', ['@section' => $section_label]),
-        '#access' => !$layout instanceof PluginFormInterface,
-      ],
-      'configure' => [
-        '#type' => 'link',
-        '#title' => $this->t('Configure @section', ['@section' => $section_label]),
-        '#access' => $layout instanceof PluginFormInterface,
-        '#url' => Url::fromRoute('layout_builder.configure_section', [
-          'section_storage_type' => $storage_type,
-          'section_storage' => $storage_id,
-          'delta' => $delta,
-        ]),
-        '#attributes' => [
-          'class' => [
-            'use-ajax',
-            'layout-builder__link',
-            'layout-builder__link--configure',
+        'remove' => [
+          '#type' => 'link',
+          '#title' => $this->t('Remove @section', ['@section' => $section_label]),
+          '#url' => Url::fromRoute('layout_builder.remove_section', [
+            'section_storage_type' => $storage_type,
+            'section_storage' => $storage_id,
+            'delta' => $delta,
+          ]),
+          '#attributes' => [
+            'class' => [
+              'use-ajax',
+              'layout-builder__link',
+              'layout-builder__link--remove',
+            ],
+            'data-dialog-type' => 'dialog',
+            'data-dialog-renderer' => 'off_canvas',
           ],
-          'data-dialog-type' => 'dialog',
-          'data-dialog-renderer' => 'off_canvas',
+        ],
+        // The section label is added to sections without a "Configure section"
+        // link, and is only visible when the move block dialog is open.
+        'section_label' => [
+          '#markup' => $this->t('<span class="layout-builder__section-label" aria-hidden="true">@section</span>', ['@section' => $section_label]),
+          '#access' => !$layout instanceof PluginFormInterface,
+        ],
+        'configure' => [
+          '#type' => 'link',
+          '#title' => $this->t('Configure @section', ['@section' => $section_label]),
+          '#access' => $layout instanceof PluginFormInterface,
+          '#url' => Url::fromRoute('layout_builder.configure_section', [
+            'section_storage_type' => $storage_type,
+            'section_storage' => $storage_id,
+            'delta' => $delta,
+          ]),
+          '#attributes' => [
+            'class' => [
+              'use-ajax',
+              'layout-builder__link',
+              'layout-builder__link--configure',
+            ],
+            'data-dialog-type' => 'dialog',
+            'data-dialog-renderer' => 'off_canvas',
+          ],
+        ],
+        'change_layout' => [
+          '#type' => 'link',
+          '#title' => $this->t('Change layout<span class="visually-hidden"> for @section</span>', ['@section' => $section_label]),
+          '#url' => Url::fromRoute('layout_builder.change_section_layout', [
+            'section_storage_type' => $storage_type,
+            'section_storage' => $storage_id,
+            'delta' => $delta,
+          ]),
+          '#attributes' => [
+            'class' => [
+              'use-ajax',
+              'layout-builder__link',
+              'layout-builder__link--change-layout',
+            ],
+            'data-dialog-type' => 'dialog',
+            'data-dialog-renderer' => 'off_canvas',
+          ],
         ],
       ],
       'layout-builder__section' => $build,
