@@ -118,6 +118,9 @@ file.formatter.media:
           - tags
           # Multiple file display: One HTML tag with multiple sources
           - sources
+    playsinline:
+      type: boolean
+      label: 'Plays inline'
 
 field.formatter.settings.file_audio:
   type: file.formatter.media
@@ -132,6 +135,9 @@ field.formatter.settings.file_video:
     muted:
       type: boolean
       label: 'Muted'
+    playsinline:
+      type: boolean
+      label: 'Plays inline'
     width:
       type: integer
       label: 'Width'
