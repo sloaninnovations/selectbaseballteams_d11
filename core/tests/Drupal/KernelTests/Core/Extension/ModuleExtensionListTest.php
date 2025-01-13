@@ -17,7 +17,7 @@ class ModuleExtensionListTest extends KernelTestBase {
    */
   public function testGetList(): void {
     \Drupal::configFactory()->getEditable('core.extension')
-      ->set('module.testing', 1000)
+      ->set('module.module_test', 1000)
       ->set('profile', 'testing')
       ->save();
 
@@ -29,8 +29,8 @@ class ModuleExtensionListTest extends KernelTestBase {
     $module_extension_list = \Drupal::service('extension.list.module');
     $extensions = $module_extension_list->getList();
 
-    $this->assertArrayHasKey('testing', $extensions);
-    $this->assertEquals(1000, $extensions['testing']->weight);
+    $this->assertArrayHasKey('module_test', $extensions);
+    $this->assertEquals(1000, $extensions['module_test']->weight);
   }
 
 }

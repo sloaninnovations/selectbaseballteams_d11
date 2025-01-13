@@ -17,7 +17,7 @@ class ThemeExtensionListTest extends KernelTestBase {
    */
   public function testGetList(): void {
     \Drupal::configFactory()->getEditable('core.extension')
-      ->set('module.testing', 1000)
+      ->set('module.module_test', 1000)
       ->set('theme.test_theme', 0)
       ->save();
 
