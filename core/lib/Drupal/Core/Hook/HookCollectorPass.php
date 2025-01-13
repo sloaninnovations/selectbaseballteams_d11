@@ -137,10 +137,10 @@ class HookCollectorPass implements CompilerPassInterface {
    * * @todo Pass only $container when ModuleHandler->add is removed https://www.drupal.org/project/drupal/issues/3481778
    */
   public static function collectAllHookImplementations(array $module_filenames, ?ContainerBuilder $container = NULL): static {
-    $modules = array_map(fn ($x) => preg_quote($x, '/'), array_keys($module_filenames));
+    $modules = [... array_keys($module_filenames), 'template'];
     // Longer modules first.
     usort($modules, fn($a, $b) => strlen($b) - strlen($a));
-    $module_preg = '/^(?<function>(?<module>' . implode('|', $modules) . ')_(?!preprocess_)(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
+    $module_preg = '/^(?<function>(?<module>' . implode('|', $modules) . ')_(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
     $collector = new static();
     foreach ($module_filenames as $module => $info) {
       $skip_procedural = FALSE;
@@ -377,7 +377,7 @@ class HookCollectorPass implements CompilerPassInterface {
       'hook_install_tasks_alter',
     ];
 
-    if (in_array($hook->hook, $staticDenyHooks) || preg_match('/^(post_update_|preprocess_|update_\d+$)/', $hook->hook)) {
+    if (in_array($hook->hook, $staticDenyHooks) || preg_match('/^(post_update_|update_\d+$)/', $hook->hook)) {
       throw new \LogicException("The hook $hook->hook on class $class does not support attributes and must remain procedural.");
     }
   }
