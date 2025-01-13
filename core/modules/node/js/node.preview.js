@@ -58,7 +58,7 @@
         return;
       }
       if (once('node-preview', 'html').length) {
-        $(document).on(
+        $(context).on(
           'click.preview',
           'a:not([href^="#"], .node-preview-container a)',
           clickPreviewModal,
@@ -71,7 +71,7 @@
           context.querySelector('.node-preview-container') &&
           once.remove('node-preview', 'html').length
         ) {
-          $(document).off('click.preview');
+          $(context).off('click.preview');
         }
       }
     },
