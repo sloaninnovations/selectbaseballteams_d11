@@ -43,13 +43,9 @@
   font-size: calc(0.75 * var(--admin-toolbar-rem));
   inline-size: var(--admin-toolbar-space-20);
   block-size: var(--admin-toolbar-space-20);
-  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
-  -webkit-mask-position: center center;
   mask-position: center center;
-  -webkit-mask-size: 100% auto;
   mask-size: 100% auto;
-  -webkit-mask-image: var(--icon);
   mask-image: var(--icon);
 }
 
