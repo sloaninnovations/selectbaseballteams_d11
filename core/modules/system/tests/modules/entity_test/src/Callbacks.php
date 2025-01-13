@@ -16,14 +16,14 @@ class Callbacks {
   /**
    * Validation handler for the entity_test entity form.
    */
-  public function entityTestFormValidate(array &$form, FormStateInterface $form_state): void {
+  public static function entityTestFormValidate(array &$form, FormStateInterface $form_state): void {
     $form['#entity_test_form_validate'] = TRUE;
   }
 
   /**
    * Validation handler for the entity_test entity form.
    */
-  public function entityTestFormValidateCheck(array &$form, FormStateInterface $form_state): void {
+  public static function entityTestFormValidateCheck(array &$form, FormStateInterface $form_state): void {
     if (!empty($form['#entity_test_form_validate'])) {
       \Drupal::state()->set('entity_test.form.validate.result', TRUE);
     }
@@ -44,8 +44,8 @@ class Callbacks {
    * @see \Drupal\field\Entity\FieldConfig::$default_value
    */
   public static function entityTestFieldDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition): array {
-    // Include the field name and entity language in the generated values to check
-    // that they are correctly passed.
+    // Include the field name and entity language in the generated values to
+    // check that they are correctly passed.
     $string = $definition->getName() . '_' . $entity->language()->getId();
     // Return a "default value" with multiple items.
     return [

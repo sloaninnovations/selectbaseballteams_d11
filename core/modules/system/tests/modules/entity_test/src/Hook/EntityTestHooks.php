@@ -235,14 +235,12 @@ class EntityTestHooks {
   public function formEntityTestFormAlter(&$form) : void {
     switch (\Drupal::state()->get('entity_test.form.validate.test')) {
       case 'form-level':
-        $callbacks = new Callbacks();
-        $form['#validate'][] = [$callbacks, 'entityTestFormValidate'];
-        $form['#validate'][] = [$callbacks, 'entityTestFormValidateCheck'];
+        $form['#validate'][] = [Callbacks::class, 'entityTestFormValidate'];
+        $form['#validate'][] = [Callbacks::class, 'entityTestFormValidateCheck'];
         break;
 
       case 'button-level':
-        $callbacks = new Callbacks();
-        $form['actions']['submit']['#validate'][] = [$callbacks, 'entityTestFormValidateCheck'];
+        $form['actions']['submit']['#validate'][] = [Callbacks::class, 'entityTestFormValidateCheck'];
     }
   }
 
@@ -709,7 +707,7 @@ class EntityTestHooks {
    * @param mixed $data
    *   Arbitrary data associated with the hook invocation.
    */
-  public function recordHooks($hook, $data): void {
+  protected function recordHooks($hook, $data): void {
     $state = \Drupal::state();
     $key = 'entity_test.hooks';
     $hooks = $state->get($key);
