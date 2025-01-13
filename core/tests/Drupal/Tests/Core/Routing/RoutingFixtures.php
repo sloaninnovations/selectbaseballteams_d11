@@ -320,7 +320,8 @@ class RoutingFixtures {
         ],
         'route' => [
           'description' => 'A serialized Route object',
-          'type' => 'text',
+          'type' => 'blob',
+          'size' => 'big',
         ],
         'alias' => [
           'description' => 'The alias of the route, if applicable.',
