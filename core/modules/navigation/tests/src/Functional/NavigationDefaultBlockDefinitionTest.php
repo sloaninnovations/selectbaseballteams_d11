@@ -34,13 +34,12 @@ class NavigationDefaultBlockDefinitionTest extends BrowserTestBase {
     // After installing Navigation, the bar is present, but not the block.
     $module_installer->install(['navigation']);
     $this->drupalLogin($this->drupalCreateUser(['access navigation']));
+    $this->drupalGet($test_page_url);
     $this->assertSession()->elementExists('css', '.admin-toolbar');
     $this->assertSession()->elementNotExists('css', '.toolbar-button--icon--test-block');
 
-    $this->drupalGet($test_page_url);
     // After installing Navigation Test Block, both elements are present.
     $module_installer->install(['navigation_test_block']);
-
     $this->drupalGet($test_page_url);
     $this->assertSession()->elementExists('css', '.admin-toolbar');
     $this->assertSession()->elementContains('css', '.toolbar-button--icon--test-block', 'Test Navigation Block');
@@ -55,9 +54,9 @@ class NavigationDefaultBlockDefinitionTest extends BrowserTestBase {
 
     // After installing Navigation Test Block, none of the elements are present.
     $module_installer->install(['navigation_test_block']);
+    $this->drupalGet($test_page_url);
     $this->assertSession()->elementNotExists('css', '.admin-toolbar');
     $this->assertSession()->elementNotExists('css', '.toolbar-button--icon--test-block');
-    $this->drupalGet($test_page_url);
 
     // After installing Navigation, both elements are present.
     $module_installer->install(['navigation']);

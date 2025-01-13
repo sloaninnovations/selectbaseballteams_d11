@@ -5,23 +5,11 @@ declare(strict_types=1);
 namespace Drupal\navigation_test_block\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\State\StateInterface;
 
 /**
  * Hooks implementations for navigation_test_block module.
  */
 class NavigationTestBlockHooks {
-
-  /**
-   * NavigationTestHooks constructor.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   */
-  public function __construct(
-    protected StateInterface $state,
-  ) {
-  }
 
   /**
    * Implements hook_block_alter().
