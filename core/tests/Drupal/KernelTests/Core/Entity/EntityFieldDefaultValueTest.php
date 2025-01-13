@@ -64,7 +64,7 @@ class EntityFieldDefaultValueTest extends EntityKernelTestBase {
   public function testDefaultValueCallback(): void {
     $entity = $this->entityTypeManager->getStorage('entity_test_default_value')->create();
     // The description field has a default value callback for testing, see
-    // \Drupal\entity_test\Callbacks::entityTestFieldDefaultValue().
+    // \Drupal\entity_test\Entity\EntityTestDefaultValue::descriptionDefaultValue().
     $string = 'description_' . $entity->language()->getId();
     $expected = [
       [
