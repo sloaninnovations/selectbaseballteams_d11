@@ -504,8 +504,6 @@ class Registry implements DestructableInterface {
       'base hook' => TRUE,
     ];
 
-    $module_list = array_keys($this->moduleHandler->getModuleList());
-
     // Invoke the hook_theme() implementation, preprocess what is returned, and
     // merge it into $cache.
     $args = [$cache, $type, $theme, $path];
@@ -591,12 +589,29 @@ class Registry implements DestructableInterface {
           $info['preprocess functions'] = [];
           $prefixes = [];
           if ($type == 'module') {
-            // Default variable preprocessor prefix.
-            $prefixes[] = 'template';
-            // Add all modules so they can intervene with their own variable
-            // preprocessors. This allows them to provide variable preprocessors
-            // even if they are not the owner of the current hook.
-            $prefixes = array_merge($prefixes, $module_list);
+            $info['preprocess functions'][] = 'template_preprocess';
+
+            // Special handling for template prefixed preprocess functions.
+            //
+            // @todo Deprecate and handle this in a different way.
+            if (function_exists('template_preprocess_' . $hook)) {
+              $info['preprocess functions'][] = 'template_preprocess_' . $hook;
+            }
+
+            $this->moduleHandler->invokeAllWith('preprocess', function (callable $callback, string $module) use (&$cache, &$info) {
+              $function = $module . '_preprocess';
+              $info['preprocess functions'][] = $function;
+              $cache['preprocess invokes'][$function] = ['module' => $module, 'hook' => 'preprocess'];
+            });
+
+            $this->moduleHandler->invokeAllWith('preprocess_' . $hook, function (callable $callback, string $module) use ($hook, &$cache, &$info) {
+              $function = $module . '_preprocess_' . $hook;
+
+              if (!in_array($function, $info['preprocess functions'])) {
+                $info['preprocess functions'][] = $function;
+                $cache['preprocess invokes'][$function] = ['module' => $module, 'hook' => 'preprocess_' . $hook];
+              }
+            });
           }
           elseif ($type == 'theme_engine' || $type == 'base_theme_engine') {
             // Theme engines get an extra set that come before the normally
@@ -611,6 +626,9 @@ class Registry implements DestructableInterface {
             // preprocessors.
             $prefixes[] = $name;
           }
+
+          // Prefixes are only set for theme engines and themes, modules are
+          // directly processed earlier.
           foreach ($prefixes as $prefix) {
             // Only use non-hook-specific variable preprocessors for theming
             // hooks implemented as templates. See the @defgroup themeable
@@ -757,7 +775,7 @@ class Registry implements DestructableInterface {
 
     // Collect all variable preprocess functions in the correct order.
     $suggestion_level = [];
-    $matches = [];
+    $invokes = [];
     // Look for functions named according to the pattern and add them if they
     // have matching hooks in the registry.
     foreach ($prefixes as $prefix) {
@@ -774,6 +792,7 @@ class Registry implements DestructableInterface {
           if (isset($cache[$matches[2]])) {
             $level = substr_count($matches[1], '__');
             $suggestion_level[$level][$candidate] = $matches[1];
+            $invokes[$candidate] = ['module' => $prefix, 'hook' => 'preprocess_' . $matches[1]];
           }
         }
       }
@@ -791,6 +810,7 @@ class Registry implements DestructableInterface {
         if (isset($cache[$hook]['preprocess functions']) && !in_array($preprocessor, $cache[$hook]['preprocess functions'])) {
           // Add missing preprocessor to existing hook.
           $cache[$hook]['preprocess functions'][] = $preprocessor;
+          $cache['preprocess invokes'][$preprocessor] = $invokes[$preprocessor];
         }
         elseif (!isset($cache[$hook]) && strpos($hook, '__')) {
           // Process non-existing hook and register it.
@@ -798,6 +818,7 @@ class Registry implements DestructableInterface {
           // suggestion hook or the base hook.
           $this->completeSuggestion($hook, $cache);
           $cache[$hook]['preprocess functions'][] = $preprocessor;
+          $cache['preprocess invokes'][$preprocessor] = $invokes[$preprocessor];
         }
       }
     }
