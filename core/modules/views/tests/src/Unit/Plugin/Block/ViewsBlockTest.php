@@ -8,9 +8,18 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\Context\ContextInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\Block\ViewsBlock;
+use Drupal\views\Plugin\views\display\Block;
+use Drupal\views\ViewEntityInterface;
+use Drupal\views\ViewExecutable;
+use Drupal\views\ViewExecutableFactory;
+use Drupal\Core\Config\Entity\ConfigEntityStorage;
+use Drupal\views\Entity\View;
+use Drupal\Core\Executable\ExecutableManagerInterface;
 
 /**
  * @coversDefaultClass \Drupal\views\Plugin\block\ViewsBlock
@@ -20,45 +29,33 @@ class ViewsBlockTest extends UnitTestCase {
 
   /**
    * The view executable.
-   *
-   * @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $executable;
+  protected ViewExecutable $executable;
 
   /**
    * The view executable factory.
-   *
-   * @var \Drupal\views\ViewExecutableFactory|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $executableFactory;
+  protected ViewExecutableFactory $executableFactory;
 
   /**
    * The view entity.
-   *
-   * @var \Drupal\views\ViewEntityInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $view;
+  protected ViewEntityInterface $view;
 
   /**
    * The view storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $storage;
+  protected EntityStorageInterface $storage;
 
   /**
    * The mocked user account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $account;
+  protected AccountInterface $account;
 
   /**
    * The mocked display handler.
-   *
-   * @var \Drupal\views\Plugin\views\display\Block|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $displayHandler;
+  protected Block $displayHandler;
 
   /**
    * {@inheritdoc}
@@ -77,7 +74,7 @@ class ViewsBlockTest extends UnitTestCase {
       ->willReturn(TRUE);
     $container->set('cache_contexts_manager', $cache_context_manager);
 
-    $condition_plugin_manager = $this->createMock('Drupal\Core\Executable\ExecutableManagerInterface');
+    $condition_plugin_manager = $this->createMock(ExecutableManagerInterface::class);
     $condition_plugin_manager->expects($this->any())
       ->method('getDefinitions')
       ->willReturn([]);
@@ -85,7 +82,7 @@ class ViewsBlockTest extends UnitTestCase {
 
     \Drupal::setContainer($container);
 
-    $this->executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
+    $this->executable = $this->getMockBuilder(ViewExecutable::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['buildRenderable', 'setDisplay', 'setItemsPerPage', 'getShowAdminLinks'])
       ->getMock();
@@ -97,12 +94,12 @@ class ViewsBlockTest extends UnitTestCase {
       ->method('getShowAdminLinks')
       ->willReturn(FALSE);
 
-    $this->executable->display_handler = $this->getMockBuilder('Drupal\views\Plugin\views\display\Block')
+    $this->executable->display_handler = $this->getMockBuilder(Block::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getCacheMetadata'])
       ->getMock();
 
-    $this->view = $this->getMockBuilder('Drupal\views\Entity\View')
+    $this->view = $this->getMockBuilder(View::class)
       ->disableOriginalConstructor()
       ->getMock();
     $this->view->expects($this->any())
@@ -110,7 +107,7 @@ class ViewsBlockTest extends UnitTestCase {
       ->willReturn('test_view');
     $this->executable->storage = $this->view;
 
-    $this->executableFactory = $this->getMockBuilder('Drupal\views\ViewExecutableFactory')
+    $this->executableFactory = $this->getMockBuilder(ViewExecutableFactory::class)
       ->disableOriginalConstructor()
       ->getMock();
     $this->executableFactory->expects($this->any())
@@ -118,7 +115,7 @@ class ViewsBlockTest extends UnitTestCase {
       ->with($this->view)
       ->willReturn($this->executable);
 
-    $this->displayHandler = $this->getMockBuilder('Drupal\views\Plugin\views\display\Block')
+    $this->displayHandler = $this->getMockBuilder(Block::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -136,7 +133,7 @@ class ViewsBlockTest extends UnitTestCase {
 
     $this->executable->display_handler = $this->displayHandler;
 
-    $this->storage = $this->getMockBuilder('Drupal\Core\Config\Entity\ConfigEntityStorage')
+    $this->storage = $this->getMockBuilder(ConfigEntityStorage::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -144,7 +141,7 @@ class ViewsBlockTest extends UnitTestCase {
       ->method('load')
       ->with('test_view')
       ->willReturn($this->view);
-    $this->account = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $this->account = $this->createMock(AccountInterface::class);
   }
 
   /**
@@ -154,7 +151,7 @@ class ViewsBlockTest extends UnitTestCase {
    */
   public function testBuild(): void {
     $output = $this->randomMachineName(100);
-    $build = ['view_build' => $output, '#view_id' => 'test_view', '#view_display_plugin_class' => '\Drupal\views\Plugin\views\display\Block', '#view_display_show_admin_links' => FALSE, '#view_display_plugin_id' => 'block', '#pre_rendered' => TRUE];
+    $build = ['view_build' => $output, '#view_id' => 'test_view', '#view_display_plugin_class' => Block::class, '#view_display_show_admin_links' => FALSE, '#view_display_plugin_id' => 'block', '#pre_rendered' => TRUE];
     $this->executable->expects($this->once())
       ->method('buildRenderable')
       ->with('block_1', [])
@@ -246,7 +243,7 @@ class ViewsBlockTest extends UnitTestCase {
    * @covers ::build
    */
   public function testBuildEmpty(): void {
-    $build = ['view_build' => [], '#view_id' => 'test_view', '#view_display_plugin_class' => '\Drupal\views\Plugin\views\display\Block', '#view_display_show_admin_links' => FALSE, '#view_display_plugin_id' => 'block', '#pre_rendered' => TRUE, '#cache' => ['contexts' => ['user']]];
+    $build = ['view_build' => [], '#view_id' => 'test_view', '#view_display_plugin_class' => Block::class, '#view_display_show_admin_links' => FALSE, '#view_display_plugin_id' => 'block', '#pre_rendered' => TRUE, '#cache' => ['contexts' => ['user']]];
     $this->executable->expects($this->once())
       ->method('buildRenderable')
       ->with('block_1', [])
