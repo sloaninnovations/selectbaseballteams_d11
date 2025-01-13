@@ -833,24 +833,19 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
     // Initialize $value as an empty array by default.
     $value = [];
 
-    // Process the string only if it is not empty.
-    if (trim($str) !== '') {
-      // Check if the string has only one word without any delimiters.
-      if (!strpos($str, '+') && !strpos($str, ',') && !strpos($str, ' ')) {
-        $value = [$str];
-        // Default to 'and' for a single word.
-        $operator = 'and';
-      }
-      // Check for 'and' operators (commas).
-      elseif (str_contains($str, ',')) {
-        $operator = 'and';
-        $value = explode(',', $str);
-      }
-      // Check for 'or' operators (plus signs or spaces).
-      elseif (str_contains($str, '+') || str_contains($str, ' ')) {
+    // Remove + and , characters from start and end of string.
+    $str = trim($str, " \n\r\t\v\0,+");
+    if ($str !== '') {
+      // Check for 'or' operators (plus signs or spaces) along with a comma.
+      if ((strpos($str, '+') || strpos($str, ' ')) && strpos($str, ',') === false) {
         $operator = 'or';
         // Replace plus signs with spaces and split.
         $value = explode(' ', str_replace('+', ' ', $str));
+      }
+      // Check for 'and' operators (commas) or if the string is one word.
+      else {
+        $operator = 'and';
+        $value = explode(',', $str);
       }
     }
 
