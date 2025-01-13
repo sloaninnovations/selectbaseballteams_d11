@@ -7,6 +7,8 @@ use Drupal\Component\Plugin\FallbackPluginManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\Plugin\PreWarmablePluginManagerTrait;
+use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\views\Plugin\views\ViewsHandlerInterface;
 use Drupal\views\ViewsData;
 use Symfony\Component\DependencyInjection\Container;
@@ -15,7 +17,9 @@ use Drupal\views\Plugin\views\HandlerBase;
 /**
  * Plugin type manager for all views handlers.
  */
-class ViewsHandlerManager extends DefaultPluginManager implements FallbackPluginManagerInterface {
+class ViewsHandlerManager extends DefaultPluginManager implements FallbackPluginManagerInterface, PreWarmableInterface {
+
+  use PreWarmablePluginManagerTrait;
 
   /**
    * The views data cache.
