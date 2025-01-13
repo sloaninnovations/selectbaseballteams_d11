@@ -4,6 +4,7 @@ namespace Drupal\Core\Menu\Plugin\Block;
 
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Menu\LocalActionManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -70,7 +71,10 @@ class LocalActionsBlock extends BlockBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return ['label_display' => FALSE];
+    return [
+      'label_display' => FALSE,
+      'label_display_type' => BlockPluginInterface::BLOCK_LABEL_HIDDEN,
+    ];
   }
 
   /**

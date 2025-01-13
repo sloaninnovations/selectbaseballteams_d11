@@ -114,6 +114,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'user',
       'label_display' => '0',
+      'label_display_type' => '0',
     ];
     $this->assertEntity('user', $visibility, 'sidebar', 'olivero', -10, $settings);
 
@@ -126,6 +127,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'level' => 1,
       'expand_all_items' => FALSE,
       'depth' => 0,
+      'label_display_type' => '0',
     ];
     $this->assertEntity('user_1', $visibility, 'sidebar', 'olivero', -11, $settings);
 
@@ -147,6 +149,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'provider' => 'core',
       'label_display' => '0',
       'items_per_page' => '5',
+      'label_display_type' => '0',
     ];
     $this->assertEntity('user_2', $visibility, 'sidebar', 'olivero', -11, $settings);
 
@@ -168,6 +171,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'provider' => 'core',
       'label_display' => '0',
       'items_per_page' => '10',
+      'label_display_type' => '0',
     ];
     $this->assertEntity('user_3', $visibility, 'sidebar', 'olivero', -10, $settings);
 
@@ -184,6 +188,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'system',
       'label_display' => '0',
+      'label_display_type' => '0',
     ];
     $this->assertEntity('system', $visibility, 'footer_top', 'olivero', -5, $settings);
 
@@ -193,6 +198,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label' => '',
       'provider' => 'core',
       'label_display' => '0',
+      'label_display_type' => '0',
     ];
     $this->assertEntity('menu', [], 'header', 'olivero', -5, $settings);
 
@@ -204,6 +210,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'label_display' => '0',
       'block_count' => 7,
       'feed' => '5',
+      'label_display_type' => '0',
     ];
     $this->assertEntity('aggregator', [], 'sidebar', 'olivero', -2, $settings);
 
@@ -214,6 +221,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'provider' => 'core',
       'label_display' => '0',
       'block_mode' => 'book pages',
+      'label_display_type' => '0',
     ];
     $this->assertEntity('book', [], 'sidebar', 'olivero', -4, $settings);
 
@@ -224,6 +232,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'provider' => 'core',
       'label_display' => '0',
       'block_count' => 3,
+      'label_display_type' => '0',
     ];
     $this->assertEntity('forum', [], 'sidebar', 'olivero', -8, $settings);
 
@@ -233,6 +242,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'provider' => 'core',
       'label_display' => '0',
       'block_count' => 4,
+      'label_display_type' => '0',
     ];
     $this->assertEntity('forum_1', [], 'sidebar', 'olivero', -9, $settings);
 
@@ -245,6 +255,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'top_day_num' => 7,
       'top_all_num' => 8,
       'top_last_num' => 9,
+      'label_display_type' => '0',
     ];
     $this->assertEntity('statistics', [], 'sidebar', 'olivero', 0, $settings);
 
@@ -264,6 +275,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'status' => TRUE,
       'info' => '',
       'view_mode' => 'full',
+      'label_display_type' => '0',
     ];
     $this->assertEntity('block', $visibility, 'content', 'olivero', 0, $settings);
 
@@ -282,6 +294,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'status' => TRUE,
       'info' => '',
       'view_mode' => 'full',
+      'label_display_type' => '0',
     ];
     // We expect this block to be disabled because '' is not a valid region,
     // and block_rebuild() will disable any block in an invalid region.
@@ -295,6 +308,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'status' => TRUE,
       'info' => '',
       'view_mode' => 'full',
+      'label_display_type' => '0',
     ];
     $this->assertEntity('block_2', [], 'right', 'test_theme', -7, $settings);
 

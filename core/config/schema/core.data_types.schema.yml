@@ -447,6 +447,9 @@ block_settings:
     label_display:
       type: label
       label: 'Display title'
+    label_display_type:
+      type: string
+      label: 'Visually hidden label'
     provider:
       type: string
       label: 'Provider of this block plugin'
