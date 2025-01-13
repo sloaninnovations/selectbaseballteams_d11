@@ -52,7 +52,7 @@ namespace Drupal\Core\Hook\Attribute;
  *   form ID without modifying any existing implementations.
  *
  * The following hooks may not have multiple implementations by a single module:
- * - hook_library_build_info()
+ * - hook_library_info_build()
  * - hook_mail()
  * - hook_help()
  * - hook_node_update_index()
@@ -67,6 +67,8 @@ namespace Drupal\Core\Hook\Attribute;
  *
  * Install hooks:
  * - hook_install()
+ * - hook_install_tasks()
+ * - hook_install_tasks_alter()
  * - hook_post_update_NAME()
  * - hook_schema()
  * - hook_uninstall()
@@ -75,7 +77,6 @@ namespace Drupal\Core\Hook\Attribute;
  *
  * Theme hooks:
  * - hook_preprocess_HOOK()
- * - hook_process_HOOK()
  *
  * @section sec_backwards_compatibility Backwards-compatibility
  *

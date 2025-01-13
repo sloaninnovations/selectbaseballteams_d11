@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Core\Form\FormState;
+use Drupal\form_test\Callbacks;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -36,10 +37,9 @@ class ElementsTableSelectTest extends BrowserTestBase {
     // Test for the presence of the Select all rows tableheader.
     $this->assertSession()->elementExists('xpath', '//th[@class="select-all"]');
 
-    $rows = ['row1', 'row2', 'row3'];
-    foreach ($rows as $row) {
-      $this->assertSession()->elementExists('xpath', '//input[@type="checkbox"]');
-    }
+    $this->assertSession()->elementExists('xpath', '//input[@type="checkbox" and @value="row1"]');
+    $this->assertSession()->elementExists('xpath', '//input[@type="checkbox" and @value="row2"]');
+    $this->assertSession()->elementExists('xpath', '//input[@type="checkbox" and @value="row3"]');
   }
 
   /**
@@ -53,10 +53,9 @@ class ElementsTableSelectTest extends BrowserTestBase {
     // Test for the absence of the Select all rows tableheader.
     $this->assertSession()->elementNotExists('xpath', '//th[@class="select-all"]');
 
-    $rows = ['row1', 'row2', 'row3'];
-    foreach ($rows as $row) {
-      $this->assertSession()->elementExists('xpath', '//input[@type="radio"]');
-    }
+    $this->assertSession()->elementExists('xpath', '//input[@type="radio" and @value="row1"]');
+    $this->assertSession()->elementExists('xpath', '//input[@type="radio" and @value="row2"]');
+    $this->assertSession()->elementExists('xpath', '//input[@type="radio" and @value="row3"]');
   }
 
   /**
@@ -154,7 +153,7 @@ class ElementsTableSelectTest extends BrowserTestBase {
    */
   public function testMultipleTrueOptionChecker(): void {
 
-    [$header, $options] = _form_test_tableselect_get_data();
+    [$header, $options] = Callbacks::tableselectGetData();
 
     $form['tableselect'] = [
       '#type' => 'tableselect',
@@ -177,7 +176,7 @@ class ElementsTableSelectTest extends BrowserTestBase {
    */
   public function testMultipleFalseOptionChecker(): void {
 
-    [$header, $options] = _form_test_tableselect_get_data();
+    [$header, $options] = Callbacks::tableselectGetData();
 
     $form['tableselect'] = [
       '#type' => 'tableselect',

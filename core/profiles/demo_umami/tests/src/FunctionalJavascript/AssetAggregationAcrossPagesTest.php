@@ -25,10 +25,14 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     $performance_data = $this->collectPerformanceData(function () {
       $this->doRequests();
     }, 'umamiFrontAndRecipePages');
-    $this->assertSame(6, $performance_data->getStylesheetCount());
-    $this->assertLessThan(125000, $performance_data->getStylesheetBytes());
-    $this->assertSame(1, $performance_data->getScriptCount());
-    $this->assertLessThan(12000, $performance_data->getScriptBytes());
+
+    $expected = [
+      'ScriptCount' => 1,
+      'ScriptBytes' => 11700,
+      'StylesheetCount' => 6,
+      'StylesheetBytes' => 124450,
+    ];
+    $this->assertMetrics($expected, $performance_data);
   }
 
   /**
@@ -41,10 +45,14 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     $performance_data = $this->collectPerformanceData(function () {
       $this->doRequests();
     }, 'umamiFrontAndRecipePagesAuthenticated');
-    $this->assertSame(6, $performance_data->getStylesheetCount());
-    $this->assertLessThan(132500, $performance_data->getStylesheetBytes());
-    $this->assertSame(2, $performance_data->getScriptCount());
-    $this->assertLessThan(250000, $performance_data->getScriptBytes());
+
+    $expected = [
+      'ScriptCount' => 2,
+      'ScriptBytes' => 249200,
+      'StylesheetCount' => 6,
+    ];
+    $this->assertMetrics($expected, $performance_data);
+
   }
 
   /**

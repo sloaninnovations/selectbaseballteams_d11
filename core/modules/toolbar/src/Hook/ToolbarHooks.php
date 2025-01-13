@@ -55,7 +55,7 @@ class ToolbarHooks {
    * Add admin toolbar to the top of the page automatically.
    */
   #[Hook('page_top')]
-  public function pageTop(array &$page_top) {
+  public function pageTop(array &$page_top): void {
     $page_top['toolbar'] = [
       '#type' => 'toolbar',
       '#access' => \Drupal::currentUser()->hasPermission('access toolbar'),
@@ -74,7 +74,7 @@ class ToolbarHooks {
    * Implements hook_toolbar().
    */
   #[Hook('toolbar')]
-  public function toolbar() {
+  public function toolbar(): array {
     // The 'Home' tab is a simple link, with no corresponding tray.
     $items['home'] = [
       '#type' => 'toolbar_item',

@@ -79,7 +79,7 @@ class TranslatableMarkupTest extends UnitTestCase {
     (string) $text;
     restore_error_handler();
 
-    $this->assertEquals(E_USER_ERROR, $this->lastErrorNumber);
+    $this->assertEquals(E_USER_WARNING, $this->lastErrorNumber);
     $this->assertMatchesRegularExpression('/Exception thrown while calling __toString on a .*MockObject_TranslatableMarkup_.* object in .*TranslatableMarkupTest.php on line [0-9]+: Yes you may./', $this->lastErrorMessage);
   }
 
@@ -90,6 +90,7 @@ class TranslatableMarkupTest extends UnitTestCase {
     $translation = $this->getStringTranslationStub();
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('$string ("foo") must be a string.');
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     new TranslatableMarkup(new TranslatableMarkup('foo', [], [], $translation));
   }
 
@@ -100,6 +101,7 @@ class TranslatableMarkupTest extends UnitTestCase {
     $formattable_string = new FormattableMarkup('@bar', ['@bar' => 'foo']);
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('$string ("foo") must be a string.');
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     new TranslatableMarkup($formattable_string);
   }
 

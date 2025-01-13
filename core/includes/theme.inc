@@ -16,6 +16,7 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Config\StorageException;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeHelper;
+use Drupal\Core\Theme\ThemeCommonElements;
 use Drupal\Core\Theme\ThemeSettings;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
@@ -84,11 +85,11 @@ function _system_default_theme_features() {
 /**
  * Allows themes and/or theme engines to easily discover overridden templates.
  *
- * @param $cache
+ * @param array $cache
  *   The existing cache of theme hooks to test against.
- * @param $extension
+ * @param string $extension
  *   The extension that these templates will have.
- * @param $path
+ * @param string $path
  *   The path to search.
  */
 function drupal_find_theme_templates($cache, $extension, $path) {
@@ -198,9 +199,9 @@ function drupal_find_theme_templates($cache, $extension, $path) {
  * To only retrieve the default global theme setting, an empty string should be
  * given for $theme.
  *
- * @param $setting_name
+ * @param string $setting_name
  *   The name of the setting to be retrieved.
- * @param $theme
+ * @param string $theme
  *   The name of a given theme; defaults to the current theme.
  *
  * @return mixed
@@ -1245,12 +1246,12 @@ function template_preprocess_page(&$variables): void {
  * variables from within preprocess functions, when wanting to base the
  * additional suggestions or classes on the path of the current page.
  *
- * @param $args
+ * @param array $args
  *   An array of path arguments.
- * @param $base
+ * @param string $base
  *   A string identifying the base 'thing' from which more specific suggestions
  *   are derived. For example, 'page' or 'html'.
- * @param $delimiter
+ * @param string $delimiter
  *   The string used to delimit increasingly specific information. The default
  *   of '__' is appropriate for theme hook suggestions. '-' is appropriate for
  *   extra classes.
@@ -1461,7 +1462,8 @@ function template_preprocess_field_multiple_value_form(&$variables): void {
 
   if ($variables['multiple']) {
     $table_id = Html::getUniqueId($element['#field_name'] . '_values');
-    $order_class = $element['#field_name'] . '-delta-order';
+    // Using table id allows handing nested content with the same field names.
+    $order_class = $table_id . '-delta-order';
     $header_attributes = new Attribute(['class' => ['label']]);
     if (!empty($element['#required'])) {
       $header_attributes['class'][] = 'js-form-required';
@@ -1800,4 +1802,17 @@ function _field_multiple_value_form_sort_helper($a, $b) {
   $a_weight = (is_array($a) && isset($a['_weight']['#value']) ? $a['_weight']['#value'] : 0);
   $b_weight = (is_array($b) && isset($b['_weight']['#value']) ? $b['_weight']['#value'] : 0);
   return $a_weight - $b_weight;
+}
+
+/**
+ * Provides theme registration for themes across .inc files.
+ *
+ * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal\Core\Theme\ThemeCommonElements::commonElements() instead,
+ *
+ * @see https://www.drupal.org/node/3488470
+ */
+function drupal_common_theme(): array {
+  @trigger_error('drupal_common_theme() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Theme\ThemeCommonElements::commonElements() instead. See https://www.drupal.org/node/3488470', E_USER_DEPRECATED);
+  return ThemeCommonElements::commonElements();
 }

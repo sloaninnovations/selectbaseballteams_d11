@@ -16,7 +16,7 @@ class ContextualHooks {
    * Implements hook_toolbar().
    */
   #[Hook('toolbar')]
-  public function toolbar() {
+  public function toolbar(): array {
     $items = [];
     $items['contextual'] = ['#cache' => ['contexts' => ['user.permissions']]];
     if (!\Drupal::currentUser()->hasPermission('access contextual links')) {
@@ -61,7 +61,7 @@ class ContextualHooks {
    * @see contextual_preprocess()
    */
   #[Hook('page_attachments')]
-  public function pageAttachments(array &$page) {
+  public function pageAttachments(array &$page): void {
     if (!\Drupal::currentUser()->hasPermission('access contextual links')) {
       return;
     }
