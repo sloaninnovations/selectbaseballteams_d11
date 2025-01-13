@@ -158,7 +158,7 @@ class DialogTest extends WebDriverTestBase {
     $form_dialog = $this->getSession()->getPage()->find('css', 'div.ui-dialog');
     $this->assertNotNull($form_dialog, 'Form dialog is visible');
 
-    $form_contents = $form_dialog->find('css', "p:contains('Ajax Form contents description.')");
+    $form_contents = $form_dialog->find('css', 'p#ajax-form-description');
     $this->assertNotNull($form_contents, 'For has the expected text.');
     $do_it = $form_dialog->findButton('Do it');
     $this->assertNotNull($do_it, 'The dialog has a "Do it" button.');
@@ -169,20 +169,23 @@ class DialogTest extends WebDriverTestBase {
     // dialog buttonpane as buttons. The originals should have their styles set
     // to display: none.
     $hidden_buttons = $this->getSession()->getPage()->findAll('css', '.ajax-test-form .button');
-    $this->assertCount(3, $hidden_buttons);
+    $this->assertCount(4, $hidden_buttons);
     $hidden_button_text = [];
+    $disabled = [];
     foreach ($hidden_buttons as $button) {
       $styles = $button->getAttribute('style');
       $this->assertStringContainsStringIgnoringCase('display: none;', $styles);
       $hidden_button_text[] = $button->hasAttribute('value') ? $button->getAttribute('value') : $button->getHtml();
+      $disabled[] = $button->hasAttribute('disabled');
     }
 
     // The copied buttons should have the same text as the submit inputs they
-    // were copied from.
+    // were copied from, and should be disabled if the original was also.
     $moved_to_buttonpane_buttons = $this->getSession()->getPage()->findAll('css', '.ui-dialog-buttonpane button');
-    $this->assertCount(3, $moved_to_buttonpane_buttons);
+    $this->assertCount(4, $moved_to_buttonpane_buttons);
     foreach ($moved_to_buttonpane_buttons as $key => $button) {
       $this->assertEquals($hidden_button_text[$key], $button->getText());
+      $this->assertEquals($disabled[$key], $button->hasAttribute('disabled'));
     }
 
     // Press buttons in the dialog to ensure there are no AJAX errors.
@@ -194,6 +197,20 @@ class DialogTest extends WebDriverTestBase {
     $this->assertSession()->assertWaitOnAjaxRequest();
     $has_focus_text = $this->getSession()->evaluateScript('document.activeElement.textContent');
     $this->assertEquals('Do it', $has_focus_text);
+
+    $expected_attrs = [
+      'aria-description' => 'Example description',
+      'aria-details' => 'ajax-form-description',
+      'aria-label' => 'Example label',
+      'title' => 'Example hover text',
+    ];
+
+    $dialog_button = $this->assertSession()->elementExists('css', '.ui-dialog-buttonpane')->findButton('Hello world');
+
+    // Ensure that supported attributes were copied to the duplicate button.
+    foreach ($expected_attrs as $key => $value) {
+      $this->assertEquals($value, $dialog_button->getAttribute($key), "Form action has the expected '{$key}' attribute value");
+    }
 
     // Reset: close the form.
     $form_dialog->findButton('Close')->press();

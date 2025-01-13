@@ -103,6 +103,11 @@
           text: $originalButton.html() || $originalButton.attr('value'),
           class: $originalButton.attr('class'),
           'data-once': $originalButton.data('once'),
+          'aria-description': $originalButton.attr('aria-description'),
+          'aria-details': $originalButton.attr('aria-details'),
+          'aria-label': $originalButton.attr('aria-label'),
+          disabled: $originalButton.prop('disabled'),
+          title: $originalButton.attr('title'),
           click(e) {
             // If the original button is an anchor tag, triggering the "click"
             // event will not simulate a click. Use the click method instead.

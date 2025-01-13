@@ -32,7 +32,7 @@ class AjaxTestForm extends FormBase {
     $form['#action'] = Url::fromRoute('ajax_test.dialog')->toString();
 
     $form['description'] = [
-      '#markup' => '<p>' . $this->t("Ajax Form contents description.") . '</p>',
+      '#markup' => '<p id="ajax-form-description">' . $this->t("Ajax Form contents description.") . '</p>',
     ];
 
     $form['actions'] = [
@@ -56,9 +56,22 @@ class AjaxTestForm extends FormBase {
       '#value' => $this->t('Hello world'),
       // No regular submit-handler. This form only works via JavaScript.
       '#submit' => [],
+      '#attributes' => [
+        'aria-description' => $this->t('Example description'),
+        'aria-details' => 'ajax-form-description',
+        'aria-label' => $this->t('Example label'),
+        'title' => $this->t('Example hover text'),
+      ],
       '#ajax' => [
         'callback' => '::helloWorld',
         'event' => 'click',
+      ],
+    ];
+    $form['actions']['disabled_action'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Disabled action'),
+      '#attributes' => [
+        'disabled' => TRUE,
       ],
     ];
     return $form;
