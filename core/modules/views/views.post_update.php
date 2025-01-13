@@ -64,3 +64,14 @@ function views_post_update_views_data_argument_plugin_id(?array &$sandbox = NULL
     return $view_config_updater->needsEntityArgumentUpdate($view);
   });
 }
+
+/**
+ * Set default value for the set_active_class option in all views using fields.
+ */
+function views_post_update_set_active_class(&$sandbox = NULL) {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function ($view) use ($view_config_updater) {
+    return $view_config_updater->needsFieldSetActiveClassUpdate($view);
+  });
+}

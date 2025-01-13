@@ -73,6 +73,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           action_title: Action
           include_exclude: exclude
           selected_actions: {  }
@@ -127,6 +128,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: target_id
           type: image
           settings:
@@ -177,6 +179,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: string
           settings:
@@ -242,6 +245,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: target_id
           type: entity_reference_label
           settings:
@@ -307,6 +311,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: target_id
           type: entity_reference_label
           settings:
@@ -372,6 +377,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: boolean
           settings:
@@ -439,6 +445,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: timestamp
           settings:
@@ -514,6 +521,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           destination: true
       pager:
         type: full

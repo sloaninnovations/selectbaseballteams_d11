@@ -72,6 +72,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
         name:
           id: name
           table: users_field_data
@@ -123,6 +124,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           type: user_name
         changed:
           id: changed
@@ -175,6 +177,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           type: timestamp
           settings:
             date_format: long

@@ -616,6 +616,9 @@ views_field:
     destination:
       type: boolean
       label: 'Append a destination query string to operation links.'
+    set_active_class:
+      type: boolean
+      label: 'Set the active class on links to the current page'
     plugin_id:
       type: string
       label: 'Plugin ID'

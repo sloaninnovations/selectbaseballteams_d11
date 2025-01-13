@@ -131,6 +131,9 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
       if ($this->processEntityArgumentUpdate($view)) {
         $changed = TRUE;
       }
+      if ($this->processFieldSetActiveClassDefaultsHandler($handler, $handler_type, $view)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }
@@ -258,6 +261,53 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
       @trigger_error(sprintf('The update to convert "numeric" arguments to "entity_target_id" for entity reference fields for view "%s" is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3441945', $view->id()), E_USER_DEPRECATED);
     }
 
+    return $changed;
+  }
+
+  /**
+   * Sets default value for field set_active_class option.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View to update.
+   *
+   * @return bool
+   *   Whether the view was updated.
+   */
+  public function needsFieldSetActiveClassUpdate(ViewEntityInterface $view) {
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) use ($view) {
+      return $this->processFieldSetActiveClassDefaultsHandler($handler, $handler_type, $view);
+    });
+  }
+
+  /**
+   * Processes field set_active_class defaults.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view being updated.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  protected function processFieldSetActiveClassDefaultsHandler(array &$handler, $handler_type, ViewEntityInterface $view) {
+    $changed = FALSE;
+    if ($handler_type === 'field') {
+      if (!isset($handler['set_active_class'])) {
+        $handler['set_active_class'] = FALSE;
+        $changed = TRUE;
+      }
+    }
+    $deprecations_triggered = &$this->triggeredDeprecations['3144346'][$view->id()];
+    if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
+      $deprecations_triggered = TRUE;
+      @trigger_error(sprintf(
+          'The "active class" for the "%s" view is deprecated in drupal:9.0.0 and will be removed in drupal:11.0.0. Module-provided Views configuration should be updated. See https://www.drupal.org/node/3144346',
+          $view->id()
+      ), E_USER_DEPRECATED);
+    }
     return $changed;
   }
 

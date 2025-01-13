@@ -540,6 +540,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     $options['hide_empty'] = ['default' => FALSE];
     $options['empty_zero'] = ['default' => FALSE];
     $options['hide_alter_empty'] = ['default' => TRUE];
+    $options['set_active_class'] = ['default' => FALSE];
 
     return $options;
   }
@@ -759,6 +760,14 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       '#title' => $this->t('Add default classes'),
       '#default_value' => $this->options['element_default_classes'],
       '#description' => $this->t('Use default Views classes to identify the field, field label and field content.'),
+      '#fieldset' => 'style_settings',
+    ];
+
+    $form['set_active_class'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Set the active class on links to the current page'),
+      '#default_value' => $this->options['set_active_class'],
+      '#description' => $this->t('If the field links to the current page, an "is-active" class will be added if this option is enabled.'),
       '#fieldset' => 'style_settings',
     ];
 
@@ -1219,7 +1228,13 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     if ($this->allowAdvancedRender()) {
       if ($this instanceof MultiItemsFieldHandlerInterface) {
         $items = [];
+        $set_active_class = !empty($this->options['set_active_class']);
         foreach ($raw_items as $count => $item) {
+          // Setting the active class on a link is now an opt-in feature, so
+          // we need to check if the feature is activated for this field.
+          if ($set_active_class && isset($item['rendered']['#url'])) {
+            $item['rendered']['#url']->setOption('set_active_class', TRUE);
+          }
           $value = $this->render_item($count, $item);
           if (is_array($value)) {
             $value = (string) $this->getRenderer()->render($value);
@@ -1447,6 +1462,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       'fragment' => NULL,
       'language' => NULL,
       'query' => [],
+      'set_active_class' => !empty($this->options['set_active_class']),
     ];
 
     $alter += [

@@ -78,6 +78,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           action_title: Action
           include_exclude: exclude
           selected_actions: {  }
@@ -131,6 +132,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           view_mode: media_library
       pager:
         type: mini
@@ -540,6 +542,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           action_title: Action
           include_exclude: exclude
           selected_actions: {  }
@@ -594,6 +597,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: string
           settings:
@@ -658,6 +662,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           text: Edit
           output_url_as_text: false
           absolute: false
@@ -711,6 +716,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           text: Delete
           output_url_as_text: false
           absolute: false
@@ -764,6 +770,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           view_mode: media_library
       defaults:
         fields: false
@@ -838,6 +845,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
         rendered_entity:
           id: rendered_entity
           table: media
@@ -888,6 +896,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           view_mode: media_library
       access:
         type: perm

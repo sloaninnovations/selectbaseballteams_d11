@@ -70,6 +70,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           action_title: Action
           include_exclude: include
           selected_actions:
@@ -126,6 +127,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: comment_permalink
           settings:
@@ -191,6 +193,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: target_id
           type: entity_reference_label
           settings:
@@ -256,6 +259,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: comment_username
           settings: {  }
@@ -320,6 +324,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: target_id
           type: entity_reference_label
           settings:
@@ -385,6 +390,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: timestamp
           settings:
@@ -460,6 +466,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           destination: true
         name_1:
           id: name_1
@@ -512,6 +519,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: user_name
           settings:
@@ -958,6 +966,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           action_title: Action
           include_exclude: include
           selected_actions:
@@ -1014,6 +1023,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: comment_permalink
           settings:
@@ -1079,6 +1089,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: target_id
           type: entity_reference_label
           settings:
@@ -1144,6 +1155,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: comment_username
           settings: {  }
@@ -1208,6 +1220,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: target_id
           type: entity_reference_label
           settings:
@@ -1273,6 +1286,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: timestamp
           settings:
@@ -1348,6 +1362,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           destination: true
         name_1:
           id: name_1
@@ -1400,6 +1415,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: user_name
           settings:

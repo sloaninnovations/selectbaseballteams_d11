@@ -53,6 +53,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
         filename:
           id: filename
           table: file_managed
@@ -104,6 +105,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: file_link
           group_column: value
@@ -167,6 +169,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           type: file_filemime
         filesize:
           id: filesize
@@ -219,6 +222,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           type: file_size
         status:
           id: status
@@ -271,6 +275,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           type: boolean
           settings:
             format: custom
@@ -327,6 +332,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           type: timestamp
           settings:
             date_format: medium
@@ -392,6 +398,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           type: timestamp
           settings:
             date_format: medium
@@ -455,6 +462,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           set_precision: false
           precision: 0
           decimal: .
@@ -894,6 +902,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           link_to_entity: true
         type:
           id: type
@@ -944,6 +953,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
         module:
           id: module
           table: file_usage
@@ -993,6 +1003,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
         count:
           id: count
           table: file_usage
@@ -1042,6 +1053,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           set_precision: false
           precision: 0
           decimal: .

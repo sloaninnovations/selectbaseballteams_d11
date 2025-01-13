@@ -69,6 +69,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
         name:
           id: name
           table: users_field_data
@@ -120,6 +121,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           type: user_name
         status:
           id: status
@@ -172,6 +174,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           type: boolean
           settings:
             format: custom
@@ -226,6 +229,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           type: ul
           separator: ', '
         created:
@@ -279,6 +283,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           type: timestamp_ago
           settings:
             future_format: '@interval'
@@ -335,6 +340,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           type: timestamp_ago
           settings:
             future_format: '@interval hence'
@@ -390,6 +396,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           destination: true
         mail:
           id: mail
@@ -442,6 +449,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: basic_string
           settings: {  }

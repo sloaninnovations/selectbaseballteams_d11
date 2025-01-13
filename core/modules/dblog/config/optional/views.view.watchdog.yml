@@ -118,6 +118,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
         severity:
           id: severity
           table: watchdog
@@ -167,6 +168,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           machine_name: false
         type:
           id: type
@@ -217,6 +219,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
         timestamp:
           id: timestamp
           table: watchdog
@@ -266,6 +269,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           date_format: short
           custom_date_format: ''
           timezone: ''
@@ -318,6 +322,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           replace_variables: true
         name:
           id: name
@@ -370,6 +375,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
           click_sort_column: value
           type: user_name
           settings:
@@ -433,6 +439,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          set_active_class: false
       pager:
         type: mini
         options:

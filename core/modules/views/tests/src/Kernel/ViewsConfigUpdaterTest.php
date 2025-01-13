@@ -55,4 +55,14 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
     return $test_view;
   }
 
+  /**
+   * @covers ::needsFieldSetActiveClassUpdate
+   */
+  public function testNeedsFieldSetActiveClassUpdate() {
+    $test_view = $this->loadTestView('views.view.test_set_active_class');
+    $this->configUpdater->setDeprecationsEnabled(FALSE);
+    $needs_update = $this->configUpdater->needsFieldSetActiveClassUpdate($test_view);
+    $this->assertTrue($needs_update);
+  }
+
 }
