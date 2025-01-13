@@ -203,13 +203,17 @@ class UrlGenerator implements UrlGeneratorInterface {
     foreach ($tokens as $token) {
       if ('variable' === $token[0]) {
         if (!$optional || !array_key_exists($token[3], $defaults) || (isset($mergedParams[$token[3]]) && (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]])) {
-          // Check requirement
-          if (!preg_match('#^' . $token[2] . '$#', $mergedParams[$token[3]])) {
-            $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
-            throw new InvalidParameterException($message);
+          // check requirement
+          if (isset($mergedParams[$token[3]])) {
+            if (!preg_match('#^' . $token[2] . '$#', $mergedParams[$token[3]])) {
+              $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
+              throw new InvalidParameterException($message);
+            }
+            $url = $token[1] . $mergedParams[$token[3]] . $url;
           }
-
-          $url = $token[1] . $mergedParams[$token[3]] . $url;
+          else {
+            $url = $token[1] . $url;
+          }
           $optional = FALSE;
         }
       }
