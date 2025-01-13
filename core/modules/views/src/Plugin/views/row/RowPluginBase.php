@@ -52,13 +52,13 @@ abstract class RowPluginBase extends PluginBase {
   /**
    * The actual field used.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public string $base_field;
 
   /**
    * The field alias.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public string $field_alias;
 
   /**
@@ -161,7 +161,7 @@ abstract class RowPluginBase extends PluginBase {
   /**
    * Allow the style to do stuff before each row is rendered.
    *
-   * @param $result
+   * @param array $result
    *   The full array of results from the query.
    */
   public function preRender($result) {}

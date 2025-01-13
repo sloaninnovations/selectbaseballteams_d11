@@ -91,7 +91,7 @@ function module_b_post_update_a() {
 /**
  * Implements hook_removed_post_updates().
  */
-function module_b_removed_post_updates() {
+function module_b_removed_post_updates(): array {
   return [
     'module_b_post_update_b' => '8.9.0',
     'module_b_post_update_c' => '8.9.0',
@@ -118,7 +118,7 @@ function module_c_post_update_b() {
 /**
  * Implements hook_removed_post_updates().
  */
-function module_c_removed_post_updates() {
+function module_c_removed_post_updates(): array {
   return [
     'module_c_post_update_b' => '8.9.0',
     'module_c_post_update_c' => '8.9.0',
@@ -145,7 +145,7 @@ function theme_d_post_update_c() {
 /**
  * Implements hook_removed_post_updates().
  */
-function theme_d_removed_post_updates() {
+function theme_d_removed_post_updates(): array {
   return [
     'theme_d_post_update_a' => '8.9.0',
   ];
@@ -194,7 +194,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -277,7 +277,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -320,7 +320,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -372,7 +372,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -442,7 +442,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -485,7 +485,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -525,7 +525,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -600,7 +600,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -687,7 +687,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);

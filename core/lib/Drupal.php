@@ -75,7 +75,7 @@ class Drupal {
   /**
    * The current system version.
    */
-  const VERSION = '11.0-dev';
+  const VERSION = '11.2-dev';
 
   /**
    * Core API compatibility.
@@ -132,6 +132,13 @@ class Drupal {
    * that have reached their EOL or will in the near future.
    */
   const RECOMMENDED_PHP = '8.3.0';
+
+  /**
+   * Default location of gettext file on the translation server.
+   *
+   * @see locale_translation_default_translation_server()
+   */
+  const TRANSLATION_DEFAULT_SERVER_PATTERN = 'https://ftp.drupal.org/files/translations/%core/%project/%project-%version.%language.po';
 
   /**
    * The currently active container object, or NULL if not initialized yet.

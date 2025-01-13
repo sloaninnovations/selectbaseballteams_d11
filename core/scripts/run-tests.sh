@@ -36,7 +36,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Process\Process;
 
-// cspell:ignore exitcode wwwrun
+// cspell:ignore exitcode testbots wwwrun
 
 // Define some colors for display.
 // A nice calming green.
@@ -479,23 +479,34 @@ function simpletest_script_init() {
   $host = 'localhost';
   $path = '';
   $port = '80';
+  $php = "";
 
   // Determine location of php command automatically, unless a command line
   // argument is supplied.
-  if (!empty($args['php'])) {
-    $php = $args['php'];
-  }
-  elseif ($php_env = getenv('_')) {
+  if ($php_env = getenv('_')) {
     // '_' is an environment variable set by the shell. It contains the command
     // that was executed.
     $php = $php_env;
   }
-  elseif ($sudo = getenv('SUDO_COMMAND')) {
+
+  if ($sudo = getenv('SUDO_COMMAND')) {
     // 'SUDO_COMMAND' is an environment variable set by the sudo program.
-    // Extract only the PHP interpreter, not the rest of the command.
-    [$php] = explode(' ', $sudo, 2);
+    // This will be set if the script is run directly by sudo or if the
+    // script is run under a shell started by sudo.
+    if (str_contains($sudo, basename(__FILE__))) {
+      // This script may have been directly run by sudo. $php may have the
+      // path to sudo from getenv('_') if run with the -E option.
+      // Extract what may be the PHP interpreter.
+      [$php] = explode(' ', $sudo, 2);
+    }
   }
-  else {
+
+  if (!empty($args['php'])) {
+    // Caller has specified path to php. Override auto-detection.
+    $php = $args['php'];
+  }
+
+  if ($php == "") {
     simpletest_script_print_error('Unable to automatically determine the path to the PHP interpreter. Supply the --php command line argument.');
     simpletest_script_help();
     exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
@@ -829,9 +840,11 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
  * Run a PHPUnit-based test.
  */
 function simpletest_script_run_phpunit(TestRun $test_run, $class) {
+  global $args;
+
   $runner = PhpUnitTestRunner::create(\Drupal::getContainer());
   $start = microtime(TRUE);
-  $results = $runner->execute($test_run, $class, $status);
+  $results = $runner->execute($test_run, $class, $status, $args['color']);
   $time = microtime(TRUE) - $start;
 
   $runner->processPhpUnitResults($test_run, $results);
@@ -944,16 +957,16 @@ function simpletest_script_get_test_list() {
     foreach ($groups as $group => $tests) {
       $not_slow_tests = array_merge($not_slow_tests, array_keys($tests));
     }
-    // Filter slow tests out of the not slow tests since they may appear in more
-    // than one group.
-    $not_slow_tests = array_diff($not_slow_tests, $slow_tests);
+    // Filter slow tests out of the not slow tests and ensure a unique list
+    // since tests may appear in more than one group.
+    $not_slow_tests = array_unique(array_diff($not_slow_tests, $slow_tests));
 
     // If the tests are not being run in parallel, then ensure slow tests run
     // all together first.
     if ((int) $args['ci-parallel-node-total'] <= 1 ) {
       sort_tests_by_type_and_methods($slow_tests);
       sort_tests_by_type_and_methods($not_slow_tests);
-      $test_list = array_unique(array_merge($slow_tests, $not_slow_tests));
+      $test_list = array_merge($slow_tests, $not_slow_tests);
     }
     else {
       // Sort all tests by the number of public methods on the test class.
@@ -974,7 +987,7 @@ function simpletest_script_get_test_list() {
       // And the same for the rest of the tests.
       $binned_other_tests = place_tests_into_bins($not_slow_tests, $bin_count);
       $other_tests_for_job = $binned_other_tests[$args['ci-parallel-node-index'] - 1];
-      $test_list = array_unique(array_merge($slow_tests_for_job, $other_tests_for_job));
+      $test_list = array_merge($slow_tests_for_job, $other_tests_for_job);
     }
   }
   else {
@@ -1159,7 +1172,7 @@ function place_tests_into_bins(array $tests, int $bin_count) {
  * Initialize the reporter.
  */
 function simpletest_script_reporter_init() {
-  global $args, $test_list, $results_map;
+  global $args, $test_list, $results_map, $php;
 
   $results_map = [
     'pass' => 'Pass',
@@ -1169,6 +1182,7 @@ function simpletest_script_reporter_init() {
 
   echo "\n";
   echo "Drupal test run\n";
+  echo "Using PHP Binary: $php\n";
   echo "---------------\n";
   echo "\n";
 
@@ -1249,7 +1263,7 @@ function simpletest_script_reporter_write_xml_results(TestRunResultsStorageInter
         }
         $test_class = $result->test_class;
         if (!isset($xml_files[$test_class])) {
-          $doc = new DomDocument('1.0');
+          $doc = new DOMDocument('1.0');
           $root = $doc->createElement('testsuite');
           $root = $doc->appendChild($root);
           $xml_files[$test_class] = ['doc' => $doc, 'suite' => $root];
@@ -1369,7 +1383,7 @@ function simpletest_script_format_result($result) {
   if ($args['non-html']) {
     $message = Html::decodeEntities($message);
   }
-  $lines = explode("\n", wordwrap($message), 76);
+  $lines = explode("\n", $message);
   foreach ($lines as $line) {
     echo "    $line\n";
   }

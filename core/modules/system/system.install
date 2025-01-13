@@ -24,6 +24,7 @@ use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Update\EquivalentUpdate;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\Error;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -705,6 +706,7 @@ function system_requirements($phase) {
       if (!file_exists($htaccess_file) || !($contents = @file_get_contents($htaccess_file)) || !str_contains($contents, 'Drupal_Security_Do_Not_Remove_See_SA_2013_003')) {
         $url = 'https://www.drupal.org/SA-CORE-2013-003';
         $requirements[$htaccess_file] = [
+          // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
           'title' => new TranslatableMarkup($protected_dir->getTitle()),
           'value' => t('Not fully protected'),
           'severity' => REQUIREMENT_ERROR,
@@ -1618,7 +1620,7 @@ function system_requirements($phase) {
 /**
  * Implements hook_install().
  */
-function system_install() {
+function system_install(): void {
   // Populate the cron key state variable.
   $cron_key = Crypt::randomBytesBase64(55);
   \Drupal::state()->set('system.cron_key', $cron_key);
@@ -1638,7 +1640,7 @@ function system_install() {
 /**
  * Implements hook_schema().
  */
-function system_schema() {
+function system_schema(): array {
   // @deprecated The sequences table has been deprecated in drupal:10.2.0 and is
   // removed from drupal:12.0.0. See https://www.drupal.org/node/3220378.
   // @todo Remove sequences table in Drupal 12. See https://www.drupal.org/i/3335756
@@ -1661,15 +1663,8 @@ function system_schema() {
 /**
  * Implements hook_update_last_removed().
  */
-function system_update_last_removed() {
+function system_update_last_removed(): int {
   return 10201;
-}
-
-/**
- * Invalidate container because the module handler has changed.
- */
-function system_update_11100(): void {
-  \Drupal::service('kernel')->invalidateContainer();
 }
 
 /**
@@ -1721,4 +1716,47 @@ function _system_advisories_requirements(array &$requirements): void {
       )->toRenderable();
     }
   }
+}
+
+/**
+ * Invalidate container because the module handler has changed.
+ */
+function system_update_11100(): void {
+  \Drupal::service('kernel')->invalidateContainer();
+}
+
+/**
+ * Update length of menu_tree fields url and route_param_key from 255 to 2048.
+ */
+function system_update_11001(): void {
+  $schema = \Drupal::database()->schema();
+  $spec = [
+    'description' => 'The external path this link points to (when not using a route).',
+    'type' => 'varchar',
+    'length' => 2048,
+    'not null' => TRUE,
+    'default' => '',
+  ];
+  $schema->changeField('menu_tree', 'url', 'url', $spec);
+
+  $spec = [
+    'description' => 'An encoded string of route parameters for loading by route.',
+    'type' => 'varchar',
+    'length' => 2048,
+  ];
+  $schema->changeField('menu_tree', 'route_param_key', 'route_param_key', $spec);
+}
+
+/**
+ * Equivalent update to 10400.
+ */
+function system_update_11102(): TranslatableMarkup|null {
+  // This is a no-op that exists to prevent an upgrade from 10.4+ to 11.0. That
+  // path is actually a downgrade.
+  $equivalent_update = \Drupal::service('update.update_hook_registry')
+    ->getEquivalentUpdate();
+  if ($equivalent_update instanceof EquivalentUpdate) {
+    return $equivalent_update->toSkipMessage();
+  }
+  return NULL;
 }

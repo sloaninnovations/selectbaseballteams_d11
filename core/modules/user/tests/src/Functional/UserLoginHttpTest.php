@@ -74,7 +74,7 @@ class UserLoginHttpTest extends BrowserTestBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   The HTTP response.
    */
-  protected function loginRequest($name, $pass, $format = 'json') {
+  protected function loginRequest($name, $pass, $format = 'json'): ResponseInterface {
     $user_login_url = Url::fromRoute('user.login.http')
       ->setRouteParameter('_format', $format)
       ->setAbsolute();
@@ -217,7 +217,7 @@ class UserLoginHttpTest extends BrowserTestBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   The HTTP response.
    */
-  protected function passwordRequest(array $request_body, $format = 'json') {
+  protected function passwordRequest(array $request_body, $format = 'json'): ResponseInterface {
     $password_reset_url = Url::fromRoute('user.pass.http')
       ->setRouteParameter('_format', $format)
       ->setAbsolute();
@@ -442,7 +442,7 @@ class UserLoginHttpTest extends BrowserTestBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   The HTTP response.
    */
-  protected function logoutRequest($format = 'json', $logout_token = '') {
+  protected function logoutRequest($format = 'json', $logout_token = ''): ResponseInterface {
     /** @var \GuzzleHttp\Client $client */
     $client = $this->container->get('http_client');
     $user_logout_url = Url::fromRoute('user.logout.http')
@@ -605,7 +605,7 @@ class UserLoginHttpTest extends BrowserTestBase {
     $resetURL = $urls[0];
     $this->drupalGet($resetURL);
     $this->submitForm([], 'Log in');
-    $this->assertSession()->pageTextContains('You have just used your one-time login link. It is no longer necessary to use this link to log in. It is recommended that you set your password.');
+    $this->assertSession()->pageTextContains('You have used a one-time login link. You can set your new password now.');
   }
 
 }

@@ -544,6 +544,7 @@ class Url implements TrustedCallbackInterface {
    * Indicates if this URL is external.
    *
    * @return bool
+   *   TRUE if the URL is external, FALSE otherwise.
    */
   public function isExternal() {
     return $this->external;
@@ -553,6 +554,7 @@ class Url implements TrustedCallbackInterface {
    * Indicates if this URL has a Drupal route.
    *
    * @return bool
+   *   TRUE if there is a Drupal route for the URL, FALSE otherwise.
    */
   public function isRouted() {
     return !$this->unrouted;
@@ -562,8 +564,9 @@ class Url implements TrustedCallbackInterface {
    * Returns the route name.
    *
    * @return string
+   *   The name of the route.
    *
-   * @throws \UnexpectedValueException.
+   * @throws \UnexpectedValueException
    *   If this is a URI with no corresponding route.
    */
   public function getRouteName() {
@@ -578,8 +581,9 @@ class Url implements TrustedCallbackInterface {
    * Returns the route parameters.
    *
    * @return array
+   *   An associative array of route parameters.
    *
-   * @throws \UnexpectedValueException.
+   * @throws \UnexpectedValueException
    *   If this is a URI with no corresponding route.
    */
   public function getRouteParameters() {
@@ -598,7 +602,7 @@ class Url implements TrustedCallbackInterface {
    *
    * @return $this
    *
-   * @throws \UnexpectedValueException.
+   * @throws \UnexpectedValueException
    *   If this is a URI with no corresponding route.
    */
   public function setRouteParameters($parameters) {
@@ -619,7 +623,7 @@ class Url implements TrustedCallbackInterface {
    *
    * @return $this
    *
-   * @throws \UnexpectedValueException.
+   * @throws \UnexpectedValueException
    *   If this is a URI with no corresponding route.
    */
   public function setRouteParameter($key, $value) {
@@ -777,7 +781,7 @@ class Url implements TrustedCallbackInterface {
    * @return string
    *   The internal path for this route.
    *
-   * @throws \UnexpectedValueException.
+   * @throws \UnexpectedValueException
    *   If this is a URI with no corresponding system path.
    */
   public function getInternalPath() {
@@ -817,6 +821,7 @@ class Url implements TrustedCallbackInterface {
 
   /**
    * @return \Drupal\Core\Access\AccessManagerInterface
+   *   The access manager service.
    */
   protected function accessManager() {
     if (!isset($this->accessManager)) {

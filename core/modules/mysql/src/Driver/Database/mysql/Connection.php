@@ -152,7 +152,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
             // Show message for socket connection via 'host' option.
             $message = 'Drupal was attempting to connect to the database server via a socket, but the socket file could not be found.';
             $message .= ' A Unix socket file is used if you do not specify a host name or if you specify the special host name localhost.';
-            $message .= ' To connect via TPC/IP use an IP address (127.0.0.1 for IPv4) instead of "localhost".';
+            $message .= ' To connect via TCP/IP use an IP address (127.0.0.1 for IPv4) instead of "localhost".';
             $message .= ' This message normally means that there is no MySQL server running on the system or that you are using an incorrect Unix socket file name when trying to connect to the server.';
             throw new DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
           }
@@ -212,6 +212,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return $pdo;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function queryRange($query, $from, $count, array $args = [], array $options = []) {
     return $this->query($query . ' LIMIT ' . (int) $from . ', ' . (int) $count, $args, $options);
   }
@@ -225,6 +228,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return $tablename;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function driver() {
     return 'mysql';
   }
@@ -279,6 +285,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return $this->serverVersion;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function databaseType() {
     return 'mysql';
   }
@@ -305,6 +314,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function mapConditionOperator($operator) {
     // We don't want to override any of the defaults.
     return NULL;
