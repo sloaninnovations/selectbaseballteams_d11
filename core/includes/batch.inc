@@ -294,7 +294,9 @@ function _batch_process() {
         'finished' => &$finished,
         'message'  => &$task_message,
       ];
-      call_user_func_array($callback, array_merge($args, [&$batch_context]));
+      // Use callable resolver service to allow callbacks in service notation.
+      $callable = \Drupal::service('callable_resolver')->getCallableFromDefinition($callback);
+      call_user_func_array($callable, array_merge($args, [&$batch_context]));
 
       if ($finished >= 1) {
         // Make sure this step is not counted twice when computing $current.
@@ -425,11 +427,24 @@ function _batch_next_set() {
   if (isset($set_indexes[$current_set_index_key + 1])) {
     $batch['current_set'] = $set_indexes[$current_set_index_key + 1];
     $current_set = &_batch_current_set();
-    if (isset($current_set['form_submit']) && ($callback = $current_set['form_submit']) && is_callable($callback)) {
+    if (isset($current_set['form_submit'])) {
+      // Use callable resolver service to allow callbacks in service notation.
+      $callable_resolver = \Drupal::service('callable_resolver');
+      switch ($current_set['form_submit']) {
+        // Callable method in the ::method notation.
+        case '::submitForm':
+          $form_obj = $batch['form_state']->getFormObject();
+          $callback = $form_obj::class . $current_set['form_submit'];
+          break;
+
+        default:
+          $callback = $current_set['form_submit'];
+      }
+      $callable = $callable_resolver->getCallableFromDefinition($callback);
       // We use our stored copies of $form and $form_state to account for
       // possible alterations by previous form submit handlers.
       $complete_form = &$batch['form_state']->getCompleteForm();
-      call_user_func_array($callback, [&$complete_form, &$batch['form_state']]);
+      call_user_func_array($callable, [&$complete_form, &$batch['form_state']]);
     }
     return TRUE;
   }
@@ -452,16 +467,16 @@ function _batch_finished() {
       if (isset($batch_set['file']) && is_file($batch_set['file'])) {
         include_once \Drupal::root() . '/' . $batch_set['file'];
       }
-      if (is_callable($batch_set['finished'])) {
-        $queue = _batch_queue($batch_set);
-        $operations = $queue->getAllItems();
-        $batch_set_result = call_user_func_array($batch_set['finished'], [$batch_set['success'], $batch_set['results'], $operations, \Drupal::service('date.formatter')->formatInterval((int) ($batch_set['elapsed'] / 1000))]);
-        // If a batch 'finished' callback requested a redirect after the batch
-        // is complete, save that for later use. If more than one batch set
-        // returned a redirect, the last one is used.
-        if ($batch_set_result instanceof RedirectResponse) {
-          $batch_finished_redirect = $batch_set_result;
-        }
+      $queue = _batch_queue($batch_set);
+      $operations = $queue->getAllItems();
+      // Use callable resolver service to allow callbacks in service notation.
+      $callable = \Drupal::service('callable_resolver')->getCallableFromDefinition($batch_set['finished']);
+      $batch_set_result = call_user_func_array($callable, [$batch_set['success'], $batch_set['results'], $operations, \Drupal::service('date.formatter')->formatInterval((int) ($batch_set['elapsed'] / 1000))]);
+      // If a batch 'finished' callback requested a redirect after the batch
+      // is complete, save that for later use. If more than one batch set
+      // returned a redirect, the last one is used.
+      if ($batch_set_result instanceof RedirectResponse) {
+        $batch_finished_redirect = $batch_set_result;
       }
     }
   }

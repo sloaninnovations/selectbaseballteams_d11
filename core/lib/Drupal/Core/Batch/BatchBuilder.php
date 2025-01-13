@@ -4,6 +4,9 @@ namespace Drupal\Core\Batch;
 
 use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\DependencyInjection\ClassResolver;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Utility\CallableResolver;
 
 /**
  * Builds an array for a batch process.
@@ -111,6 +114,20 @@ class BatchBuilder {
   protected $queue;
 
   /**
+   * The container.
+   *
+   * @var \Symfony\Component\DependencyInjection\ContainerBuilder
+   */
+  protected ContainerBuilder $container;
+
+  /**
+   * The container.
+   *
+   * @var \Drupal\Core\Utility\CallableResolver
+   */
+  protected CallableResolver $callableResolver;
+
+  /**
    * Sets the default values for the batch builder.
    */
   public function __construct() {
@@ -118,6 +135,12 @@ class BatchBuilder {
     $this->initMessage = new TranslatableMarkup('Initializing.');
     $this->progressMessage = new TranslatableMarkup('Completed @current of @total.');
     $this->errorMessage = new TranslatableMarkup('An error has occurred.');
+    // Instantiate a new ContainerBuilder.
+    $this->container = new ContainerBuilder();
+    // Initialize a ClassResolver with the container.
+    $class_resolver = new ClassResolver($this->container);
+    // Set up a CallableResolver with the previously initialized ClassResolver.
+    $this->callableResolver = new CallableResolver($class_resolver);
   }
 
   /**
@@ -144,7 +167,8 @@ class BatchBuilder {
    * @return $this
    */
   public function setFinishCallback(callable $callback) {
-    $this->finished = $callback;
+    // Use callable resolver service to allow callbacks in service notation.
+    $this->finished = $this->callableResolver->getCallableFromDefinition($callback);
     return $this;
   }
 
@@ -313,7 +337,11 @@ class BatchBuilder {
    * @return $this
    */
   public function addOperation(callable $callback, array $arguments = []) {
-    $this->operations[] = [$callback, $arguments];
+    $this->operations[] = [
+      // Use callable resolver service to allow callbacks in service notation.
+      $this->callableResolver->getCallableFromDefinition($callback),
+      $arguments,
+    ];
     return $this;
   }
 
