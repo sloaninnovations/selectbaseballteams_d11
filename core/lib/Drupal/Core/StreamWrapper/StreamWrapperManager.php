@@ -42,7 +42,6 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
    *   - class: stream wrapper class name
    *   - type: a bitmask corresponding to the type constants in
    *     StreamWrapperInterface
-   *   - service_id: name of service
    *
    * The array on key StreamWrapperInterface::ALL contains representations of
    * all schemes and corresponding wrappers.
