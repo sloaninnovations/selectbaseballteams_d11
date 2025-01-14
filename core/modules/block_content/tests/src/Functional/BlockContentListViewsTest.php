@@ -107,7 +107,7 @@ class BlockContentListViewsTest extends BlockContentTestBase {
     $edit = [];
     $edit['info[0][value]'] = $label;
     $edit['body[0][value]'] = $this->randomMachineName(16);
-    $this->submitForm($edit, 'Save');
+    $this->submitForm($edit, 'Save and configure');
 
     // Confirm that once the user returns to the listing, the text of the label
     // (versus elsewhere on the page).
