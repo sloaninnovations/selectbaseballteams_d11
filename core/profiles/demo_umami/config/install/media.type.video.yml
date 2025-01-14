@@ -3,7 +3,7 @@ status: true
 dependencies: {  }
 id: video
 label: Video
-description: 'A locally hosted video file.'
+description: 'Use video for locally hosted video files.'
 source: video_file
 queue_thumbnail_downloads: false
 new_revision: true
