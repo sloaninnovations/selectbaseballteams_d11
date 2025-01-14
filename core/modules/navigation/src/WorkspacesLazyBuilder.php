@@ -62,7 +62,10 @@ final class WorkspacesLazyBuilder {
         ],
       ],
       '#attached' => [
-        'library' => ['workspaces/drupal.workspaces.off-canvas'],
+        'library' => [
+          'navigation/internal.navigation-workspaces',
+          'workspaces/drupal.workspaces.off-canvas',
+        ],
       ],
       '#cache' => [
         'max-age' => 0,
