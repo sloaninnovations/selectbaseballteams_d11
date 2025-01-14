@@ -184,4 +184,11 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
     $this->assertSame(1, Settings::get('entity_update_batch_size'));
   }
 
+  /**
+   * Tests that settings are prepared correctly.
+   */
+  public function testPrepareSettings(): void {
+    $this->assertSame(1, Settings::get('entity_update_batch_size'));
+  }
+
 }
