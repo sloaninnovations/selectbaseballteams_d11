@@ -95,7 +95,7 @@ class Link extends RenderElementBase {
     }
 
     if (!empty($element['#url']) && $element['#url'] instanceof CoreUrl) {
-      $options = NestedArray::mergeDeep($element['#url']->getOptions(), $element['#options']);
+      $options = NestedArray::mergeDeepArray([$element['#url']->getOptions(), $element['#options']], TRUE);
       /** @var \Drupal\Core\Utility\LinkGenerator $link_generator */
       $link_generator = \Drupal::service('link_generator');
       $generated_link = $link_generator->generate($element['#title'], $element['#url']->setOptions($options));
