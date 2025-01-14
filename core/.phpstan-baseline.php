@@ -35833,7 +35833,7 @@ in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
   the deprecation message for DeprecatedMethod\\:\\:method\\(\\)\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
-	'path' => __DIR__ . '//build/core/modules/system/tests/modules/deprecation_test/src/DeprecatedController.php',
+	'path' => __DIR__ . '/modules/system/tests/modules/deprecation_test/src/DeprecatedController.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\destructable_test\\\\Destructable\\:\\:destruct\\(\\) has no return type specified\\.$#',
