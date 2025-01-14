@@ -236,12 +236,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/includes/errors.inc',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Function _drupal_log_error\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/includes/errors.inc',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function drupal_error_levels\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
