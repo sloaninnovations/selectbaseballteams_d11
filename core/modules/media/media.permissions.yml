@@ -23,7 +23,8 @@ delete any media:
   title:  'Delete any media'
 
 create media:
-  title: 'Create media'
+  title: 'Create any media'
+  description: 'Users with this permission can create media of any type, regardless of per-media type permissions.'
 
 view all media revisions:
   title: 'View all media revisions'
