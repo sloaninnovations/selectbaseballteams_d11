@@ -19,13 +19,13 @@ class DeprecatedMethod {
    *   A known return value of 'known_return_value'.
    *
    * @deprecated in drupal:8.4.0 and is removed from drupal:9.0.0. This is
-   *   the deprecation message for DeprecatedMethod::deprecatedMethod().
+   *   the deprecation message for DeprecatedMethod::method().
    *
    * @see https://www.drupal.org/project/drupal/issues/2870194
    */
-  public static function deprecatedMethod(): string {
+  public static function method(): string {
     // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-    @trigger_error('This is the deprecation message for \Drupal\deprecation_test\DeprecatedMethod::deprecatedMethod().', E_USER_DEPRECATED);
+    @trigger_error('This is the deprecation message for \Drupal\deprecation_test\DeprecatedMethod::method().', E_USER_DEPRECATED);
     return 'known_return_value';
   }
 

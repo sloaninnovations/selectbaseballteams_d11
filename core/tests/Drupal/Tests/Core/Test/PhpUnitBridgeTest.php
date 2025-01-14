@@ -29,7 +29,7 @@ class PhpUnitBridgeTest extends UnitTestCase {
    * Tests function deprecation.
    */
   public function testDeprecatedFunction(): void {
-    $this->assertEquals('known_return_value', DeprecatedMethod::deprecatedMethod());
+    $this->assertEquals('known_return_value', DeprecatedMethod::method());
   }
 
 }

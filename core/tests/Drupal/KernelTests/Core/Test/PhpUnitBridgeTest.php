@@ -28,8 +28,8 @@ class PhpUnitBridgeTest extends KernelTestBase {
   }
 
   public function testDeprecatedFunction(): void {
-    $this->expectDeprecation('This is the deprecation message for \Drupal\deprecation_test\DeprecatedMethod::deprecatedMethod().');
-    $this->assertEquals('known_return_value', DeprecatedMethod::deprecatedMethod());
+    $this->expectDeprecation('This is the deprecation message for \Drupal\deprecation_test\DeprecatedMethod::method().');
+    $this->assertEquals('known_return_value', DeprecatedMethod::method());
   }
 
 }
