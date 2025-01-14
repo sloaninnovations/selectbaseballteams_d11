@@ -110,7 +110,8 @@
 .dropbutton-action a {
   display: flex;
   align-items: center;
-  margin-bottom: -2px; /* Account for borders. */
+  height: auto;
+  margin: 2px;
   padding: 0 0.5625rem;
   -webkit-text-decoration: none;
   text-decoration: none;
