@@ -427,12 +427,19 @@ function node_form_system_themes_admin_form_submit($form, FormStateInterface $fo
  *   arrays of grants for those realms.
  */
 function node_access_grants($operation, AccountInterface $account) {
-  // Fetch node access grants from other modules.
-  $grants = \Drupal::moduleHandler()->invokeAll('node_grants', [$account, $operation]);
-  // Allow modules to alter the assigned grants.
-  \Drupal::moduleHandler()->alter('node_grants', $grants, $account, $operation);
+  $grants_cache = &drupal_static(__FUNCTION__, []);
+  $account_id = $account->id();
 
-  return array_merge(['all' => [0]], $grants);
+  if (!isset($grants_cache[$operation][$account_id])) {
+    // Fetch node access grants from other modules.
+    $grants = \Drupal::moduleHandler()->invokeAll('node_grants', [$account, $operation]);
+    // Allow modules to alter the assigned grants.
+    \Drupal::moduleHandler()->alter('node_grants', $grants, $account, $operation);
+
+    $grants_cache[$operation][$account_id] = array_merge(['all' => [0]], $grants);
+  }
+
+  return $grants_cache[$operation][$account_id];
 }
 
 /**
