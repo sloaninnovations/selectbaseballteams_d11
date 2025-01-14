@@ -160,7 +160,7 @@ interface StreamWrapperInterface extends PhpStreamWrapperInterface {
    * wrappers. We provide this as a default so that individual wrappers may
    * implement their own solutions.
    *
-   * @return string
+   * @return string|false
    *   Returns a string with absolute pathname on success (implemented
    *   by core wrappers), or FALSE on failure or if the registered
    *   wrapper does not provide an implementation.
