@@ -375,6 +375,7 @@ default:
         ls -al ./core
         rm -r core/phpstan-tmp
         rm -v $CI_PROJECT_DIR/core/.phpstan-baseline.php
+        rm -v ./core/.phpstan-baseline.php
         ls -al ./core
         php vendor/bin/phpstan clear-result-cache -vvv --configuration=./core/phpstan.neon.dist
         php vendor/bin/phpstan analyze -vvv --configuration=./core/phpstan.neon.dist --generate-baseline=$CI_PROJECT_DIR/core/.phpstan-baseline.php || true
