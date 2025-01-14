@@ -935,18 +935,17 @@ display:
           transform_dash: false
           break_phrase: false
       filters:
-        status:
-          id: status
+        status_extra:
+          id: status_extra
           table: media_field_data
-          field: status
+          field: status_extra
           relationship: none
           group_type: group
           admin_label: ''
           entity_type: media
-          entity_field: status
-          plugin_id: boolean
+          plugin_id: media_status
           operator: '='
-          value: '1'
+          value: ''
           group: 1
           exposed: false
           expose:
@@ -1098,6 +1097,7 @@ display:
         - url
         - url.query_args
         - 'url.query_args:sort_by'
+        - user
         - user.permissions
       tags: {  }
   widget_table:
@@ -1225,18 +1225,17 @@ display:
           transform_dash: false
           break_phrase: false
       filters:
-        status:
-          id: status
+        status_extra:
+          id: status_extra
           table: media_field_data
-          field: status
+          field: status_extra
           relationship: none
           group_type: group
           admin_label: ''
           entity_type: media
-          entity_field: status
-          plugin_id: boolean
+          plugin_id: media_status
           operator: '='
-          value: '1'
+          value: ''
           group: 1
           exposed: false
           expose:
@@ -1396,5 +1395,6 @@ display:
         - url
         - url.query_args
         - 'url.query_args:sort_by'
+        - user
         - user.permissions
       tags: {  }
