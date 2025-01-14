@@ -372,13 +372,13 @@ default:
         php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress || true
         # Generate a new baseline.
         echo "Generating an PHPStan baseline file (available as job artifact)."
-        ls -al ./core
-        rm -r core/phpstan-tmp
-        rm -v $CI_PROJECT_DIR/core/.phpstan-baseline.php
+        # ls -al ./core
+        # rm -r core/phpstan-tmp
+        # rm -v $CI_PROJECT_DIR/core/.phpstan-baseline.php
         rm -v ./core/.phpstan-baseline.php
-        ls -al ./core
+        # ls -al ./core
         cp $CI_PROJECT_DIR/.gitlab-ci/scripts/.empty-phpstan-baseline.php ./core/.phpstan-baseline.php
-        php vendor/bin/phpstan clear-result-cache -vvv --configuration=./core/phpstan.neon.dist
+        # php vendor/bin/phpstan clear-result-cache -vvv --configuration=./core/phpstan.neon.dist
         php vendor/bin/phpstan analyze -vvv --configuration=./core/phpstan.neon.dist --generate-baseline=$CI_PROJECT_DIR/core/.phpstan-baseline.php --allow-empty-baseline || true
         exit $EXIT_CODE
       fi
