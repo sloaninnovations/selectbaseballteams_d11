@@ -318,7 +318,7 @@ function locale_translation_build_server_pattern($project, $template) {
   $variables = [
     '%project' => $project->name,
     '%version' => $project->version,
-    '%core' => $project->core,
+    '%core' => 'all',
     '%language' => $project->langcode ?? '%language',
   ];
   return strtr($template, $variables);
