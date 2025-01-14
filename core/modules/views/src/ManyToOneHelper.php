@@ -195,13 +195,11 @@ class ManyToOneHelper {
           $join->type = 'LEFT';
           if (!empty($this->handler->view->many_to_one_tables[$field])) {
             foreach ($this->handler->view->many_to_one_tables[$field] as $value) {
-              $join->extra = [
-                [
-                  'field' => $this->handler->realField,
-                  'operator' => '!=',
-                  'value' => $value,
-                  'numeric' => !empty($this->handler->definition['numeric']),
-                ],
+              $join->extra[] = [
+                'field' => $this->handler->realField,
+                'operator' => '!=',
+                'value' => $value,
+                'numeric' => !empty($this->handler->definition['numeric']),
               ];
             }
           }
