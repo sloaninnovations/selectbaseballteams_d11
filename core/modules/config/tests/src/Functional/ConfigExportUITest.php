@@ -19,7 +19,7 @@ class ConfigExportUITest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['config', 'config_test'];
+  protected static $modules = ['config', 'config_test', 'dblog'];
 
   /**
    * {@inheritdoc}
@@ -50,11 +50,26 @@ class ConfigExportUITest extends BrowserTestBase {
     $this->drupalGet('admin/config/development/configuration/full/export');
     $this->assertSession()->buttonExists('Export');
 
+    // Ensure the archive doesn't exist yet.
+    $file_system = \Drupal::service('file_system');
+    assert($file_system instanceof FileSystemInterface);
+    $temp_directory = $file_system->getTempDirectory();
+    $file_path = $temp_directory . '/config.tar.gz';
+    $this->assertFileDoesNotExist($file_path, "Archive file already exists");
+
+    // Ensure some watchdog entries exist from setting up the modules.
+    $dblog_pre_export = \Drupal::database()->select('watchdog')->countQuery()->execute()->fetchField();
+    $this->assertNotEmpty($dblog_pre_export, 'Should have some watchdog entries.');
+
     // Submit the export form and verify response. This will create a file in
     // temporary directory with the default name config.tar.gz.
     $this->drupalGet('admin/config/development/configuration/full/export');
     $this->submitForm([], 'Export');
     $this->assertSession()->statusCodeEquals(200);
+
+    // Ensure there were no watchdog entries logged after exporting.
+    $dblog_post_export = \Drupal::database()->select('watchdog')->countQuery()->execute()->fetchField();
+    $this->assertSame($dblog_pre_export, $dblog_post_export);
 
     // Test if header contains file name with hostname and timestamp.
     $request = \Drupal::request();
@@ -62,10 +77,6 @@ class ConfigExportUITest extends BrowserTestBase {
     $this->assertSession()->responseHeaderMatches('content-disposition', '/attachment; filename="config-' . preg_quote($hostname) . '-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}\.tar\.gz"/');
 
     // Extract the archive and verify it's not empty.
-    $file_system = \Drupal::service('file_system');
-    assert($file_system instanceof FileSystemInterface);
-    $temp_directory = $file_system->getTempDirectory();
-    $file_path = $temp_directory . '/config.tar.gz';
     $archiver = new Tar($file_path);
     $archive_contents = $archiver->listContents();
     $this->assertNotEmpty($archive_contents, 'Downloaded archive file is not empty.');

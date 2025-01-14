@@ -132,7 +132,10 @@ class ConfigController implements ContainerInjectionInterface {
    */
   public function downloadExport() {
     try {
-      $this->fileSystem->delete($this->fileSystem->getTempDirectory() . '/config.tar.gz');
+      $tmp_file = $this->fileSystem->getTempDirectory() . '/config.tar.gz';
+      if (file_exists($tmp_file)) {
+        $this->fileSystem->delete($tmp_file);
+      }
     }
     catch (FileException) {
       // Ignore failed deletes.
