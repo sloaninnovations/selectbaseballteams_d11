@@ -4,7 +4,6 @@ namespace Drupal\Core\Menu;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -15,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Provides a default implementation for local action plugins.
  */
-class LocalActionDefault extends PluginBase implements LocalActionInterface, ContainerFactoryPluginInterface, CacheableDependencyInterface {
+class LocalActionDefault extends PluginBase implements LocalActionInterface, ContainerFactoryPluginInterface {
 
   use DependencySerializationTrait;
 
