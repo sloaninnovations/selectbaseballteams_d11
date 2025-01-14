@@ -133,7 +133,6 @@ class AccessManagerTest extends UnitTestCase {
    * Tests \Drupal\Core\Access\AccessManager::setChecks().
    */
   public function testSetChecks(): void {
-    $this->assertFalse(TRUE);
     // Check setChecks without any access checker defined yet.
     $this->checkProvider->setChecks($this->routeCollection);
 
