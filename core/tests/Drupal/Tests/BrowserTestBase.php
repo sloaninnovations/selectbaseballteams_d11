@@ -56,6 +56,9 @@ abstract class BrowserTestBase extends TestCase {
     FunctionalTestSetupTrait::refreshVariables insteadof UiHelperTrait;
   }
   use TestSetupTrait;
+  use SitePrefixTrait {
+    SitePrefixTrait::prepareDatabasePrefix insteadof TestSetupTrait;
+  }
   use BlockCreationTrait {
     placeBlock as drupalPlaceBlock;
   }
