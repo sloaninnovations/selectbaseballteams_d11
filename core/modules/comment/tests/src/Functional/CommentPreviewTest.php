@@ -45,7 +45,7 @@ class CommentPreviewTest extends CommentTestBase {
 
     // Test escaping of the username on the preview form.
     \Drupal::service('module_installer')->install(['user_hooks_test']);
-    \Drupal::state()->set('user_hooks_test_user_format_name_alter', TRUE);
+    \Drupal::keyValue('user_hooks_test')->set('user_format_name_alter', TRUE);
     $edit = [];
     $edit['subject[0][value]'] = $this->randomMachineName(8);
     $edit['comment_body[0][value]'] = $this->randomMachineName(16);
@@ -53,7 +53,7 @@ class CommentPreviewTest extends CommentTestBase {
     $this->submitForm($edit, 'Preview');
     $this->assertSession()->assertEscaped('<em>' . $this->webUser->id() . '</em>');
 
-    \Drupal::state()->set('user_hooks_test_user_format_name_alter_safe', TRUE);
+    \Drupal::keyValue('user_hooks_test')->set('user_format_name_alter_safe', TRUE);
     $this->drupalGet('node/' . $this->node->id());
     $this->submitForm($edit, 'Preview');
     $this->assertInstanceOf(MarkupInterface::class, $this->webUser->getDisplayName());
@@ -197,8 +197,6 @@ class CommentPreviewTest extends CommentTestBase {
     $this->submitForm($displayed, 'Save');
 
     // Check that the saved comment is still correct.
-    $comment_storage = \Drupal::entityTypeManager()->getStorage('comment');
-    $comment_storage->resetCache([$comment->id()]);
     /** @var \Drupal\comment\CommentInterface $comment_loaded */
     $comment_loaded = Comment::load($comment->id());
     $this->assertEquals($edit['subject[0][value]'], $comment_loaded->getSubject(), 'Subject loaded.');
@@ -216,7 +214,6 @@ class CommentPreviewTest extends CommentTestBase {
     unset($edit['uid']);
     $this->drupalGet('comment/' . $comment->id() . '/edit');
     $this->submitForm($user_edit, 'Save');
-    $comment_storage->resetCache([$comment->id()]);
     $comment_loaded = Comment::load($comment->id());
     $this->assertEquals($expected_created_time, $comment_loaded->getCreatedTime(), 'Expected date and time for comment edited.');
     $this->drupalLogout();

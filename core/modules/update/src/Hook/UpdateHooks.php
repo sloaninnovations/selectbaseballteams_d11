@@ -200,7 +200,7 @@ class UpdateHooks {
    * If themes are installed, we invalidate the information of available updates.
    */
   #[Hook('themes_installed')]
-  public function themesInstalled($themes) {
+  public function themesInstalled($themes): void {
     // Clear all update module data.
     update_storage_clear();
   }
@@ -211,7 +211,7 @@ class UpdateHooks {
    * If themes are uninstalled, we invalidate the information of available updates.
    */
   #[Hook('themes_uninstalled')]
-  public function themesUninstalled($themes) {
+  public function themesUninstalled($themes): void {
     // Clear all update module data.
     update_storage_clear();
   }
@@ -222,7 +222,7 @@ class UpdateHooks {
    * If modules are installed, we invalidate the information of available updates.
    */
   #[Hook('modules_installed')]
-  public function modulesInstalled($modules) {
+  public function modulesInstalled($modules): void {
     // Clear all update module data.
     update_storage_clear();
   }
@@ -233,7 +233,7 @@ class UpdateHooks {
    * If modules are uninstalled, we invalidate the information of available updates.
    */
   #[Hook('modules_uninstalled')]
-  public function modulesUninstalled($modules) {
+  public function modulesUninstalled($modules): void {
     // Clear all update module data.
     update_storage_clear();
   }
@@ -249,7 +249,7 @@ class UpdateHooks {
    * @see \Drupal\update\UpdateManagerInterface
    */
   #[Hook('mail')]
-  public function mail($key, &$message, $params) {
+  public function mail($key, &$message, $params): void {
     $langcode = $message['langcode'];
     $language = \Drupal::languageManager()->getLanguage($langcode);
     $message['subject'] .= t('New release(s) available for @site_name', ['@site_name' => \Drupal::config('system.site')->get('name')], ['langcode' => $langcode]);
@@ -282,7 +282,7 @@ class UpdateHooks {
    * @see \Drupal\Core\Extension\ExtensionDiscovery
    */
   #[Hook('verify_update_archive')]
-  public function verifyUpdateArchive($project, $archive_file, $directory) {
+  public function verifyUpdateArchive($project, $archive_file, $directory): array {
     $errors = [];
     // Make sure this isn't a tarball of Drupal core.
     if (file_exists("{$directory}/{$project}/index.php") && file_exists("{$directory}/{$project}/core/install.php") && file_exists("{$directory}/{$project}/core/includes/bootstrap.inc") && file_exists("{$directory}/{$project}/core/modules/node/node.module") && file_exists("{$directory}/{$project}/core/modules/system/system.module")) {

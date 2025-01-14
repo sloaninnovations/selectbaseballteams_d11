@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\entity_test\Hook;
 
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Database\Query\AlterableInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -24,6 +26,8 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for entity_test.
  */
 class EntityTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_entity_type_alter().
@@ -83,10 +87,10 @@ class EntityTestHooks {
       ]);
     }
     if ($entity_type->id() == 'entity_test_mulrev' && \Drupal::state()->get('entity_test.field_test_item')) {
-      $fields['field_test_item'] = BaseFieldDefinition::create('field_test')->setLabel(t('Field test'))->setDescription(t('A field test.'))->setRevisionable(TRUE)->setTranslatable(TRUE);
+      $fields['field_test_item'] = BaseFieldDefinition::create('field_test')->setLabel($this->t('Field test'))->setDescription($this->t('A field test.'))->setRevisionable(TRUE)->setTranslatable(TRUE);
     }
     if ($entity_type->id() == 'entity_test_mulrev' && \Drupal::state()->get('entity_test.multi_column')) {
-      $fields['description'] = BaseFieldDefinition::create('shape')->setLabel(t('Some custom description'))->setTranslatable(TRUE);
+      $fields['description'] = BaseFieldDefinition::create('shape')->setLabel($this->t('Some custom description'))->setTranslatable(TRUE);
     }
     return $fields;
   }
@@ -163,12 +167,12 @@ class EntityTestHooks {
       if ($entity_info[$entity_type]->getProvider() == 'entity_test' && !isset($view_modes[$entity_type])) {
         $view_modes[$entity_type] = [
           'full' => [
-            'label' => t('Full object'),
+            'label' => $this->t('Full object'),
             'status' => TRUE,
             'cache' => TRUE,
           ],
           'teaser' => [
-            'label' => t('Teaser'),
+            'label' => $this->t('Teaser'),
             'status' => TRUE,
             'cache' => TRUE,
           ],
@@ -185,7 +189,7 @@ class EntityTestHooks {
     $entity_info = \Drupal::entityTypeManager()->getDefinitions();
     foreach ($entity_info as $entity_type => $info) {
       if ($entity_info[$entity_type]->getProvider() == 'entity_test') {
-        $form_modes[$entity_type]['compact'] = ['label' => t('Compact version'), 'status' => TRUE];
+        $form_modes[$entity_type]['compact'] = ['label' => $this->t('Compact version'), 'status' => TRUE];
       }
     }
   }
@@ -211,14 +215,14 @@ class EntityTestHooks {
               // just used in \Drupal\Tests\field_ui\Kernel\EntityDisplayTest to test
               // the behavior of entity display objects.
         'display_extra_field' => [
-          'label' => t('Display extra field'),
-          'description' => t('An extra field on the display side.'),
+          'label' => $this->t('Display extra field'),
+          'description' => $this->t('An extra field on the display side.'),
           'weight' => 5,
           'visible' => TRUE,
         ],
         'display_extra_field_hidden' => [
-          'label' => t('Display extra field (hidden)'),
-          'description' => t('An extra field on the display side, hidden by default.'),
+          'label' => $this->t('Display extra field (hidden)'),
+          'description' => $this->t('An extra field on the display side, hidden by default.'),
           'visible' => FALSE,
         ],
       ],
@@ -288,7 +292,7 @@ class EntityTestHooks {
    * @see \Drupal\system\Tests\Entity\FieldAccessTest::testFieldAccess()
    */
   #[Hook('entity_field_access')]
-  public function entityFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL) {
+  public function entityFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL): AccessResultInterface {
     if ($field_definition->getName() == 'field_test_text') {
       if ($items) {
         if ($items->value == 'no access value') {
@@ -610,7 +614,7 @@ class EntityTestHooks {
    * Implements hook_entity_access().
    */
   #[Hook('entity_access')]
-  public function entityAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+  public function entityAccess(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
     // Only apply to the 'entity_test' entities.
     if ($entity->getEntityType()->getProvider() != 'entity_test') {
       return AccessResult::neutral();
@@ -641,7 +645,7 @@ class EntityTestHooks {
    * Implements hook_ENTITY_TYPE_access() for 'entity_test'.
    */
   #[Hook('entity_test_access')]
-  public function entityTestAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+  public function entityTestAccess(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
     \Drupal::state()->set('entity_test_entity_test_access', TRUE);
     // No opinion.
     return AccessResult::neutral();
@@ -651,7 +655,7 @@ class EntityTestHooks {
    * Implements hook_entity_create_access().
    */
   #[Hook('entity_create_access')]
-  public function entityCreateAccess(AccountInterface $account, $context, $entity_bundle) {
+  public function entityCreateAccess(AccountInterface $account, $context, $entity_bundle): AccessResultInterface {
     \Drupal::state()->set('entity_test_entity_create_access', TRUE);
     \Drupal::state()->set('entity_test_entity_create_access_context', $context);
     if ($entity_bundle === 'forbidden_access_bundle') {
@@ -667,7 +671,7 @@ class EntityTestHooks {
    * Implements hook_ENTITY_TYPE_create_access() for 'entity_test'.
    */
   #[Hook('entity_test_create_access')]
-  public function entityTestCreateAccess(AccountInterface $account, $context, $entity_bundle) {
+  public function entityTestCreateAccess(AccountInterface $account, $context, $entity_bundle): AccessResultInterface {
     \Drupal::state()->set('entity_test_entity_test_create_access', TRUE);
     // No opinion.
     return AccessResult::neutral();

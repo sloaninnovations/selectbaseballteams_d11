@@ -10,6 +10,7 @@ use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\navigation\TopBarItemManagerInterface;
 
 /**
  * Hook implementations for navigation.
@@ -98,6 +99,11 @@ class NavigationHooks {
       ],
     ];
     $items['menu_region__footer'] = ['variables' => ['items' => [], 'title' => NULL, 'menu_name' => NULL]];
+    $items['navigation_content_top'] = [
+      'variables' => [
+        'items' => [],
+      ],
+    ];
     return $items;
   }
 
@@ -120,7 +126,11 @@ class NavigationHooks {
   public function blockBuildLocalTasksBlockAlter(array &$build, BlockPluginInterface $block): void {
     $navigation_renderer = \Drupal::service('navigation.renderer');
     assert($navigation_renderer instanceof NavigationRenderer);
-    $navigation_renderer->removeLocalTasks($build, $block);
+    if (\Drupal::currentUser()->hasPermission('access navigation') &&
+      array_key_exists('page_actions', \Drupal::service(TopBarItemManagerInterface::class)->getDefinitions())
+    ) {
+      $navigation_renderer->removeLocalTasks($build, $block);
+    }
   }
 
   /**
