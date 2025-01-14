@@ -26,12 +26,10 @@ echo "----------------------------------------\n";
 echo sprintf("%6d * Total baselined errors\n", $stats['__total']);
 echo "----------------------------------------\n";
 echo "Breakdown by error identifier:\n";
-file_put_contents('phpstan-metrics.txt', 'phpstan-baseline ' . $stats['__total'] . PHP_EOL, FILE_APPEND);
 
 unset($stats['__total']);
 arsort($stats);
 
 foreach ($stats as $identifier => $stat) {
   echo sprintf("%6d %s\n", $stat, $identifier);
-  file_put_contents('phpstan-metrics.txt', 'phpstan-baseline.' . $identifier . ' ' . $stat . PHP_EOL, FILE_APPEND);
 }
