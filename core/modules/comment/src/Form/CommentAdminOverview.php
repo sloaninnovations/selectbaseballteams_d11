@@ -27,13 +27,6 @@ class CommentAdminOverview extends FormBase {
   protected $entityTypeManager;
 
   /**
-   * The comment storage.
-   *
-   * @var \Drupal\comment\CommentStorageInterface
-   */
-  protected $commentStorage;
-
-  /**
    * The date formatter service.
    *
    * @var \Drupal\Core\Datetime\DateFormatterInterface
@@ -68,7 +61,6 @@ class CommentAdminOverview extends FormBase {
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, DateFormatterInterface $date_formatter, ModuleHandlerInterface $module_handler, PrivateTempStoreFactory $temp_store_factory) {
     $this->entityTypeManager = $entity_type_manager;
-    $this->commentStorage = $entity_type_manager->getStorage('comment');
     $this->dateFormatter = $date_formatter;
     $this->moduleHandler = $module_handler;
     $this->tempStoreFactory = $temp_store_factory;
@@ -160,7 +152,8 @@ class CommentAdminOverview extends FormBase {
       ],
       'operations' => $this->t('Operations'),
     ];
-    $cids = $this->commentStorage->getQuery()
+    $comment_storage = $this->entityTypeManager->getStorage('comment');
+    $cids = $comment_storage->getQuery()
       ->accessCheck(TRUE)
       ->condition('status', $status)
       ->tableSort($header)
@@ -168,7 +161,7 @@ class CommentAdminOverview extends FormBase {
       ->execute();
 
     /** @var \Drupal\comment\CommentInterface[] $comments */
-    $comments = $this->commentStorage->loadMultiple($cids);
+    $comments = $comment_storage->loadMultiple($cids);
 
     // Build a table listing the appropriate comments.
     $options = [];
@@ -268,8 +261,9 @@ class CommentAdminOverview extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $operation = $form_state->getValue('operation');
     $cids = $form_state->getValue('comments');
+    $comment_storage = $this->entityTypeManager->getStorage('comment');
     /** @var \Drupal\comment\CommentInterface[] $comments */
-    $comments = $this->commentStorage->loadMultiple($cids);
+    $comments = $comment_storage->loadMultiple($cids);
     if ($operation != 'delete') {
       foreach ($comments as $comment) {
         if ($operation == 'unpublish') {

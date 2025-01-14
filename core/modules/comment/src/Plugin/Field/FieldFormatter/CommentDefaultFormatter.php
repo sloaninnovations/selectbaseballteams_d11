@@ -40,11 +40,11 @@ class CommentDefaultFormatter extends FormatterBase {
   }
 
   /**
-   * The comment storage.
+   * The entity type manager.
    *
-   * @var \Drupal\comment\CommentStorageInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $storage;
+  protected $entityTypeManager;
 
   /**
    * The current user.
@@ -130,7 +130,7 @@ class CommentDefaultFormatter extends FormatterBase {
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder, RouteMatchInterface $route_match, EntityDisplayRepositoryInterface $entity_display_repository) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->viewBuilder = $entity_type_manager->getViewBuilder('comment');
-    $this->storage = $entity_type_manager->getStorage('comment');
+    $this->entityTypeManager = $entity_type_manager;
     $this->currentUser = $current_user;
     $this->entityFormBuilder = $entity_form_builder;
     $this->routeMatch = $route_match;
@@ -167,7 +167,8 @@ class CommentDefaultFormatter extends FormatterBase {
         if ($entity->get($field_name)->comment_count || $this->currentUser->hasPermission('administer comments')) {
           $mode = $comment_settings['default_mode'];
           $comments_per_page = $comment_settings['per_page'];
-          $comments = $this->storage->loadThread($entity, $field_name, $mode, $comments_per_page, $this->getSetting('pager_id'));
+          $comment_storage = $this->entityTypeManager->getStorage('comment');
+          $comments = $comment_storage->loadThread($entity, $field_name, $mode, $comments_per_page, $this->getSetting('pager_id'));
           if ($comments) {
             $build = $this->viewBuilder->viewMultiple($comments, $this->getSetting('view_mode'));
             $build['pager']['#type'] = 'pager';

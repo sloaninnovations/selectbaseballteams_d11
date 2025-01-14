@@ -54,11 +54,11 @@ class CommentManager implements CommentManagerInterface {
   protected $authenticatedCanPostComments;
 
   /**
-   * The user settings config object.
+   * The config factory.
    *
-   * @var \Drupal\Core\Config\Config
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $userConfig;
+  protected $configFactory;
 
   /**
    * The module handler service.
@@ -94,7 +94,7 @@ class CommentManager implements CommentManagerInterface {
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory, TranslationInterface $string_translation, ModuleHandlerInterface $module_handler, AccountInterface $current_user, EntityFieldManagerInterface $entity_field_manager, EntityDisplayRepositoryInterface $entity_display_repository) {
     $this->entityTypeManager = $entity_type_manager;
-    $this->userConfig = $config_factory->get('user.settings');
+    $this->configFactory = $config_factory;
     $this->stringTranslation = $string_translation;
     $this->moduleHandler = $module_handler;
     $this->currentUser = $current_user;
@@ -151,6 +151,7 @@ class CommentManager implements CommentManagerInterface {
    * {@inheritdoc}
    */
   public function forbiddenMessage(EntityInterface $entity, $field_name) {
+    $user_config = $this->configFactory->get('user.settings');
     if (!isset($this->authenticatedCanPostComments)) {
       // We only output a link if we are certain that users will get the
       // permission to post comments by logging in.
@@ -175,7 +176,7 @@ class CommentManager implements CommentManagerInterface {
         $destination = ['destination' => $entity->toUrl('canonical', ['fragment' => 'comment-form'])->toString()];
       }
 
-      if ($this->userConfig->get('register') != UserInterface::REGISTER_ADMINISTRATORS_ONLY) {
+      if ($user_config->get('register') != UserInterface::REGISTER_ADMINISTRATORS_ONLY) {
         // Users can register themselves.
         return $this->t('<a href=":login">Log in</a> or <a href=":register">register</a> to post comments', [
           ':login' => Url::fromRoute('user.login', [], ['query' => $destination])->toString(),
