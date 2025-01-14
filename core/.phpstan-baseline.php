@@ -12194,12 +12194,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block/tests/src/Kernel/BlockConfigSchemaTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^@covers value \\:\\:block_rebuild references an invalid method\\.$#',
-	'identifier' => 'phpunit.coversMethod',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/block/tests/src/Kernel/BlockRebuildTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Kernel\\\\Plugin\\\\migrate\\\\source\\\\BlockTest\\:\\:providerSource\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -24542,12 +24536,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/Kernel/DefaultsSectionStorageTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^@covers value layout_builder_entity_view_alter references an invalid class or function\\.$#',
-	'identifier' => 'phpunit.covers',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Kernel/EntityViewAlterTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Kernel\\\\FieldBlockTest\\:\\:providerTestBlockAccessEntityAllowedFieldHasValue\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -28082,18 +28070,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/MigrateEntityContentBaseTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^@dataProvider providerSource related method not found\\.$#',
-	'identifier' => 'phpunit.dataProviderMethod',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/MigrateSourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^@dataProvider providerSource related method not found\\.$#',
-	'identifier' => 'phpunit.dataProviderMethod',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/MigrateSqlSourceTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\MigrateSqlSourceTestBase\\:\\:register\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -30516,12 +30492,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeBlockFunctionalTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^@covers value node_local_tasks_alter references an invalid class or function\\.$#',
-	'identifier' => 'phpunit.covers',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeRevisionsUiTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeTestBase\\:\\:assertNodeAccess\\(\\) has no return type specified\\.$#',
@@ -42514,12 +42484,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/update/tests/src/Unit/ProjectCoreCompatibilityTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^@covers value \\\\update_mail references an invalid class or function\\.$#',
-	'identifier' => 'phpunit.covers',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/update/tests/src/Unit/UpdateMailTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function _update_authorize_clear_update_status\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -54326,30 +54290,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Kernel/WorkspaceInformationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^@covers value \\:\\:workspaces_entity_delete references an invalid method\\.$#',
-	'identifier' => 'phpunit.coversMethod',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Kernel/WorkspaceIntegrationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^@covers value \\:\\:workspaces_entity_insert references an invalid method\\.$#',
-	'identifier' => 'phpunit.coversMethod',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Kernel/WorkspaceIntegrationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^@covers value \\:\\:workspaces_entity_presave references an invalid method\\.$#',
-	'identifier' => 'phpunit.coversMethod',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Kernel/WorkspaceIntegrationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^@covers value \\:\\:workspaces_entity_revision_delete references an invalid method\\.$#',
-	'identifier' => 'phpunit.coversMethod',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Kernel/WorkspaceIntegrationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Kernel\\\\WorkspaceIntegrationTest\\:\\:assertWorkspaceAssociation\\(\\) has no return type specified\\.$#',
