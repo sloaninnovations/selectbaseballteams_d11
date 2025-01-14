@@ -35828,9 +35828,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/delay_cache_tags_invalidation/src/Hook/DelayCacheTagsInvalidationHooks.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to deprecated method method\\(\\) of class Drupal\\\\deprecation_test\\\\DeprecatedMethod\\:
+	'message' => '#^Call to deprecated method methodDeprecated\\(\\) of class Drupal\\\\deprecation_test\\\\DeprecatedMethod\\:
 in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
-  the deprecation message for DeprecatedMethod\\:\\:method\\(\\)\\.$#',
+  the deprecation message for DeprecatedMethod\\:\\:methodDeprecated\\(\\)\\.$#',
 	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/deprecation_test/src/DeprecatedController.php',

@@ -30,15 +30,15 @@ class PhpUnitBridgeTest extends BrowserTestBase {
    * Tests deprecation message from deprecation_test_function().
    */
   public function testSilencedError(): void {
-    $this->expectDeprecation('This is the deprecation message for \Drupal\deprecation_test\DeprecatedMethod::method().');
-    $this->assertEquals('known_return_value', DeprecatedMethod::method());
+    $this->expectDeprecation('This is the deprecation message for \Drupal\deprecation_test\DeprecatedMethod::methodDeprecated().');
+    $this->assertEquals('known_return_value', DeprecatedMethod::methodDeprecated());
   }
 
   /**
    * Tests deprecation message from deprecated route.
    */
   public function testErrorOnSiteUnderTest(): void {
-    $this->expectDeprecation('This is the deprecation message for \Drupal\deprecation_test\DeprecatedMethod::method().');
+    $this->expectDeprecation('This is the deprecation message for \Drupal\deprecation_test\DeprecatedMethod::methodDeprecated().');
     $this->drupalGet(Url::fromRoute('deprecation_test.route'));
   }
 
