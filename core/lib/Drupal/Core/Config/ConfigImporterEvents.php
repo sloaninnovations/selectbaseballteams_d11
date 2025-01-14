@@ -1,78 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Config;
 
 /**
- * Defines events for the configuration system.
+ * Defines events for working with a configuration importer.
  *
- * @see \Drupal\Core\Config\ConfigCrudEvent
+ * A config importer imports the changes into the configuration system. It fires
+ * events during import.
+ *
+ * @see \Drupal\Core\Config\ConfigImporter
+ * @see \Drupal\Core\Config\ImportStorageTransformer
+ * @see \Drupal\Core\Config\StorageManagerInterface
+ * @see \Drupal\Core\Config\ConfigImporterEvent
+ * @see \Drupal\Core\Config\StorageTransformEvent
  */
-final class ConfigEvents {
-
-  /**
-   * Name of the event fired when saving a configuration object.
-   *
-   * This event allows modules to perform an action whenever a configuration
-   * object is saved. The event listener method receives a
-   * \Drupal\Core\Config\ConfigCrudEvent instance.
-   *
-   * See hook_update_N() documentation for safe configuration API usage and
-   * restrictions as this event will be fired when configuration is saved by
-   * hook_update_N().
-   *
-   * @Event
-   *
-   * @see \Drupal\Core\Config\ConfigCrudEvent
-   * @see \Drupal\Core\Config\Config::save()
-   * @see \Drupal\Core\Config\ConfigFactory::onConfigSave()
-   * @see hook_update_N()
-   *
-   * @var string
-   */
-  const SAVE = 'config.save';
-
-  /**
-   * Name of the event fired when deleting a configuration object.
-   *
-   * This event allows modules to perform an action whenever a configuration
-   * object is deleted. The event listener method receives a
-   * \Drupal\Core\Config\ConfigCrudEvent instance.
-   *
-   * See hook_update_N() documentation for safe configuration API usage and
-   * restrictions as this event will be fired when configuration is deleted by
-   * hook_update_N().
-   *
-   * @Event
-   *
-   * @see \Drupal\Core\Config\ConfigCrudEvent
-   * @see \Drupal\Core\Config\Config::delete()
-   * @see \Drupal\Core\Config\ConfigFactory::onConfigDelete()
-   * @see hook_update_N()
-   *
-   * @var string
-   */
-  const DELETE = 'config.delete';
-
-  /**
-   * Name of the event fired when renaming a configuration object.
-   *
-   * This event allows modules to perform an action whenever a configuration
-   * object's name is changed. The event listener method receives a
-   * \Drupal\Core\Config\ConfigRenameEvent instance.
-   *
-   * See hook_update_N() documentation for safe configuration API usage and
-   * restrictions as this event will be fired when configuration is renamed by
-   * hook_update_N().
-   *
-   * @Event
-   *
-   * @see \Drupal\Core\Config\ConfigRenameEvent
-   * @see \Drupal\Core\Config\ConfigFactoryInterface::rename()
-   * @see hook_update_N()
-   *
-   * @var string
-   */
-  const RENAME = 'config.rename';
+final class ConfigImporterEvents {
 
   /**
    * Name of the event fired when validating imported configuration.
@@ -88,13 +32,8 @@ final class ConfigEvents {
    * @see \Drupal\Core\EventSubscriber\ConfigImportSubscriber::onConfigImporterValidate().
    *
    * @var string
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
-   *    Use \Drupal\Core\Config\ConfigImporterEvents::IMPORT_VALIDATE instead.
-   *
-   * @see https://www.drupal.org/node/3406105
    */
-  const IMPORT_VALIDATE = ConfigImporterEvents::IMPORT_VALIDATE;
+  const IMPORT_VALIDATE = 'config.importer.validate';
 
   /**
    * Name of the event fired when importing configuration to target storage.
@@ -110,13 +49,8 @@ final class ConfigEvents {
    * @see \Drupal\Core\EventSubscriber\ConfigSnapshotSubscriber::onConfigImporterImport().
    *
    * @var string
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
-   *    Use \Drupal\Core\Config\ConfigImporterEvents::IMPORT instead.
-   *
-   * @see https://www.drupal.org/node/3406105
    */
-  const IMPORT = ConfigImporterEvents::IMPORT;
+  const IMPORT = 'config.importer.import';
 
   /**
    * Name of event fired when missing content dependencies are detected.
@@ -132,14 +66,8 @@ final class ConfigEvents {
    *
    * @see \Drupal\Core\Config\ConfigImporter::processMissingContent()
    * @see \Drupal\Core\Config\Importer\MissingContentEvent
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
-   *    Use \Drupal\Core\Config\ConfigImporterEvents::IMPORT_MISSING_CONTENT
-   *    instead.
-   *
-   * @see https://www.drupal.org/node/3406105
    */
-  const IMPORT_MISSING_CONTENT = ConfigImporterEvents::IMPORT_MISSING_CONTENT;
+  const IMPORT_MISSING_CONTENT = 'config.importer.missing_content';
 
   /**
    * Name of the event fired just before importing configuration.
@@ -150,7 +78,7 @@ final class ConfigEvents {
    * config storage which subscribers can interact with and which will finally
    * be used to import the configuration from.
    * Together with
-   * Drupal\Core\Config\ConfigImporterEvents::STORAGE_TRANSFORM_EXPORT
+   * \Drupal\Core\Config\ConfigImporterEvents::STORAGE_TRANSFORM_EXPORT
    * subscribers can alter the active configuration in a config sync workflow
    * instead of just overriding at runtime via the config-override system.
    * This allows a complete customization of the workflow including additional
@@ -172,14 +100,8 @@ final class ConfigEvents {
    * @see \Drupal\Core\Config\ImportStorageTransformer::transform
    *
    * @var string
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
-   *    Use \Drupal\Core\Config\ConfigImporterEvents::STORAGE_TRANSFORM_IMPORT
-   *    instead.
-   *
-   * @see https://www.drupal.org/node/3406105
    */
-  const STORAGE_TRANSFORM_IMPORT = ConfigImporterEvents::STORAGE_TRANSFORM_IMPORT;
+  const STORAGE_TRANSFORM_IMPORT = 'config.transform.import';
 
   /**
    * Name of the event fired when the export storage is used.
@@ -196,7 +118,7 @@ final class ConfigEvents {
    *
    * Typically subscribers will want to perform the reverse operation on the
    * storage than for
-   * \Drupal\Core\Config\ConfigImporterEvents::STORAGE_TRANSFORM_IMPORT to make
+   * \Drupal\Core\Config\ConfigImporterEvents::STORAGE_TRANSFORM_IMPORT to
    * sure successive exports and imports yield no difference.
    *
    * @Event
@@ -206,13 +128,7 @@ final class ConfigEvents {
    * @see \Drupal\Core\Config\ExportStorageManager::getStorage
    *
    * @var string
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
-   *    Use \Drupal\Core\Config\ConfigImporterEvents::STORAGE_TRANSFORM_EXPORT
-   *    instead.
-   *
-   * @see https://www.drupal.org/node/3406105
    */
-  const STORAGE_TRANSFORM_EXPORT = ConfigImporterEvents::STORAGE_TRANSFORM_EXPORT;
+  const STORAGE_TRANSFORM_EXPORT = 'config.transform.export';
 
 }
