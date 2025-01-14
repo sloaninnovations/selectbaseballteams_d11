@@ -53,6 +53,12 @@ class EntityCreateAccessCheck implements AccessInterface {
   public function access(Route $route, RouteMatchInterface $route_match, AccountInterface $account) {
     [$entity_type, $bundle] = explode(':', $route->getRequirement($this->requirementsKey) . ':');
 
+    // For an entity type that has bundles, the $bundle must be specified.
+    $entity_type_definition = $this->entityTypeManager->getDefinition($entity_type);
+    if (empty($bundle) && $entity_type_definition && $entity_type_definition->hasKey('bundle')) {
+      throw new \Exception("The _entity_create_access route access requires a bundle parameter because the $entity_type entity type uses bundles.");
+    }
+
     // The bundle argument can contain request argument placeholders like
     // {name}, loop over the raw variables and attempt to replace them in the
     // bundle name. If a placeholder does not exist, it won't get replaced.
