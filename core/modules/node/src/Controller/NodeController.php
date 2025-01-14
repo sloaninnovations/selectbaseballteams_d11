@@ -157,7 +157,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     $header = [$this->t('Revision'), $this->t('Operations')];
 
     $rows = [];
-    $current_revision_displayed = FALSE;
+    $current_revision = $this->getCurrentRevisionId($node, $node_storage);
 
     foreach ($this->getRevisionIds($node, $node_storage) as $vid) {
       /** @var \Drupal\node\NodeInterface $revision */
@@ -173,17 +173,12 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
         // Use revision link to link to revisions that are not active.
         $date = $this->dateFormatter->format($revision->revision_timestamp->value, 'short');
 
-        // We treat also the latest translation-affecting revision as current
-        // revision, if it was the default revision, as its values for the
-        // current language will be the same of the current default revision in
-        // this case.
-        $is_current_revision = $revision->isDefaultRevision() || (!$current_revision_displayed && $revision->wasDefaultRevision());
+        $is_current_revision = $vid == $current_revision;
         if (!$is_current_revision) {
           $link = Link::fromTextAndUrl($date, new Url('entity.node.revision', ['node' => $node->id(), 'node_revision' => $vid]))->toString();
         }
         else {
           $link = $node->toLink($date)->toString();
-          $current_revision_displayed = TRUE;
         }
 
         $row = [];
@@ -294,6 +289,32 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
       ->pager(50)
       ->execute();
     return array_keys($result);
+  }
+
+  /**
+   * Gets the ID of the current revision for a specific node.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   The node entity.
+   * @param \Drupal\node\NodeStorageInterface $node_storage
+   *   The node storage handler.
+   *
+   * @return int|null
+   *   The current revision ID, if it exists.
+   */
+  protected function getCurrentRevisionId(NodeInterface $node, NodeStorageInterface $node_storage): int|null {
+    $result = $node_storage->getQuery()
+      ->accessCheck(FALSE)
+      ->allRevisions()
+      ->condition($node->getEntityType()->getKey('id'), $node->id())
+      ->condition($node->getEntityType()->getKey('langcode'), $node->language()->getId())
+      ->condition($node->getEntityType()->getKey('revision_translation_affected'), 1)
+      ->condition($node->getEntityType()->getRevisionMetadataKey('revision_default'), 1)
+      ->sort($node->getEntityType()->getKey('revision'), 'DESC')
+      ->range(0, 1)
+      ->execute();
+
+    return array_key_first($result);
   }
 
 }

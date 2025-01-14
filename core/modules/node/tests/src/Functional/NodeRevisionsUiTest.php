@@ -193,6 +193,34 @@ class NodeRevisionsUiTest extends NodeTestBase {
   }
 
   /**
+   * Test revisions pagination.
+   */
+  public function testPaginationRevisions(): void {
+    $this->drupalLogin($this->editor);
+
+    $revision_log = $this->randomMachineName(10);
+    $node = $this->drupalCreateNode(['revision_log' => $revision_log]);
+
+    // Create 51 revisions to generate paginated revisions.
+    $revision_count = 51;
+    for ($i = 0; $i < $revision_count; $i++) {
+      $node->setTitle($this->randomString());
+      $node->setRevisionLogMessage($i);
+      $node->setNewRevision();
+      $node->save();
+    }
+
+    $this->drupalGet('node/' . $node->id() . '/revisions');
+    $this->assertSession()->pageTextContains('Current revision');
+
+    $this->drupalGet('node/' . $node->id() . '/revisions', ['query' => ['page' => '1']]);
+    $this->assertSession()->addressEquals('node/' . $node->id() . '/revisions?page=1');
+    // Verify the first revision exists on page 1.
+    $this->assertSession()->linkByHrefExists('/node/' . $node->id() . '/revisions/1/revert');
+    $this->assertSession()->pageTextNotContains('Current revision');
+  }
+
+  /**
    * Checks the Revisions tab.
    *
    * Tests two 'Revisions' local tasks are not added by both Node and
