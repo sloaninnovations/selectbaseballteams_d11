@@ -315,8 +315,15 @@ class Renderer implements RendererInterface {
     ]);
 
     // If the default values for this element have not been loaded yet, populate
-    // them.
-    if (isset($elements['#type']) && empty($elements['#defaults_loaded'])) {
+    // them. This ensures that defaults are only loaded for elements without a
+    // specific theme set, preventing interference with customizations and avoiding
+    // potential infinite loops caused by repeatedly loading defaults for elements
+    // that have been modified in preprocessing functions.
+    // The condition checks if the element has a type set (indicating it's a form element)
+    // and if it doesn't have a specific theme set. This is crucial because elements
+    // with a specific theme set might have been customized elsewhere, and loading
+    // defaults for them could interfere with these customizations.
+    if ((isset($elements['#type']) && !isset($elements['#theme'])) && empty($elements['#defaults_loaded'])) {
       $elements += $this->elementInfo->getInfo($elements['#type']);
     }
 
