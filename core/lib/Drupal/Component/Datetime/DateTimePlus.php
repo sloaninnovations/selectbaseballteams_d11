@@ -207,7 +207,7 @@ class DateTimePlus {
       throw new \InvalidArgumentException('The timestamp must be numeric.');
     }
     $datetime = new static('', $timezone, $settings);
-    $datetime->setTimestamp($timestamp);
+    $datetime->setTimestamp((int) $timestamp);
     return $datetime;
   }
 
