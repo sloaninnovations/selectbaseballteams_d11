@@ -20,4 +20,11 @@ class UserNameUnique extends UniqueFieldConstraint {
    */
   public $message = 'The username %value is already taken.';
 
+  /**
+   * {@inheritdoc}
+   */
+  public function shouldIgnoreCase(): bool {
+    return TRUE;
+  }
+
 }
