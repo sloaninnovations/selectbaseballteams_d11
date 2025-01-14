@@ -345,20 +345,25 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * @see \Drupal\Core\Render\Element\FormElementBase::processPattern()
    */
   public static function validateAllowedValues($element, FormStateInterface $form_state) {
-    $items = array_filter(array_map(function ($item) use ($element) {
+    $items = array_map(function ($item) use ($element) {
       $current_element = $element['table'][$item];
-      if ($current_element['item']['key']['#value'] !== NULL && $current_element['item']['label']['#value']) {
-        return $current_element['item']['key']['#value'] . '|' . $current_element['item']['label']['#value'];
+      $key = $current_element['item']['key']['#value'];
+      $label = $current_element['item']['label']['#value'];
+
+      if ($key !== NULL && $label) {
+        return "$key|$label";
       }
-      elseif ($current_element['item']['key']['#value']) {
-        return $current_element['item']['key']['#value'];
+      elseif ($key) {
+        return $key;
       }
-      elseif ($current_element['item']['label']['#value']) {
-        return $current_element['item']['label']['#value'];
+      elseif ($label) {
+        return $label;
       }
 
       return NULL;
-    }, Element::children($element['table'])), function ($item) {
+    }, Element::children($element['table']));
+
+    $items = array_filter($items, function ($item) {
       return $item;
     });
     if ($reordered_items = $form_state->getValue([...$element['#parents'], 'table'])) {
