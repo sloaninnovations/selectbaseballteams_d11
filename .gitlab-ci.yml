@@ -374,8 +374,8 @@ default:
         echo "Generating an PHPStan baseline file (available as job artifact)."
         cp $CI_PROJECT_DIR/.gitlab-ci/scripts/.empty-phpstan-baseline.php ./core/.phpstan-baseline.php
         php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress --generate-baseline=$CI_PROJECT_DIR/core/.phpstan-baseline.php || true
-        sed -i --debug "s#__DIR__ \. \'\/\/build\/core\/#__DIR__ . '/#g" $CI_PROJECT_DIR/core/.phpstan-baseline.php
-        sed -i --debug "s#__DIR__ \. \'\/\/build\/#__DIR__ . '/../#g" $CI_PROJECT_DIR/core/.phpstan-baseline.php
+        #sed -i "s#__DIR__ \. \'\/\/build\/core\/#__DIR__ . '/#g" $CI_PROJECT_DIR/core/.phpstan-baseline.php
+        #sed -i "s#__DIR__ \. \'\/\/build\/#__DIR__ . '/../#g" $CI_PROJECT_DIR/core/.phpstan-baseline.php
         exit $EXIT_CODE
       fi
 
@@ -386,7 +386,7 @@ default:
       codequality: phpstan-quality-report.json
       junit: phpstan-junit.xml
     paths:
-      - core/.phpstan-baseline.php
+      - $CI_PROJECT_DIR/core/.phpstan-baseline.php
 
 '🧹 PHP Coding standards (PHPCS)':
   <<: [ *default-job-settings-lint ]
