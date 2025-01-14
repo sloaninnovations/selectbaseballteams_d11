@@ -17,7 +17,7 @@ foreach ($ignoreErrors as $ignore) {
   $identifier = $ignore['identifier'] ?? '* not specified *';
   $count = $ignore['count'] ?? 1;
   $stats['__total'] += $count;
-  $stats[$identifier] = isset($stats[$identifier]) ? $stats[$ignore['identifier']] + $count : $count;
+  $stats[$identifier] = isset($stats[$identifier]) ? $stats[$identifier] + $count : $count;
 }
 
 echo "----------------------------------------\n";
