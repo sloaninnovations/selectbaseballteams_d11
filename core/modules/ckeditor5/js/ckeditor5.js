@@ -585,6 +585,52 @@
      */
     saveCallback: null,
 
+    
+    callbacks,
+
+    /**
+     * Select CKEditor 5 plugin classes to include.
+     *
+     * Found in the CKEditor 5 global JavaScript object as {package.Class}.
+     *
+     * @param {Array} plugins
+     *  List of package and Class name of plugins
+     *
+     * @return {Array}
+     *   List of JavaScript Classes to add in the extraPlugins property of config.
+     */
+    selectPlugins(plugins) {
+      return selectPlugins(plugins);
+    },
+
+    /**
+     * Casts configuration items to correct types.
+     *
+     * @param {Object} config
+     *   The config object.
+     * @return {Object}
+     *   The config object with items transformed to correct type.
+     */
+
+    processConfig(config) {
+      return processConfig(config);
+    },
+
+    /**
+     * Set an id to a data-attribute for registering this element instance.
+     *
+     * @param {Element} element
+     *   An element that should receive unique ID.
+     *
+     * @return {string}
+     *   The id to use for this element.
+     */
+
+    setElementId($element) {
+      return setElementId($element);
+    },
+
+
     /**
      * Open a dialog for a Drupal-based plugin.
      *
