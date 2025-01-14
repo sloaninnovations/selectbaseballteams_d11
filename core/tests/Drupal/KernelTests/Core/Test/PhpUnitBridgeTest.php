@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Test;
 
+use Drupal\deprecation_test\DeprecatedMethod;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\deprecation_test\Deprecation\FixtureDeprecatedClass;
 
@@ -27,8 +28,8 @@ class PhpUnitBridgeTest extends KernelTestBase {
   }
 
   public function testDeprecatedFunction(): void {
-    $this->expectDeprecation('This is the deprecation message for deprecation_test_function().');
-    $this->assertEquals('known_return_value', \deprecation_test_function());
+    $this->expectDeprecation('This is the deprecation message for \Drupal\deprecation_test\DeprecatedMethod::deprecatedMethod().');
+    $this->assertEquals('known_return_value', DeprecatedMethod::deprecatedMethod());
   }
 
 }

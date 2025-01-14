@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Test;
 
+use Drupal\deprecation_test\DeprecatedMethod;
 use Drupal\Tests\UnitTestCase;
 use Drupal\deprecation_test\Deprecation\FixtureDeprecatedClass;
 
@@ -24,9 +25,11 @@ class PhpUnitBridgeTest extends UnitTestCase {
     $this->assertEquals('test', $deprecated->testFunction());
   }
 
+  /**
+   * Tests function deprecation.
+   */
   public function testDeprecatedFunction(): void {
-    $this->markTestIncomplete('Modules are not loaded for unit tests, so deprecated_test_function() will not be available.');
-    $this->assertEquals('known_return_value', \deprecation_test_function());
+    $this->assertEquals('known_return_value', DeprecatedMethod::deprecatedMethod());
   }
 
 }
