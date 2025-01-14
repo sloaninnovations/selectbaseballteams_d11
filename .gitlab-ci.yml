@@ -372,6 +372,7 @@ default:
         php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress || true
         # Generate a new baseline.
         echo "Generating an PHPStan baseline file (available as job artifact)."
+        rm $CI_PROJECT_DIR/core/.phpstan-baseline.php
         php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress --generate-baseline=$CI_PROJECT_DIR/core/.phpstan-baseline.php || true
         exit $EXIT_CODE
       fi
