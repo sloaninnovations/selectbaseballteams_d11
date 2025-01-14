@@ -40,6 +40,9 @@ global-styling:
       css/components/layout-field.css: {}
       css/components/messages.css: {}
       css/components/navigation/nav-button-mobile.css: {}
+      css/components/navigation/nav-primary.css: {}
+      css/components/navigation/nav-primary-button.css: {}
+      css/components/navigation/nav-primary-wide.css: {}
       css/components/node.css: {}
       css/components/node-teaser.css: {}
       css/components/page-title.css: {}
@@ -52,6 +55,9 @@ global-styling:
 
   js:
     js/checkbox.js: {}
+    js/navigation.js: {}
+    js/second-level-navigation.js: {}
+    js/nav-resize.js: {}
 
   dependencies:
     - core/drupal
@@ -209,20 +215,6 @@ navigation-base:
     - core/drupal
     - core/once
     - core/tabbable
-
-navigation-primary:
-  version: VERSION
-  css:
-    component:
-      css/components/navigation/nav-primary.css: {}
-      css/components/navigation/nav-primary-button.css: {}
-      css/components/navigation/nav-primary-wide.css: {}
-  js:
-    js/navigation.js: {}
-    js/second-level-navigation.js: {}
-    js/nav-resize.js: {}
-  dependencies:
-    - olivero/navigation-base
 
 navigation-secondary:
   version: VERSION
