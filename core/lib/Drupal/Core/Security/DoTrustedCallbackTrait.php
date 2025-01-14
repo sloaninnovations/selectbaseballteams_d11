@@ -63,6 +63,12 @@ trait DoTrustedCallbackTrait {
     elseif (is_string($callback) && str_contains($callback, '::')) {
       [$object_or_classname, $method_name] = explode('::', $callback, 2);
     }
+    elseif ($callback instanceof \Closure) {
+      $safe_callback = TRUE;
+    }
+    elseif (is_object($callback)) {
+      $method_name = '__invoke';
+    }
 
     if (isset($method_name)) {
       if ($extra_trusted_interface && is_subclass_of($object_or_classname, $extra_trusted_interface)) {
@@ -82,16 +88,13 @@ trait DoTrustedCallbackTrait {
         $safe_callback = (bool) $method->getAttributes(TrustedCallback::class);
       }
     }
-    elseif ($callback instanceof \Closure) {
-      $safe_callback = TRUE;
-    }
 
     if (!$safe_callback) {
       $description = $object_or_classname;
       if (is_object($description)) {
         $description = get_class($description);
       }
-      if (isset($method_name)) {
+      if (isset($method_name) && !is_object($callback)) {
         $description .= '::' . $method_name;
       }
       $message = sprintf($message, $description);

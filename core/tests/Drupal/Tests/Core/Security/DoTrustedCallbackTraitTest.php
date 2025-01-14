@@ -43,6 +43,7 @@ class DoTrustedCallbackTraitTest extends UnitTestCase {
     $tests['extra_trusted_interface_object'] = [[new TrustedObject(), 'callback'], TrustedInterface::class];
     $tests['extra_trusted_interface_static_string'] = ['\Drupal\Tests\Core\Security\TrustedObject::callback', TrustedInterface::class];
     $tests['extra_trusted_interface_static_array'] = [[TrustedObject::class, 'callback'], TrustedInterface::class];
+    $tests['invokable_trusted_object'] = [new InvokableTrustedObject(), TrustedInterface::class];
     return $tests;
   }
 
@@ -113,6 +114,15 @@ class TrustedObject implements TrustedInterface {
 class UntrustedObject {
 
   public static function callback() {
+    return 'test';
+  }
+
+}
+
+class InvokableTrustedObject {
+
+  #[TrustedCallback]
+  public function __invoke(): string {
     return 'test';
   }
 
