@@ -35828,6 +35828,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/delay_cache_tags_invalidation/src/Hook/DelayCacheTagsInvalidationHooks.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method method\\(\\) of class Drupal\\\\deprecation_test\\\\DeprecatedMethod\\:
+in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
+  the deprecation message for DeprecatedMethod\\:\\:method\\(\\)\\.$#',
+	'identifier' => 'staticMethod.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '//build/core/modules/system/tests/modules/deprecation_test/src/DeprecatedController.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\destructable_test\\\\Destructable\\:\\:destruct\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
