@@ -128,24 +128,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/assets/scaffold/files/default.settings.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "autoload\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/assets/scaffold/files/index.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "autoload\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/assets/scaffold/files/update.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "autoload\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/authorize.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function _batch_current_set\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3048,12 +3030,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Command/DbImportCommand.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "core/includes/install\\.core\\.inc" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Command/InstallCommand.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Command\\\\ServerCommand\\:\\:openBrowser\\(\\) has no return type specified\\.$#',
@@ -34670,18 +34646,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/system.post_update.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "autoload\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/http.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "autoload\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/https.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\accept_header_routing_test\\\\AcceptHeaderRoutingTestServiceProvider\\:\\:alter\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -55300,12 +55264,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Config/DefaultConfigTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "core/modules/system/system\\.module" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Config/Schema/MappingTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Action\\\\EmailActionTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -56806,18 +56764,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Form/TriggeringElementProgrammedTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Path in include_once\\(\\) "core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/src/Hook/ModuleHandlerTestAll1Hooks\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'includeOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Hook/HookCollectorPassTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "core/includes/install\\.inc" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Installer/InstallerLanguageTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\KeyValueStore\\\\StorageTestBase\\:\\:createStorage\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -57398,12 +57344,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteInstallCommand.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require\\(\\) "autoload\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'require.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteUserLoginCommand.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\TestSite\\\\TestPreinstallInterface\\:\\:preinstall\\(\\) has no return type specified\\.$#',
