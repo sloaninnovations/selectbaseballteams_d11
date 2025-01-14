@@ -35,7 +35,7 @@ class ListFloatItem extends ListItemBase {
       ->setLabel(new TranslatableMarkup('Float value'))
       ->setRequired(TRUE);
 
-    return $properties;
+    return $properties + parent::propertyDefinitions($field_definition);
   }
 
   /**

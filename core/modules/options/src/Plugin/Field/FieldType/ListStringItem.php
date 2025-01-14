@@ -36,7 +36,7 @@ class ListStringItem extends ListItemBase {
       ->addConstraint('Length', ['max' => 255])
       ->setRequired(TRUE);
 
-    return $properties;
+    return $properties + parent::propertyDefinitions($field_definition);
   }
 
   /**
