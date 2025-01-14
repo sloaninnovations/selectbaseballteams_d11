@@ -86,7 +86,7 @@ class ShortcutCacheTagsTest extends EntityCacheTagsTestBase {
    * Tests that when creating a shortcut, the shortcut set tag is invalidated.
    */
   public function testEntityCreation(): void {
-    $cache_bin = $this->getRenderCacheBackend();
+    $cache_bin = $this->getDefaultCacheBackend();
 
     // Create a cache entry that is tagged with a shortcut set cache tag.
     $cache_tags = ['config:shortcut.set.default'];
@@ -96,7 +96,7 @@ class ShortcutCacheTagsTest extends EntityCacheTagsTestBase {
     $cache_bin->set(['foo'], 'bar', $cacheability, $cacheability);
 
     // Verify a cache hit.
-    $this->verifyRenderCache(['foo'], $cache_tags, $cacheability);
+    $this->verifyCache(['foo'], $cache_tags, $cacheability);
 
     // Now create a shortcut entity in that shortcut set.
     $this->createEntity();

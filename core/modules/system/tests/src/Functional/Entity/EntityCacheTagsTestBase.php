@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Functional\Entity;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\VariationCacheInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -641,6 +642,39 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
     /** @var \Drupal\Core\Cache\VariationCacheFactoryInterface $variation_cache_factory */
     $variation_cache_factory = \Drupal::service('variation_cache_factory');
     return $variation_cache_factory->get('render');
+  }
+
+  /**
+   * Retrieves the default cache backend as a variation cache.
+   *
+   * @return \Drupal\Core\Cache\VariationCacheInterface
+   *   The cache backend as a variation cache.
+   */
+  protected function getDefaultCacheBackend(): VariationCacheInterface {
+    /** @var \Drupal\Core\Cache\VariationCacheFactoryInterface $variation_cache_factory */
+    $variation_cache_factory = \Drupal::service('variation_cache_factory');
+    return $variation_cache_factory->get('default');
+  }
+
+  /**
+   * Verify that a given render cache entry exists, with the correct cache tags.
+   *
+   * @param string[] $keys
+   *   The cache item keys.
+   * @param array $tags
+   *   An array of expected cache tags.
+   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
+   *   The initial cacheability for the item.
+   */
+  protected function verifyCache(array $keys, array $tags, CacheableDependencyInterface $cacheability): void {
+    $cache_bin = $this->getDefaultCacheBackend();
+
+    // Also verify the existence of an entity render cache entry.
+    $cache_entry = $cache_bin->get($keys, $cacheability);
+    $this->assertInstanceOf(\stdClass::class, $cache_entry);
+    sort($cache_entry->tags);
+    sort($tags);
+    $this->assertSame($cache_entry->tags, $tags);
   }
 
 }
