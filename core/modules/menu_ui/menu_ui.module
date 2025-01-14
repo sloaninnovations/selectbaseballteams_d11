@@ -21,12 +21,14 @@ function _menu_ui_node_save(NodeInterface $node, array $values) {
   /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
   if (!empty($values['entity_id'])) {
     $entity = MenuLinkContent::load($values['entity_id']);
-    if ($entity->isTranslatable() && $node->isTranslatable()) {
-      if (!$entity->hasTranslation($node->language()->getId())) {
-        $entity = $entity->addTranslation($node->language()->getId(), $entity->toArray());
-      }
-      else {
-        $entity = $entity->getTranslation($node->language()->getId());
+    if (isset($entity)) {
+      if ($entity->isTranslatable() && $node->isTranslatable()) {
+        if (!$entity->hasTranslation($node->language()->getId())) {
+          $entity = $entity->addTranslation($node->language()->getId(), $entity->toArray());
+        }
+        else {
+          $entity = $entity->getTranslation($node->language()->getId());
+        }
       }
     }
     else {
@@ -43,13 +45,15 @@ function _menu_ui_node_save(NodeInterface $node, array $values) {
     ]);
     $entity->enabled->value = 1;
   }
-  $entity->title->value = trim($values['title']);
-  $entity->description->value = trim($values['description']);
-  $entity->menu_name->value = $values['menu_name'];
-  $entity->parent->value = $values['parent'];
-  $entity->weight->value = $values['weight'] ?? 0;
-  $entity->isDefaultRevision($node->isDefaultRevision());
-  $entity->save();
+  if (isset($entity)) {
+    $entity->title->value = trim($values['title']);
+    $entity->description->value = trim($values['description']);
+    $entity->menu_name->value = $values['menu_name'];
+    $entity->parent->value = $values['parent'];
+    $entity->weight->value = $values['weight'] ?? 0;
+    $entity->isDefaultRevision($node->isDefaultRevision());
+    $entity->save();
+  }
 }
 
 /**
