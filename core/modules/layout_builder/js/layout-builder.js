@@ -164,6 +164,7 @@
         (region) => {
           Sortable.create(region, {
             draggable: '.js-layout-builder-block',
+            filter: '.contextual',
             ghostClass: 'ui-state-drop',
             group: 'builder-region',
             filter: '.contextual',
