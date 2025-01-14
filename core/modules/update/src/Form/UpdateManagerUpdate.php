@@ -7,6 +7,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Extension\ExtensionVersion;
@@ -160,10 +161,24 @@ class UpdateManagerUpdate extends FormBase {
       ];
 
       // Create an entry for this project.
+      $diff_url = Url::fromUri(strtr(Settings::get('update.diff_url', 'https://git.drupalcode.org/project/@project/-/compare/@existing_version...@recommended_version'), [
+        '@project' => $project['name'],
+        '@existing_version' => $project['existing_version'],
+        '@recommended_version' => $project['recommended'],
+      ]), [
+        'attributes' => [
+          'title' => $this->t('Compare code changes between @existing_version and @recommended_version for @project_title', [
+            '@existing_version' => $project['existing_version'],
+            '@recommended_version' => $project['recommended'],
+            '@project_title' => $project['title'],
+          ]),
+        ],
+      ]);
       $entry = [
         'title' => $project_name,
         'installed_version' => $project['existing_version'],
         'recommended_version' => ['data' => $recommended_version],
+        'compare_changes' => ['data' => Link::fromTextAndUrl($this->t('Compare'), $diff_url)],
       ];
 
       switch ($project['status']) {
@@ -268,6 +283,7 @@ class UpdateManagerUpdate extends FormBase {
       ],
       'installed_version' => $this->t('Site version'),
       'recommended_version' => $this->t('Recommended version'),
+      'compare_changes' => $this->t('Compare changes'),
     ];
 
     if (!empty($projects['installed'])) {
