@@ -3,6 +3,7 @@ services:
     autoconfigure: true
   access_check.cron:
     class: Drupal\system\Access\CronAccessCheck
+    arguments: ['@logger.channel.cron', '@state']
     tags:
       - { name: access_check, applies_to: _access_system_cron }
   access_check.db_update:
