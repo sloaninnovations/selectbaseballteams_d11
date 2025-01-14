@@ -203,7 +203,7 @@ class SqlBaseTest extends MigrateTestBase {
   /**
    * Tests prepare query method.
    */
-  public function testPrepareQuery() {
+  public function testPrepareQuery(): void {
     $this->prepareSourceData();
     $this->enableModules(['migrate_sql_prepare_query_test', 'entity_test']);
 
@@ -230,7 +230,7 @@ class SqlBaseTest extends MigrateTestBase {
   /**
    * Creates a custom source table and some sample data.
    */
-  protected function prepareSourceData() {
+  protected function prepareSourceData(): void {
     // Create a custom source table and some sample data.
     $this->sourceDatabase->schema()->createTable('migrate_source_test', [
       'fields' => [
