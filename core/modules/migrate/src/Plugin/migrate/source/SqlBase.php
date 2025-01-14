@@ -133,7 +133,7 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
    *   The query string.
    */
   public function __toString() {
-    return (string) $this->query();
+    return (string) $this->prepareQuery();
   }
 
   /**
@@ -383,7 +383,13 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
   }
 
   /**
+   * Prepares query object to retrieve data from the source database.
+   *
+   * This method should not be called directly, but will be called
+   * automatically from SqlBase::prepareQuery().
+   *
    * @return \Drupal\Core\Database\Query\SelectInterface
+   *   A Select query object with the source data.
    */
   abstract public function query();
 
@@ -391,7 +397,7 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
    * Gets the source count using countQuery().
    */
   protected function doCount() {
-    return (int) $this->query()->countQuery()->execute()->fetchField();
+    return (int) $this->prepareQuery()->countQuery()->execute()->fetchField();
   }
 
   /**
