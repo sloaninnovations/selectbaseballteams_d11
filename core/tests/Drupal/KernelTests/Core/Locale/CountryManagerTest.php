@@ -32,4 +32,13 @@ class CountryManagerTest extends KernelTestBase {
     self::assertSame('Elbonia', $countries['EB']);
   }
 
+  /**
+   * Tests that function iso2ToIso3() works as expected.
+   */
+  public function testTwoCodeToAlphaThreeCode(): void {
+    $iso3Codes = $this->container->get('country_manager')->iso2ToIso3();
+    self::assertArrayHasKey('AC', $iso3Codes);
+    self::assertSame($iso3Codes['AC'], 'ASC');
+  }
+
 }
