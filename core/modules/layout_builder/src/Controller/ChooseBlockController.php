@@ -10,6 +10,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\layout_builder\Context\LayoutBuilderContextTrait;
+use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\layout_builder\LayoutBuilderHighlightTrait;
 use Drupal\layout_builder\SectionStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -182,7 +183,18 @@ class ChooseBlockController implements ContainerInjectionInterface {
     $build = [];
     $inline_blocks_category = (string) $this->t('Inline blocks');
     if (isset($blocks[$inline_blocks_category])) {
-      $build['links'] = $this->getBlockLinks($section_storage, $delta, $region, $blocks[$inline_blocks_category]);
+      $available_inline_blocks_category = $blocks[$inline_blocks_category];
+      if ($section_storage->getContextValue('display') instanceof LayoutBuilderEntityViewDisplay) {
+        /** @var \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay $context_display */
+        $context_display = $section_storage->getContextValue('display');
+        if ($context_display->getTargetEntityTypeId() === 'block_content') {
+          // Remove in-progress editing layout inline_block.
+          $discard_bundle = 'inline_block:' . $context_display->getTargetBundle();
+          unset($available_inline_blocks_category[$discard_bundle]);
+        }
+      }
+
+      $build['links'] = $this->getBlockLinks($section_storage, $delta, $region, $available_inline_blocks_category);
       $build['links']['#attributes']['class'][] = 'inline-block-list';
       foreach ($build['links']['#links'] as &$link) {
         $link['attributes']['class'][] = 'inline-block-list__item';
