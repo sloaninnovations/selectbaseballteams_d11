@@ -24,6 +24,7 @@ use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use Drupal\TestTools\TestVarDumper;
 use GuzzleHttp\Cookie\CookieJar;
+use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -204,6 +205,16 @@ abstract class BrowserTestBase extends TestCase {
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
     VarDumper::setHandler(TestVarDumper::class . '::cliHandler');
+  }
+
+  /**
+   * Ensure skipped tests do not run setUp() as it is expensive.
+   */
+  #[After]
+  public function ensureSkippedTestsDoNotRunSetUp(): void {
+    if (isset($this->container) && $this->status()->isSkipped()) {
+      $this->fail('Skipped tests should avoid calling setUp() as it is expensive.');
+    }
   }
 
   /**
