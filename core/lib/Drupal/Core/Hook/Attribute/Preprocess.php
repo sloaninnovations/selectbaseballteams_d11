@@ -11,6 +11,9 @@ namespace Drupal\Core\Hook\Attribute;
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Preprocess extends Hook {
+  /**
+   * {@inheritdoc}
+   */
   public const string PREFIX = 'preprocess';
 
   /**

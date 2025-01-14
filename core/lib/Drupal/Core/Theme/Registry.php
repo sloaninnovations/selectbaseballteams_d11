@@ -460,11 +460,6 @@ class Registry implements DestructableInterface {
     // @todo Implement more reduction of the theme registry entry.
     // Optimize the registry to not have empty arrays for functions.
     foreach ($cache as $hook => $info) {
-      // @todo Remove this: template_preprocess exists and is present for every
-      // hook.
-      if (empty($info['preprocess functions'])) {
-        unset($cache[$hook]['preprocess functions']);
-      }
     }
     $this->registry[$this->theme->getName()] = $cache;
 
