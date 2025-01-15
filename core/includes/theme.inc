@@ -8,7 +8,6 @@
  * customized by user themes.
  */
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Url;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Crypt;
@@ -1067,7 +1066,6 @@ function template_preprocess_maintenance_task_list(&$variables): void {
  *   directly in \Drupal\Core\Theme\ThemeManager.
  *
  * @see https://www.drupal.org/node/2340341
- *
  */
 function template_preprocess(&$variables, $hook, $info) {
   $themeManager = \Drupal::service('theme.manager');
