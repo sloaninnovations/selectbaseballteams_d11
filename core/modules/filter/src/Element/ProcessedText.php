@@ -26,6 +26,7 @@ class ProcessedText extends RenderElementBase {
       '#text' => '',
       '#format' => NULL,
       '#filter_types_to_skip' => [],
+      '#filters_to_skip' => [],
       '#langcode' => '',
       '#pre_render' => [
         [$class, 'preRenderText'],
@@ -66,6 +67,7 @@ class ProcessedText extends RenderElementBase {
   public static function preRenderText($element) {
     $format_id = $element['#format'];
     $filter_types_to_skip = $element['#filter_types_to_skip'];
+    $filters_to_skip = $element['#filters_to_skip'];
     $text = $element['#text'];
     $langcode = $element['#langcode'];
 
@@ -88,11 +90,12 @@ class ProcessedText extends RenderElementBase {
       return $element;
     }
 
-    $filter_must_be_applied = function (FilterInterface $filter) use ($filter_types_to_skip) {
+    $filter_must_be_applied = function (FilterInterface $filter) use ($filter_types_to_skip, $filters_to_skip) {
       $enabled = $filter->status === TRUE;
       $type = $filter->getType();
+      $filter_id = $filter->getPluginId();
       // Prevent FilterInterface::TYPE_HTML_RESTRICTOR from being skipped.
-      $filter_type_must_be_applied = $type == FilterInterface::TYPE_HTML_RESTRICTOR || !in_array($type, $filter_types_to_skip);
+      $filter_type_must_be_applied = $type == FilterInterface::TYPE_HTML_RESTRICTOR || (!in_array($type, $filter_types_to_skip) && !in_array($filter_id, $filters_to_skip));
       return $enabled && $filter_type_must_be_applied;
     };
 
