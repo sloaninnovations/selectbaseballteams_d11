@@ -80,7 +80,7 @@ class EntityRepositoryTest extends UnitTestCase {
         }
         return $candidates;
       })
-      ->shouldBeCalledTimes(1);
+      ->shouldBeCalledTimes(2);
 
     $translated_entity = $this->prophesize(ContentEntityInterface::class);
 
@@ -95,6 +95,11 @@ class EntityRepositoryTest extends UnitTestCase {
 
     $this->assertSame($entity->reveal(), $this->entityRepository->getTranslationFromContext($entity->reveal()));
     $this->assertSame($translated_entity->reveal(), $this->entityRepository->getTranslationFromContext($entity->reveal(), 'custom_langcode'));
+
+    // Testing with strict fallback mode, when the function should return NULL
+    // if the translation and suitable fallbacks are really missing.
+    $entity->hasTranslation('custom_langcode')->willReturn(FALSE);
+    $this->assertNull($this->entityRepository->getTranslationFromContext($entity->reveal(), 'custom_langcode', ['strict_fallback' => TRUE]));
   }
 
 }
