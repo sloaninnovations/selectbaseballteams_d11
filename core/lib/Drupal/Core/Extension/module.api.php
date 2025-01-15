@@ -64,6 +64,16 @@ use Drupal\Core\Utility\UpdateException;
  *
  * Only procedural implementations are supported for this hook.
  *
+ * Support for this hook will be removed in Drupal 12.0.0.
+ * This hook has intentionally not been deprecated since removing
+ * implementations will break modules with code in $module.$group.inc files.
+ *
+ * $module.$group.inc themselves have been deprecated so modules supporting
+ * drupal 12.0.0 will have removed all code from $module.$group.inc files.
+ *
+ * Once a module supports 12.0.0 as a minimum version of Drupal the module can
+ * safely remove hook_hook_info implementations.
+ *
  * Normally hooks do not need to be explicitly defined. However, by declaring a
  * hook explicitly, a module may define a "group" for it. Modules that implement
  * a hook may then place their implementation in either $module.module or in
