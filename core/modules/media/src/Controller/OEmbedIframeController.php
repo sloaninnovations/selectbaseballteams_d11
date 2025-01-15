@@ -136,6 +136,7 @@ class OEmbedIframeController implements ContainerInjectionInterface {
     $url = $request->query->get('url');
     $max_width = $request->query->getInt('max_width');
     $max_height = $request->query->getInt('max_height');
+    $view_mode = $request->query->get('view_mode');
 
     // Hash the URL and max dimensions, and ensure it is equal to the hash
     // parameter passed in the query string.
@@ -168,6 +169,7 @@ class OEmbedIframeController implements ContainerInjectionInterface {
         // because we are serving it in an iframe, which will mitigate the
         // potential dangers of displaying third-party markup.
         '#media' => IFrameMarkup::create($resource->getHtml()),
+        '#view_mode' => $view_mode,
         '#cache' => [
           // Add the 'rendered' cache tag as this response is not processed by
           // \Drupal\Core\Render\MainContent\HtmlRenderer::renderResponse().

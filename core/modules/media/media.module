@@ -82,6 +82,7 @@ function media_theme() {
       'variables' => [
         'resource' => NULL,
         'media' => NULL,
+        'view_mode' => NULL,
         'placeholder_token' => '',
       ],
     ],

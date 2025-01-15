@@ -210,6 +210,7 @@ class OEmbedFormatter extends FormatterBase {
             'url' => $value,
             'max_width' => $max_width,
             'max_height' => $max_height,
+            'view_mode' => $this->viewMode,
             'hash' => $this->iFrameUrlHelper->getHash($value, $max_width, $max_height),
           ],
         ]);
