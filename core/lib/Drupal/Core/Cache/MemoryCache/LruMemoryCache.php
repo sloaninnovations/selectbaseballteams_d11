@@ -22,12 +22,11 @@ class LruMemoryCache extends MemoryCache {
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    * @param int $allowedSlots
-   *   (optional) The number of slots to allocate for items in the cache.
-   *   Defaults to 300.
+   *   The number of slots to allocate for items in the cache.
    */
   public function __construct(
     TimeInterface $time,
-    protected readonly int $allowedSlots = 300,
+    protected readonly int $allowedSlots,
   ) {
     parent::__construct($time);
   }
