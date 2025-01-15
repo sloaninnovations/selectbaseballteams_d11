@@ -455,11 +455,6 @@ class Registry implements DestructableInterface {
     // Let modules and themes alter the registry.
     $this->moduleHandler->alter('theme_registry', $cache);
     $this->themeManager->alterForTheme($this->theme, 'theme_registry', $cache);
-
-    // @todo Implement more reduction of the theme registry entry.
-    // Optimize the registry to not have empty arrays for functions.
-    foreach ($cache as $hook => $info) {
-    }
     $this->registry[$this->theme->getName()] = $cache;
 
     return $this->registry[$this->theme->getName()];
