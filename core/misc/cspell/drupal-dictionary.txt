@@ -19,7 +19,6 @@ drush
 fapi
 fieldable
 groupwise
-itok
 jswebassert
 keyvalue
 langcode

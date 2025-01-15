@@ -204,7 +204,6 @@ français
 fraîche
 frontpage
 fudgy
-fulldata
 fulltext
 gabilondo
 gids
@@ -599,3 +598,4 @@ zoneinfo
 zoomin
 zoomout
 zxvf
+itok
