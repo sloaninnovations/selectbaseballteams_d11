@@ -508,6 +508,6 @@ function views_field_default_views_data(FieldStorageConfigInterface $field_stora
  * @see https://www.drupal.org/node/3489411
  */
 function views_entity_field_label($entity_type, $field_name) {
-  @trigger_error("views_entity_field_label() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal::service('entity_field.manager')->getFieldLabels(). See https://www.drupal.org/node/2317841", E_USER_DEPRECATED);
+  @trigger_error("views_entity_field_label() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal::service('entity_field.manager')->getFieldLabels(). See https://www.drupal.org/node/3489411", E_USER_DEPRECATED);
   return \Drupal::service('entity_field.manager')->getFieldLabels($entity_type, $field_name);
 }
