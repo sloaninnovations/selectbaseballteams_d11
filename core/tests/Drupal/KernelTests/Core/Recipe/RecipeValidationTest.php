@@ -211,7 +211,7 @@ YAML,
 name: 'Unknown extensions'
 install:
   - config test
-  - drupal:color
+  - color
 YAML,
       [
         '[install][0]' => ['"config test" is not a known module or theme.'],
@@ -223,7 +223,7 @@ YAML,
 name: 'Only installs extensions'
 install:
   - filter
-  - drupal:claro
+  - claro
 YAML,
       NULL,
     ];
