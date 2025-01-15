@@ -260,7 +260,7 @@ final class NavigationRenderer {
     ];
     // For now, we're only interested in local tasks corresponding to a content
     // entity.
-    if (!$this->entityRouteHelper->meetsContentEntityRoutesCondition()) {
+    if (!$this->entityRouteHelper->isContentEntityRoute()) {
       return $this->localTasks;
     }
     $entity_local_tasks = $this->localTaskManager->getLocalTasks($this->routeMatch->getRouteName());

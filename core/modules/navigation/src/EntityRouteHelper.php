@@ -50,8 +50,22 @@ class EntityRouteHelper {
    * @return bool
    *   TRUE if the content entity route condition is met, FALSE otherwise.
    */
-  public function meetsContentEntityRoutesCondition(): bool {
+  public function isContentEntityRoute(): bool {
     return array_key_exists($this->routeMatch->getRouteObject()->getPath(), $this->getContentEntityPaths());
+  }
+
+  public function getContentEntityFromRoute(): ?ContentEntityInterface {
+    $path = $this->routeMatch->getRouteObject()->getPath();
+    if (!$entity_type = $this->getContentEntityPaths()[$path] ?? NULL) {
+      return NULL;
+    }
+
+    $entity = $this->routeMatch->getParameter($entity_type);
+    if ($entity instanceof ContentEntityInterface && $entity->getEntityTypeId() === $entity_type) {
+      return $entity;
+    }
+
+    return NULL;
   }
 
   /**

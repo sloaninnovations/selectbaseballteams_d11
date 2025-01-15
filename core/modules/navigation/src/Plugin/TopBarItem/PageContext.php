@@ -9,6 +9,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\navigation\Attribute\TopBarItem;
+use Drupal\navigation\EntityRouteHelper;
 use Drupal\navigation\TopBarItemBase;
 use Drupal\navigation\TopBarRegion;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -39,15 +40,15 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
-   *   The route match service.
+   * @param \Drupal\navigation\EntityRouteHelper $entityRouteHelper
+   *   The entity route helper service.
    */
   public function __construct(
     array $configuration,
     $plugin_id,
     $plugin_definition,
     private EntityTypeManagerInterface $entityTypeManager,
-    private RouteMatchInterface $routeMatch,
+    private EntityRouteHelper $entityRouteHelper,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -60,8 +61,8 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
     $configuration,
     $plugin_id,
     $plugin_definition,
-    $container->get('entity_type.manager'),
-    $container->get('current_route_match')
+    $container->get(EntityTypeManagerInterface::class),
+    $container->get(EntityRouteHelper::class)
     );
   }
 
@@ -69,34 +70,38 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
    * {@inheritdoc}
    */
   public function build(): array {
-    $build = [];
+    $build = [
+      '#cache' => [
+        'contexts' => ['route']
+      ]
+    ];
 
-    foreach ($this->routeMatch->getParameters() as $parameter) {
-      if ($parameter instanceof EntityInterface) {
-        $items[] = [
-          '#markup' => $parameter->label(),
-          '#wrapper_attributes' => ['class' => ['context-title']],
-        ];
-        try {
-          $items[] = [
-            '#markup' => $this->getStatus($parameter),
-            '#wrapper_attributes' => [
-              'class' => ['context-status', $this->getStatusClass($parameter)],
-            ],
-          ];
-        }
-        catch (\InvalidArgumentException) {
-          // No status to show for the given entity.
-        }
-        $build = [
-          '#theme' => 'item_list',
-          '#items' => $items,
-          '#attributes' => [
-            'class' => ['navigation-top-bar-context'],
-          ],
-        ];
-      }
+    if (!$entity = $this->entityRouteHelper->getContentEntityFromRoute()) {
+      return $build;
     }
+
+    $items[] = [
+      '#markup' => $entity->label(),
+      '#wrapper_attributes' => ['class' => ['context-title']],
+    ];
+
+    if ($status = $this->getStatus($entity)) {
+      $items[] = [
+        '#markup' => $status,
+        '#wrapper_attributes' => [
+          'class' => ['context-status', $this->getStatusClass($entity)],
+        ],
+      ];
+    }
+
+    $build += [
+      '#theme' => 'item_list',
+      '#items' => $items,
+      '#attributes' => [
+        'class' => ['navigation-top-bar-context'],
+      ],
+    ];
+
     return $build;
   }
 
@@ -106,18 +111,14 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity for which the status is being retrieved.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
-   *   The translated status.
-   *
-   * @throws \InvalidArgumentException
-   *   Thrown when the entity does not implement EntityPublishedInterface.
-   *   Child classes may override this method to provide more complete coverage.
+   * @return string|null
+   *   The translated status if available. NULL otherwise.
    */
-  protected function getStatus(EntityInterface $entity): TranslatableMarkup {
+  protected function getStatus(EntityInterface $entity): ?string {
     if (!$entity instanceof EntityPublishedInterface) {
-      throw new \InvalidArgumentException('Only EntityPublishedInterface are supported by navigation module.');
+      return NULL;
     }
-    return $entity->isPublished() ? $this->t('Published') : $this->t('Unpublished');
+    return (string) ($entity->isPublished() ? $this->t('Published') : $this->t('Unpublished'));
   }
 
   /**
@@ -126,16 +127,16 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity whose status class is to be determined.
    *
-   * @return string
-   *   The CSS class representing the status of the entity.
+   * @return string|null
+   *   The CSS class representing the status of the entity. NULL otherwise.
    *
    * @throws \InvalidArgumentException
    *   If the provided entity does not implement EntityPublishedInterface.
    *   Child classes may override this method to provide more complete coverage.
    */
-  protected function getStatusClass(EntityInterface $entity): string {
+  protected function getStatusClass(EntityInterface $entity): ?string {
     if (!$entity instanceof EntityPublishedInterface) {
-      throw new \InvalidArgumentException('Only EntityPublishedInterface are supported by navigation module.');
+      return NULL;
     }
     return $entity->isPublished() ? 'published' : 'unpublished';
   }
