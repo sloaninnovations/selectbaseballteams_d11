@@ -57,7 +57,7 @@ class BlockContentDeriverTest extends KernelTestBase {
     $this->installEntitySchema('block_content');
 
     $this->blockContentStorage = \Drupal::entityTypeManager()->getStorage('block_content');
-    $this->blockContentDerivative = new DerivativeBlockContent($this->blockContentStorage);
+    $this->blockContentDerivative = new DerivativeBlockContent($this->blockContentStorage, \Drupal::service('language_manager'));
   }
 
   /**
