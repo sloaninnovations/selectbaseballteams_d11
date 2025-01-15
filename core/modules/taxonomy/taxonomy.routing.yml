@@ -37,3 +37,18 @@ entity.taxonomy_term.canonical:
   requirements:
     _entity_access: 'taxonomy_term.view'
     taxonomy_term: \d+
+
+entity.taxonomy_term.revision:
+  path: '/taxonomy/{taxonomy_term}/revisions/{taxonomy_term_revision}/view'
+  defaults:
+    _controller: '\Drupal\Core\Entity\Controller\EntityRevisionViewController'
+    _title_callback: '\Drupal\Core\Entity\Controller\EntityController::title'
+  options:
+    parameters:
+      taxonomy_term:
+        type: entity:taxonomy_term
+      taxonomy_term_revision:
+        type: entity_revision:taxonomy_term
+  requirements:
+    _entity_access: 'taxonomy_term.view all revisions'
+    taxonomy: \d+

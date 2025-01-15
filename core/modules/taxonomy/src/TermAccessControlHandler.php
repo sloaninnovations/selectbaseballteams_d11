@@ -4,15 +4,49 @@ namespace Drupal\taxonomy;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
+use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines the access control handler for the taxonomy term entity type.
  *
  * @see \Drupal\taxonomy\Entity\Term
  */
-class TermAccessControlHandler extends EntityAccessControlHandler {
+class TermAccessControlHandler extends EntityAccessControlHandler implements EntityHandlerInterface {
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * Constructs a TermAccessControlHandler object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   */
+  public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager) {
+    parent::__construct($entity_type);
+    $this->entityTypeManager = $entity_type_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
+    return new static(
+      $entity_type,
+      $container->get('entity_type.manager'),
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -64,6 +98,22 @@ class TermAccessControlHandler extends EntityAccessControlHandler {
           return AccessResult::allowed()->cachePerPermissions();
         }
         return AccessResult::neutral()->setReason("The following permissions are required: 'delete term revisions in {$entity->bundle()}' OR 'delete all taxonomy revisions'.");
+
+      case 'view all revisions':
+        // Perform basic permission checks first.
+        if (!$account->hasPermission('view all taxonomy revisions')) {
+          return AccessResult::neutral("The 'view all taxonomy revisions' permission is required.")->cachePerPermissions();
+        }
+
+        // First check the access to the default revision and finally, if the
+        // taxonomy passed in is not the default revision then access to that,
+        // too.
+        $taxonomy_storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
+        $access = $this->access($taxonomy_storage->load($entity->id()), 'view', $account, TRUE);
+        if (!$entity->isDefaultRevision()) {
+          $access = $access->andIf($this->access($entity, 'view', $account, TRUE));
+        }
+        return $access->cachePerPermissions()->addCacheableDependency($entity);
 
       default:
         // No opinion.
