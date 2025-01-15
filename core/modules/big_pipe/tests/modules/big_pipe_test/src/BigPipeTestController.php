@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\big_pipe_test;
 
 use Drupal\big_pipe\Render\BigPipeMarkup;
 use Drupal\big_pipe_test\EventSubscriber\BigPipeTestSubscriber;
+use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Security\TrustedCallbackInterface;
-
-// cspell:ignore yarhar
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Returns responses for Big Pipe routes.
@@ -109,7 +111,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
         '#type' => 'container',
         '#attributes' => ['id' => 'placeholder-render-array-container'],
         'user_links' => [
-          '#lazy_builder' => [static::class . '::helloOrYarhar', []],
+          '#lazy_builder' => [static::class . '::helloOrHi', []],
           '#create_placeholder' => TRUE,
           '#lazy_builder_preview' => [
             '#attributes' => ['id' => 'render-array-preview'],
@@ -154,13 +156,13 @@ class BigPipeTestController implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback; says "hello" or "yarhar".
+   * #lazy_builder callback; says "hello" or "hi".
    *
    * @return array
    */
-  public static function helloOrYarhar() {
+  public static function helloOrHi() {
     return [
-      '#markup' => BigPipeMarkup::create('<marquee>Yarhar llamas forever!</marquee>'),
+      '#markup' => BigPipeMarkup::create('<marquee>llamas forever!</marquee>'),
       '#cache' => [
         'max-age' => 0,
         'tags' => ['cache_tag_set_in_lazy_builder'],
@@ -216,10 +218,62 @@ class BigPipeTestController implements TrustedCallbackInterface {
   }
 
   /**
+   * Route callback to test a trusted lazy builder redirect response.
+   *
+   * @return array
+   *   The lazy builder callback.
+   */
+  public function trustedRedirectLazyBuilder(): array {
+    return [
+      'redirect' => [
+        '#lazy_builder' => [static::class . '::redirectTrusted', []],
+        '#create_placeholder' => TRUE,
+      ],
+    ];
+  }
+
+  /**
+   * Supports Big Pipe testing of the enforced redirect response.
+   *
+   * @throws \Drupal\Core\Form\EnforcedResponseException
+   *   Trigger catch of Big Pipe enforced redirect response exception.
+   */
+  public static function redirectTrusted(): void {
+    $response = new RedirectResponse('/big_pipe_test');
+    throw new EnforcedResponseException($response);
+  }
+
+  /**
+   * Route callback to test an untrusted lazy builder redirect response.
+   *
+   * @return array
+   *   The lazy builder callback.
+   */
+  public function untrustedRedirectLazyBuilder(): array {
+    return [
+      'redirect' => [
+        '#lazy_builder' => [static::class . '::redirectUntrusted', []],
+        '#create_placeholder' => TRUE,
+      ],
+    ];
+  }
+
+  /**
+   * Supports Big Pipe testing of an untrusted external URL.
+   *
+   * @throws \Drupal\Core\Form\EnforcedResponseException
+   *   Trigger catch of Big Pipe enforced redirect response exception.
+   */
+  public static function redirectUntrusted(): void {
+    $response = new RedirectResponse('https://example.com');
+    throw new EnforcedResponseException($response);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function trustedCallbacks() {
-    return ['currentTime', 'piggy', 'helloOrYarhar', 'exception', 'responseException', 'counter'];
+    return ['currentTime', 'piggy', 'helloOrHi', 'exception', 'responseException', 'counter', 'redirectTrusted', 'redirectUntrusted'];
   }
 
 }

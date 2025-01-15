@@ -18,8 +18,19 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class LanguageNegotiationUrlTest extends UnitTestCase {
 
+  /**
+   * The language manager.
+   */
   protected $languageManager;
+
+  /**
+   * The test user.
+   */
   protected $user;
+
+  /**
+   * An array of languages.
+   */
   protected array $languages;
 
   /**
@@ -69,7 +80,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    *
    * @dataProvider providerTestPathPrefix
    */
-  public function testPathPrefix($prefix, $prefixes, $expected_langcode) {
+  public function testPathPrefix($prefix, $prefixes, $expected_langcode): void {
     $this->languageManager->expects($this->any())
       ->method('getCurrentLanguage')
       ->willReturn($this->languages[(in_array($expected_langcode, [
@@ -161,7 +172,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    *
    * @dataProvider providerNeutralLanguages
    */
-  public function testNeutralLanguages($langcode, $expected_langcode) {
+  public function testNeutralLanguages($langcode, $expected_langcode): void {
     if ($expected_langcode) {
       $this->languageManager->expects($this->once())
         ->method('getCurrentLanguage')
@@ -226,7 +237,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    *
    * @dataProvider providerTestDomain
    */
-  public function testDomain($http_host, $domains, $expected_langcode) {
+  public function testDomain($http_host, $domains, $expected_langcode): void {
     $this->languageManager->expects($this->any())
       ->method('getCurrentLanguage')
       ->willReturn($this->languages['en']);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional\EntityReference\Views;
 
 use Drupal\Component\Serialization\Json;
@@ -84,7 +86,7 @@ class SelectionTest extends BrowserTestBase {
   /**
    * Tests that the Views selection handles the views output properly.
    */
-  public function testAutocompleteOutput() {
+  public function testAutocompleteOutput(): void {
     // Reset any internal static caching.
     \Drupal::service('entity_type.manager')->getStorage('node')->resetCache();
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Handler;
 
 use Drupal\Component\Utility\Html;
@@ -68,7 +70,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests the click sorting functionality.
    */
-  public function testClickSorting() {
+  public function testClickSorting(): void {
     $this->drupalGet('test_click_sort');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -104,7 +106,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests the default click sorting functionality with distinct.
    */
-  public function testClickSortingDistinct() {
+  public function testClickSortingDistinct(): void {
     ConfigurableLanguage::createFromLangcode('es')->save();
     $node = $this->drupalCreateNode();
     $this->drupalGet('test_distinct_click_sorting');
@@ -125,7 +127,7 @@ class FieldWebTest extends ViewTestBase {
    * @return array
    *   A list of beatle ids.
    */
-  protected function clickSortLoadIdsFromOutput() {
+  protected function clickSortLoadIdsFromOutput(): array {
     $fields = $this->xpath("//td[contains(@class, 'views-field-id')]");
     $ids = [];
     foreach ($fields as $field) {
@@ -204,7 +206,7 @@ class FieldWebTest extends ViewTestBase {
       $xpath = $this->assertSession()->buildXPathQuery($xpath, $arguments);
       $result = $elements->xpath($xpath);
       // Some combinations of PHP / libxml versions return an empty array
-      // instead of the documented FALSE. Forcefully convert any falsish values
+      // instead of the documented FALSE. Forcefully convert any falsy values
       // to an empty array to allow foreach(...) constructions.
       return $result ? $result : [];
     }
@@ -216,7 +218,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests rewriting the output to a link.
    */
-  public function testAlterUrl() {
+  public function testAlterUrl(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -406,7 +408,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests the field/label/wrapper classes.
    */
-  public function testFieldClasses() {
+  public function testFieldClasses(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_field_classes');
@@ -517,7 +519,7 @@ class FieldWebTest extends ViewTestBase {
   /**
    * Tests trimming/read-more/ellipses.
    */
-  public function testTextRendering() {
+  public function testTextRendering(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -643,7 +645,7 @@ class FieldWebTest extends ViewTestBase {
       }
     }
 
-    // Tests for displaying a readmore link when the output got trimmed.
+    // Tests for displaying a 'read more' link when the output got trimmed.
     $row->views_test_data_name = $this->randomMachineName(8);
     $name_field->options['alter']['max_length'] = 5;
     $name_field->options['alter']['more_link'] = TRUE;

@@ -216,7 +216,7 @@ abstract class RendererTestBase extends UnitTestCase {
    * @see PlaceholdersTest::callback()
    * @see https://www.drupal.org/node/2151609
    */
-  protected function randomContextValue() {
+  protected static function randomContextValue(): string {
     $tokens = ['llama', 'alpaca', 'camel', 'moose', 'elk'];
     return $tokens[mt_rand(0, 4)];
   }
@@ -232,7 +232,7 @@ abstract class RendererTestBase extends UnitTestCase {
   /**
    * Sets up a memory-based render cache back-end.
    */
-  protected function setupMemoryCache() {
+  protected function setUpMemoryCache() {
     $this->memoryCache = $this->memoryCache ?: new VariationCache($this->requestStack, new MemoryBackend(new Time($this->requestStack)), $this->cacheContextsManager);
 
     $this->cacheFactory->expects($this->atLeastOnce())

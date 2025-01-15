@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\UseCacheBackendTrait;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -277,7 +278,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     $provider = $entity_type->getProvider();
     foreach ($base_field_definitions as $definition) {
       // @todo Remove this check once FieldDefinitionInterface exposes a proper
-      //   provider setter. See https://www.drupal.org/node/2225961.
+      //   provider setter. See https://www.drupal.org/node/2346329.
       if ($definition instanceof BaseFieldDefinition) {
         $definition->setProvider($provider);
       }
@@ -292,7 +293,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
         // defining the field.
         foreach ($module_definitions as $field_name => $definition) {
           // @todo Remove this check once FieldDefinitionInterface exposes a
-          //   proper provider setter. See https://www.drupal.org/node/2225961.
+          //   proper provider setter. See https://www.drupal.org/node/2346329.
           if ($definition instanceof BaseFieldDefinition && $definition->getProvider() == NULL) {
             $definition->setProvider($module);
           }
@@ -402,7 +403,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     $provider = $entity_type->getProvider();
     foreach ($bundle_field_definitions as $definition) {
       // @todo Remove this check once FieldDefinitionInterface exposes a proper
-      //   provider setter. See https://www.drupal.org/node/2225961.
+      //   provider setter. See https://www.drupal.org/node/2346329.
       if ($definition instanceof BaseFieldDefinition) {
         $definition->setProvider($provider);
       }
@@ -417,7 +418,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
         // defining the field.
         foreach ($module_definitions as $field_name => $definition) {
           // @todo Remove this check once FieldDefinitionInterface exposes a
-          //   proper provider setter. See https://www.drupal.org/node/2225961.
+          //   proper provider setter. See https://www.drupal.org/node/2346329.
           if ($definition instanceof BaseFieldDefinition) {
             $definition->setProvider($module);
           }
@@ -594,7 +595,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
         // defining the field.
         foreach ($module_definitions as $field_name => $definition) {
           // @todo Remove this check once FieldDefinitionInterface exposes a
-          //   proper provider setter. See https://www.drupal.org/node/2225961.
+          //   proper provider setter. See https://www.drupal.org/node/2346329.
           if ($definition instanceof BaseFieldDefinition) {
             $definition->setProvider($module);
             $definition->setName($field_name);
@@ -691,6 +692,41 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     ]);
 
     return $extra;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFieldLabels(string $entity_type, string $field_name): array {
+    $label_counter = [];
+    $all_labels = [];
+    // Count the number of fields per label per field storage.
+    foreach (array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type)) as $bundle) {
+      $bundle_fields = array_filter($this->getFieldDefinitions($entity_type, $bundle), function ($field_definition) {
+        return $field_definition instanceof FieldConfigInterface;
+      });
+      if (isset($bundle_fields[$field_name])) {
+        $field = $bundle_fields[$field_name];
+        $label = $field->getLabel();
+        $label_counter[$label] = isset($label_counter[$label]) ? ++$label_counter[$label] : 1;
+        $all_labels[$label] = TRUE;
+      }
+    }
+    if (empty($label_counter)) {
+      return [$field_name, $all_labels];
+    }
+    // Sort the field labels by the most used label and return the most used
+    // one. If the counts are equal, sort by the label to ensure the result is
+    // deterministic.
+    uksort($label_counter, function ($a, $b) use ($label_counter) {
+      if ($label_counter[$a] === $label_counter[$b]) {
+        return strcmp($a, $b);
+      }
+      return $label_counter[$b] <=> $label_counter[$a];
+    });
+    $label_counter = array_keys($label_counter);
+
+    return [$label_counter[0], $all_labels];
   }
 
 }

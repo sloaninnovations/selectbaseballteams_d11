@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Tests\BrowserTestBase;
@@ -15,9 +17,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 class ConfigEntityListMultilingualTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config_test', 'language', 'block'];
 
@@ -41,7 +41,7 @@ class ConfigEntityListMultilingualTest extends BrowserTestBase {
   /**
    * Tests the listing UI with different language scenarios.
    */
-  public function testListUI() {
+  public function testListUI(): void {
     // Log in as an administrative user to access the full menu trail.
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',

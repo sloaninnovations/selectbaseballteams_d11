@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\Exception\AmbiguousBundleClassException;
@@ -10,6 +12,8 @@ use Drupal\entity_test_bundle_class\Entity\EntityTestAmbiguousBundleClass;
 use Drupal\entity_test_bundle_class\Entity\EntityTestBundleClass;
 use Drupal\entity_test_bundle_class\Entity\EntityTestUserClass;
 use Drupal\entity_test_bundle_class\Entity\EntityTestVariant;
+use Drupal\entity_test_bundle_class\Entity\SharedEntityTestBundleClassA;
+use Drupal\entity_test_bundle_class\Entity\SharedEntityTestBundleClassB;
 use Drupal\user\Entity\User;
 
 /**
@@ -42,7 +46,7 @@ class BundleClassTest extends EntityKernelTestBase {
   /**
    * Tests making use of a custom bundle class.
    */
-  public function testEntitySubclass() {
+  public function testEntitySubclass(): void {
     entity_test_create_bundle('bundle_class');
 
     // Ensure we start life with empty counters.
@@ -55,6 +59,10 @@ class BundleClassTest extends EntityKernelTestBase {
     // Verify statically created entity with bundle class returns correct class.
     $entity = EntityTestBundleClass::create();
     $this->assertInstanceOf(EntityTestBundleClass::class, $entity);
+
+    // Verify that bundle returns bundle_class when create is called without
+    // passing a bundle.
+    $this->assertSame($entity->bundle(), 'bundle_class');
 
     // Check that both preCreate() and postCreate() were called once.
     $this->assertEquals(1, EntityTestBundleClass::$preCreateCount);
@@ -143,7 +151,7 @@ class BundleClassTest extends EntityKernelTestBase {
       $entity_test_1->id(),
       $entity_test_2->id(),
     ];
-    $entities = $this->storage->loadMultiple($entity_ids);
+    $this->storage->loadMultiple($entity_ids);
     // postLoad() should only have been called once more so far.
     $this->assertEquals(2, EntityTestBundleClass::$postLoadCount);
     $this->assertCount(2, EntityTestBundleClass::$postLoadEntitiesCount);
@@ -157,7 +165,7 @@ class BundleClassTest extends EntityKernelTestBase {
     // Reset the storage cache and try loading again.
     $this->storage->resetCache();
 
-    $entities = $this->storage->loadMultiple($entity_ids);
+    $this->storage->loadMultiple($entity_ids);
     $this->assertEquals(3, EntityTestBundleClass::$postLoadCount);
     $this->assertCount(3, EntityTestBundleClass::$postLoadEntitiesCount);
     // This time, all 3 bundle_class entities should be included.
@@ -198,7 +206,7 @@ class BundleClassTest extends EntityKernelTestBase {
   /**
    * Tests making use of a custom bundle class for an entity without bundles.
    */
-  public function testEntityNoBundleSubclass() {
+  public function testEntityNoBundleSubclass(): void {
     $this->container->get('state')->set('entity_test_bundle_class_enable_user_class', TRUE);
     $this->container->get('kernel')->rebuildContainer();
     $this->entityTypeManager->clearCachedDefinitions();
@@ -212,7 +220,7 @@ class BundleClassTest extends EntityKernelTestBase {
    *
    * @covers Drupal\Core\Entity\ContentEntityStorageBase::create
    */
-  public function testAmbiguousBundleClassExceptionCreate() {
+  public function testAmbiguousBundleClassExceptionCreate(): void {
     $this->container->get('state')->set('entity_test_bundle_class_enable_ambiguous_entity_types', TRUE);
     $this->entityTypeManager->clearCachedDefinitions();
     entity_test_create_bundle('bundle_class');
@@ -229,20 +237,32 @@ class BundleClassTest extends EntityKernelTestBase {
    *
    * @covers Drupal\Core\Entity\EntityTypeRepository::getEntityTypeFromClass
    */
-  public function testAmbiguousBundleClassExceptionEntityTypeRepository() {
+  public function testAmbiguousBundleClassExceptionEntityTypeRepository(): void {
     $this->container->get('state')->set('entity_test_bundle_class_enable_ambiguous_entity_types', TRUE);
     entity_test_create_bundle('entity_test_no_label');
     entity_test_create_bundle('entity_test_no_label', NULL, 'entity_test_no_label');
     // Now that we have an entity bundle class that's shared by two entirely
     // different entity types, we expect an exception to be thrown.
     $this->expectException(AmbiguousBundleClassException::class);
-    $entity_type = $this->container->get('entity_type.repository')->getEntityTypeFromClass(EntityTestAmbiguousBundleClass::class);
+    $this->container->get('entity_type.repository')->getEntityTypeFromClass(EntityTestAmbiguousBundleClass::class);
+  }
+
+  /**
+   * Checks that no exception is thrown when two bundles share an entity class.
+   *
+   * @covers Drupal\Core\Entity\EntityTypeRepository::getEntityTypeFromClass
+   */
+  public function testNoAmbiguousBundleClassExceptionSharingEntityClass(): void {
+    $shared_type_a = $this->container->get('entity_type.repository')->getEntityTypeFromClass(SharedEntityTestBundleClassA::class);
+    $shared_type_b = $this->container->get('entity_type.repository')->getEntityTypeFromClass(SharedEntityTestBundleClassB::class);
+    $this->assertSame('shared_type', $shared_type_a);
+    $this->assertSame('shared_type', $shared_type_b);
   }
 
   /**
    * Checks exception thrown if a bundle class doesn't extend the entity class.
    */
-  public function testBundleClassShouldExtendEntityClass() {
+  public function testBundleClassShouldExtendEntityClass(): void {
     $this->container->get('state')->set('entity_test_bundle_class_non_inheriting', TRUE);
     $this->entityTypeManager->clearCachedDefinitions();
     $this->expectException(BundleClassInheritanceException::class);
@@ -253,7 +273,7 @@ class BundleClassTest extends EntityKernelTestBase {
   /**
    * Checks exception thrown if a bundle class doesn't exist.
    */
-  public function testBundleClassShouldExist() {
+  public function testBundleClassShouldExist(): void {
     $this->container->get('state')->set('entity_test_bundle_class_does_not_exist', TRUE);
     $this->entityTypeManager->clearCachedDefinitions();
     $this->expectException(MissingBundleClassException::class);

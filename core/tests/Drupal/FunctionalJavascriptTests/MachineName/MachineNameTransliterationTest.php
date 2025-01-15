@@ -17,9 +17,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 class MachineNameTransliterationTest extends WebDriverTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',
@@ -51,7 +49,7 @@ class MachineNameTransliterationTest extends WebDriverTestBase {
    *
    * @dataProvider machineNameInputOutput
    */
-  public function testMachineNameTransliterations($langcode, $input, $output) {
+  public function testMachineNameTransliterations($langcode, $input, $output): void {
     $page = $this->getSession()->getPage();
     if ($langcode !== 'en') {
       ConfigurableLanguage::createFromLangcode($langcode)->save();
@@ -61,8 +59,7 @@ class MachineNameTransliterationTest extends WebDriverTestBase {
 
     $this->drupalGet("/admin/people/roles/add");
     $page->find('css', '[data-drupal-selector="edit-label"]')->setValue($input);
-    $this->assertSession()->pageTextContains($output);
-
+    $this->assertSession()->elementTextEquals('css', 'span.machine-name-value', $output);
   }
 
   /**
@@ -78,13 +75,13 @@ class MachineNameTransliterationTest extends WebDriverTestBase {
       ['de', 'Äwesome', 'aewesome'],
       ['da', 'äöüåøhello', 'aouaaoehello'],
       ['fr', 'ц', 'c'],
-      // These tests are not working with chromedriver as
-      // 'ᐑ','𐌰𐌸' chars are not accepted.
-      // ['fr', 'ᐑ', 'wii'],
+      ['fr', 'ᐑ', 'wii'],
+      // This test is not working with chromedriver as '𐌰𐌸' chars are not
+      // accepted.
       // ['en', '𐌰𐌸', '__'],
       ['en', 'Ä Ö Ü Å Ø äöüåøhello', 'a_o_u_a_o_aouaohello'],
       ['de', 'Ä Ö Ü Å Ø äöüåøhello', 'ae_oe_ue_a_o_aeoeueaohello'],
-      ['de', ']URY&m_G^;', ' ury_m_g'],
+      ['de', ']URY&m_G^;', 'ury_m_g'],
       ['da', 'Ä Ö Ü Å Ø äöüåøhello', 'a_o_u_aa_oe_aouaaoehello'],
       ['kg', 'ц', 'ts'],
       ['en', ' Hello Abventor! ', 'hello_abventor'],

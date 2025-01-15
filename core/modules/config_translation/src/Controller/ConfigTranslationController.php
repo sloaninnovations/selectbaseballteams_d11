@@ -147,7 +147,7 @@ class ConfigTranslationController extends ControllerBase {
       $original_langcode = $mapper->getLangcode();
       $operations_access = TRUE;
     }
-    catch (ConfigMapperLanguageException $exception) {
+    catch (ConfigMapperLanguageException) {
       $items = [];
       foreach ($mapper->getConfigNames() as $config_name) {
         $langcode = $mapper->getLangcodeFromConfig($config_name);
@@ -163,7 +163,7 @@ class ConfigTranslationController extends ControllerBase {
           '#items' => $items,
         ],
       ];
-      $this->messenger()->addWarning($this->renderer->renderPlain($message));
+      $this->messenger()->addWarning($this->renderer->renderInIsolation($message));
 
       $original_langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED;
       $operations_access = FALSE;

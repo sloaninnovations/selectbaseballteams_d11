@@ -17,6 +17,8 @@ class Drupal6SqlBaseTest extends MigrateTestCase {
 
   /**
    * Define bare minimum migration configuration.
+   *
+   * @var string[]
    */
   protected $migrationConfiguration = [
     'id' => 'Drupal6SqlBase',
@@ -29,6 +31,8 @@ class Drupal6SqlBaseTest extends MigrateTestCase {
 
   /**
    * Minimum database contents needed to test Drupal6SqlBase.
+   *
+   * @var string[]
    */
   protected $databaseContents = [
     'system' => [
@@ -80,7 +84,7 @@ class Drupal6SqlBaseTest extends MigrateTestCase {
   /**
    * Tests for Drupal6SqlBase::getSystemData().
    */
-  public function testGetSystemData() {
+  public function testGetSystemData(): void {
     $system_data = $this->base->getSystemData();
     // Should be 1 theme and 2 modules.
     $this->assertCount(1, $system_data['theme']);
@@ -93,7 +97,7 @@ class Drupal6SqlBaseTest extends MigrateTestCase {
   /**
    * Tests for Drupal6SqlBase::moduleExists().
    */
-  public function testDrupal6ModuleExists() {
+  public function testDrupal6ModuleExists(): void {
     // This module should exist.
     $this->assertTrue($this->base->moduleExistsWrapper('module1'));
 
@@ -105,7 +109,7 @@ class Drupal6SqlBaseTest extends MigrateTestCase {
   /**
    * Tests for Drupal6SqlBase::getModuleSchemaVersion().
    */
-  public function testGetModuleSchemaVersion() {
+  public function testGetModuleSchemaVersion(): void {
     // Non-existent module.
     $this->assertFalse($this->base->getModuleSchemaVersionWrapper('module3'));
 
@@ -119,7 +123,7 @@ class Drupal6SqlBaseTest extends MigrateTestCase {
   /**
    * Tests for Drupal6SqlBase::variableGet().
    */
-  public function testVariableGet() {
+  public function testVariableGet(): void {
     // Test default value.
     $this->assertEquals('my_default', $this->base->variableGetWrapper('non_existent_variable', 'my_default'));
 
@@ -145,16 +149,16 @@ class TestDrupal6SqlBase extends DrupalSqlBase {
    */
   public function fields() {
     return [
-      'filename' => $this->t('The path of the primary file for this item.'),
-      'name' => $this->t('The name of the item; e.g. node.'),
-      'type' => $this->t('The type of the item, either module, theme, or theme_engine.'),
-      'owner' => $this->t("A theme's 'parent'. Can be either a theme or an engine."),
-      'status' => $this->t('Boolean indicating whether or not this item is enabled.'),
-      'throttle' => $this->t('Boolean indicating whether this item is disabled when the throttle.module disables throttleable items.'),
-      'bootstrap' => $this->t("Boolean indicating whether this module is loaded during Drupal's early bootstrapping phase (e.g. even before the page cache is consulted)."),
-      'schema_version' => $this->t("The module's database schema version number."),
-      'weight' => $this->t("The order in which this module's hooks should be invoked."),
-      'info' => $this->t("A serialized array containing information from the module's .info file."),
+      'filename' => 'The path of the primary file for this item.',
+      'name' => 'The name of the item; e.g. node.',
+      'type' => 'The type of the item, either module, theme, or theme_engine.',
+      'owner' => "A theme's 'parent'. Can be either a theme or an engine.",
+      'status' => 'Boolean indicating whether or not this item is enabled.',
+      'throttle' => 'Boolean indicating whether this item is disabled when the throttle.module disables throttleable items.',
+      'bootstrap' => "Boolean indicating whether this module is loaded during Drupal's early bootstrapping phase (e.g. even before the page cache is consulted).",
+      'schema_version' => "The module's database schema version number.",
+      'weight' => "The order in which this module's hooks should be invoked.",
+      'info' => "A serialized array containing information from the module's .info file.",
     ];
   }
 
@@ -176,7 +180,7 @@ class TestDrupal6SqlBase extends DrupalSqlBase {
    *
    * @see \Drupal\Tests\migrate\Unit\MigrateSqlTestCase
    */
-  public function setDatabase(Connection $database) {
+  public function setDatabase(Connection $database): void {
     $this->database = $database;
   }
 
@@ -188,7 +192,7 @@ class TestDrupal6SqlBase extends DrupalSqlBase {
    *
    * @see \Drupal\Tests\migrate\Unit\MigrateSqlTestCase
    */
-  public function setModuleHandler(ModuleHandlerInterface $module_handler) {
+  public function setModuleHandler(ModuleHandlerInterface $module_handler): void {
     $this->moduleHandler = $module_handler;
   }
 

@@ -2,15 +2,24 @@
 
 namespace Drupal\big_pipe\Render;
 
+use Drupal\Component\HttpFoundation\SecuredRedirectResponse;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\MessageCommand;
+use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Form\EnforcedResponseException;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Routing\LocalRedirectResponse;
+use Drupal\Core\Routing\RequestContext;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -163,81 +172,17 @@ class BigPipe {
    */
   const STOP_SIGNAL = '<script type="application/vnd.drupal-ajax" data-big-pipe-event="stop"></script>';
 
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * The session.
-   *
-   * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
-   */
-  protected $session;
-
-  /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
-   * The HTTP kernel.
-   *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
-   */
-  protected $httpKernel;
-
-  /**
-   * The event dispatcher.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
-   */
-  protected $eventDispatcher;
-
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * Constructs a new BigPipe class.
-   *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Symfony\Component\HttpFoundation\Session\SessionInterface $session
-   *   The session.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
-   *   The HTTP kernel.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   */
-  public function __construct(RendererInterface $renderer, SessionInterface $session, RequestStack $request_stack, HttpKernelInterface $http_kernel, EventDispatcherInterface $event_dispatcher, ConfigFactoryInterface $config_factory) {
-    $this->renderer = $renderer;
-    $this->session = $session;
-    $this->requestStack = $request_stack;
-    $this->httpKernel = $http_kernel;
-    $this->eventDispatcher = $event_dispatcher;
-    $this->configFactory = $config_factory;
-  }
-
-  /**
-   * Performs tasks before sending content (and rendering placeholders).
-   */
-  protected function performPreSendTasks() {
-    // The content in the placeholders may depend on the session, and by the
-    // time the response is sent (see index.php), the session is already
-    // closed. Reopen it for the duration that we are rendering placeholders.
-    $this->session->start();
+  public function __construct(
+    protected RendererInterface $renderer,
+    protected SessionInterface $session,
+    protected RequestStack $requestStack,
+    protected HttpKernelInterface $httpKernel,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected ConfigFactoryInterface $configFactory,
+    protected MessengerInterface $messenger,
+    protected RequestContext $requestContext,
+    protected LoggerInterface $logger,
+  ) {
   }
 
   /**
@@ -288,11 +233,9 @@ class BigPipe {
     // BigPipe sends responses using "Transfer-Encoding: chunked". To avoid
     // sending already-sent assets, it is necessary to track cumulative assets
     // from all previously rendered/sent chunks.
-    // @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.41
+    // @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.41
     $cumulative_assets = AttachedAssets::createFromRenderArray(['#attached' => $attachments]);
     $cumulative_assets->setAlreadyLoadedLibraries($attachments['library']);
-
-    $this->performPreSendTasks();
 
     // Find the closing </body> tag and get the strings before and after. But be
     // careful to use the latest occurrence of the string "</body>", to ensure
@@ -438,7 +381,7 @@ class BigPipe {
           throw $e;
         }
         else {
-          trigger_error($e, E_USER_ERROR);
+          trigger_error($e, E_USER_WARNING);
           continue;
         }
       }
@@ -474,7 +417,7 @@ class BigPipe {
           throw $e;
         }
         else {
-          trigger_error($e, E_USER_ERROR);
+          trigger_error($e, E_USER_WARNING);
           continue;
         }
       }
@@ -538,29 +481,16 @@ class BigPipe {
 
     // Create a Fiber for each placeholder.
     $fibers = [];
-    $message_placeholder_id = NULL;
     foreach ($placeholder_order as $placeholder_id) {
       if (!isset($placeholders[$placeholder_id])) {
         continue;
       }
       $placeholder_render_array = $placeholders[$placeholder_id];
-
-      // Ensure the messages placeholder renders last, the render order of every
-      // other placeholder is safe to change.
-      // @see static::getPlaceholderOrder()
-      if (isset($placeholder_render_array['#lazy_builder']) && $placeholder_render_array['#lazy_builder'][0] === 'Drupal\Core\Render\Element\StatusMessages::renderMessages') {
-        $message_placeholder_id = $placeholder_id;
-      }
       $fibers[$placeholder_id] = new \Fiber(fn() => $this->renderPlaceholder($placeholder_id, $placeholder_render_array));
     }
     $iterations = 0;
     while (count($fibers) > 0) {
       foreach ($fibers as $placeholder_id => $fiber) {
-        // Keep skipping the messages placeholder until it's the only Fiber
-        // remaining. @todo https://www.drupal.org/project/drupal/issues/3379885
-        if (isset($message_placeholder_id) && $placeholder_id === $message_placeholder_id && count($fibers) > 1) {
-          continue;
-        }
         try {
           if (!$fiber->isStarted()) {
             $fiber->start();
@@ -594,6 +524,15 @@ class BigPipe {
           $ajax_response->addCommand(new ReplaceCommand(sprintf('[data-big-pipe-placeholder-id="%s"]', $big_pipe_js_placeholder_id), $elements['#markup']));
           $ajax_response->setAttachments($elements['#attached']);
 
+          // Delete all messages that were generated during the rendering of this
+          // placeholder, to render them in a BigPipe-optimized way.
+          $messages = $this->messenger->deleteAll();
+          foreach ($messages as $type => $type_messages) {
+            foreach ($type_messages as $message) {
+              $ajax_response->addCommand(new MessageCommand($message, NULL, ['type' => $type], FALSE));
+            }
+          }
+
           // Push a fake request with the asset libraries loaded so far and
           // dispatch KernelEvents::RESPONSE event. This results in the
           // attachments for the AJAX response being processed by
@@ -623,13 +562,60 @@ EOF;
             $cumulative_assets->setAlreadyLoadedLibraries(explode(',', $ajax_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries']));
           }
         }
+        // Handle enforced redirect responses.
+        // A typical use case where this might happen are forms using GET as
+        // #method that are build inside a lazy builder.
+        catch (EnforcedResponseException $e) {
+          $response = $e->getResponse();
+          if (!$response instanceof RedirectResponse) {
+            throw $e;
+          }
+          $ajax_response = new AjaxResponse();
+          if ($response instanceof SecuredRedirectResponse) {
+            // Only redirect to safe locations.
+            $ajax_response->addCommand(new RedirectCommand($response->getTargetUrl()));
+          }
+          else {
+            try {
+              // SecuredRedirectResponse is an abstract class that requires a
+              // concrete implementation. Default to LocalRedirectResponse, which
+              // considers only redirects to within the same site as safe.
+              $safe_response = LocalRedirectResponse::createFromRedirectResponse($response);
+              $safe_response->setRequestContext($this->requestContext);
+              $ajax_response->addCommand(new RedirectCommand($safe_response->getTargetUrl()));
+            }
+            catch (\InvalidArgumentException) {
+              // If the above failed, it's because the redirect target wasn't
+              // local. Do not follow that redirect. Log an error message
+              // instead, then return a 400 response to the client with the
+              // error message. We don't throw an exception, because this is a
+              // client error rather than a server error.
+              $message = 'Redirects to external URLs are not allowed by default, use \Drupal\Core\Routing\TrustedRedirectResponse for it.';
+              $this->logger->error($message);
+              $ajax_response->addCommand(new MessageCommand($message));
+            }
+          }
+          $ajax_response = $this->filterEmbeddedResponse($fake_request, $ajax_response);
+
+          $json = $ajax_response->getContent();
+          $output = <<<EOF
+<script type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="$placeholder_id">
+$json
+</script>
+EOF;
+          $this->sendChunk($output);
+
+          // Send the stop signal.
+          $this->sendChunk("\n" . static::STOP_SIGNAL . "\n");
+          break;
+        }
         catch (\Exception $e) {
           unset($fibers[$placeholder_id]);
           if ($this->configFactory->get('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE) {
             throw $e;
           }
           else {
-            trigger_error($e, E_USER_ERROR);
+            trigger_error($e, E_USER_WARNING);
           }
         }
       }
@@ -726,7 +712,9 @@ EOF;
   /**
    * Gets the BigPipe placeholder order.
    *
-   * Determines the order in which BigPipe placeholders are executed.
+   * Determines the order in which BigPipe placeholders are executed. It is
+   * safe to use a regular expression here as the HTML is statically created in
+   * \Drupal\big_pipe\Render\Placeholder\BigPipeStrategy::createBigPipeJsPlaceholder().
    *
    * @param string $html
    *   HTML markup.
@@ -736,8 +724,7 @@ EOF;
    *
    * @return array
    *   Indexed array; the order in which the BigPipe placeholders will start
-   *   execution. Placeholders begin execution in DOM order, except for the
-   *   messages placeholder which must always be executed last. Note that due to
+   *   execution. Placeholders begin execution in DOM order. Note that due to
    *   the Fibers implementation of BigPipe, although placeholders will start
    *   executing in DOM order, they may finish and render in any order. Values
    *   are the BigPipe placeholder IDs. Note that only unique placeholders are
@@ -745,41 +732,10 @@ EOF;
    *   first occurrence.
    */
   protected function getPlaceholderOrder($html, $placeholders) {
-    $placeholder_ids = [];
-    $dom = Html::load($html);
-    $xpath = new \DOMXPath($dom);
-    foreach ($xpath->query('//span[@data-big-pipe-placeholder-id]') as $node) {
-      $placeholder_ids[] = Html::escape($node->getAttribute('data-big-pipe-placeholder-id'));
+    if (preg_match_all('/<span data-big-pipe-placeholder-id="([^"]*)">/', $html, $matches)) {
+      return array_unique($matches[1]);
     }
-    $placeholder_ids = array_unique($placeholder_ids);
-
-    // The 'status messages' placeholder needs to be special cased, because it
-    // depends on global state that can be modified when other placeholders are
-    // being rendered: any code can add messages to render.
-    // This violates the principle that each lazy builder must be able to render
-    // itself in isolation, and therefore in any order. However, we cannot
-    // change the way \Drupal\Core\Messenger\MessengerInterface::addMessage()
-    // works in the Drupal 8 cycle. So we have to accommodate its special needs.
-    // Allowing placeholders to be rendered in a particular order (in this case:
-    // last) would violate this isolation principle. Thus a monopoly is granted
-    // to this one special case, with this hard-coded solution.
-    // @see \Drupal\Core\Render\Element\StatusMessages
-    // @see \Drupal\Core\Render\Renderer::replacePlaceholders()
-    // @see https://www.drupal.org/node/2712935#comment-11368923
-    $message_placeholder_ids = [];
-    foreach ($placeholders as $placeholder_id => $placeholder_element) {
-      if (isset($placeholder_element['#lazy_builder']) && $placeholder_element['#lazy_builder'][0] === 'Drupal\Core\Render\Element\StatusMessages::renderMessages') {
-        $message_placeholder_ids[] = $placeholder_id;
-      }
-    }
-
-    // Return placeholder IDs in DOM order, but with the 'status messages'
-    // placeholders at the end, if they are present.
-    $ordered_placeholder_ids = array_merge(
-      array_diff($placeholder_ids, $message_placeholder_ids),
-      array_intersect($placeholder_ids, $message_placeholder_ids)
-    );
-    return $ordered_placeholder_ids;
+    return [];
   }
 
   /**

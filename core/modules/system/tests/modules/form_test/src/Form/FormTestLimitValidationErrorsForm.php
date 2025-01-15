@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\form_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -61,23 +63,23 @@ class FormTestLimitValidationErrorsForm extends FormBase {
       '#type' => 'submit',
       '#limit_validation_errors' => [['test']],
       '#submit' => ['::partialSubmitForm'],
-      '#value' => t('Partial validate'),
+      '#value' => $this->t('Partial validate'),
     ];
     $form['actions']['partial_numeric_index'] = [
       '#type' => 'submit',
       '#limit_validation_errors' => [['test_numeric_index', 0]],
       '#submit' => ['::partialSubmitForm'],
-      '#value' => t('Partial validate (numeric index)'),
+      '#value' => $this->t('Partial validate (numeric index)'),
     ];
     $form['actions']['substring'] = [
       '#type' => 'submit',
       '#limit_validation_errors' => [['test_substring', 'foo']],
       '#submit' => ['::partialSubmitForm'],
-      '#value' => t('Partial validate (substring)'),
+      '#value' => $this->t('Partial validate (substring)'),
     ];
     $form['actions']['full'] = [
       '#type' => 'submit',
-      '#value' => t('Full validate'),
+      '#value' => $this->t('Full validate'),
     ];
     return $form;
   }
@@ -87,7 +89,7 @@ class FormTestLimitValidationErrorsForm extends FormBase {
    */
   public function elementValidateLimitValidationErrors($element, FormStateInterface $form_state) {
     if ($element['#value'] == 'invalid') {
-      $form_state->setError($element, t('@label element is invalid', ['@label' => $element['#title']]));
+      $form_state->setError($element, $this->t('@label element is invalid', ['@label' => $element['#title']]));
     }
   }
 

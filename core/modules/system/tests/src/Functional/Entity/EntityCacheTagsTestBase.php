@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Entity;
 
 use Drupal\Core\Cache\Cache;
@@ -22,9 +24,7 @@ use Drupal\user\RoleInterface;
 abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'field_test'];
 
@@ -307,7 +307,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
    * - referencing entity type view cache tag: "<referencing entity type>_view"
    * - referencing entity type cache tag: "<referencing entity type>:<referencing entity ID>"
    */
-  public function testReferencedEntity() {
+  public function testReferencedEntity(): void {
     $entity_type = $this->entity->getEntityTypeId();
     $referencing_entity_url = $this->referencingEntity->toUrl('canonical');
     $non_referencing_entity_url = $this->nonReferencingEntity->toUrl('canonical');
@@ -606,32 +606,6 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
     $this->verifyPageCache($listing_url, 'HIT', $page_cache_tags);
     $this->verifyPageCache($empty_entity_listing_url, 'HIT', $empty_entity_listing_cache_tags);
     $this->verifyPageCache($nonempty_entity_listing_url, 'HIT', $nonempty_entity_listing_cache_tags);
-  }
-
-  /**
-   * Creates a cache ID from a list of cache keys and a set of cache contexts.
-   *
-   * @param string[] $keys
-   *   A list of cache keys.
-   * @param string[] $contexts
-   *   A set of cache contexts.
-   *
-   * @return string
-   *   The cache ID string.
-   *
-   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3354596
-   */
-  protected function createCacheId(array $keys, array $contexts) {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3354596', E_USER_DEPRECATED);
-    $cid_parts = $keys;
-
-    $contexts = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($contexts);
-    $cid_parts = array_merge($cid_parts, $contexts->getKeys());
-
-    return implode(':', $cid_parts);
   }
 
   /**

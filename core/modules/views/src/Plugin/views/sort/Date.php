@@ -3,17 +3,20 @@
 namespace Drupal\views\Plugin\views\sort;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\Attribute\ViewsSort;
 
 /**
  * Basic sort handler for dates.
  *
  * This handler enables granularity, which is the ability to make dates
  * equivalent based upon nearness.
- *
- * @ViewsSort("date")
  */
+#[ViewsSort("date")]
 class Date extends SortPluginBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -22,6 +25,9 @@ class Date extends SortPluginBase {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
 

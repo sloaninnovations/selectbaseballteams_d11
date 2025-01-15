@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\Core\Database\Query\ConditionInterface;
@@ -37,7 +39,7 @@ class SqlBaseTest extends MigrateTestBase {
   /**
    * Tests different connection types.
    */
-  public function testConnectionTypes() {
+  public function testConnectionTypes(): void {
     $sql_base = new TestSqlBase([], $this->migration);
 
     // Verify that falling back to the default 'migrate' connection (defined in
@@ -158,7 +160,7 @@ class SqlBaseTest extends MigrateTestBase {
    *
    * @dataProvider highWaterDataProvider
    */
-  public function testHighWater($high_water = NULL, array $query_result = []) {
+  public function testHighWater($high_water = NULL, array $query_result = []): void {
     $configuration = [
       'high_water_property' => [
         'name' => 'order',
@@ -220,7 +222,7 @@ class TestSqlBase extends SqlBase {
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   (optional) The migration being run.
    */
-  public function __construct(array $configuration = [], MigrationInterface $migration = NULL) {
+  public function __construct(array $configuration = [], ?MigrationInterface $migration = NULL) {
     parent::__construct($configuration, 'sql_base', ['requirements_met' => TRUE], $migration, \Drupal::state());
   }
 
@@ -238,7 +240,7 @@ class TestSqlBase extends SqlBase {
    * @param array $config
    *   The config array.
    */
-  public function setConfiguration($config) {
+  public function setConfiguration($config): void {
     $this->configuration = $config;
   }
 
@@ -269,7 +271,7 @@ class TestSqlBase extends SqlBase {
    * @param \Drupal\Core\Database\Query\SelectInterface $query
    *   The query to execute.
    */
-  public function setQuery(SelectInterface $query) {
+  public function setQuery(SelectInterface $query): void {
     $this->query = $query;
   }
 

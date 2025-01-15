@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\theme_test\EventSubscriber;
 
 use Drupal\Core\Render\RendererInterface;
@@ -70,7 +72,7 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
         '#url' => Url::fromRoute('user.page'),
         '#attributes' => ['title' => 'Themed output generated in a KernelEvents::REQUEST listener'],
       ];
-      $GLOBALS['theme_test_output'] = $this->renderer->renderPlain($more_link);
+      $GLOBALS['theme_test_output'] = $this->renderer->renderInIsolation($more_link);
     }
   }
 

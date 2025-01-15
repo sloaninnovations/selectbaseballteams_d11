@@ -162,29 +162,12 @@ class StatementPrefetchIterator implements \Iterator, StatementInterface {
   }
 
   /**
-   * Throw a PDO Exception based on the last PDO error.
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. There is
-   *   no replacement.
-   *
-   * @see https://www.drupal.org/node/3410663
-   */
-  protected function throwPDOException(): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3410663', E_USER_DEPRECATED);
-    $error_info = $this->connection->errorInfo();
-    // We rebuild a message formatted in the same way as PDO.
-    $exception = new \PDOException("SQLSTATE[" . $error_info[0] . "]: General error " . $error_info[1] . ": " . $error_info[2]);
-    $exception->errorInfo = $error_info;
-    throw $exception;
-  }
-
-  /**
    * Grab a PDOStatement object from a given query and its arguments.
    *
    * Some drivers (including SQLite) will need to perform some preparation
    * themselves to get the statement right.
    *
-   * @param $query
+   * @param string $query
    *   The query.
    * @param array|null $args
    *   An array of arguments. This can be NULL.
@@ -207,9 +190,8 @@ class StatementPrefetchIterator implements \Iterator, StatementInterface {
    * {@inheritdoc}
    */
   public function setFetchMode($mode, $a1 = NULL, $a2 = []) {
-    if (!in_array($mode, $this->supportedFetchModes)) {
-      @trigger_error('Fetch mode ' . ($this->fetchModeLiterals[$mode] ?? $mode) . ' is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use supported modes only. See https://www.drupal.org/node/3377999', E_USER_DEPRECATED);
-    }
+    assert(in_array($mode, $this->supportedFetchModes), 'Fetch mode ' . ($this->fetchModeLiterals[$mode] ?? $mode) . ' is not supported. Use supported modes only.');
+
     $this->defaultFetchStyle = $mode;
     switch ($mode) {
       case \PDO::FETCH_CLASS:
@@ -259,34 +241,37 @@ class StatementPrefetchIterator implements \Iterator, StatementInterface {
 
     // Now, format the next prefetched record according to the required fetch
     // style.
-    // @todo in Drupal 11, remove arms for deprecated fetch modes.
     $rowAssoc = $this->data[$currentKey];
-    $row = match($fetch_style ?? $this->defaultFetchStyle) {
+    $mode = $fetch_style ?? $this->defaultFetchStyle;
+    $row = match($mode) {
       \PDO::FETCH_ASSOC => $rowAssoc,
-      // @phpstan-ignore-next-line
-      \PDO::FETCH_BOTH => $this->assocToBoth($rowAssoc),
-      \PDO::FETCH_NUM => $this->assocToNum($rowAssoc),
-      \PDO::FETCH_LAZY, \PDO::FETCH_OBJ => $this->assocToObj($rowAssoc),
-      // @phpstan-ignore-next-line
-      \PDO::FETCH_CLASS | \PDO::FETCH_CLASSTYPE => $this->assocToClassType($rowAssoc, $this->fetchOptions['constructor_args']),
-      \PDO::FETCH_CLASS => $this->assocToClass($rowAssoc, $this->fetchOptions['class'], $this->fetchOptions['constructor_args']),
-      // @phpstan-ignore-next-line
-      \PDO::FETCH_INTO => $this->assocIntoObject($rowAssoc, $this->fetchOptions['object']),
+      \PDO::FETCH_CLASS, \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE => $this->assocToClass($rowAssoc, $this->fetchOptions['class'], $this->fetchOptions['constructor_args']),
       \PDO::FETCH_COLUMN => $this->assocToColumn($rowAssoc, $this->columnNames, $this->fetchOptions['column']),
-      // @todo in Drupal 11, throw an exception if the fetch style cannot be
-      //   matched.
-      default => FALSE,
+      \PDO::FETCH_NUM => $this->assocToNum($rowAssoc),
+      \PDO::FETCH_OBJ => $this->assocToObj($rowAssoc),
+      default => throw new DatabaseExceptionWrapper('Fetch mode ' . ($this->fetchModeLiterals[$mode] ?? $mode) . ' is not supported. Use supported modes only.'),
     };
     $this->setResultsetCurrentRow($row);
     return $row;
   }
 
   /**
-   * {@inheritdoc}
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   ::fetchField() instead.
+   *
+   * @see https://www.drupal.org/node/3490312
    */
   public function fetchColumn($index = 0) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ::fetchField() instead. See https://www.drupal.org/node/3490312', E_USER_DEPRECATED);
+    return $this->fetchField($index);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fetchField($index = 0) {
     if ($row = $this->fetch(\PDO::FETCH_ASSOC)) {
-      return $row[$this->columnNames[$index]];
+      return $this->assocToColumn($row, $this->columnNames, $index);
     }
     return FALSE;
   }
@@ -294,14 +279,7 @@ class StatementPrefetchIterator implements \Iterator, StatementInterface {
   /**
    * {@inheritdoc}
    */
-  public function fetchField($index = 0) {
-    return $this->fetchColumn($index);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function fetchObject(string $class_name = NULL, array $constructor_arguments = []) {
+  public function fetchObject(?string $class_name = NULL, array $constructor_arguments = []) {
     if (!isset($class_name)) {
       return $this->fetch(\PDO::FETCH_OBJ);
     }
@@ -323,10 +301,10 @@ class StatementPrefetchIterator implements \Iterator, StatementInterface {
    * {@inheritdoc}
    */
   public function fetchAll($mode = NULL, $column_index = NULL, $constructor_arguments = NULL) {
-    if (isset($mode) && !in_array($mode, $this->supportedFetchModes)) {
-      @trigger_error('Fetch mode ' . ($this->fetchModeLiterals[$mode] ?? $mode) . ' is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use supported modes only. See https://www.drupal.org/node/3377999', E_USER_DEPRECATED);
-    }
     $fetchStyle = $mode ?? $this->defaultFetchStyle;
+
+    assert(in_array($fetchStyle, $this->supportedFetchModes), 'Fetch mode ' . ($this->fetchModeLiterals[$fetchStyle] ?? $fetchStyle) . ' is not supported. Use supported modes only.');
+
     if (isset($column_index)) {
       $this->fetchOptions['column'] = $column_index;
     }
@@ -345,14 +323,11 @@ class StatementPrefetchIterator implements \Iterator, StatementInterface {
    * {@inheritdoc}
    */
   public function fetchCol($index = 0) {
-    if (isset($this->columnNames[$index])) {
-      $result = [];
-      while ($row = $this->fetch(\PDO::FETCH_ASSOC)) {
-        $result[] = $row[$this->columnNames[$index]];
-      }
-      return $result;
+    $result = [];
+    while (($columnValue = $this->fetchField($index)) !== FALSE) {
+      $result[] = $columnValue;
     }
-    return [];
+    return $result;
   }
 
   /**

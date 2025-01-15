@@ -49,15 +49,15 @@
  * preprocessing functions. For example, the core Search module defines a theme
  * hook for a search result item in search_theme():
  * @code
- * return array(
- *   'search_result' => array(
- *     'variables' => array(
+ * return [
+ *   'search_result' => [
+ *     'variables' => [
  *       'result' => NULL,
  *       'plugin_id' => NULL,
- *     ),
+ *     ],
  *    'file' => 'search.pages.inc',
- *   ),
- * );
+ *   ],
+ * ];
  * @endcode
  * Given this definition, the template file with the default implementation is
  * search-result.html.twig, which can be found in the
@@ -313,21 +313,22 @@
  * define a render element is to create a render element plugin. There are
  * two types of render element plugins:
  * - Generic elements: Generic render element plugins implement
- *   \Drupal\Core\Render\Element\ElementInterface, are annotated with
- *   \Drupal\Core\Render\Annotation\RenderElement annotation, go in plugin
+ *   \Drupal\Core\Render\Element\ElementInterface, have the
+ *   \Drupal\Core\Render\Attribute\RenderElement attribute, go in plugin
  *   namespace Element, and generally extend the
- *   \Drupal\Core\Render\Element\RenderElement base class.
+ *   \Drupal\Core\Render\Element\RenderElementBase base class.
  * - Form input elements: Render elements representing form input elements
- *   implement \Drupal\Core\Render\Element\FormElementInterface, are annotated
- *   with \Drupal\Core\Render\Annotation\FormElement annotation, go in plugin
- *   namespace Element, and generally extend the
- *   \Drupal\Core\Render\Element\FormElement base class.
+ *   implement \Drupal\Core\Render\Element\FormElementInterface, have the
+ *   \Drupal\Core\Render\Attribute\FormElement, go in plugin namespace Element,
+ *   and generally extend the \Drupal\Core\Render\Element\FormElementBase base
+ *   class.
  * See the @link plugin_api Plugin API topic @endlink for general information
  * on plugins. You can search for classes with the RenderElement or FormElement
- * annotation to discover what render elements are available. API reference
+ * attribute to discover what render elements are available. API reference
  * sites (such as https://api.drupal.org) generate lists of all existing
- * elements from these classes. Look for the Elements link in the API Navigation
- * block.
+ * elements from these classes. Use the
+ * @link listing_page_element Elements link @endlink in the API Navigation
+ * block to view the available elements.
  *
  * Modules can define render elements by defining an element plugin.
  *
@@ -455,8 +456,8 @@
  *   ways: no decoration at all (just a page showing the main content) or blocks
  *   (a page with regions, with blocks positioned in regions around the main
  *   content). Modules can provide additional options, by implementing a page
- *   variant, which is a plugin annotated with
- *   \Drupal\Core\Display\Annotation\PageDisplayVariant.
+ *   variant, which is a plugin with the
+ *   \Drupal\Core\Display\Attribute\PageDisplayVariant attribute.
  *
  * Routes whose controllers return a \Symfony\Component\HttpFoundation\Response
  * object are fully handled by the Symfony render pipeline.
@@ -494,16 +495,16 @@
  * processing, and form arrays.
  *
  * Each form and render element type corresponds to an element plugin class;
- * each of them either extends \Drupal\Core\Render\Element\RenderElement
- * (render elements) or \Drupal\Core\Render\Element\FormElement (form
+ * each of them either extends \Drupal\Core\Render\Element\RenderElementBase
+ * (render elements) or \Drupal\Core\Render\Element\FormElementBase (form
  * elements). Usage and properties are documented on the individual classes,
  * and the two base classes list common properties shared by all render
  * elements and the form element subset, respectively.
  *
  * @see theme_render
  * @see form_api
- * @see \Drupal\Core\Render\Element\RenderElement
- * @see \Drupal\Core\Render\Element\FormElement
+ * @see \Drupal\Core\Render\Element\RenderElementBase
+ * @see \Drupal\Core\Render\Element\FormElementBase
  *
  * @}
  */
@@ -524,9 +525,9 @@
  * Note that the base theme's form alterations will be run before any sub-theme
  * alterations.
  *
- * @param $form
+ * @param array $form
  *   Nested array of form elements that comprise the form.
- * @param $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The current state of the form.
  */
 function hook_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
@@ -549,9 +550,9 @@ function hook_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
  * For more detailed information, see the
  * @link themeable Theme system overview topic @endlink.
  *
- * @param $variables
+ * @param array $variables
  *   The variables array (modify in place).
- * @param $hook
+ * @param string $hook
  *   The name of the theme hook.
  */
 function hook_preprocess(&$variables, $hook) {
@@ -598,10 +599,10 @@ function hook_preprocess(&$variables, $hook) {
  * For more detailed information, see the
  * @link themeable Theme system overview topic @endlink.
  *
- * @param $variables
+ * @param array $variables
  *   The variables array (modify in place).
  */
-function hook_preprocess_HOOK(&$variables) {
+function hook_preprocess_HOOK(&$variables): void {
   // This example is from node_preprocess_html(). It adds the node type to
   // the body classes, when on an individual node page or node preview page.
   if (($node = \Drupal::routeMatch()->getParameter('node')) || ($node = \Drupal::routeMatch()->getParameter('node_preview'))) {
@@ -688,7 +689,7 @@ function hook_theme_suggestions_HOOK(array $variables) {
  *
  * @code
  * function MY_MODULE_theme_suggestions_alter(array &$suggestions, array &$variables, $hook) {
- *   if (\Drupal::currentUser()->isAuthenticated() && in_array($hook, array('node', 'taxonomy_term'))) {
+ *   if (\Drupal::currentUser()->isAuthenticated() && in_array($hook, ['node', 'taxonomy_term'])) {
  *     $suggestions[] = $hook . '__' . 'logged_in';
  *   }
  * }
@@ -772,7 +773,7 @@ function hook_theme_suggestions_HOOK_alter(array &$suggestions, array &$variable
  *
  * @see \Drupal\Core\Extension\ThemeInstallerInterface::install()
  */
-function hook_themes_installed($theme_list) {
+function hook_themes_installed($theme_list): void {
   foreach ($theme_list as $theme) {
     block_theme_initialize($theme);
   }
@@ -786,7 +787,7 @@ function hook_themes_installed($theme_list) {
  *
  * @see \Drupal\Core\Extension\ThemeInstallerInterface::uninstall()
  */
-function hook_themes_uninstalled(array $themes) {
+function hook_themes_uninstalled(array $themes): void {
   // Remove some state entries depending on the theme.
   foreach ($themes as $theme) {
     \Drupal::state()->delete('example.' . $theme);
@@ -875,7 +876,7 @@ function hook_element_plugin_alter(array &$definitions) {
 /**
  * Alters JavaScript before it is presented on the page.
  *
- * @param $javascript
+ * @param array $javascript
  *   An array of all JavaScript being presented on the page.
  * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
  *   The assets attached to the current response.
@@ -903,7 +904,7 @@ function hook_js_alter(&$javascript, \Drupal\Core\Asset\AttachedAssetsInterface 
  * @see core.libraries.yml
  * @see hook_library_info_alter()
  */
-function hook_library_info_build() {
+function hook_library_info_build(): array {
   $libraries = [];
   // Add a library whose information changes depending on certain conditions.
   $libraries['zombie'] = [
@@ -911,7 +912,7 @@ function hook_library_info_build() {
       'core/once',
     ],
   ];
-  if (Drupal::moduleHandler()->moduleExists('minifyzombies')) {
+  if (Drupal::moduleHandler()->moduleExists('minify_zombies')) {
     $libraries['zombie'] += [
       'js' => [
         'zombie.min.js' => [],
@@ -941,7 +942,7 @@ function hook_library_info_build() {
   // without reproducing this check. If the library definition does not exist
   // the library (of course) not be loaded but no notices or errors will be
   // triggered.
-  if (Drupal::moduleHandler()->moduleExists('vampirize')) {
+  if (Drupal::moduleHandler()->moduleExists('vampire')) {
     $libraries['vampire'] = [
       'js' => [
         'js/vampire.js' => [],
@@ -973,7 +974,7 @@ function hook_library_info_build() {
  * The results of this hook are cached, however modules may use
  * hook_js_settings_alter() to dynamically alter settings.
  */
-function hook_js_settings_build(array &$settings, \Drupal\Core\Asset\AttachedAssetsInterface $assets) {
+function hook_js_settings_build(array &$settings, \Drupal\Core\Asset\AttachedAssetsInterface $assets): void {
   // Manipulate settings.
   if (isset($settings['dialog'])) {
     $settings['dialog']['autoResize'] = FALSE;
@@ -1059,7 +1060,7 @@ function hook_library_info_alter(&$libraries, $extension) {
 /**
  * Alter CSS files before they are output on the page.
  *
- * @param $css
+ * @param array $css
  *   An array of all CSS items (files and inline CSS) being requested on the page.
  * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
  *   The assets attached to the current response.
@@ -1092,7 +1093,7 @@ function hook_css_alter(&$css, \Drupal\Core\Asset\AttachedAssetsInterface $asset
  *
  * @see hook_page_attachments_alter()
  */
-function hook_page_attachments(array &$attachments) {
+function hook_page_attachments(array &$attachments): void {
   // Unconditionally attach an asset to the page.
   $attachments['#attached']['library'][] = 'core/drupalSettings';
 
@@ -1118,7 +1119,7 @@ function hook_page_attachments(array &$attachments) {
  *
  * @see hook_page_attachments()
  */
-function hook_page_attachments_alter(array &$attachments) {
+function hook_page_attachments_alter(array &$attachments): void {
   // Conditionally remove an asset.
   if (in_array('core/jquery', $attachments['#attached']['library'])) {
     $index = array_search('core/jquery', $attachments['#attached']['library']);
@@ -1132,7 +1133,7 @@ function hook_page_attachments_alter(array &$attachments) {
  * @param array $page_top
  *   A renderable array representing the top of the page.
  */
-function hook_page_top(array &$page_top) {
+function hook_page_top(array &$page_top): void {
   $page_top['my_module'] = ['#markup' => 'This is the top.'];
 }
 
@@ -1142,7 +1143,7 @@ function hook_page_top(array &$page_top) {
  * @param array $page_bottom
  *   A renderable array representing the bottom of the page.
  */
-function hook_page_bottom(array &$page_bottom) {
+function hook_page_bottom(array &$page_bottom): void {
   $page_bottom['my_module'] = ['#markup' => 'This is the bottom.'];
 }
 
@@ -1157,7 +1158,7 @@ function hook_page_bottom(array &$page_bottom) {
  *   purposes. This is primarily useful for themes that may wish to examine
  *   existing implementations to extract data (such as arguments) so that
  *   it may properly register its own, higher priority implementations.
- * @param $type
+ * @param string $type
  *   Whether a theme, module, etc. is being processed. This is primarily useful
  *   so that themes tell if they are the actual theme being called or a parent
  *   theme. May be one of:
@@ -1168,9 +1169,9 @@ function hook_page_bottom(array &$page_bottom) {
  *     being used.
  *   - 'base_theme': A base theme is being checked for theme implementations.
  *   - 'theme': The actual theme in use is being checked.
- * @param $theme
+ * @param string $theme
  *   The actual name of theme, module, etc. that is being processed.
- * @param $path
+ * @param string $path
  *   The directory path of the theme or module, so that it doesn't need to be
  *   looked up.
  *
@@ -1247,16 +1248,32 @@ function hook_page_bottom(array &$page_bottom) {
  * @see themeable
  * @see hook_theme_registry_alter()
  */
-function hook_theme($existing, $type, $theme, $path) {
+function hook_theme($existing, $type, $theme, $path): array {
   return [
     'my_module_display' => [
-      'variables' => ['my_modules' => NULL, 'topics' => NULL, 'parents' => NULL, 'tid' => NULL, 'sortby' => NULL, 'my_module_per_page' => NULL],
+      'variables' => [
+        'my_modules' => NULL,
+        'topics' => NULL,
+        'parents' => NULL,
+        'tid' => NULL,
+        'sortby' => NULL,
+        'my_module_per_page' => NULL,
+      ],
     ],
     'my_module_list' => [
-      'variables' => ['my_modules' => NULL, 'parents' => NULL, 'tid' => NULL],
+      'variables' => [
+        'my_modules' => NULL,
+        'parents' => NULL,
+        'tid' => NULL,
+      ],
     ],
     'my_module_icon' => [
-      'variables' => ['new_posts' => NULL, 'num_posts' => 0, 'comment_mode' => 0, 'sticky' => 0],
+      'variables' => [
+        'new_posts' => NULL,
+        'num_posts' => 0,
+        'comment_mode' => 0,
+        'sticky' => 0,
+      ],
     ],
     'status_report' => [
       'render element' => 'requirements',
@@ -1281,27 +1298,27 @@ function hook_theme($existing, $type, $theme, $path) {
  *
  * For example:
  * @code
- * $theme_registry['block_content_add_list'] = array (
+ * $theme_registry['block_content_add_list'] = [
  *   'template' => 'block-content-add-list',
  *   'path' => 'core/themes/claro/templates',
  *   'type' => 'theme_engine',
  *   'theme path' => 'core/themes/claro',
- *   'includes' => array (
+ *   'includes' => [
  *     0 => 'core/modules/block_content/block_content.pages.inc',
- *   ),
- *   'variables' => array (
+ *   ],
+ *   'variables' => [
  *     'content' => NULL,
- *   ),
- *   'preprocess functions' => array (
+ *   ],
+ *   'preprocess functions' => [
  *     0 => 'template_preprocess',
  *     1 => 'template_preprocess_block_content_add_list',
  *     2 => 'contextual_preprocess',
  *     3 => 'claro_preprocess_block_content_add_list',
- *   ),
- * );
+ *   ],
+ * ];
  * @endcode
  *
- * @param $theme_registry
+ * @param array $theme_registry
  *   The entire cache of theme registry information, post-processing.
  *
  * @see hook_theme()

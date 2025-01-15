@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Connection;
@@ -51,7 +53,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * @param string|null $column
    *   Optional column to test.
    */
-  abstract public function checkSchemaComment(string $description, string $table, string $column = NULL): void;
+  abstract public function checkSchemaComment(string $description, string $table, ?string $column = NULL): void;
 
   /**
    * Tests inserting data into an existing table.
@@ -70,7 +72,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ->execute();
       return TRUE;
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       return FALSE;
     }
   }
@@ -94,7 +96,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ->execute();
       return TRUE;
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       return FALSE;
     }
   }
@@ -113,7 +115,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ->execute();
       $this->fail('Expected IntegrityConstraintViolationException not thrown');
     }
-    catch (IntegrityConstraintViolationException $e) {
+    catch (IntegrityConstraintViolationException) {
       // Do nothing, it's the expected behavior.
     }
   }
@@ -728,7 +730,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ->execute();
       $this->fail('Expected IntegrityConstraintViolationException not thrown');
     }
-    catch (IntegrityConstraintViolationException $e) {
+    catch (IntegrityConstraintViolationException) {
     }
 
     // Ensure auto numbering now works.

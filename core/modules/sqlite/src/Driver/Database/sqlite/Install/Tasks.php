@@ -16,9 +16,10 @@ class Tasks extends InstallTasks {
    * Minimum required SQLite version.
    *
    * Use to build sqlite library with json1 option for JSON datatype support.
+   *
    * @see https://www.sqlite.org/json1.html
    */
-  const SQLITE_MINIMUM_VERSION = '3.26';
+  const SQLITE_MINIMUM_VERSION = '3.45';
 
   /**
    * {@inheritdoc}

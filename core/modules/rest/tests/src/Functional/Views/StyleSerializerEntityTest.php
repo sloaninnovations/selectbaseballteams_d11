@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Functional\Views;
 
 use Drupal\Component\Serialization\Json;
@@ -19,7 +21,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  * Tests the serializer style plugin.
  *
  * @group rest
- * @group #slow
  * @see \Drupal\rest\Plugin\views\display\RestExport
  * @see \Drupal\rest\Plugin\views\style\Serializer
  * @see \Drupal\rest\Plugin\views\row\DataEntityRow
@@ -30,9 +31,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'views_ui',
@@ -58,6 +57,10 @@ class StyleSerializerEntityTest extends ViewTestBase {
 
   /**
    * A user with administrative privileges to look at test entity and configure views.
+   *
+   * @var \Drupal\user\Entity\User|false
+   *
+   * @see \Drupal\Tests\user\Traits\UserCreationTrait::createUser
    */
   protected $adminUser;
 
@@ -93,7 +96,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
   /**
    * Checks the behavior of the Serializer callback paths and row plugins.
    */
-  public function testSerializerResponses() {
+  public function testSerializerResponses(): void {
     // Test the serialize callback.
     $view = Views::getView('test_serializer_display_field');
     $view->initDisplay();
@@ -204,7 +207,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
    * @param string $format
    *   The new request format.
    */
-  protected function addRequestWithFormat($format) {
+  protected function addRequestWithFormat($format): void {
     $request = \Drupal::request();
     $request = clone $request;
     $request->setRequestFormat($format);
@@ -215,7 +218,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
   /**
    * Tests REST export with views render caching enabled.
    */
-  public function testRestRenderCaching() {
+  public function testRestRenderCaching(): void {
     $this->drupalLogin($this->adminUser);
     /** @var \Drupal\Core\Render\RenderCacheInterface $render_cache */
     $render_cache = \Drupal::service('render_cache');
@@ -306,7 +309,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
   /**
    * Tests the response format configuration.
    */
-  public function testResponseFormatConfiguration() {
+  public function testResponseFormatConfiguration(): void {
     $this->drupalLogin($this->adminUser);
 
     $style_options = 'admin/structure/views/nojs/display/test_serializer_display_field/rest_export_1/style_options';
@@ -336,7 +339,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $this->submitForm([], 'Save');
 
     // Should return a 406. Emulates a sample Firefox header.
-    $this->drupalGet('test/serialize/field', [], ['Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8']);
+    $this->drupalGet('test/serialize/field', [], ['Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8']);
     $this->assertSession()->responseHeaderEquals('content-type', 'text/html; charset=UTF-8');
     $this->assertSession()->statusCodeEquals(406);
 
@@ -381,7 +384,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
   /**
    * Tests the field ID alias functionality of the DataFieldRow plugin.
    */
-  public function testUIFieldAlias() {
+  public function testUIFieldAlias(): void {
     $this->drupalLogin($this->adminUser);
 
     // Test the UI settings for adding field ID aliases.
@@ -451,7 +454,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
   /**
    * Tests the raw output options for row field rendering.
    */
-  public function testFieldRawOutput() {
+  public function testFieldRawOutput(): void {
     $this->drupalLogin($this->adminUser);
 
     // Test the UI settings for adding field ID aliases.
@@ -518,7 +521,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
   /**
    * Tests the live preview output for json output.
    */
-  public function testLivePreview() {
+  public function testLivePreview(): void {
     // We set up a request so it looks like a request in the live preview.
     $request = new Request();
     $request->query->add([MainContentViewSubscriber::WRAPPER_FORMAT => 'drupal_ajax']);
@@ -572,7 +575,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
   /**
    * Tests the views interface for REST export displays.
    */
-  public function testSerializerViewsUI() {
+  public function testSerializerViewsUI(): void {
     $this->drupalLogin($this->adminUser);
     // Click the "Update preview button".
     $this->drupalGet('admin/structure/views/view/test_serializer_display_field/edit/rest_export_1');

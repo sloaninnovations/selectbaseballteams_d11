@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 
 /**
@@ -20,23 +21,21 @@ use Drupal\Core\Render\Element;
  *
  * Usage Example:
  * @code
- * $form['actions']['preview'] = array(
+ * $form['actions']['preview'] = [
  *   '#type' => 'button',
  *   '#value' => $this->t('Preview'),
- * );
+ * ];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Submit
- *
- * @FormElement("button")
  */
-class Button extends FormElement {
+#[FormElement('button')]
+class Button extends FormElementBase {
 
   /**
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#name' => 'op',
@@ -44,11 +43,11 @@ class Button extends FormElement {
       '#executes_submit_callback' => FALSE,
       '#limit_validation_errors' => FALSE,
       '#process' => [
-        [$class, 'processButton'],
-        [$class, 'processAjaxForm'],
+        [static::class, 'processButton'],
+        [static::class, 'processAjaxForm'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderButton'],
+        [static::class, 'preRenderButton'],
       ],
       '#theme_wrappers' => ['input__submit'],
     ];

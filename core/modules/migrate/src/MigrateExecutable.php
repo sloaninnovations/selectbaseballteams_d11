@@ -85,9 +85,9 @@ class MigrateExecutable implements MigrateExecutableInterface {
   /**
    * Migration message service.
    *
-   * @todo https://www.drupal.org/node/2822663 Make this protected.
-   *
    * @var \Drupal\migrate\MigrateMessageInterface
+   *
+   * @todo https://www.drupal.org/node/2822663 Make this protected.
    */
   public $message;
 
@@ -101,7 +101,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   (optional) The event dispatcher.
    */
-  public function __construct(MigrationInterface $migration, MigrateMessageInterface $message = NULL, EventDispatcherInterface $event_dispatcher = NULL) {
+  public function __construct(MigrationInterface $migration, ?MigrateMessageInterface $message = NULL, ?EventDispatcherInterface $event_dispatcher = NULL) {
     $this->migration = $migration;
     $this->message = $message ?: new MigrateMessage();
     $this->getIdMap()->setMessage($this->message);
@@ -152,6 +152,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
       $this->message->display($this->t('Migration @id is busy with another operation: @status',
         [
           '@id' => $this->migration->id(),
+          // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
           '@status' => $this->t($this->migration->getStatusLabel()),
         ]), 'error');
       return MigrationInterface::RESULT_FAILED;
@@ -315,6 +316,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
   public function rollback() {
     // Only begin the rollback operation if the migration is currently idle.
     if ($this->migration->getStatus() !== MigrationInterface::STATUS_IDLE) {
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $this->message->display($this->t('Migration @id is busy with another operation: @status', ['@id' => $this->migration->id(), '@status' => $this->t($this->migration->getStatusLabel())]), 'error');
       return MigrationInterface::RESULT_FAILED;
     }
@@ -387,7 +389,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
   /**
    * {@inheritdoc}
    */
-  public function processRow(Row $row, array $process = NULL, $value = NULL) {
+  public function processRow(Row $row, ?array $process = NULL, $value = NULL) {
     foreach ($this->migration->getProcessPlugins($process) as $destination => $plugins) {
       $this->processPipeline($row, $destination, $plugins, $value);
     }
@@ -452,7 +454,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
         try {
           $value = $plugin->transform($value, $this, $row, $destination);
         }
-        catch (MigrateSkipProcessException $e) {
+        catch (MigrateSkipProcessException) {
           $value = NULL;
           break;
         }
@@ -612,32 +614,12 @@ class MigrateExecutable implements MigrateExecutableInterface {
     // Entity storage can blow up with caches, so clear it out.
     \Drupal::service('entity.memory_cache')->deleteAll();
 
-    // @TODO: explore resetting the container.
+    // @todo Explore resetting the container.
 
     // Run garbage collector to further reduce memory.
     gc_collect_cycles();
 
     return memory_get_usage();
-  }
-
-  /**
-   * Generates a string representation for the given byte count.
-   *
-   * @param int $size
-   *   A size in bytes.
-   *
-   * @return string
-   *   A translated string representation of the size.
-   *
-   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
-   *   \Drupal\Core\StringTranslation\ByteSizeMarkup::create($size, $langcode)
-   *   instead.
-   *
-   * @see https://www.drupal.org/node/2999981
-   */
-  protected function formatSize($size) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\Core\StringTranslation\ByteSizeMarkup::create($size, $langcode) instead. See https://www.drupal.org/node/2999981', E_USER_DEPRECATED);
-    return format_size($size);
   }
 
 }

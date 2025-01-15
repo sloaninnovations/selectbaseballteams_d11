@@ -18,7 +18,7 @@ class PerComponentEntityFormDisplayTest extends MigrateTestCase {
   /**
    * Tests the entity display import method.
    */
-  public function testImport() {
+  public function testImport(): void {
     $values = [
       'entity_type' => 'entity_type_test',
       'bundle' => 'bundle_test',
@@ -36,7 +36,7 @@ class PerComponentEntityFormDisplayTest extends MigrateTestCase {
     $entity->expects($this->once())
       ->method('setComponent')
       ->with('field_name_test', ['test setting'])
-      ->will($this->returnSelf());
+      ->willReturnSelf();
     $entity->expects($this->once())
       ->method('save')
       ->with();
@@ -49,7 +49,15 @@ class PerComponentEntityFormDisplayTest extends MigrateTestCase {
 
 class TestPerComponentEntityFormDisplay extends PerComponentEntityFormDisplay {
   const MODE_NAME = 'form_mode';
+
+  /**
+   * The test values.
+   */
   protected $testValues;
+
+  /**
+   * The test entity.
+   */
   protected $entity;
 
   public function __construct($entity) {

@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workspaces\Kernel;
+
+// cspell:ignore differring
 
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\entity_test\Entity\EntityTestMulRevPub;
+use Drupal\form_test\Form\FormTestAlterForm;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\system\Form\SiteInformationForm;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
@@ -21,7 +25,6 @@ use Drupal\workspaces\WorkspacePublishException;
 /**
  * Tests a complete publishing scenario across different workspaces.
  *
- * @group #slow
  * @group workspaces
  */
 class WorkspaceIntegrationTest extends KernelTestBase {
@@ -69,6 +72,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     'language',
     'content_translation',
     'path_alias',
+    'form_test',
   ];
 
   /**
@@ -112,7 +116,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   /**
    * Tests various scenarios for creating and publishing content in workspaces.
    */
-  public function testWorkspaces() {
+  public function testWorkspaces(): void {
     $this->initializeWorkspacesModule();
 
     // Notes about the structure of the test scenarios:
@@ -375,7 +379,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
    * @covers ::workspaces_entity_delete
    * @covers ::workspaces_entity_revision_delete
    */
-  public function testWorkspaceAssociationDataIntegrity() {
+  public function testWorkspaceAssociationDataIntegrity(): void {
     $this->initializeWorkspacesModule();
 
     // Check the initial empty state.
@@ -405,9 +409,13 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     // revision is tracked in the workspace association data. Note that revision
     // '5' has been created as an unpublished default revision in Live, so it is
     // not tracked.
-    $this->createNode(['title' => 'stage - 4 - r6 - published', 'created' => $this->createdTimestamp++, 'status' => TRUE]);
+    $node = $this->createNode(['title' => 'stage - 4 - r6 - published', 'created' => $this->createdTimestamp++, 'status' => TRUE]);
     $expected_workspace_association = ['stage' => [6]];
     $this->assertWorkspaceAssociation($expected_workspace_association, 'node');
+
+    // Check that the entity object that was saved has been updated to point to
+    // the workspace-specific revision.
+    $this->assertEquals(6, $node->getRevisionId());
 
     // Delete revision '6' and check that the workspace association does not
     // track it anymore.
@@ -419,7 +427,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   /**
    * Tests entity tracking in workspace descendants.
    */
-  public function testWorkspaceHierarchy() {
+  public function testWorkspaceHierarchy(): void {
     $this->initializeWorkspacesModule();
     $this->createWorkspaceHierarchy();
 
@@ -534,7 +542,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   /**
    * Tests workspace publishing as anonymous user, simulating a CLI request.
    */
-  public function testCliPublishing() {
+  public function testCliPublishing(): void {
     $this->initializeWorkspacesModule();
     $this->switchToWorkspace('stage');
 
@@ -554,7 +562,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   /**
    * Tests entity query overrides without any conditions.
    */
-  public function testEntityQueryWithoutConditions() {
+  public function testEntityQueryWithoutConditions(): void {
     $this->initializeWorkspacesModule();
     $this->switchToWorkspace('stage');
 
@@ -581,7 +589,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   /**
    * Tests the Entity Query relationship API with workspaces.
    */
-  public function testEntityQueryRelationship() {
+  public function testEntityQueryRelationship(): void {
     $this->initializeWorkspacesModule();
 
     // Add an entity reference field that targets 'entity_test_mulrevpub'
@@ -668,7 +676,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
    *
    * @dataProvider providerTestAllowedEntityCrudInNonDefaultWorkspace
    */
-  public function testDisallowedEntityCreateInNonDefaultWorkspace($entity_type_id, $allowed) {
+  public function testDisallowedEntityCreateInNonDefaultWorkspace($entity_type_id, $allowed): void {
     $this->initializeWorkspacesModule();
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
@@ -684,7 +692,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     if (!$allowed) {
       $this->expectException(EntityStorageException::class);
-      $this->expectExceptionMessage('This entity can only be saved in the default workspace.');
+      $this->expectExceptionMessage("The \"$entity_type_id\" entity type can only be saved in the default workspace.");
     }
     $entity->save();
   }
@@ -694,7 +702,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
    *
    * @dataProvider providerTestAllowedEntityCrudInNonDefaultWorkspace
    */
-  public function testDisallowedEntityUpdateInNonDefaultWorkspace($entity_type_id, $allowed) {
+  public function testDisallowedEntityUpdateInNonDefaultWorkspace($entity_type_id, $allowed): void {
     $this->initializeWorkspacesModule();
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
@@ -715,7 +723,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     if (!$allowed) {
       $this->expectException(EntityStorageException::class);
-      $this->expectExceptionMessage('This entity can only be saved in the default workspace.');
+      $this->expectExceptionMessage("The \"$entity_type_id\" entity type can only be saved in the default workspace.");
     }
     $entity->save();
   }
@@ -725,7 +733,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
    *
    * @dataProvider providerTestAllowedEntityCrudInNonDefaultWorkspace
    */
-  public function testDisallowedEntityDeleteInNonDefaultWorkspace($entity_type_id, $allowed) {
+  public function testDisallowedEntityDeleteInNonDefaultWorkspace($entity_type_id, $allowed): void {
     $this->initializeWorkspacesModule();
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
@@ -744,7 +752,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     if (!$allowed) {
       $this->expectException(EntityStorageException::class);
-      $this->expectExceptionMessage('This entity can only be deleted in the default workspace.');
+      $this->expectExceptionMessage("This {$entity->getEntityType()->getSingularLabel()} can only be deleted in the Live workspace.");
     }
     $entity->delete();
   }
@@ -772,7 +780,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   /**
    * @covers \Drupal\workspaces\WorkspaceManager::executeInWorkspace
    */
-  public function testExecuteInWorkspaceContext() {
+  public function testExecuteInWorkspaceContext(): void {
     $this->initializeWorkspacesModule();
 
     // Create an entity in the default workspace.
@@ -874,23 +882,6 @@ class WorkspaceIntegrationTest extends KernelTestBase {
           $this->assertNoRaw($expected_entity_values[$entity_keys['label']]);
         }
       }
-
-      // Add a filter on a field that is stored in a dedicated table in order to
-      // test field joins with extra conditions (e.g. 'deleted' and 'langcode').
-      $view->destroy();
-      $view->setDisplay('page_1');
-      $filters = $view->displayHandlers->get('page_1')->getOption('filters');
-      $view->displayHandlers->get('page_1')->overrideOption('filters', $filters + [
-        'body_value' => [
-          'id' => 'body_value',
-          'table' => 'node__body',
-          'field' => 'body_value',
-          'operator' => 'not empty',
-          'plugin_id' => 'string',
-        ],
-      ]);
-      $view->execute();
-      $this->assertIdenticalResultset($view, $expected_frontpage, ['nid' => 'nid']);
     }
   }
 
@@ -1046,7 +1037,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
    *   An array where all the entity IDs and revision IDs are merged inside each
    *   expected values array.
    */
-  protected function flattenExpectedValues(array $expected, $entity_type_id) {
+  protected function flattenExpectedValues(array $expected, $entity_type_id): array {
     $flattened = [];
 
     $entity_keys = $this->entityTypeManager->getDefinition($entity_type_id)->getKeys();
@@ -1064,7 +1055,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   /**
    * Tests that entity forms can be stored in the form cache.
    */
-  public function testFormCacheForEntityForms() {
+  public function testFormCacheForEntityForms(): void {
     $this->initializeWorkspacesModule();
     $this->switchToWorkspace('stage');
 
@@ -1081,21 +1072,21 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   /**
    * Tests that non-entity forms can be stored in the form cache.
    */
-  public function testFormCacheForRegularForms() {
+  public function testFormCacheForRegularForms(): void {
     $this->initializeWorkspacesModule();
     $this->switchToWorkspace('stage');
 
     $form_builder = $this->container->get('form_builder');
 
     $form_state = new FormState();
-    $built_form = $form_builder->getForm(SiteInformationForm::class, $form_state);
+    $built_form = $form_builder->getForm(FormTestAlterForm::class, $form_state);
     $form_builder->setCache($built_form['#build_id'], $built_form, $form_state);
   }
 
   /**
    * Tests publishing with fields in dedicated table storage.
    */
-  public function testPublishWorkspaceDedicatedTableStorage() {
+  public function testPublishWorkspaceDedicatedTableStorage(): void {
     $this->initializeWorkspacesModule();
     $node_storage = $this->entityTypeManager->getStorage('node');
 
@@ -1129,7 +1120,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
    * so enable it and test getDifferringRevisionIdsOnTarget() with an anonymous
    * node.
    */
-  public function testNodeAccessDifferringRevisionIdsOnTarget() {
+  public function testNodeAccessDifferringRevisionIdsOnTarget(): void {
     $this->initializeWorkspacesModule();
     \Drupal::service('module_installer')->install(['node_access_test']);
     node_access_rebuild();

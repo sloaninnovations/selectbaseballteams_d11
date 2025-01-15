@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
@@ -18,9 +20,7 @@ class EntityQueryRelationshipTest extends EntityKernelTestBase {
   use EntityReferenceFieldCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['taxonomy'];
 
@@ -84,7 +84,7 @@ class EntityQueryRelationshipTest extends EntityKernelTestBase {
       ],
       'auto_create' => TRUE,
     ];
-    $this->createEntityReferenceField('entity_test', 'test_bundle', $this->fieldName, NULL, 'taxonomy_term', 'default', $handler_settings);
+    $this->createEntityReferenceField('entity_test', 'test_bundle', $this->fieldName, '', 'taxonomy_term', 'default', $handler_settings);
 
     // Create two terms and also two accounts.
     for ($i = 0; $i <= 1; $i++) {
@@ -113,7 +113,7 @@ class EntityQueryRelationshipTest extends EntityKernelTestBase {
   /**
    * Tests querying.
    */
-  public function testQuery() {
+  public function testQuery(): void {
     $storage = $this->container->get('entity_type.manager')->getStorage('entity_test');
     // This returns the 0th entity as that's the only one pointing to the 0th
     // account.
@@ -212,7 +212,7 @@ class EntityQueryRelationshipTest extends EntityKernelTestBase {
   /**
    * Tests the invalid specifier in the query relationship.
    */
-  public function testInvalidSpecifier() {
+  public function testInvalidSpecifier(): void {
     $this->expectException(PluginNotFoundException::class);
     $this->container
       ->get('entity_type.manager')

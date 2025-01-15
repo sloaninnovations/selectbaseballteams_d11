@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Functional;
 
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
@@ -70,7 +72,7 @@ class LayoutBuilderAccessTest extends BrowserTestBase {
    * @param array $permission_dependencies
    *   An array of expected permission dependencies.
    */
-  public function testAccessWithBundles(array $permissions, $default_access, $non_editable_access, $editable_access, array $permission_dependencies) {
+  public function testAccessWithBundles(array $permissions, $default_access, $non_editable_access, $editable_access, array $permission_dependencies): void {
     $permissions[] = 'edit own bundle_with_section_field content';
     $permissions[] = 'access content';
     $user = $this->drupalCreateUser($permissions);
@@ -185,7 +187,7 @@ class LayoutBuilderAccessTest extends BrowserTestBase {
    *
    * @dataProvider providerTestAccessWithoutBundles
    */
-  public function testAccessWithoutBundles(array $permissions, $default_access, $non_editable_access, $editable_access, array $permission_dependencies) {
+  public function testAccessWithoutBundles(array $permissions, $default_access, $non_editable_access, $editable_access, array $permission_dependencies): void {
     $permissions[] = 'access user profiles';
     $user = $this->drupalCreateUser($permissions);
     $this->drupalLogin($user);

@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 
@@ -20,7 +21,7 @@ class SortDateTest extends ViewsKernelTestBase {
    */
   public static $testViews = ['test_view'];
 
-  protected function expectedResultSet($granularity, $reverse = TRUE) {
+  protected function expectedResultSet($granularity, $reverse = TRUE): array {
     $expected = [];
     if (!$reverse) {
       switch ($granularity) {
@@ -155,7 +156,7 @@ class SortDateTest extends ViewsKernelTestBase {
   /**
    * Tests numeric ordering of the result set.
    */
-  public function testDateOrdering() {
+  public function testDateOrdering(): void {
     foreach (['second', 'minute', 'hour', 'day', 'month', 'year'] as $granularity) {
       foreach ([FALSE, TRUE] as $reverse) {
         $view = Views::getView('test_view');
@@ -202,7 +203,7 @@ class SortDateTest extends ViewsKernelTestBase {
         // Verify the result.
         $this->assertIdenticalResultset($view, $this->expectedResultSet($granularity, $reverse), [
           'views_test_data_name' => 'name',
-        ], new FormattableMarkup('Result is returned correctly when ordering by granularity @granularity, @reverse.', ['@granularity' => $granularity, '@reverse' => $reverse ? 'reverse' : 'forward']));
+        ], sprintf('Result is returned correctly when ordering by granularity %s, %s.', $granularity, $reverse ? 'reverse' : 'forward'));
         $view->destroy();
         unset($view);
       }

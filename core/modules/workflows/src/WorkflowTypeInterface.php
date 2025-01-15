@@ -241,12 +241,12 @@ interface WorkflowTypeInterface extends PluginWithFormsInterface, DerivativeInsp
    * @throws \InvalidArgumentException
    *   Thrown if $transition_ids contains a transition ID that does not exist.
    */
-  public function getTransitions(array $transition_ids = NULL);
+  public function getTransitions(?array $transition_ids = NULL);
 
   /**
    * Gets the transitions for a state for the provided direction.
    *
-   * @param $state_id
+   * @param string $state_id
    *   The state to get transitions for.
    * @param string $direction
    *   (optional) The direction of the transition, defaults to

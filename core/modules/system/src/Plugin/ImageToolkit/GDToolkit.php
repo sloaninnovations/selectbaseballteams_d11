@@ -5,13 +5,16 @@ namespace Drupal\system\Plugin\ImageToolkit;
 use Drupal\Component\Utility\Color;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\ImageToolkit\Attribute\ImageToolkit;
 use Drupal\Core\ImageToolkit\ImageToolkitBase;
 use Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -19,12 +22,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines the GD2 toolkit for image manipulation within Drupal.
- *
- * @ImageToolkit(
- *   id = "gd",
- *   title = @Translation("GD2 image manipulation toolkit")
- * )
  */
+#[ImageToolkit(
+  id: "gd",
+  title: new TranslatableMarkup("GD2 image manipulation toolkit"),
+)]
 class GDToolkit extends ImageToolkitBase {
 
   /**
@@ -74,7 +76,7 @@ class GDToolkit extends ImageToolkitBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface $operation_manager
@@ -108,85 +110,6 @@ class GDToolkit extends ImageToolkitBase {
       $container->get('stream_wrapper_manager'),
       $container->get('file_system')
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __get(string $name) {
-    if ($name === 'resource') {
-      @trigger_error('Accessing the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead. See https://www.drupal.org/node/3265963', E_USER_DEPRECATED);
-      return $this->image;
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __set(string $name, mixed $value): void {
-    if ($name === 'resource') {
-      @trigger_error('Setting the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead. See https://www.drupal.org/node/3265963', E_USER_DEPRECATED);
-      $this->image = $value;
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __isset(string $name): bool {
-    if ($name === 'resource') {
-      @trigger_error('Checking the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead. See https://www.drupal.org/node/3265963', E_USER_DEPRECATED);
-      return isset($this->image);
-    }
-    return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __unset(string $name): void {
-    if ($name === 'resource') {
-      @trigger_error('Unsetting the \Drupal\system\Plugin\ImageToolkit\GDToolkit::resource property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::image instead. See https://www.drupal.org/node/3265963', E_USER_DEPRECATED);
-      unset($this->image);
-    }
-  }
-
-  /**
-   * Sets the GD image resource.
-   *
-   * @param \GdImage $resource
-   *   The GD image resource.
-   *
-   * @return $this
-   *   An instance of the current toolkit object.
-   *
-   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
-   *   \Drupal\system\Plugin\ImageToolkit\GDToolkit::setImage() instead.
-   *
-   * @see https://www.drupal.org/node/3265963
-   */
-  public function setResource($resource) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::setImage() instead. See https://www.drupal.org/node/3265963', E_USER_DEPRECATED);
-    if (!$resource instanceof \GdImage) {
-      throw new \InvalidArgumentException('Invalid resource argument');
-    }
-    return $this->setImage($resource);
-  }
-
-  /**
-   * Retrieves the GD image resource.
-   *
-   * @return \GdImage|null
-   *   The GD image resource, or NULL if not available.
-   *
-   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
-   *   \Drupal\system\Plugin\ImageToolkit\GDToolkit::getImage() instead.
-   *
-   * @see https://www.drupal.org/node/3265963
-   */
-  public function getResource() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\system\Plugin\ImageToolkit\GDToolkit::getImage() instead. See https://www.drupal.org/node/3265963', E_USER_DEPRECATED);
-    return $this->getImage();
   }
 
   /**
@@ -367,10 +290,10 @@ class GDToolkit extends ImageToolkitBase {
     // Move temporary local file to remote destination.
     if (isset($permanent_destination) && $success) {
       try {
-        $this->fileSystem->move($destination, $permanent_destination, FileSystemInterface::EXISTS_REPLACE);
+        $this->fileSystem->move($destination, $permanent_destination, FileExists::Replace);
         return TRUE;
       }
-      catch (FileException $e) {
+      catch (FileException) {
         return FALSE;
       }
     }

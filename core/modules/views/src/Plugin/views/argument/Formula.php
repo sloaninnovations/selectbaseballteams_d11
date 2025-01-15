@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\argument;
 
+use Drupal\views\Attribute\ViewsArgument;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ViewExecutable;
 
@@ -14,17 +15,21 @@ use Drupal\views\ViewExecutable;
  * - formula: The formula to use for this handler.
  *
  * @ingroup views_argument_handlers
- *
- * @ViewsArgument("formula")
- */
+  */
+#[ViewsArgument(
+  id: 'formula',
+)]
 class Formula extends ArgumentPluginBase {
 
+  /**
+   * An appropriate SQL string for the DB type and field type.
+   */
   public $formula = NULL;
 
   /**
    * {@inheritdoc}
    */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
     if (!empty($this->definition['formula'])) {

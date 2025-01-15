@@ -2,43 +2,12 @@
 
 /**
  * @file
- * Administrative screens and processing functions of the Update Manager module.
- *
- * This allows site administrators with the 'administer software updates'
- * permission to either upgrade existing projects, or download and install new
- * ones, so long as the kill switch setting ('allow_authorize_operations') is
- * not FALSE.
- *
- * To install new code, the administrator is prompted for either the URL of an
- * archive file, or to directly upload the archive file. The archive is loaded
- * into a temporary location, extracted, and verified. If everything is
- * successful, the user is redirected to authorize.php to type in file transfer
- * credentials and authorize the installation to proceed with elevated
- * privileges, such that the extracted files can be copied out of the temporary
- * location and into the live web root.
- *
- * Updating existing code is a more elaborate process. The first step is a
- * selection form where the user is presented with a table of installed projects
- * that are missing newer releases. The user selects which projects they wish to
- * update, and presses the "Download updates" button to continue. This sets up a
- * batch to fetch all the selected releases, and redirects to
- * admin/update/download to display the batch progress bar as it runs. Each
- * batch operation is responsible for downloading a single file, extracting the
- * archive, and verifying the contents. If there are any errors, the user is
- * redirected back to the first page with the error messages. If all downloads
- * were extracted and verified, the user is instead redirected to
- * admin/update/ready, a landing page which reminds them to backup their
- * database and asks if they want to put the site offline during the update.
- * Once the user presses the "Install updates" button, they are redirected to
- * authorize.php to supply their web root file access credentials. The
- * authorized operation (which lives in update.authorize.inc) sets up a batch to
- * copy each extracted update from the temporary location into the live web
- * root.
  */
 
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
-use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\File\FileExists;
+use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\Url;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -46,11 +15,12 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 /**
  * Batch callback: Performs actions when the download batch is completed.
  *
- * @param $success
+ * @param bool $success
  *   TRUE if the batch operation was successful, FALSE if there were errors.
- * @param $results
+ * @param array $results
  *   An associative array of results from the batch operation.
  */
+#[StopProceduralHookScan]
 function update_manager_download_batch_finished($success, $results) {
   if (!empty($results['errors'])) {
     $item_list = [
@@ -176,7 +146,7 @@ function update_manager_archive_extract($file, $directory) {
     try {
       \Drupal::service('file_system')->deleteRecursive($extract_location);
     }
-    catch (FileException $e) {
+    catch (FileException) {
       // Ignore failed deletes.
     }
   }
@@ -210,7 +180,7 @@ function update_manager_archive_verify($project, $archive_file, $directory) {
  *
  * Returns the local path if the file has already been downloaded.
  *
- * @param $url
+ * @param string $url
  *   The URL of the file on the server.
  *
  * @return string|false
@@ -231,7 +201,7 @@ function update_manager_file_get($url) {
   if (!file_exists($local) || update_delete_file_if_stale($local)) {
     try {
       $data = (string) \Drupal::httpClient()->get($url)->getBody();
-      return \Drupal::service('file_system')->saveData($data, $local, FileSystemInterface::EXISTS_REPLACE);
+      return \Drupal::service('file_system')->saveData($data, $local, FileExists::Replace);
     }
     catch (ClientExceptionInterface $exception) {
       \Drupal::messenger()->addError(t('Failed to fetch file due to error "%error"', ['%error' => $exception->getMessage()]));

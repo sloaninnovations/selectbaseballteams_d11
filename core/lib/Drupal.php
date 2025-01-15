@@ -75,7 +75,7 @@ class Drupal {
   /**
    * The current system version.
    */
-  const VERSION = '11.0-dev';
+  const VERSION = '11.2-dev';
 
   /**
    * Core API compatibility.
@@ -113,7 +113,7 @@ class Drupal {
    * - Once in the error message printed to the user immediately after.
    * Remember to update both whenever this constant is updated.
    */
-  const MINIMUM_PHP = '8.1.0';
+  const MINIMUM_PHP = '8.3.0';
 
   /**
    * Minimum recommended value of PHP memory_limit.
@@ -131,7 +131,14 @@ class Drupal {
    * message, but Drupal can still be installed. Used for (e.g.) PHP versions
    * that have reached their EOL or will in the near future.
    */
-  const RECOMMENDED_PHP = '8.2.0';
+  const RECOMMENDED_PHP = '8.3.0';
+
+  /**
+   * Default location of gettext file on the translation server.
+   *
+   * @see locale_translation_default_translation_server()
+   */
+  const TRANSLATION_DEFAULT_SERVER_PATTERN = 'https://ftp.drupal.org/files/translations/%core/%project/%project-%version.%language.po';
 
   /**
    * The currently active container object, or NULL if not initialized yet.
@@ -223,8 +230,10 @@ class Drupal {
   /**
    * Gets the active install profile.
    *
-   * @return string|null
-   *   The name of the active install profile.
+   * @return string|false|null
+   *   The name of the active install profile. FALSE indicates that the site is
+   *   not using an install profile. NULL indicates that the site has not yet
+   *   been installed.
    */
   public static function installProfile() {
     return static::getContainer()->getParameter('install_profile');

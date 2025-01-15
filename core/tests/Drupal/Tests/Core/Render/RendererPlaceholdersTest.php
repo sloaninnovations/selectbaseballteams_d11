@@ -9,7 +9,9 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\PlaceholderingRenderCache;
 use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\Renderer;
 use Drupal\Core\Security\TrustedCallbackInterface;
 
 /**
@@ -61,8 +63,8 @@ class RendererPlaceholdersTest extends RendererTestBase {
    *
    * @return array
    */
-  public function providerPlaceholders() {
-    $args = [$this->randomContextValue()];
+  public static function providerPlaceholders(): array {
+    $args = [static::randomContextValue()];
 
     $generate_placeholder_markup = function ($cache_keys = NULL) use ($args) {
       $token_render_array = [
@@ -147,7 +149,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
     // Note the absence of '#create_placeholder', presence of max-age=0 created
     // by the #lazy_builder callback.
     // @todo in https://www.drupal.org/node/2559847
-    $base_element_a5 = [];
+    //   $base_element_a5 = [];
     // Note the absence of '#create_placeholder', presence of high cardinality
     // cache context created by the #lazy_builder callback.
     // @see \Drupal\Tests\Core\Render\PlaceholdersTest::callbackPerUser()
@@ -471,7 +473,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
     // - uncacheable
     $x = $base_element_b;
     $expected_placeholder_render_array = $x['#attached']['placeholders'][(string) $generate_placeholder_markup()];
-    $this->assertArrayNotHasKey('#cache', $expected_placeholder_render_array);
+    self::assertArrayNotHasKey('#cache', $expected_placeholder_render_array);
     $cases[] = [
       $x,
       $args,
@@ -528,8 +530,8 @@ class RendererPlaceholdersTest extends RendererTestBase {
    *   - A render array containing a placeholder.
    *   - The context used for that #lazy_builder callback.
    */
-  protected function generatePlaceholderElement() {
-    $args = [$this->randomContextValue()];
+  protected function generatePlaceholderElement(): array {
+    $args = [static::randomContextValue()];
     $test_element = [];
     $test_element['#attached']['drupalSettings']['foo'] = 'bar';
     $test_element['placeholder']['#cache']['keys'] = ['placeholder', 'output', 'can', 'be', 'render', 'cached', 'too'];
@@ -548,7 +550,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    *
    * @internal
    */
-  protected function assertPlaceholderRenderCache($cache_keys, array $expected_data) {
+  protected function assertPlaceholderRenderCache($cache_keys, array $expected_data): void {
     if ($cache_keys !== FALSE) {
       $cached = $this->memoryCache->get($cache_keys, CacheableMetadata::createFromRenderArray($expected_data));
       $cached_element = $cached->data;
@@ -562,9 +564,9 @@ class RendererPlaceholdersTest extends RendererTestBase {
    *
    * @dataProvider providerPlaceholders
    */
-  public function testUncacheableParent($element, $args, array $expected_placeholder_render_array, $placeholder_cache_keys, array $bubbled_cache_contexts, array $bubbled_cache_tags, array $placeholder_expected_render_cache_array) {
+  public function testUncacheableParent(array $element, array $args, array $expected_placeholder_render_array, array|false $placeholder_cache_keys, array $bubbled_cache_contexts, array $bubbled_cache_tags, array $placeholder_expected_render_cache_array): void {
     if ($placeholder_cache_keys) {
-      $this->setupMemoryCache();
+      $this->setUpMemoryCache();
     }
     else {
       $this->setUpUnusedCache();
@@ -593,7 +595,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    *
    * @dataProvider providerPlaceholders
    */
-  public function testCacheableParent($test_element, $args, array $expected_placeholder_render_array, $placeholder_cache_keys, array $bubbled_cache_contexts, array $bubbled_cache_tags, array $placeholder_expected_render_cache_array) {
+  public function testCacheableParent(array $test_element, array $args, array $expected_placeholder_render_array, array|false $placeholder_cache_keys, array $bubbled_cache_contexts, array $bubbled_cache_tags, array $placeholder_expected_render_cache_array): void {
     $element = $test_element;
     $this->setupMemoryCache();
 
@@ -726,8 +728,8 @@ class RendererPlaceholdersTest extends RendererTestBase {
    *
    * @dataProvider providerPlaceholders
    */
-  public function testCacheableParentWithPostRequest($test_element, $args) {
-    $this->setUpUnusedCache();
+  public function testCacheableParentWithPostRequest(array $test_element, array $args): void {
+    $this->setUpMemoryCache();
 
     // Verify behavior when handling a non-GET request, e.g. a POST request:
     // also in that case, placeholders must be replaced.
@@ -762,8 +764,13 @@ class RendererPlaceholdersTest extends RendererTestBase {
    *
    * @dataProvider providerPlaceholders
    */
-  public function testPlaceholderingDisabledForPostRequests($test_element, $args) {
-    $this->setUpUnusedCache();
+  public function testPlaceholderingDisabledForPostRequests(array $test_element, array $args, array $expected_placeholder_render_array, array|false $placeholder_cache_keys): void {
+    if ($placeholder_cache_keys && !empty($test_element['placeholder']['#cache']['keys'])) {
+      $this->setUpMemoryCache();
+    }
+    else {
+      $this->setUpUnusedCache();
+    }
     $this->setUpRequest('POST');
 
     $element = $test_element;
@@ -796,8 +803,8 @@ class RendererPlaceholdersTest extends RendererTestBase {
    * @covers ::doRender
    * @covers ::replacePlaceholders
    */
-  public function testRecursivePlaceholder() {
-    $args = [$this->randomContextValue()];
+  public function testRecursivePlaceholder(): void {
+    $args = [static::randomContextValue()];
     $element = [];
     $element['#create_placeholder'] = TRUE;
     $element['#lazy_builder'] = ['Drupal\Tests\Core\Render\RecursivePlaceholdersTest::callback', $args];
@@ -815,7 +822,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    * @covers ::render
    * @covers ::doRender
    */
-  public function testInvalidLazyBuilder() {
+  public function testInvalidLazyBuilder(): void {
     $element = [];
     $element['#lazy_builder'] = '\Drupal\Tests\Core\Render\PlaceholdersTest::callback';
 
@@ -828,7 +835,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    * @covers ::render
    * @covers ::doRender
    */
-  public function testInvalidLazyBuilderArguments() {
+  public function testInvalidLazyBuilderArguments(): void {
     $element = [];
     $element['#lazy_builder'] = ['\Drupal\Tests\Core\Render\PlaceholdersTest::callback', 'arg1', 'arg2'];
 
@@ -843,7 +850,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    *
    * @see testNonScalarLazyBuilderCallbackContext
    */
-  public function testScalarLazyBuilderCallbackContext() {
+  public function testScalarLazyBuilderCallbackContext(): void {
     $element = [];
     $element['#lazy_builder'] = [
       '\Drupal\Tests\Core\Render\PlaceholdersTest::callback',
@@ -865,7 +872,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    * @covers ::render
    * @covers ::doRender
    */
-  public function testNonScalarLazyBuilderCallbackContext() {
+  public function testNonScalarLazyBuilderCallbackContext(): void {
     $element = [];
     $element['#lazy_builder'] = [
       '\Drupal\Tests\Core\Render\PlaceholdersTest::callback',
@@ -875,7 +882,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
         'int' => 1337,
         'float' => 3.14,
         'null' => NULL,
-        // array is not one of the scalar types.
+        // Array is not one of the scalar types.
         'array' => ['hi!'],
       ],
     ];
@@ -889,7 +896,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    * @covers ::render
    * @covers ::doRender
    */
-  public function testChildrenPlusBuilder() {
+  public function testChildrenPlusBuilder(): void {
     $element = [];
     $element['#lazy_builder'] = ['Drupal\Tests\Core\Render\RecursivePlaceholdersTest::callback', []];
     $element['child_a']['#markup'] = 'Oh hai!';
@@ -904,7 +911,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    * @covers ::render
    * @covers ::doRender
    */
-  public function testPropertiesPlusBuilder() {
+  public function testPropertiesPlusBuilder(): void {
     $element = [];
     $element['#lazy_builder'] = ['Drupal\Tests\Core\Render\RecursivePlaceholdersTest::callback', []];
     $element['#llama'] = '#awesome';
@@ -919,7 +926,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    * @covers ::render
    * @covers ::doRender
    */
-  public function testCreatePlaceholderPropertyWithoutLazyBuilder() {
+  public function testCreatePlaceholderPropertyWithoutLazyBuilder(): void {
     $element = [];
     $element['#create_placeholder'] = TRUE;
 
@@ -951,7 +958,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    * @covers \Drupal\Core\Render\RenderCache::get
    * @covers ::replacePlaceholders
    */
-  public function testRenderChildrenPlaceholdersDifferentArguments() {
+  public function testRenderChildrenPlaceholdersDifferentArguments(): void {
     $this->setUpRequest();
     $this->setupMemoryCache();
     $this->cacheContextsManager->expects($this->any())
@@ -1043,6 +1050,50 @@ HTML;
   }
 
   /**
+   * Tests the creation of an element with a lazy_builder_preview.
+   *
+   * @covers ::render
+   * @covers ::doRender
+   * @covers \Drupal\Core\Render\RenderCache::get
+   * @covers ::replacePlaceholders
+   */
+  public function testRenderLazyBuilderPreview(): void {
+    $this->setUpRequest();
+    $this->setupMemoryCache();
+    $this->renderCache = new TestPlaceholderingRenderCache($this->requestStack, $this->cacheFactory, $this->cacheContextsManager, $this->placeholderGenerator);
+    $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig);
+
+    $this->cacheContextsManager->expects($this->any())
+      ->method('convertTokensToKeys')
+      ->willReturnArgument(0);
+    $this->callableResolver->expects($this->any())
+      ->method('getCallableFromDefinition')
+      ->willReturnArgument(0);
+
+    $test_element = $this->generatePlaceholderWithLazyBuilderPreview();
+
+    $element1 = $element2 = $test_element;
+    // Render the element twice so that it is in the render cache.
+    $this->renderer->renderRoot($element1);
+    $this->renderer->renderRoot($element2);
+    $placeholder_string = (string) $this->renderCache->placeholderElements[0]['#markup'];
+    $this->assertSame($this->renderCache->placeholderElements[0]['#attached']['placeholders'][$placeholder_string]['#preview'], ['#markup' => 'Lazy Builder Preview']);
+  }
+
+  /**
+   * Generates an element with a lazy builder and preview.
+   */
+  public function generatePlaceholderWithLazyBuilderPreview(): array {
+    return [
+      '#cache' => [
+        'keys' => ['test_render'],
+      ],
+      '#lazy_builder' => [__namespace__ . '\\PlaceholdersTest::callbackPerUser', ['foo']],
+      '#lazy_builder_preview' => ['#markup' => 'Lazy Builder Preview'],
+    ];
+  }
+
+  /**
    * Generates an element with placeholders at 3 levels.
    *
    * @param array $args_1
@@ -1055,7 +1106,7 @@ HTML;
    * @return array
    *   The generated render array for testing.
    */
-  protected function generatePlaceholdersWithChildrenTestElement(array $args_1, array $args_2, array $args_3) {
+  protected function generatePlaceholdersWithChildrenTestElement(array $args_1, array $args_2, array $args_3): array {
     $test_element = [
       '#type' => 'details',
       '#cache' => [
@@ -1148,6 +1199,21 @@ class RecursivePlaceholdersTest implements TrustedCallbackInterface {
    */
   public static function trustedCallbacks() {
     return ['callback'];
+  }
+
+}
+
+class TestPlaceholderingRenderCache extends PlaceholderingRenderCache {
+
+  /**
+   * The placeholder elements created during rendering.
+   */
+  public array $placeholderElements = [];
+
+  protected function createPlaceholderAndRemember(array $rendered_elements, array $pre_bubbling_elements) {
+    $placeholder_element = parent::createPlaceholderAndRemember($rendered_elements, $pre_bubbling_elements);
+    $this->placeholderElements[] = $placeholder_element;
+    return $placeholder_element;
   }
 
 }

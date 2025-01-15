@@ -15,7 +15,9 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  * Static methods in base class can also be used to create DrupalDateTime objects.
  * For example:
  *
- * DrupalDateTime::createFromArray( array('year' => 2010, 'month' => 9, 'day' => 28) )
+ * @code
+ * DrupalDateTime::createFromArray(['year' => 2010, 'month' => 9, 'day' => 28])
+ * @endcode
  *
  * @see \Drupal\Component\Datetime\DateTimePlus
  */
@@ -29,6 +31,7 @@ class DrupalDateTime extends DateTimePlus {
   /**
    * Formatted strings translation cache.
    *
+   * @var array
    * Translation cache represents an instance storage for formatted date
    * strings. It contains a multidimensional array where:
    * - first level keys - are drupal language codes;
@@ -53,8 +56,6 @@ class DrupalDateTime extends DateTimePlus {
    *     ],
    *   ]
    * @endcode
-   *
-   * @var array
    */
   protected $formatTranslationCache = [];
 
@@ -154,6 +155,7 @@ class DrupalDateTime extends DateTimePlus {
               $this->formatTranslationCache[$langcode][$code][$string] = $string;
             }
             else {
+              // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
               $this->formatTranslationCache[$langcode][$code][$string] = $this->t($string, [], $options);
             }
           }

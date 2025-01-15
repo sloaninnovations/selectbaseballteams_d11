@@ -28,6 +28,7 @@ class Html {
 
   /**
    * An array of IDs, including incremented versions when an ID is duplicated.
+   *
    * @var array
    */
   protected static $seenIds;
@@ -51,10 +52,10 @@ class Html {
    *   tag. That tag only makes sense in an HTML-served-as-HTML context, in
    *   which case relative URLs are guaranteed to work.
    *
+   * @var string[]
+   *
    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes
    * @see https://stackoverflow.com/questions/2725156/complete-list-of-html-tag-attributes-which-have-a-url-value
-   *
-   * @var string[]
    */
   protected static $uriAttributes = ['href', 'poster', 'src', 'cite', 'data', 'action', 'formaction', 'srcset', 'about'];
 
@@ -85,7 +86,7 @@ class Html {
    * Link below shows the syntax for valid CSS identifiers (including element
    * names, classes, and IDs in selectors).
    *
-   * @see http://www.w3.org/TR/CSS21/syndata.html#characters
+   * @see https://www.w3.org/TR/CSS21/syndata.html#characters
    *
    * @param string $identifier
    *   The identifier to clean.
@@ -95,13 +96,16 @@ class Html {
    * @return string
    *   The cleaned identifier.
    */
-  public static function cleanCssIdentifier($identifier, array $filter = [
-    ' ' => '-',
-    '_' => '-',
-    '/' => '-',
-    '[' => '-',
-    ']' => '',
-  ]) {
+  public static function cleanCssIdentifier(
+    $identifier,
+    array $filter = [
+      ' ' => '-',
+      '_' => '-',
+      '/' => '-',
+      '[' => '-',
+      ']' => '',
+    ],
+  ) {
     // We could also use strtr() here but its much slower than str_replace(). In
     // order to keep '__' to stay '__' we first replace it with a different
     // placeholder after checking that it is not defined as a filter.
@@ -221,11 +225,11 @@ class Html {
   public static function getId($id) {
     $id = str_replace([' ', '_', '[', ']'], ['-', '-', '-', ''], mb_strtolower($id));
 
-    // As defined in http://www.w3.org/TR/html4/types.html#type-name, HTML IDs can
+    // As defined in https://www.w3.org/TR/html4/types.html#type-name, HTML IDs can
     // only contain letters, digits ([0-9]), hyphens ("-"), underscores ("_"),
     // colons (":"), and periods ("."). We strip out any character not in that
     // list. Note that the CSS spec doesn't allow colons or periods in identifiers
-    // (http://www.w3.org/TR/CSS21/syndata.html#characters), so we strip those two
+    // (https://www.w3.org/TR/CSS21/syndata.html#characters), so we strip those two
     // characters as well.
     $id = preg_replace('/[^A-Za-z0-9\-_]/', '', $id);
 
@@ -387,11 +391,7 @@ class Html {
    * @see html_entity_decode()
    * @see \Drupal\Component\Utility\Html::escape()
    */
-  public static function decodeEntities($text): string {
-    if (is_null($text)) {
-      @trigger_error('Passing NULL to ' . __METHOD__ . ' is deprecated in drupal:9.5.0 and will trigger a PHP error from drupal:11.0.0. Pass a string instead. See https://www.drupal.org/node/3318826', E_USER_DEPRECATED);
-      return '';
-    }
+  public static function decodeEntities(string $text): string {
     return html_entity_decode($text, ENT_QUOTES, 'UTF-8');
   }
 
@@ -429,11 +429,7 @@ class Html {
    *
    * @ingroup sanitization
    */
-  public static function escape($text): string {
-    if (is_null($text)) {
-      @trigger_error('Passing NULL to ' . __METHOD__ . ' is deprecated in drupal:9.5.0 and will trigger a PHP error from drupal:11.0.0. Pass a string instead. See https://www.drupal.org/node/3318826', E_USER_DEPRECATED);
-      return '';
-    }
+  public static function escape(string $text): string {
     return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
   }
 
@@ -470,7 +466,7 @@ class Html {
     assert(isset(parse_url($scheme_and_host)["host"]), '$base_url is absolute and hence has a host.');
 
     $html_dom = Html::load($html);
-    $xpath = new \DOMXpath($html_dom);
+    $xpath = new \DOMXPath($html_dom);
 
     // Update all root-relative URLs to absolute URLs in the given HTML.
     // Perform on attributes that may contain a single URI.

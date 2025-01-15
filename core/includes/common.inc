@@ -11,7 +11,6 @@
 use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\DrupalKernel;
-use Drupal\Core\StringTranslation\ByteSizeMarkup;
 
 /**
  * @defgroup php_wrappers PHP wrapper functions
@@ -115,39 +114,6 @@ const JS_DEFAULT = 0;
 const JS_THEME = 100;
 
 /**
- * @defgroup format Formatting
- * @{
- * Functions to format numbers, strings, dates, etc.
- */
-
-/**
- * Generates a string representation for the given byte count.
- *
- * @param $size
- *   A size in bytes.
- * @param $langcode
- *   Optional language code to translate to a language other than what is used
- *   to display the page.
- *
- * @return \Drupal\Core\StringTranslation\TranslatableMarkup
- *   A translated string representation of the size.
- *
- * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
- *   \Drupal\Core\StringTranslation\ByteSizeMarkup::create($size, $langcode)
- *   instead.
- *
- * @see https://www.drupal.org/node/2999981
- */
-function format_size($size, $langcode = NULL) {
-  @trigger_error('format_size() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\Core\StringTranslation\ByteSizeMarkup::create($size, $langcode) instead. See https://www.drupal.org/node/2999981', E_USER_DEPRECATED);
-  return ByteSizeMarkup::create($size ?? 0, $langcode);
-}
-
-/**
- * @} End of "defgroup format".
- */
-
-/**
  * Returns the base URL path (i.e., directory) of the Drupal installation.
  *
  * Function base_path() adds a "/" to the beginning and end of the returned path
@@ -173,14 +139,14 @@ function base_path() {
  * into a table. The table must have an ID attribute set and it
  * may be set as follows:
  * @code
- * $table = array(
+ * $table = [
  *   '#type' => 'table',
  *   '#header' => $header,
  *   '#rows' => $rows,
- *   '#attributes' => array(
+ *   '#attributes' => [
  *     'id' => 'my-module-table',
- *   ),
- * );
+ *   ],
+ * ];
  * return \Drupal::service('renderer')->render($table);
  * @endcode
  *
@@ -190,17 +156,17 @@ function base_path() {
  * In a situation where a single weight column is being sorted in the table, the
  * classes could be added like this (in the theme function):
  * @code
- * $form['my_elements'][$delta]['weight']['#attributes']['class'] = array('my-elements-weight');
+ * $form['my_elements'][$delta]['weight']['#attributes']['class'] = ['my-elements-weight'];
  * @endcode
  *
  * Each row of the table must also have a class of "draggable" in order to
  * enable the drag handles:
  * @code
- * $row = array(...);
- * $rows[] = array(
+ * $row = [...];
+ * $rows[] = [
  *   'data' => $row,
- *   'class' => array('draggable'),
- * );
+ *   'class' => ['draggable'],
+ * ];
  * @endcode
  *
  * When tree relationships are present, the two additional classes
@@ -210,18 +176,18 @@ function base_path() {
  *
  * Calling drupal_attach_tabledrag() would then be written as such:
  * @code
- * drupal_attach_tabledrag('my-module-table', array(
+ * drupal_attach_tabledrag('my-module-table', [
  *   'action' => 'order',
  *   'relationship' => 'sibling',
  *   'group' => 'my-elements-weight',
- * );
+ * ];
  * @endcode
  *
  * In a more complex case where there are several groups in one column (such as
  * the block regions on the admin/structure/block page), a separate subgroup
  * class must also be added to differentiate the groups.
  * @code
- * $form['my_elements'][$region][$delta]['weight']['#attributes']['class'] = array('my-elements-weight', 'my-elements-weight-' . $region);
+ * $form['my_elements'][$region][$delta]['weight']['#attributes']['class'] = ['my-elements-weight', 'my-elements-weight-' . $region];
  * @endcode
  *
  * The 'group' option is still 'my-element-weight', and the additional
@@ -231,12 +197,12 @@ function base_path() {
  *
  * @code
  * foreach ($regions as $region) {
- *   drupal_attach_tabledrag('my-module-table', array(
+ *   drupal_attach_tabledrag('my-module-table', [
  *     'action' => 'order',
  *     'relationship' => 'sibling',
  *     'group' => 'my-elements-weight',
  *     'subgroup' => 'my-elements-weight-' . $region,
- *   ));
+ *   ]);
  * }
  * @endcode
  *
@@ -246,7 +212,7 @@ function base_path() {
  * MenuForm::BuildOverviewForm for an example creating a table
  * containing parent relationships.
  *
- * @param $element
+ * @param array $element
  *   A form element to attach the tableDrag behavior to.
  * @param array $options
  *   These options are used to generate JavaScript settings necessary to
@@ -324,7 +290,7 @@ function drupal_attach_tabledrag(&$element, array $options) {
  * is rendered for the first time, as it will have no effect on subsequent
  * renderings of the parent tree.
  *
- * @param $element
+ * @param array $element
  *   The element to be hidden.
  *
  * @return array
@@ -354,7 +320,7 @@ function hide(&$element) {
  * is rendered for the first time, as it will have no effect on subsequent
  * renderings of the parent tree.
  *
- * @param $element
+ * @param array $element
  *   The element to be shown.
  *
  * @return array
@@ -473,6 +439,9 @@ function drupal_flush_all_caches($kernel = NULL) {
   // Rebuild module data that is stored in state.
   \Drupal::service('extension.list.module')->reset();
 
+  // Reload modules.
+  \Drupal::moduleHandler()->reload();
+
   // Rebuild all information based on new module data.
   \Drupal::moduleHandler()->invokeAll('rebuild');
 
@@ -491,22 +460,6 @@ function drupal_flush_all_caches($kernel = NULL) {
     \Drupal::theme()->resetActiveTheme();
     drupal_maintenance_theme();
   }
-}
-
-/**
- * Changes the dummy query string added to all CSS and JavaScript files.
- *
- * Changing the dummy query string appended to CSS and JavaScript files forces
- * all browsers to reload fresh files.
- *
- * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
- *   Use \Drupal\Core\Asset\AssetQueryStringInterface::reset() instead.
- *
- * @see https://www.drupal.org/node/3358337
- */
-function _drupal_flush_css_js() {
-  @trigger_error('_drupal_flush_css_js is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Asset\AssetQueryStringInterface::reset() instead. See https://www.drupal.org/node/3358337', E_USER_DEPRECATED);
-  \Drupal::service('asset.query_string')->reset();
 }
 
 /**

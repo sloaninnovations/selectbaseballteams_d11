@@ -142,7 +142,7 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
       try {
         $items = $this->fastBackend->getMultiple($cids, $allow_invalid);
       }
-      catch (\Exception $e) {
+      catch (\Exception) {
         $cids = $cids_copy;
         $items = [];
       }
@@ -166,7 +166,9 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
     if ($cids) {
       foreach ($this->consistentBackend->getMultiple($cids, $allow_invalid) as $item) {
         $cache[$item->cid] = $item;
-        $this->fastBackend->set($item->cid, $item->data, $item->expire, $item->tags);
+        if (!$allow_invalid || $item->valid) {
+          $this->fastBackend->set($item->cid, $item->data, $item->expire, $item->tags);
+        }
       }
     }
 
@@ -289,7 +291,7 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
    */
   protected function markAsOutdated() {
     // Clocks on a single server can drift. Multiple servers may have slightly
-    // differing opinions about the current time. Given that, do not assume
+    // different opinions about the current time. Given that, do not assume
     // 'now' on this server is always later than our stored timestamp.
     // Also add 1 millisecond, to ensure that caches written earlier in the same
     // millisecond are invalidated. It is possible that caches will be later in

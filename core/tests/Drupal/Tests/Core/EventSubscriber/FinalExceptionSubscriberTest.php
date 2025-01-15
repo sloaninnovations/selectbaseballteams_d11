@@ -21,7 +21,7 @@ class FinalExceptionSubscriberTest extends UnitTestCase {
   /**
    * @covers ::onException
    */
-  public function testOnExceptionWithUnknownFormat() {
+  public function testOnExceptionWithUnknownFormat(): void {
     $config_factory = $this->getConfigFactoryStub();
 
     $kernel = $this->prophesize(HttpKernelInterface::class);
@@ -48,7 +48,7 @@ class FinalExceptionSubscriberTest extends UnitTestCase {
 
 class TestDefaultExceptionSubscriber extends FinalExceptionSubscriber {
 
-  protected function isErrorDisplayable($error) {
+  protected function isErrorDisplayable($error): bool {
     return TRUE;
   }
 
@@ -56,7 +56,7 @@ class TestDefaultExceptionSubscriber extends FinalExceptionSubscriber {
     return $error;
   }
 
-  protected function isErrorLevelVerbose() {
+  protected function isErrorLevelVerbose(): bool {
     return TRUE;
   }
 

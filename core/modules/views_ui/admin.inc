@@ -2,7 +2,6 @@
 
 /**
  * @file
- * Provides the Views' administrative interface.
  */
 
 use Drupal\Component\Utility\NestedArray;
@@ -25,20 +24,20 @@ use Drupal\Core\Url;
  * mean that the non-JavaScript fallback button does not appear in the correct
  * place in the form.
  *
- * @param $wrapping_element
+ * @param array $wrapping_element
  *   The element whose child will server as the AJAX trigger. For example, if
  *   $form['some_wrapper']['triggering_element'] represents the element which
  *   will trigger the AJAX behavior, you would pass $form['some_wrapper'] for
  *   this parameter.
- * @param $trigger_key
+ * @param string $trigger_key
  *   The key within the wrapping element that identifies which of its children
  *   serves as the AJAX trigger. In the above example, you would pass
  *   'triggering_element' for this parameter.
- * @param $refresh_parents
+ * @param array $refresh_parents
  *   An array of parent keys that point to the part of the form that will be
  *   refreshed by AJAX. For example, if triggering the AJAX behavior should
  *   cause $form['dynamic_content']['section'] to be refreshed, you would pass
- *   array('dynamic_content', 'section') for this parameter.
+ *   ['dynamic_content', 'section'] for this parameter.
  */
 function views_ui_add_ajax_trigger(&$wrapping_element, $trigger_key, $refresh_parents) {
   $seen_ids = &drupal_static(__FUNCTION__ . ':seen_ids', []);
@@ -253,7 +252,7 @@ function views_ui_standard_display_dropdown(&$form, FormStateInterface $form_sta
 
   $form['override']['dropdown'] = [
     '#type' => 'select',
-    // @TODO: Translators may need more context than this.
+    // @todo Translators may need more context than this.
     '#title' => t('For'),
     '#options' => $display_dropdown,
   ];

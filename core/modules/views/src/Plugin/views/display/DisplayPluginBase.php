@@ -117,22 +117,24 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   /**
    * The display information coming directly from the view entity.
    *
+   * @var array
+   *
    * @see \Drupal\views\Entity\View::getDisplay()
    *
    * @todo \Drupal\views\Entity\View::duplicateDisplayAsType directly access it.
-   *
-   * @var array
    */
   public $display;
 
   /**
    * Keeps track whether the display uses exposed filters.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public bool $has_exposed;
 
   /**
    * The default display.
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public DisplayPluginInterface $default_display;
 
   /**
@@ -149,7 +151,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    */
@@ -160,7 +162,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   /**
    * {@inheritdoc}
    */
-  public function initDisplay(ViewExecutable $view, array &$display, array &$options = NULL) {
+  public function initDisplay(ViewExecutable $view, array &$display, ?array &$options = NULL) {
     $this->view = $view;
 
     // Load extenders as soon as possible.
@@ -172,7 +174,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       foreach ($extenders as $extender) {
         /** @var \Drupal\views\Plugin\views\display_extender\DisplayExtenderPluginBase $plugin */
         if ($plugin = $manager->createInstance($extender)) {
-          $extender_options = isset($display_extender_options[$plugin->getPluginId()]) ? $display_extender_options[$plugin->getPluginId()] : [];
+          $extender_options = $display_extender_options[$plugin->getPluginId()] ?? [];
           $plugin->init($this->view, $this, $extender_options);
           $this->extenders[$extender] = $plugin;
         }
@@ -461,6 +463,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = [
       'defaults' => [
@@ -2146,10 +2151,8 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       $parts['fragment'] = $this->viewsTokenReplace($parts['fragment'], $tokens);
 
       // Handle query parameters where the key is part of an array.
-      // For example, f[0] for facets.
-      array_walk_recursive($parts['query'], function (&$value) use ($tokens) {
-        $value = $this->viewsTokenReplace($value, $tokens);
-      });
+      // For example, f[0] for facets or field_name[id]=id for exposed filters.
+      $parts['query'] = $this->recursiveReplaceTokens($parts['query'], $tokens);
       $options = $parts;
     }
 
@@ -2169,10 +2172,38 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   }
 
   /**
+   * Replace the query parameters recursively, both key and value.
+   *
+   * @param array $parts
+   *   Query parts of the request.
+   * @param array $tokens
+   *   Tokens for replacement.
+   *
+   * @return array
+   *   The parameters with replacements done.
+   */
+  protected function recursiveReplaceTokens(array $parts, array $tokens): array {
+    foreach ($parts as $key => $value) {
+      if (is_array($value)) {
+        $value = $this->recursiveReplaceTokens($value, $tokens);
+      }
+      else {
+        $value = $this->viewsTokenReplace($value, $tokens);
+      }
+      if (!is_int($key)) {
+        unset($parts[$key]);
+        $key = $this->viewsTokenReplace($key, $tokens);
+      }
+      $parts[$key] = $value;
+    }
+    return $parts;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function render() {
-    $rows = (!empty($this->view->result) || $this->view->style_plugin->evenEmpty()) ? $this->view->style_plugin->render($this->view->result) : [];
+    $rows = (!empty($this->view->result) || $this->view->style_plugin->evenEmpty()) ? $this->view->style_plugin->render() : [];
 
     $element = [
       '#theme' => $this->themeFunctions(),
@@ -2298,7 +2329,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   /**
    * {@inheritdoc}
    */
-  public function access(AccountInterface $account = NULL) {
+  public function access(?AccountInterface $account = NULL) {
     if (!isset($account)) {
       $account = \Drupal::currentUser();
     }

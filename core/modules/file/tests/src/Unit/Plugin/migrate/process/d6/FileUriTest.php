@@ -15,11 +15,14 @@ use Drupal\Tests\migrate\Unit\MigrateTestCase;
  */
 class FileUriTest extends MigrateTestCase {
 
+  /**
+   * The plugin configuration.
+   */
   protected $migrationConfiguration = [
     'id' => 'test',
   ];
 
-  public function testPublic() {
+  public function testPublic(): void {
     $value = [
       'sites/default/files/foo.jpg',
       'sites/default/files',
@@ -29,7 +32,7 @@ class FileUriTest extends MigrateTestCase {
     $this->assertEquals('public://foo.jpg', $this->doTransform($value));
   }
 
-  public function testPublicUnknownBasePath() {
+  public function testPublicUnknownBasePath(): void {
     $value = [
       '/path/to/public/files/foo.jpg',
       'sites/default/files',
@@ -39,7 +42,7 @@ class FileUriTest extends MigrateTestCase {
     $this->assertEquals('public://path/to/public/files/foo.jpg', $this->doTransform($value));
   }
 
-  public function testPrivate() {
+  public function testPrivate(): void {
     $value = [
       'sites/default/files/baz.gif',
       'sites/default/files',
@@ -49,7 +52,7 @@ class FileUriTest extends MigrateTestCase {
     $this->assertEquals('private://baz.gif', $this->doTransform($value));
   }
 
-  public function testPrivateUnknownBasePath() {
+  public function testPrivateUnknownBasePath(): void {
     $value = [
       '/path/to/private/files/baz.gif',
       'sites/default/files',
@@ -59,7 +62,7 @@ class FileUriTest extends MigrateTestCase {
     $this->assertEquals('private://path/to/private/files/baz.gif', $this->doTransform($value));
   }
 
-  public function testTemporary() {
+  public function testTemporary(): void {
     $value = [
       '/tmp/bar.png',
       'sites/default/files',

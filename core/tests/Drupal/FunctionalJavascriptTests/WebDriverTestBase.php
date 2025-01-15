@@ -7,11 +7,18 @@ namespace Drupal\FunctionalJavascriptTests;
 use Behat\Mink\Exception\DriverException;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Runner\BaseTestRunner;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Runs a browser test using a driver that supports JavaScript.
+ *
+ * Module tests extending WebDriverTestBase must exist in the
+ * Drupal\Tests\your_module\FunctionalJavascript namespace and live in the
+ * modules/your_module/tests/src/FunctionalJavascript directory.
+ *
+ * Tests for core/lib/Drupal classes extending WebDriverTestBase must exist in
+ * the \Drupal\FunctionalJavascriptTests\Core namespace and live in the
+ * core/tests/Drupal/FunctionalJavascriptTests directory.
  *
  * Base class for testing browser interaction implemented in JavaScript.
  *
@@ -48,7 +55,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
     if (!is_a($this->minkDefaultDriverClass, DrupalSelenium2Driver::class, TRUE)) {
       throw new \UnexpectedValueException(sprintf("%s has to be an instance of %s", $this->minkDefaultDriverClass, DrupalSelenium2Driver::class));
     }
-    $this->minkDefaultDriverArgs = ['chrome', NULL, 'http://localhost:4444'];
+    $this->minkDefaultDriverArgs = ['chrome', ['goog:chromeOptions' => ['w3c' => FALSE]], 'http://localhost:4444'];
 
     try {
       return parent::initMink();
@@ -73,7 +80,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
     self::$modules = [
       'js_testing_ajax_request_test',
       'js_testing_log_test',
-      'jquery_keyevent_polyfill_test',
+      'jquery_key_event_polyfill_test',
     ];
     if ($this->disableCssAnimations) {
       self::$modules[] = 'css_disable_transitions_test';
@@ -96,11 +103,6 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    */
   protected function tearDown(): void {
     if ($this->mink) {
-      $status = $this->getStatus();
-      if ($status === BaseTestRunner::STATUS_ERROR || $status === BaseTestRunner::STATUS_WARNING || $status === BaseTestRunner::STATUS_FAILURE) {
-        // Ensure we capture the output at point of failure.
-        @$this->htmlOutput();
-      }
       // Wait for all requests to finish. It is possible that an AJAX request is
       // still on-going.
       $result = $this->getSession()->wait(5000, 'window.drupalActiveXhrCount === 0 || typeof window.drupalActiveXhrCount === "undefined"');
@@ -145,7 +147,17 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    */
   protected function getMinkDriverArgs() {
     if ($this->minkDefaultDriverClass === DrupalSelenium2Driver::class) {
-      return getenv('MINK_DRIVER_ARGS_WEBDRIVER') ?: parent::getMinkDriverArgs();
+      $json = getenv('MINK_DRIVER_ARGS_WEBDRIVER') ?: parent::getMinkDriverArgs();
+      if (!($json === FALSE || $json === '')) {
+        $args = json_decode($json, TRUE);
+        if (isset($args[0]) && $args[0] === 'chrome' && !isset($args[1]['goog:chromeOptions']['w3c'])) {
+          // @todo https://www.drupal.org/project/drupal/issues/3421202
+          //   Deprecate defaulting behavior and require w3c to be set.
+          $args[1]['goog:chromeOptions']['w3c'] = FALSE;
+        }
+        $json = json_encode($args);
+      }
+      return $json;
     }
     return parent::getMinkDriverArgs();
   }

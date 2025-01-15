@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Component\Utility\Number as NumberUtility;
 
@@ -19,35 +20,33 @@ use Drupal\Component\Utility\Number as NumberUtility;
  *
  * Usage example:
  * @code
- * $form['quantity'] = array(
+ * $form['quantity'] = [
  *   '#type' => 'number',
  *   '#title' => $this->t('Quantity'),
- * );
+ * ];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Range
  * @see \Drupal\Core\Render\Element\Textfield
- *
- * @FormElement("number")
  */
-class Number extends FormElement {
+#[FormElement('number')]
+class Number extends FormElementBase {
 
   /**
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#step' => 1,
       '#process' => [
-        [$class, 'processAjaxForm'],
+        [static::class, 'processAjaxForm'],
       ],
       '#element_validate' => [
-        [$class, 'validateNumber'],
+        [static::class, 'validateNumber'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderNumber'],
+        [static::class, 'preRenderNumber'],
       ],
       '#theme' => 'input__number',
       '#theme_wrappers' => ['form_element'],
