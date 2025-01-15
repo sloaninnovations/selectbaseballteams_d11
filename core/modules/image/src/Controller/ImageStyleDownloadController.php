@@ -95,7 +95,7 @@ class ImageStyleDownloadController extends FileDownloadController {
    *   The file scheme, defaults to 'private'.
    * @param \Drupal\image\ImageStyleInterface $image_style
    *   The image style to deliver.
-   * @param string $required_derivative_scheme
+   * @param string|null $required_derivative_scheme
    *   The required scheme for the derivative image.
    *
    * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Symfony\Component\HttpFoundation\Response
@@ -108,7 +108,12 @@ class ImageStyleDownloadController extends FileDownloadController {
    * @throws \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException
    *   Thrown when the file is still being generated.
    */
-  public function deliver(Request $request, $scheme, ImageStyleInterface $image_style, string $required_derivative_scheme) {
+  public function deliver(Request $request, $scheme, ImageStyleInterface $image_style, ?string $required_derivative_scheme = NULL) {
+    if ($required_derivative_scheme === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $required_derivative_scheme argument is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. See http://www.drupal.org/node/3346038', E_USER_DEPRECATED);
+      $required_derivative_scheme = $scheme;
+    }
+
     $target = $request->query->get('file');
     $image_uri = $scheme . '://' . $target;
     $image_uri = $this->streamWrapperManager->normalizeUri($image_uri);
