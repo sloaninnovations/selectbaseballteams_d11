@@ -3,6 +3,9 @@
 namespace Drupal\Core\Theme;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -56,6 +59,11 @@ class ThemeManager implements ThemeManagerInterface {
   protected $root;
 
   /**
+   * @var \Drupal\Core\Extension\ModuleExtensionList
+   */
+  private ModuleExtensionList $moduleExtensionList;
+
+  /**
    * Constructs a new ThemeManager object.
    *
    * @param string $root
@@ -66,12 +74,14 @@ class ThemeManager implements ThemeManagerInterface {
    *   The theme initialization.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    */
-  public function __construct($root, ThemeNegotiatorInterface $theme_negotiator, ThemeInitializationInterface $theme_initialization, ModuleHandlerInterface $module_handler) {
+  public function __construct($root, ThemeNegotiatorInterface $theme_negotiator, ThemeInitializationInterface $theme_initialization, ModuleHandlerInterface $module_handler, ModuleExtensionList $moduleExtensionList) {
     $this->root = $root;
     $this->themeNegotiator = $theme_negotiator;
     $this->themeInitialization = $theme_initialization;
     $this->moduleHandler = $module_handler;
+    $this->moduleExtensionList = $moduleExtensionList;
   }
 
   /**
@@ -248,6 +258,24 @@ class ThemeManager implements ThemeManagerInterface {
         $theme_hook_suggestion = $hook;
       }
     }
+
+    // Set default variables before preprocess hooks.
+    $variables += $this->getDefaultTemplateVariables();
+
+    // Merge element #attributes into $default_variables['attributes'] if they
+    // exist in render_element.
+    $render_element_type = isset($info['render element']) ? $info['render element'] : NULL;
+    if (isset($variables[$render_element_type]['#attributes'])) {
+      $variables['attributes'] = NestedArray::mergeDeep(
+        $variables['attributes'],
+        $variables[$render_element_type]['#attributes']
+      );
+    }
+
+    // Invoke preprocess hooks.
+    // By default $info['preprocess functions'] should always be set, but it's
+    // good to check it if default Registry service implementation is
+    // overridden. See \Drupal\Core\Theme\Registry.
     if (isset($info['preprocess functions'])) {
       foreach ($info['preprocess functions'] as $preprocessor_function) {
         if (is_callable($preprocessor_function)) {
@@ -293,21 +321,6 @@ class ThemeManager implements ThemeManagerInterface {
       }
     }
 
-    // In some cases, a template implementation may not have had
-    // template_preprocess() run (for example, if the default implementation
-    // is a function, but a template overrides that default implementation).
-    // In these cases, a template should still be able to expect to have
-    // access to the variables provided by template_preprocess(), so we add
-    // them here if they don't already exist. We don't want the overhead of
-    // running template_preprocess() twice, so we use the 'directory' variable
-    // to determine if it has already run, which while not completely
-    // intuitive, is reasonably safe, and allows us to save on the overhead of
-    // adding some new variable to track that.
-    if (!isset($variables['directory'])) {
-      $default_template_variables = [];
-      template_preprocess($default_template_variables, $hook, $info);
-      $variables += $default_template_variables;
-    }
     if (!isset($default_attributes)) {
       $default_attributes = new Attribute();
     }
@@ -458,6 +471,36 @@ class ThemeManager implements ThemeManagerInterface {
   public function alter($type, &$data, &$context1 = NULL, &$context2 = NULL) {
     $theme = $this->getActiveTheme();
     $this->alterForTheme($theme, $type, $data, $context1, $context2);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultTemplateVariables() {
+    static $drupal_static_fast;
+    if (!isset($drupal_static_fast)) {
+      $drupal_static_fast['default_variables'] = &drupal_static(__METHOD__);
+    }
+    $default_variables = &$drupal_static_fast['default_variables'];
+    if (!isset($default_variables)) {
+      // Variables that don't depend on a database connection.
+      $default_variables = [
+        'attributes' => [],
+        'title_attributes' => [],
+        'content_attributes' => [],
+        'title_prefix' => [],
+        'title_suffix' => [],
+        'db_is_active' => !defined('MAINTENANCE_MODE'),
+        'is_admin' => FALSE,
+        'logged_in' => FALSE,
+      ];
+
+      // Give modules a chance to alter default template variables.
+      $this->moduleHandler->alter('template_preprocess_default_variables', $default_variables);
+      // Tell all templates where they are located.
+      $default_variables['directory'] = $this->getActiveTheme()->getPath();
+    }
+    return $default_variables;
   }
 
 }
