@@ -251,7 +251,10 @@ class UpdateScriptTest extends BrowserTestBase {
       . $expected_error
       . $extension_name
       . static::HANDBOOK_MESSAGE;
-    $base_info = ['name' => $extension_name];
+    $base_info = [
+      'name' => $extension_name,
+      'package' => 'Testing',
+    ];
     if ($extension_type === 'theme') {
       $base_info['base theme'] = FALSE;
     }
@@ -389,6 +392,7 @@ class UpdateScriptTest extends BrowserTestBase {
           [
             'name' => "The magically disappearing core $type $extension",
             'type' => $type,
+            'package' => 'Testing',
           ];
         if ($type === 'theme') {
           $extension_info['base theme'] = FALSE;
@@ -429,6 +433,7 @@ class UpdateScriptTest extends BrowserTestBase {
           [
             'name' => "The magically disappearing contrib $type $extension",
             'type' => $type,
+            'package' => 'Testing',
           ];
         if ($type === 'theme') {
           $extension_info['base theme'] = FALSE;
