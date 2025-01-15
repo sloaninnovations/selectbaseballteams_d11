@@ -211,7 +211,7 @@ class NavigationHooks {
    * Implements hook_menu_local_tasks_alter().
    */
   #[Hook('menu_local_tasks_alter')]
-  public function menuLocalTasksAlter(array &$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void{
+  public function menuLocalTasksAlter(array &$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
     $navigation_renderer = \Drupal::service('navigation.renderer');
     if ($navigation_renderer->meetsContentEntityRoutesCondition()) {
       // Add a new local task for content entity pages.
