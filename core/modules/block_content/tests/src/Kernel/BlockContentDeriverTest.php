@@ -118,7 +118,7 @@ class BlockContentDeriverTest extends KernelTestBase {
     $this->assertEquals('Basic prototype', $plugin->getPluginDefinition()['admin_label']);
 
     $plugin = $blockPluginManager->createInstance('block_content:' . $blockContentNoLabel->uuid());
-    $this->assertEquals('Basic Block: ' . $blockContentNoLabel->id(), $plugin->getPluginDefinition()['admin_label']);
+    $this->assertNull($plugin->getPluginDefinition()['admin_label']);
   }
 
 }
