@@ -37,6 +37,9 @@ class CommentBulkFormTest extends UnitTestCase {
       $action->expects($this->any())
         ->method('getType')
         ->willReturn('comment');
+      $action->expects($this->any())
+        ->method('access')
+        ->willReturn(TRUE);
       $actions[$i] = $action;
     }
 
@@ -44,6 +47,9 @@ class CommentBulkFormTest extends UnitTestCase {
     $action->expects($this->any())
       ->method('getType')
       ->willReturn('user');
+    $action->expects($this->any())
+      ->method('access')
+      ->willReturn(TRUE);
     $actions[] = $action;
 
     $entity_storage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');

@@ -29,6 +29,9 @@ use Drupal\Core\Action\ActionPluginCollection;
  *     "id" = "id",
  *     "label" = "label"
  *   },
+ *   handlers = {
+ *     "access" = "Drupal\system\ActionAccessControlHandler",
+ *   },
  *   config_export = {
  *     "id",
  *     "label",
