@@ -151,10 +151,10 @@
           '.navigation-contextual-link',
           context,
         ).forEach((link) => {
-
           link.addEventListener('click', (e) => {
             e.preventDefault();
-            link.textContent = link.textContent === showText ? hideText : showText;
+            link.textContent =
+              link.textContent === showText ? hideText : showText;
             document
               .querySelectorAll('.contextual button')
               .forEach(toggleContextualItems);
