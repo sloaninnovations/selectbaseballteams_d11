@@ -59,7 +59,7 @@ class ModuleHandlerDeprecatedHookTest extends KernelTestBase {
    * @covers ::alterDeprecated
    */
   public function testAlterDeprecated(): void {
-    $this->expectDeprecation('The deprecated alter hook hook_deprecated_alter_alter() is implemented in these locations: deprecation_test_deprecated_alter_alter, Drupal\deprecation_hook_attribute_test\Hook\DeprecationHookAttributeTestHooks::deprecatedAlterAlterFirst. Alter something else.');
+    $this->expectDeprecation('The deprecated alter hook hook_deprecated_alter_alter() is implemented in these locations: Drupal\deprecation_test\Hook\DeprecationTestHooks::deprecatedAlterAlter, Drupal\deprecation_hook_attribute_test\Hook\DeprecationHookAttributeTestHooks::deprecatedAlterAlterFirst. Alter something else.');
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
     $data = [];
