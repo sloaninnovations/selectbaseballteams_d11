@@ -34,6 +34,11 @@
       if (options?.dependent_selectors) {
         Object.keys(options.dependent_selectors).forEach((field) => {
           $fields = $context.find(`input[name^="${field}"]`);
+
+          if ($fields.length === 0) {
+            return;
+          }
+
           const dependentColumns = options.dependent_selectors[field];
 
           $fields.on('change', fieldsChangeHandler($fields, dependentColumns));
