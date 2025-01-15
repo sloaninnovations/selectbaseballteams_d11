@@ -232,8 +232,8 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '2',
           'title' => 'An English Node',
-          'created' => '1529615790',
-          'changed' => '1529615790',
+          'created' => '1421727515',
+          'changed' => '1421727515',
           'promote' => '1',
           'sticky' => '0',
           'default_langcode' => '1',
@@ -476,8 +476,8 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '2',
           'title' => 'An English Node',
-          'created' => '1529615790',
-          'changed' => '1529615790',
+          'created' => '1421727515',
+          'changed' => '1421727515',
           'promote' => '1',
           'sticky' => '0',
           'default_langcode' => '1',
@@ -1012,7 +1012,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           [
             'log' => NULL,
             'field_text_long_plain' => NULL,
-            'revision_created' => '1529615790',
+            'revision_created' => '1421727515',
           ],
         // Node 2, revision 2, en.
         1 =>
