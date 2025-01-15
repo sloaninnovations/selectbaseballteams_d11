@@ -2,6 +2,7 @@
 
 namespace Drupal\navigation\Hook;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\navigation\RenderCallbacks;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
@@ -18,6 +19,8 @@ use Drupal\navigation\TopBarItemManagerInterface;
  * Hook implementations for navigation.
  */
 class NavigationHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_help().
@@ -106,6 +109,11 @@ class NavigationHooks {
       ],
     ];
     $items['menu_region__footer'] = ['variables' => ['items' => [], 'title' => NULL, 'menu_name' => NULL]];
+    $items['navigation_content_top'] = [
+      'variables' => [
+        'items' => [],
+      ],
+    ];
     return $items;
   }
 
@@ -203,7 +211,7 @@ class NavigationHooks {
    * Implements hook_menu_local_tasks_alter().
    */
   #[Hook('menu_local_tasks_alter')]
-  public function menuLocalTasksAlter(array &$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
+  public function menuLocalTasksAlter(array &$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void{
     $navigation_renderer = \Drupal::service('navigation.renderer');
     if ($navigation_renderer->meetsContentEntityRoutesCondition()) {
       // Add a new local task for content entity pages.
@@ -220,6 +228,42 @@ class NavigationHooks {
         '#access' => \Drupal::currentUser()->hasPermission('access contextual links'),
       ];
     }
+  }
+
+  /**
+   * Implements hook_navigation_content_top().
+   */
+  #[Hook('navigation_content_top')]
+  public function navigationWorkspaces(): array {
+    // This navigation item requires the Workspaces UI module.
+    if (!\Drupal::moduleHandler()->moduleExists('workspaces_ui')) {
+      return [];
+    }
+
+    $current_user = \Drupal::currentUser();
+    if (!$current_user->hasPermission('administer workspaces')
+      && !$current_user->hasPermission('view own workspace')
+      && !$current_user->hasPermission('view any workspace')
+    ) {
+      return [];
+    }
+
+    return [
+      'workspace' => [
+        // @phpstan-ignore-next-line
+        '#lazy_builder' => ['navigation.workspaces_lazy_builders:renderNavigationLinks', []],
+        '#create_placeholder' => TRUE,
+        '#lazy_builder_preview' => [
+          '#type' => 'component',
+          '#component' => 'navigation:toolbar-button',
+          '#props' => [
+            'html_tag' => 'a',
+            'text' => $this->t('Workspace'),
+          ],
+        ],
+        '#weight' => -1000,
+      ],
+    ];
   }
 
 }
