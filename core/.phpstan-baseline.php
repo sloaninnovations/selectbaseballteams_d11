@@ -32,12 +32,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../composer/Plugin/Scaffold/Handler.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Composer\\\\Plugin\\\\Scaffold\\\\Handler\\:\\:requireWasCalled\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/../composer/Plugin/Scaffold/Handler.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Composer\\\\Plugin\\\\Scaffold\\\\Handler\\:\\:scaffold\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
