@@ -1062,28 +1062,24 @@ function template_preprocess_maintenance_task_list(&$variables): void {
  * See the @link themeable Default theme implementations topic @endlink for
  * details.
  *
- * @deprecated in Drupal 8.3.x, will be removed before Drupal 9.0.0.
- * Now ThemeManager is responsible for setting the default template variables.
- * There is no publicly usable replacement for this function. It should not be
- * called anywhere. If you do please stop! Use preprocess hooks to alter default
- * variables or use your own ThemeManager class.
+ * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is
+ *   no replacement, default preprocess variables are added for all theme hooks
+ *   directly in \Drupal\Core\Theme\ThemeManager.
+ *
+ * @see https://www.drupal.org/node/2340341
+ *
  */
 function template_preprocess(&$variables, $hook, $info) {
   $themeManager = \Drupal::service('theme.manager');
   $variables += $themeManager->getDefaultTemplateVariables();
 
-  // Merge element #attributes into $default_variables['attributes'] if they
-  // exist in render_element.
-  // This code is dublicated in ThemeManager::render(). Moving it to
-  // ThemeManager would make ThemeManagerInterface messy because we would need
-  // to pass in $variables as reference in getDefaultTemplateVariables() or
-  // some other thing that doesn't make sense.
-  $render_element_type = isset($info['render element']) ? $info['render element'] : NULL;
-  if (isset($variables[$render_element_type]['#attributes'])) {
-    $variables['attributes'] = NestedArray::mergeDeep(
-      $variables['attributes'],
-      $variables[$render_element_type]['#attributes']
-    );
+  // When theming a render element, merge its #attributes into
+  // $variables['attributes'].
+  if (isset($info['render element'])) {
+    $key = $info['render element'];
+    if (isset($variables[$key]['#attributes'])) {
+      $variables['attributes'] = AttributeHelper::mergeCollections($variables['attributes'], $variables[$key]['#attributes']);
+    }
   }
 }
 
