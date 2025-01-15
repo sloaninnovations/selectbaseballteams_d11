@@ -3,13 +3,11 @@
 namespace Drupal\Core\Theme;
 
 use Drupal\Component\Render\MarkupInterface;
-use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Template\Attribute;
+use Drupal\Core\Template\AttributeHelper;
 
 /**
  * Provides the default implementation of a theme manager.
@@ -59,11 +57,6 @@ class ThemeManager implements ThemeManagerInterface {
   protected $root;
 
   /**
-   * @var \Drupal\Core\Extension\ModuleExtensionList
-   */
-  private ModuleExtensionList $moduleExtensionList;
-
-  /**
    * Constructs a new ThemeManager object.
    *
    * @param string $root
@@ -74,14 +67,12 @@ class ThemeManager implements ThemeManagerInterface {
    *   The theme initialization.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    */
-  public function __construct($root, ThemeNegotiatorInterface $theme_negotiator, ThemeInitializationInterface $theme_initialization, ModuleHandlerInterface $module_handler, ModuleExtensionList $moduleExtensionList) {
+  public function __construct($root, ThemeNegotiatorInterface $theme_negotiator, ThemeInitializationInterface $theme_initialization, ModuleHandlerInterface $module_handler) {
     $this->root = $root;
     $this->themeNegotiator = $theme_negotiator;
     $this->themeInitialization = $theme_initialization;
     $this->moduleHandler = $module_handler;
-    $this->moduleExtensionList = $moduleExtensionList;
   }
 
   /**
@@ -262,14 +253,13 @@ class ThemeManager implements ThemeManagerInterface {
     // Set default variables before preprocess hooks.
     $variables += $this->getDefaultTemplateVariables();
 
-    // Merge element #attributes into $default_variables['attributes'] if they
-    // exist in render_element.
-    $render_element_type = isset($info['render element']) ? $info['render element'] : NULL;
-    if (isset($variables[$render_element_type]['#attributes'])) {
-      $variables['attributes'] = NestedArray::mergeDeep(
-        $variables['attributes'],
-        $variables[$render_element_type]['#attributes']
-      );
+    // When theming a render element, merge its #attributes into
+    // $variables['attributes'].
+    if (isset($info['render element'])) {
+      $key = $info['render element'];
+      if (isset($variables[$key]['#attributes'])) {
+        $variables['attributes'] = AttributeHelper::mergeCollections($variables['attributes'], $variables[$key]['#attributes']);
+      }
     }
 
     // Invoke preprocess hooks.
@@ -476,7 +466,7 @@ class ThemeManager implements ThemeManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultTemplateVariables() {
+  public function getDefaultTemplateVariables(): array {
     static $drupal_static_fast;
     if (!isset($drupal_static_fast)) {
       $drupal_static_fast['default_variables'] = &drupal_static(__METHOD__);
