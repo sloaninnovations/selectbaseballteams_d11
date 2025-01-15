@@ -23,9 +23,10 @@ class BlockContent extends DeriverBase implements ContainerDeriverInterface {
    */
   public function __construct(
     protected EntityStorageInterface $blockContentStorage,
-    protected ?LanguageManagerInterface $languageManager = NULL) {
+    protected ?LanguageManagerInterface $languageManager = NULL,
+  ) {
     if (!$this->languageManager) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $languageManager argument is deprecated in drupal:10.2.3 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3417692', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $languageManager argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3417692', E_USER_DEPRECATED);
       $this->languageManager = \Drupal::service('language_manager');
     }
   }
