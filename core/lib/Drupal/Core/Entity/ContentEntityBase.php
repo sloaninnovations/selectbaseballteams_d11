@@ -835,7 +835,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         if ($this->isDefaultTranslation()) {
           // Update the default internal language cache.
           $this->setDefaultLangcode();
-          if (isset($this->translations[$this->defaultLangcode])) {
+          if (isset($this->translations[$this->defaultLangcode]['status'], $this->translations[$this->defaultLangcode]['entity'])) {
             $message = new FormattableMarkup('A translation already exists for the specified language (@langcode).', ['@langcode' => $this->defaultLangcode]);
             throw new \InvalidArgumentException($message);
           }
