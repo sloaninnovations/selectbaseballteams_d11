@@ -10,6 +10,7 @@ use Drupal\migrate\Event\MigrateEvents;
 use Drupal\migrate\Event\MigrateImportEvent;
 use Drupal\migrate\Event\MigratePostRowSaveEvent;
 use Drupal\migrate\Event\MigratePreRowSaveEvent;
+use Drupal\migrate\Event\MigrateRowFailEvent;
 use Drupal\migrate\Event\MigrateRollbackEvent;
 use Drupal\migrate\Event\MigrateRowDeleteEvent;
 use Drupal\migrate\Exception\RequirementsException;
@@ -227,6 +228,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
           $this->getIdMap()->saveIdMapping($row, [], $e->getStatus());
           $msg = sprintf("%s:%s:%s", $this->migration->getPluginId(), $destination_property_name, $e->getMessage());
           $this->saveMessage($msg, $e->getLevel());
+          $this->getEventDispatcher()->dispatch(new MigrateRowFailEvent($this->migration, $this->message, $row, $e), MigrateEvents::ROW_FAIL);
           $save = FALSE;
         }
         catch (MigrateSkipRowException $e) {
@@ -237,6 +239,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
             $msg = sprintf("%s:%s: %s", $this->migration->getPluginId(), $destination_property_name, $message);
             $this->saveMessage($msg, MigrationInterface::MESSAGE_INFORMATIONAL);
           }
+          $this->getEventDispatcher()->dispatch(new MigrateRowFailEvent($this->migration, $this->message, $row, $e), MigrateEvents::ROW_FAIL);
           $save = FALSE;
         }
 
@@ -267,8 +270,10 @@ class MigrateExecutable implements MigrateExecutableInterface {
           catch (MigrateException $e) {
             $this->getIdMap()->saveIdMapping($row, [], $e->getStatus());
             $this->saveMessage($e->getMessage(), $e->getLevel());
+            $this->getEventDispatcher()->dispatch(new MigrateRowFailEvent($this->migration, $this->message, $row, $e), MigrateEvents::ROW_FAIL);
           }
           catch (\Exception $e) {
+            $this->getEventDispatcher()->dispatch(new MigrateRowFailEvent($this->migration, $this->message, $row, $e), MigrateEvents::ROW_FAIL);
             $this->getIdMap()
               ->saveIdMapping($row, [], MigrateIdMapInterface::STATUS_FAILED);
             $this->handleException($e);
