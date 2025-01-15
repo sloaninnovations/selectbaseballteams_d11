@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\navigation\Plugin\TopBarItem;
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\navigation\Attribute\TopBarItem;
 use Drupal\navigation\EntityRouteHelper;
 use Drupal\navigation\TopBarItemBase;
 use Drupal\navigation\TopBarRegion;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityPublishedInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Provides the Page Context top bar item.
@@ -72,8 +71,8 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
   public function build(): array {
     $build = [
       '#cache' => [
-        'contexts' => ['route']
-      ]
+        'contexts' => ['route'],
+      ],
     ];
 
     if (!$entity = $this->entityRouteHelper->getContentEntityFromRoute()) {
