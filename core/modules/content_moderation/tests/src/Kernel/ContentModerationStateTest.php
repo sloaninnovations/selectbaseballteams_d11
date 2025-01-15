@@ -224,7 +224,8 @@ class ContentModerationStateTest extends KernelTestBase {
     $entity = $this->createEntity($entity_type_id);
     $entity = $this->reloadEntity($entity);
     $entity->delete();
-    $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity);
+
+    $content_moderation_state = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
     $this->assertNull($content_moderation_state);
   }
 
@@ -245,7 +246,7 @@ class ContentModerationStateTest extends KernelTestBase {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->createEntity($entity_type_id);
     $revision_1 = clone $entity;
-    $this->assertNotNull(ContentModerationState::loadFromModeratedEntity($revision_1));
+    $this->assertNotNull(\Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($revision_1));
 
     // Create a second revision.
     $entity = $this->reloadEntity($entity);
@@ -266,9 +267,9 @@ class ContentModerationStateTest extends KernelTestBase {
     $entity_storage = $this->entityTypeManager->getStorage($entity_type_id);
     $entity_storage->deleteRevision($revision_2->getRevisionId());
 
-    $this->assertNotNull(ContentModerationState::loadFromModeratedEntity($revision_1));
-    $this->assertNull(ContentModerationState::loadFromModeratedEntity($revision_2));
-    $this->assertNotNull(ContentModerationState::loadFromModeratedEntity($revision_3));
+    $this->assertNotNull(\Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($revision_1));
+    $this->assertNull(\Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($revision_2));
+    $this->assertNotNull(\Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($revision_3));
   }
 
   /**
@@ -290,14 +291,14 @@ class ContentModerationStateTest extends KernelTestBase {
     $entity->moderation_state = 'draft';
     $entity->save();
 
-    $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity);
+    $content_moderation_state = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
     $this->assertNotEmpty($content_moderation_state);
 
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $entity_storage */
     $entity_storage = $this->entityTypeManager->getStorage($entity_type_id);
     $entity_storage->deleteRevision($entity->getRevisionId());
 
-    $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity);
+    $content_moderation_state = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
     $this->assertNull($content_moderation_state);
   }
 
@@ -350,11 +351,11 @@ class ContentModerationStateTest extends KernelTestBase {
         $translation->info = $this->randomString();
       }
       $translation->save();
-      $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity);
+      $content_moderation_state = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
       $this->assertTrue($content_moderation_state->hasTranslation($langcode));
       $entity->removeTranslation($langcode);
       $entity->save();
-      $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity);
+      $content_moderation_state = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
       $this->assertFalse($content_moderation_state->hasTranslation($langcode));
     }
   }
@@ -438,7 +439,7 @@ class ContentModerationStateTest extends KernelTestBase {
     $this->assertTrue($french_node->isPublished());
 
     // Change the EN state without saving the node.
-    $content_moderation_state = ContentModerationState::loadFromModeratedEntity($english_node);
+    $content_moderation_state = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($english_node);
     $content_moderation_state->set('moderation_state', 'draft');
     $content_moderation_state->setNewRevision(TRUE);
     // Revision 8 (en, fr).
@@ -450,7 +451,7 @@ class ContentModerationStateTest extends KernelTestBase {
     $this->assertEquals('published', $french_node->moderation_state->value);
 
     // This should unpublish the French node.
-    $content_moderation_state = ContentModerationState::loadFromModeratedEntity($english_node);
+    $content_moderation_state = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($english_node);
     $content_moderation_state = $content_moderation_state->getTranslation('fr');
     $content_moderation_state->set('moderation_state', 'draft');
     $content_moderation_state->setNewRevision(TRUE);
@@ -560,7 +561,7 @@ class ContentModerationStateTest extends KernelTestBase {
     ]);
     $entity->save();
 
-    $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity);
+    $content_moderation_state = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
     $this->assertCount(1, $entity->getTranslationLanguages());
     $this->assertCount(1, $content_moderation_state->getTranslationLanguages());
     $this->assertEquals('en', $entity->langcode->value);
@@ -569,7 +570,7 @@ class ContentModerationStateTest extends KernelTestBase {
     $entity->langcode = 'fr';
     $entity->save();
 
-    $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity);
+    $content_moderation_state = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
     $this->assertCount(1, $entity->getTranslationLanguages());
     $this->assertCount(1, $content_moderation_state->getTranslationLanguages());
     $this->assertEquals('fr', $entity->langcode->value);
@@ -732,22 +733,22 @@ class ContentModerationStateTest extends KernelTestBase {
     // Check that the revision default state of the moderated entity and the
     // content moderation state entity always match.
     $entity = $this->createEntity($entity_type_id, 'published');
-    $cms_entity = ContentModerationState::loadFromModeratedEntity($entity);
+    $cms_entity = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
     $this->assertEquals($entity->isDefaultRevision(), $cms_entity->isDefaultRevision());
 
     $entity->get('moderation_state')->value = 'published';
     $entity->save();
-    $cms_entity = ContentModerationState::loadFromModeratedEntity($entity);
+    $cms_entity = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
     $this->assertEquals($entity->isDefaultRevision(), $cms_entity->isDefaultRevision());
 
     $entity->get('moderation_state')->value = 'draft';
     $entity->save();
-    $cms_entity = ContentModerationState::loadFromModeratedEntity($entity);
+    $cms_entity = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
     $this->assertEquals($entity->isDefaultRevision(), $cms_entity->isDefaultRevision());
 
     $entity->get('moderation_state')->value = 'published';
     $entity->save();
-    $cms_entity = ContentModerationState::loadFromModeratedEntity($entity);
+    $cms_entity = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
     $this->assertEquals($entity->isDefaultRevision(), $cms_entity->isDefaultRevision());
   }
 

@@ -34,6 +34,13 @@ class ContentModerationStateStorageSchemaTest extends KernelTestBase {
   ];
 
   /**
+   * The moderation_information API service.
+   *
+   * @var \Drupal\content_moderation\ModerationInformationInterface
+   */
+  protected $moderationInformation;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -45,6 +52,7 @@ class ContentModerationStateStorageSchemaTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('content_moderation_state');
     $this->installConfig('content_moderation');
+    $this->moderationInformation = $this->container->get('content_moderation.moderation_information');
 
     NodeType::create([
       'type' => 'example',
@@ -138,7 +146,7 @@ class ContentModerationStateStorageSchemaTest extends KernelTestBase {
     $entity = ContentModerationState::create($values + $defaults);
     $exception_triggered = FALSE;
     try {
-      ContentModerationState::updateOrCreateFromEntity($entity);
+      $entity->realSave();
     }
     catch (\Exception) {
       $exception_triggered = TRUE;
