@@ -7,7 +7,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DestructableInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
@@ -512,7 +511,8 @@ class Registry implements DestructableInterface {
    */
   protected function processExtension(array &$cache, $name, $type, $theme, $path) {
     $result = [];
-    $add = function (array &$info, string $prefix, string $hook = '') use (&$cache): void {
+    // Stores valid preprocess and their invoke array.
+    $storePreprocess = function (array &$info, string $prefix, ?string $hook = NULL) use (&$cache): void {
       $hook = $hook ? 'preprocess_' . $hook : 'preprocess';
       $function = $prefix . '_' . $hook;
       // Store a string resembling a procedural function for backwards
@@ -524,17 +524,20 @@ class Registry implements DestructableInterface {
       // used in ThemeManager::render().
       $cache['preprocess invokes'][$function] = ['module' => $prefix, 'hook' => $hook];
     };
-    $check = function (array &$info, string $name, string $hook, ?string $path = NULL) use ($add) {
+
+    // This finds functions outside of modules.
+    // Specifically functions in themes, theme engines and core includes.
+    $checkLegacyFunction = function (array &$info, string $name, string $hook, ?string $path = NULL) use ($storePreprocess) {
       // Only use non-hook-specific variable preprocessors for theming
       // hooks implemented as templates. See the @defgroup themeable
       // topic. Also, template_preprocess() exists and is handled elsewhere.
-      if (isset($info['template']) && $name !== 'template' && ModuleHandler::getFunctionForLegacyInvoke($name, 'preprocess')) {
-        $add($info, $name);
+      if ($name !== 'template' && function_exists($name . '_preprocess')) {
+        $storePreprocess($info, $name);
       }
       // This gathers any template functions outside of modules and functions
       // that are defined by a theme that implements hook_theme.
-      if (ModuleHandler::getFunctionForLegacyInvoke($name, 'preprocess_' . $hook)) {
-        $add($info, $name, $hook);
+      if (function_exists($name . '_preprocess_' . $hook)) {
+        $storePreprocess($info, $name, $hook);
         if (isset($path)) {
           $info['theme path'] = $path;
         }
@@ -651,7 +654,7 @@ class Registry implements DestructableInterface {
           }
 
           foreach ($prefixes as $prefix) {
-            $check($info, $prefix, $hook);
+            $checkLegacyFunction($info, $prefix, $hook);
           }
         }
         else {
@@ -659,7 +662,7 @@ class Registry implements DestructableInterface {
           $info['preprocess functions'] = [];
           foreach ($preprocess_functions as $function) {
             if (is_string($function)) {
-              $add($info, ... explode('_preprocess_', $function, 2));
+              $storePreprocess($info, ... explode('_preprocess_', $function, 2));
             }
             else {
               $info['preprocess functions'][] = $function;
@@ -693,7 +696,7 @@ class Registry implements DestructableInterface {
           if (!isset($info['preprocess functions'])) {
             $cache[$hook]['preprocess functions'] = [];
           }
-          $check($cache[$hook], $name, $hook, $path);
+          $checkLegacyFunction($cache[$hook], $name, $hook, $path);
         }
       }
     }

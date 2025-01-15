@@ -66,13 +66,6 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected array $invokeMap = [];
 
   /**
-   * Legacy hooks for example hook_preprocess_HOOK or template_preprocess_HOOK.
-   *
-   * @var array
-   */
-  protected static array $legacyProceduralHooks = [];
-
-  /**
    * Constructs a ModuleHandler object.
    *
    * @param string $root
@@ -345,38 +338,12 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   protected function legacyInvoke($module, $hook, array $args = []) {
     $this->load($module);
-    if ($function = self::getFunctionForLegacyInvoke($module, $hook)) {
+    $function = $module . '_' . $hook;
+    if (function_exists($function) && !(new \ReflectionFunction($function))->getAttributes(LegacyHook::class)) {
       return $function(... $args);
     }
-    return NULL;
-  }
 
-  /**
-   * Get a function to execute for legacy invoke.
-   *
-   * This method should only be used by \Drupal\Core\Theme\Registry
-   * and ModuleHandler.
-   *
-   * @param string $extension
-   *   The module or theme to check for.
-   * @param string $hook
-   *   The hook to check for.
-   *
-   * @return string|false
-   *   Return the cached function if it exists or FALSE if it does not or
-   *   if it is tagged with #[LegacyHook]
-   *
-   * @internal
-   */
-  public static function getFunctionForLegacyInvoke(string $extension, string $hook): string|FALSE {
-    $function = $extension . '_' . $hook;
-    if (!function_exists($function)) {
-      return FALSE;
-    }
-    if (!isset(self::$legacyProceduralHooks[$function])) {
-      self::$legacyProceduralHooks[$function] = (new \ReflectionFunction($function))->getAttributes(LegacyHook::class) ? FALSE : $function;
-    }
-    return self::$legacyProceduralHooks[$function];
+    return NULL;
   }
 
   /**
