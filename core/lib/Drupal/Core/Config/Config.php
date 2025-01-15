@@ -204,17 +204,25 @@ class Config extends StorableConfigBase {
 
     // If there is a schema for this configuration object, cast all values to
     // conform to the schema.
-    if (!$has_trusted_data) {
-      if ($this->typedConfigManager->hasConfigSchema($this->name)) {
-        // Ensure that the schema wrapper has the latest data.
-        $this->schemaWrapper = NULL;
-        $this->data = $this->castValue(NULL, $this->data);
-      }
-      else {
-        foreach ($this->data as $key => $value) {
-          $this->validateValue($key, $value);
+    try {
+      if (!$has_trusted_data) {
+        if ($this->typedConfigManager->hasConfigSchema($this->name)) {
+          // Ensure that the schema wrapper has the latest data.
+          $this->schemaWrapper = NULL;
+          foreach ($this->data as $key => $value) {
+            $this->data[$key] = $this->castValue($key, $value);
+          }
+        }
+        else {
+          foreach ($this->data as $key => $value) {
+            $this->validateValue($key, $value);
+          }
         }
       }
+    }
+    catch (\Exception $e) {
+      // Log and ignore exceptions caused by invalid config structures.
+      watchdog_exception('config', $e);
     }
 
     // Potentially configuration schema could have changed the underlying data's
