@@ -17,7 +17,7 @@ class FileViewsHooks {
 
   public function __construct(
     protected readonly EntityTypeManagerInterface $entityTypeManager,
-    private readonly EntityFieldManagerInterface $entityFieldManager,
+    protected readonly EntityFieldManagerInterface $entityFieldManager,
     protected readonly ?FieldViewsDataProvider $fieldViewsDataProvider,
   ) {}
 
