@@ -96,6 +96,7 @@
  * copy the default implementation template, and then modifying it as desired.
  *
  * @section sec_preprocess_templates Preprocessing for Template Files
+<<<<<<< HEAD
  * Several functions are called before the template file is invoked to modify
  * the variables that are passed to the template. These make up the
  * "preprocessing" phase, and are executed (if they exist), in the following
@@ -107,6 +108,22 @@
  * the data is preprocessed, before it is passed to the theme template:
  * - template_preprocess(&$variables, $hook): Creates a default set of variables
  *   for all theme hooks with template implementations. Provided by Drupal Core.
+=======
+ * If the theme implementation is a template file, several functions are called
+ * before the template file is invoked to modify the variables that are passed
+ * to the template. These make up the "preprocessing" phase, and are executed
+ * (if they exist), in the following order (note that in the following list,
+ * HOOK indicates the hook being called or a less specific hook. For example, if
+ * '#theme' => 'node__article' is called, hook is node__article and node. MODULE
+ * indicates a module name, THEME indicates a theme name, and ENGINE indicates a
+ * theme engine name). Modules, themes, and theme engines can provide these
+ * functions to modify how the data is preprocessed, before it is passed to the
+ * theme template:
+ * - ThemeManager::addDefaultTemplateVariables(&$variables): Creates
+ *   a default set of variables for all theme hooks with template
+ *   implementations. You can alter these variables by
+ *   using HOOK_template_preprocess_default_variables_alter(&$variables).
+>>>>>>> 91f6daf4d99 (applied patch)
  * - template_preprocess_HOOK(&$variables): Should be implemented by the module
  *   that registers the theme hook, to set up default variables.
  * - MODULE_preprocess(&$variables, $hook): hook_preprocess() is invoked on all
@@ -1194,6 +1211,7 @@ function hook_page_bottom(array &$page_bottom): void {
  *     are using these variables in a render array, prefix the variable names
  *     defined here with a #.
  *   - render element: Used for render element items only: the name of the
+<<<<<<< HEAD
  *     renderable element or element tree to pass to the template. This name is
  *     used as the name of the variable that holds the renderable element or
  *     tree in preprocess and process functions.
@@ -1210,6 +1228,30 @@ function hook_page_bottom(array &$page_bottom): void {
  *     specified. If not specified, a default template name will be assumed.
  *     For example, if a module registers the 'search_result' theme hook,
  *     'search-result' will be assigned as its template name.
+=======
+ *     renderable element or element tree to pass to the theme function. This
+ *     name is used as the name of the variable that holds the renderable
+ *     element or tree in preprocess functions.
+ *   - file: The file the implementation resides in. This file will be included
+ *     prior to the theme being rendered, to make sure that the function or
+ *     preprocess function (as needed) is actually loaded.
+ *   - path: Override the path of the file to be used. Ordinarily the module or
+ *     theme path will be used, but if the file will not be in the default
+ *     path, include it here. This path should be relative to the Drupal root
+ *     directory.
+ *   - template: If specified, the theme implementation is a template file, and
+ *     this is the template name. Do not add 'html.twig' on the end of the
+ *     template name. The extension will be added automatically by the default
+ *     rendering engine (which is Twig.) If 'path' is specified, 'template'
+ *     should also be specified. If neither 'template' nor 'function' are
+ *     specified, a default template name will be assumed. For example, if a
+ *     module registers the 'search_result' theme hook, 'search-result' will be
+ *     assigned as its template name.
+ *   - function: (deprecated in Drupal 8.0.x, will be removed in Drupal 9.0.x)
+ *     If specified, this will be the function name to invoke for this
+ *     implementation. If neither 'template' nor 'function' are specified, a
+ *     default template name will be assumed. See above for more details.
+>>>>>>> 91f6daf4d99 (applied patch)
  *   - base hook: Used for theme suggestions only: the base theme hook name.
  *     Instead of this suggestion's implementation being used directly, the base
  *     hook will be invoked with this implementation as its first suggestion.
@@ -1308,6 +1350,7 @@ function hook_theme($existing, $type, $theme, $path): array {
  *   ],
  *   'variables' => [
  *     'content' => NULL,
+<<<<<<< HEAD
  *   ],
  *   'preprocess functions' => [
  *     0 => 'template_preprocess',
@@ -1316,6 +1359,15 @@ function hook_theme($existing, $type, $theme, $path): array {
  *     3 => 'claro_preprocess_block_content_add_list',
  *   ],
  * ];
+=======
+ *   ),
+ *   'preprocess functions' => array (
+ *     0 => 'template_preprocess_block_content_add_list',
+ *     1 => 'contextual_preprocess',
+ *     2 => 'seven_preprocess_block_content_add_list',
+ *   ),
+ * );
+>>>>>>> 91f6daf4d99 (applied patch)
  * @endcode
  *
  * @param array $theme_registry
@@ -1334,29 +1386,27 @@ function hook_theme_registry_alter(&$theme_registry) {
 }
 
 /**
- * Alter the default, hook-independent variables for all templates.
+ * Alter the default variables for all templates.
  *
  * Allows modules to provide additional default template variables or manipulate
- * existing. This hook is invoked from template_preprocess() after basic default
- * template variables have been set up and before the next template preprocess
- * function is invoked.
+ * existing. This hook is invoked from ThemeManager service's
+ * getDefaultTemplateVariables() method after basic default template variables
+ * have been set up and before the template preprocess functions are invoked.
  *
  * Note that the default template variables are statically cached within a
  * request. When adding a template variable that depends on other context, it is
  * your responsibility to appropriately reset the static cache in
- * template_preprocess() when needed:
+ * ThemeManager's getDefaultTemplateVariables() when needed:
  * @code
- * drupal_static_reset('template_preprocess');
+ * drupal_static_reset('getDefaultTemplateVariables');
  * @endcode
  *
  * See user_template_preprocess_default_variables_alter() for an example.
  *
  * @param array $variables
  *   An associative array of default template variables, as set up by
- *   _template_preprocess_default_variables(). Passed by reference.
- *
- * @see template_preprocess()
- * @see _template_preprocess_default_variables()
+ *   Drupal/Core/Theme/ThemeManagerInterface::getDefaultTemplateVariables().
+ *   Passed by reference.
  */
 function hook_template_preprocess_default_variables_alter(&$variables) {
   $variables['is_admin'] = \Drupal::currentUser()->hasPermission('access administration pages');

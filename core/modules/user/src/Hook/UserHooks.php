@@ -225,7 +225,7 @@ class UserHooks {
   public function userLogin(UserInterface $account): void {
     // Reset static cache of default variables in template_preprocess() to reflect
     // the new user.
-    drupal_static_reset('template_preprocess');
+    drupal_static_reset('getDefaultTemplateVariables');
     // If the user has a NULL time zone, notify them to set a time zone.
     $config = \Drupal::config('system.date');
     if (!$account->getTimezone() && $config->get('timezone.user.configurable') && $config->get('timezone.user.warn')) {
@@ -245,7 +245,7 @@ class UserHooks {
   public function userLogout(AccountInterface $account): void {
     // Reset static cache of default variables in template_preprocess() to reflect
     // the new user.
-    drupal_static_reset('template_preprocess');
+    drupal_static_reset('getDefaultTemplateVariables');
   }
 
   /**

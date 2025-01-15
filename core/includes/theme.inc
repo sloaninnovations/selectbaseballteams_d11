@@ -8,6 +8,7 @@
  * customized by user themes.
  */
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Url;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Crypt;
@@ -1060,54 +1061,30 @@ function template_preprocess_maintenance_task_list(&$variables): void {
  *
  * See the @link themeable Default theme implementations topic @endlink for
  * details.
+ *
+ * @deprecated in Drupal 8.3.x, will be removed before Drupal 9.0.0.
+ * Now ThemeManager is responsible for setting the default template variables.
+ * There is no publicly usable replacement for this function. It should not be
+ * called anywhere. If you do please stop! Use preprocess hooks to alter default
+ * variables or use your own ThemeManager class.
  */
 function template_preprocess(&$variables, $hook, $info) {
-  // Merge in variables that don't depend on hook and don't change during a
-  // single page request.
-  // Use the advanced drupal_static() pattern, since this is called very often.
-  static $drupal_static_fast;
-  if (!isset($drupal_static_fast)) {
-    $drupal_static_fast['default_variables'] = &drupal_static(__FUNCTION__);
+  $themeManager = \Drupal::service('theme.manager');
+  $variables += $themeManager->getDefaultTemplateVariables();
+
+  // Merge element #attributes into $default_variables['attributes'] if they
+  // exist in render_element.
+  // This code is dublicated in ThemeManager::render(). Moving it to
+  // ThemeManager would make ThemeManagerInterface messy because we would need
+  // to pass in $variables as reference in getDefaultTemplateVariables() or
+  // some other thing that doesn't make sense.
+  $render_element_type = isset($info['render element']) ? $info['render element'] : NULL;
+  if (isset($variables[$render_element_type]['#attributes'])) {
+    $variables['attributes'] = NestedArray::mergeDeep(
+      $variables['attributes'],
+      $variables[$render_element_type]['#attributes']
+    );
   }
-  $default_variables = &$drupal_static_fast['default_variables'];
-  if (!isset($default_variables)) {
-    $default_variables = _template_preprocess_default_variables();
-  }
-  $variables += $default_variables;
-
-  // When theming a render element, merge its #attributes into
-  // $variables['attributes'].
-  if (isset($info['render element'])) {
-    $key = $info['render element'];
-    if (isset($variables[$key]['#attributes'])) {
-      $variables['attributes'] = AttributeHelper::mergeCollections($variables['attributes'], $variables[$key]['#attributes']);
-    }
-  }
-}
-
-/**
- * Returns hook-independent variables to template_preprocess().
- */
-function _template_preprocess_default_variables() {
-  // Variables that don't depend on a database connection.
-  $variables = [
-    'attributes' => [],
-    'title_attributes' => [],
-    'content_attributes' => [],
-    'title_prefix' => [],
-    'title_suffix' => [],
-    'db_is_active' => !defined('MAINTENANCE_MODE'),
-    'is_admin' => FALSE,
-    'logged_in' => FALSE,
-  ];
-
-  // Give modules a chance to alter the default template variables.
-  \Drupal::moduleHandler()->alter('template_preprocess_default_variables', $variables);
-
-  // Tell all templates where they are located.
-  $variables['directory'] = \Drupal::theme()->getActiveTheme()->getPath();
-
-  return $variables;
 }
 
 /**
