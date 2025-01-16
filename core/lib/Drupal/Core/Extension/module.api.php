@@ -1213,7 +1213,7 @@ function hook_requirements_alter(array &$requirements): void {
  *     - REQUIREMENT_OK: The requirement is satisfied.
  *     - REQUIREMENT_WARNING: The requirement failed with a warning.
  *     - REQUIREMENT_ERROR: The requirement failed with an error.
- *     Defaults to REQUIREMENT_INFO.
+ *     Defaults to REQUIREMENT_OK.
  */
 function hook_runtime_requirements(): array {
   $requirements = [];
