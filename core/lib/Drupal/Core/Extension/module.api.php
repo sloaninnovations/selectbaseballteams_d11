@@ -1208,7 +1208,7 @@ function hook_requirements_alter(array &$requirements): void {
  *   - title: The name of the requirement.
  *   - value: The current value (e.g., version, time, level, etc).
  *   - description: The description of the requirement/status.
- *   - severity: (optional) The requirement's result/severity level, one of:
+ *   - severity: (optional) The requirement's severity level, one of:
  *     - REQUIREMENT_INFO: For info only.
  *     - REQUIREMENT_OK: The requirement is satisfied.
  *     - REQUIREMENT_WARNING: The requirement failed with a warning.
