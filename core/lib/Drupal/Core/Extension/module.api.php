@@ -1240,17 +1240,13 @@ function hook_runtime_requirements(): array {
   $requirements['cron']['title'] = t('Cron maintenance tasks');
 
   if (is_numeric($cron_last)) {
-    $requirements['cron'] = [
-      'description' => '',
-      'value' => t('Last run @time ago', ['@time' => \Drupal::service('date.formatter')->formatTimeDiffSince($cron_last)]),
-    ];
+    $requirements['cron']['description'] = '';
+    $requirements['cron']['value'] = t('Last run @time ago', ['@time' => \Drupal::service('date.formatter')->formatTimeDiffSince($cron_last)]);
   }
   else {
-    $requirements['cron'] = [
-      'description' => t('Cron has not run. It appears cron jobs have not been setup on your system. Check the help pages for <a href=":url">configuring cron jobs</a>.', [':url' => 'https://www.drupal.org/docs/administering-a-drupal-site/cron-automated-tasks/cron-automated-tasks-overview']),
-      'severity' => REQUIREMENT_ERROR,
-      'value' => t('Never run'),
-    ];
+    $requirements['cron']['description'] = t('Cron has not run. It appears cron jobs have not been setup on your system. Check the help pages for <a href=":url">configuring cron jobs</a>.', [':url' => 'https://www.drupal.org/docs/administering-a-drupal-site/cron-automated-tasks/cron-automated-tasks-overview']);
+    $requirements['cron']['value'] = t('Never run');
+    $requirements['cron']['severity'] = REQUIREMENT_ERROR;
   }
 
   $requirements['cron']['description'] .= ' ' . t('You can <a href=":cron">run cron manually</a>.', [':cron' => Url::fromRoute('system.run_cron')->toString()]);
