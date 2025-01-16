@@ -204,4 +204,18 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
     parent::setValue($values, $notify);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(): void {
+    if (!empty($this->uri)) {
+      $this->uri = trim($this->uri);
+    }
+    if (!empty($this->title)) {
+      $this->title = trim($this->title);
+    }
+
+    parent::preSave();
+  }
+
 }
