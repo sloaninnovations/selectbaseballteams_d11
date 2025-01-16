@@ -304,6 +304,16 @@ display:
         options: {  }
       empty:
         area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: text_custom
+          empty: true
+          content: ''
+          tokenize: false
         block_content_listing_empty:
           id: block_content_listing_empty
           table: block_content

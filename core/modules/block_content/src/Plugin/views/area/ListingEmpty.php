@@ -65,32 +65,29 @@ class ListingEmpty extends AreaPluginBase {
     );
   }
 
-/**
- * {@inheritdoc}
- */
-public function render($empty = FALSE) {
-  if (!$empty || !empty($this->options['empty'])) {
-    // Construct the first sentence.
-    $message = $this->t('There are no content blocks available.');
+  /**
+   * {@inheritdoc}
+   */
+  public function render($empty = FALSE) {
+    if (!$empty || !empty($this->options['empty'])) {
+      $message = $this->t('There are no content blocks available.');
 
-    // Construct the "Add a content block" link.
-    $add_link = $this->t('Add a <a href=":url">content block</a>.', [
-      ':url' => Url::fromRoute('block_content.add_page')->toString(),
-    ]);
+      // Construct the "Add a content block" link.
+      $add_link = $this->t('Add a <a href=":url">content block</a>.', [
+        ':url' => Url::fromRoute('block_content.add_page')->toString(),
+      ]);
 
-    // Combine both sentences with a space in between.
-    $element = [
-      '#markup' => $message . ' ' . $add_link,
-      '#cache' => [
-        'contexts' => ['user.permissions'],
-        // Cache for users with different access levels.
-      ],
-    ];
+      $element = [
+        '#markup' => $message . ' ' . $add_link,
+        '#cache' => [
+          'contexts' => ['user.permissions'],
+        ],
+      ];
 
-    return $element;
+      return $element;
+    }
+
+    return [];
   }
-
-  return [];
-}
 
 }
