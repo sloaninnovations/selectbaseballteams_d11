@@ -49,7 +49,7 @@
    * element constrains the width. This can happen when toggling the
    * "lazy-load" option within an image field.
    */
-  @nest td & {
+  td & {
     width: min-content;
     min-width: 100%;
   }
