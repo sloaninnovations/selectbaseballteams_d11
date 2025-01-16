@@ -2,8 +2,13 @@
 
 namespace Drupal\field_ui\Form;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\SortArray;
+use Drupal\Core\Ajax\AjaxHelperTrait;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\OpenModalDialogCommand;
+use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -13,6 +18,7 @@ use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TempStore\PrivateTempStore;
+use Drupal\Core\Url;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field_ui\FieldUI;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -23,6 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  */
 class FieldStorageAddForm extends FormBase {
+  use AjaxHelperTrait;
 
   /**
    * The name of the entity type.
@@ -94,8 +101,17 @@ class FieldStorageAddForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Continue'),
       '#button_type' => 'primary',
+      '#attributes' => [
+        'class' => ['button', 'button--primary'],
+        'data-dialog-type' => 'modal',
+        'data-dialog-options' => Json::encode([
+          'width' => '1100',
+        ]),
+      ],
     ];
-
+    if ($this->isAjax()) {
+      $form['actions']['submit']['#ajax']['callback'] = '::ajaxSubmit';
+    }
     $form['#attached']['library'] = [
       'field_ui/drupal.field_ui',
       'field_ui/drupal.field_ui.manage_fields',
@@ -273,11 +289,20 @@ class FieldStorageAddForm extends FormBase {
     ];
 
     $form['actions']['submit']['#validate'][] = '::validateFieldType';
+    $entity_type = $this->entityTypeManager->getDefinition($this->entityTypeId);
+    $route_parameters_back = [] + FieldUI::getRouteBundleParameter($entity_type, $this->bundle);
 
     $form['actions']['back'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Back'),
-      '#submit' => ['::startOver'],
+      '#type' => 'link',
+      '#title' => $this->t('Back'),
+      '#url' => Url::fromRoute("field_ui.field_storage_config_add_$this->entityTypeId", $route_parameters_back),
+      '#attributes' => [
+        'class' => ['button', 'use-ajax'],
+        'data-dialog-type' => 'modal',
+        'data-dialog-options' => Json::encode([
+          'width' => '1100',
+        ]),
+      ],
     ];
 
     $field_type_options = $form_state->get('field_type_options');
@@ -557,9 +582,63 @@ class FieldStorageAddForm extends FormBase {
   /**
    * Submit handler for resetting the form.
    */
-  public static function startOver($form, FormStateInterface &$form_state) {
+  public function startOver($form, FormStateInterface &$form_state) {
     $form_state->unsetValue('new_storage_type');
     $form_state->setRebuild();
+  }
+
+  /**
+   * Submit form #ajax callback.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return
+   *   An AJAX response that display validation error messages or represents a
+   *   successful submission.
+   *
+   * @see \Drupal\Core\Ajax\AjaxFormHelperTrait
+   */
+  public function ajaxSubmit(array &$form, FormStateInterface $form_state) {
+    if ($form_state->hasAnyErrors()) {
+      $form['status_messages'] = [
+        '#type' => 'status_messages',
+        '#weight' => -1000,
+      ];
+      $form['#sorted'] = FALSE;
+      $response = new AjaxResponse();
+      $response->addCommand(new ReplaceCommand('#field-storage-subfield', $form));
+    }
+    else {
+      if (!empty($form_state->getValue('label'))) {
+        /** @var \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver */
+        $controller_resolver = \Drupal::service('controller_resolver');
+        $callback = $controller_resolver->getControllerFromDefinition('\Drupal\field_ui\Controller\FieldConfigAddController::fieldConfigAddConfigureForm');
+        $form = call_user_func_array($callback,
+        [$this->entityTypeId, $form_state->getValue('field_name')]);
+      }
+      $response = $this->successfulAjaxSubmit($form, $form_state);
+    }
+    return $response;
+  }
+
+  /**
+   * Respond to a successful AJAX submission.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   An AJAX response.
+   */
+  protected function successfulAjaxSubmit(array $form, FormStateInterface $form_state): AjaxResponse {
+    $response = new AjaxResponse();
+    $response->addCommand(new OpenModalDialogCommand('title', $form));
+    return $response;
   }
 
 }
