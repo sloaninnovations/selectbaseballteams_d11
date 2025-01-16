@@ -1237,9 +1237,13 @@ function hook_runtime_requirements(): array {
 
   // Report cron status
   $cron_last = \Drupal::state()->get('system.cron_last');
+  $requirements['cron']['title'] = t('Cron maintenance tasks');
 
   if (is_numeric($cron_last)) {
-    $requirements['cron']['value'] = t('Last run @time ago', ['@time' => \Drupal::service('date.formatter')->formatTimeDiffSince($cron_last)]);
+    $requirements['cron'] = [
+      'description' => '',
+      'value' => t('Last run @time ago', ['@time' => \Drupal::service('date.formatter')->formatTimeDiffSince($cron_last)]),
+    ];
   }
   else {
     $requirements['cron'] = [
@@ -1250,8 +1254,6 @@ function hook_runtime_requirements(): array {
   }
 
   $requirements['cron']['description'] .= ' ' . t('You can <a href=":cron">run cron manually</a>.', [':cron' => Url::fromRoute('system.run_cron')->toString()]);
-
-  $requirements['cron']['title'] = t('Cron maintenance tasks');
 
   return $requirements;
 }
