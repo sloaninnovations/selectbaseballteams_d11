@@ -120,6 +120,7 @@ function _node_mass_update_batch_process(array $nodes, array $updates, $langcode
   }
 
   // Process nodes by groups of 5.
+  /** @var \Drupal\node\NodeStorageInterface $storage */
   $storage = \Drupal::entityTypeManager()->getStorage('node');
   $count = min(5, count($context['sandbox']['nodes']));
   for ($i = 1; $i <= $count; $i++) {
