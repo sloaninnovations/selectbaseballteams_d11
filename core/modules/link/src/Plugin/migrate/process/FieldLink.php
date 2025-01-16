@@ -76,11 +76,6 @@ class FieldLink extends ProcessPluginBase {
       return 'route:<nolink>';
     }
 
-    // Buttons are allowed.
-    if (strpos($uri, '<button>') === 0) {
-      return 'route:<button>';
-    }
-
     // Remove the <front> component of the URL.
     if (strpos($uri, '<front>') === 0) {
       $uri = substr($uri, strlen('<front>'));
