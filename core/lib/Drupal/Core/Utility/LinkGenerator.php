@@ -124,25 +124,28 @@ class LinkGenerator implements LinkGeneratorInterface {
       // Add a "data-drupal-link-system-path" attribute to let the
       // drupal.active-link library know the path in a standardized manner.
       if ($url->isRouted() && !isset($variables['options']['attributes']['data-drupal-link-system-path'])) {
-        // @todo System path is deprecated - use the route name and parameters
-        //   see https://www.drupal.org/project/drupal/issues/3443759.
-        $system_path = $url->getInternalPath();
+        // Get the route match from the URL.
+        $routeMatch = $url->getRouteMatch();
+        if ($routeMatch) {
+          $internalPath = Url::fromRouteMatch($routeMatch);
+          $system_path = \Drupal::urlGenerator()->getPathFromRoute($internalPath->getRouteName(), $internalPath->getRouteParameters());
 
-        // Special case for the front page.
-        if ($url->getRouteName() === '<front>') {
-          $system_path = '<front>';
-        }
+          // Special case for the front page.
+          if ($routeMatch->getRouteName() === '<front>') {
+            $system_path = '<front>';
+          }
 
-        if (!empty($system_path)) {
-          $variables['options']['attributes']['data-drupal-link-system-path'] = $system_path;
+          if (!empty($system_path)) {
+            $variables['options']['attributes']['data-drupal-link-system-path'] = $system_path;
+          }
         }
       }
-    }
 
-    // Remove all HTML and PHP tags from a tooltip, calling expensive strip_tags()
-    // only when a quick strpos() gives suspicion tags are present.
-    if (isset($variables['options']['attributes']['title']) && str_contains($variables['options']['attributes']['title'], '<')) {
-      $variables['options']['attributes']['title'] = strip_tags($variables['options']['attributes']['title']);
+      // Remove all HTML PHP tags from a tooltip, calling expensive strip_tags()
+      // only when a quick strpos() gives suspicion tags are present.
+      if (isset($variables['options']['attributes']['title']) && str_contains($variables['options']['attributes']['title'], '<')) {
+        $variables['options']['attributes']['title'] = strip_tags($variables['options']['attributes']['title']);
+      }
     }
 
     // Allow other modules to modify the structure of the link.
