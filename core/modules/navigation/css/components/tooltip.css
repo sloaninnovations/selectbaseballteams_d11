@@ -31,3 +31,6 @@
 [data-admin-toolbar="expanded"] [data-drupal-tooltip]:hover + .toolbar-block__title-tooltip {
   display: none;
 }
+.layout-builder .toolbar-block__title-tooltip {
+  display: none !important;
+}
