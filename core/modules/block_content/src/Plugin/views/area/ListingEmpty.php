@@ -65,25 +65,32 @@ class ListingEmpty extends AreaPluginBase {
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function render($empty = FALSE) {
-    if (!$empty || !empty($this->options['empty'])) {
-      /** @var \Drupal\Core\Access\AccessResultInterface|\Drupal\Core\Cache\CacheableDependencyInterface $access_result */
-      $access_result = $this->accessManager->checkNamedRoute('block_content.add_page', [], $this->currentUser, TRUE);
-      $element = [
-        '#markup' => $this->t('Add a <a href=":url">content block</a>.', [':url' => Url::fromRoute('block_content.add_page')->toString()]),
-        '#access' => $access_result->isAllowed(),
-        '#cache' => [
-          'contexts' => $access_result->getCacheContexts(),
-          'tags' => $access_result->getCacheTags(),
-          'max-age' => $access_result->getCacheMaxAge(),
-        ],
-      ];
-      return $element;
-    }
-    return [];
+/**
+ * {@inheritdoc}
+ */
+public function render($empty = FALSE) {
+  if (!$empty || !empty($this->options['empty'])) {
+    // Construct the first sentence.
+    $message = $this->t('There are no content blocks available.');
+
+    // Construct the "Add a content block" link.
+    $add_link = $this->t('Add a <a href=":url">content block</a>.', [
+      ':url' => Url::fromRoute('block_content.add_page')->toString(),
+    ]);
+
+    // Combine both sentences with a space in between.
+    $element = [
+      '#markup' => $message . ' ' . $add_link,
+      '#cache' => [
+        'contexts' => ['user.permissions'],
+        // Cache for users with different access levels.
+      ],
+    ];
+
+    return $element;
   }
+
+  return [];
+}
 
 }
