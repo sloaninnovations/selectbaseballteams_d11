@@ -27,6 +27,9 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
       $configuration,
@@ -45,22 +48,37 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
         'contexts' => ['route'],
       ],
     ];
+
     // Local tasks for content entities.
     if ($this->navigationRenderer->hasLocalTasks()) {
       $local_tasks = $this->navigationRenderer->getLocalTasks();
+      $current_route_name = \Drupal::routeMatch()->getRouteName();
 
-      $edit_route_name = key(array_filter(
-        $local_tasks['tasks'],
-        fn($task) => isset($task['#link']['#title']) && $task['#link']['#title'] === 'Edit'
-      ));
+      // Canonical routes for supported entity types.
+      $canonical_routes = [
+        'entity.node.canonical',
+        'entity.media.canonical',
+        'entity.taxonomy_term.canonical',
+        'entity.user.canonical',
+      ];
 
       $exposed_local_tasks = [];
-      if (isset($edit_route_name) && array_key_exists($edit_route_name, $local_tasks['tasks'])) {
-        $exposed_local_tasks[] = [
-          'task' => $local_tasks['tasks'][$edit_route_name],
-          'icon' => 'edit',
-        ];
-        unset($local_tasks['tasks'][$edit_route_name]);
+
+      // Check if the current route is canonical.
+      if (in_array($current_route_name, $canonical_routes, TRUE)) {
+        // Look for the "Edit" task in the local tasks.
+        $edit_route_name = key(array_filter(
+          $local_tasks['tasks'],
+          fn($task) => isset($task['#link']['#title']) && $task['#link']['#title'] === 'Edit'
+        ));
+
+        if (isset($edit_route_name) && array_key_exists($edit_route_name, $local_tasks['tasks'])) {
+          $exposed_local_tasks[] = [
+            'task' => $local_tasks['tasks'][$edit_route_name],
+            'icon' => 'edit',
+          ];
+          unset($local_tasks['tasks'][$edit_route_name]);
+        }
       }
 
       $build += [
@@ -68,12 +86,12 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
         '#local_tasks' => $local_tasks['tasks'],
         '#exposed_local_tasks' => $exposed_local_tasks,
       ];
+
       assert($local_tasks['cacheability'] instanceof CacheableMetadata);
       $local_tasks['cacheability']->applyTo($build);
     }
 
     return $build;
-
   }
 
 }
