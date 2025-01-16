@@ -189,22 +189,20 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     }
 
     // Hides field to avoid self-blocking when user editing its own profile
-    if ($user->id() !== $account->id()) {
-      if (!$self_register) {
-        $status = $account->get('status')->value;
-      }
-      else {
-        $status = $config->get('register') == UserInterface::REGISTER_VISITORS ? 1 : 0;
-      }
-
-      $form['account']['status'] = [
-        '#type' => 'radios',
-        '#title' => $this->t('Status'),
-        '#default_value' => $status,
-        '#options' => [$this->t('Blocked'), $this->t('Active')],
-        '#access' => $account->status->access('edit'),
-      ];
+    if (!$self_register) {
+      $status = $account->get('status')->value;
     }
+    else {
+      $status = $config->get('register') == UserInterface::REGISTER_VISITORS ? 1 : 0;
+    }
+
+    $form['account']['status'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Status'),
+      '#default_value' => $status,
+      '#options' => [$this->t('Blocked'), $this->t('Active')],
+      '#access' => $account->status->access('edit') && $user->id() !== $account->id(),
+    ];
 
     $roles = Role::loadMultiple();
     unset($roles[RoleInterface::ANONYMOUS_ID]);
