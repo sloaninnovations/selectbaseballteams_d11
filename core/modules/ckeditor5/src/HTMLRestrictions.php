@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\ckeditor5;
 
@@ -393,6 +393,7 @@ final class HTMLRestrictions {
    * Creates the empty set of HTML restrictions: nothing is allowed.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
+   *   The empty restriction.
    */
   public static function emptySet(): HTMLRestrictions {
     return new self([]);
@@ -402,6 +403,7 @@ final class HTMLRestrictions {
    * Whether this set of HTML restrictions is unrestricted.
    *
    * @return bool
+   *   Return TRUE if it is unrestricted, otherwise return FALSE.
    */
   public function isUnrestricted(): bool {
     return $this->unrestricted;
@@ -411,8 +413,7 @@ final class HTMLRestrictions {
    * Whether this set of HTML restrictions allows nothing.
    *
    * @return bool
-   *
-   * @see ::emptySet()
+   *   TRUE if it is an empty set, otherwise FALSE.
    */
   public function allowsNothing(): bool {
     return count($this->elements) === 0
@@ -428,6 +429,7 @@ final class HTMLRestrictions {
    *   A filter plugin instance to construct a HTML restrictions object for.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
+   *   The restrictions matching the given text format.
    */
   public static function fromFilterPluginInstance(FilterInterface $filter): HTMLRestrictions {
     return self::fromObjectWithHtmlRestrictions($filter);
@@ -440,6 +442,7 @@ final class HTMLRestrictions {
    *   A text format to construct a HTML restrictions object for.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
+   *   Return the restriction matching the text.
    */
   public static function fromTextFormat(FilterFormatInterface $text_format): HTMLRestrictions {
     return self::fromObjectWithHtmlRestrictions($text_format);
@@ -449,6 +452,7 @@ final class HTMLRestrictions {
    * Constructs an unrestricted set of HTML restrictions.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
+   *   Return the unrestricted restriction.
    */
   private static function unrestricted(): self {
     $restrictions = HTMLRestrictions::emptySet();
@@ -470,6 +474,7 @@ final class HTMLRestrictions {
    *   object for.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
+   *   Return the restriction matching the given object.
    *
    * @see ::fromFilterPluginInstance()
    * @see ::fromTextFormat()
@@ -485,7 +490,7 @@ final class HTMLRestrictions {
     }
 
     // When allowing all tags on an attribute, transform FilterHtml output from
-    // ['tag' => ['*'=> TRUE]] to ['tag' => TRUE]
+    // ['tag' => ['*'=> TRUE]] to ['tag' => TRUE].
     $allowed = $restrictions['allowed'];
     foreach ($allowed as $element => $attributes) {
       if (is_array($attributes) && isset($attributes['*']) && $attributes['*'] === TRUE) {
@@ -504,7 +509,7 @@ final class HTMLRestrictions {
     // - `<tag bar on*>` will become `<tag bar>` since the `on*` attribute is
     //   globally disallowed by FilterHtml
     // - `<tag ontouch baz>` will become `<tag baz>` since the `on*` attribute
-    //   is globally disallowed by FilterHtml
+    //   is globally disallowed by FilterHtml.
     // @see ::validateAllowedRestrictionsPhase5()
     // @see \Drupal\filter\Plugin\Filter\FilterHtml::process()
     // @see \Drupal\filter\Plugin\Filter\FilterHtml::getHTMLRestrictions()
@@ -530,6 +535,7 @@ final class HTMLRestrictions {
    *   A string representing a list of allowed HTML elements.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
+   *   Return the restriction based on the string.
    *
    * @see ::toFilterHtmlAllowedTagsString()
    * @see ::toCKEditor5ElementsArray()
@@ -572,7 +578,7 @@ final class HTMLRestrictions {
     }
 
     // When allowing all tags on an attribute, transform FilterHtml output from
-    // ['tag' => ['*'=> TRUE]] to ['tag' => TRUE]
+    // ['tag' => ['*'=> TRUE]] to ['tag' => TRUE].
     foreach ($allowed_elements as $element => $attributes) {
       if (is_array($attributes) && isset($attributes['*']) && $attributes['*'] === TRUE) {
         $allowed_elements[$element] = TRUE;
@@ -617,8 +623,8 @@ final class HTMLRestrictions {
       // - An array value for a given tag/attribute provides an array keyed by
       //   specific attributes/attribute values with boolean values determining
       //   if they are allowed or not.
-      // - A value of TRUE for a given tag/attribute permits all attributes/attribute
-      //   values for that tag/attribute.
+      // - A value of TRUE for a given tag/attribute permits all
+      //   attributes/attribute values for that tag/attribute.
       // @see \Drupal\filter\Entity\FilterFormat::getHtmlRestrictions()
       function ($value, string $tag) use ($other) {
         // If this HTML restrictions object contains a tag that the other did
@@ -629,7 +635,6 @@ final class HTMLRestrictions {
 
         // All subsequent checks can assume that $other contains an entry for
         // this tag.
-
         // If this HTML restrictions object does not allow any attributes for
         // this tag, then the other is at least equally restrictive: drop the
         // DiffArray result.
@@ -669,7 +674,7 @@ final class HTMLRestrictions {
     // Attribute-level postprocessing for two special cases:
     // - wildcard attribute names
     // - per attribute name: attribute value restrictions in $this vs all values
-    //   allowed in $other
+    //   allowed in $other.
     foreach ($diff_elements as $tag => $tag_config) {
       // If there are no per-attribute restrictions for this tag in either
       // operand, then no postprocessing is needed.
@@ -835,8 +840,14 @@ final class HTMLRestrictions {
       if (!(is_array($this->elements[$tag]) && is_array($other->elements[$tag]))) {
         continue;
       }
-      $other_wildcard_attributes = array_filter(array_keys($other->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
-      $this_wildcard_attributes = array_filter(array_keys($this->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
+      $other_wildcard_attributes = array_filter(array_keys($other->elements[$tag]), [
+        __CLASS__,
+        'isWildcardAttributeName',
+      ]);
+      $this_wildcard_attributes = array_filter(array_keys($this->elements[$tag]), [
+        __CLASS__,
+        'isWildcardAttributeName',
+      ]);
 
       // If the same wildcard attribute restrictions are present in both or
       // neither, no adjustment necessary: the intersection is already correct.
@@ -1014,8 +1025,18 @@ final class HTMLRestrictions {
     // For example: <p class="text-align-center"> in the first operand and
     // <$text-container class="text-align-center"> in the second
     // operand.
-    $a_concrete = self::resolveWildcards($a);
-    $b_concrete = self::resolveWildcards($b);
+    if ($a_wildcard->elements == $a->elements) {
+      $a_concrete = self::resolveWildcards($a, $b->elements);
+    }
+    else {
+      $a_concrete = self::resolveWildcards($a);
+    }
+    if ($b_wildcard->elements === $b->elements) {
+      $b_concrete = self::resolveWildcards($b, $a->elements);
+    }
+    else {
+      $b_concrete = self::resolveWildcards($b);
+    }
     $concrete_op_result = $a_concrete->$operation_method_name($b_concrete);
 
     // Using the PHP array union operator is safe because the two operation
@@ -1096,6 +1117,8 @@ final class HTMLRestrictions {
   /**
    * Extracts the subset of plain tags (attributes omitted) from allowed elements.
    *
+   * From allowed elements.
+   *
    * @return \Drupal\ckeditor5\HTMLRestrictions
    *   The extracted subset of the given set of HTML restrictions.
    */
@@ -1124,6 +1147,8 @@ final class HTMLRestrictions {
    *
    * @param \Drupal\ckeditor5\HTMLRestrictions $r
    *   A set of HTML restrictions.
+   * @param array $supported_wildcard_tags
+   *   (optional) Supported wildcard tags. Defaults to an empty array.
    *
    * @return \Drupal\ckeditor5\HTMLRestrictions
    *   The concrete interpretation of the given set of HTML restrictions. All
@@ -1133,7 +1158,7 @@ final class HTMLRestrictions {
    *
    * @see ::getWildcardTags()
    */
-  private static function resolveWildcards(HTMLRestrictions $r): HTMLRestrictions {
+  private static function resolveWildcards(HTMLRestrictions $r, array $supported_wildcard_tags = []): HTMLRestrictions {
     // Start by resolving the wildcards in a naive, simple way: generate
     // tags, attributes and attribute values they support.
     $naively_resolved_wildcard_elements = [];
@@ -1145,7 +1170,7 @@ final class HTMLRestrictions {
         // allow declaring support for additional attributes and attribute
         // values on already supported tags.
         foreach ($wildcard_tags as $wildcard_tag) {
-          if (isset($r->elements[$wildcard_tag])) {
+          if (isset($r->elements[$wildcard_tag]) || isset($supported_wildcard_tags[$wildcard_tag])) {
             $naively_resolved_wildcard_elements[$wildcard_tag] = $tag_config;
           }
         }
@@ -1167,7 +1192,7 @@ final class HTMLRestrictions {
     // - then $naive will be `<p class="foo">`
     // - merging them yields `<p class> <$text-container class="foo">`
     //   again
-    // - diffing the wildcard subsets yields just `<p class>`
+    // - diffing the wildcard subsets yields just `<p class>`.
     return $r->merge($naive_resolution)->doDiff($r->getWildcardSubset());
   }
 
@@ -1178,14 +1203,17 @@ final class HTMLRestrictions {
    *   (optional) Whether to resolve wildcards. Defaults to TRUE. When set to
    *   FALSE, the raw allowed elements will be returned (with no processing
    *   applied hence no resolved wildcards).
+   * @param array $supported_wildcard_tags
+   *   (optional) Supported wildcard tags. Defaults to an empty array.
    *
    * @return array
+   *   Return all allowed elements in an array.
    *
    * @see \Drupal\filter\Plugin\FilterInterface::getHTMLRestrictions()
    */
-  public function getAllowedElements(bool $resolve_wildcards = TRUE): array {
+  public function getAllowedElements(bool $resolve_wildcards = TRUE, array $supported_wildcard_tags = []): array {
     if ($resolve_wildcards) {
-      return self::resolveWildcards($this)->elements;
+      return self::resolveWildcards($this, $supported_wildcard_tags)->elements;
     }
 
     return $this->elements;
