@@ -6,6 +6,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
+use Drupal\Core\Routing\RequestContext;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -30,6 +31,13 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
   protected $pathProcessor;
 
   /**
+   * The request context.
+   *
+   * @var \Drupal\Core\Routing\RequestContext
+   */
+  protected $requestContext;
+
+  /**
    * Constructs a new unroutedUrlAssembler object.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
@@ -38,11 +46,18 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
    *   The output path processor.
    * @param string[] $filter_protocols
    *   (optional) An array of protocols allowed for URL generation.
+   * @param \Drupal\Core\Routing\RequestContext $request_context
+   *   The request context.
    */
-  public function __construct(RequestStack $request_stack, OutboundPathProcessorInterface $path_processor, array $filter_protocols = ['http', 'https']) {
+  public function __construct(RequestStack $request_stack, OutboundPathProcessorInterface $path_processor, array $filter_protocols = ['http', 'https'], RequestContext $request_context = NULL) {
     UrlHelper::setAllowedProtocols($filter_protocols);
     $this->requestStack = $request_stack;
     $this->pathProcessor = $path_processor;
+    if (!$request_context) {
+      @trigger_error(sprintf('Invoking %s without $request_context is deprecated in drupal:10.3.0 and unsupported in drupal:11.0.0. See https://www.drupal.org/node/3268509', __FUNCTION__), E_USER_DEPRECATED);
+      $request_context = \Drupal::service('router.request_context');
+    }
+    $this->requestContext = $request_context;
   }
 
   /**
@@ -90,6 +105,19 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
       elseif ($options['https'] === FALSE) {
         $uri = str_replace('https://', 'http://', $uri);
       }
+    }
+    // Allow (outbound) path processing, if needed.
+    $base_url = $this->requestContext->getCompleteBaseUrl();
+    if (!array_key_exists('path_processing', $options) && UrlHelper::externalIsLocal($uri, $base_url)) {
+      // Match UrlGenerator::generateFromRoute()'s default.
+      $options['path_processing'] = TRUE;
+    }
+    if (!empty($options['path_processing'])) {
+      // @see ::buildLocalUrl().
+      $uri = $base_url . $this->pathProcessor->processOutbound(
+        substr($uri, strlen($base_url)),
+        $options
+      );
     }
     // Append the query.
     if ($options['query']) {

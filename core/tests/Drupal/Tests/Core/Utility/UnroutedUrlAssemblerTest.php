@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Utility;
 
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Utility\UnroutedUrlAssembler;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,8 +53,14 @@ class UnroutedUrlAssemblerTest extends UnitTestCase {
     parent::setUp();
 
     $this->requestStack = new RequestStack();
-    $this->pathProcessor = $this->createMock('Drupal\Core\PathProcessor\OutboundPathProcessorInterface');
-    $this->unroutedUrlAssembler = new UnroutedUrlAssembler($this->requestStack, $this->pathProcessor);
+    $this->pathProcessor = new TestOutboundPathProcessor();
+    $request_context = new RequestContext('https://www.example.com/subdir');
+    $request_context->setCompleteBaseUrl('https://www.example.com/subdir');
+    $this->unroutedUrlAssembler = new UnroutedUrlAssembler(
+      $this->requestStack,
+      $this->pathProcessor,
+      request_context: $request_context,
+    );
   }
 
   /**
@@ -104,6 +111,8 @@ class UnroutedUrlAssemblerTest extends UnitTestCase {
       'override-deep-query-merge-int-ket' => ['https://example.com/test?120=1', ['query' => ['bar' => ['baz' => 'foo']]], 'https://example.com/test?120=1&bar%5Bbaz%5D=foo'],
       'override-fragment' => ['https://example.com/test?foo=1#bar', ['fragment' => 'baz'], 'https://example.com/test?foo=1#baz'],
       ['//www.drupal.org', [], '//www.drupal.org'],
+      'external-is-local-with-processing-noop' => ['https://www.example.com/subdir/external-is-local', [], 'https://www.example.com/subdir/external-is-local'],
+      'external-is-local-with-processing-changed' => ['https://www.example.com/subdir/external-is-local-changeme', [], 'https://www.example.com/subdir/changed'],
     ];
   }
 
