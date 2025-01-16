@@ -156,7 +156,6 @@ csslintrc
 csstools
 curle
 curlopt
-customevent
 customrequest
 cweagans
 datelist
@@ -438,7 +437,6 @@ nntp
 noadd
 nocache
 nocase
-nodelist
 nodir
 nofields
 nojs
@@ -496,7 +494,6 @@ phpdocumentor
 phpserialize
 phpspec
 pickable
-picturefill
 pingback
 pjpeg
 placeholdered
@@ -603,7 +600,6 @@ schemeless
 scorewords
 scriptable
 scrollbars
-sebastianbergmann
 seld
 selectbox
 sess
