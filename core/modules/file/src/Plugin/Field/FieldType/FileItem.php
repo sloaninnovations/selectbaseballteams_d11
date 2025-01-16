@@ -33,7 +33,7 @@ use Drupal\file\Validation\FileValidatorSettingsTrait;
   default_widget: "file_generic",
   default_formatter: "file_default",
   list_class: FileFieldItemList::class,
-  constraints: ["ReferenceAccess" => [], "FileValidation" => []],
+  constraints: ["ReferenceAccess" => [], "FileValidation" => [], "FileDescriptionRequired" => []],
   column_groups: [
     'target_id' => [
       'label' => new TranslatableMarkup('File'),
@@ -73,7 +73,8 @@ class FileItem extends EntityReferenceItem {
       'file_extensions' => 'txt',
       'file_directory' => '[date:custom:Y]-[date:custom:m]',
       'max_filesize' => '',
-      'description_field' => 0,
+      'description_field' => FALSE,
+      'description_field_required' => FALSE,
     ] + parent::defaultFieldSettings();
   }
 
@@ -226,6 +227,18 @@ class FileItem extends EntityReferenceItem {
       '#weight' => 11,
     ];
 
+    $element['description_field_required'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Require the <em>Description</em> field'),
+      '#default_value' => $settings['description_field_required'] ?? FALSE,
+      '#weight' => 20,
+      '#states' => [
+        'visible' => [
+          ':input[name="settings[description_field]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
     return $element;
   }
 
@@ -253,8 +266,7 @@ class FileItem extends EntityReferenceItem {
    *
    * This doubles as a convenience clean-up function and a validation routine.
    * Commas are allowed by the end-user, but ultimately the value will be stored
-   * as a space-separated list for compatibility with the 'FileExtension'
-   * constraint.
+   * as a space-separated list for compatibility with file_validate_extensions().
    */
   public static function validateExtensions($element, FormStateInterface $form_state) {
     if (!empty($element['#value'])) {

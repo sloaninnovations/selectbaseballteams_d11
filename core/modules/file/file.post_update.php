@@ -5,6 +5,18 @@
  * Post update functions for File.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\field\FieldConfigInterface;
+
+/**
+ * Add the 'require description' file field setting.
+ */
+function file_post_update_description_required(array &$sandbox): void {
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'field_config', function (FieldConfigInterface $field_config): bool {
+    return $field_config->getType() === 'file';
+  });
+}
+
 /**
  * Implements hook_removed_post_updates().
  */
