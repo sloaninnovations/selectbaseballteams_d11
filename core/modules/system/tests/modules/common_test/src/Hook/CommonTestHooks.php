@@ -49,12 +49,12 @@ class CommonTestHooks {
    * Implements hook_TYPE_alter().
    *
    * This is to verify that
-   * \Drupal::moduleHandler()->alter(array(TYPE1, TYPE2), ...) allows
+   * \Drupal::moduleHandler()->alter([TYPE1, TYPE2], ...) allows
    * hook_module_implements_alter() to affect the order in which module
    * implementations are executed.
    */
   #[Hook('drupal_alter_foo_alter', module: 'block')]
-  public function blockDrupalAlterFooAlter(&$data, &$arg2 = NULL, &$arg3 = NULL) {
+  public function blockDrupalAlterFooAlter(&$data, &$arg2 = NULL, &$arg3 = NULL): void {
     $data['foo'] .= ' block';
   }
 
@@ -80,7 +80,7 @@ class CommonTestHooks {
    * Implements hook_library_info_build().
    */
   #[Hook('library_info_build')]
-  public function libraryInfoBuild() {
+  public function libraryInfoBuild(): array {
     $libraries = [];
     if (\Drupal::state()->get('common_test.library_info_build_test')) {
       $libraries['dynamic_library'] = ['version' => '1.0', 'css' => ['base' => ['common_test.css' => []]]];

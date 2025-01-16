@@ -167,7 +167,7 @@ class StatementPrefetchIterator implements \Iterator, StatementInterface {
    * Some drivers (including SQLite) will need to perform some preparation
    * themselves to get the statement right.
    *
-   * @param $query
+   * @param string $query
    *   The query.
    * @param array|null $args
    *   An array of arguments. This can be NULL.
@@ -256,20 +256,24 @@ class StatementPrefetchIterator implements \Iterator, StatementInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   ::fetchField() instead.
+   *
+   * @see https://www.drupal.org/node/3490312
    */
   public function fetchColumn($index = 0) {
-    if ($row = $this->fetch(\PDO::FETCH_ASSOC)) {
-      return $this->assocToColumn($row, $this->columnNames, $index);
-    }
-    return FALSE;
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ::fetchField() instead. See https://www.drupal.org/node/3490312', E_USER_DEPRECATED);
+    return $this->fetchField($index);
   }
 
   /**
    * {@inheritdoc}
    */
   public function fetchField($index = 0) {
-    return $this->fetchColumn($index);
+    if ($row = $this->fetch(\PDO::FETCH_ASSOC)) {
+      return $this->assocToColumn($row, $this->columnNames, $index);
+    }
+    return FALSE;
   }
 
   /**
@@ -319,14 +323,11 @@ class StatementPrefetchIterator implements \Iterator, StatementInterface {
    * {@inheritdoc}
    */
   public function fetchCol($index = 0) {
-    if (isset($this->columnNames[$index])) {
-      $result = [];
-      while ($row = $this->fetch(\PDO::FETCH_ASSOC)) {
-        $result[] = $row[$this->columnNames[$index]];
-      }
-      return $result;
+    $result = [];
+    while (($columnValue = $this->fetchField($index)) !== FALSE) {
+      $result[] = $columnValue;
     }
-    return [];
+    return $result;
   }
 
   /**

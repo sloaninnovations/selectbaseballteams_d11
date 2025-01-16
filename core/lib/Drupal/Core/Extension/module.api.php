@@ -111,11 +111,11 @@ function hook_hook_info() {
  * you will have to change the order of hook_form_alter() implementation in
  * hook_module_implements_alter().
  *
- * @param $implementations
+ * @param array $implementations
  *   An array keyed by the module's name. The value of each item corresponds
  *   to a $group, which is usually FALSE, unless the implementation is in a
  *   file named $module.$group.inc.
- * @param $hook
+ * @param string $hook
  *   The name of the module hook being implemented.
  */
 function hook_module_implements_alter(&$implementations, $hook) {
@@ -173,7 +173,7 @@ function hook_system_info_alter(array &$info, \Drupal\Core\Extension\Extension $
  *   should be made earlier and exported so during import there's no need to
  *   do them again.
  */
-function hook_module_preinstall($module, bool $is_syncing) {
+function hook_module_preinstall($module, bool $is_syncing): void {
   my_module_cache_clear();
 }
 
@@ -188,7 +188,7 @@ function hook_module_preinstall($module, bool $is_syncing) {
  *
  * This hook should be implemented in a .module file, not in an .install file.
  *
- * @param $modules
+ * @param string[] $modules
  *   An array of the modules that were installed.
  * @param bool $is_syncing
  *   TRUE if the module is being installed as part of a configuration import. In
@@ -201,7 +201,7 @@ function hook_module_preinstall($module, bool $is_syncing) {
  * @see \Drupal\Core\Extension\ModuleInstaller::install()
  * @see hook_install()
  */
-function hook_modules_installed($modules, $is_syncing) {
+function hook_modules_installed($modules, $is_syncing): void {
   if (in_array('lousy_module', $modules)) {
     \Drupal::state()->set('my_module.lousy_module_compatibility', TRUE);
   }
@@ -272,7 +272,7 @@ function hook_install($is_syncing): void {
  *   should be made earlier and exported so during import there's no need to
  *   do them again.
  */
-function hook_module_preuninstall($module, bool $is_syncing) {
+function hook_module_preuninstall($module, bool $is_syncing): void {
   my_module_cache_clear();
 }
 
@@ -286,7 +286,7 @@ function hook_module_preuninstall($module, bool $is_syncing) {
  * It is recommended that you implement this hook if your module stores
  * data that may have been set by other modules.
  *
- * @param $modules
+ * @param string[] $modules
  *   An array of the modules that were uninstalled.
  * @param bool $is_syncing
  *   TRUE if the module is being uninstalled as part of a configuration import.
@@ -297,7 +297,7 @@ function hook_module_preuninstall($module, bool $is_syncing) {
  *
  * @see hook_uninstall()
  */
-function hook_modules_uninstalled($modules, $is_syncing) {
+function hook_modules_uninstalled($modules, $is_syncing): void {
   if (in_array('lousy_module', $modules)) {
     \Drupal::state()->delete('my_module.lousy_module_compatibility');
   }
@@ -522,11 +522,11 @@ function hook_install_tasks(&$install_state) {
  *
  * This hook is invoked on the install profile in install_tasks().
  *
- * @param $tasks
+ * @param string[] $tasks
  *   An array of all available installation tasks, including those provided by
  *   Drupal core. You can modify this array to change or replace individual
  *   steps within the installation process.
- * @param $install_state
+ * @param array $install_state
  *   An array of information about the current installation state.
  *
  * @see hook_install_tasks()
@@ -1096,7 +1096,7 @@ function hook_updater_info_alter(&$updaters) {
  * Moreover, any requirement with a severity of REQUIREMENT_ERROR severity will
  * result in a notice on the administration configuration page.
  *
- * @param $phase
+ * @param string $phase
  *   The phase in which requirements are checked:
  *   - install: The module is being installed.
  *   - update: The module is enabled and update.php is run.
@@ -1119,7 +1119,7 @@ function hook_updater_info_alter(&$updaters) {
  *     - REQUIREMENT_ERROR: The requirement failed with an error.
  *     Defaults to REQUIREMENT_OK when installing, REQUIREMENT_INFO otherwise.
  */
-function hook_requirements($phase) {
+function hook_requirements($phase): array {
   $requirements = [];
 
   // Report Drupal version

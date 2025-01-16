@@ -6,6 +6,7 @@
 
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\field\FieldStorageConfigInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
@@ -76,13 +77,13 @@ function views_preprocess_comment(&$variables): void {
  * later on (for example, alter hooks which run later during the same page
  * request).
  *
- * @param $render_element
+ * @param array $render_element
  *   The renderable array to which contextual links will be added. This array
  *   should be suitable for passing in to
  *   \Drupal\Core\Render\RendererInterface::render() and will normally contain a
  *   representation of the view display whose contextual links are being
  *   requested.
- * @param $location
+ * @param string $location
  *   The location in which the calling function intends to render the view and
  *   its contextual links. The core system supports three options for this
  *   parameter:
@@ -380,12 +381,12 @@ function _views_query_tag_alter_condition(AlterableInterface $query, &$condition
  * to do that, you will need to do what this function does manually, by
  * loading the view, getting the preview and then getting $view->getTitle().
  *
- * @param $name
+ * @param string $name
  *   The name of the view to embed.
- * @param $display_id
+ * @param string $display_id
  *   The display id to embed. If unsure, use 'default', as it will always be
  *   valid. But things like 'page' or 'block' should work here.
- * @param ...$args
+ * @param mixed ...$args
  *   Any additional parameters will be passed as arguments.
  *
  * @return array|null
@@ -418,7 +419,7 @@ function views_embed_view($name, $display_id = 'default', ...$args) {
  *   want to use. A URL will appear in the status bar of your browser. This is
  *   usually at the bottom of the window, in the chrome. Everything after
  *   #views-tab- is the display ID, e.g. page_1.
- * @param ...$args
+ * @param mixed ...$args
  *   Any additional parameters will be passed as arguments.
  *
  * @return array
@@ -456,4 +457,57 @@ function views_element_validate_tags($element, FormStateInterface $form_state) {
       return;
     }
   }
+}
+
+/**
+ * Determines whether the entity type the field appears in is SQL based.
+ *
+ * @param \Drupal\field\FieldStorageConfigInterface $field_storage
+ *   The field storage definition.
+ *
+ * @return \Drupal\Core\Entity\Sql\SqlContentEntityStorage
+ *   Returns the entity type storage if supported.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+ * \Drupal::service('views.field_data_provider')
+ * ->getSqlStorageForField($field_storage); instead.
+ * @see https://www.drupal.org/node/3489502
+ */
+function _views_field_get_entity_type_storage(FieldStorageConfigInterface $field_storage) {
+  @trigger_error('_views_field_get_entity_type_storage() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'views.field_data_provider\')->getSqlStorageForField($field_storage). See https://www.drupal.org/node/3489502', E_USER_DEPRECATED);
+  return \Drupal::service('views.field_data_provider')->getSqlStorageForField($field_storage);
+}
+
+/**
+ * Default views data implementation for a field.
+ *
+ * @param \Drupal\field\FieldStorageConfigInterface $field_storage
+ *   The field definition.
+ *
+ * @return array
+ *   The default views data for the field.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+ * \Drupal::service('views.field_data_provider')
+ * ->defaultFieldImplementation($field_storage); instead.
+ * @see https://www.drupal.org/node/3489502
+ */
+function views_field_default_views_data(FieldStorageConfigInterface $field_storage) {
+  @trigger_error('views_field_default_views_data() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'views.field_data_provider\')->defaultFieldImplementation($field_storage). See https://www.drupal.org/node/3489502', E_USER_DEPRECATED);
+  return \Drupal::service('views.field_data_provider')->defaultFieldImplementation($field_storage);
+}
+
+/**
+ * Returns the label of a certain field.
+ *
+ * Therefore it looks up in all bundles to find the most used field.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+ *   \Drupal::service('entity_field.manager')->getFieldLabels() instead.
+ *
+ * @see https://www.drupal.org/node/3489411
+ */
+function views_entity_field_label($entity_type, $field_name) {
+  @trigger_error("views_entity_field_label() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal::service('entity_field.manager')->getFieldLabels(). See https://www.drupal.org/node/3489411", E_USER_DEPRECATED);
+  return \Drupal::service('entity_field.manager')->getFieldLabels($entity_type, $field_name);
 }
