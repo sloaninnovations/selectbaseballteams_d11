@@ -2,6 +2,7 @@
 
 namespace Drupal\navigation\Hook;
 
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\navigation\RenderCallbacks;
 use Drupal\Component\Plugin\PluginBase;
@@ -10,6 +11,7 @@ use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\navigation\TopBarItemManagerInterface;
 
 /**
  * Hook implementations for navigation.
@@ -79,7 +81,7 @@ class NavigationHooks {
   #[Hook('theme')]
   public function theme($existing, $type, $theme, $path) : array {
     $items['top_bar'] = ['render element' => 'element'];
-    $items['top_bar_local_tasks'] = ['variables' => ['local_tasks' => [], 'exposed_local_tasks' => []]];
+    $items['top_bar_local_tasks'] = ['variables' => ['local_tasks' => []]];
     $items['top_bar_local_task'] = ['variables' => ['link' => []]];
     $items['big_pipe_interface_preview__navigation_shortcut_lazy_builder_lazyLinks__Shortcuts'] = [
       'variables' => [
@@ -118,6 +120,20 @@ class NavigationHooks {
     $navigation_links->addMenuLinks($links);
     $navigation_links->removeAdminContentLink($links);
     $navigation_links->removeHelpLink($links);
+  }
+
+  /**
+   * Implements hook_block_build_BASE_BLOCK_ID_alter().
+   */
+  #[Hook('block_build_local_tasks_block_alter')]
+  public function blockBuildLocalTasksBlockAlter(array &$build, BlockPluginInterface $block): void {
+    $navigation_renderer = \Drupal::service('navigation.renderer');
+    assert($navigation_renderer instanceof NavigationRenderer);
+    if (\Drupal::currentUser()->hasPermission('access navigation') &&
+      array_key_exists('page_actions', \Drupal::service(TopBarItemManagerInterface::class)->getDefinitions())
+    ) {
+      $navigation_renderer->removeLocalTasks($build, $block);
+    }
   }
 
   /**
@@ -218,15 +234,6 @@ class NavigationHooks {
         '#weight' => -1000,
       ],
     ];
-  }
-
-  /**
-   * Implements hook_theme_suggestions_HOOK_alter().
-   */
-  #[Hook('theme_suggestions_menu_local_tasks_alter')]
-  public function themeSuggestionsMenuLocalTasksAlter(array &$suggestions, array $variables) : void {
-    // Add a custom theme suggestion to use our module’s template.
-    $suggestions[] = 'menu_local_tasks__navigation';
   }
 
 }
