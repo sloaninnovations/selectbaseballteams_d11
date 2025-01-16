@@ -1,6 +1,8 @@
 core.menu.static_menu_link_overrides:
   type: config_object
   label: 'Static menu link overrides'
+  constraints:
+    FullyValidatable: ~
   mapping:
     definitions:
       type: sequence
@@ -12,9 +14,15 @@ core.menu.static_menu_link_overrides:
           menu_name:
             type: string
             label: 'Menu name'
+            constraints:
+              NotNull: []
           parent:
             type: string
             label: 'Parent'
+            constraints:
+              NotNull: []
+              PluginExists:
+                manager: plugin.manager.menu.link
           weight:
             type: weight
             label: 'Weight'
