@@ -1201,11 +1201,11 @@ function hook_requirements_alter(array &$requirements): void {
  *   - value: The current value (e.g., version, time, level, etc).
  *   - description: The description of the requirement/status.
  *   - severity: (optional) The requirement's result/severity level, one of:
- *     - REQUIREMENT_INFO: For info only.
- *     - REQUIREMENT_OK: The requirement is satisfied.
- *     - REQUIREMENT_WARNING: The requirement failed with a warning.
- *     - REQUIREMENT_ERROR: The requirement failed with an error.
- *     Defaults to REQUIREMENT_INFO.
+ *     - REQUIREMENT_INFO: Has no effect during updates.
+ *     - REQUIREMENT_OK: Has no effect during updates.
+ *     - REQUIREMENT_WARNING: Prevents update unless update_ignore_wa is set.
+ *     - REQUIREMENT_ERROR: Prevents update with the error.
+ *     Defaults to REQUIREMENT_OK.
  */
 function hook_update_requirements() {
   $requirements = [];
