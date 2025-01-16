@@ -2,15 +2,15 @@
 
 namespace Drupal\navigation\Hook;
 
-use Drupal\Core\Block\BlockPluginInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\navigation\RenderCallbacks;
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
+use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
+use Drupal\navigation\RenderCallbacks;
 use Drupal\navigation\TopBarItemManagerInterface;
 
 /**
