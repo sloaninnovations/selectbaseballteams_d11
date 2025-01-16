@@ -1196,7 +1196,7 @@ function hook_requirements_alter(array &$requirements): void {
  * define them. These requirements are only used to display information on the
  * status report but do not impact site behavior. They can be used for more
  * general status information like maintenance tasks and security issues.
- * The returned 'requirements' will be listed on the status report in the
+ * The returned requirements will be listed on the status report in the
  * administration section, with an indication of the severity level.
  * Moreover, any requirement with a severity of REQUIREMENT_ERROR will result in
  * a notice on the 'Configuration' administration page (/admin/config).
@@ -1238,7 +1238,6 @@ function hook_runtime_requirements(): array {
   // Report cron status
   $cron_last = \Drupal::state()->get('system.cron_last');
   $requirements['cron']['title'] = t('Cron maintenance tasks');
-
   if (is_numeric($cron_last)) {
     $requirements['cron']['description'] = '';
     $requirements['cron']['value'] = t('Last run @time ago', ['@time' => \Drupal::service('date.formatter')->formatTimeDiffSince($cron_last)]);
@@ -1248,7 +1247,6 @@ function hook_runtime_requirements(): array {
     $requirements['cron']['value'] = t('Never run');
     $requirements['cron']['severity'] = REQUIREMENT_ERROR;
   }
-
   $requirements['cron']['description'] .= ' ' . t('You can <a href=":cron">run cron manually</a>.', [':cron' => Url::fromRoute('system.run_cron')->toString()]);
 
   return $requirements;
