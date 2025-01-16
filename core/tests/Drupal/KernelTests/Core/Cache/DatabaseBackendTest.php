@@ -38,7 +38,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
       $this->container->get('cache_tags.invalidator.checksum'),
       $bin,
       $this->container->get('serialization.phpserialize'),
-      \Drupal::service(TimeInterface::class),
+      \Drupal::serviceByClass(TimeInterface::class),
       static::$maxRows,
     );
   }

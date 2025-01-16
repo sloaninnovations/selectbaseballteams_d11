@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\ApcuBackend;
+use Drupal\Core\Cache\CacheTagsChecksumInterface;
 
 /**
  * Tests the APCu cache backend.
@@ -19,7 +20,12 @@ class ApcuBackendTest extends GenericCacheBackendUnitTestBase {
    * {@inheritdoc}
    */
   protected function createCacheBackend($bin) {
-    return new ApcuBackend($bin, $this->databasePrefix, \Drupal::service('cache_tags.invalidator.checksum'), \Drupal::service(TimeInterface::class));
+    return new ApcuBackend(
+      $bin,
+      $this->databasePrefix,
+      \Drupal::serviceByClass(CacheTagsChecksumInterface::class),
+      \Drupal::service(TimeInterface::class),
+    );
   }
 
   /**
