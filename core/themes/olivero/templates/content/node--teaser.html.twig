@@ -110,6 +110,6 @@
     {% endif %}
   {% endblock %}
   {% block content %}
-    {{ content|without('field_image', 'links') }}
+    {{ content|without('field_image') }}
   {% endblock %}
 {% endembed %}
