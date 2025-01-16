@@ -50,8 +50,7 @@ use Drupal\views\EntityViewsData;
     ],
   ],
   links: [
-    'add-form' => '/entity_test_rev/add/{type}',
-    'add-page' => '/entity_test_rev/add',
+    'add-form' => '/entity_test_rev/add',
     'canonical' => '/entity_test_rev/manage/{entity_test_rev}',
     'delete-form' => '/entity_test/delete/entity_test_rev/{entity_test_rev}',
     'delete-multiple-form' => '/entity_test_rev/delete_multiple',
