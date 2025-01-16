@@ -68,7 +68,7 @@
                 newState ? 'locked' : 'unlocked',
               );
 
-              doc.querySelector('.admin-toolbar').dispatchEvent(
+              doc.querySelector('.admin-toolbar')?.dispatchEvent(
                 new CustomEvent(SIDEBAR_CONTENT_EVENT, {
                   detail: {
                     state: newState,
@@ -143,45 +143,48 @@
                 : Drupal.t('Expand sidebar');
             }
           });
+          localStorage.setItem('Drupal.navigation.sidebarExpanded', toState);
         };
 
-        let firstState =
-          localStorage.getItem('Drupal.navigation.sidebarExpanded') !== 'false';
+        if (context === document) {
+          let firstState =
+            localStorage.getItem('Drupal.navigation.sidebarExpanded') !==
+            'false';
 
-        // We need to display closed sidebar on init on mobile.
-        if (window.matchMedia('(max-width: 1023px)').matches) {
-          firstState = false;
-        }
+          // We need to display closed sidebar on init on mobile.
+          if (window.matchMedia('(max-width: 1023px)').matches) {
+            firstState = false;
+          }
 
-        // Set values on load.
-        toggleTriggers(firstState);
-        document.documentElement.dispatchEvent(
-          new CustomEvent(HTML_TRIGGER_EVENT, {
-            bubbles: true,
-            detail: {
-              state: firstState,
-              manual: false,
-            },
-          }),
-        );
+          // Set values on load.
+          toggleTriggers(firstState);
+          document.documentElement.dispatchEvent(
+            new CustomEvent(HTML_TRIGGER_EVENT, {
+              bubbles: true,
+              detail: {
+                state: firstState,
+                manual: false,
+              },
+            }),
+          );
 
-        triggers.forEach((trigger) => {
-          trigger.addEventListener('click', (e) => {
-            const state =
-              e.currentTarget.getAttribute('aria-expanded') === 'false';
-            trigger.dispatchEvent(
-              new CustomEvent(HTML_TRIGGER_EVENT, {
-                bubbles: true,
-                detail: {
-                  state,
-                  manual: true,
-                },
-              }),
-            );
-            toggleTriggers(state);
-            localStorage.setItem('Drupal.navigation.sidebarExpanded', state);
+          triggers.forEach((trigger) => {
+            trigger.addEventListener('click', (e) => {
+              const state =
+                e.currentTarget.getAttribute('aria-expanded') === 'false';
+              trigger.dispatchEvent(
+                new CustomEvent(HTML_TRIGGER_EVENT, {
+                  bubbles: true,
+                  detail: {
+                    state,
+                    manual: true,
+                  },
+                }),
+              );
+              toggleTriggers(state);
+            });
           });
-        });
+        }
       },
     };
   }

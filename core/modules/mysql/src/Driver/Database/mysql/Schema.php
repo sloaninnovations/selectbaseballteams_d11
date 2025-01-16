@@ -199,7 +199,7 @@ class Schema extends DatabaseSchema {
   /**
    * Set database-engine specific properties for a field.
    *
-   * @param $field
+   * @param array $field
    *   A field description array, as specified in the schema documentation.
    */
   protected function processField($field) {
@@ -271,6 +271,9 @@ class Schema extends DatabaseSchema {
     return $map;
   }
 
+  /**
+   * Creates the keys for an SQL table.
+   */
   protected function createKeysSql($spec) {
     $keys = [];
 
@@ -355,6 +358,9 @@ class Schema extends DatabaseSchema {
     }
   }
 
+  /**
+   * Creates an SQL key for the given fields.
+   */
   protected function createKeySql($fields) {
     $return = [];
     foreach ($fields as $field) {

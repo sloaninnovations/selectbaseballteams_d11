@@ -24,14 +24,13 @@ class Datelist extends DateElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#element_validate' => [
-        [$class, 'validateDatelist'],
+        [static::class, 'validateDatelist'],
       ],
       '#process' => [
-        [$class, 'processDatelist'],
+        [static::class, 'processDatelist'],
       ],
       '#theme' => 'datetime_form',
       '#theme_wrappers' => ['datetime_wrapper'],
@@ -354,9 +353,9 @@ class Datelist extends DateElementBase {
   /**
    * Rounds minutes and seconds to nearest requested value.
    *
-   * @param $date
+   * @param mixed $date
    *   The date.
-   * @param $increment
+   * @param int $increment
    *   The value to round to.
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime
