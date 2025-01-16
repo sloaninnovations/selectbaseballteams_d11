@@ -5,20 +5,21 @@
  *
  * Available variables:
  * - local_tasks: Array of local tasks for the current route.
+ * - featured_local_task: The local task to show featured before the dropdown.
  */
 #}
 {% set dropdown_id = 'admin-local-tasks'|clean_unique_id %}
 
-{% for exposed_task in exposed_local_tasks %}
-  {#  The exposed_task.task is an render array and the text passed to the parent
+{% if featured_local_task %}
+  {#  The featured_local_task.task is a render array and the text passed to the parent
   component needs to be an string. Hence we are rendering the text and passing
   it to the component.#}
   {% include 'navigation:toolbar-button' with {
-    text: exposed_task.task|render,
+    text: featured_local_task.task|render,
     extra_classes: ['toolbar-button-exposed'],
-    icon: exposed_task.icon,
+    icon: featured_local_task.icon,
   } only %}
-{% endfor %}
+{% endif %}
 
 {% include 'navigation:toolbar-button' with {
   icon: 'kebab',

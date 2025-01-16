@@ -229,7 +229,6 @@ final class NavigationRenderer {
     ];
   }
 
-
   /**
    * Alter the build of any local_tasks_block plugin block.
    *

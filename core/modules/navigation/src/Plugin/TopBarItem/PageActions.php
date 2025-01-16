@@ -6,6 +6,7 @@ namespace Drupal\navigation\Plugin\TopBarItem;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\navigation\Attribute\TopBarItem;
 use Drupal\navigation\NavigationRenderer;
@@ -23,7 +24,27 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 final class PageActions extends TopBarItemBase implements ContainerFactoryPluginInterface {
 
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, private NavigationRenderer $navigationRenderer) {
+  /**
+   * Constructs a PageActions object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin ID for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\navigation\NavigationRenderer $navigationRenderer
+   *   The navigation renderer.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
+   *   The route match.
+   */
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected NavigationRenderer $navigationRenderer,
+    protected RouteMatchInterface $routeMatch,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
@@ -35,7 +56,8 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get(NavigationRenderer::class)
+      $container->get(NavigationRenderer::class),
+      $container->get(RouteMatchInterface::class),
     );
   }
 
@@ -50,48 +72,55 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
     ];
 
     // Local tasks for content entities.
-    if ($this->navigationRenderer->hasLocalTasks()) {
-      $local_tasks = $this->navigationRenderer->getLocalTasks();
-      $current_route_name = \Drupal::routeMatch()->getRouteName();
-
-      // Canonical routes for supported entity types.
-      $canonical_routes = [
-        'entity.node.canonical',
-        'entity.media.canonical',
-        'entity.taxonomy_term.canonical',
-        'entity.user.canonical',
-      ];
-
-      $exposed_local_tasks = [];
-
-      // Check if the current route is canonical.
-      if (in_array($current_route_name, $canonical_routes, TRUE)) {
-        // Look for the "Edit" task in the local tasks.
-        $edit_route_name = key(array_filter(
-          $local_tasks['tasks'],
-          fn($task) => isset($task['#link']['#title']) && $task['#link']['#title'] === 'Edit'
-        ));
-
-        if (isset($edit_route_name) && array_key_exists($edit_route_name, $local_tasks['tasks'])) {
-          $exposed_local_tasks[] = [
-            'task' => $local_tasks['tasks'][$edit_route_name],
-            'icon' => 'edit',
-          ];
-          unset($local_tasks['tasks'][$edit_route_name]);
-        }
-      }
-
-      $build += [
-        '#theme' => 'top_bar_local_tasks',
-        '#local_tasks' => $local_tasks['tasks'],
-        '#exposed_local_tasks' => $exposed_local_tasks,
-      ];
-
-      assert($local_tasks['cacheability'] instanceof CacheableMetadata);
-      $local_tasks['cacheability']->applyTo($build);
+    if (!$this->navigationRenderer->hasLocalTasks()) {
+      return $build;
     }
 
+    $local_tasks = $this->navigationRenderer->getLocalTasks();
+    $featured_local_task = $this->getFeaturedLocalTask($local_tasks);
+    if (isset($featured_local_task)) {
+      unset($local_tasks['tasks'][$featured_local_task['route']]);
+    }
+
+    $build += [
+      '#theme' => 'top_bar_local_tasks',
+      '#local_tasks' => $local_tasks['tasks'],
+      '#featured_local_task' => $featured_local_task,
+    ];
+
+    assert($local_tasks['cacheability'] instanceof CacheableMetadata);
+    $local_tasks['cacheability']->applyTo($build);
+
     return $build;
+  }
+
+  /**
+   * Gets the featured local task.
+   *
+   * @param array $local_tasks
+   *   The array of local tasks for the current page.
+   *
+   * @return array|null
+   *   The featured local task definition if available. NULL otherwise.
+   */
+  protected function getFeaturedLocalTask(array $local_tasks): ?array {
+    $featured_local_task = NULL;
+    $current_route_name = $this->routeMatch->getRouteName();
+    $canonical_pattern = '/^entity\.(.+?)\.canonical$/';
+    if (preg_match($canonical_pattern, $current_route_name, $matches)) {
+      $entity_type = $matches[1];
+      $edit_route = "entity.$entity_type.edit_form";
+      // For core entities, the local task name matches the route name. If
+      // needed, we could iterate over the items and check the actual route.
+      if (isset($local_tasks['tasks'][$edit_route])) {
+        $featured_local_task = [
+          'route' => $edit_route,
+          'task' => $local_tasks['tasks'][$edit_route],
+          'icon' => 'edit',
+        ];
+      }
+    }
+    return $featured_local_task;
   }
 
 }
