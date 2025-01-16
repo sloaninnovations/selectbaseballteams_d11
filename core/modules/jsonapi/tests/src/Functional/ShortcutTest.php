@@ -83,6 +83,8 @@ class ShortcutTest extends ResourceTestBase {
    */
   protected function getExpectedDocument() {
     $self_url = Url::fromUri('base:/jsonapi/shortcut/default/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
+    $uri = 'internal:/user/logout';
+    $url = Url::fromUri($uri);
     return [
       'jsonapi' => [
         'meta' => [
@@ -104,7 +106,8 @@ class ShortcutTest extends ResourceTestBase {
         'attributes' => [
           'title' => 'Comments',
           'link' => [
-            'uri' => 'internal:/user/logout',
+            'uri' => $uri,
+            'full_url' => $url->toString(),
             'title' => NULL,
             'options' => [],
           ],
