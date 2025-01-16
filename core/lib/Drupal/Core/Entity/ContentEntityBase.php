@@ -351,7 +351,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if (isset($new_value) && !$this->isNew()) {
       $this->isDefaultRevision = (bool) $new_value;
     }
-    return $return;
+    return (bool) $return;
   }
 
   /**
