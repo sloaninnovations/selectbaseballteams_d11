@@ -33,12 +33,15 @@ class CommentPreviewTest extends CommentTestBase {
 
   /**
    * Tests comment preview.
+   *
+   * @group legacy
    */
   public function testCommentPreview(): void {
     $this->setCommentPreview(DRUPAL_OPTIONAL);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     // Log in as web user.
     $this->drupalLogin($this->webUser);
@@ -89,12 +92,15 @@ class CommentPreviewTest extends CommentTestBase {
 
   /**
    * Tests comment preview.
+   *
+   * @group legacy
    */
   public function testCommentPreviewDuplicateSubmission(): void {
     $this->setCommentPreview(DRUPAL_OPTIONAL);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     // Log in as web user.
     $this->drupalLogin($this->webUser);
@@ -130,6 +136,8 @@ class CommentPreviewTest extends CommentTestBase {
 
   /**
    * Tests comment edit, preview, and save.
+   *
+   * @group legacy
    */
   public function testCommentEditPreviewSave(): void {
     $web_user = $this->drupalCreateUser([
@@ -143,6 +151,7 @@ class CommentPreviewTest extends CommentTestBase {
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
+    $this->expectDeprecation('Accessing the $message property is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3479310');
 
     $edit = [];
     $date = new DrupalDateTime('2008-03-02 17:23');
