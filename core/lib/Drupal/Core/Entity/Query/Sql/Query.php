@@ -134,8 +134,11 @@ class Query extends QueryBase implements QueryInterface {
     // Add a self-join to the base revision table if we're querying only the
     // latest revisions.
     if ($this->latestRevision && $revision_field) {
-      $this->sqlQuery->leftJoin($base_table, 'base_table_2', "[base_table].[$id_field] = [base_table_2].[$id_field] AND [base_table].[$revision_field] < [base_table_2].[$revision_field]");
-      $this->sqlQuery->isNull("base_table_2.$id_field");
+      $this->sqlQuery->where("base_table.$revision_field = (
+        SELECT MAX($revision_field)
+        FROM $base_table
+        WHERE $id_field = base_table.$id_field
+      )");
     }
 
     if (is_null($this->accessCheck)) {
