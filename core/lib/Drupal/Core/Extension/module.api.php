@@ -1200,7 +1200,6 @@ function hook_requirements_alter(array &$requirements): void {
  * administration section, with an indication of the severity level.
  * Moreover, any requirement with a severity of REQUIREMENT_ERROR will result in
  * a notice on the 'Configuration' administration page (/admin/config).
- * ```
  *
  * @return array
  *   An associative array where the keys are arbitrary but must be unique (it
