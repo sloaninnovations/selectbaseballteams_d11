@@ -286,6 +286,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
       'entity_reference_entity_id',
       'entity_reference_rss_category',
       'entity_reference_entity_view',
+      'list_item',
     ]);
 
     // Test if User Reference Field has the correct formatters.
