@@ -76,11 +76,14 @@ class ListingEmpty extends AreaPluginBase {
       $add_link = $this->t('Add a <a href=":url">content block</a>.', [
         ':url' => Url::fromRoute('block_content.add_page')->toString(),
       ]);
+      $access_result = $this->accessManager->checkNamedRoute('block_content.add_page', [], $this->currentUser, TRUE);
 
       $element = [
         '#markup' => $message . ' ' . $add_link,
         '#cache' => [
-          'contexts' => ['user.permissions'],
+          'contexts' => $access_result->getCacheContexts(),
+          'tags' => $access_result->getCacheTags(),
+          'max-age' => $access_result->getCacheMaxAge(),
         ],
       ];
 
