@@ -129,10 +129,13 @@ function _node_mass_update_batch_process(array $nodes, array $updates, $langcode
       $node = $revisions ?
         $storage->loadRevision($node) : $storage->load($node);
     }
-    $node = _node_mass_update_helper($node, $updates, $langcode);
 
-    // Store result for post-processing in the finished callback.
-    $context['results'][] = Link::fromTextAndUrl($node->label(), $node->toUrl())->toString();
+    if ($node instanceof NodeInterface) {
+      $node = _node_mass_update_helper($node, $updates, $langcode);
+
+      // Store result for post-processing in the finished callback.
+      $context['results'][] = Link::fromTextAndUrl($node->label(), $node->toUrl())->toString();
+    }
 
     // Update our progress information.
     $context['sandbox']['progress']++;
