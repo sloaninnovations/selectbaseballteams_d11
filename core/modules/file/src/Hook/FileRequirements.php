@@ -6,9 +6,9 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
- * RuntimeRequirements for file.
+ * Requirements for the File module.
  */
-class FileRuntimeRequirements {
+class FileRequirements {
 
   use StringTranslationTrait;
 
