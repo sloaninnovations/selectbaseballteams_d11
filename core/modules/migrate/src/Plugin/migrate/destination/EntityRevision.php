@@ -162,7 +162,6 @@ class EntityRevision extends EntityContentBase {
     // We need to update the entity, so that the destination row IDs are
     // correct.
     $entity = $this->updateEntity($entity, $row);
-    $entity->isDefaultRevision(FALSE);
     return $entity;
   }
 
