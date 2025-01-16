@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Batch;
 
+use Drupal\Core\Database\Database;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -85,6 +86,22 @@ class PageTest extends BrowserTestBase {
     $this->drupalGet('batch-test/test-title');
     // Check that the progress message for second step appears correctly.
     $this->assertSession()->responseContains('<div class="progress__description">Completed 1 of 1.</div>');
+  }
+
+  /**
+   * Tests when progressive is FALSE.
+   */
+  public function testBatchNonProgressive(): void {
+    \Drupal::service('module_installer')->install(['dblog']);
+
+    // Run a cron job.
+    $this->container->get('cron')->run();
+
+    $query = Database::getConnection()->select('watchdog', 'watchdog')
+      ->fields('watchdog', ['wid'])
+      ->condition('message', 'Non progressive operation 100');
+    $wid = $query->execute()->fetchField();
+    $this->assertGreaterThan(0, $wid);
   }
 
 }

@@ -752,6 +752,9 @@ function batch_set($batch_definition) {
         'sets' => [],
         'has_form_submits' => FALSE,
       ];
+      if (isset($batch_definition['progressive'])) {
+        $batch['progressive'] = $batch_definition['progressive'];
+      }
     }
 
     // Base and default properties for the batch set.
