@@ -1190,15 +1190,17 @@ function hook_requirements_alter(array &$requirements): void {
 /**
  * Check runtime requirements and do status reporting.
  *
- * This hook will report requirements on Status report.
+ * Requirements are displayed on the 'Status report' (/admin/reports/status).
  *
- * The runtime_requirements is not limited to pure installation requirements
- * but can also be used for more general status information like maintenance
- * tasks and security issues.
+ * Runtime requirements do not impact installation or updates of modules that
+ * define them. These requirements are only used to display information on the
+ * status report but do not impact site behavior. They can be used for more
+ * general status information like maintenance tasks and security issues.
  * The returned 'requirements' will be listed on the status report in the
- * administration section, with indication of the severity level.
- * Moreover, any requirement with a severity of REQUIREMENT_ERROR severity will
- * result in a notice on the administration configuration page.
+ * administration section, with an indication of the severity level.
+ * Moreover, any requirement with a severity of REQUIREMENT_ERROR will result in
+ * a notice on the 'Configuration' administration page (/admin/config).
+ * ```
  *
  * @return array
  *   An associative array where the keys are arbitrary but must be unique (it
