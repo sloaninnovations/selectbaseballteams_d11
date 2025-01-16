@@ -1203,8 +1203,9 @@ function hook_requirements_alter(array &$requirements): void {
  *   - severity: (optional) The requirement's result/severity level, one of:
  *     - REQUIREMENT_INFO: Has no effect during updates.
  *     - REQUIREMENT_OK: Has no effect during updates.
- *     - REQUIREMENT_WARNING: Prevents update unless update_ignore_wa is set.
- *     - REQUIREMENT_ERROR: Prevents update with the error.
+ *     - REQUIREMENT_WARNING: Displays a warning, user can choose to continue.
+ *     - REQUIREMENT_ERROR: Displays an error message, user cannot continue
+ *       until the problem is resolved.
  *     Defaults to REQUIREMENT_OK.
  */
 function hook_update_requirements() {
