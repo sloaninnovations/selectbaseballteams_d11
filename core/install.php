@@ -12,15 +12,6 @@ chdir('..');
 // Store the Drupal root path.
 $root_path = realpath('');
 
-/**
- * Global flag to indicate the site is in installation mode.
- *
- * The constant is defined using define() instead of const so that PHP
- * versions prior to 5.3 can display proper PHP requirements instead of causing
- * a fatal error.
- */
-define('MAINTENANCE_MODE', 'install');
-
 // Exit early if an incompatible PHP version is in use, so that the user sees a
 // helpful error message rather than a white screen from any fatal errors due to
 // the incompatible version. The minimum version is also hardcoded (instead of

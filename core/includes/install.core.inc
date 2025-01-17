@@ -77,6 +77,11 @@ const INSTALL_TASK_RUN_IF_REACHED = 2;
 const INSTALL_TASK_RUN_IF_NOT_COMPLETED = 3;
 
 /**
+ * Global flag to indicate the site is in installation mode.
+ */
+const MAINTENANCE_MODE = 'install';
+
+/**
  * Installs Drupal either interactively or via an array of passed-in settings.
  *
  * The Drupal installation happens in a series of steps, which may be spread
