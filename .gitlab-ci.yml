@@ -373,6 +373,7 @@ default:
         # Generate a new baseline.
         echo "Generating an PHPStan baseline file (available as job artifact)."
         php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress --generate-baseline=$CI_PROJECT_DIR/core/.phpstan-baseline.php || true
+        php $CI_PROJECT_DIR/.gitlab-ci/scripts/phpstan-baseline-statistics.php
         exit $EXIT_CODE
       fi
     # Generate baseline statistics.
