@@ -58,7 +58,7 @@
               placement: trigger.dataset.drupalTooltipPosition || 'right',
               middleware: [
                 flip({ padding: 16 }),
-                offset(6),
+                offset(18),
                 shift({ padding: 16 }),
               ],
             }).then(({ x, y }) => {
