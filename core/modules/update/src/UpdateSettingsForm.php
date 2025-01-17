@@ -126,7 +126,7 @@ class UpdateSettingsForm extends ConfigFormBase {
    *   The value to be stored in config.
    */
   public static function multiLineStringToArray(string $value): array {
-    return array_map('trim', explode("\n", trim($value)));
+    return trim($value) ? array_map('trim', explode("\n", $value)) : [];
   }
 
   /**
@@ -139,7 +139,7 @@ class UpdateSettingsForm extends ConfigFormBase {
    *   The value of the form element.
    */
   public static function arrayToMultiLineString(array $value): string {
-    return implode("\n", $value);
+    return count(array_filter($value)) > 0 ? implode("\n", $value) : '';
   }
 
 }
