@@ -27974,6 +27974,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/process/MigrationLookup.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Constructor of class Drupal\\\\migrate\\\\Plugin\\\\migrate\\\\source\\\\ContentEntityDeriver has an unused parameter \\$base_plugin_id\\.$#',
+	'identifier' => 'constructor.unusedParameter',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/source/ContentEntityDeriver.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\migrate\\\\Plugin\\\\migrate\\\\source\\\\SourcePluginBase\\:\\:fetchNextRow\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
