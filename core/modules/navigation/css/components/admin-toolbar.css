@@ -218,6 +218,11 @@ body {
     padding-block-start: revert;
     padding-block-end: 0;
   }
+
+  :where([data-admin-toolbar="collapsed"]) .admin-toolbar__header {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 .admin-toolbar__item {
   flex: 1 0 100%;
@@ -232,6 +237,9 @@ body {
 }
 .admin-toolbar__logo img {
   display: block;
+  max-width: var(--admin-toolbar-space-40);
+}
+:where([data-admin-toolbar="collapsed"]) .admin-toolbar__logo {
   max-width: var(--admin-toolbar-space-40);
 }
 /**
