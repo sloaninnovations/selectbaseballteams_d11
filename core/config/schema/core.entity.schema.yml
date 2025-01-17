@@ -312,6 +312,21 @@ field.formatter.settings.string:
     link_to_entity:
       type: boolean
       label: 'Link to the entity'
+    tag:
+      type: string
+      label: 'Tag'
+      constraints:
+        Choice:
+          choices:
+            - ''
+            - 'span'
+            - 'div'
+            - 'h1'
+            - 'h2'
+            - 'h3'
+            - 'h4'
+            - 'h5'
+            - 'h6'
 
 field.formatter.settings.language:
   type: field.formatter.settings.string
