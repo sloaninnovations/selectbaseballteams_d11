@@ -433,7 +433,7 @@ class ContentEntityTest extends KernelTestBase {
    * @see \Drupal\Tests\migrate\Kernel\Plugin\source\ContentEntityTest::testMediaSource
    * @see \Drupal\Tests\migrate\Kernel\Plugin\source\ContentEntityTest::testTermSource
    */
-  public static function migrationConfigurationProvider() {
+  public static function migrationConfigurationProvider(): array {
     $data = [];
     foreach ([FALSE, TRUE] as $include_translations) {
       foreach ([FALSE, TRUE] as $add_revision_id) {
