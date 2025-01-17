@@ -10,6 +10,7 @@ use Drupal\Core\Plugin\Context\ContextHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\layout_builder\Attribute\SectionStorage;
 use Drupal\layout_builder\SectionStorageInterface;
+use Drupal\layout_builder\SupportAwareSectionStorageInterface;
 
 /**
  * Provides the Section Storage type plugin manager.
@@ -20,7 +21,7 @@ use Drupal\layout_builder\SectionStorageInterface;
  * While internally depending on the parent class is necessary, external code
  * should only use the methods available on that interface.
  */
-class SectionStorageManager extends DefaultPluginManager implements SectionStorageManagerInterface {
+class SectionStorageManager extends DefaultPluginManager implements SupportAwareSectionStorageManagerInterface {
 
   /**
    * The context handler.
@@ -105,6 +106,34 @@ class SectionStorageManager extends DefaultPluginManager implements SectionStora
    */
   public function loadEmpty($type) {
     return $this->createInstance($type);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function notSupported(string $entity_type_id, string $bundle, string $view_mode): bool {
+    $storage_types = array_keys($this->getDefinitions());
+    $plugins = [];
+    // First check if all storage types are support aware.
+    foreach ($storage_types as $storage_type) {
+      $plugins[$storage_type] = $this->loadEmpty($storage_type);
+
+      if (!$plugins[$storage_type] instanceof SupportAwareSectionStorageInterface) {
+        // If a plugin can't determine if it supports layout builder, we have
+        // to bail early.
+        return FALSE;
+      }
+    }
+    /** @var \Drupal\layout_builder\SupportAwareSectionStorageInterface $storage */
+    foreach ($plugins as $storage) {
+      if ($storage->isSupported($entity_type_id, $bundle, $view_mode)) {
+        // If one of the plugins is supports this view mode then this storage
+        // is considered supported.
+        return FALSE;
+      }
+    }
+    // No plugins support this view mode.
+    return TRUE;
   }
 
 }

@@ -413,4 +413,31 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
     parent::setContext($name, $context);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isSupported(string $entity_type_id, string $bundle, string $view_mode): bool {
+    static $supported = [];
+    if ($bundle) {
+      $id = "$entity_type_id.$bundle.$view_mode";
+    }
+    else {
+      $id = "$entity_type_id.$view_mode";
+    }
+
+    if (isset($supported[$id])) {
+      return $supported[$id];
+    }
+    $storage = $this->entityTypeManager->getStorage('entity_view_display');
+    $display = $storage->load($id);
+    if (empty($display)) {
+      $display = $storage->load("$entity_type_id.$bundle.default");
+      if (!$display) {
+        return FALSE;
+      }
+    }
+    $supported[$id] = $display->isLayoutBuilderEnabled();
+    return $supported[$id];
+  }
+
 }

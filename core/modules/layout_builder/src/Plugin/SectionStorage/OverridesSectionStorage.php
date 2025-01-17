@@ -19,6 +19,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\layout_builder\Attribute\SectionStorage;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\layout_builder\LayoutBuilderEnabledInterface;
 use Drupal\layout_builder\OverridesSectionStorageInterface;
 use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -412,6 +413,29 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
     // storage has been overridden. Do not use count() as it does not include
     // blank sections.
     return !empty($this->getSections());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isSupported(string $entity_type_id, string $bundle, string $view_mode): bool {
+    // Layout builder currently only supports the default view mode.
+    // @see https://www.drupal.org/node/2907413
+    if ($view_mode !== 'default') {
+      return FALSE;
+    }
+    static $supported = [];
+    $id = "$entity_type_id.$bundle.$view_mode";
+    if (isset($supported[$id])) {
+      return $supported[$id];
+    }
+    $storage = $this->entityTypeManager->getStorage('entity_view_display');
+    $display = $storage->load("$entity_type_id.$bundle.$view_mode");
+    if (!$display instanceof LayoutBuilderEnabledInterface) {
+      return FALSE;
+    }
+    $supported[$id] = $display->isLayoutBuilderEnabled() && $display->isOverridable();
+    return $supported[$id];
   }
 
 }
