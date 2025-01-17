@@ -13,6 +13,7 @@ use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\Element\EntityAutocomplete;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
@@ -20,6 +21,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Drupal\filter\FilterFormatInterface;
@@ -683,6 +685,7 @@ function _user_cancel($edit, $account, $method) {
       break;
 
     case 'user_cancel_reassign':
+    case 'user_cancel_reassign_select':
     case 'user_cancel_delete':
       // Send account canceled notification if option was checked.
       if (!empty($edit['user_cancel_notify'])) {
@@ -701,6 +704,71 @@ function _user_cancel($edit, $account, $method) {
   if ($account->id() == \Drupal::currentUser()->id()) {
     \Drupal::currentUser()->setAccount(new AnonymousUserSession());
   }
+}
+
+/**
+ * User entity autocomplete validation callback for user cancel operations.
+ *
+ * @param array $element
+ *   Entity autocomplete form element.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   Form state object.
+ * @param array $form
+ *   Form builder array.
+ */
+function _user_cancel_reassign_account_validate_element(array &$element, FormStateInterface $form_state, array $form):void {
+  if ($form_state->getValue('user_cancel_method') === 'user_cancel_reassign_select') {
+    $accounts = [];
+    if ($form_state->hasValue('uid')) {
+      $accounts = [$form_state->getValue('uid')];
+    }
+    elseif ($form_state->hasValue('accounts')) {
+      $accounts = $form_state->getValue('accounts');
+    }
+    if (empty($accounts)) {
+      return;
+    }
+    $error = _user_cancel_reassign_account_validate($form_state->getValues(), $accounts);
+    if ($error !== NULL) {
+      $form_state->setErrorByName('user_cancel_reassign_select_user', $error);
+    }
+  }
+}
+
+/**
+ * Validates target account for content reassignment.
+ *
+ * @param array $edit
+ *   The array of form values submitted on the user cancel form.
+ * @param array $accounts
+ *   List of users IDs to be deleted.
+ *
+ * @return \Drupal\Core\StringTranslation\TranslatableMarkup|null
+ */
+function _user_cancel_reassign_account_validate(array $edit, array $accounts):?TranslatableMarkup {
+  $uid = EntityAutocomplete::extractEntityIdFromAutocompleteInput($edit['user_cancel_reassign_select_user']) ?? NULL;
+  // Make sure target account is selected
+  if ($uid === NULL) {
+    return t('Select an account to reassign the content to.');
+  }
+  // Do not allow selection of the same user.
+  if (in_array($uid, $accounts, FALSE)) {
+    return t('Cannot reassign content to the same account.');
+  }
+  // Make sure target account exists.
+  $user = User::load($uid);
+  if ($user === NULL) {
+    return t('Select account does not exist.');
+  }
+  // Check content permissions if requested.
+  $required_roles = [];
+  foreach ($accounts as $uid) {
+    $required_roles += User::load($uid)?->getRoles() ?? [];
+  }
+  if (!empty($edit['user_cancel_reassign_check_user']) && !empty(array_diff($required_roles, $user->getRoles()))) {
+    return t('Selected account does not have matching roles.');
+  }
+  return NULL;
 }
 
 /**
@@ -730,6 +798,7 @@ function _user_cancel_session_regenerate() {
 function user_cancel_methods() {
   $user_settings = \Drupal::config('user.settings');
   $anonymous_name = $user_settings->get('anonymous');
+  $can_administer_users = \Drupal::currentUser()->hasPermission('administer users');
   $methods = [
     'user_cancel_block' => [
       'title' => t('Disable the account and keep its content.'),
@@ -743,10 +812,15 @@ function user_cancel_methods() {
       'title' => t('Delete the account and make its content belong to the %anonymous-name user. This action cannot be undone.', ['%anonymous-name' => $anonymous_name]),
       'description' => t('Your account will be removed and all account information deleted. All of your content will be assigned to the %anonymous-name user.', ['%anonymous-name' => $anonymous_name]),
     ],
+    'user_cancel_reassign_select' => [
+      'title' => t('Delete the account and make its content belong to another account. This action cannot be undone.'),
+      'description' => t('Your account will be removed and all account information deleted. All of your content will be assigned to a select user.'),
+      'access' => $can_administer_users,
+    ],
     'user_cancel_delete' => [
       'title' => t('Delete the account and its content. This action cannot be undone.'),
       'description' => t('Your account will be removed and all account information deleted. All of your content will also be deleted.'),
-      'access' => \Drupal::currentUser()->hasPermission('administer users'),
+      'access' => $can_administer_users,
     ],
   ];
   // Allow modules to customize account cancellation methods.
@@ -769,6 +843,49 @@ function user_cancel_methods() {
       $form[$name]['#access'] = $method['access'];
     }
   }
+
+  // Show 'Delete the account and make its content belong to another account' option only to users
+  // with 'administer users' permissions.
+  if ($can_administer_users) {
+    $roles = Role::loadMultiple();
+    unset($roles[RoleInterface::ANONYMOUS_ID], $roles[RoleInterface::AUTHENTICATED_ID]);
+    $form['user_cancel_reassign_select_user'] = [
+      '#type' => 'entity_autocomplete',
+      '#title' => t('Target account'),
+      "#description" => t("Select an account to reassign content to."),
+      '#target_type' => 'user',
+      '#selection_settings' => [
+        'include_anonymous' => FALSE,
+        'filter' => [
+          'type' => 'role',
+          'role' => array_keys($roles),
+        ],
+      ],
+      '#states' => [
+        'visible' => [
+          ':input[name="user_cancel_method"]' => ['value' => 'user_cancel_reassign_select'],
+        ],
+        'required' => [
+          ':input[name="user_cancel_method"]' => ['value' => 'user_cancel_reassign_select'],
+        ],
+      ],
+      '#access' => $can_administer_users,
+      '#element_validate' => ['_user_cancel_reassign_account_validate_element'],
+    ];
+    $form['user_cancel_reassign_check_user'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Check roles'),
+      '#description' => t('If checked, the selected account must have the same roles as the account(s) being cancelled.'),
+      '#default_value' => FALSE,
+      '#states' => [
+        'visible' => [
+          ':input[name="user_cancel_method"]' => ['value' => 'user_cancel_reassign_select'],
+        ],
+      ],
+      '#access' => $can_administer_users,
+    ];
+  }
+
   return $form;
 }
 

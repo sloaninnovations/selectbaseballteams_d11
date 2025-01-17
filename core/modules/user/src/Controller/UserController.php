@@ -428,6 +428,8 @@ class UserController extends ControllerBase {
       if ($user->id() && $this->validatePathParameters($user, $timestamp, $hashed_pass, $timeout)) {
         $edit = [
           'user_cancel_notify' => $account_data['cancel_notify'] ?? $this->config('user.settings')->get('notify.status_canceled'),
+          'user_cancel_reassign_select' => $account_data['cancel_reassign_select'] ?? NULL,
+          'user_cancel_reassign_select_user' => $account_data['cancel_reassign_select_user'] ?? NULL,
         ];
         user_cancel($edit, $user->id(), $account_data['cancel_method']);
         // Since user_cancel() is not invoked via Form API, batch processing

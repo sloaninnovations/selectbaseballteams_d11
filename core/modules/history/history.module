@@ -168,6 +168,7 @@ function history_node_delete(EntityInterface $node) {
 function history_user_cancel($edit, UserInterface $account, $method) {
   switch ($method) {
     case 'user_cancel_reassign':
+    case 'user_cancel_reassign_select':
       \Drupal::database()->delete('history')
         ->condition('uid', $account->id())
         ->execute();

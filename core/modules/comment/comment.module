@@ -11,6 +11,7 @@
 
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\CommentType;
+use Drupal\Core\Entity\Element\EntityAutocomplete;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Entity\Entity\EntityViewMode;
@@ -25,6 +26,7 @@ use Drupal\Core\Url;
 use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\node\NodeInterface;
+use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 use Drupal\user\UserInterface;
 
@@ -460,7 +462,12 @@ function comment_user_cancel($edit, UserInterface $account, $method) {
       }
       break;
 
+    case 'user_cancel_reassign_select':
+      $uid = EntityAutocomplete::extractEntityIdFromAutocompleteInput($edit['user_cancel_reassign_select_user']) ?? 0;
+      /** @var \Drupal\user\UserInterface $user */
+      $user = User::load($uid);
     case 'user_cancel_reassign':
+      $user ??= User::getAnonymousUser();
       /** @var \Drupal\comment\CommentInterface[] $comments */
       $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
       foreach ($comments as $comment) {
@@ -470,8 +477,8 @@ function comment_user_cancel($edit, UserInterface $account, $method) {
         $comment->original = clone $comment;
         foreach ($langcodes as $langcode) {
           $comment_translated = $comment->getTranslation($langcode);
-          $comment_translated->setOwnerId(0);
-          $comment_translated->setAuthorName(\Drupal::config('user.settings')->get('anonymous'));
+          $comment_translated->setOwnerId($user->id());
+          $comment_translated->setAuthorName($user->isAnonymous() ? \Drupal::config('user.settings')->get('anonymous') : $user->getAccountName());
         }
         $comment->save();
       }

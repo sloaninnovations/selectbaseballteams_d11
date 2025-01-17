@@ -104,7 +104,12 @@ class User extends ContentEntityBase implements UserInterface {
     }
 
     // Store account cancellation information.
-    foreach (['user_cancel_method', 'user_cancel_notify'] as $key) {
+    $keys = [
+      'user_cancel_method',
+      'user_cancel_notify',
+      'user_cancel_reassign_select_user',
+    ];
+    foreach ($keys as $key) {
       if (isset($this->{$key})) {
         \Drupal::service('user.data')->set('user', $this->id(), substr($key, 5), $this->{$key});
       }

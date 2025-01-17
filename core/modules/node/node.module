@@ -17,6 +17,7 @@ use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\Element\EntityAutocomplete;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
@@ -676,13 +677,16 @@ function node_user_cancel($edit, UserInterface $account, $method) {
       node_mass_update($nids, ['status' => 0], NULL, TRUE);
       break;
 
+    case 'user_cancel_reassign_select':
+      $uid = EntityAutocomplete::extractEntityIdFromAutocompleteInput($edit['user_cancel_reassign_select_user']) ?? 0;
     case 'user_cancel_reassign':
-      // Anonymize all of the nodes for this old account.
+      // Reassigned all nodes of this old account to either preselected earlier
+      // user, or anonymous user.
       \Drupal::moduleHandler()->loadInclude('node', 'inc', 'node.admin');
       $vids = \Drupal::entityTypeManager()->getStorage('node')->userRevisionIds($account);
       node_mass_update($vids, [
-        'uid' => 0,
-        'revision_uid' => 0,
+        'uid' => $uid ?? 0,
+        'revision_uid' => $uid ?? 0,
       ], NULL, TRUE, TRUE);
       break;
   }
