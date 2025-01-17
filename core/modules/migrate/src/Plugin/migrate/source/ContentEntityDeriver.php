@@ -3,7 +3,6 @@
 namespace Drupal\migrate\Plugin\migrate\source;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
@@ -12,8 +11,6 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
  * Deriver for content entity source plugins.
  */
 class ContentEntityDeriver extends DeriverBase implements ContainerDeriverInterface {
-
-  use AutowireTrait;
 
   /**
    * Constructs a new ContentEntityDeriver.
@@ -24,6 +21,15 @@ class ContentEntityDeriver extends DeriverBase implements ContainerDeriverInterf
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
   ) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static(
+      $container->get('entity_type.manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
