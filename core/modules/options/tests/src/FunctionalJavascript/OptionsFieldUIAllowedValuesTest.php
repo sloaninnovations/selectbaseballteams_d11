@@ -26,6 +26,7 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
     'node',
     'options',
     'field_ui',
+    'block',
   ];
 
   /**
@@ -66,6 +67,7 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->drupalPlaceBlock('local_actions_block');
 
     // Create test user.
     $admin_user = $this->drupalCreateUser([
@@ -170,7 +172,8 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
       $this->assertHasFocusByAttribute('name', $key_element_name);
       $this->assertAllowValuesRowCount($expected_rows);
     }
-    $page->pressButton('Save');
+    $page->pressButton('Save settings');
+    $this->assertTrue($this->assertSession()->waitForText('Saved field_options_text configuration.'));
 
     // Test the order of the option list on node form.
     $this->drupalGet($this->nodeFormPath);
@@ -185,7 +188,8 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
     // Change the order the items appear.
     $drag_handle->dragTo($target);
     $this->assertOrder(['Second', 'Third', 'First', ''], $is_string_option);
-    $page->pressButton('Save');
+    $page->pressButton('Save settings');
+    $this->assertTrue($this->assertSession()->waitForText('Saved field_options_text configuration.'));
 
     $this->drupalGet($this->nodeFormPath);
     $this->assertNodeFormOrder(['- None -', 'Second', 'Third', 'First']);
@@ -199,7 +203,8 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
     $page->pressButton('remove_row_button__1');
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertOrder(['Second', 'First', ''], $is_string_option);
-    $page->pressButton('Save');
+    $page->pressButton('Save settings');
+    $this->assertTrue($this->assertSession()->waitForText('Saved field_options_text configuration.'));
 
     $this->drupalGet($this->nodeFormPath);
     $this->assertNodeFormOrder(['- None -', 'Second', 'First']);
