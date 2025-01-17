@@ -243,12 +243,14 @@ class Tables implements TablesInterface {
             $next = $specifiers[$key + 1];
           }
           // Is this a field column?
-          $columns = $field_storage->getColumns();
-          if (isset($columns[$next]) || in_array($next, $table_mapping->getReservedColumns())) {
-            // Use it.
-            $sql_column = $table_mapping->getFieldColumnName($field_storage, $next);
-            // Do not process it again.
-            $key++;
+          if ($field_storage) {
+            $columns = $field_storage->getColumns();
+            if (isset($columns[$next]) || in_array($next, $table_mapping->getReservedColumns())) {
+              // Use it.
+              $sql_column = $table_mapping->getFieldColumnName($field_storage, $next);
+              // Do not process it again.
+              $key++;
+            }
           }
         }
         // If there are no additional specifiers but the field has a main
