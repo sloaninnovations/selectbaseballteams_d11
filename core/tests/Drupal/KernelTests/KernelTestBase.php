@@ -22,6 +22,7 @@ use Drupal\Core\Test\TestDatabase;
 use Drupal\Tests\ConfigTestTrait;
 use Drupal\Tests\ExtensionListTestTrait;
 use Drupal\Tests\RandomGeneratorTrait;
+use Drupal\Tests\KernelHtmlDebugTrait;
 use Drupal\Tests\PhpUnitCompatibilityTrait;
 use Drupal\Tests\TestRequirementsTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
@@ -38,6 +39,7 @@ use Symfony\Component\HttpFoundation\Request;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamPrintVisitor;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -103,6 +105,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   use PhpUnitCompatibilityTrait;
   use ProphecyTrait;
   use ExpectDeprecationTrait;
+  use KernelHtmlDebugTrait;
 
   /**
    * {@inheritdoc}
@@ -230,6 +233,9 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->initFileCache();
     $this->bootEnvironment();
     $this->bootKernel();
+
+    // Set up the browser test output file.
+    $this->initBrowserOutputFile();
   }
 
   /**
@@ -897,6 +903,71 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
         throw new \RuntimeException("$module module is not uninstalled after uninstalling it.");
       }
     }
+  }
+
+  /**
+   * Retrieves a Drupal path or an absolute path.
+   *
+   * @todo say this doesn't handle redirects -- in BTB it does.
+   *
+   * @param string|\Drupal\Core\Url $path
+   *   Drupal path or URL to load into Mink controlled browser.
+   * @param array $options
+   *   (optional) Options to be forwarded to the URL generator.
+   * @param string[] $headers
+   *   An array containing additional HTTP request headers, the array keys are
+   *   the header names and the array values the header values. This is useful
+   *   to set for example the "Accept-Language" header for requesting the page
+   *   in a different language. Note that not all headers are supported, for
+   *   example the "Accept" header is always overridden by the browser. For
+   *   testing REST APIs it is recommended to obtain a separate HTTP client
+   *   using getHttpClient() and performing requests that way.
+   *
+   * @return string
+   *   The retrieved HTML string, // ??? also available as $this->getRawContent()
+   *
+   * @see \Drupal\Tests\BrowserTestBase::getHttpClient()
+   */
+  protected function drupalGet($path, array $options = [], array $headers = []): string {
+    // @todo Handle $options and $headers.
+    $request = Request::create($path);
+    $response = $this->doRequest($request);
+
+    $content = $response->getContent();
+
+    // @todo !! Quick hack! Needs base path.
+    $url = $path;
+
+    if ($this->htmlOutputEnabled) {
+      $html_output = 'GET request to: ' . $url;
+      $html_output .= '<hr />' . $content;
+      $html_output .= $this->formatHtmlOutputHeaders($response->headers->all());
+      $this->htmlOutput($html_output);
+    }
+
+    return $content;
+  }
+
+  /**
+   * Sends a request to the HTTP kernel and builds the response.
+   *
+   * The content of the response is passed to self::setRawContent().
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The response.
+   *
+   * @throws \Exception
+   */
+  protected function doRequest(Request $request): Response {
+    $response = $this->container->get('http_kernel')->handle($request);
+    $content = $response->getContent();
+    self::assertNotFalse($content);
+    $this->setRawContent($content);
+
+    return $response;
   }
 
   /**
