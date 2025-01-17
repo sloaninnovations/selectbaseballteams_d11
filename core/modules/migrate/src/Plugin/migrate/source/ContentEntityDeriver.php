@@ -33,7 +33,7 @@ class ContentEntityDeriver extends DeriverBase implements ContainerDeriverInterf
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('entity_type.manager')
     );
@@ -42,7 +42,7 @@ class ContentEntityDeriver extends DeriverBase implements ContainerDeriverInterf
   /**
    * {@inheritdoc}
    */
-  public function getDerivativeDefinitions($base_plugin_definition) {
+  public function getDerivativeDefinitions($base_plugin_definition): ?array {
     $this->derivatives = [];
     foreach ($this->entityTypeManager->getDefinitions() as $id => $definition) {
       if ($definition instanceof ContentEntityTypeInterface) {

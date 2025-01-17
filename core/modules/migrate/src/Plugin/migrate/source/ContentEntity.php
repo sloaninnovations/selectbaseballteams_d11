@@ -8,6 +8,7 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\EntityFieldDefinitionTrait;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
@@ -138,7 +139,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL): static {
     return new static(
       $configuration,
       $plugin_id,
@@ -163,7 +164,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
    * @return \Generator
    *   A data generator for this source.
    */
-  protected function initializeIterator() {
+  protected function initializeIterator(): \Generator {
     $ids = $this->query()->execute();
     return $this->yieldEntities($ids);
   }
@@ -177,7 +178,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
    * @return \Generator
    *   An iterable of the loaded entities.
    */
-  protected function yieldEntities(array $ids) {
+  protected function yieldEntities(array $ids): \Generator {
     $storage = $this->entityTypeManager
       ->getStorage($this->entityType->id());
     foreach ($ids as $id) {
@@ -204,7 +205,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
    * @return array
    *   The entity, represented as an array.
    */
-  protected function toArray(ContentEntityInterface $entity) {
+  protected function toArray(ContentEntityInterface $entity): array {
     $return = $entity->toArray();
     // This is necessary because the IDs must be flat. They cannot be nested for
     // the ID map.
@@ -223,7 +224,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   The query.
    */
-  public function query() {
+  public function query(): QueryInterface {
     $query = $this->entityTypeManager
       ->getStorage($this->entityType->id())
       ->getQuery()
@@ -254,14 +255,14 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
   /**
    * {@inheritdoc}
    */
-  protected function doCount() {
+  protected function doCount(): int {
     return $this->query()->count()->execute();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function fields() {
+  public function fields(): array {
     // Retrieving fields from a non-fieldable content entity will throw a
     // LogicException. Return an empty list of fields instead.
     if (!$this->entityType->entityClassImplements('Drupal\Core\Entity\FieldableEntityInterface')) {
@@ -280,7 +281,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
   /**
    * {@inheritdoc}
    */
-  public function getIds() {
+  public function getIds(): array {
     $id_key = $this->entityType->getKey('id');
     $ids[$id_key] = $this->getDefinitionFromEntity($id_key);
     if ($this->configuration['add_revision_id'] && $this->entityType->isRevisionable()) {
