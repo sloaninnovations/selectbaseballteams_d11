@@ -13,9 +13,11 @@ use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsDisplay;
 use Drupal\views\Plugin\views\display\ResponseDisplayPluginInterface;
+use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\PathPluginBase;
+use Drupal\views\ViewsData;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -121,9 +123,45 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    *   The authentication providers, keyed by ID.
    * @param string[] $serializer_format_providers
    *   The serialization format providers, keyed by format.
+   * @param \Drupal\views\ViewsData|null $viewsData
+   *   The views data.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $accessPluginManager
+   *   The plugin manager for views access plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $cachePluginManager
+   *   The plugin manager for views cache plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayExtenderPluginManager
+   *   The plugin manager for views display extender plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $exposedFormPluginManager
+   *   The plugin manager for views exposed form plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $pagerPluginManager
+   *   The plugin manager for views pager plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $rowPluginManager
+   *   The plugin manager for views row plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $stylePluginManager
+   *   The plugin manager for views style plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $queryPluginManager
+   *   The plugin manager for views query plugins.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, RendererInterface $renderer, array $authentication_providers, array $serializer_format_providers) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state);
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    RouteProviderInterface $route_provider,
+    StateInterface $state,
+    RendererInterface $renderer,
+    array $authentication_providers,
+    array $serializer_format_providers,
+    protected ?ViewsData $viewsData = NULL,
+    protected ?ViewsPluginManager $accessPluginManager = NULL,
+    protected ?ViewsPluginManager $cachePluginManager = NULL,
+    protected ?ViewsPluginManager $displayExtenderPluginManager = NULL,
+    protected ?ViewsPluginManager $exposedFormPluginManager = NULL,
+    protected ?ViewsPluginManager $pagerPluginManager = NULL,
+    protected ?ViewsPluginManager $rowPluginManager = NULL,
+    protected ?ViewsPluginManager $stylePluginManager = NULL,
+    protected ?ViewsPluginManager $queryPluginManager = NULL,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state, $viewsData, $accessPluginManager, $cachePluginManager, $displayExtenderPluginManager, $exposedFormPluginManager, $pagerPluginManager, $rowPluginManager, $stylePluginManager, $queryPluginManager);
 
     $this->renderer = $renderer;
     // $authentication_providers as defined in
@@ -147,7 +185,16 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
       $container->get('state'),
       $container->get('renderer'),
       $container->getParameter('authentication_providers'),
-      $container->getParameter('serializer.format_providers')
+      $container->getParameter('serializer.format_providers'),
+      $container->get('views.views_data'),
+      $container->get('plugin.manager.views.access'),
+      $container->get('plugin.manager.views.cache'),
+      $container->get('plugin.manager.views.display_extender'),
+      $container->get('plugin.manager.views.exposed_form'),
+      $container->get('plugin.manager.views.pager'),
+      $container->get('plugin.manager.views.row'),
+      $container->get('plugin.manager.views.style'),
+      $container->get('plugin.manager.views.query'),
     );
   }
 

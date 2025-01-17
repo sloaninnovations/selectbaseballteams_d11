@@ -5,6 +5,8 @@ namespace Drupal\views\Plugin\views\display;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsDisplay;
+use Drupal\views\Plugin\ViewsPluginManager;
+use Drupal\views\ViewsData;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -67,9 +69,41 @@ class EntityReference extends DisplayPluginBase {
    *   The plugin implementation definition.
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
+   * @param \Drupal\views\ViewsData|null $viewsData
+   *   The views data.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $accessPluginManager
+   *   The plugin manager for views access plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $cachePluginManager
+   *   The plugin manager for views cache plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayExtenderPluginManager
+   *   The plugin manager for views display extender plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $exposedFormPluginManager
+   *   The plugin manager for views exposed form plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $pagerPluginManager
+   *   The plugin manager for views pager plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $rowPluginManager
+   *   The plugin manager for views row plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $stylePluginManager
+   *   The plugin manager for views style plugins.
+   * @param \Drupal\views\Plugin\ViewsPluginManager|null $queryPluginManager
+   *   The plugin manager for views query plugins.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $connection) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    Connection $connection,
+    protected ?ViewsData $viewsData = NULL,
+    protected ?ViewsPluginManager $accessPluginManager = NULL,
+    protected ?ViewsPluginManager $cachePluginManager = NULL,
+    protected ?ViewsPluginManager $displayExtenderPluginManager = NULL,
+    protected ?ViewsPluginManager $exposedFormPluginManager = NULL,
+    protected ?ViewsPluginManager $pagerPluginManager = NULL,
+    protected ?ViewsPluginManager $rowPluginManager = NULL,
+    protected ?ViewsPluginManager $stylePluginManager = NULL,
+    protected ?ViewsPluginManager $queryPluginManager = NULL,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $viewsData, $accessPluginManager, $cachePluginManager, $displayExtenderPluginManager, $exposedFormPluginManager, $pagerPluginManager, $rowPluginManager, $stylePluginManager, $queryPluginManager);
     $this->connection = $connection;
   }
 
@@ -81,7 +115,16 @@ class EntityReference extends DisplayPluginBase {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('database')
+      $container->get('database'),
+      $container->get('views.views_data'),
+      $container->get('plugin.manager.views.access'),
+      $container->get('plugin.manager.views.cache'),
+      $container->get('plugin.manager.views.display_extender'),
+      $container->get('plugin.manager.views.exposed_form'),
+      $container->get('plugin.manager.views.pager'),
+      $container->get('plugin.manager.views.row'),
+      $container->get('plugin.manager.views.style'),
+      $container->get('plugin.manager.views.query'),
     );
   }
 
