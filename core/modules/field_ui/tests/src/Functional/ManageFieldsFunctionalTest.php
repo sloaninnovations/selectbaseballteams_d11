@@ -193,10 +193,12 @@ class ManageFieldsFunctionalTest extends ManageFieldsFunctionalTestBase {
         }
         catch (ElementNotFoundException) {
           if ($group = $this->getFieldFromGroup($field_type)) {
-            $link = $this->assertSession()->elementExists('xpath', "//a[.//span[text()='$group']]");
-            $link->click();
-            $this->assertSession()
-              ->elementExists('css', "[name='field_options_wrapper'][value='$field_type']");
+            if ($group !== 'General') {
+              $link = $this->assertSession()->elementExists('xpath', "//a[.//span[text()='$group']]");
+              $link->click();
+              $this->assertSession()
+                ->elementExists('css', "[name='field_options_wrapper'][value='$field_type']");
+            }
           }
         }
       }
