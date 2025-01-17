@@ -11,6 +11,7 @@ use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -399,7 +400,6 @@ class BigPipe {
 
       $html_response = new HtmlResponse();
       $html_response->setContent($elements);
-      $html_response->getCacheableMetadata()->setCacheMaxAge(0);
 
       // Push a fake request with the asset libraries loaded so far and dispatch
       // KernelEvents::RESPONSE event. This results in the attachments for the
@@ -548,11 +548,12 @@ class BigPipe {
           $ajax_response = $this->filterEmbeddedResponse($fake_request, $ajax_response);
           // Send this embedded AJAX response.
           $json = $ajax_response->getContent();
-          $output = <<<EOF
+          $output = new HtmlResponse(<<<EOF
 <script type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="$placeholder_id">
 $json
 </script>
-EOF;
+EOF);
+          $output->addCacheableDependency(CacheableMetadata::createFromRenderArray($elements));
           $this->sendChunk($output);
 
           // Another placeholder was rendered and sent, track the set of asset
