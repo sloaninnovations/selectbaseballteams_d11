@@ -81,14 +81,14 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
 
     $items[] = [
       '#markup' => $entity->label(),
-      '#wrapper_attributes' => ['class' => ['context-title']],
+      '#wrapper_attributes' => ['class' => ['context-title', 'top-bar-context-item']],
     ];
 
     if ($status = $this->getStatus($entity)) {
       $items[] = [
         '#markup' => $status,
         '#wrapper_attributes' => [
-          'class' => ['context-status', $this->getStatusClass($entity)],
+          'class' => ['context-status', $this->getStatusClass($entity), 'top-bar-context-item'],
         ],
       ];
     }
@@ -137,7 +137,7 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
     if (!$entity instanceof EntityPublishedInterface) {
       return NULL;
     }
-    return $entity->isPublished() ? 'published' : 'unpublished';
+    return $entity->isPublished() ? 'top-bar-published' : 'top-bar-unpublished';
   }
 
 }
