@@ -10,10 +10,12 @@ use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
  * Implements hook_module_implements_alter().
  */
 function layout_builder_module_implements_alter(&$implementations, $hook): void {
-  if ($hook === 'entity_view_alter') {
+  if ($hook === 'entity_view_alter' || $hook == 'config_schema_info_alter') {
     // Ensure that this module's implementation of hook_entity_view_alter() runs
     // last so that other modules that use this hook to render extra fields will
-    // run before it.
+    // run before it. For hook_config_schema_info_alter() case, it's needed to
+    // run after field_ui module in order to perform our alterations for
+    // the form element once main logic is done.
     $group = $implementations['layout_builder'];
     unset($implementations['layout_builder']);
     $implementations['layout_builder'] = $group;
