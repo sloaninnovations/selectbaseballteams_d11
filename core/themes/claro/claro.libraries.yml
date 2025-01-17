@@ -26,6 +26,7 @@ global-styling:
       css/components/ckeditor5.css: {}
       css/components/container-inline.css: {}
       css/components/container-inline.module.css: {}
+      css/components/accounts.css: {}
       css/components/breadcrumb.css: {}
       css/components/button.css: {}
       css/components/details.css: {}
