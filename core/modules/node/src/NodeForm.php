@@ -5,11 +5,13 @@ namespace Drupal\node;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
+use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -315,6 +317,31 @@ class NodeForm extends ContentEntityForm {
       $this->messenger()->addError($this->t('The post could not be saved.'));
       $form_state->setRebuild();
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state): ContentEntityInterface {
+    // Add warning if the title of node changed but menu link title stay the same.
+    /** @var \Drupal\node\NodeInterface $node */
+    $node = $this->entity;
+
+    if (!$node->isNew() && $node->getTitle() !== $form_state->getValue(['title', 0, 'value'])) {
+      // Check if node is not new and the title is changed.
+      if ($menu_link_content_id = $form_state->getValue(['menu', 'entity_id'])) {
+        // Check if menu link exists for current node.
+        $menu_link_content = MenuLinkContent::load($menu_link_content_id);
+
+        if ($menu_link_content->label() === $form_state->getValue(['menu', 'title'])) {
+          // Check if menu link title stay the same and show warning.
+          $this->messenger()
+            ->addWarning($this->t('You have changed the content title. Consider also updating the menu link title so that the text in the navigation reflects the new content title.'));
+        }
+      }
+    }
+
+    return parent::validateForm($form, $form_state);
   }
 
 }
