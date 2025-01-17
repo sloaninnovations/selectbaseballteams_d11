@@ -28658,10 +28658,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate_drupal/src/Plugin/migrate/field/d7/UserReference.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Constructor of class Drupal\\\\migrate\\\\Plugin\\\\migrate\\\\source\\\\ContentEntityDeriver has an unused parameter \\$base_plugin_id\\.$#',
+	'message' => '#^Constructor of class Drupal\\\\migrate_drupal\\\\Plugin\\\\migrate\\\\source\\\\ContentEntityDeriver has an unused parameter \\$base_plugin_id\\.$#',
 	'identifier' => 'constructor.unusedParameter',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/source/ContentEntityDeriver.php',
+	'path' => __DIR__ . '/modules/migrate_drupal/src/Plugin/migrate/source/ContentEntityDeriver.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\migrate_drupal\\\\Plugin\\\\migrate\\\\source\\\\DrupalSqlBase\\:\\:addDependencies\\(\\) has no return type specified\\.$#',
@@ -28712,22 +28712,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate_drupal/tests/src/Kernel/NodeMigrationTypePluginAlterTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\Plugin\\\\source\\\\ContentEntityConstructorTest\\:\\:providerTestConstructor\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\migrate_drupal\\\\Kernel\\\\Plugin\\\\migrate\\\\source\\\\ContentEntityConstructorTest\\:\\:providerTestConstructor\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/Plugin/source/ContentEntityConstructorTest.php',
+	'path' => __DIR__ . '/modules/migrate_drupal/tests/src/Kernel/Plugin/migrate/source/ContentEntityConstructorTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\Plugin\\\\source\\\\ContentEntityTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\migrate_drupal\\\\Kernel\\\\Plugin\\\\migrate\\\\source\\\\ContentEntityTest\\:\\:createEntityReferenceField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/Plugin/source/ContentEntityTest.php',
+	'path' => __DIR__ . '/modules/migrate_drupal/tests/src/Kernel/Plugin/migrate/source/ContentEntityTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\Plugin\\\\source\\\\ContentEntityTest\\:\\:migrationConfigurationProvider\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\migrate_drupal\\\\Kernel\\\\Plugin\\\\migrate\\\\source\\\\ContentEntityTest\\:\\:migrationConfigurationProvider\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/Plugin/source/ContentEntityTest.php',
+	'path' => __DIR__ . '/modules/migrate_drupal/tests/src/Kernel/Plugin/migrate/source/ContentEntityTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\migrate_drupal\\\\Kernel\\\\Plugin\\\\migrate\\\\source\\\\VariableMultiRowTest\\:\\:providerSource\\(\\) has no return type specified\\.$#',
