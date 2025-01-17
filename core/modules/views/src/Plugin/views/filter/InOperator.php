@@ -294,7 +294,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
         continue;
       }
       elseif (is_object($option) && !$option instanceof MarkupInterface) {
-        $keys = array_keys($option->option);
+        $keys = isset($option->option) && is_array($option->option) ? array_keys($option->option) : [];
         $key = array_shift($keys);
         if (isset($this->options['value'][$key])) {
           $options[$id] = $option;
@@ -360,7 +360,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     // Some filter_in_operator usage uses optgroups forms, so flatten it.
     $flat_options = OptGroup::flattenOptions($this->valueOptions);
 
-    if (!is_array($this->value)) {
+    if (!is_array($this->value) || $this->value === null) {
       return;
     }
 
