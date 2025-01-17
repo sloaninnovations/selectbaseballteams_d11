@@ -315,6 +315,8 @@ class NodeForm extends ContentEntityForm {
       $this->messenger()->addError($this->t('The post could not be saved.'));
       $form_state->setRebuild();
     }
+
+    return $insert ? SAVED_NEW : SAVED_UPDATED;
   }
 
 }
