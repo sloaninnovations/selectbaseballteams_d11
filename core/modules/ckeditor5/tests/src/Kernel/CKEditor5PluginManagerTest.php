@@ -166,7 +166,7 @@ YAML,
 
     // The exception to the above elegance: re-resolve the '%app_root%' param.
     // @see \Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass
-    // @see \Drupal\Core\DrupalKernel::guessApplicationRoot()
+    // @see \Drupal\Core\DrupalKernel::getApplicationRoot()
     $container->getDefinition('module_handler')->setArgument(0, '%app.root%');
 
     // To discover per-test case config schema YAML files, work around the

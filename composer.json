@@ -102,11 +102,12 @@
     "autoload": {
         "psr-4": {
             "Drupal\\Core\\Composer\\": "core/lib/Drupal/Core/Composer",
-            "Drupal\\Composer\\": "composer"
+            "Drupal\\Locations\\": ""
         }
     },
     "autoload-dev": {
         "psr-4": {
+            "Drupal\\Composer\\": "composer",
             "Drupal\\PHPStan\\Rules\\": "core/tests/PHPStan/Rules"
         }
     },
