@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Deriver for content entity source plugins.
@@ -15,19 +16,23 @@ class ContentEntityDeriver extends DeriverBase implements ContainerDeriverInterf
   /**
    * Constructs a new ContentEntityDeriver.
    *
+   * @param string $base_plugin_id
+   *   The base plugin ID.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
   public function __construct(
+    $base_plugin_id,
     protected EntityTypeManagerInterface $entityTypeManager,
   ) {}
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container): static {
+  public static function create(ContainerInterface $container, $base_plugin_id): static {
     return new static(
-      $container->get('entity_type.manager')
+      $base_plugin_id,
+      $container->get('entity_type.manager'),
     );
   }
 
