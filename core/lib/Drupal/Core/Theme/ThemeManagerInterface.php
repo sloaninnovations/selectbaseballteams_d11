@@ -149,22 +149,4 @@ interface ThemeManagerInterface {
    */
   public function alterForTheme(ActiveTheme $theme, $type, &$data, &$context1 = NULL, &$context2 = NULL);
 
-  /**
-   * Returns default template variables.
-   *
-   * These are set for every template before template preprocessing hooks.
-   * Template preprocess hooks have the following form:
-   * template_preprocess_HOOK($variables).
-   *
-   * This function isn't probably needed in Drupal 9 when the deprecated
-   * template_preprocess function is removed.
-   *
-   * See the @link themeable Default theme implementations topic @endlink for
-   * details.
-   *
-   * @return array
-   *   An array of default template variables.
-   */
-  public function getDefaultTemplateVariables();
-
 }
