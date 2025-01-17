@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\media\Unit;
+namespace Drupal\Tests\media\Kernel;
 
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\media\OEmbed\ProviderException;
 use Drupal\media\OEmbed\ProviderRepository;
-use Drupal\Tests\UnitTestCase;
+use Drupal\KernelTests\KernelTestBase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -19,7 +19,14 @@ use GuzzleHttp\Psr7\Response;
  *
  * @group media
  */
-class ProviderRepositoryTest extends UnitTestCase {
+class ProviderRepositoryTest extends KernelTestBase {
+
+  /**
+   * The modules to enable.
+   *
+   * @var array
+   */
+  protected static $modules = ['media', 'key_value', 'system', 'user'];
 
   /**
    * The provider repository under test.
@@ -62,11 +69,10 @@ class ProviderRepositoryTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $config_factory = $this->getConfigFactoryStub([
-      'media.settings' => [
-        'oembed_providers_url' => 'https://oembed.com/providers.json',
-      ],
-    ]);
+    // Set up the configuration.
+    $this->config('media.settings')
+      ->set('oembed_providers_url', 'https://oembed.com/providers.json')
+      ->save();
 
     $key_value_factory = new KeyValueMemoryFactory();
     $this->keyValue = $key_value_factory->get('media');
@@ -85,7 +91,7 @@ class ProviderRepositoryTest extends UnitTestCase {
     ]);
     $this->repository = new ProviderRepository(
       $client,
-      $config_factory,
+      $this->configFactory(),
       $time->reveal(),
       $key_value_factory,
       $logger_factory->reveal()
