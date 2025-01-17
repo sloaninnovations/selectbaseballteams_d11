@@ -105,8 +105,8 @@
  * THEME indicates a theme name, and ENGINE indicates a theme engine name).
  * Modules, themes, and theme engines can provide these functions to modify how
  * the data is preprocessed, before it is passed to the theme template:
- * -ThemeManager::addDefaultTemplateVariables(&$variables): Creates a default set of variables
- *   for all theme hooks with template implementations. Provided by Drupal Core.
+ * - ThemeManager::addDefaultTemplateVariables(&$variables): Creates a default
+ *   set of variables for all theme hooks. Provided by Drupal Core.
  * - template_preprocess_HOOK(&$variables): Should be implemented by the module
  *   that registers the theme hook, to set up default variables.
  * - MODULE_preprocess(&$variables, $hook): hook_preprocess() is invoked on all
@@ -1342,10 +1342,9 @@ function hook_theme_registry_alter(&$theme_registry) {
  *
  * Note that the default template variables are statically cached within a
  * request. When adding a template variable that depends on other context, it is
- * your responsibility to appropriately reset the static cache in
- * ThemeManager's getDefaultTemplateVariables() when needed:
+ * your responsibility to appropriately reset the default variables:
  * @code
- * drupal_static_reset('getDefaultTemplateVariables');
+ * \Drupal::service('theme.manager)->resetActiveTheme()
  * @endcode
  *
  * See user_template_preprocess_default_variables_alter() for an example.

@@ -57,6 +57,13 @@ class ThemeManager implements ThemeManagerInterface {
   protected $root;
 
   /**
+   * Default variables.
+   *
+   * @var array|null
+   */
+  protected ?array $defaultVariables = NULL;
+
+  /**
    * Constructs a new ThemeManager object.
    *
    * @param string $root
@@ -110,6 +117,7 @@ class ThemeManager implements ThemeManagerInterface {
    */
   public function resetActiveTheme() {
     $this->activeTheme = NULL;
+    $this->defaultVariables = NULL;
     return $this;
   }
 
@@ -464,17 +472,22 @@ class ThemeManager implements ThemeManagerInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Returns default template variables.
+   *
+   * These are set for every template before template preprocessing hooks.
+   *
+   * See the @link themeable Default theme implementations topic @endlink for
+   * details.
+   *
+   * @return array
+   *   An array of default template variables.
+   *
+   * @internal
    */
   public function getDefaultTemplateVariables(): array {
-    static $drupal_static_fast;
-    if (!isset($drupal_static_fast)) {
-      $drupal_static_fast['default_variables'] = &drupal_static(__METHOD__);
-    }
-    $default_variables = &$drupal_static_fast['default_variables'];
-    if (!isset($default_variables)) {
+    if (!isset($this->defaultVariables)) {
       // Variables that don't depend on a database connection.
-      $default_variables = [
+      $this->defaultVariables = [
         'attributes' => [],
         'title_attributes' => [],
         'content_attributes' => [],
@@ -486,11 +499,11 @@ class ThemeManager implements ThemeManagerInterface {
       ];
 
       // Give modules a chance to alter default template variables.
-      $this->moduleHandler->alter('template_preprocess_default_variables', $default_variables);
+      $this->moduleHandler->alter('template_preprocess_default_variables', $this->defaultVariables);
       // Tell all templates where they are located.
-      $default_variables['directory'] = $this->getActiveTheme()->getPath();
+      $this->defaultVariables['directory'] = $this->getActiveTheme()->getPath();
     }
-    return $default_variables;
+    return $this->defaultVariables;
   }
 
 }
