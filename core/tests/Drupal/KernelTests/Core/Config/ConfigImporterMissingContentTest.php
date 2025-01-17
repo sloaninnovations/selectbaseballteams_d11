@@ -13,11 +13,11 @@ use Drupal\Core\Block\Plugin\Block\Broken;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 
 /**
  * Tests importing configuration which has missing content dependencies.
@@ -26,7 +26,7 @@ use Psr\Log\LoggerInterface;
  */
 class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerInterface {
   use BlockCreationTrait;
-  use RfcLoggerTrait;
+  use LoggerTrait;
 
   /**
    * The logged messages.

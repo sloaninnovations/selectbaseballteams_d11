@@ -7,14 +7,15 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Logger\LogMessageParserInterface;
-use Drupal\Core\Logger\RfcLoggerTrait;
+use Drupal\Core\Logger\RfcLogLevel;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 
 /**
  * Logs events in the watchdog database table.
  */
 class DbLog implements LoggerInterface {
-  use RfcLoggerTrait;
+  use LoggerTrait;
   use DependencySerializationTrait;
 
   /**
@@ -68,7 +69,7 @@ class DbLog implements LoggerInterface {
           'type' => mb_substr($context['channel'], 0, 64),
           'message' => $message,
           'variables' => serialize($message_placeholders),
-          'severity' => $level,
+          'severity' => RfcLogLevel::fromPsr3($level),
           'link' => $context['link'],
           'location' => $context['request_uri'],
           'referer' => $context['referer'],

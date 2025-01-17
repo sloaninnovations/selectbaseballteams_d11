@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\EventSubscriber;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\KernelTests\KernelTestBase;
+use Psr\Log\LogLevel;
 use Symfony\Component\ErrorHandler\BufferingLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -35,7 +35,7 @@ class ExceptionLoggingSubscriberTest extends KernelTestBase {
    *
    * @dataProvider exceptionDataProvider
    */
-  public function testExceptionLogging(int $error_code, string $channel, int $log_level, string $exception = ''): void {
+  public function testExceptionLogging(int $error_code, string $channel, string $log_level, string $exception = ''): void {
     $http_kernel = \Drupal::service('http_kernel');
 
     // Ensure that noting is logged.
@@ -66,18 +66,18 @@ class ExceptionLoggingSubscriberTest extends KernelTestBase {
     return [
       // When a BadRequestException is thrown, DefaultHttpExceptionSubscriber
       // will rethrow the exception.
-      [400, 'client error', RfcLogLevel::WARNING, HttpException::class],
-      [401, 'client error', RfcLogLevel::WARNING],
-      [403, 'access denied', RfcLogLevel::WARNING],
-      [404, 'page not found', RfcLogLevel::WARNING],
-      [405, 'client error', RfcLogLevel::WARNING],
-      [408, 'client error', RfcLogLevel::WARNING],
+      [400, 'client error', LogLevel::WARNING, HttpException::class],
+      [401, 'client error', LogLevel::WARNING],
+      [403, 'access denied', LogLevel::WARNING],
+      [404, 'page not found', LogLevel::WARNING],
+      [405, 'client error', LogLevel::WARNING],
+      [408, 'client error', LogLevel::WARNING],
       // Do not check the 500 status code here because it would be caught by
       // Drupal\Core\EventSubscriberExceptionTestSiteSubscriber which has lower
       // priority.
-      [501, 'php', RfcLogLevel::ERROR],
-      [502, 'php', RfcLogLevel::ERROR],
-      [503, 'php', RfcLogLevel::ERROR],
+      [501, 'php', LogLevel::ERROR],
+      [502, 'php', LogLevel::ERROR],
+      [503, 'php', LogLevel::ERROR],
     ];
   }
 

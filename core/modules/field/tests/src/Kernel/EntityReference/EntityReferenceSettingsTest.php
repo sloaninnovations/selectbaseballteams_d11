@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\field\Kernel\EntityReference;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\node\Entity\NodeType;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use Psr\Log\LogLevel;
 use Symfony\Component\ErrorHandler\BufferingLogger;
 
 /**
@@ -134,7 +134,7 @@ class EntityReferenceSettingsTest extends KernelTestBase {
     // Ensure that field_field_config_presave() logs the expected critical
     // error.
     $log_message = $this->container->get($this->testLogServiceName)->cleanLogs()[0];
-    $this->assertEquals(RfcLogLevel::CRITICAL, $log_message[0]);
+    $this->assertEquals(LogLevel::CRITICAL, $log_message[0]);
     $this->assertEquals('The %field_name entity reference field (entity_type: %entity_type, bundle: %bundle) no longer has any valid bundle it can reference. The field is not working correctly anymore and has to be adjusted.', $log_message[1]);
     $this->assertEquals($field_config->getName(), $log_message[2]['%field_name']);
     $this->assertEquals('node', $log_message[2]['%entity_type']);
@@ -168,7 +168,7 @@ class EntityReferenceSettingsTest extends KernelTestBase {
     // Ensure that field_field_config_presave() logs the expected critical
     // error.
     $log_message = $this->container->get($this->testLogServiceName)->cleanLogs()[0];
-    $this->assertEquals(RfcLogLevel::CRITICAL, $log_message[0]);
+    $this->assertEquals(LogLevel::CRITICAL, $log_message[0]);
     $this->assertEquals('The %field_name entity reference field (entity_type: %entity_type, bundle: %bundle) no longer has any valid bundle it can reference. The field is not working correctly anymore and has to be adjusted.', $log_message[1]);
     $this->assertEquals($field_config->getName(), $log_message[2]['%field_name']);
     $this->assertEquals('node', $log_message[2]['%entity_type']);

@@ -91,7 +91,7 @@ class LoggerChannel implements LoggerChannelInterface {
   /**
    * {@inheritdoc}
    */
-  public function log($level, string|\Stringable $message, array $context = []): void {
+  public function log(mixed $level, string|\Stringable $message, array $context = []): void {
     if ($this->callDepth == self::MAX_CALL_DEPTH) {
       return;
     }
@@ -118,10 +118,11 @@ class LoggerChannel implements LoggerChannelInterface {
       }
     }
 
-    if (is_string($level)) {
-      // Convert to integer equivalent for consistency with RFC 5424.
-      $level = $this->levelTranslation[$level];
+    if (is_int($level)) {
+      // Convert to string equivalent for consistency with PSR-3.
+      $level = array_search($level, $this->levelTranslation, TRUE);
     }
+
     // Call all available loggers.
     foreach ($this->sortLoggers() as $logger) {
       $logger->log($level, $message, $context);

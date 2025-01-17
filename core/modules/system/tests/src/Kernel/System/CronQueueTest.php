@@ -6,18 +6,18 @@ namespace Drupal\Tests\system\Kernel\System;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Queue\DatabaseQueue;
 use Drupal\Core\Queue\Memory;
+use Drupal\Core\Queue\QueueWorkerManagerInterface;
+use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestDatabaseDelayException;
 use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestDeriverQueue;
 use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestException;
 use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestRequeueException;
 use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestSuspendQueue;
-use Drupal\Core\Queue\QueueWorkerManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\cron_queue_test\Plugin\QueueWorker\CronQueueTestDatabaseDelayException;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * Tests the Cron Queue runner.
@@ -174,7 +174,7 @@ class CronQueueTest extends KernelTestBase {
    */
   public function testUncaughtExceptions(): void {
     $this->logger->log(
-      RfcLogLevel::ERROR,
+      LogLevel::ERROR,
       '%type: @message in %function (line %line of %file).',
       Argument::that(function ($args) {
         return $args['@message'] === 'That is not supposed to happen.'
@@ -183,7 +183,7 @@ class CronQueueTest extends KernelTestBase {
     )->shouldBeCalled();
 
     $this->logger->log(
-      RfcLogLevel::INFO,
+      LogLevel::INFO,
       'Cron run completed.',
       Argument::cetera()
     )->shouldBeCalled();
@@ -225,7 +225,7 @@ class CronQueueTest extends KernelTestBase {
    */
   public function testSuspendQueueException(): void {
     $this->logger->log(
-      RfcLogLevel::DEBUG,
+      LogLevel::DEBUG,
       'A worker for @queue queue suspended further processing of the queue.',
       Argument::that(function ($args) {
         return $args['@queue'] === CronQueueTestSuspendQueue::PLUGIN_ID;
@@ -233,7 +233,7 @@ class CronQueueTest extends KernelTestBase {
     )->shouldBeCalled();
 
     $this->logger->log(
-      RfcLogLevel::INFO,
+      LogLevel::INFO,
       'Cron run completed.',
       Argument::cetera()
     )->shouldBeCalled();

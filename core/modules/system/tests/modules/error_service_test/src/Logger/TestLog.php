@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\error_service_test\Logger;
 
-use Drupal\Core\Logger\RfcLoggerTrait;
+use Drupal\Core\Logger\RfcLogLevel;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 
 /**
  * Throws an exception while logging an exception.
@@ -13,7 +14,7 @@ use Psr\Log\LoggerInterface;
  * @see \Drupal\system\Tests\System\UncaughtExceptionTest::testLoggerException()
  */
 class TestLog implements LoggerInterface {
-  use RfcLoggerTrait;
+  use LoggerTrait;
 
   /**
    * {@inheritdoc}
@@ -23,7 +24,7 @@ class TestLog implements LoggerInterface {
       '%type' => 'Exception',
       '@message' => 'Deforestation',
       '%function' => 'Drupal\error_service_test\MonkeysInTheControlRoom->handle()',
-      'severity_level' => 3,
+      'severity_level' => RfcLogLevel::ERROR,
       'channel' => 'php',
     ];
     if (array_diff_assoc($trigger, $context) === []) {

@@ -7,11 +7,12 @@ namespace Drupal\Tests\Core\Logger;
 use Drupal\Core\Logger\LoggerChannel;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
+use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
 
 /**
  * @coversDefaultClass \Drupal\Core\Logger\LoggerChannel
@@ -64,7 +65,7 @@ class LoggerChannelTest extends UnitTestCase {
 
       $channel->setCurrentUser($account_mock);
     }
-    $channel->log(rand(0, 7), $message);
+    $channel->log(LogLevel::INFO, $message);
   }
 
   /**
@@ -79,7 +80,7 @@ class LoggerChannelTest extends UnitTestCase {
       ->method('log');
     $channel->addLogger($logger);
     $channel->addLogger(new NaughtyRecursiveLogger($channel));
-    $channel->log(rand(0, 7), $this->randomMachineName());
+    $channel->log(LogLevel::INFO, $this->randomMachineName());
   }
 
   /**
@@ -103,7 +104,7 @@ class LoggerChannelTest extends UnitTestCase {
       $channel->addLogger($logger, $i);
     }
 
-    $channel->log(rand(0, 7), $this->randomMachineName());
+    $channel->log(LogLevel::INFO, $this->randomMachineName());
     // Ensure that the logger added in the end fired first.
     $this->assertEquals('3210', $index_order);
   }
@@ -138,7 +139,7 @@ class LoggerChannelTest extends UnitTestCase {
     $channel->setRequestStack($requestStack);
 
     // Perform the test.
-    $channel->log(rand(0, 7), 'Test message');
+    $channel->log(LogLevel::INFO, 'Test message');
   }
 
   /**
@@ -196,7 +197,7 @@ class NaughtyRecursiveLogger implements LoggerInterface {
   }
 
   public function log($level, string|\Stringable $message, array $context = []): void {
-    $this->channel->log(rand(0, 7), $message, $context);
+    $this->channel->log(LogLevel::INFO, $message, $context);
   }
 
 }
