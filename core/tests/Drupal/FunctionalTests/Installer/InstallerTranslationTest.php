@@ -93,9 +93,11 @@ class InstallerTranslationTest extends InstallerTestBase {
     $this->rebuildContainer();
     /** @var \Drupal\user\Entity\User $account */
     $account = User::load(0);
-    $this->assertEquals('de', $account->language()->getId(), 'Anonymous user is German.');
+    // The anonymous user and the root user are created before the language
+    // change, therefore they are still english.
+    $this->assertEquals('en', $account->language()->getId(), 'Anonymous user is German.');
     $account = User::load(1);
-    $this->assertEquals('de', $account->language()->getId(), 'Administrator user is German.');
+    $this->assertEquals('en', $account->language()->getId(), 'Administrator user is German.');
     $account = $this->drupalCreateUser();
     $this->assertEquals('de', $account->language()->getId(), 'New user is German.');
 
