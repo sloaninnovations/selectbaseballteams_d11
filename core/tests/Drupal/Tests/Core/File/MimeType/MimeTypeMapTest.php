@@ -4,29 +4,29 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\File\MimeType;
 
-use Drupal\Core\File\MimeType\DefaultMimeTypeMap;
+use Drupal\Core\File\MimeType\MimeTypeMap;
 use Drupal\Tests\UnitTestCase;
 
 /**
  * Tests the MIME type mapper to extension.
  *
- * @coversDefaultClass \Drupal\Core\File\MimeType\DefaultMimeTypeMap
+ * @coversDefaultClass \Drupal\Core\File\MimeType\MimeTypeMap
  *
  * @group File
  */
-class DefaultMimeTypeMapTest extends UnitTestCase {
+class MimeTypeMapTest extends UnitTestCase {
 
   /**
    * The default MIME type map under test.
    */
-  protected DefaultMimeTypeMap $map;
+  protected MimeTypeMap $map;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->map = new DefaultMimeTypeMap();
+    $this->map = new MimeTypeMap();
   }
 
   /**

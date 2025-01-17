@@ -8,9 +8,9 @@ use Drupal\Core\File\Event\MimeTypeMapLoadedEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Factory for creating the default MIME type map.
+ * Factory for creating the MIME type map.
  */
-class DefaultMimeTypeMapFactory {
+class MimeTypeMapFactory {
 
   public function __construct(
     protected readonly EventDispatcherInterface $eventDispatcher,
@@ -23,7 +23,7 @@ class DefaultMimeTypeMapFactory {
    *   The MIME type map.
    */
   public function create(): MimeTypeMapInterface {
-    $map = new DefaultMimeTypeMap();
+    $map = new MimeTypeMap();
     $map->loadDefault();
     $this->eventDispatcher->dispatch(new MimeTypeMapLoadedEvent($map));
     return $map;

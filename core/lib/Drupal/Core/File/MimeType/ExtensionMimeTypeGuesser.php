@@ -27,6 +27,11 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
    *
    * @var array
    *   Array of mimetypes correlated to the extensions that relate to them.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Pass a
+   *   MimeTypeMapInterface $map to the constructor instead.
+   *
+   * @see https://www.drupal.org/node/3494040
    */
   protected $defaultMapping = [];
 
@@ -103,16 +108,13 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
       __METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\File\MimeType\MimeTypeMapInterface::addMapping() instead or define your own MimeTypeMapInterface implementation. See https://www.drupal.org/node/3494040',
       E_USER_DEPRECATED
     );
-    if (!$this->map instanceof DefaultMimeTypeMap) {
-      return;
-    }
     // Convert the mapping to be keyed by type.
     $typeMapping = [];
     foreach ($mapping['mimetypes'] as $index => $mimetype) {
       $typeMapping[$mimetype] = array_keys($mapping['extensions'], $index);
     }
 
-    $this->map = new DefaultMimeTypeMap();
+    $this->map = new MimeTypeMap();
     foreach ($typeMapping as $type => $extensions) {
       foreach ($extensions as $extension) {
         $this->map->addMapping($type, $extension);

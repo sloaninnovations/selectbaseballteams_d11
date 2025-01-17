@@ -1777,11 +1777,11 @@ services:
     tags:
       - { name: mime_type_guesser }
     lazy: true
-  Drupal\Core\File\MimeType\DefaultMimeTypeMapFactory:
+  Drupal\Core\File\MimeType\MimeTypeMapFactory:
     autowire: true
     public: false
   Drupal\Core\File\MimeType\MimeTypeMapInterface:
-    factory: ['@Drupal\Core\File\MimeType\DefaultMimeTypeMapFactory', create]
+    factory: ['@Drupal\Core\File\MimeType\MimeTypeMapFactory', create]
   Drupal\Core\File\EventSubscriber\LegacyMimeTypeMapLoadedSubscriber:
     autowire: true
   # Currently needs to be public as it is called by

@@ -108,7 +108,6 @@ function hook_file_url_alter(&$uri) {
 /**
  * Alter MIME type mappings used to determine MIME type from a file extension.
  *
- *
  * @param array $mapping
  *   An array of mimetypes correlated to the extensions that relate to them.
  *   The array has 'mimetypes' and 'extensions' elements, each of which is an

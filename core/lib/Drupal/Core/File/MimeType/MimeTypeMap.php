@@ -7,7 +7,7 @@ namespace Drupal\Core\File\MimeType;
 /**
  * Provides a sensible mapping between filename extensions and MIME types.
  */
-class DefaultMimeTypeMap implements MimeTypeMapInterface {
+class MimeTypeMap implements MimeTypeMapInterface {
 
   /**
    * Default MIME extension mapping.
