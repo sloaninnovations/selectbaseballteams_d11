@@ -4,6 +4,7 @@ namespace Drupal\media\OEmbed;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -24,6 +25,8 @@ class ResourceFetcher implements ResourceFetcherInterface {
    *   The oEmbed provider repository service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface|null $moduleHandler
+   *   The module handler service.
    * @param int $timeout
    *   The length of time to wait for the request before the request
    *   should time out.
@@ -32,8 +35,14 @@ class ResourceFetcher implements ResourceFetcherInterface {
     protected ClientInterface $httpClient,
     protected ProviderRepositoryInterface $providers,
     protected CacheBackendInterface $cacheBackend,
+    protected ?ModuleHandlerInterface $moduleHandler,
     protected int $timeout = 5,
   ) {
+    if (empty($moduleHandler)) {
+      $moduleHandler = \Drupal::moduleHandler();
+      @trigger_error('Passing NULL as the $module_handler parameter to ' . __METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3042423', E_USER_DEPRECATED);
+    }
+    $this->moduleHandler = $moduleHandler;
   }
 
   /**
@@ -73,6 +82,8 @@ class ResourceFetcher implements ResourceFetcherInterface {
     if (empty($data) || !is_array($data)) {
       throw new ResourceException('The oEmbed resource could not be decoded.', $url);
     }
+
+    $this->moduleHandler->alter('oembed_resource_data', $data, $url);
 
     $this->cacheBackend->set($cache_id, $data);
 
