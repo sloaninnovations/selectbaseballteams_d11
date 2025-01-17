@@ -42,6 +42,7 @@ class DisabledDisplayTest extends ViewTestBase {
     $this->drupalPlaceBlock('page_title_block');
 
     $admin_user = $this->drupalCreateUser([
+      'administer blocks',
       'administer site configuration',
     ]);
     $this->drupalLogin($admin_user);
