@@ -84,7 +84,7 @@ class NavigationTopBarPageContextTest extends BrowserTestBase {
     // Check the node title
     $this->assertSession()->pageTextContains('No easy twist on the bow');
     // Check the CSS class for published status
-    $this->assertSession()->elementContains('css', '.context-status.published', 'Published');
+    $this->assertSession()->elementContains('css', '.context-status.top-bar-published', 'Published');
 
     // Unpublish the node.
     $node->setUnpublished();
@@ -95,7 +95,7 @@ class NavigationTopBarPageContextTest extends BrowserTestBase {
     // Check the node title
     $this->assertSession()->pageTextContains('No easy twist on the bow');
     // Check the CSS class for unpublished status
-    $this->assertSession()->elementContains('css', '.context-status.unpublished', 'Unpublished');
+    $this->assertSession()->elementContains('css', '.context-status.top-bar-unpublished', 'Unpublished');
   }
 
 }
