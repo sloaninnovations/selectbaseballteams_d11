@@ -60,6 +60,18 @@
                 newState ? 'expanded' : 'collapsed',
               );
 
+              document
+                .querySelector(
+                  '[data-admin-toolbar-transitions] .admin-toolbar',
+                )
+                .addEventListener(
+                  'transitionend',
+                  () => {
+                    Drupal.displace();
+                  },
+                  { once: true },
+                );
+
               // Set [data-admin-toolbar-body-scroll='locked']
               // See css/components/body-scroll-lock.pcss.css.
 
