@@ -90,6 +90,7 @@ class CacheabilityMetadataConfigOverrideTest extends KernelTestBase {
 
     // Check that renaming a config entity does not have the original config
     // entity's cache tag.
+    $block = $entity_type_manager->getStorage('block')->loadOverrideFree('call_to_action');
     $block->set('id', 'call_to_looting')->save();
     $this->assertEquals(['pirate_day'], $block->getCacheContexts());
     $this->assertEquals(['config:block.block.call_to_looting', 'pirate-day-tag'], $block->getCacheTags());

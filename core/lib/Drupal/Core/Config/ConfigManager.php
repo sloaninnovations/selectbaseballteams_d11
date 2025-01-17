@@ -5,6 +5,7 @@ namespace Drupal\Core\Config;
 use Drupal\Component\Diff\Diff;
 use Drupal\Core\Config\Entity\ConfigDependencyManager;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -300,9 +301,10 @@ class ConfigManager implements ConfigManagerInterface {
     $entities_to_return = [];
     foreach ($entities as $entity_type_id => $entities_to_load) {
       $storage = $this->entityTypeManager->getStorage($entity_type_id);
+      assert($storage instanceof ConfigEntityStorageInterface);
       // Remove the keys since there are potential ID clashes from different
       // configuration entity types.
-      $entities_to_return[] = array_values($storage->loadMultiple($entities_to_load));
+      $entities_to_return[] = array_values($storage->loadMultipleOverrideFree($entities_to_load));
     }
     return array_merge(...$entities_to_return);
   }
