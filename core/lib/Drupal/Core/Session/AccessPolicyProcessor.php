@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Session;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\VariationCacheInterface;
@@ -24,7 +25,12 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
     protected CacheBackendInterface $static,
     protected AccountProxyInterface $currentUser,
     protected AccountSwitcherInterface $accountSwitcher,
+    protected ?TimeInterface $time = NULL,
   ) {
+    if ($this->time === NULL) {
+      @trigger_error('Calling ' . __CLASS__ . '() without the $time argument is deprecated in drupal:11.1.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3447821', E_USER_DEPRECATED);
+      $this->time = \Drupal::service('datetime.time');
+    }
   }
 
   /**
@@ -78,6 +84,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
     try {
       // Retrieve the permissions from the static cache if available.
       if ($static_cache = $this->variationStatic->get($cache_keys, $initial_cacheability)) {
+        // @todo How to handle this?
         return $static_cache->data;
       }
 
@@ -91,6 +98,13 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
         // conversion every time we call for the calculated permissions from a
         // warm static cache.
         $calculated_permissions = new CalculatedPermissions($calculated_permissions);
+        if ($cache->expire >= 0) {
+          $max_age = max($cache->expire - $this->time->getRequestTime(), 0);
+          $calculated_permissions = (new RefinableCalculatedPermissions())
+            ->merge($calculated_permissions)
+            ->mergeCacheMaxAge($max_age);
+        }
+
         $this->variationStatic->set($cache_keys, $calculated_permissions, $cacheability, $initial_cacheability);
         return $calculated_permissions;
       }
