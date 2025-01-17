@@ -4,6 +4,7 @@ namespace Drupal\path\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Provides the path admin overview filter form.
@@ -22,7 +23,7 @@ class PathFilterForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $keys = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $query = []) {
     $form['#attributes'] = ['class' => ['search-form']];
     $form['basic'] = [
       '#type' => 'details',
@@ -30,19 +31,40 @@ class PathFilterForm extends FormBase {
       '#open' => TRUE,
       '#attributes' => ['class' => ['container-inline']],
     ];
-    $form['basic']['filter'] = [
+    $form['basic']['alias'] = [
       '#type' => 'search',
       '#title' => $this->t('Path alias'),
+      '#attributes' => [
+        'placeholder' => $this->t('Path alias'),
+      ],
       '#title_display' => 'invisible',
-      '#default_value' => $keys,
+      '#default_value' => $query['alias'] ?? NULL,
       '#maxlength' => 128,
       '#size' => 25,
+    ];
+    $form['basic']['path'] = [
+      '#type' => 'search',
+      '#title' => $this->t('System path'),
+      '#attributes' => [
+        'placeholder' => $this->t('System path'),
+      ],
+      '#title_display' => 'invisible',
+      '#default_value' => $query['path'] ?? NULL,
+      '#maxlength' => 128,
+      '#size' => 25,
+    ];
+    $form['basic']['langcode'] = [
+      '#type' => 'language_select',
+      '#languages' => LanguageInterface::STATE_ALL,
+      '#title' => $this->t('Language'),
+      '#title_display' => 'invisible',
+      '#default_value' => $query['langcode'] ?? 'und',
     ];
     $form['basic']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Filter'),
     ];
-    if ($keys) {
+    if ($query) {
       $form['basic']['reset'] = [
         '#type' => 'submit',
         '#value' => $this->t('Reset'),
@@ -57,7 +79,11 @@ class PathFilterForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $form_state->setRedirect('entity.path_alias.collection', [], [
-      'query' => ['search' => trim($form_state->getValue('filter'))],
+      'query' => [
+        'alias' => trim($form_state->getValue('alias')),
+        'path' => trim($form_state->getValue('path')),
+        'langcode' => trim($form_state->getValue('langcode')),
+      ],
     ]);
   }
 
