@@ -318,7 +318,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     // The "All" state for this type of filter could have a default value. If
     // this is a non-multiple and non-required option, then this filter will
     // participate by using the default settings *if* 'limit' is true.
-    if (empty($this->options['expose']['multiple']) && empty($this->options['expose']['required']) && !empty($this->options['expose']['limit'])) {
+    if (empty($this->options['expose']['multiple']) && empty($this->options['expose']['required']) && !empty($this->options['expose']['reduce'])) {
       $identifier = $this->options['expose']['identifier'];
       if ($input[$identifier] == 'All') {
         return TRUE;
