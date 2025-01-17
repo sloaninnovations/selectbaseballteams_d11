@@ -12,6 +12,7 @@ use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
 use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
 use Drupal\navigation\RenderCallbacks;
+use Drupal\navigation\TopBarRegion;
 
 /**
  * Implements hook_help().
@@ -85,13 +86,29 @@ function navigation_module_implements_alter(&$implementations, $hook) {
 }
 
 /**
+ * Prepares variables for navigation top bar template.
+ *
+ * Default template: top-bar.html.twig
+ *
+ * @param $variables
+ *   An associative array containing:
+ *    - element: An associative array containing the properties and children of
+ *      the top bar.
+ */
+function template_preprocess_top_bar(&$variables): void {
+  $element = $variables['element'];
+
+  foreach (TopBarRegion::cases() as $region) {
+    $variables[$region->value] = $element[$region->value] ?? NULL;
+  }
+}
+
+/**
  * Implements hook_theme().
  */
 function navigation_theme($existing, $type, $theme, $path) {
   $items['top_bar'] = [
-    'variables' => [
-      'local_tasks' => [],
-    ],
+    'render element' => 'element',
   ];
 
   $items['top_bar_local_tasks'] = [
