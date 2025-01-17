@@ -36,6 +36,7 @@ props:
           - non-interactive
           - small-offset
           - weight--400
+          - main-action
     extra_classes:
       type: array
       title: Extra classes.

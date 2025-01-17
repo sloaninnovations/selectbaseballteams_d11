@@ -203,6 +203,36 @@
   }
 }
 
+.toolbar-button--main-action {
+  position: relative;
+  padding: 0;
+  list-style: none;
+  color: var(--admin-toolbar-color-white);
+  background-color: var(--admin-toolbar-top-bar-action-color);
+
+  &::before {
+    position: absolute;
+    inset-inline-start: var(--admin-toolbar-space-12);
+    inline-size: var(--admin-toolbar-space-16);
+    block-size: var(--admin-toolbar-space-16);
+  }
+
+  .toolbar-button__label {
+    z-index: 1;
+  }
+
+  .toolbar-dropdown__link {
+    color: var(--admin-toolbar-color-white);
+    padding-inline: var(--admin-toolbar-space-36) var(--admin-toolbar-space-12);
+
+    &:hover {
+      text-decoration: none;
+      color: inherit;
+      background-color: transparent;
+    }
+  }
+}
+
 .toolbar-button--icon--announcements-feed-announcement {
   --icon: url(./assets/announcement.svg);
   &::before {

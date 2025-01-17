@@ -14,9 +14,10 @@
   {#  The featured_local_task.task is a render array and the text passed to the parent
   component needs to be an string. Hence we are rendering the text and passing
   it to the component.#}
+  {{ dump(featured_local_task.task) }}
   {% include 'navigation:toolbar-button' with {
     text: featured_local_task.task|render,
-    extra_classes: ['toolbar-button-exposed'],
+    modifiers: ['main-action'],
     icon: featured_local_task.icon,
   } only %}
 {% endif %}
