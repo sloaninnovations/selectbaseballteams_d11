@@ -88,7 +88,7 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
    * @param bool $in_cache
    *   Whether to prefill the handler's access cache.
    * @param string $cid
-   *   The cache id.
+   *   The cache ID.
    *
    * @return \ReflectionProperty
    *   A reflection of the handler's accessCache property.
@@ -122,7 +122,7 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
    * @param array $context
    *   The context array for the test createAccess() check.
    * @param bool $in_cache
-   *   Whether there is already a cached createAccess() check for the cache id.
+   *   Whether there is already a cached createAccess() check for the cache ID.
    * @param bool $cacheable
    *   If the test createAccess() check should be cacheable.
    *
@@ -141,7 +141,7 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
     $cache = $access_cache->getValue($handler);
 
     // The cached value is AccessResult::allowed() but default result is
-    // neutral()so createAccess return TRUE for a cache hit, FALSE otherwise.
+    // neutral() so createAccess returns TRUE for a cache hit, FALSE otherwise.
     $should_get_from_cache = $in_cache && $cacheable;
     $this->assertSame($should_get_from_cache, $handler->createAccess($bundle, $this->account, $context));
 
@@ -212,7 +212,7 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
    * @param string $cid
    *   The static cache ID.
    * @param bool $in_cache
-   *   Whether there is already a cached createAccess() check for the cache id.
+   *   Whether there is already a cached createAccess() check for the cache ID.
    *
    * @covers ::buildCreateAccessCid
    * @dataProvider providerTestCustomCid
@@ -233,10 +233,10 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
     $handler = new EntityTestAccessControlHandler($this->entityType);
     $handler->setModuleHandler($this->moduleHandler);
 
-    $access_cache = $this->setUpAccessCache($handler, $in_cache, $cid);
+    $this->setUpAccessCache($handler, $in_cache, $cid);
 
-    // The prefilled cache is set to AccessResult::allowed(), but the default for
-    // EntityTestAccessControlHandler() is neutral(); so createAccess() will
+    // The prefilled cache is set to AccessResult::allowed(), but the default
+    // for EntityTestAccessControlHandler() is neutral(); so createAccess() will
     // return TRUE for a cache hit and FALSE otherwise.
     $this->assertSame($in_cache, $handler->createAccess($bundle, $this->account, $context));
   }
