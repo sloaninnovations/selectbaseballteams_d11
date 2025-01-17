@@ -25,7 +25,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   id: "default:user",
   label: new TranslatableMarkup("User selection"),
   entity_types: ["user"],
-  group: "default",
   weight: 1
 )]
 class UserSelection extends DefaultSelection {
