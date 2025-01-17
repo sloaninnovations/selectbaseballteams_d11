@@ -42,6 +42,22 @@ class BlockXssTest extends BrowserTestBase {
   }
 
   /**
+   * Tests XSS in Place Block page.
+   */
+  public function testXssInPlaceBlock() {
+    $this->container->get('module_installer')->install(['block_test']);
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer blocks',
+      'access administration pages',
+    ]));
+    $this->drupalGet('admin/structure/block/library/stark');
+    $this->assertSession()->responseNotContains("<script>alert('XSS subject');</script>");
+    $this->assertSession()->assertEscaped("<script>alert('XSS subject');</script>");
+    $this->assertSession()->responseNotContains("<script>alert('XSS category');</script>");
+    $this->assertSession()->assertEscaped("<script>alert('XSS category');</script>");
+  }
+
+  /**
    * Tests XSS in title.
    */
   public function testXssInTitle(): void {
@@ -52,16 +68,18 @@ class BlockXssTest extends BrowserTestBase {
     $this->drupalGet('');
     // Check that the block title was properly sanitized when rendered.
     $this->assertSession()->responseNotContains('<script>alert("XSS label");</script>');
+    $this->assertSession()->assertEscaped('<script>alert("XSS label");</script>');
 
     $this->drupalLogin($this->drupalCreateUser([
       'administer blocks',
       'access administration pages',
     ]));
-    $default_theme = $this->config('system.theme')->get('default');
-    $this->drupalGet('admin/structure/block/list/' . $default_theme);
+
+    $this->drupalGet(Url::fromRoute('block.admin_display'));
     // Check that the block title was properly sanitized in Block Plugin UI
     // Admin page.
-    $this->assertSession()->responseNotContains("<script>alert('XSS subject');</script>");
+    $this->assertSession()->responseNotContains("<script>alert('XSS label');</script>");
+    $this->assertSession()->assertEscaped('<script>alert("XSS label");</script>');
   }
 
   /**
@@ -77,6 +95,7 @@ class BlockXssTest extends BrowserTestBase {
     $this->drupalGet(Url::fromRoute('block.admin_display'));
     $this->clickLink('Place block');
     $this->assertSession()->responseNotContains("<script>alert('XSS category');</script>");
+    $this->assertSession()->assertEscaped("<script>alert('XSS category');</script>");
   }
 
   /**

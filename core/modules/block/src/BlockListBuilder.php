@@ -287,7 +287,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
           }
 
           $form[$entity_id]['type'] = [
-            '#markup' => $info['category'],
+            '#plain_text' => $info['category'],
           ];
           $form[$entity_id]['region-theme']['region'] = [
             '#type' => 'select',
