@@ -72,27 +72,6 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
   use EntityFieldDefinitionTrait;
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
-
-  /**
-   * The entity type bundle info service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
-   */
-  protected $entityTypeBundleInfo;
-
-  /**
    * The entity type definition.
    *
    * @var \Drupal\Core\Entity\EntityTypeInterface
@@ -113,13 +92,18 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationInterface $migration,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+  ) {
     if (empty($plugin_definition['entity_type'])) {
       throw new InvalidPluginDefinitionException($plugin_id, 'Missing required "entity_type" definition.');
     }
-    $this->entityTypeManager = $entity_type_manager;
-    $this->entityFieldManager = $entity_field_manager;
-    $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityType = $this->entityTypeManager->getDefinition($plugin_definition['entity_type']);
     if (!$this->entityType instanceof ContentEntityTypeInterface) {
       throw new InvalidPluginDefinitionException($plugin_id, sprintf('The entity type (%s) is not supported. The "content_entity" source plugin only supports content entities.', $plugin_definition['entity_type']));
