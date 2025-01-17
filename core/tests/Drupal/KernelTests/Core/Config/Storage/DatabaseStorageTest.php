@@ -90,6 +90,25 @@ class DatabaseStorageTest extends ConfigStorageTestBase {
       // Exception was expected
     }
 
+    // Disallowed character handling.
+    try {
+      // cspell:disable-next-line
+      $exists = $this->storage->exists('config.testáéóú');
+      $this->assertEmpty($exists);
+    }
+    catch (DatabaseExceptionWrapper) {
+      // Exception was expected
+    }
+
+    try {
+      // cspell:disable-next-line
+      $read = $this->storage->read('config.testáéóú');
+      $this->assertEmpty($read);
+    }
+    catch (\InvalidArgumentException) {
+      // Exception was expected
+    }
+
     try {
       $this->storage->write('config.settings', ['data' => '']);
       $this->fail('Expected exception not thrown from deleteAll()');
@@ -122,6 +141,28 @@ class DatabaseStorageTest extends ConfigStorageTestBase {
       // Exception was expected
     }
 
+    $this->assertTrue(TRUE);
+  }
+
+  /**
+   * Tests that DatabaseStorage::readMultiple throws an InvalidArgumentException if the config entity name contains invalid characters.
+   */
+  public function testInvalidArgumentExceptionIsThrownIfInvalidCharacters(): void {
+    $connection = Database::getConnection();
+    if ($connection->databaseType() === 'sqlite') {
+      // See: https://www.drupal.org/project/drupal/issues/3349286
+      $this->markTestSkipped('SQLite cannot allow detection of exceptions due to double quoting.');
+      return;
+    }
+
+    try {
+      // cspell:disable-next-line
+      $read = $this->storage->readMultiple(['config.testáé', 'config.testóú']);
+      $this->assertNotEmpty($read);
+    }
+    catch (\InvalidArgumentException) {
+      // Exception was expected
+    }
     $this->assertTrue(TRUE);
   }
 

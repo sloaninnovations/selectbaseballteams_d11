@@ -320,6 +320,17 @@ class ConfigEntityTest extends BrowserTestBase {
     $storage = \Drupal::entityTypeManager()->getStorage('config_test');
     $this->assertNull($storage->load(0), 'Test entity deleted');
 
+    // Try to create a configuration entity with a name containing invalid characters.
+    $edit = [
+      // cspell:disable-next-line
+      'id' => 'testäáé',
+      'label' => 'test',
+    ];
+    $this->drupalGet('admin/structure/config_test/add');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->statusCodeEquals(500);
+    $this->assertSession()->pageTextContains('The config name part of the URI');
+
     // Create a configuration entity with a property that uses AJAX to show
     // extra form elements. Test this scenario in a non-JS case by using a
     // 'js-hidden' submit button.

@@ -26,6 +26,9 @@ interface StorageInterface {
    * @param string $name
    *   The name of a configuration object to test.
    *
+   * @throws \InvalidArgumentException
+   *   If the configuration name contains non-ASCII characters.
+   *
    * @return bool
    *   TRUE if the configuration object exists, FALSE otherwise.
    */
@@ -36,6 +39,9 @@ interface StorageInterface {
    *
    * @param string $name
    *   The name of a configuration object to load.
+   *
+   * @throws \InvalidArgumentException
+   *   If the configuration object's name contains non-ASCII characters.
    *
    * @return array|false
    *   The configuration data stored for the configuration object name. If no
@@ -48,6 +54,10 @@ interface StorageInterface {
    *
    * @param array $names
    *   List of names of the configuration objects to load.
+   *
+   * @throws \InvalidArgumentException
+   *   If any value in the $names array contains non-ASCII characters throw an
+   *   understandable exception.
    *
    * @return array
    *   A list of the configuration data stored for the configuration object name
