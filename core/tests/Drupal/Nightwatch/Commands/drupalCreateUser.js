@@ -19,6 +19,7 @@ exports.command = function drupalCreateUser(
   callback,
 ) {
   const self = this;
+  const email = `${Math.random().toString(36).substring(2, 15)}@example.com`;
 
   // Define the name here because the callback from drupalCreateRole can be
   // undefined in some cases.
@@ -35,6 +36,7 @@ exports.command = function drupalCreateUser(
       .setValue('input[name="name"]', name)
       .setValue('input[name="pass[pass1]"]', password)
       .setValue('input[name="pass[pass2]"]', password)
+      .setValue('input[name="mail"]', email)
       .perform((client, done) => {
         if (permissions.length) {
           client.click(`input[name="roles[${roleName}]`, () => {

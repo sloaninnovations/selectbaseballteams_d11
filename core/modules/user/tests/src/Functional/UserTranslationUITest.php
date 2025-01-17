@@ -21,6 +21,13 @@ class UserTranslationUITest extends ContentTranslationUITestBase {
   protected $name;
 
   /**
+   * The email of the test user.
+   *
+   * @var string
+   */
+  protected $mail;
+
+  /**
    * {@inheritdoc}
    */
   protected $defaultCacheContexts = [
@@ -53,6 +60,7 @@ class UserTranslationUITest extends ContentTranslationUITestBase {
     $this->entityTypeId = 'user';
     $this->testLanguageSelector = FALSE;
     $this->name = $this->randomMachineName();
+    $this->mail = $this->randomMachineName() . '@example.com';
     parent::setUp();
     $this->doSetup();
 
@@ -71,7 +79,7 @@ class UserTranslationUITest extends ContentTranslationUITestBase {
    */
   protected function getNewEntityValues($langcode) {
     // User name is not translatable hence we use a fixed value.
-    return ['name' => $this->name] + parent::getNewEntityValues($langcode);
+    return ['name' => $this->name, 'mail' => $this->mail] + parent::getNewEntityValues($langcode);
   }
 
   /**
