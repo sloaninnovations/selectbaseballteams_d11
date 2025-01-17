@@ -6,9 +6,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Defines an interface for displays that can collect routes.
- *
- * In addition to implementing the interface, specify 'uses_routes' in the
- * plugin definition.
  */
 interface DisplayRouterInterface extends DisplayPluginInterface {
 
