@@ -243,35 +243,48 @@ final class NavigationLinkBlock extends BlockBase {
   public function build(): array {
     $config = $this->configuration;
     $build = [];
+    // Ensure that the Help module is enabled.
+    if (!\Drupal::moduleHandler()->moduleExists('help')) {
+      // Return an empty array, so the Help link is not displayed
+      return $build;
+    }
     // Ensure that user has access to link before rendering it.
     try {
       $url = Url::fromUri($config['uri']);
       $access = $url->access(NULL, TRUE);
-      if (!$access->isAllowed()) {
-        // Cacheable dependency is explicitly added when access is not granted.
-        // It is bubbled when the link is rendered.
-        $cacheable_metadata = new CacheableMetadata();
-        $cacheable_metadata->addCacheableDependency($access);
-        $cacheable_metadata->applyTo($build);
+      try {
+        $url = Url::fromUri($config['uri']);
+        // Internal routes must exist.
+        if (!$url->isExternal() && !$url->isRouted()) {
+          return $build;
+        }
+        $access = $url->access(NULL, TRUE);
+        if (!$access->isAllowed()) {
+          // Cacheable dependency is explicitly added when access is not granted.
+          // It is bubbled when the link is rendered.
+          $cacheable_metadata = new CacheableMetadata();
+          $cacheable_metadata->addCacheableDependency($access);
+          $cacheable_metadata->applyTo($build);
+          return $build;
+        }
+      }
+      catch (\InvalidArgumentException) {
         return $build;
       }
-    }
-    catch (\InvalidArgumentException) {
-      return $build;
-    }
 
-    return $build + [
-      '#title' => $config['label'],
-      '#theme' => 'navigation_menu',
-      '#menu_name' => 'link',
-      '#items' => [
+      return $build + [
+        '#title' => $config['label'],
+        '#theme' => 'navigation_menu',
+        '#menu_name' => 'link',
+        '#items' => [
         [
           'title' => $config['title'],
           'class' => $config['icon_class'],
           'url' => $url,
         ],
-      ],
-    ];
+        ],
+      ];
+    }
   }
 
 }
