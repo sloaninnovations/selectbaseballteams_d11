@@ -373,6 +373,7 @@ td.group-title {
   border: 1px solid var(--color-gray-200-o-80);
   border-radius: var(--base-border-radius);
   box-shadow: var(--details-box-shadow);
+  background-color: var(--color-white);
 }
 
 .views-display-column + .views-display-column {
@@ -827,4 +828,9 @@ html:not(.no-touchevents) .views-ui-display-tab-bucket__header--actions {
 
 html:not(.no-touchevents) .edit-display-settings-top.views-ui-display-tab-bucket {
   padding: var(--space-m) var(--space-xs);
+}
+
+/* Alert the user that the View is disabled. */
+.views-instance-disabled #edit-displays{
+  background-color: var(--color-gray-050);
 }

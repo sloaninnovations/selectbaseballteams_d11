@@ -683,3 +683,10 @@ html:not(.no-touchevents) .views-ui-display-tab-bucket__header--actions {
 html:not(.no-touchevents) .edit-display-settings-top.views-ui-display-tab-bucket {
   padding: var(--space-m) var(--space-xs);
 }
+
+/* Alert the user that the View is disabled. */
+.views-instance-disabled #edit-displays,
+.views-edit-view.disabled #edit-displays .claro-details {
+  background-color: var(--color-gray-050);
+}
+

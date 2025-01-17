@@ -853,3 +853,11 @@ td.group-title {
 .form-item-options-content {
   width: 100%;
 }
+
+/* Alert the user that the View is disabled. */
+.views-edit-view.disabled  #edit-displays {
+  background-color: #f3f4f9;
+}
+.views-instance-disabled #edit-displays{
+  background-color: #f3f4f9;
+}
