@@ -213,7 +213,7 @@ class Xss {
       switch ($mode) {
         case 0:
           // Attribute name, href for instance.
-          if (preg_match('/^([-a-zA-Z][-a-zA-Z0-9]*)/', $attributes, $match)) {
+          if (preg_match('/^([-a-zA-Z_][-a-zA-Z0-9_]*)/', $attributes, $match)) {
             $attribute_name = strtolower($match[1]);
             $skip = (
               $attribute_name == 'style' ||
@@ -242,7 +242,7 @@ class Xss {
             ]);
 
             $working = $mode = 1;
-            $attributes = preg_replace('/^[-a-zA-Z][-a-zA-Z0-9]*/', '', $attributes);
+            $attributes = preg_replace('/^[-a-zA-Z][-a-zA-Z0-9_]*/', '', $attributes);
           }
           break;
 
