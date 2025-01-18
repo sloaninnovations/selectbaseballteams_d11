@@ -12266,12 +12266,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block_content/src/BlockContentForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\block_content\\\\BlockContentForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/block_content/src/BlockContentForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\block_content\\\\BlockContentPermissions\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

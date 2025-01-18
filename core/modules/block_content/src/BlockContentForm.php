@@ -129,6 +129,8 @@ class BlockContentForm extends ContentEntityForm {
       $this->messenger()->addError($this->t('The block could not be saved.'));
       $form_state->setRebuild();
     }
+
+    return $insert ? SAVED_NEW : SAVED_UPDATED;
   }
 
 }
