@@ -18,7 +18,7 @@
    * Maintains active tab in horizontal orientation.
    */
   $.fn.drupalToolbarMenuHorizontal = function () {
-    let currentPath = drupalSettings.path.currentPath;
+    let { currentPath } = drupalSettings.path;
     const menu = once('toolbar-menu-horizontal', this);
     if (menu.length) {
       const $menu = $(menu);
@@ -42,11 +42,6 @@
   };
 
   $.fn.drupalToolbarMenu = function () {
-    const ui = {
-      handleOpen: Drupal.t('Extend'),
-      handleClose: Drupal.t('Collapse'),
-    };
-
     /**
      * Toggle the open/close state of a list is a menu.
      *
@@ -67,11 +62,8 @@
       $item.toggleClass('open', switcher);
       // Twist the toggle.
       $toggle.toggleClass('open', switcher);
-      // Adjust the toggle text.
-      $toggle.find('.action').each((index, element) => {
-        // Expand Structure, Collapse Structure.
-        element.textContent = switcher ? ui.handleClose : ui.handleOpen;
-      });
+      // Update the toggle's aria-expanded attribute.
+      $toggle.attr('aria-expanded', switcher ? 'true' : 'false');
     }
 
     /**
@@ -124,8 +116,8 @@
     function initItems($menu) {
       const options = {
         class: 'toolbar-icon toolbar-handle',
-        action: ui.handleOpen,
-        text: '',
+        expanded: 'false',
+        labelledby: '',
       };
       // Initialize items and their links.
       $menu.find('li > a').wrap('<div class="toolbar-box">');
@@ -135,9 +127,7 @@
         if ($item.children('ul.toolbar-menu').length) {
           const $box = $item.children('.toolbar-box');
           const $link = $box.find('a');
-          options.text = Drupal.t('@label', {
-            '@label': $link.length ? $link[0].textContent : '',
-          });
+          options.labelledby = $link.attr('id');
           $item
             .children('.toolbar-box')
             .append(
@@ -180,7 +170,7 @@
      *   The root of the menu.
      */
     function openActiveItem($menu) {
-      let currentPath = drupalSettings.path.currentPath;
+      let { currentPath } = drupalSettings.path;
       const pathItem = $menu.find(`a[href="${window.location.pathname}"]`);
       if (pathItem.length && !activeItem) {
         activeItem = window.location.pathname;
@@ -242,15 +232,15 @@
    *   Options for the button.
    * @param {string} options.class
    *   Class to set on the button.
-   * @param {string} options.action
-   *   Action for the button.
-   * @param {string} options.text
-   *   Used as label for the button.
+   * @param {string} options.expanded
+   *   The button's aria-expanded attribute.
+   * @param {string} options.labelledby
+   *   The button's aria-labelledby attribute.
    *
    * @return {string}
    *   A string representing a DOM fragment.
    */
   Drupal.theme.toolbarMenuItemToggle = function (options) {
-    return `<button class="${options.class}"><span class="action">${options.action}</span> <span class="label">${options.text}</span></button>`;
+    return `<button aria-expanded="${options.expanded}" aria-labelledby="${options.labelledby}" class="${options.class}"></button>`;
   };
 })(jQuery, Drupal, drupalSettings);
