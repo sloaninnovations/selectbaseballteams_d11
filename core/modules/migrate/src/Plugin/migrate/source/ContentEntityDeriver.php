@@ -16,13 +16,10 @@ class ContentEntityDeriver extends DeriverBase implements ContainerDeriverInterf
   /**
    * Constructs a new ContentEntityDeriver.
    *
-   * @param string $base_plugin_id
-   *   The base plugin ID.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
   public function __construct(
-    $base_plugin_id,
     protected EntityTypeManagerInterface $entityTypeManager,
   ) {}
 
@@ -31,7 +28,6 @@ class ContentEntityDeriver extends DeriverBase implements ContainerDeriverInterf
    */
   public static function create(ContainerInterface $container, $base_plugin_id): static {
     return new static(
-      $base_plugin_id,
       $container->get('entity_type.manager'),
     );
   }
