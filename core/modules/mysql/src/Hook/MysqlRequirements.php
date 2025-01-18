@@ -12,6 +12,7 @@ use Drupal\Core\Render\Markup;
  * Requirements for the mysql module.
  */
 class MysqlRequirements {
+
   /**
    * Implements hook_runtime_requirements().
    */

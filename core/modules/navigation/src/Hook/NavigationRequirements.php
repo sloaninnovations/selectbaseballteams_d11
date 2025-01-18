@@ -13,7 +13,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 class NavigationRequirements {
 
   public function __construct(
-    protected readonly ModuleHandlerInterface $moduleHandler
+    protected readonly ModuleHandlerInterface $moduleHandler,
   ) {}
 
   /**

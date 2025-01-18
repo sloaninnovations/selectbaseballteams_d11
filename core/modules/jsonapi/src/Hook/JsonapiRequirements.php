@@ -30,8 +30,9 @@ class JsonapiRequirements {
       'config_translation',
       'language',
     ];
-    $should_warn = array_reduce($potential_conflicts, function ($should_warn, $module_name) use ($this) {
-      return $should_warn ?: $this->moduleHandler->moduleExists($module_name);
+    $module_handler = $this->moduleHandler;
+    $should_warn = array_reduce($potential_conflicts, function ($should_warn, $module_name) use ($module_handler) {
+      return $should_warn ?: $module_handler->moduleExists($module_name);
     }, FALSE);
     if ($should_warn) {
       $requirements['jsonapi_multilingual_support'] = [

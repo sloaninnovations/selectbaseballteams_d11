@@ -11,7 +11,7 @@ use Drupal\Core\Url;
 use Drupal\update\ProjectSecurityData;
 use Drupal\update\ProjectSecurityRequirement;
 use Drupal\update\UpdateFetcherInterface;
-use Drupal\update\UpdateManagerInterface;;
+use Drupal\update\UpdateManagerInterface;
 
 /**
  * Requirements for the update module.
@@ -98,7 +98,7 @@ class UpdateRequirements {
    * @see update_requirements()
    * @see update_calculate_project_data()
    */
-  function requirementCheck($project, $type): array {
+  public function requirementCheck($project, $type): array {
     $requirement = [];
     if ($type == 'core') {
       $requirement['title'] = t('Drupal core update status');

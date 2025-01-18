@@ -12,6 +12,7 @@ use Drupal\Core\Url;
  * Requirements for the locale module.
  */
 class LocaleRequirements {
+
   /**
    * Implements hook_runtime_requirements().
    */

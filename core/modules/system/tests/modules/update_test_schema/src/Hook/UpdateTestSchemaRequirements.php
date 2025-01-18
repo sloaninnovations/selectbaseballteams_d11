@@ -12,6 +12,7 @@ use Drupal\Core\Url;
  * Requirements for the update_test_schema module.
  */
 class UpdateTestSchemaRequirements {
+
   /**
    * Implements hook_runtime_requirements().
    */
