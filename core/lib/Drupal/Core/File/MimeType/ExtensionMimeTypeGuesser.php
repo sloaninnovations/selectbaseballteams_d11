@@ -910,7 +910,7 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
   protected readonly MimeTypeMapInterface $map;
 
   /**
-   *   The file system.
+   * The file system.
    */
   protected readonly FileSystemInterface $fileSystem;
 
