@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity\Plugin\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Url;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -174,6 +175,33 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     $selected_bundles = [];
 
     if ($entity_type->hasKey('bundle')) {
+      if (empty($bundles)) {
+        $bundle_entity_type_id = $entity_type->getBundleEntityType();
+        $bundle_entity_type = $this->entityTypeManager->getDefinition($bundle_entity_type_id);
+        if ($bundle_entity_type && $this->currentUser->hasPermission($bundle_entity_type->getAdminPermission()) && $collection = $bundle_entity_type->getLinkTemplate('collection')) {
+          $url = Url::fromUserInput($collection, ['query' => \Drupal::destination()->getAsArray()]);
+          $help = $this->t('No eligible @bundle was found. <a href=":create">Create a @bundle</a>.', [
+            '@bundle' => $bundle_entity_type->getLabel(),
+            ':create' => $url->toString(),
+          ]);
+        }
+        else {
+          $help = $this->t('No eligible @bundle was found.', ['@bundle' => $bundle_entity_type->getLabel()]);
+        }
+        $form['target_bundles']['no_bundle_help'] = [
+          '#theme' => 'status_messages',
+          '#message_list' => [
+            'error' => [
+              $help,
+            ],
+          ],
+          '#status_headings' => [
+            'error' => $this->t('Error Message'),
+          ],
+        ];
+        return $form;
+      }
+
       $bundle_options = [];
       foreach ($bundles as $bundle_name => $bundle_info) {
         $bundle_options[$bundle_name] = $bundle_info['label'];
