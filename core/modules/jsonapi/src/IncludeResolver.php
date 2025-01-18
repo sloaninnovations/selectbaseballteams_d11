@@ -150,7 +150,7 @@ class IncludeResolver {
 
             // Support entity reference fields that don't have the referenced
             // target type stored in settings.
-            $references[$field_item->entity->getEntityTypeId()][] = $field_item->get($field_item::mainPropertyName())->getValue();
+            $references[$field_item->entity->getEntityTypeId()][$field_item->entity->id()] = $field_item->entity;
           }
         }
         else {
@@ -161,14 +161,20 @@ class IncludeResolver {
           $target_type = $field_list->getFieldDefinition()->getFieldStorageDefinition()->getSetting('target_type');
           if (!empty($target_type)) {
             foreach ($field_list as $field_item) {
-              $references[$target_type][] = $field_item->get($field_item::mainPropertyName())->getValue();
+              if ($field_item->entity instanceof EntityInterface) {
+                $references[$target_type][$field_item->entity->id()] = $field_item->entity;
+              }
+              else {
+                $entity_storage = $this->entityTypeManager->getStorage($target_type);
+                if ($targeted_entity = $entity_storage->load($field_item->get($field_item::mainPropertyName())->getValue())) {
+                  $references[$target_type][$targeted_entity->id()] = $targeted_entity;
+                }
+              }
             }
           }
         }
       }
-      foreach ($references as $target_type => $ids) {
-        $entity_storage = $this->entityTypeManager->getStorage($target_type);
-        $targeted_entities = $entity_storage->loadMultiple(array_unique($ids));
+      foreach ($references as $targeted_entities) {
         $access_checked_entities = array_map(function (EntityInterface $entity) {
           return $this->entityAccessChecker->getAccessCheckedResourceObject($entity);
         }, $targeted_entities);
