@@ -14,8 +14,6 @@ use Drupal\Core\Url;
 class UpdateTestSchemaRequirements {
   /**
    * Implements hook_runtime_requirements().
-   *
-   * For the Status Report, return information about search index status.
    */
   #[Hook('runtime_requirements')]
   public function runtime(): array {
