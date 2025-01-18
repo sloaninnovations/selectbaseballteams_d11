@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\File\MimeType;
 
-use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\Event\MimeTypeMapLoadedEvent;
 use Drupal\Core\File\FileSystemInterface;
@@ -12,15 +11,6 @@ use Symfony\Component\Mime\MimeTypeGuesserInterface;
  * Makes possible to guess the MIME type of a file using its extension.
  */
 class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
-
-  use DeprecatedServicePropertyTrait;
-
-  /**
-   * The service properties that should raise a deprecation error.
-   */
-  protected array $deprecatedProperties = [
-    'moduleHandler' => 'module_handler',
-  ];
 
   /**
    * Default MIME extension mapping.
@@ -34,6 +24,30 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
    * @see https://www.drupal.org/node/3494040
    */
   protected $defaultMapping = [];
+
+  /**
+   * The MIME types mapping array after going through the module handler.
+   *
+   * @var array
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Pass a
+   *   MimeTypeMapInterface $map to the constructor instead.
+   *
+   * @see https://www.drupal.org/node/3494040
+   */
+  protected $mapping;
+
+  /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There
+   *   is no replacement.
+   *
+   * @see https://www.drupal.org/node/3494040
+   */
+  protected $moduleHandler;
 
   /**
    * The MIME type map.
@@ -57,7 +71,11 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
         'Calling ' . __METHOD__ . '() with the $map argument as an instance of \Drupal\Core\Extension\ModuleHandlerInterface is deprecated in drupal:11.2.0 and an instance of \Drupal\Core\File\MimeType\MimeTypeMapInterface is required in drupal:12.0.0. See https://www.drupal.org/node/3494040',
         E_USER_DEPRECATED
       );
+      $this->moduleHandler = $map;
       $map = \Drupal::service(MimeTypeMapInterface::class);
+    }
+    else {
+      $this->moduleHandler = \Drupal::service(MimeTypeMapInterface::class);
     }
     $this->map = $map;
     if (!$this->fileSystem) {
