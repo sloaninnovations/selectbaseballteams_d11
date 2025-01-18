@@ -23,8 +23,7 @@ namespace Drupal\migrate\Plugin\migrate\source;
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
  *
  * @MigrateSource(
- *   id = "empty",
- *   source_module = "migrate"
+ *   id = "empty"
  * )
  */
 class EmptySource extends SourcePluginBase {

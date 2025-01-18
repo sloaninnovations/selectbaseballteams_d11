@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\migrate\Kernel\Plugin;
+namespace Drupal\Tests\migrate_drupal\Kernel\Plugin;
 
 use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
 use Drupal\migrate\Plugin\Exception\BadPluginDefinitionException;
@@ -41,8 +41,10 @@ class MigrationProvidersExistTest extends MigrateDrupalTestBase {
     $plugin_manager = $this->container->get('plugin.manager.migrate.source');
 
     foreach ($plugin_manager->getDefinitions() as $definition) {
-      $id = $definition['id'];
-      $this->assertArrayHasKey('source_module', $definition, "No source_module property in '$id'");
+      if (in_array('migrate_drupal', $definition['provider'], TRUE)) {
+        $id = $definition['id'];
+        $this->assertArrayHasKey('source_module', $definition, "No source_module property in '$id'");
+      }
     }
   }
 

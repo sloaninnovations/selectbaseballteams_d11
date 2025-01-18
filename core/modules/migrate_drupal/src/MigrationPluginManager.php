@@ -96,12 +96,16 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
     // enforcement.
     $applied_tags = array_intersect($this->getEnforcedSourceModuleTags(), $definition['migration_tags']);
     if ($applied_tags) {
-      // Throw an exception if the source plugin definition does not define a
-      // source_module.
-      $source_id = $definition['source']['plugin'];
-      $source_definition = $this->sourceManager->getDefinition($source_id);
-      if (empty($source_definition['source_module'])) {
-        throw new BadPluginDefinitionException($source_id, 'source_module');
+      // Confirm that source_module is defined for Drupal sourced migrations.
+      // If source_module is not defined in the migration then check for it in
+      // the source plugin. Throw an exception if the source plugin has
+      // migrate_drupal as a provider but does not define a source_module.
+      if (empty($definition['source']['source_module'])) {
+        $source_id = $definition['source']['plugin'];
+        $source_definition = $this->sourceManager->getDefinition($source_id);
+        if (in_array('migrate_drupal', $source_definition['provider'], TRUE) && empty($source_definition['source_module'])) {
+          throw new BadPluginDefinitionException($source_id, 'source_module');
+        }
       }
     }
   }
