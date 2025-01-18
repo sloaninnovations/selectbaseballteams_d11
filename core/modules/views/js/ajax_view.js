@@ -100,13 +100,13 @@
     this.settings = settings;
 
     // Add the ajax to exposed forms.
-    this.$exposed_form = $(
+    this.$exposedForm = $(
       `form#views-exposed-form-${settings.view_name.replace(
         /_/g,
         '-',
       )}-${settings.view_display_id.replace(/_/g, '-')}`,
     );
-    once('exposed-form', this.$exposed_form).forEach(
+    once('exposed-form', this.$exposedForm).forEach(
       this.attachExposedFormAjax.bind(this),
     );
 
@@ -144,7 +144,7 @@
     // break during the form reset phase if using AJAX.
     $(
       'input[type=submit], button[type=submit], input[type=image]',
-      this.$exposed_form,
+      this.$exposedForm,
     )
       .not('[data-drupal-selector=edit-reset]')
       .each(function (index) {
@@ -152,8 +152,39 @@
           base: $(this).attr('id'),
           element: this,
         });
+
+        selfSettings.url = that.removeExposedFiltersQueryParameters(selfSettings.url, that.$exposedForm);
         that.exposedFormAjax[index] = Drupal.ajax(selfSettings);
       });
+  };
+
+  /**
+   * Sanitizes the AJAX URL removing the parameters existing in the exposed form.
+   *
+   * @param {string} url
+   *   The AJAX URL.
+   * @param {jQuery} $exposedForm
+   *   The exposed form element.
+   *
+   * @return {string}
+   *   The modified AJAX URL without the query parameters existing in the exposed form.
+   */
+  Drupal.views.ajaxView.prototype.removeExposedFiltersQueryParameters = function (url, $exposedForm) {
+    const urlObj = new URL(url, window.location.origin);
+    // Use copy to keep the iterator consistent.
+    const urlObjCopy = new URL(url, window.location.origin);
+    const cleanKeys = {};
+    // Operate with element names to handle empty values.
+    $exposedForm.find('[name]').each((i, el) => {
+      cleanKeys[el.getAttribute('name').split('[')[0]] = true;
+    });
+    urlObjCopy.searchParams.forEach((value, key) => {
+      if (cleanKeys[key.split('[')[0]]) {
+        urlObj.searchParams.delete(key);
+      }
+    });
+
+    return urlObj.pathname + urlObj.search;
   };
 
   /**
@@ -205,6 +236,7 @@
       element: link,
       httpMethod: 'GET',
     });
+    selfSettings.url = this.removeExposedFiltersQueryParameters(selfSettings.url, this.$exposedForm);
     this.pagerAjax = Drupal.ajax(selfSettings);
   };
 })(jQuery, Drupal, drupalSettings);
