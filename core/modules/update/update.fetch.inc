@@ -19,6 +19,8 @@ use Drupal\update\UpdateManagerInterface;
 #[StopProceduralHookScan]
 function _update_cron_notify() {
   $update_config = \Drupal::config('update.settings');
+  // This loadInclude is to ensure that the install api is available.
+  \Drupal::moduleHandler()->loadInclude('update', 'install');
   $status = \Drupal::moduleHandler()->invoke('update', 'runtime_requirements');
   $params = [];
   $notify_all = ($update_config->get('notification.threshold') == 'all');

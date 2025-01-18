@@ -89,6 +89,8 @@ class UpdateHooks {
           $verbose = TRUE;
           break;
       }
+      // This loadInclude is to ensure that the install api is available.
+      \Drupal::moduleHandler()->loadInclude('update', 'install');
       $status = \Drupal::moduleHandler()->invoke('update', 'runtime_requirements');
       foreach (['core', 'contrib'] as $report_type) {
         $type = 'update_' . $report_type;
