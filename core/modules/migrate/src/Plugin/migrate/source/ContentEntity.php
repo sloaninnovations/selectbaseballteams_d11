@@ -94,8 +94,8 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
    */
   public function __construct(
     array $configuration,
-    $plugin_id,
-    $plugin_definition,
+    string $plugin_id,
+    array $plugin_definition,
     MigrationInterface $migration,
     protected EntityTypeManagerInterface $entityTypeManager,
     protected EntityFieldManagerInterface $entityFieldManager,
