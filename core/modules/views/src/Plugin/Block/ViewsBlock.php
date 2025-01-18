@@ -88,6 +88,11 @@ class ViewsBlock extends ViewsBlockBase {
     // Set the label to the static title configured in the view.
     if (!empty($configuration['views_label'])) {
       $configuration['label'] = $configuration['views_label'];
+
+      $view = $this->getViewExecutable();
+      if (!$view->total_rows && $view->getDisplay()->getOption('block_hide_empty')) {
+        $configuration['label'] = '';
+      }
     }
 
     return $configuration;
