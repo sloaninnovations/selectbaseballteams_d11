@@ -21,7 +21,8 @@ class RssResponseRelativeUrlFilter implements EventSubscriberInterface {
    */
   public function onResponse(ResponseEvent $event) {
     // Only care about RSS responses.
-    if (stripos($event->getResponse()->headers->get('Content-Type', ''), 'application/rss+xml') === FALSE) {
+    $content_type = $response->headers->get('Content-Type');
+    if (empty($content_type) || !(str_starts_with($content_type, 'application/rss+xml'))) {
       return;
     }
 
