@@ -907,7 +907,12 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
   /**
    * The MIME type map.
    */
-  protected MimeTypeMapInterface $map;
+  protected readonly MimeTypeMapInterface $map;
+
+  /**
+   *   The file system.
+   */
+  protected readonly FileSystemInterface $fileSystem;
 
   /**
    * Constructs a new ExtensionMimeTypeGuesser.
@@ -918,8 +923,8 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
    *   The file system.
    */
   public function __construct(
-    ModuleHandlerInterface | MimeTypeMapInterface $map,
-    protected ?FileSystemInterface $fileSystem = NULL,
+    MimeTypeMapInterface|ModuleHandlerInterface $map,
+    ?FileSystemInterface $fileSystem = NULL,
   ) {
     if (!$map instanceof MimeTypeMapInterface) {
       @trigger_error(
@@ -935,19 +940,28 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
       $this->moduleHandler = \Drupal::service(MimeTypeMapInterface::class);
     }
     $this->map = $map;
-    if (!$this->fileSystem) {
+    if (!$fileSystem) {
       @trigger_error(
         'Calling ' . __METHOD__ . '() without the $fileSystem argument is deprecated in drupal:11.2.0 and is required in drupal:12.0.0. See https://www.drupal.org/node/3494040',
         E_USER_DEPRECATED
       );
-      $this->fileSystem = \Drupal::service('file_system');
+      $fileSystem = \Drupal::service('file_system');
     }
+    $this->fileSystem = $fileSystem;
   }
 
   /**
    * {@inheritdoc}
    */
   public function guessMimeType($path): ?string {
+    if (!isset($this->fileSystem)) {
+      @trigger_error(
+        'Calling ' . __METHOD__ . '() without the file_system service already injected is deprecated in drupal:11.2.0 and throws an exception in drupal:12.0.0. See https://www.drupal.org/node/3494040',
+        E_USER_DEPRECATED
+      );
+      $this->fileSystem = \Drupal::service('file_system');
+    }
+
     $extension = '';
     $file_parts = explode('.', $this->fileSystem->basename($path));
 
