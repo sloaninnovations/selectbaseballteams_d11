@@ -24,14 +24,14 @@ class UserRequirementsTest extends KernelTestBase {
   /**
    * Module handler for invoking user requirements.
    */
-  protected $module_handler;
+  protected $moduleHandler;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->module_handler = $this->container->get('module_handler');
+    $this->moduleHandler = $this->container->get('module_handler');
     $this->installEntitySchema('user');
     include_once $this->root . '/core/includes/install.inc';
   }
@@ -43,13 +43,13 @@ class UserRequirementsTest extends KernelTestBase {
    */
   public function testConflictingUserEmails(): void {
 
-    $output = $this->module_handler->invoke('user', 'runtime_requirements');
+    $output = $this->moduleHandler->invoke('user', 'runtime_requirements');
     $this->assertArrayNotHasKey('conflicting emails', $output);
 
     $this->createUser([], 'User A', FALSE, ['mail' => 'unique@example.com']);
     $this->createUser([], 'User B', FALSE, ['mail' => 'UNIQUE@example.com']);
 
-    $output = $this->module_handler->invoke('user', 'runtime_requirements');
+    $output = $this->moduleHandler->invoke('user', 'runtime_requirements');
     $this->assertArrayHasKey('conflicting emails', $output);
   }
 
@@ -58,13 +58,13 @@ class UserRequirementsTest extends KernelTestBase {
    */
   public function testBlankUserEmails(): void {
 
-    $output = $this->module_handler->invoke('user', 'runtime_requirements');
+    $output = $this->moduleHandler->invoke('user', 'runtime_requirements');
     $this->assertArrayNotHasKey('conflicting emails', $output);
 
     $this->createUser([], 'User A', FALSE, ['mail' => '']);
     $this->createUser([], 'User B', FALSE, ['mail' => '']);
 
-    $output = $this->module_handler->invoke('user', 'runtime_requirements');
+    $output = $this->moduleHandler->invoke('user', 'runtime_requirements');
     $this->assertArrayNotHasKey('conflicting emails', $output);
   }
 
