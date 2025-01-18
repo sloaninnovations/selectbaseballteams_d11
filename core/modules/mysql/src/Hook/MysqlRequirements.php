@@ -9,7 +9,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\Markup;
 
 /**
- * Requirements for the image module.
+ * Requirements for the mysql module.
  */
 class MysqlRequirements {
   /**
