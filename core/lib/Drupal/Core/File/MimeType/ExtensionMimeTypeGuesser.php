@@ -937,7 +937,7 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
     }
     else {
       // @phpstan-ignore property.deprecated
-      $this->moduleHandler = \Drupal::service(MimeTypeMapInterface::class);
+      $this->moduleHandler = \Drupal::service(ModuleHandlerInterface::class);
     }
     $this->map = $map;
     if (!$fileSystem) {
@@ -945,7 +945,7 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
         'Calling ' . __METHOD__ . '() without the $fileSystem argument is deprecated in drupal:11.2.0 and is required in drupal:12.0.0. See https://www.drupal.org/node/3494040',
         E_USER_DEPRECATED
       );
-      $fileSystem = \Drupal::service('file_system');
+      $fileSystem = \Drupal::service(FileSystemInterface::class);
     }
     $this->fileSystem = $fileSystem;
   }
@@ -959,7 +959,14 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
         'Calling ' . __METHOD__ . '() without the file_system service already injected is deprecated in drupal:11.2.0 and throws an exception in drupal:12.0.0. See https://www.drupal.org/node/3494040',
         E_USER_DEPRECATED
       );
-      $this->fileSystem = \Drupal::service('file_system');
+      $this->fileSystem = \Drupal::service(FileSystemInterface::class);
+    }
+    if (!isset($this->map)) {
+      @trigger_error(
+        'Calling ' . __METHOD__ . '() without the MimeTypeMapInterface service already injected is deprecated in drupal:11.2.0 and throws an exception in drupal:12.0.0. See https://www.drupal.org/node/3494040',
+        E_USER_DEPRECATED
+      );
+      $this->map = \Drupal::service(MimeTypeMapInterface::class);
     }
 
     $extension = '';
@@ -997,6 +1004,14 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
       __METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\File\MimeType\MimeTypeMapInterface::addMapping() instead or define your own MimeTypeMapInterface implementation. See https://www.drupal.org/node/3494040',
       E_USER_DEPRECATED
     );
+    if (!isset($this->map)) {
+      @trigger_error(
+        'Calling ' . __METHOD__ . '() without the MimeTypeMapInterface service already injected is deprecated in drupal:11.2.0 and throws an exception in drupal:12.0.0. See https://www.drupal.org/node/3494040',
+        E_USER_DEPRECATED
+      );
+      $this->map = \Drupal::service(MimeTypeMapInterface::class);
+    }
+
     // Convert the mapping to be keyed by type.
     $typeMapping = [];
     foreach ($mapping['mimetypes'] as $index => $mimetype) {
