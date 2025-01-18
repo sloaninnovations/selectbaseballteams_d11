@@ -8,7 +8,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
- * Requirements for the udpate_script_test module.
+ * Requirements for the update_script_test module.
  */
 class UpdateScriptTestRequirements {
 

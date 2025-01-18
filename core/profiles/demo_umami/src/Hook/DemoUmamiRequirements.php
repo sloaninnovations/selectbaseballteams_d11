@@ -12,7 +12,7 @@ use Drupal\Core\Hook\Attribute\Hook;
  */
 class DemoUmamiRequirements {
 
-  public function __construct(protected readonly ProfileExtensionList $profileExtenstionList) {}
+  public function __construct(protected readonly ProfileExtensionList $profileExtensionList) {}
 
   /**
    * Implements hook_runtime_requirements().
@@ -21,7 +21,7 @@ class DemoUmamiRequirements {
   public function runtime(): array {
     $requirements = [];
     $profile = \Drupal::installProfile();
-    $info = $this->profileExtenstionList->getExtensionInfo($profile);
+    $info = $this->profileExtensionList->getExtensionInfo($profile);
     $requirements['experimental_profile_used'] = [
       'title' => t('Experimental installation profile used'),
       'value' => $info['name'],

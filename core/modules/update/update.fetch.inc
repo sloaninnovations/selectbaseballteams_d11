@@ -19,8 +19,7 @@ use Drupal\update\UpdateManagerInterface;
 #[StopProceduralHookScan]
 function _update_cron_notify() {
   $update_config = \Drupal::config('update.settings');
-  \Drupal::moduleHandler()->loadInclude('update', 'install');
-  $status = update_requirements('runtime');
+  $status = \Drupal::moduleHandler()->invoke('update', 'runtime_requirements');
   $params = [];
   $notify_all = ($update_config->get('notification.threshold') == 'all');
   foreach (['core', 'contrib'] as $report_type) {
