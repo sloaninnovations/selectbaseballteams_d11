@@ -9,6 +9,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Tests\Core\Entity\ContentEntityBaseMockableClass;
 use Drupal\Tests\UnitTestCase;
@@ -31,6 +32,13 @@ class ContentTranslationManageAccessCheckTest extends UnitTestCase {
   protected $cacheContextsManager;
 
   /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $moduleHandler;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -40,8 +48,10 @@ class ContentTranslationManageAccessCheckTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
     $this->cacheContextsManager->method('assertValidTokens')->willReturn(TRUE);
+    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
 
     $container = new ContainerBuilder();
+    $container->set('module_handler', $this->moduleHandler);
     $container->set('cache_contexts_manager', $this->cacheContextsManager);
     \Drupal::setContainer($container);
   }
@@ -58,11 +68,26 @@ class ContentTranslationManageAccessCheckTest extends UnitTestCase {
       ->method('getTranslationAccess')
       ->willReturn(AccessResult::allowed());
 
+    $entity_type = $this->createMock('Drupal\Core\Entity\ContentEntityTypeInterface');
+    $entity_type->expects($this->once())
+      ->method('isRevisionable')
+      ->willReturn(TRUE);
+
     $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
     $entity_type_manager->expects($this->once())
       ->method('getHandler')
       ->withAnyParameters()
       ->willReturn($translation_handler);
+
+    $entity_type_manager->expects($this->once())
+      ->method('getDefinition')
+      ->with('node')
+      ->willReturn($entity_type);
+
+    $this->moduleHandler->expects($this->once())
+      ->method('moduleExists')
+      ->with('content_moderation')
+      ->willReturn(FALSE);
 
     // Set our source and target languages.
     $source = 'en';
@@ -87,6 +112,9 @@ class ContentTranslationManageAccessCheckTest extends UnitTestCase {
       ->getMock();
     $entity->expects($this->once())
       ->method('getEntityTypeId');
+    $entity->expects($this->once())
+      ->method('bundle')
+      ->willReturn('page');
     $entity->expects($this->once())
       ->method('getTranslationLanguages')
       ->with()
