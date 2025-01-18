@@ -107,18 +107,24 @@ class ContextualLinkManagerTest extends UnitTestCase {
         'class' => '\Drupal\Core\Menu\ContextualLinkDefault',
         'group' => 'group1',
         'route_name' => 'test_route',
+        'title_context' => '',
+        'title_arguments' => [],
       ],
       'test_plugin2' => [
         'id' => 'test_plugin2',
         'class' => '\Drupal\Core\Menu\ContextualLinkDefault',
         'group' => 'group1',
         'route_name' => 'test_route2',
+        'title_context' => '',
+        'title_arguments' => [],
       ],
       'test_plugin3' => [
         'id' => 'test_plugin3',
         'class' => '\Drupal\Core\Menu\ContextualLinkDefault',
         'group' => 'group2',
         'route_name' => 'test_router3',
+        'title_context' => '',
+        'title_arguments' => [],
       ],
     ];
     $this->pluginDiscovery->expects($this->once())
@@ -146,12 +152,16 @@ class ContextualLinkManagerTest extends UnitTestCase {
         'class' => '\Drupal\Core\Menu\ContextualLinkDefault',
         'group' => 'group1',
         'route_name' => 'test_route',
+        'title_context' => '',
+        'title_arguments' => [],
       ],
       'test_plugin2' => [
         'id' => 'test_plugin2',
         'class' => '\Drupal\Core\Menu\ContextualLinkDefault',
         'group' => 'group1',
         'route_name' => 'test_route2',
+        'title_context' => '',
+        'title_arguments' => [],
       ],
     ];
 
@@ -213,6 +223,8 @@ class ContextualLinkManagerTest extends UnitTestCase {
         'weight' => 0,
         'group' => 'group1',
         'route_name' => 'test_route',
+        'title_context' => '',
+        'title_arguments' => [],
         'options' => [],
       ],
       'test_plugin2' => [
@@ -222,6 +234,8 @@ class ContextualLinkManagerTest extends UnitTestCase {
         'weight' => 2,
         'group' => 'group1',
         'route_name' => 'test_route2',
+        'title_context' => '',
+        'title_arguments' => [],
         'options' => ['key' => 'value'],
       ],
       'test_plugin3' => [
@@ -231,6 +245,8 @@ class ContextualLinkManagerTest extends UnitTestCase {
         'weight' => 5,
         'group' => 'group2',
         'route_name' => 'test_router3',
+        'title_context' => '',
+        'title_arguments' => [],
         'options' => [],
       ],
     ];
@@ -273,6 +289,8 @@ class ContextualLinkManagerTest extends UnitTestCase {
         'weight' => 0,
         'group' => 'group1',
         'route_name' => 'test_route',
+        'title_context' => '',
+        'title_arguments' => [],
         'options' => [],
       ],
       'test_plugin2' => [
@@ -282,6 +300,8 @@ class ContextualLinkManagerTest extends UnitTestCase {
         'weight' => 2,
         'group' => 'group1',
         'route_name' => 'test_route2',
+        'title_context' => '',
+        'title_arguments' => [],
         'options' => ['key' => 'value'],
       ],
     ];
@@ -315,6 +335,8 @@ class ContextualLinkManagerTest extends UnitTestCase {
       'weight' => 2,
       'group' => 'group1',
       'route_name' => 'test_route',
+      'title_context' => '',
+      'title_arguments' => [],
       'options' => ['key' => 'value'],
     ];
 
