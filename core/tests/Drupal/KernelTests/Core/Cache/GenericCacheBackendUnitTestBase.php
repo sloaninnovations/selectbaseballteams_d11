@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\Cache;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\KernelTests\KernelTestBase;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests any cache backend.
