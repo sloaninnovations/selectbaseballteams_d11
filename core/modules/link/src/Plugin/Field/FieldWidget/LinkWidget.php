@@ -10,6 +10,8 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\link\LinkItemInterface;
+use Drupal\node\Entity\Node;
+use Drupal\taxonomy\Entity\Term;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -96,13 +98,15 @@ class LinkWidget extends WidgetBase {
    *
    * @param string $string
    *   The user-entered string.
+   * @param string $langcode
+   *   The langcode.
    *
    * @return string
    *   The URI, if a non-empty $uri was passed.
    *
    * @see static::getUriAsDisplayableString()
    */
-  protected static function getUserEnteredStringAsUri($string) {
+  protected static function getUserEnteredStringAsUri($string, $langcode = NULL) {
     // By default, assume the entered string is a URI.
     $uri = trim($string);
 
@@ -112,6 +116,17 @@ class LinkWidget extends WidgetBase {
       // @todo Support entity types other than 'node'. Will be fixed in
       //   https://www.drupal.org/node/2423093.
       $uri = 'entity:node/' . $entity_id;
+      $node = Node::load($entity_id);
+      // On layout builder pages, the langcode is not passed.
+      if (is_null($langcode) && str_contains(\Drupal::routeMatch()->getRouteName(), 'layout_builder') ) {
+        $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+      }
+      if ($node && isset($langcode) && $node->isTranslatable() && $node->hasTranslation($langcode)) {
+        $node = $node->getTranslation($langcode);
+      }
+      if (!$node || (!str_contains($string, $node->label()) && Term::load($entity_id) !== null)) {
+        $uri = 'entity:taxonomy_term/' . $entity_id;
+      }
     }
     // Support linking to nothing.
     elseif (in_array($string, ['<nolink>', '<none>', '<button>'], TRUE)) {
@@ -138,7 +153,7 @@ class LinkWidget extends WidgetBase {
    * Disallows saving inaccessible or untrusted URLs.
    */
   public static function validateUriElement($element, FormStateInterface $form_state, $form) {
-    $uri = static::getUserEnteredStringAsUri($element['#value']);
+    $uri = static::getUserEnteredStringAsUri($element['#value'], $form_state->get('langcode'));
     $form_state->setValueForElement($element, $uri);
 
     // If getUserEnteredStringAsUri() mapped the entered value to an 'internal:'
@@ -214,9 +229,9 @@ class LinkWidget extends WidgetBase {
     // 'url' form element and we have to do the validation ourselves.
     if ($this->supportsInternalLinks()) {
       $element['uri']['#type'] = 'entity_autocomplete';
-      // @todo The user should be able to select an entity type. Will be fixed
-      //   in https://www.drupal.org/node/2423093.
-      $element['uri']['#target_type'] = 'node';
+      // Dirty hack around https://www.drupal.org/node/2423093
+      // @todo: remove when the issue is fixed.
+      $element['uri']['#target_type'] = 'node,taxonomy_term';
       // Disable autocompletion when the first character is '/', '#' or '?'.
       $element['uri']['#attributes']['data-autocomplete-first-character-blacklist'] = '/#?';
 
