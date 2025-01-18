@@ -71,10 +71,12 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
         'Calling ' . __METHOD__ . '() with the $map argument as an instance of \Drupal\Core\Extension\ModuleHandlerInterface is deprecated in drupal:11.2.0 and an instance of \Drupal\Core\File\MimeType\MimeTypeMapInterface is required in drupal:12.0.0. See https://www.drupal.org/node/3494040',
         E_USER_DEPRECATED
       );
+      // @phpstan-ignore property.deprecated
       $this->moduleHandler = $map;
       $map = \Drupal::service(MimeTypeMapInterface::class);
     }
     else {
+      // @phpstan-ignore property.deprecated
       $this->moduleHandler = \Drupal::service(MimeTypeMapInterface::class);
     }
     $this->map = $map;
