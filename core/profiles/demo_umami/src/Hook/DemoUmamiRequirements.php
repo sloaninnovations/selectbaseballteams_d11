@@ -12,7 +12,7 @@ use Drupal\Core\Hook\Attribute\Hook;
  */
 class DemoUmamiRequirements {
 
-  public function __construct(protected readonly  ProfileExtensionList $profileExtenstionList) {}
+  public function __construct(protected readonly ProfileExtensionList $profileExtenstionList) {}
 
   /**
    * Implements hook_runtime_requirements().
