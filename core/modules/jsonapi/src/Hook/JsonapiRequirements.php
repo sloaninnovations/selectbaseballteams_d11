@@ -23,7 +23,7 @@ class JsonapiRequirements {
    * Implements hook_runtime_requirements().
    */
   #[Hook('runtime_requirements')]
-  public function runtime() {
+  public function runtime(): array {
     $requirements = [];
     $potential_conflicts = [
       'content_translation',

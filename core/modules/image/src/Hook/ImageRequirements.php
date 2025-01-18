@@ -8,7 +8,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\ImageToolkit\ImageToolkitManager;
 
 /**
- * Requirements for the Image module.
+ * Requirements for the image module.
  */
 class ImageRequirements {
 
@@ -18,7 +18,7 @@ class ImageRequirements {
    * Implements hook_runtime_requirements().
    */
   #[Hook('runtime_requirements')]
-  public function runtime() {
+  public function runtime(): array {
     $toolkit = $this->imageToolkitManager->getDefaultToolkit();
     if ($toolkit) {
       $plugin_definition = $toolkit->getPluginDefinition();
