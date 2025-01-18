@@ -1,20 +1,23 @@
 <?php
 
-/**
- * @file
- * Install, update and uninstall functions for the mysql module.
- */
+declare(strict_types=1);
+
+namespace Drupal\mysql\Hook;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\Markup;
 
 /**
- * Implements hook_requirements().
+ * Requirements for the image module.
  */
-function mysql_requirements($phase): array {
-  $requirements = [];
-
-  if ($phase === 'runtime') {
+class MysqlRequirements {
+  /**
+   * Implements hook_runtime_requirements().
+   */
+  #[Hook('runtime_requirements')]
+  public function runtime(): array {
+    $requirements = [];
     // Test with MySql databases.
     if (Database::isActiveConnection()) {
       $connection = Database::getConnection();
@@ -71,7 +74,8 @@ function mysql_requirements($phase): array {
         'description' => Markup::create(implode(' ', $description)),
       ];
     }
+
+    return $requirements;
   }
 
-  return $requirements;
 }
