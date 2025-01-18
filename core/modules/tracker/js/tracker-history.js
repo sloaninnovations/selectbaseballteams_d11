@@ -123,7 +123,7 @@
           'data-history-node-id',
         );
         if (Drupal.history.needsServerCheck(nodeID, lastCommentTimestamp)) {
-          if (nodeIDs.indexOf(nodeID) === -1) {
+          if (!nodeIDs.includes(nodeID)) {
             nodeIDs.push(nodeID);
           }
           return true;
