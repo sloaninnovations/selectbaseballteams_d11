@@ -30,6 +30,7 @@ function tracker_views_data() {
       'name field' => 'title',
       'numeric' => TRUE,
       'validate type' => 'nid',
+      'entity_type' => 'node',
     ],
     'filter' => [
       'id' => 'numeric',
@@ -93,6 +94,7 @@ function tracker_views_data() {
       'name field' => 'title',
       'numeric' => TRUE,
       'validate type' => 'nid',
+      'entity_type' => 'node',
     ],
     'filter' => [
       'id' => 'numeric',
@@ -110,6 +112,7 @@ function tracker_views_data() {
     'argument' => [
       'id' => 'user_uid',
       'name field' => 'name',
+      'entity_type' => 'user',
     ],
     'filter' => [
       'title' => t('Name'),
