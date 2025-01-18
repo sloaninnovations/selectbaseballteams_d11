@@ -2433,6 +2433,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       '#embed' => FALSE,
       '#view' => $this->view,
       '#cache_properties' => ['#view_id', '#view_display_show_admin_links', '#view_display_plugin_id'],
+      '#view_display_show_admin_links' => $this->view->getShowAdminLinks(),
+      '#view_display_plugin_id' => $this->display['display_plugin'],
+      '#view_id' => $this->view->storage->id(),
     ];
 
     // When something passes $cache = FALSE, they're asking us not to create our
@@ -2459,6 +2462,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       // still be bubbled.
       unset($this->view->element['#cache']['keys']);
     }
+
+    // Attach the contextual links directly to the view.
+    views_add_contextual_links($this->view->element, "block", $this->display['id']);
 
     return $this->view->element;
   }
