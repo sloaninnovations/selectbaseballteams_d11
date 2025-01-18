@@ -7,7 +7,7 @@ namespace Drupal\node\Hook;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\StringTranslation\TranslationManager;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 
 /**
@@ -18,7 +18,7 @@ class NodeRequirements {
   public function __construct(
     protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly ModuleHandlerInterface $moduleHandler,
-    protected readonly TranslationManager $translationManager,
+    protected readonly TranslationInterface $translation,
   ) {}
 
   /**
@@ -32,7 +32,7 @@ class NodeRequirements {
     // implement hook_node_grants().
     $grant_count = $this->entityTypeManager->getAccessControlHandler('node')->countGrants();
     if ($grant_count != 1 || $this->moduleHandler->hasImplementations('node_grants')) {
-      $value = $this->translationManager->formatPlural($grant_count, 'One permission in use', '@count permissions in use', ['@count' => $grant_count]);
+      $value = $this->translation->formatPlural($grant_count, 'One permission in use', '@count permissions in use', ['@count' => $grant_count]);
     }
     else {
       $value = t('Disabled');
