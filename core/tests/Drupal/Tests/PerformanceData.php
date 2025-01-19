@@ -57,6 +57,13 @@ class PerformanceData {
   protected int $cacheDeleteCount = 0;
 
   /**
+   * List of cids keyed by operation and bin.
+   *
+   * @var string[][]
+   */
+  protected array $cacheOperations = [];
+
+  /**
    * The number of cache tag checksum checks.
    */
   protected int $cacheTagChecksumCount = 0;
@@ -205,6 +212,58 @@ class PerformanceData {
    */
   public function getCacheGetCount(): int {
     return $this->cacheGetCount;
+  }
+
+  /**
+   * Sets the cache operations.
+   *
+   * @param string[][] $cacheOperations
+   *   List of cids keyed by operation and bin.
+   *
+   * @return void
+   */
+  public function setCacheOperations(array $cacheOperations): void {
+    $this->cacheOperations = $cacheOperations;
+  }
+
+  /**
+   * Gets the cache operations.
+   *
+   * @return string[][]
+   *   List of cids keyed by operation and bin.
+   */
+  public function getCacheOperations(): array {
+    return $this->cacheOperations;
+  }
+
+  /**
+   * Returns the cache get operation count grouped by bin.
+   *
+   * @return int[]
+   *   Count of cache get operations keyed by bin.
+   */
+  public function getCacheGetCountByBin(): array {
+    return array_map(fn (array $cids) => count($cids), $this->cacheOperations['get'] ?? []);
+  }
+
+  /**
+   * Returns the cache set operation count grouped by bin.
+   *
+   * @return int[]
+   *   Count of cache set operations keyed by bin.
+   */
+  public function getCacheSetCountByBin(): array {
+    return array_map(fn (array $cids) => count($cids), $this->cacheOperations['set'] ?? []);
+  }
+
+  /**
+   * Returns the cache delete operation count grouped by bin.
+   *
+   * @return int[]
+   *   Count of cache delete operations keyed by bin.
+   */
+  public function getCacheDeleteCountByBin(): array {
+    return array_map(fn (array $cids) => count($cids), $this->cacheOperations['delete'] ?? []);
   }
 
   /**

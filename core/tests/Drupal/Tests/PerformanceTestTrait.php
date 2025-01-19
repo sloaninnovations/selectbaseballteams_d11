@@ -144,14 +144,18 @@ trait PerformanceTestTrait {
           );
         }
       }
+      $cache_operations = [];
       foreach ($performance_test_data['cache_operations'] as $operation) {
         if (in_array($operation['operation'], ['get', 'getMultiple'], TRUE)) {
+          $cache_operations['get'][$operation['bin']] = array_merge($cache_operations['get'][$operation['bin']] ?? [], explode(', ', $operation['cids']));
           $cache_get_count++;
         }
         elseif (in_array($operation['operation'], ['set', 'setMultiple'], TRUE)) {
+          $cache_operations['set'][$operation['bin']] = array_merge($cache_operations['set'][$operation['bin']] ?? [], explode(', ', $operation['cids']));
           $cache_set_count++;
         }
         elseif (in_array($operation['operation'], ['delete', 'deleteMultiple'], TRUE)) {
+          $cache_operations['delete'][$operation['bin']] = array_merge($cache_operations['delete'][$operation['bin']] ?? [], explode(', ', $operation['cids']));
           $cache_delete_count++;
         }
       }
@@ -168,6 +172,7 @@ trait PerformanceTestTrait {
       $performance_data->setCacheTagChecksumCount($cache_tag_checksum_count);
       $performance_data->setCacheTagIsValidCount($cache_tag_is_valid_count);
       $performance_data->setCacheTagInvalidationCount($cache_tag_invalidation_count);
+      $performance_data->setCacheOperations($cache_operations);
     }
 
     return $performance_data;
