@@ -120,6 +120,8 @@ class FileStorage implements PhpStorageInterface {
       }
       else {
         // Something failed and the directory doesn't exist.
+        // The directory path is not disclosed for security reasons.
+        // @see https://www.drupal.org/project/drupal/issues/3032737
         trigger_error('mkdir(): Permission Denied', E_USER_WARNING);
       }
     }
