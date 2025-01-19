@@ -69,7 +69,9 @@ class PathAliasTest extends ResourceTestBase {
       'path' => '/<front>',
       'langcode' => 'en',
     ]);
+    $path_alias->setChangedTime(123456789);
     $path_alias->save();
+
     return $path_alias;
   }
 
@@ -102,6 +104,7 @@ class PathAliasTest extends ResourceTestBase {
         'attributes' => [
           'alias' => '/frontpage1',
           'path' => '/<front>',
+          'changed' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'langcode' => 'en',
           'status' => TRUE,
           'drupal_internal__id' => 1,
