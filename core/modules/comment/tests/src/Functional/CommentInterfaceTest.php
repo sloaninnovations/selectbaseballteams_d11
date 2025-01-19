@@ -173,6 +173,17 @@ class CommentInterfaceTest extends CommentTestBase {
     $reply_loaded->save();
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment/' . $reply_loaded->id());
     $this->assertSession()->statusCodeEquals(403);
+    $this->assertSession()->pageTextContains(t('You are not authorized to access this page.'), 'Replying to an unpublished comment is not possible with insufficient permissions.');
+    // Attempt to reply to an unpublished comment as an administrator.
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment/' . $reply_loaded->id());
+    $this->assertSession()->statusCodeEquals(200);
+    $reply = $this->postComment(NULL, $this->randomMachineName(), $this->randomMachineName(), TRUE);
+    $this->assertTrue($this->commentExists($reply, TRUE), 'An administration user was able to comment to an unpublished comment.');
+    // Make sure the reply on the unpublished comment is unpublished as well.
+    $this->drupalLogin($this->webUser);
+    $this->drupalGet('node/' . $this->node->getOriginalId());
+    $this->assertFalse($this->commentExists($reply), 'The unpublished reply was not found.');
 
     // Attempt to post to node with comments disabled.
     $this->node = $this->drupalCreateNode(['type' => 'article', 'promote' => 1, 'comment' => [['status' => CommentItemInterface::HIDDEN]]]);
