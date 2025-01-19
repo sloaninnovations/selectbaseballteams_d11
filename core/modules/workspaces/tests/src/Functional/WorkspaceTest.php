@@ -373,4 +373,36 @@ class WorkspaceTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Successful publication.');
   }
 
+  /**
+   * Verifies that a workspace can be published.
+   */
+  public function testPublishWorkspace() {
+    $this->createContentType(['type' => 'test', 'label' => 'Test']);
+    $this->drupalLogin($this->rootUser);
+
+    $this->drupalGet('/admin/config/workflow/workspaces/add');
+    $this->submitForm([
+      'id' => 'test_workspace',
+      'label' => 'Test workspace',
+    ], 'Save');
+
+    // Activate the test workspace.
+    $this->drupalGet('/admin/config/workflow/workspaces/manage/test_workspace/activate');
+    $this->submitForm([], 'Confirm');
+
+    $this->drupalGet('/admin/config/workflow/workspaces/manage/test_workspace/publish');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('There are no changes that can be published from Test workspace to Live.');
+
+    // Create a node in the workspace.
+    $node = $this->createNodeThroughUi('Test node', 'test');
+
+    $this->drupalGet('/admin/config/workflow/workspaces/manage/test_workspace/publish');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('There is 1 item that can be published from Test workspace to Live');
+
+    $this->getSession()->getPage()->pressButton('Publish 1 item to Live');
+    $this->assertSession()->pageTextContains('Successful publication.');
+  }
+
 }
