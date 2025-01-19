@@ -404,7 +404,7 @@ final class DocParser
      * @param string     $expected Expected string.
      * @param array|null $token    Optional token.
      *
-     * @return void
+     * @return never
      *
      * @throws AnnotationException
      */
