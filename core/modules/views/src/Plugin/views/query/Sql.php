@@ -1748,6 +1748,7 @@ class Sql extends QueryPluginBase {
    * Gets all the involved entities of the view.
    *
    * @return \Drupal\Core\Entity\EntityInterface[]
+   *   The involved entities.
    */
   protected function getAllEntities() {
     $entities = [];
