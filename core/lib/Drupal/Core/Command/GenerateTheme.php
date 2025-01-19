@@ -144,22 +144,39 @@ class GenerateTheme extends Command {
       'old' => self::namePatterns($starterkit->getName(), $starterkit->info['name']),
       'new' => self::namePatterns($destination_theme, $theme_label),
     ];
+
+    // Generate unique placeholders for each pattern key in $patterns['old'].
+    $placeholders = [];
+    foreach (array_keys($patterns['old']) as $key) {
+      $placeholders[$key] = '__' . strtoupper($key) . '__';
+    }
+
+    // Step 1: Replace old patterns with placeholders in content.
     $filesToEdit = self::createFilesFinder($tmpDir)
       ->contains(array_values($patterns['old']))
       ->notPath($starterkit_config['no_edit']);
     foreach ($filesToEdit as $file) {
       $contents = file_get_contents($file->getRealPath());
-      $contents = str_replace($patterns['old'], $patterns['new'], $contents);
+      $contents = str_replace($patterns['old'], $placeholders, $contents);
       file_put_contents($file->getRealPath(), $contents);
     }
 
+    // Step 2: Replace placeholders with new patterns in content.
+    foreach ($filesToEdit as $file) {
+      $contents = file_get_contents($file->getRealPath());
+      $contents = str_replace($placeholders, $patterns['new'], $contents);
+      file_put_contents($file->getRealPath(), $contents);
+    }
+
+    // Step 3: Repeat for file renaming.
     $filesToRename = self::createFilesFinder($tmpDir)
       ->name(array_map(static fn (string $pattern) => "*$pattern*", array_values($patterns['old'])))
       ->notPath($starterkit_config['no_rename']);
     foreach ($filesToRename as $file) {
       $filepath_segments = explode('/', $file->getRealPath());
       $filename = array_pop($filepath_segments);
-      $filename = str_replace($patterns['old'], $patterns['new'], $filename);
+      $filename = str_replace($patterns['old'], $placeholders, $filename);
+      $filename = str_replace($placeholders, $patterns['new'], $filename);
       $filepath_segments[] = $filename;
       $filesystem->rename($file->getRealPath(), implode('/', $filepath_segments));
     }

@@ -46,6 +46,69 @@ class GenerateThemeTest extends QuickStartTestBase {
   }
 
   /**
+   * Tests generating theme from a simple named Starterkit enabled theme.
+   */
+  public function testSimpleStarterkitTheme(): void {
+    $starterkit_theme_path_relative = 'themes/simple';
+    mkdir($this->getWorkspaceDirectory() . '/' . $starterkit_theme_path_relative);
+    file_put_contents($this->getWorkspaceDirectory() . '/themes/simple/simple.info.yml', Yaml::encode([
+      'name' => 'Simple',
+      'type' => 'theme',
+      'base theme' => FALSE,
+      'core_version_requirement' => '*',
+    ]));
+    file_put_contents($this->getWorkspaceDirectory() . '/themes/simple/simple.starterkit.yml', Yaml::encode([
+      'ignore' => ['/simple.starterkit.yml'],
+      'no_edit' => [],
+      'no_rename' => [],
+      'info' => [
+        'version' => '1.0.0',
+      ],
+    ]));
+    $fixture = <<<FIXTURE
+# machine_name
+simple
+# label
+Simple
+# machine_class_name
+Simple
+# label_class_name
+Simple
+FIXTURE;
+    file_put_contents($this->getWorkspaceDirectory() . '/themes/simple/README.md', $fixture);
+
+    $this->assertFileExists($this->getWorkspaceDirectory() . "/$starterkit_theme_path_relative/simple.info.yml");
+    $this->assertThemeExists($starterkit_theme_path_relative);
+
+    $tester = $this->runCommand([
+      'machine-name' => 'simple_theme',
+      '--name' => 'Simple Theme',
+      '--description' => 'Custom theme generated from a Simple Starterkit theme',
+      '--starterkit' => 'simple',
+    ]);
+
+    $tester->assertCommandIsSuccessful();
+    $theme_path_relative = 'themes/simple_theme';
+    $this->assertThemeExists($theme_path_relative);
+
+    $info = $this->assertThemeExists($theme_path_relative);
+    self::assertEquals('Simple Theme', $info['name']);
+    $readme_file = $this->getWorkspaceDirectory() . "/$theme_path_relative/README.md";
+    $this->assertFileExists($readme_file);
+    $fixture = <<<FIXTURE
+# machine_name
+simple_theme
+# label
+Simple Theme
+# machine_class_name
+SimpleTheme
+# label_class_name
+SimpleTheme
+FIXTURE;
+    $this->assertSame($fixture, file_get_contents($readme_file));
+  }
+
+  /**
    * Generates PHP process to generate a theme from core's starterkit theme.
    *
    * @return \Symfony\Component\Process\Process
