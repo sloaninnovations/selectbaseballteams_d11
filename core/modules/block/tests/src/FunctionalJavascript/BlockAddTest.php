@@ -30,6 +30,7 @@ class BlockAddTest extends WebDriverTestBase {
    * Tests the AJAX for the theme selector.
    */
   public function testBlockAddThemeSelector(): void {
+    $this->assertTrue(FALSE);
     \Drupal::service('theme_installer')->install(['claro']);
 
     $this->drupalLogin($this->drupalCreateUser([
