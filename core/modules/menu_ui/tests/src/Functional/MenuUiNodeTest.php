@@ -282,6 +282,77 @@ class MenuUiNodeTest extends BrowserTestBase {
   }
 
   /**
+   * Testing menu link is NOT updated when unchanged.
+   */
+  public function testMenuLinkIsNotUpdatedWhenUnchanged(): void {
+    // Create a node.
+    $node_title = $this->randomMachineName();
+    $edit = [
+      'title[0][value]' => $node_title,
+      'body[0][value]' => $this->randomString(),
+    ];
+    $this->drupalGet('node/add/page');
+    $this->submitForm($edit, 'Save');
+    $node = $this->drupalGetNodeByTitle($node_title);
+
+    // Add a menu link to the Main menu.
+    $original = MenuLinkContent::create([
+      'link' => [['uri' => 'entity:node/' . $node->id()]],
+      'title' => $node_title,
+      'menu_name' => 'main',
+    ]);
+    $original->save();
+
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $edit = [
+      'body[0][value]' => $this->randomString(),
+    ];
+    $this->submitForm($edit, 'Save');
+
+    $link = MenuLinkContent::load($original->id());
+
+    // Assert that the menu link updated date has not been updated.
+    $this->assertEquals($original->getChangedTime(), $link->getChangedTime());
+  }
+
+  /**
+   * Testing menu link is only changed when updated.
+   */
+  public function testMenuLinkIsOnlyUpdatedWhenChanged(): void {
+    // Create a node.
+    $node_title = $this->randomMachineName();
+    $edit = [
+      'title[0][value]' => $node_title,
+      'body[0][value]' => $this->randomString(),
+    ];
+    $this->drupalGet('node/add/page');
+    $this->submitForm($edit, 'Save');
+    $node = $this->drupalGetNodeByTitle($node_title);
+
+    // Add a menu link to the Main menu.
+    $original = MenuLinkContent::create([
+      'link' => [['uri' => 'entity:node/' . $node->id()]],
+      'title' => $node_title,
+      'menu_name' => 'main',
+    ]);
+    $original->save();
+
+    $menu_title = $this->randomString();
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $edit = [
+      'menu[title]' => $menu_title,
+    ];
+    $this->submitForm($edit, 'Save');
+
+    $link = MenuLinkContent::load($original->id());
+
+    // Assert that the menu link updated date has not been updated.
+    $this->assertNotEquals($original->getChangedTime(), $link->getChangedTime());
+    // Assert the link title is correct.
+    $this->assertEquals($menu_title, $link->title->value);
+  }
+
+  /**
    * Testing correct loading and saving of menu links via node form widget in a multilingual environment.
    */
   public function testMultilingualMenuNodeFormWidget(): void {

@@ -34,6 +34,8 @@ function _menu_ui_node_save(NodeInterface $node, array $values) {
       $entity = $entity->getUntranslated();
       $entity->set($entity->getEntityType()->getKey('langcode'), $node->language()->getId());
     }
+    // Store the original entity before it is updated.
+    $entity->original = clone $entity;
   }
   else {
     // Create a new menu_link_content entity.
@@ -48,8 +50,12 @@ function _menu_ui_node_save(NodeInterface $node, array $values) {
   $entity->menu_name->value = $values['menu_name'];
   $entity->parent->value = $values['parent'];
   $entity->weight->value = $values['weight'] ?? 0;
-  $entity->isDefaultRevision($node->isDefaultRevision());
-  $entity->save();
+  // Check for changes to the menu link content.
+  if ($entity->hasTranslationChanges()) {
+    $entity->isDefaultRevision($node->isDefaultRevision());
+    $entity->setChangedTime(\Drupal::service('datetime.time')->getRequestTime());
+    $entity->save();
+  }
 }
 
 /**
