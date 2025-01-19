@@ -51,7 +51,6 @@ parameters:
     # Ignore common errors for now.
     - "#Drupal calls should be avoided in classes, use dependency injection instead#"
     - "#^Class .* extends @internal class#"
-    - identifier: missingType.iterableValue
 
 rules:
   - Drupal\PHPStan\Rules\ComponentTestDoesNotExtendCoreTest
