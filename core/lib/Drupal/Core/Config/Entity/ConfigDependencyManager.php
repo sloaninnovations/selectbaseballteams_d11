@@ -265,6 +265,7 @@ class ConfigDependencyManager {
   protected function getGraph() {
     if (!isset($this->graph)) {
       $graph = [];
+      $user_roles = [];
       foreach ($this->data as $entity) {
         $graph_key = $entity->getConfigDependencyName();
         if (!isset($graph[$graph_key])) {
@@ -273,6 +274,9 @@ class ConfigDependencyManager {
             'name' => $graph_key,
           ];
         }
+        if (str_starts_with($graph_key, 'user.role.')) {
+          $user_roles[$graph_key] = $entity;
+        }
         // Include all dependencies in the graph so that topographical sorting
         // works.
         foreach (array_merge($entity->getDependencies('config'), $entity->getDependencies('module'), $entity->getDependencies('theme')) as $dependency) {
@@ -280,6 +284,22 @@ class ConfigDependencyManager {
           $graph[$dependency]['name'] = $dependency;
         }
       }
+
+      // Ensure the user roles are added to the module/theme config dependency
+      // edges. This is necessary so that permissions declared via
+      // permission_callbacks which rely on config entities are installed first.
+      foreach ($user_roles as $user_role_graph_key => $user_role) {
+        foreach (['module', 'theme'] as $dependency_type) {
+          foreach ($user_role->getDependencies($dependency_type) as $dependency) {
+            foreach (array_keys($graph[$dependency]['edges']) as $edge_dependency) {
+              if (!str_starts_with($edge_dependency, 'user.role.')) {
+                $graph[$edge_dependency]['edges'][$user_role_graph_key] = TRUE;
+              }
+            }
+          }
+        }
+      }
+
       // Ensure that order of the graph is consistent.
       krsort($graph);
       $graph_object = new Graph($graph);

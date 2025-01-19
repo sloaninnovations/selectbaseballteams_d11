@@ -116,6 +116,33 @@ class ConfigDependencyManagerTest extends UnitTestCase {
       ['block.block.b', 'block.block.a', 'provider.entity_c', 'provider.entity_a', 'provider.entity_b'],
     ];
 
+    $datasets[] = [
+      [
+        // The anonymous role must be loaded after the configs provided by
+        // aaa_provider and zzz_provider.
+        'user.role.anonymous' => ['dependencies' => ['module' => ['aaa_provider', 'zzz_provider']]],
+        'user.role.authenticated' => [],
+        'zzz_provider.entity_a' => [],
+        'zzz_another_provider.entity_a' => [],
+        'aaa_provider.entity_b' => ['dependencies' => ['module' => ['system']]],
+        'block.block.b' => [],
+        'block.block.a' => ['dependencies' => ['module' => ['system']]],
+        'aaa_provider.entity_a' => ['dependencies' => ['config' => ['aaa_provider.entity_c']]],
+        'aaa_provider.entity_c' => ['dependencies' => ['config' => ['block.block.a']]],
+      ],
+      [
+        'block.block.b',
+        'block.block.a',
+        'aaa_provider.entity_c',
+        'aaa_provider.entity_a',
+        'aaa_provider.entity_b',
+        'user.role.authenticated',
+        'zzz_provider.entity_a',
+        'user.role.anonymous',
+        'zzz_another_provider.entity_a',
+      ],
+    ];
+
     return $datasets;
   }
 
