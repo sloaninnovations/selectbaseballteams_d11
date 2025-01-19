@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Drupal\search\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\search\SearchPageRepositoryInterface;
 
 /**
  * Requirements for the search module.
  */
 class SearchRequirements {
+
+  use StringTranslationTrait;
 
   public function __construct(
     protected readonly SearchPageRepositoryInterface $searchPageRepository,
@@ -37,8 +40,8 @@ class SearchRequirements {
     // will show as 99%, to indicate "almost done".
     $percent = ($total > 0 ? floor(100 * $done / $total) : 100);
     $requirements['search_status'] = [
-      'title' => t('Search index progress'),
-      'value' => t('@percent% (@remaining remaining)', ['@percent' => $percent, '@remaining' => $remaining]),
+      'title' => $this->t('Search index progress'),
+      'value' => $this->t('@percent% (@remaining remaining)', ['@percent' => $percent, '@remaining' => $remaining]),
       'severity' => REQUIREMENT_INFO,
     ];
     return $requirements;

@@ -7,11 +7,14 @@ namespace Drupal\mysql\Hook;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Requirements for the mysql module.
  */
 class MysqlRequirements {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_runtime_requirements().
@@ -55,21 +58,21 @@ class MysqlRequirements {
         }
         else {
           $severity_level = REQUIREMENT_ERROR;
-          $description[] = t('This is not supported by Drupal.');
+          $description[] = $this->t('This is not supported by Drupal.');
         }
-        $description[] = t('The recommended level for Drupal is "READ COMMITTED".');
+        $description[] = $this->t('The recommended level for Drupal is "READ COMMITTED".');
       }
 
       if (!empty($tables_missing_primary_key)) {
-        $description[] = t('For this to work correctly, all tables must have a primary key. The following table(s) do not have a primary key: @tables.', ['@tables' => implode(', ', $tables_missing_primary_key)]);
+        $description[] = $this->t('For this to work correctly, all tables must have a primary key. The following table(s) do not have a primary key: @tables.', ['@tables' => implode(', ', $tables_missing_primary_key)]);
       }
 
-      $description[] = t('See the <a href=":performance_doc">setting MySQL transaction isolation level</a> page for more information.', [
+      $description[] = $this->t('See the <a href=":performance_doc">setting MySQL transaction isolation level</a> page for more information.', [
         ':performance_doc' => 'https://www.drupal.org/docs/system-requirements/setting-the-mysql-transaction-isolation-level',
       ]);
 
       $requirements['mysql_transaction_level'] = [
-        'title' => t('Transaction isolation level'),
+        'title' => $this->t('Transaction isolation level'),
         'severity' => $severity_level,
         'value' => $isolation_level,
         'description' => Markup::create(implode(' ', $description)),

@@ -6,11 +6,14 @@ namespace Drupal\image\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\ImageToolkit\ImageToolkitManager;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Requirements for the image module.
  */
 class ImageRequirements {
+
+  use StringTranslationTrait;
 
   public function __construct(protected readonly ImageToolkitManager $imageToolkitManager) {}
 
@@ -24,7 +27,7 @@ class ImageRequirements {
       $plugin_definition = $toolkit->getPluginDefinition();
       $requirements = [
         'image.toolkit' => [
-          'title' => t('Image toolkit'),
+          'title' => $this->t('Image toolkit'),
           'value' => $toolkit->getPluginId(),
           'description' => $plugin_definition['title'],
         ],
@@ -38,9 +41,9 @@ class ImageRequirements {
     else {
       $requirements = [
         'image.toolkit' => [
-          'title' => t('Image toolkit'),
-          'value' => t('None'),
-          'description' => t("No image toolkit is configured on the site. Check PHP installed extensions or add a contributed toolkit that doesn't require a PHP extension. Make sure that at least one valid image toolkit is installed."),
+          'title' => $this->t('Image toolkit'),
+          'value' => $this->t('None'),
+          'description' => $this->t("No image toolkit is configured on the site. Check PHP installed extensions or add a contributed toolkit that doesn't require a PHP extension. Make sure that at least one valid image toolkit is installed."),
           'severity' => REQUIREMENT_ERROR,
         ],
       ];

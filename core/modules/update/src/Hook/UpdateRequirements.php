@@ -7,6 +7,7 @@ namespace Drupal\update\Hook;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\update\ProjectSecurityData;
 use Drupal\update\ProjectSecurityRequirement;
@@ -17,6 +18,8 @@ use Drupal\update\UpdateManagerInterface;
  * Requirements for the update module.
  */
 class UpdateRequirements {
+
+  use StringTranslationTrait;
 
   public function __construct(
     protected readonly ModuleHandlerInterface $moduleHandler,
@@ -70,8 +73,8 @@ class UpdateRequirements {
       }
     }
     else {
-      $requirements['update_core']['title'] = t('Drupal core update status');
-      $requirements['update_core']['value'] = t('No update data available');
+      $requirements['update_core']['title'] = $this->t('Drupal core update status');
+      $requirements['update_core']['value'] = $this->t('No update data available');
       $requirements['update_core']['severity'] = REQUIREMENT_WARNING;
       $requirements['update_core']['reason'] = UpdateFetcherInterface::UNKNOWN;
       $requirements['update_core']['description'] = _update_no_data();
@@ -101,10 +104,10 @@ class UpdateRequirements {
   public function requirementCheck($project, $type): array {
     $requirement = [];
     if ($type == 'core') {
-      $requirement['title'] = t('Drupal core update status');
+      $requirement['title'] = $this->t('Drupal core update status');
     }
     else {
-      $requirement['title'] = t('Module and theme update status');
+      $requirement['title'] = $this->t('Module and theme update status');
     }
     $status = $project['status'];
     if ($status != UpdateManagerInterface::CURRENT) {
@@ -116,28 +119,28 @@ class UpdateRequirements {
       $requirement['description'][] = ['#markup' => _update_message_text($type, $status)];
       if (!in_array($status, [UpdateFetcherInterface::UNKNOWN, UpdateFetcherInterface::NOT_CHECKED, UpdateFetcherInterface::NOT_FETCHED, UpdateFetcherInterface::FETCH_PENDING])) {
         if (_update_manager_access()) {
-          $requirement['description'][] = ['#prefix' => ' ', '#markup' => t('See the <a href=":available_updates">available updates</a> page for more information and to update your software.', [':available_updates' => Url::fromRoute('update.report_update')->toString()])];
+          $requirement['description'][] = ['#prefix' => ' ', '#markup' => $this->t('See the <a href=":available_updates">available updates</a> page for more information and to update your software.', [':available_updates' => Url::fromRoute('update.report_update')->toString()])];
         }
         else {
-          $requirement['description'][] = ['#prefix' => ' ', '#markup' => t('See the <a href=":available_updates">available updates</a> page for more information.', [':available_updates' => Url::fromRoute('update.status')->toString()])];
+          $requirement['description'][] = ['#prefix' => ' ', '#markup' => $this->t('See the <a href=":available_updates">available updates</a> page for more information.', [':available_updates' => Url::fromRoute('update.status')->toString()])];
         }
       }
     }
     switch ($status) {
       case UpdateManagerInterface::NOT_SECURE:
-        $requirement_label = t('Not secure!');
+        $requirement_label = $this->t('Not secure!');
         break;
 
       case UpdateManagerInterface::REVOKED:
-        $requirement_label = t('Revoked!');
+        $requirement_label = $this->t('Revoked!');
         break;
 
       case UpdateManagerInterface::NOT_SUPPORTED:
-        $requirement_label = t('Unsupported release');
+        $requirement_label = $this->t('Unsupported release');
         break;
 
       case UpdateManagerInterface::NOT_CURRENT:
-        $requirement_label = t('Out of date');
+        $requirement_label = $this->t('Out of date');
         $requirement['severity'] = REQUIREMENT_WARNING;
         break;
 
@@ -145,15 +148,15 @@ class UpdateRequirements {
       case UpdateFetcherInterface::NOT_CHECKED:
       case UpdateFetcherInterface::NOT_FETCHED:
       case UpdateFetcherInterface::FETCH_PENDING:
-        $requirement_label = $project['reason'] ?? t('Can not determine status');
+        $requirement_label = $project['reason'] ?? $this->t('Can not determine status');
         $requirement['severity'] = REQUIREMENT_WARNING;
         break;
 
       default:
-        $requirement_label = t('Up to date');
+        $requirement_label = $this->t('Up to date');
     }
     if ($status != UpdateManagerInterface::CURRENT && $type == 'core' && isset($project['recommended'])) {
-      $requirement_label .= ' ' . t('(version @version available)', ['@version' => $project['recommended']]);
+      $requirement_label .= ' ' . $this->t('(version @version available)', ['@version' => $project['recommended']]);
     }
     $requirement['value'] = Link::fromTextAndUrl($requirement_label, Url::fromRoute(_update_manager_access() ? 'update.report_update' : 'update.status'))->toString();
     return $requirement;

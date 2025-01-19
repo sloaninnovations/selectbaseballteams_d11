@@ -7,12 +7,15 @@ namespace Drupal\jsonapi\Hook;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 
 /**
  * Requirements for the jsonapi module.
  */
 class JsonapiRequirements {
+
+  use StringTranslationTrait;
 
   public function __construct(
     protected readonly ConfigFactoryInterface $configFactory,
@@ -36,30 +39,30 @@ class JsonapiRequirements {
     }, FALSE);
     if ($should_warn) {
       $requirements['jsonapi_multilingual_support'] = [
-        'title' => t('JSON:API multilingual support'),
-        'value' => t('Limited'),
+        'title' => $this->t('JSON:API multilingual support'),
+        'value' => $this->t('Limited'),
         'severity' => REQUIREMENT_INFO,
-        'description' => t('Some multilingual features currently do not work well with JSON:API. See the <a href=":jsonapi-docs">JSON:API multilingual support documentation</a> for more information on the current status of multilingual support.', [
+        'description' => $this->t('Some multilingual features currently do not work well with JSON:API. See the <a href=":jsonapi-docs">JSON:API multilingual support documentation</a> for more information on the current status of multilingual support.', [
           ':jsonapi-docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/translations',
         ]),
       ];
     }
     $requirements['jsonapi_revision_support'] = [
-      'title' => t('JSON:API revision support'),
-      'value' => t('Limited'),
+      'title' => $this->t('JSON:API revision support'),
+      'value' => $this->t('Limited'),
       'severity' => REQUIREMENT_INFO,
-      'description' => t('Revision support is currently read-only and only for the "Content" and "Media" entity types in JSON:API. See the <a href=":jsonapi-docs">JSON:API revision support documentation</a> for more information on the current status of revision support.', [
+      'description' => $this->t('Revision support is currently read-only and only for the "Content" and "Media" entity types in JSON:API. See the <a href=":jsonapi-docs">JSON:API revision support documentation</a> for more information on the current status of revision support.', [
         ':jsonapi-docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/revisions',
       ]),
     ];
     $requirements['jsonapi_read_only_mode'] = [
-      'title' => t('JSON:API allowed operations'),
-      'value' => t('Read-only'),
+      'title' => $this->t('JSON:API allowed operations'),
+      'value' => $this->t('Read-only'),
       'severity' => REQUIREMENT_INFO,
     ];
     if (!$this->configFactory->get('jsonapi.settings')->get('read_only')) {
-      $requirements['jsonapi_read_only_mode']['value'] = t('All (create, read, update, delete)');
-      $requirements['jsonapi_read_only_mode']['description'] = t('It is recommended to <a href=":configure-url">configure</a> JSON:API to only accept all operations if the site requires it. <a href=":docs">Learn more about securing your site with JSON:API.</a>', [
+      $requirements['jsonapi_read_only_mode']['value'] = $this->t('All (create, read, update, delete)');
+      $requirements['jsonapi_read_only_mode']['description'] = $this->t('It is recommended to <a href=":configure-url">configure</a> JSON:API to only accept all operations if the site requires it. <a href=":docs">Learn more about securing your site with JSON:API.</a>', [
         ':docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/security-considerations',
         ':configure-url' => Url::fromRoute('jsonapi.settings')->toString(),
       ]);
