@@ -12,7 +12,7 @@ use Drupal\Core\Site\MaintenanceModeEvents;
 use Drupal\Core\Site\MaintenanceModeInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * Maintenance mode subscriber for controller requests.
  */
-class MaintenanceModeSubscriber implements EventSubscriberInterface {
+class MaintenanceModeSubscriber {
 
   use StringTranslationTrait;
 
@@ -111,6 +111,8 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The event to process.
    */
+  #[AsEventListener(event: KernelEvents::REQUEST, priority: 30)]
+  #[AsEventListener(event: KernelEvents::EXCEPTION)]
   public function onKernelRequestMaintenance(RequestEvent $event) {
     $request = $event->getRequest();
     $route_match = RouteMatch::createFromRequest($request);
@@ -152,6 +154,10 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The event to process.
    */
+  #[AsEventListener(
+    event: MaintenanceModeEvents::MAINTENANCE_MODE_REQUEST,
+    priority: -1000,
+  )]
   public function onMaintenanceModeRequest(RequestEvent $event) {
     $request = $event->getRequest();
     if ($request->getRequestFormat() !== 'html') {
@@ -165,19 +171,6 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
     $response->setStatusCode(503);
     // Calling RequestEvent::setResponse() also stops propagation of the event.
     $event->setResponse($response);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getSubscribedEvents(): array {
-    $events[KernelEvents::REQUEST][] = ['onKernelRequestMaintenance', 30];
-    $events[KernelEvents::EXCEPTION][] = ['onKernelRequestMaintenance'];
-    $events[MaintenanceModeEvents::MAINTENANCE_MODE_REQUEST][] = [
-      'onMaintenanceModeRequest',
-      -1000,
-    ];
-    return $events;
   }
 
 }
