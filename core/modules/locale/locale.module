@@ -711,6 +711,9 @@ function locale_string_is_safe($string) {
   //   \Drupal\Component\Utility\Xss::filter() to not incorrectly alter the
   //   string. https://www.drupal.org/node/2372127
   $string = preg_replace('/\[[a-z0-9_-]+(:[a-z0-9_-]+)+\]/i', '', $string);
+  // Remove the "<front>" placeholder if it exists, before testing with the
+  // XSS filter, as this looks like an invalid HTML tag while it's a Drupalism.
+  $string = str_replace('<front>', '', $string);
 
   return Html::decodeEntities($string) == Html::decodeEntities(Xss::filter($string, ['a', 'abbr', 'acronym', 'address', 'b', 'bdo', 'big', 'blockquote', 'br', 'caption', 'cite', 'code', 'col', 'colgroup', 'dd', 'del', 'dfn', 'dl', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'i', 'ins', 'kbd', 'li', 'ol', 'p', 'pre', 'q', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'tt', 'ul', 'var']));
 }
