@@ -1570,6 +1570,8 @@ function claro_preprocess_item_list__media_library_add_form_media_list(array &$v
  * This targets each media item selected in an entity reference field.
  */
 function claro_preprocess_media_library_item__widget(array &$variables): void {
+  $variables['content']['edit_button']['#attributes']['class'][] = 'media-library-item__edit';
+  $variables['content']['edit_button']['#attributes']['class'][] = 'icon-link';
   $variables['content']['remove_button']['#attributes']['class'][] = 'media-library-item__remove';
   $variables['content']['remove_button']['#attributes']['class'][] = 'icon-link';
 }
