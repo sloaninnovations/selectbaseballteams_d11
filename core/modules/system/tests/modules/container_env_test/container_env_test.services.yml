@@ -1,0 +1,10 @@
+parameters:
+  container_env_test: '%env(CONTAINER_ENV_TEST)%'
+  container_env_test_with_default: '%env(default:container_env_test_with_default__default:CONTAINER_ENV_TEST_WITH_DEFAULT)%'
+  container_env_test_with_default__default: 'some-test'
+  container_env_test_with_default2: '%env(default:container_env_test_with_default__default:CONTAINER_ENV_TEST_WITH_DEFAULT2)%'
+  container_env_test_with_default__default2: 'some-test2'
+services:
+  Drupal\container_env_test\TestService:
+    arguments:
+      - '%container_env_test%'
