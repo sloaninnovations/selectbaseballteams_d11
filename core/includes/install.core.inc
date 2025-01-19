@@ -443,38 +443,64 @@ function install_begin_request($class_loader, &$install_state) {
   $container->get('string_translation')
     ->addTranslator($container->get('string_translator.file_translation'));
 
-  // Add list of all available profiles to the installation state.
-  $listing = new ExtensionDiscovery($container->getParameter('app.root'));
-  $listing->setProfileDirectories([]);
-  $install_state['profiles'] += $listing->scan('profile');
-
   /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
   $module_list = \Drupal::service('extension.list.module');
   /** @var \Drupal\Core\Extension\ProfileExtensionList $profile_list */
   $profile_list = \Drupal::service('extension.list.profile');
 
-  // Prime \Drupal\Core\Extension\ExtensionList::getPathname()'s static cache.
-  foreach ($install_state['profiles'] as $name => $profile) {
-    // Profile path is set in both module and profile lists. See
-    // \Drupal\Core\Config\ConfigInstaller::getProfileStorages for example.
-    $profile_list->setPathname($name, $profile->getPathname());
-    $module_list->setPathname($name, $profile->getPathname());
-  }
+  // Add list of all available profiles to the installation state.
+  if (!$install_state['base_system_verified']) {
+    $listing = new ExtensionDiscovery($container->getParameter('app.root'));
+    $listing->setProfileDirectories([]);
+    $install_state['profiles'] += $listing->scan('profile');
 
-  $profile = _install_select_profile($install_state);
-  if ($profile !== NULL) {
-    $install_state['parameters']['profile'] = $profile;
-    install_load_profile($install_state);
-    if (isset($install_state['profile_info']['distribution']['install']['theme'])) {
-      $install_state['theme'] = $install_state['profile_info']['distribution']['install']['theme'];
+    // Prime \Drupal\Core\Extension\ExtensionList::getPathname()'s static cache.
+    foreach ($install_state['profiles'] as $name => $profile) {
+      // Profile path is set in both module and profile lists. See
+      // \Drupal\Core\Config\ConfigInstaller::getProfileStorages for example.
+      $profile_list->setPathname($name, $profile->getPathname());
+      $module_list->setPathname($name, $profile->getPathname());
+    }
+
+    $profile = _install_select_profile($install_state);
+    if ($profile !== NULL) {
+      $install_state['parameters']['profile'] = $profile;
+      install_load_profile($install_state);
+      if (isset($install_state['profile_info']['distribution']['install']['theme'])) {
+        $install_state['theme'] = $install_state['profile_info']['distribution']['install']['theme'];
+      }
+    }
+
+    // Before having installed the system module and being able to do a module
+    // rebuild, prime the module list static cache with the system module's
+    // location.
+    // @todo Remove as part of https://www.drupal.org/node/2186491
+    $module_list->setPathname('system', 'core/modules/system/system.info.yml');
+
+    // Override the module list with a minimal set of modules.
+    $module_handler = \Drupal::moduleHandler();
+    if (!$module_handler->moduleExists('system')) {
+      $module_handler->addModule('system', 'core/modules/system');
+    }
+    if ($profile && !$module_handler->moduleExists($profile)) {
+      $module_handler->addProfile($profile, $install_state['profiles'][$profile]->getPath());
     }
   }
 
-  // Before having installed the system module and being able to do a module
-  // rebuild, prime the module list static cache with the system module's
-  // location.
-  // @todo Remove as part of https://www.drupal.org/node/2186491
-  $module_list->setPathname('system', 'core/modules/system/system.info.yml');
+  $sync_directory = Settings::get('config_sync_directory');
+  if (!empty($install_state['parameters']['existing_config']) && !empty($sync_directory)) {
+    $install_state['config_install_path'] = $sync_directory;
+  }
+  // If the profile has a config/sync directory copy the information to the
+  // install_state global.
+  elseif (!empty($install_state['profile_info']['config_install_path'])) {
+    $install_state['config_install_path'] = $install_state['profile_info']['config_install_path'];
+  }
+
+  if (!empty($install_state['config_install_path'])) {
+    $sync = new FileStorage($install_state['config_install_path']);
+    $install_state['config']['system.site'] = $sync->read('system.site');
+  }
 
   // Use the language from profile configuration if available.
   if (!empty($install_state['config_install_path']) && $install_state['config']['system.site']) {
@@ -491,15 +517,6 @@ function install_begin_request($class_loader, &$install_state) {
     $default_language = new Language(['id' => $install_state['parameters']['langcode']]);
     $container->get('language.default')->set($default_language);
     \Drupal::translation()->setDefaultLangcode($install_state['parameters']['langcode']);
-  }
-
-  // Override the module list with a minimal set of modules.
-  $module_handler = \Drupal::moduleHandler();
-  if (!$module_handler->moduleExists('system')) {
-    $module_handler->addModule('system', 'core/modules/system');
-  }
-  if ($profile && !$module_handler->moduleExists($profile)) {
-    $module_handler->addProfile($profile, $install_state['profiles'][$profile]->getPath());
   }
 
   // Load all modules and perform request related initialization.
@@ -774,7 +791,7 @@ function install_tasks($install_state) {
       'run' => INSTALL_TASK_RUN_IF_REACHED,
     ],
     'install_load_profile' => [
-      'run' => INSTALL_TASK_RUN_IF_REACHED,
+      'run' => $install_state['base_system_verified'] ? INSTALL_TASK_SKIP : INSTALL_TASK_RUN_IF_REACHED,
     ],
     'install_verify_requirements' => [
       'display_name' => t('Verify requirements'),
@@ -863,7 +880,7 @@ function install_tasks($install_state) {
   }
 
   // Now add any tasks defined by the installation profile.
-  if (!empty($install_state['parameters']['profile'])) {
+  if (!$install_state['base_system_verified'] && !empty($install_state['parameters']['profile'])) {
     // Load the profile install file, because it is not always loaded when
     // hook_install_tasks() is invoked (e.g. batch processing).
     $profile = $install_state['parameters']['profile'];
@@ -895,8 +912,12 @@ function install_tasks($install_state) {
 
   // Allow the installation profile to modify the full list of tasks.
   if (!empty($install_state['parameters']['profile'])) {
+    $loaded = FALSE;
     $profile = $install_state['parameters']['profile'];
-    if ($install_state['profiles'][$profile]->load()) {
+    if (!$install_state['base_system_verified']) {
+      $loaded = $install_state['profiles'][$profile]->load();
+    }
+    if ($loaded) {
       $function = $install_state['parameters']['profile'] . '_install_tasks_alter';
       if (function_exists($function)) {
         $function($tasks, $install_state);
@@ -1538,21 +1559,6 @@ function install_load_profile(&$install_state) {
     $install_state['profiles'][$profile]->load();
     $install_state['profile_info'] = install_profile_info($profile, $install_state['parameters']['langcode'] ?? 'en');
   }
-
-  $sync_directory = Settings::get('config_sync_directory');
-  if (!empty($install_state['parameters']['existing_config']) && !empty($sync_directory)) {
-    $install_state['config_install_path'] = $sync_directory;
-  }
-  // If the profile has a config/sync directory copy the information to the
-  // install_state global.
-  elseif (!empty($install_state['profile_info']['config_install_path'])) {
-    $install_state['config_install_path'] = $install_state['profile_info']['config_install_path'];
-  }
-
-  if (!empty($install_state['config_install_path'])) {
-    $sync = new FileStorage($install_state['config_install_path']);
-    $install_state['config']['system.site'] = $sync->read('system.site');
-  }
 }
 
 /**
@@ -1576,6 +1582,7 @@ function install_bootstrap_full() {
  *   The batch definition.
  */
 function install_profile_modules(&$install_state) {
+  $install_state['profile_info'] = install_profile_info($install_state['parameters']['profile'], $install_state['parameters']['langcode'] ?? 'en');
   // We need to manually trigger the installation of core-provided entity types,
   // as those will not be handled by the module installer.
   install_core_entity_type_definitions();
@@ -1668,6 +1675,7 @@ function install_core_entity_type_definitions() {
  *   An array of information about the current installation state.
  */
 function install_profile_themes(&$install_state) {
+  $install_state['profile_info'] = install_profile_info($install_state['parameters']['profile'], $install_state['parameters']['langcode'] ?? 'en');
   // Install the themes specified by the installation profile.
   $themes = $install_state['profile_info']['themes'];
   \Drupal::service('theme_installer')->install($themes);
