@@ -35,6 +35,10 @@ class EntityTestDefaultValue extends EntityTest {
       ->setLabel(t('Some custom description'))
       ->setDefaultValueCallback('entity_test_field_default_value');
 
+    $fields['description_2'] = BaseFieldDefinition::create('shape')
+      ->setLabel(t('Some custom description'))
+      ->setDefaultValueCallback('entity_test.entity_field_default_value:defaultValue');
+
     return $fields;
   }
 
