@@ -25,6 +25,13 @@ class UserLogoutConfirm extends ConfirmFormBase implements WorkspaceSafeFormInte
   /**
    * {@inheritdoc}
    */
+  public function getDescription() {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getQuestion(): TranslatableMarkup {
     return $this->t('Are you sure you want to log out?');
   }
