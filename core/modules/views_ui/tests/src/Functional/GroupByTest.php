@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_ui\Functional;
 
 /**
- * Tests UI of aggregate functionality..
+ * Tests UI of aggregate functionality.
  *
  * @group views_ui
  */

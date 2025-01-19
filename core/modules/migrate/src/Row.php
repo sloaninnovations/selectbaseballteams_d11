@@ -413,7 +413,7 @@ class Row {
   }
 
   /**
-   * Returns the hash for the source values..
+   * Returns the hash for the source values.
    *
    * @return mixed
    *   The hash of the source values.

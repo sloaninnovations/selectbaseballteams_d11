@@ -132,7 +132,7 @@ trait CacheTagsChecksumTrait {
   protected function calculateChecksum(array $tags) {
     $checksum = 0;
     // If there are no cache tags, then there is no cache tag to checksum,
-    // so return early..
+    // so return early.
     if (empty($tags)) {
       return $checksum;
     }
