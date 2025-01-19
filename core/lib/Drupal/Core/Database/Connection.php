@@ -339,7 +339,7 @@ abstract class Connection {
    *   A single prefix.
    */
   protected function setPrefix($prefix) {
-    assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
+    assert(is_string($prefix), 'The prefix argument to ' . __METHOD__ . '() must be a string, this is ' . gettype($prefix) . ' type');
     $this->prefix = $prefix;
     $this->tablePlaceholderReplacements = [
       $this->identifierQuotes[0] . str_replace('.', $this->identifierQuotes[1] . '.' . $this->identifierQuotes[0], $prefix),
