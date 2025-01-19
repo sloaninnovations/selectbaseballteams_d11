@@ -92,4 +92,19 @@ class LayoutBuilderEntityViewDisplayTest extends SectionListTestBase {
     $this->assertTrue($this->sectionList->isLayoutBuilderEnabled());
   }
 
+  /**
+   * Tests that enabling Layout Builder moves fields to hidden.
+   */
+  public function testFieldsMovedToHiddenOnEnable(): void {
+    $display = LayoutBuilderEntityViewDisplay::load('entity_test.entity_test.default');
+    $display->disableLayoutBuilder()->save();
+    $display->trustData();
+    $display->enableLayoutBuilder()->save();
+    $this->assertEmpty($display->get('content'));
+    $this->assertEquals([
+      'langcode' => TRUE,
+      'name' => TRUE,
+    ], $display->get('hidden'));
+  }
+
 }

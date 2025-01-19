@@ -154,6 +154,9 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
         uasort($components, 'Drupal\Component\Utility\SortArray::sortByWeightElement');
         foreach ($components as $name => $component) {
           $this->setComponent($name, $component);
+          // Move all fields to the hidden region.
+          $this->hidden[$name] = $name;
+          unset($this->content[$name]);
         }
       }
       else {
