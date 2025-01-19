@@ -1,7 +1,7 @@
 {#
 /**
  * @file
- * Default theme implementation for the modules uninstall page.
+ * Claro theme implementation for the modules uninstall page.
  *
  * Available variables:
  * - form: The modules uninstall form.
@@ -24,33 +24,32 @@
 #}
 {{ form.filters }}
 
-<table class="responsive-enabled">
+<table class="responsive-enabled module-list">
   <thead>
     <tr>
-      <th>{{ 'Uninstall'|t }}</th>
-      <th>{{ 'Name'|t }}</th>
-      <th class="priority-medium">{{ 'Description'|t }}</th>
+      <th class="checkbox">{{ 'Uninstall'|t }}</th>
+      <th class="name">{{ 'Name'|t }}</th>
+      <th class="description priority-low">{{ 'Description'|t }}</th>
     </tr>
   </thead>
   <tbody>
     {% for module in modules %}
-      {% set zebra = cycle(['odd', 'even'], loop.index0) -%}
-      <tr{{ module.attributes.addClass(zebra) }}>
-        <td align="center" class="checkbox">
+      <tr{{ module.attributes.addClass('module-list__module') }}>
+        <td class="module-list__checkbox">
           {{- module.checkbox -}}
         </td>
-        <td>
-          <label for="{{ module.checkbox_id }}" class="module-name table-filter-text-source">{{ module.name }}</label>
+        <td class="module-list__module">
+          <label id="{{ module.checkbox_id }}" for="{{ module.checkbox_id }}" class="module-list__module-name table-filter-text-source">{{ module.name }}</label>
         </td>
-        <td class="description expand priority-low">
-          <details class="js-form-wrapper form-wrapper" id="{{ module.checkbox_id }}-description">
-            <summary aria-controls="{{ module.checkbox_id }}-description" role="button" aria-expanded="false">
+        <td class="module-list__description expand priority-low">
+          <details class="js-form-wrapper form-wrapper module-list__module-details claro-details" id="{{ module.checkbox_id }}-description">
+            <summary aria-controls="{{ module.checkbox_id }}-description" role="button" aria-expanded="false" class="claro-details__summary module-list__module-summary">
               <span class="text module-description">{{ module.description }}</span>
             </summary>
-            <div class="details-wrapper">
-              <div class="details-description">
-                <div class="requirements">
-                  <div class="admin-requirements">{{ 'Machine name: <span dir="ltr" class="module-machine-name table-filter-text-source">@machine-name</span>'|t({'@machine-name': module.machine_name }) }}</div>
+            <div class="claro-details__wrapper module-details__wrapper">
+              <div class="module-details__description">
+                <div class="module-details__requirements">
+                  <div class="module-details__requirement">{{ 'Machine name: <span dir="ltr" class="module-machine-name table-filter-text-source">@machine-name</span>'|t({'@machine-name': module.machine_name }) }}</div>
                   {% if module.reasons_count > 0 %}
                     <div class="admin-requirements">
                       {%- trans -%}
@@ -64,7 +63,7 @@
                             <li>{{ reason }}</li>
                           {%- endfor -%}
                           {%- if module.required_by -%}
-                            <li>{{ 'Required by: @module-list'|t({'@module-list': module.required_by|safe_join(', ')}) }}</li>
+                            <li>{{ 'Required by: @module-list'|t({'@module-list': module.required_by|safe_join(', ') }) }}</li>
                           {%- endif -%}
                         </ul>
                       </div>
@@ -77,7 +76,7 @@
         </td>
       </tr>
     {% else %}
-      <tr class="odd">
+      <tr>
         <td colspan="3" class="empty message">{{ 'No modules are available to uninstall.'|t }}</td>
       </tr>
     {% endfor %}
