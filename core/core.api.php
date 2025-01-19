@@ -1909,49 +1909,44 @@
  */
 
 /**
- * @defgroup annotation Annotations
+ * @defgroup attribute Attributes
  * @{
- * Annotations for class discovery and metadata description.
+ * Attributes for class discovery and metadata description.
  *
  * The Drupal plugin system has a set of reusable components that developers
  * can use, override, and extend in their modules. Most of the plugins use
- * annotations, which let classes register themselves as plugins and describe
- * their metadata. (Annotations can also be used for other purposes, though
+ * attributes, which let classes register themselves as plugins and describe
+ * their metadata. (Attributes can also be used for other purposes, though
  * at the moment, Drupal only uses them for the plugin system.)
  *
- * To annotate a class as a plugin, add code similar to the following to the
+ * To attribute a class as a plugin, add code similar to the following to the
  * end of the documentation block immediately preceding the class declaration:
  * @code
- * * @ContentEntityType(
- * *   id = "comment",
- * *   label = @Translation("Comment"),
+ * * #[ContentEntityType(
+ * *   id: "comment",
+ * *   label: new TranslatableMarkup("Comment"),
  * *   ...
  * *   base_table = "comment"
- * * )
+ * * )]
  * @endcode
  *
- * Note that you must use double quotes; single quotes will not work in
- * annotations.
- *
- * Some annotation types, which extend the "@ PluginID" annotation class, have
- * only a single 'id' key in their annotation. For these, it is possible to use
- * a shorthand annotation. For example:
+ * Some attribute types, which extend the "PluginID" attribute class, have
+ * only a single 'id' key in their attribute. For these, it is possible to use
+ * a shorthand attribute. For example:
  * @code
- * * @ViewsArea("entity")
+ * * #[ViewsArea("entity")]
  * @endcode
  * in place of
  * @code
- * * @ViewsArea(
- * *   id = "entity"
- * *)
+ * * #[ViewsArea(id: "entity")]
  * @endcode
  *
- * The available annotation classes are listed in this topic, and can be
+ * The available attribute classes are listed in this topic, and can be
  * identified when you are looking at the Drupal source code by having
- * "@ Annotation" in their documentation blocks (without the space after @). To
- * find examples of annotation for a particular annotation class, such as
- * EntityType, look for class files that have an @ annotation section using the
- * annotation class.
+ * "# Attribute-Name" in their documentation blocks (without the space after #). To
+ * find examples of attribute for a particular attribute class, such as
+ * EntityType, look for class files that have an # attribute section using the
+ * attribute class.
  *
  * @see plugin_translatable
  * @see plugin_context
