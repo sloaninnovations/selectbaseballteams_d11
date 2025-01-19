@@ -3,6 +3,7 @@
 namespace Drupal\node\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
+use Drupal\Core\Entity\Attribute\EntityTypeProperty;
 use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -84,7 +85,6 @@ use Drupal\user\EntityOwnerTrait;
     'singular' => '@count content item',
     'plural' => '@count content items',
   ],
-  field_ui_base_route: 'entity.node_type.edit_form',
   common_reference_target: TRUE,
   list_cache_contexts: ['user.node_grants:view'],
   revision_metadata_keys: [
@@ -92,6 +92,11 @@ use Drupal\user\EntityOwnerTrait;
     'revision_created' => 'revision_timestamp',
     'revision_log_message' => 'revision_log',
   ],
+)]
+#[EntityTypeProperty(
+  key: 'field_ui_base_route',
+  value: 'entity.node_type.edit_form',
+  moduleDependencies: ['field_ui'],
 )]
 class Node extends EditorialContentEntityBase implements NodeInterface {
 

@@ -87,7 +87,7 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
     /** @var \Drupal\Component\Annotation\AnnotationInterface $annotation */
     if ($annotation = $this->getAnnotationReader()->getClassAnnotation($reflection_class, $this->pluginDefinitionAnnotationName)) {
       $this->prepareAnnotationDefinition($annotation, $class);
-      return ['id' => $annotation->getId(), 'content' => $annotation->get()];
+      return ['id' => $annotation->getId(), 'content' => $annotation->get(), 'third_party_attributes' => []];
     }
 
     // Annotations use static reflection and are able to analyze a class that
@@ -97,7 +97,7 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
     if ($reflection_class->hasClassAttribute($this->pluginDefinitionAttributeName)) {
       return parent::parseClass($class, $fileinfo);
     }
-    return ['id' => NULL, 'content' => NULL];
+    return ['id' => NULL, 'content' => NULL, 'third_party_attributes' => []];
   }
 
   /**
