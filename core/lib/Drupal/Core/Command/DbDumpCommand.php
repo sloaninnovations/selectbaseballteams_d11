@@ -41,7 +41,7 @@ class DbDumpCommand extends DbCommandBase {
   protected function configure(): void {
     $this->setName('dump-database-d8-mysql')
       ->setDescription('Dump the current database to a generation script')
-      ->addOption('schema-only', NULL, InputOption::VALUE_OPTIONAL, 'A comma separated list of tables to only export the schema without data.', 'cache.*,sessions,watchdog')
+      ->addOption('schema-only', NULL, InputOption::VALUE_OPTIONAL, 'A comma separated list of tables to only export the schema without data.', 'cache.*,database_file_cache,sessions,watchdog')
       ->addOption('insert-count', NULL, InputOption::VALUE_OPTIONAL, ' The number of rows to insert in a single SQL statement.', 1000);
     parent::configure();
   }

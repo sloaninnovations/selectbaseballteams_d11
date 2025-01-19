@@ -5,7 +5,7 @@ namespace Drupal\Component\FileCache;
 /**
  * Allows to cache data based on file modification dates.
  */
-class FileCache implements FileCacheInterface {
+class FileCache implements FileCacheInterface, GarbageCollectionInterface {
 
   /**
    * Prefix that is used for cache entries.
@@ -155,6 +155,15 @@ class FileCache implements FileCacheInterface {
    */
   public static function reset() {
     static::$cached = [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection(): void {
+    if ($this->cache instanceof GarbageCollectionInterface) {
+      $this->cache->garbageCollection();
+    }
   }
 
 }

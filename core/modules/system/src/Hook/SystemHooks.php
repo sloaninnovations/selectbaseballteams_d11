@@ -9,6 +9,8 @@ use Drupal\Core\Link;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\FileCache\GarbageCollectionInterface;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Queue\QueueGarbageCollectionInterface;
 use Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory;
@@ -313,6 +315,14 @@ class SystemHooks {
     foreach (Cache::getBins() as $cache_backend) {
       $cache_backend->garbageCollection();
     }
+
+    foreach (array_keys(FileCacheFactory::getConfiguration()) as $namespace) {
+      $file_cache = FileCacheFactory::get($namespace);
+      if ($file_cache instanceof GarbageCollectionInterface) {
+        $file_cache->garbageCollection();
+      }
+    }
+
     // Clean up the expirable key value database store.
     if (\Drupal::service('keyvalue.expirable.database') instanceof KeyValueDatabaseExpirableFactory) {
       \Drupal::service('keyvalue.expirable.database')->garbageCollection();

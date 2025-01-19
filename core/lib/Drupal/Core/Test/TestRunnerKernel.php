@@ -18,6 +18,11 @@ class TestRunnerKernel extends DrupalKernel {
   /**
    * {@inheritdoc}
    */
+  protected const DEFAULT_FILE_CACHE_BACKEND = '\Drupal\Component\FileCache\ApcuFileCacheBackend';
+
+  /**
+   * {@inheritdoc}
+   */
   public static function createFromRequest(Request $request, $class_loader, $environment = 'test_runner', $allow_dumping = TRUE, $app_root = NULL) {
     return parent::createFromRequest($request, $class_loader, $environment, $allow_dumping, $app_root);
   }

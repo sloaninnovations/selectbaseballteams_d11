@@ -53,6 +53,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   use InstallerRedirectTrait;
 
   /**
+   * The default file cache backend.
+   */
+  protected const DEFAULT_FILE_CACHE_BACKEND = '\Drupal\Core\FileCache\DatabaseApcuFileCacheBackend';
+
+  /**
    * Holds the class used for dumping the container to a PHP array.
    *
    * In combination with swapping the container class this is useful to e.g.
@@ -493,7 +498,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // @todo Use extension_loaded('apcu') for non-testbot
       //   https://www.drupal.org/node/2447753.
       if (function_exists('apcu_fetch')) {
-        $configuration['default']['cache_backend_class'] = '\Drupal\Component\FileCache\ApcuFileCacheBackend';
+        $configuration['default']['cache_backend_class'] = static::DEFAULT_FILE_CACHE_BACKEND;
       }
     }
     FileCacheFactory::setConfiguration($configuration);
@@ -1293,6 +1298,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     $this->initializeServiceProviders();
+    // Prevent writing to the database when there are no modules installed.
+    if (empty($this->moduleList) && (function_exists('apcu_fetch'))) {
+      $configuration = FileCacheFactory::getConfiguration();
+      $configuration['default']['cache_backend_class'] = '\Drupal\Component\FileCache\ApcuFileCacheBackend';
+      FileCacheFactory::setConfiguration($configuration);
+    }
     $container = $this->getContainerBuilder();
     $container->set('kernel', $this);
     $container->setParameter('container.modules', $this->getModulesParameter());
