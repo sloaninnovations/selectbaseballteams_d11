@@ -173,6 +173,7 @@ trait BlockPluginTrait {
     $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Title'),
+      '#description' => $this->t('The title of the block as shown to the user.'),
       '#maxlength' => 255,
       '#default_value' => $this->label(),
       '#required' => TRUE,
