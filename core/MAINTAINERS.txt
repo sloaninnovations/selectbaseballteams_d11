@@ -463,7 +463,7 @@ Accessibility
 - Ben Mullins 'bnjmnm' https://www.drupal.org/u/bnjmnm
 
 Documentation
-- ?
+- Joachim Noreiko 'joachim' https://www.drupal.org/u/joachim
 
 Performance
 - Nathaniel Catchpole 'catch' https://www.drupal.org/u/catch
