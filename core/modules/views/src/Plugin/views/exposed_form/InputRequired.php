@@ -130,4 +130,11 @@ class InputRequired extends ExposedFormPluginBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isInputRequired(): bool {
+    return TRUE;
+  }
+
 }
