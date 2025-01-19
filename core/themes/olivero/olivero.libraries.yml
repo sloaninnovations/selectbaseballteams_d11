@@ -283,9 +283,3 @@ tabledrag:
   css:
     component:
       css/components/tabledrag.css: {}
-
-tags:
-  version: VERSION
-  css:
-    theme:
-      css/components/tags.css: {}
