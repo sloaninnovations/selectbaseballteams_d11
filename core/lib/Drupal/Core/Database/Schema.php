@@ -10,6 +10,11 @@ use Drupal\Core\Database\Query\PlaceholderInterface;
 abstract class Schema implements PlaceholderInterface {
 
   /**
+   * The maximum table name length allowed by the database.
+   */
+  protected const MAX_TABLE_NAME_LENGTH = 64;
+
+  /**
    * The database connection.
    *
    * @var \Drupal\Core\Database\Connection
@@ -750,6 +755,65 @@ abstract class Schema implements PlaceholderInterface {
         throw new SchemaException("The '$field_name' field specification does not define 'not null' as TRUE.");
       }
     }
+  }
+
+  /**
+   * Creates a table with an abbreviated name.
+   *
+   * @param string $actual_table_name
+   *   The full name of the table you want to create.
+   * @param string $fixed_prefix
+   *   The first part of this name that will not be hashed.
+   * @param array $schema
+   *   The schema definition for the table.
+   *
+   * @return string
+   *   The abbreviated table name.
+   */
+  public function createAbbreviatedTable(string $actual_table_name, string $fixed_prefix, array $schema): string {
+    $max_length = self::MAX_TABLE_NAME_LENGTH;
+
+    // Abbreviate the table name if it exceeds the max length.
+    if (strlen($actual_table_name) > $max_length) {
+      $prefix_length = strlen($fixed_prefix);
+      $suffix_length = $max_length - $prefix_length;
+      // Create a hash for the suffix to ensure uniqueness.
+      $hashed_suffix = substr(hash('sha256', $actual_table_name), 0, $suffix_length);
+      $abbreviated_name = $fixed_prefix . $hashed_suffix;
+    }
+    else {
+      $abbreviated_name = $actual_table_name;
+    }
+
+    $this->createTable($abbreviated_name, $schema);
+    return $abbreviated_name;
+  }
+
+  /**
+   * Gets an abbreviated table name for use in queries.
+   *
+   * @param string $actual_table_name
+   *   The full name of the table that may be too long.
+   * @param string $fixed_prefix
+   *   The prefix of the table name that should remain unchanged.
+   *
+   * @return string
+   *   The abbreviated table name, if necessary, or the original table name if
+   *   it does not exceed the maximum length.
+   */
+  public function getAbbreviatedTableName(string $actual_table_name, string $fixed_prefix): string {
+    $max_length = self::MAX_TABLE_NAME_LENGTH;
+
+    // Abbreviate the table name if it exceeds the max length.
+    if (strlen($actual_table_name) > $max_length) {
+      $prefix_length = strlen($fixed_prefix);
+      $suffix_length = $max_length - $prefix_length;
+
+      $hashed_suffix = substr(hash('sha256', $actual_table_name), 0, $suffix_length);
+      return $fixed_prefix . $hashed_suffix;
+    }
+
+    return $actual_table_name;
   }
 
 }
