@@ -146,7 +146,10 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
    * {@inheritdoc}
    */
   public function deleteAll() {
-    $this->fileSystem->deleteRecursive('assets://js');
+    $path = 'assets://js';
+    if (\file_exists($path)) {
+      $this->fileSystem->deleteRecursive($path);
+    }
   }
 
   /**

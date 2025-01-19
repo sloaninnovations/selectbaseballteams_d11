@@ -131,7 +131,10 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
    * {@inheritdoc}
    */
   public function deleteAll() {
-    $this->fileSystem->deleteRecursive('assets://css');
+    $path = 'assets://css';
+    if (\file_exists($path)) {
+      $this->fileSystem->deleteRecursive($path);
+    }
   }
 
   /**
