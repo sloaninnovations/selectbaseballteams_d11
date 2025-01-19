@@ -213,10 +213,22 @@ class Heading extends CKEditor5PluginDefault implements CKEditor5PluginConfigura
     $tags_to_return = [];
     foreach ($enabled_headings as $model) {
       if (isset($heading_keyed_by_model[$model]) && isset($heading_keyed_by_model[$model]['view'])) {
-        $element_as_tag = "<{$heading_keyed_by_model[$model]['view']}>";
-        if (in_array($element_as_tag, $elements, TRUE)) {
-          $tags_to_return[] = "<{$heading_keyed_by_model[$model]['view']}>";
+        // For headings with a view that has an HTML element and some additional
+        // classes.
+        if (is_array($heading_keyed_by_model[$model]['view'])) {
+          $element_as_tag = "<{$heading_keyed_by_model[$model]['view']['name']}>";
+          if (in_array($element_as_tag, $elements, TRUE)) {
+            $tags_to_return[] = "<{$heading_keyed_by_model[$model]['view']['name']}>";
+          }
         }
+        // For headings with a view that has an HTML element only.
+        else {
+          $element_as_tag = "<{$heading_keyed_by_model[$model]['view']}>";
+          if (in_array($element_as_tag, $elements, TRUE)) {
+            $tags_to_return[] = "<{$heading_keyed_by_model[$model]['view']}>";
+          }
+        }
+
       }
     }
 
