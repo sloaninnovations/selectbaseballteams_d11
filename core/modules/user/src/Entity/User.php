@@ -436,6 +436,18 @@ class User extends ContentEntityBase implements UserInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function isAdmin(): bool {
+    foreach ($this->get('roles')->referencedEntities() as $role) {
+      if ($role->isAdmin()) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Returns an anonymous user entity.
    *
    * @return \Drupal\user\UserInterface
