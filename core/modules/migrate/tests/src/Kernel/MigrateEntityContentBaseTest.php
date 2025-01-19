@@ -56,7 +56,7 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
     \Drupal::state()->set('entity_test.required_multi_default_field', TRUE);
     $this->installEntitySchema('entity_test_mul');
 
-    ConfigurableLanguage::createFromLangcode('en')->save();
+    $this->installConfig(['language']);
     ConfigurableLanguage::createFromLangcode('fr')->save();
 
     $this->storage = $this->container->get('entity_type.manager')->getStorage('entity_test_mul');

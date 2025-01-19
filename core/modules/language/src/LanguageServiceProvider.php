@@ -16,6 +16,13 @@ class LanguageServiceProvider extends ServiceProviderBase {
   const CONFIG_PREFIX = 'language.entity.';
 
   /**
+   * TRUE if the site is multilingual, FALSE otherwise.
+   *
+   * @var bool
+   */
+  protected $isMultilingual;
+
+  /**
    * {@inheritdoc}
    */
   public function register(ContainerBuilder $container) {
@@ -53,7 +60,14 @@ class LanguageServiceProvider extends ServiceProviderBase {
     if ($default_language_values = $this->getDefaultLanguageValues()) {
       $container->setParameter('language.default_values', $default_language_values);
     }
-
+    if ($this->isMultilingual()) {
+      $renderer_config = $container->getParameter('renderer.config');
+      foreach ($this->getConfigurableTypes() as $type) {
+        $renderer_config['required_cache_contexts'][] = "languages:$type";
+      }
+      $renderer_config['required_cache_contexts'] = array_unique($renderer_config['required_cache_contexts']);
+      $container->setParameter('renderer.config', $renderer_config);
+    }
   }
 
   /**
@@ -63,17 +77,20 @@ class LanguageServiceProvider extends ServiceProviderBase {
    *   TRUE if the site is multilingual, FALSE otherwise.
    */
   protected function isMultilingual() {
-    // Assign the prefix to a local variable so it can be used in an anonymous
-    // function.
-    $prefix = static::CONFIG_PREFIX;
-    // @todo Try to swap out for config.storage to take advantage of database
-    //   and caching. This might prove difficult as this is called before the
-    //   container has finished building.
-    $config_storage = BootstrapConfigStorageFactory::get();
-    $config_ids = array_filter($config_storage->listAll($prefix), function ($config_id) use ($prefix) {
-      return $config_id != $prefix . LanguageInterface::LANGCODE_NOT_SPECIFIED && $config_id != $prefix . LanguageInterface::LANGCODE_NOT_APPLICABLE;
-    });
-    return count($config_ids) > 1;
+    if (!isset($this->isMultilingual)) {
+      // Assign the prefix to a local variable so it can be used in an anonymous
+      // function.
+      $prefix = static::CONFIG_PREFIX;
+      // @todo Try to swap out for config.storage to take advantage of database
+      //   and caching. This might prove difficult as this is called before the
+      //   container has finished building.
+      $config_storage = BootstrapConfigStorageFactory::get();
+      $config_ids = array_filter($config_storage->listAll($prefix), function ($config_id) use ($prefix) {
+        return $config_id != $prefix . LanguageInterface::LANGCODE_NOT_SPECIFIED && $config_id != $prefix . LanguageInterface::LANGCODE_NOT_APPLICABLE;
+      });
+      $this->isMultilingual = count($config_ids) > 1;
+    }
+    return $this->isMultilingual;
   }
 
   /**
@@ -98,6 +115,17 @@ class LanguageServiceProvider extends ServiceProviderBase {
       return $default_language;
     }
     return FALSE;
+  }
+
+  /**
+   * @return array
+   *   The list of configurable language types. Typically just
+   *   ['language_interface'] but can be
+   *   ['language_interface', 'language_content'] as well.
+   */
+  protected function getConfigurableTypes() {
+    $config_storage = BootstrapConfigStorageFactory::get();
+    return $config_storage->read('language.types')['configurable'];
   }
 
 }
