@@ -8,8 +8,10 @@ use Drupal\Core\Utility\Error;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\migrate\Event\MigrateEvents;
 use Drupal\migrate\Event\MigrateImportEvent;
+use Drupal\migrate\Event\MigrateImportFailedEvent;
 use Drupal\migrate\Event\MigratePostRowSaveEvent;
 use Drupal\migrate\Event\MigratePreRowSaveEvent;
+use Drupal\migrate\Event\MigrateRowSkippedEvent;
 use Drupal\migrate\Event\MigrateRollbackEvent;
 use Drupal\migrate\Event\MigrateRowDeleteEvent;
 use Drupal\migrate\Exception\RequirementsException;
@@ -155,6 +157,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
           // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
           '@status' => $this->t($this->migration->getStatusLabel()),
         ]), 'error');
+      $this->getEventDispatcher()->dispatch(new MigrateImportFailedEvent($this->migration, $this->message), MigrateEvents::IMPORT_FAILED);
       return MigrationInterface::RESULT_FAILED;
     }
     $this->getEventDispatcher()->dispatch(new MigrateImportEvent($this->migration, $this->message), MigrateEvents::PRE_IMPORT);
@@ -175,6 +178,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
         'error'
       );
 
+      $this->getEventDispatcher()->dispatch(new MigrateImportFailedEvent($this->migration, $this->message, $e), MigrateEvents::IMPORT_FAILED);
       return MigrationInterface::RESULT_FAILED;
     }
 
@@ -192,6 +196,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
           '@line' => $e->getLine(),
         ]), 'error');
       $this->migration->setStatus(MigrationInterface::STATUS_IDLE);
+      $this->getEventDispatcher()->dispatch(new MigrateImportFailedEvent($this->migration, $this->message, $e), MigrateEvents::IMPORT_FAILED);
       return MigrationInterface::RESULT_FAILED;
     }
 
@@ -206,6 +211,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
         $this->sourceIdValues = $row->getSourceIdValues();
         $this->getIdMap()->saveIdMapping($row, [], $e->getStatus());
         $this->saveMessage($e->getMessage(), $e->getLevel());
+        $this->getEventDispatcher()->dispatch(new MigrateImportFailedEvent($this->migration, $this->message, $e), MigrateEvents::IMPORT_FAILED);
       }
     }
 
@@ -228,6 +234,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
           $msg = sprintf("%s:%s:%s", $this->migration->getPluginId(), $destination_property_name, $e->getMessage());
           $this->saveMessage($msg, $e->getLevel());
           $save = FALSE;
+          $this->getEventDispatcher()->dispatch(new MigrateImportFailedEvent($this->migration, $this->message, $e), MigrateEvents::IMPORT_FAILED);
         }
         catch (MigrateSkipRowException $e) {
           if ($e->getSaveToMap()) {
@@ -238,6 +245,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
             $this->saveMessage($msg, MigrationInterface::MESSAGE_INFORMATIONAL);
           }
           $save = FALSE;
+          $this->getEventDispatcher()->dispatch(new MigrateRowSkippedEvent($this->migration, $this->message, $row, $e), MigrateEvents::ROW_SKIPPED);
         }
 
         if ($save) {
@@ -267,11 +275,13 @@ class MigrateExecutable implements MigrateExecutableInterface {
           catch (MigrateException $e) {
             $this->getIdMap()->saveIdMapping($row, [], $e->getStatus());
             $this->saveMessage($e->getMessage(), $e->getLevel());
+            $this->getEventDispatcher()->dispatch(new MigrateImportFailedEvent($this->migration, $this->message, $e), MigrateEvents::IMPORT_FAILED);
           }
           catch (\Exception $e) {
             $this->getIdMap()
               ->saveIdMapping($row, [], MigrateIdMapInterface::STATUS_FAILED);
             $this->handleException($e);
+            $this->getEventDispatcher()->dispatch(new MigrateImportFailedEvent($this->migration, $this->message, $e), MigrateEvents::IMPORT_FAILED);
           }
         }
 
@@ -300,6 +310,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
               '@line' => $e->getLine(),
             ]), 'error');
           $this->migration->setStatus(MigrationInterface::STATUS_IDLE);
+          $this->getEventDispatcher()->dispatch(new MigrateImportFailedEvent($this->migration, $this->message, $e), MigrateEvents::IMPORT_FAILED);
           return MigrationInterface::RESULT_FAILED;
         }
       }
