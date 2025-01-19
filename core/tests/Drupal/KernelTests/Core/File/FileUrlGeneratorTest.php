@@ -232,7 +232,7 @@ class FileUrlGeneratorTest extends FileTestBase {
       'query string' =>
         [
           '//core/assets/vendor/jquery/jquery.min.js?foo',
-          '//core/assets/vendor/jquery/jquery.min.js?foo',
+          '//core/assets/vendor/jquery/jquery.min.js?foo=',
         ],
       'query string and hashes' =>
         [
