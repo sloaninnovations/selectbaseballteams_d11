@@ -1614,10 +1614,29 @@ function install_profile_modules(&$install_state) {
   arsort($non_required);
 
   $batch_builder = new BatchBuilder();
+
+  // Put modules into groups of up to the maximum batch size, or until a module
+  // states that it needs a container rebuild immediately after install.
+  $index = 0;
+  $module_groups = [];
   foreach ($required + $non_required as $module => $weight) {
+    $module_groups[$index][$module] = $weight;
+    if (count($module_groups[$index]) === Settings::get('core.multi-module-install', 20)) {
+      $index++;
+    }
+    elseif (isset($files[$module]->info['container_rebuild_required']) && $files[$module]->info['container_rebuild_required']) {
+      $index++;
+    }
+  }
+
+  foreach ($module_groups as $module_group) {
+    $names = [];
+    foreach ($module_group as $module => $weight) {
+      $names[] = $files[$module]->info['name'];
+    }
     $batch_builder->addOperation(
       '_install_module_batch',
-      [$module, $files[$module]->info['name']],
+      [array_keys($module_group), $names],
     );
   }
   $batch_builder
@@ -1918,10 +1937,10 @@ function install_finished(&$install_state) {
  *
  * Performs batch installation of modules.
  */
-function _install_module_batch($module, $module_name, &$context) {
-  \Drupal::service('module_installer')->install([$module], FALSE);
-  $context['results'][] = $module;
-  $context['message'] = t('Installed %module module.', ['%module' => $module_name]);
+function _install_module_batch(array $modules, array $module_names, array &$context) {
+  \Drupal::service('module_installer')->install($modules, FALSE);
+  $context['results'] = array_merge($context['results'], $modules);
+  $context['message'] = t('Installed %module module(s).', ['%module' => implode(', ', $module_names)]);
 }
 
 /**
@@ -2608,12 +2627,15 @@ function install_recipe_required_modules() {
   // The system module is already installed. See install_base_system().
   unset($required['system']);
 
+  $modules = [];
+  $names = [];
   foreach ($required as $module => $weight) {
-    $batch_builder->addOperation(
-      '_install_module_batch',
-      [$module, $files[$module]->info['name']],
-    );
+    $modules[] = $module;
+    $names[] = $files[$module]->info['name'];
   }
+  $batch_builder->addOperation('_install_module_batch',
+    [$modules, $names]
+  );
   return $batch_builder->toArray();
 }
 
