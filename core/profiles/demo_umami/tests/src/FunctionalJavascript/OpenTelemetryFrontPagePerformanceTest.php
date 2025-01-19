@@ -28,6 +28,7 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
     $this->testFrontPageColdCache();
     $this->testFrontPageCoolCache();
     $this->testFrontPageHotCache();
+    $this->testFrontPageColdDrupalCache();
   }
 
   /**
@@ -99,6 +100,36 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
     $this->collectPerformanceData(function () {
       $this->drupalGet('<front>');
     }, 'umamiFrontPageCoolCache');
+  }
+
+  /**
+   * Check performance metrics with a cold Drupal cache.
+   */
+  protected function testFrontPageColdDrupalCache(): void {
+    // Request the page twice so that all assets are cached in the browser. We
+    // will be checking performance metrics and want to avoid additional
+    // requests made by the browser influencing the results.
+    $this->drupalGet('<front>');
+    $this->drupalGet('<front>');
+
+    // Clear caches to ensure a cold cache.
+    $this->clearCaches();
+
+    $performance_data = $this->collectPerformanceData(function () {
+      $this->drupalGet('<front>');
+    }, 'umamiFrontPageColdDrupalCache');
+    $this->assertSession()->pageTextContains('Umami');
+    $this->assertCountBetween(375, 395, $performance_data->getQueryCount());
+    $this->assertCountBetween(540, 565, $performance_data->getCacheGetCount());
+    $this->assertCountBetween(465, 490, $performance_data->getCacheSetCount());
+    $this->assertSame(0, $performance_data->getCacheDeleteCount());
+    $this->assertCountBetween(250, 265, $performance_data->getCacheTagChecksumCount());
+    $this->assertCountBetween(55, 60, $performance_data->getCacheTagIsValidCount());
+    $this->assertSame(0, $performance_data->getCacheTagInvalidationCount());
+    $this->assertSame(1, $performance_data->getScriptCount());
+    $this->assertCountBetween(7000, 7100, $performance_data->getScriptBytes());
+    $this->assertSame(2, $performance_data->getStylesheetCount());
+    $this->assertCountBetween(40200, 40300, $performance_data->getStylesheetBytes());
   }
 
   /**
