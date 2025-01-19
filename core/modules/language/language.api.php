@@ -112,5 +112,21 @@ function hook_language_fallback_candidates_OPERATION_alter(array &$candidates, a
 }
 
 /**
+ * Allow modules to alter the links for the language switcher.
+ *
+ * @param array $links
+ *   An array of language switch links, empty array hides the block.
+ * @param string $type
+ *   The language type.
+ * @param \Drupal\Core\Url $url
+ *   The URL the switch links will be relative to.
+ *
+ * @see \Drupal\language\ConfigurableLanguageManager::getLanguageSwitchLinks()
+ */
+function hook_language_switch_links_alter(array &$links, $type, Url $url) {
+  // Change links here.
+}
+
+/**
  * @} End of "addtogroup hooks".
  */
