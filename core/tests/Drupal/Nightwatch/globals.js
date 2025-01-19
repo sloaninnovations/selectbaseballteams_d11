@@ -4,7 +4,7 @@ const mkdirp = require('mkdirp');
 const nightwatchSettings = require('./nightwatch.conf');
 
 const commandAsWebserver = (command) => {
-  if (process.env.DRUPAL_TEST_WEBSERVER_USER) {
+  if (process.env.DRUPAL_TEST_WEBSERVER_USER && process.env.DRUPAL_TEST_DOCKER) {
     return `sudo -u ${process.env.DRUPAL_TEST_WEBSERVER_USER} ${command}`;
   }
   return command;
