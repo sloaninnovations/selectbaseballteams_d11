@@ -590,7 +590,7 @@ EOF;
               // instead, then return a 400 response to the client with the
               // error message. We don't throw an exception, because this is a
               // client error rather than a server error.
-              $message = 'Redirects to external URLs are not allowed by default, use \Drupal\Core\Routing\TrustedRedirectResponse for it.';
+              $message = sprintf('Redirects to external URLs are not allowed by default, use \Drupal\Core\Routing\TrustedRedirectResponse for "%s".', $response->getTargetUrl());
               $this->logger->error($message);
               $ajax_response->addCommand(new MessageCommand($message));
             }
