@@ -249,6 +249,8 @@ class Schema extends DatabaseSchema {
 
       'blob:big'        => 'BLOB',
       'blob:normal'     => 'BLOB',
+
+      'json:normal'     => 'JSON',
     ];
     return $map;
   }
