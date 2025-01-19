@@ -404,7 +404,7 @@ class ModuleHandler implements ModuleHandlerInterface {
       return;
     }
     $hookInvoker = \Closure::fromCallable($module . '_' . $hook);
-    return call_user_func_array($hookInvoker, $args);
+    return call_user_func_array($hookInvoker, array_values($args));
   }
 
   /**
@@ -413,7 +413,7 @@ class ModuleHandler implements ModuleHandlerInterface {
   public function invokeAll($hook, array $args = []) {
     $return = [];
     $this->invokeAllWith($hook, function (callable $hook, string $module) use ($args, &$return) {
-      $result = call_user_func_array($hook, $args);
+      $result = call_user_func_array($hook, array_values($args));
       if (isset($result) && is_array($result)) {
         $return = NestedArray::mergeDeep($return, $result);
       }
@@ -428,7 +428,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function invokeDeprecated($description, $module, $hook, array $args = []) {
-    $result = $this->invoke($module, $hook, $args);
+    $result = $this->invoke($module, $hook, array_values($args));
     $this->triggerDeprecationError($description, $hook);
     return $result;
   }
@@ -437,7 +437,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function invokeAllDeprecated($description, $hook, array $args = []) {
-    $result = $this->invokeAll($hook, $args);
+    $result = $this->invokeAll($hook, array_values($args));
     $this->triggerDeprecationError($description, $hook);
     return $result;
   }
