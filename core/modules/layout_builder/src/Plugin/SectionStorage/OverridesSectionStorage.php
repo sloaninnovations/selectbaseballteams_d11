@@ -414,4 +414,17 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
     return !empty($this->getSections());
   }
 
+  /**
+   * Returns the number of values in the entity's field.
+   *
+   * @param string $field_name
+   *   The name of the field.
+   *
+   * @return int
+   *   The number of values in the field.
+   */
+  public function fieldValuesCount(string $field_name): void {
+    return $this->getEntity()->hasField($field_name) ? $this->getEntity()->get($field_name)->count() : 0;
+  }
+
 }
