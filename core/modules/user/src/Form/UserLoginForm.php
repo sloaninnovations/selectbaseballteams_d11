@@ -2,17 +2,19 @@
 
 namespace Drupal\user\Form;
 
+use Drupal\Component\Utility\EmailValidatorInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\BareHtmlPageRendererInterface;
+use Drupal\Core\Render\Element\Email;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
-use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserAuthInterface;
+use Drupal\user\UserAuthenticationInterface;
+use Drupal\user\UserFloodControlInterface;
 use Drupal\user\UserInterface;
 use Drupal\user\UserStorageInterface;
-use Drupal\user\UserFloodControlInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -58,6 +60,13 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
   protected $bareHtmlPageRenderer;
 
   /**
+   * The email validator.
+   *
+   * @var \Drupal\Component\Utility\EmailValidatorInterface
+   */
+  protected ?EmailValidatorInterface $emailValidator = NULL;
+
+  /**
    * Constructs a new UserLoginForm.
    *
    * @param \Drupal\user\UserFloodControlInterface $user_flood_control
@@ -70,8 +79,10 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
    *   The renderer.
    * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bare_html_renderer
    *   The renderer.
+   * @param \Drupal\Component\Utility\EmailValidatorInterface $email_validator
+   *   The email validator.
    */
-  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, UserAuthInterface|UserAuthenticationInterface $user_auth, RendererInterface $renderer, BareHtmlPageRendererInterface $bare_html_renderer) {
+  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, UserAuthInterface|UserAuthenticationInterface $user_auth, RendererInterface $renderer, BareHtmlPageRendererInterface $bare_html_renderer, ?EmailValidatorInterface $email_validator = NULL) {
     $this->userFloodControl = $user_flood_control;
     $this->userStorage = $user_storage;
     if (!$user_auth instanceof UserAuthenticationInterface) {
@@ -80,6 +91,7 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
     $this->userAuth = $user_auth;
     $this->renderer = $renderer;
     $this->bareHtmlPageRenderer = $bare_html_renderer;
+    $this->emailValidator = $email_validator;
   }
 
   /**
@@ -91,7 +103,8 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
       $container->get('entity_type.manager')->getStorage('user'),
       $container->get('user.auth'),
       $container->get('renderer'),
-      $container->get('bare_html_page_renderer')
+      $container->get('bare_html_page_renderer'),
+      $container->get('email.validator')
     );
   }
 
@@ -107,13 +120,14 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('system.site');
+    $credentials = $this->config('user.settings')->get('user_login_method');
 
     // Display login form:
     $form['name'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Username'),
+      '#title' => $credentials == UserInterface::USER_LOGIN_USERNAME_ONLY ? $this->t('Username') : ($credentials == UserInterface::USER_LOGIN_EMAIL_ONLY ? $this->t('Email address') : $this->t('Username or email address')),
       '#size' => 60,
-      '#maxlength' => UserInterface::USERNAME_MAX_LENGTH,
+      '#maxlength' => $credentials == UserInterface::USER_LOGIN_USERNAME_ONLY ? UserInterface::USERNAME_MAX_LENGTH : Email::EMAIL_MAX_LENGTH,
       '#required' => TRUE,
       '#attributes' => [
         'autocorrect' => 'none',
@@ -181,8 +195,9 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
       // Do not allow any login from the current user's IP if the limit has been
       // reached. Default is 50 failed attempts allowed in one hour. This is
       // independent of the per-user limit to catch attempts from one IP to log
-      // in to many different user accounts.  We have a reasonably high limit
-      // since there may be only one apparent IP for all users at an institution.
+      // in to many different user accounts. We have a reasonably high limit
+      // since there may be only one apparent IP for all users at an
+      // institution.
       if (!$this->userFloodControl->isAllowed('user.failed_login_ip', $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {
         $form_state->set('flood_control_triggered', 'ip');
         return;
@@ -191,8 +206,16 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
         $account = $this->userAuth->lookupAccount($form_state->getValue('name'));
       }
       else {
-        $accounts = $this->userStorage->loadByProperties(['name' => $form_state->getValue('name')]);
-        $account = reset($accounts);
+        $account = FALSE;
+        $credentials = $this->config('user.settings')->get('user_login_method');
+        if ($credentials != UserInterface::USER_LOGIN_USERNAME_ONLY && $this->emailValidator->isValid($form_state->getValue('name'))) {
+          $accounts = $this->userStorage->loadByProperties(['mail' => $form_state->getValue('name'), 'status' => 1]);
+          $account = reset($accounts);
+        }
+        if (!$account && $credentials != UserInterface::USER_LOGIN_EMAIL_ONLY) {
+          $accounts = $this->userStorage->loadByProperties(['name' => $form_state->getValue('name'), 'status' => 1]);
+          $account = reset($accounts);
+        }
       }
       if ($account && $account->isBlocked()) {
         $form_state->setErrorByName('name', $this->t('The username %name has not been activated or is blocked.', ['%name' => $form_state->getValue('name')]));
@@ -237,7 +260,7 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
         // been upgraded to the new UserAuthenticationInterface. Fallback
         // to the authenticate() method.
         else {
-          $uid = $this->userAuth->authenticate($form_state->getValue('name'), $password);
+          $uid = $this->userAuth->authenticate($account->getAccountName(), $password);
           $form_state->set('uid', $uid);
         }
       }

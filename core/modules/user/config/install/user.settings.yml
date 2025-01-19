@@ -1,5 +1,6 @@
 langcode: en
 anonymous: Anonymous
+user_login_method: username_only
 verify_mail: true
 notify:
   cancel_confirm: true

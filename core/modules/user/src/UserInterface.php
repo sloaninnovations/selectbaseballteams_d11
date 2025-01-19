@@ -14,6 +14,21 @@ use Drupal\Core\Session\AccountInterface;
 interface UserInterface extends ContentEntityInterface, EntityChangedInterface, AccountInterface {
 
   /**
+   * Users can login with username only.
+   */
+  const USER_LOGIN_USERNAME_ONLY = 'username_only';
+
+  /**
+   * Users can login with email address only.
+   */
+  const USER_LOGIN_EMAIL_ONLY = 'email_only';
+
+  /**
+   * Users can login using either username or email address.
+   */
+  const USER_LOGIN_USERNAME_OR_EMAIL = 'username_or_email';
+
+  /**
    * Maximum length of username text field.
    *
    * Keep this under 191 characters so we can use a unique constraint in MySQL.

@@ -9,6 +9,9 @@ user.settings:
     anonymous:
       type: required_label
       label: 'Name'
+    user_login_method:
+      type: string
+      label: 'Login credentials'
     verify_mail:
       type: boolean
       label: 'Require email verification when a visitor creates an account'

@@ -286,13 +286,18 @@ class UserLoginTest extends BrowserTestBase {
    *   - Set to 'user' to expect a 'too many failed logins error.
    *   - Set to any value to expect an error for too many failed logins per IP.
    *   - Set to NULL to expect a failed login.
+   * @param bool $by_email
+   *   Authenticate with email instead of username.
    *
    * @internal
    */
-  public function assertFailedLogin(User $account, ?string $flood_trigger = NULL): void {
+  public function assertFailedLogin(User $account, ?string $flood_trigger = NULL, $by_email = FALSE): void {
+    if ($this->loggedInUser) {
+      $this->drupalLogout();
+    }
     $database = \Drupal::database();
     $edit = [
-      'name' => $account->getAccountName(),
+      'name' => $by_email ? $account->getEmail() : $account->getAccountName(),
       'pass' => $account->passRaw,
     ];
     $this->drupalGet('user/login');
@@ -326,7 +331,24 @@ class UserLoginTest extends BrowserTestBase {
     else {
       $this->assertSession()->statusCodeEquals(200);
       $this->assertSession()->fieldValueEquals('pass', '');
-      $this->assertSession()->pageTextContains('Unrecognized username or password. Forgot your password?');
+      switch (\Drupal::config('user.settings')->get('user_login_method')) {
+        case UserInterface::USER_LOGIN_USERNAME_ONLY:
+          $this->assertSession()->pageTextContains('Unrecognized username or password. Forgot your password?');
+          break;
+
+        case UserInterface::USER_LOGIN_EMAIL_ONLY:
+          if (!$by_email) {
+            $this->assertSession()->pageTextContains('The email address @email is not valid.', ['@email' => $account->getAccountName()]);
+          }
+          else {
+            $this->assertSession()->pageTextContains('Unrecognized username or password. Forgot your password?');
+          }
+          break;
+
+        case UserInterface::USER_LOGIN_USERNAME_OR_EMAIL:
+          $this->assertSession()->pageTextContains('Unrecognized username or password. Forgot your password?');
+          break;
+      }
     }
   }
 
@@ -358,6 +380,39 @@ class UserLoginTest extends BrowserTestBase {
     $pass_field = $this->getSession()->getPage()->findField('pass');
     $this->assertEquals('username', $name_field->getAttribute('autocomplete'));
     $this->assertEquals('current-password', $pass_field->getAttribute('autocomplete'));
+  }
+
+  /**
+   * Test that login credentials work with each method.
+   */
+  public function testLoginByEmail(): void {
+
+    $account = $this->drupalCreateUser([]);
+
+    // Login test with username only, the default method.
+    // Using email should fail with username only method.
+    $this->drupalLogin($account);
+    // Using username should pass.
+    $this->assertFailedLogin($account, NULL, TRUE);
+
+    // Login test with email only method.
+    $this->config('user.settings')
+      ->set('user_login_method', UserInterface::USER_LOGIN_EMAIL_ONLY)
+      ->save();
+    // Using email should pass.
+    $this->drupalLogin($account, TRUE);
+    // Using username should fail.
+    $this->assertFailedLogin($account);
+
+    // Login test with username or email method.
+    $this->config('user.settings')
+      ->set('user_login_method', UserInterface::USER_LOGIN_USERNAME_OR_EMAIL)
+      ->save();
+
+    // Using email should pass.
+    $this->drupalLogin($account, TRUE);
+    // Using username should pass.
+    $this->drupalLogin($account);
   }
 
 }

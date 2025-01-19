@@ -2,10 +2,10 @@
 
 namespace Drupal\user;
 
-use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
@@ -115,6 +115,24 @@ class AccountSettingsForm extends ConfigFormBase {
       $form_state->set(['content_translation', 'key'], 'language');
       $form['language'] += content_translation_enable_widget('user', 'user', $form, $form_state);
     }
+
+    // User login settings.
+    $form['user_login'] = [
+      '#type' => 'details',
+      '#title' => $this->t('User login'),
+    ];
+
+    $form['user_login']['user_login_method'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Login credentials'),
+      '#config_target' => 'user.settings:user_login_method',
+      '#description' => $this->t('The details users may use to identify themselves.'),
+      '#options' => [
+        UserInterface::USER_LOGIN_USERNAME_ONLY => $this->t('Username'),
+        UserInterface::USER_LOGIN_EMAIL_ONLY => $this->t('Email address'),
+        UserInterface::USER_LOGIN_USERNAME_OR_EMAIL => $this->t('Username or email address'),
+      ],
+    ];
 
     // User registration settings.
     $form['registration_cancellation'] = [

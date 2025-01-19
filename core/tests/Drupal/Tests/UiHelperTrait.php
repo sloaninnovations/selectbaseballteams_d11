@@ -153,10 +153,12 @@ trait UiHelperTrait {
    *
    * @param \Drupal\Core\Session\AccountInterface $account
    *   User object representing the user to log in.
+   * @param bool $by_email
+   *   Whether to use email for login instead of username.
    *
    * @see drupalCreateUser()
    */
-  protected function drupalLogin(AccountInterface $account) {
+  protected function drupalLogin(AccountInterface $account, $by_email = FALSE) {
     if ($this->loggedInUser) {
       $this->drupalLogout();
     }
@@ -172,7 +174,7 @@ trait UiHelperTrait {
     else {
       $this->drupalGet(Url::fromRoute('user.login'));
       $this->submitForm([
-        'name' => $account->getAccountName(),
+        'name' => $by_email ? $account->getEmail() : $account->getAccountName(),
         'pass' => $account->passRaw,
       ], 'Log in');
     }
