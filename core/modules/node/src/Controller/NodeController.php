@@ -286,10 +286,13 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
    *   Node revision IDs (in descending order).
    */
   protected function getRevisionIds(NodeInterface $node, NodeStorageInterface $node_storage) {
+    $langcode = $node->language()->getId();
     $result = $node_storage->getQuery()
       ->accessCheck(TRUE)
       ->allRevisions()
       ->condition($node->getEntityType()->getKey('id'), $node->id())
+      ->condition($node->getEntityType()->getKey('langcode'), $langcode)
+      ->condition($node->getEntityType()->getKey('revision_translation_affected'), '1')
       ->sort($node->getEntityType()->getKey('revision'), 'DESC')
       ->pager(50)
       ->execute();
