@@ -16,6 +16,7 @@ parameters:
     cookie_lifetime: 2000000
     cookie_samesite: Lax
     name_suffix: ''
+  theme_name: ~
   twig.config:
     debug: false
     auto_reload: null
@@ -1550,7 +1551,7 @@ services:
   Drupal\Core\Theme\ThemeInitializationInterface: '@theme.initialization'
   theme.registry:
     class: Drupal\Core\Theme\Registry
-    arguments: ['%app.root%', '@cache.default', '@lock', '@module_handler', '@theme_handler', '@theme.initialization', '@cache.bootstrap', '@extension.list.module', '@kernel']
+    arguments: ['%app.root%', '@cache.default', '@lock', '@module_handler', '@theme_handler', '@theme.initialization', '@cache.bootstrap', '@extension.list.module', '@kernel', '%theme_name%', '%preprocess_with_levels%']
     tags:
       - { name: needs_destruction }
     calls:

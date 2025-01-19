@@ -7,6 +7,7 @@ namespace Drupal\theme_test\Hook;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Attribute\Preprocess;
 
 /**
  * Hook implementations for theme_test.
@@ -115,6 +116,14 @@ class ThemeTestHooks {
     if (is_array($info)) {
       $libraries = NestedArray::mergeDeep($libraries, $info);
     }
+  }
+
+  /**
+   * Implements hook_preprocess_HOOK().
+   */
+  #[Preprocess('theme_test_preprocess_suggestions__monkey')]
+  public function preprocessTestSuggestions(&$variables): void {
+    $variables['foo'] = 'Monkey';
   }
 
 }
