@@ -132,16 +132,18 @@ trait PerformanceTestTrait {
       $cache_tag_is_valid_count = 0;
       $cache_tag_invalidation_count = 0;
       $cache_tag_checksum_count = 0;
+      $cache_tag_lookup_query_count = 0;
       foreach ($performance_test_data['database_events'] as $event) {
+        $normalized_query = static::normalizeQuery($event->queryString, $this->databasePrefix);
+
         // Don't log queries from the database cache backend because they're
         // logged separately as cache operations.
         if (!static::isDatabaseCache($event)) {
-          // Make the query easier to read and log it.
-          static::logQuery(
-            $performance_data,
-            str_replace([$this->databasePrefix, "\r\n", "\r", "\n"], ['', ' ', ' ', ' '], $event->queryString),
-            $event->args
-          );
+          static::logQuery($performance_data, $normalized_query, $event->args);
+        }
+        // Keep track of cache tag lookup queries.
+        elseif (str_starts_with($normalized_query, 'SELECT "tag", "invalidations" FROM "cachetags"')) {
+          $cache_tag_lookup_query_count++;
         }
       }
       $cache_operations = [];
@@ -173,6 +175,7 @@ trait PerformanceTestTrait {
       $performance_data->setCacheTagIsValidCount($cache_tag_is_valid_count);
       $performance_data->setCacheTagInvalidationCount($cache_tag_invalidation_count);
       $performance_data->setCacheOperations($cache_operations);
+      $performance_data->setCacheTagLookupQueryCount($cache_tag_lookup_query_count);
     }
 
     return $performance_data;
@@ -684,6 +687,21 @@ trait PerformanceTestTrait {
       'CacheTagIsValidCount' => $performance_data->getCacheTagIsValidCount(),
       'CacheTagInvalidationCount' => $performance_data->getCacheTagInvalidationCount(),
     ];
+  }
+
+  /**
+   * Normalizes a query by removing the database prefix and newlines.
+   *
+   * @param string $query_string
+   *   The query string to normalize.
+   * @param string $database_prefix
+   *   The database prefix to remove from the query.
+   *
+   * @return string
+   *   The normalized query string.
+   */
+  protected static function normalizeQuery(string $query_string, string $database_prefix): string {
+    return str_replace([$database_prefix, "\r\n", "\r", "\n"], ['', ' ', ' ', ' '], $query_string);
   }
 
 }

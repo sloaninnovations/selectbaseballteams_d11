@@ -79,6 +79,11 @@ class PerformanceData {
   protected int $cacheTagInvalidationCount = 0;
 
   /**
+   * The number of cache tag lookup queries.
+   */
+  protected int $cacheTagLookupQueryCount = 0;
+
+  /**
    * The original return value.
    */
   protected $returnValue;
@@ -364,6 +369,26 @@ class PerformanceData {
    */
   public function getCacheTagInvalidationCount(): int {
     return $this->cacheTagInvalidationCount;
+  }
+
+  /**
+   * Sets the cache tag lookup query count.
+   *
+   * @param int $count
+   *   The number of cache tag lookup queries recorded.
+   */
+  public function setCacheTagLookupQueryCount(int $count): void {
+    $this->cacheTagLookupQueryCount = $count;
+  }
+
+  /**
+   * Gets the cache tag lookup query count.
+   *
+   * @return int
+   *   The number of cache tag lookup queries recorded.
+   */
+  public function getCacheTagLookupQueryCount(): int {
+    return $this->cacheTagLookupQueryCount;
   }
 
   /**
