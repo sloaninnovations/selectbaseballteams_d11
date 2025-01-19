@@ -210,6 +210,24 @@ class HtmlTagTest extends RendererTestBase {
     ];
     $tags['link'] = [$element, '<link />' . "\n"];
 
+    // Valid href attribute for link tag.
+    $element = [
+      '#tag' => 'link',
+      '#attributes' => [
+        'href' => '/blog?tag=security&page=4',
+      ],
+    ];
+    $tags['link-href'] = [$element, '<link href="/blog?tag=security&page=4" />' . "\n"];
+
+    // Valid src attribute for img tag.
+    $element = [
+      '#tag' => 'img',
+      '#attributes' => [
+        'src' => '/blog?tag=security&page=4',
+      ],
+    ];
+    $tags['img-src'] = [$element, '<img src="/blog?tag=security&page=4" />' . "\n"];
+
     return $tags;
   }
 

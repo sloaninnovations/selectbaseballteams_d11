@@ -4,9 +4,10 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html as HtmlUtility;
+use Drupal\Component\Utility\UrlHelper;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Markup;
-use Drupal\Component\Utility\Xss;
 use Drupal\Core\Template\Attribute;
 
 /**
@@ -83,6 +84,25 @@ class HtmlTag extends RenderElementBase {
    */
   public static function preRenderHtmlTag($element) {
     $attributes = isset($element['#attributes']) ? new Attribute($element['#attributes']) : '';
+
+    // Ensure href and src attributes don't get escaped.
+    // @see https://www.drupal.org/project/drupal/issues/2968558
+    if ($element['#tag'] == 'link') {
+      $url = $element['#attributes']['href'] ?? NULL;
+      if (UrlHelper::isValid($url)) {
+        unset($element['#attributes']['href']);
+        $attributes = isset($element['#attributes']) ? new Attribute($element['#attributes']) : '';
+        $attributes = $attributes . ' href="' . $url . '"';
+      }
+    }
+    elseif ($element['#tag'] == 'src') {
+      $url = $element['#attributes']['src'] ?? NULL;
+      if (UrlHelper::isValid($url)) {
+        unset($element['#attributes']['src']);
+        $attributes = isset($element['#attributes']) ? new Attribute($element['#attributes']) : '';
+        $attributes = $attributes . ' src="' . $url . '"';
+      }
+    }
 
     // An HTML tag should not contain any special characters. Escape them to
     // ensure this cannot be abused.
