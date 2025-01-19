@@ -218,7 +218,7 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Call the plugin submit handler.
     $subform_state = SubformState::createForSubform($form['settings'], $form, $form_state);
-    $this->getPluginForm($this->block)->submitConfigurationForm($form, $subform_state);
+    $this->getPluginForm($this->block)->submitConfigurationForm($form['settings'], $subform_state);
 
     // If this block is context-aware, set the context mapping.
     if ($this->block instanceof ContextAwarePluginInterface) {
