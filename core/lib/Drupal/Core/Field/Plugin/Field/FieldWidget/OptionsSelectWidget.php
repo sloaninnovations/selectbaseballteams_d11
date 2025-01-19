@@ -29,6 +29,7 @@ class OptionsSelectWidget extends OptionsWidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
+    $options = $this->getOptions($items->getEntity());
 
     $element += [
       '#type' => 'select',
@@ -37,6 +38,14 @@ class OptionsSelectWidget extends OptionsWidgetBase {
       // Do not display a 'multiple' select box if there is only one option.
       '#multiple' => $this->multiple && count($this->options) > 1,
     ];
+
+    $bundles = $items->getItemDefinition()->getSettings();
+    $type = implode('', $bundles['handler_settings']['target_bundles']);
+    if (count($options) < 2) {
+      $element['#description'] = $this->t('There are no @type types available. Contact the site administrator.', [
+        '@type' => $type,
+      ]);
+    }
 
     return $element;
   }
