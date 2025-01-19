@@ -15,6 +15,7 @@ use Drupal\menu_link_content\MenuLinkContentAccessControlHandler;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\menu_link_content\MenuLinkContentStorage;
 use Drupal\menu_link_content\MenuLinkContentStorageSchema;
+use Drupal\menu_link_content\MenuLinkContentViewsData;
 use Drupal\menu_link_content\MenuLinkListBuilder;
 
 /**
@@ -26,6 +27,7 @@ use Drupal\menu_link_content\MenuLinkListBuilder;
 #[ContentEntityType(
   id: 'menu_link_content',
   label: new TranslatableMarkup('Custom menu link'),
+  bundle_label: new TranslatableMarkup('Custom menu link type'),
   label_collection: new TranslatableMarkup('Custom menu links'),
   label_singular: new TranslatableMarkup('custom menu link'),
   label_plural: new TranslatableMarkup('custom menu links'),
@@ -42,6 +44,7 @@ use Drupal\menu_link_content\MenuLinkListBuilder;
     'storage' => MenuLinkContentStorage::class,
     'storage_schema' => MenuLinkContentStorageSchema::class,
     'access' => MenuLinkContentAccessControlHandler::class,
+    "views_data" => MenuLinkContentViewsData::class,
     'form' => [
       'default' => MenuLinkContentForm::class,
       'delete' => MenuLinkContentDeleteForm::class,
