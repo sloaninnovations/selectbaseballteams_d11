@@ -151,8 +151,9 @@ class FormatterPluginManager extends DefaultPluginManager {
       $configuration['type'] = $field_type['default_formatter'];
     }
     // Filter out unknown settings, and fill in defaults for missing settings.
+    $settings = $configuration['settings'] ?? [];
     $default_settings = $this->getDefaultSettings($configuration['type']);
-    $configuration['settings'] = array_intersect_key($configuration['settings'], $default_settings) + $default_settings;
+    $configuration['settings'] = array_intersect_key($settings, $default_settings) + $default_settings;
 
     return $configuration;
   }

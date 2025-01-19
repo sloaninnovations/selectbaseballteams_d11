@@ -468,9 +468,22 @@ class LinkFieldTest extends BrowserTestBase {
     // the link generator and options/attributes. Only 'url_plain' has a
     // dependency on 'url_only'.
     $options = [
-      'trim_length' => [NULL, 6],
-      'rel' => [NULL, 'nofollow'],
-      'target' => [NULL, '_blank'],
+      'empty' => [
+        NULL,
+        [],
+      ],
+      'trim_length' => [
+        ['trim_length' => NULL],
+        ['trim_length' => 6],
+      ],
+      'rel' => [
+        ['rel' => NULL],
+        ['rel' => 'nofollow'],
+      ],
+      'target' => [
+        ['target' => NULL],
+        ['target' => '_blank'],
+      ],
       'url_only' => [
         ['url_only' => FALSE],
         ['url_only' => FALSE, 'url_plain' => TRUE],
@@ -481,19 +494,21 @@ class LinkFieldTest extends BrowserTestBase {
     foreach ($options as $setting => $values) {
       foreach ($values as $new_value) {
         // Update the field formatter settings.
-        if (!is_array($new_value)) {
-          $display_options['settings'] = [$setting => $new_value];
-        }
-        else {
-          $display_options['settings'] = $new_value;
-        }
+        $display_options['settings'] = $new_value;
         $display_repository->getViewDisplay('entity_test', 'entity_test', 'full')
           ->setComponent($field_name, $display_options)
           ->save();
 
         $output = $this->renderTestEntity($id);
         switch ($setting) {
+          case 'empty':
+            $this->assertStringContainsString('<a href="' . Html::escape($url1) . '">' . Html::escape($title1) . '</a>', $output);
+            $this->assertStringContainsString('<a href="' . Html::escape($url2) . '">' . Html::escape($title2) . '</a>', $output);
+            $this->assertStringContainsString('<a href="' . Html::escape($url3) . '">' . Html::escape($title3) . '</a>', $output);
+            break;
+
           case 'trim_length':
+            $new_value = $new_value[$setting];
             $url = $url1;
             $title = isset($new_value) ? Unicode::truncate($title1, $new_value, FALSE, TRUE) : $title1;
             $this->assertStringContainsString('<a href="' . Html::escape($url) . '">' . Html::escape($title) . '</a>', $output);
@@ -508,6 +523,7 @@ class LinkFieldTest extends BrowserTestBase {
             break;
 
           case 'rel':
+            $new_value = $new_value[$setting];
             $rel = isset($new_value) ? ' rel="' . $new_value . '"' : '';
             $this->assertStringContainsString('<a href="' . Html::escape($url1) . '"' . $rel . '>' . Html::escape($title1) . '</a>', $output);
             $this->assertStringContainsString('<a href="' . Html::escape($url2) . '"' . $rel . '>' . Html::escape($title2) . '</a>', $output);
@@ -515,6 +531,7 @@ class LinkFieldTest extends BrowserTestBase {
             break;
 
           case 'target':
+            $new_value = $new_value[$setting];
             $target = isset($new_value) ? ' target="' . $new_value . '"' : '';
             $this->assertStringContainsString('<a href="' . Html::escape($url1) . '"' . $target . '>' . Html::escape($title1) . '</a>', $output);
             $this->assertStringContainsString('<a href="' . Html::escape($url2) . '"' . $target . '>' . Html::escape($title2) . '</a>', $output);
