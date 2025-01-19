@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\Entity;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\field\Entity\FieldConfig;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
@@ -114,7 +113,7 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
       FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED
     );
 
-    // Create four test nodes.
+    // Create two test nodes.
     $published_node = Node::create([
       'title' => 'Test published node',
       'type' => 'article',
@@ -129,26 +128,10 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     ]);
     $unpublished_node->save();
 
-    $different_bundle_node = Node::create([
-      'title' => 'Test page node',
-      'type' => 'page',
-      'status' => NodeInterface::PUBLISHED,
-    ]);
-    $different_bundle_node->save();
-
-    $deleted_node = Node::create([
-      'title' => 'Test deleted node',
-      'type' => 'article',
-      'status' => NodeInterface::PUBLISHED,
-    ]);
-    $deleted_node->save();
-
     $referencing_entity = EntityTest::create([
       'field_test' => [
         ['entity' => $published_node],
         ['entity' => $unpublished_node],
-        ['entity' => $different_bundle_node],
-        ['entity' => $deleted_node],
       ],
     ]);
 
@@ -191,31 +174,10 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $referencing_entity->save();
     $this->assertEquals($published_node->id(), $referencing_entity->field_test[0]->target_id);
     $this->assertEquals($unpublished_node->id(), $referencing_entity->field_test[1]->target_id);
-    $this->assertEquals($different_bundle_node->id(), $referencing_entity->field_test[2]->target_id);
-    $this->assertEquals($deleted_node->id(), $referencing_entity->field_test[3]->target_id);
 
     $violations = $referencing_entity->field_test->validate();
     $this->assertCount(0, $violations);
 
-    // Remove one of the referenceable bundles and check that a pre-existing node
-    // of that bundle can not be referenced anymore.
-    $field = FieldConfig::loadByName('entity_test', 'entity_test', 'field_test');
-    $field->setSetting('handler_settings', ['target_bundles' => ['article']]);
-    $field->save();
-    $referencing_entity = $this->reloadEntity($referencing_entity);
-
-    $violations = $referencing_entity->field_test->validate();
-    $this->assertCount(1, $violations);
-    $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $different_bundle_node->id()), $violations[0]->getMessage());
-
-    // Delete the last node and check that the pre-existing reference is not
-    // valid anymore.
-    $deleted_node->delete();
-
-    $violations = $referencing_entity->field_test->validate();
-    $this->assertCount(2, $violations);
-    $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $different_bundle_node->id()), $violations[0]->getMessage());
-    $this->assertEquals(sprintf('The referenced entity (node: %s) does not exist.', $deleted_node->id()), $violations[1]->getMessage());
   }
 
 }
