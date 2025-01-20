@@ -71,6 +71,7 @@ variables:
   MINK_DRIVER_ARGS_WEBDRIVER_CHROMEDRIVER_NON_W3C: '["chrome", {"browserName":"chrome","goog:chromeOptions":{"args":["--disable-dev-shm-usage","--disable-gpu","--headless","--dns-prefetch-disable"]}}, "http://localhost:9515"]'
   CI_PARALLEL_NODE_INDEX: $CI_NODE_INDEX
   CI_PARALLEL_NODE_TOTAL: $CI_NODE_TOTAL
+  PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: false
 
 .with-database: &with-database
   name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:production

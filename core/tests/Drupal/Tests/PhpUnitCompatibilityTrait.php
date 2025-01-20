@@ -22,7 +22,7 @@ if (FALSE) {
    */
   trait PhpUnitCompatibilityTrait {
 
-    use \Drupal\TestTools\PhpUnitCompatibility\PhpUnit10\TestCompatibilityTrait;
+    use \Drupal\TestTools\PhpUnitCompatibility\PhpUnit11\TestCompatibilityTrait;
 
   }
 

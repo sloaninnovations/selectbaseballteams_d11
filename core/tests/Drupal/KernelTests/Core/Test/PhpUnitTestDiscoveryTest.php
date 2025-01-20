@@ -74,8 +74,16 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
     $phpUnitXmlList = new \DOMDocument();
     $phpUnitXmlList->loadXML(file_get_contents($this->xmlOutputFile));
     $phpUnitList = [];
+    // Try PHPUnit 10 format first.
+    // @todo remove once PHPUnit 10 is no longer used.
     foreach ($phpUnitXmlList->getElementsByTagName('testCaseClass') as $node) {
       $phpUnitList[] = $node->getAttribute('name');
+    }
+    // If empty, try PHPUnit 11+ format.
+    if (empty($phpUnitList)) {
+      foreach ($phpUnitXmlList->getElementsByTagName('testClass') as $node) {
+        $phpUnitList[] = $node->getAttribute('name');
+      }
     }
     asort($phpUnitList);
 
@@ -93,7 +101,7 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
     $internalList = array_unique($internalList);
     asort($internalList);
 
-    $this->assertEquals(array_values($phpUnitList), array_values($internalList));
+    $this->assertEquals(implode("\n", $phpUnitList), implode("\n", $internalList));
   }
 
 }

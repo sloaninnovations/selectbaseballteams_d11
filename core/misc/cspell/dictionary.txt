@@ -458,6 +458,7 @@ squiz
 squizlabs
 srcset
 ssess
+staabm
 starterkit
 statuscode
 stddev

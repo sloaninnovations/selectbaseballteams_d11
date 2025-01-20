@@ -6,20 +6,23 @@ namespace Drupal\Tests\Core\Test;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\deprecation_test\Deprecation\FixtureDeprecatedClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Test how unit tests interact with deprecation errors.
  *
  * @group Test
- * @group legacy
  */
+#[Group('Test')]
+#[IgnoreDeprecations]
 class PhpUnitBridgeTest extends UnitTestCase {
 
   /**
    * Tests class-level deprecation.
    */
   public function testDeprecatedClass(): void {
-    $this->expectDeprecation('Drupal\deprecation_test\Deprecation\FixtureDeprecatedClass is deprecated.');
+    $this->expectUserDeprecationMessage('Drupal\deprecation_test\Deprecation\FixtureDeprecatedClass is deprecated.');
     $deprecated = new FixtureDeprecatedClass();
     $this->assertEquals('test', $deprecated->testFunction());
   }

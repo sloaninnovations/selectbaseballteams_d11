@@ -1101,8 +1101,8 @@ class HTMLRestrictionsTest extends UnitTestCase {
       'expected_union' => 'a',
     ];
     yield 'attribute restrictions are different: <ol type=*> vs <ol type="A"> — vice versa' => [
-      'b' => new HTMLRestrictions(['ol' => ['type' => ['A' => TRUE]]]),
-      'a' => new HTMLRestrictions(['ol' => ['type' => TRUE]]),
+      'a' => new HTMLRestrictions(['ol' => ['type' => ['A' => TRUE]]]),
+      'b' => new HTMLRestrictions(['ol' => ['type' => TRUE]]),
       'expected_diff' => HTMLRestrictions::emptySet(),
       'expected_intersection' => 'a',
       'expected_union' => 'b',
@@ -1115,8 +1115,8 @@ class HTMLRestrictionsTest extends UnitTestCase {
       'expected_union' => 'a',
     ];
     yield 'attribute restrictions are different: <ol type=*> vs <ol type="1"> — vice versa' => [
-      'b' => new HTMLRestrictions(['ol' => ['type' => ['1' => TRUE]]]),
-      'a' => new HTMLRestrictions(['ol' => ['type' => TRUE]]),
+      'a' => new HTMLRestrictions(['ol' => ['type' => ['1' => TRUE]]]),
+      'b' => new HTMLRestrictions(['ol' => ['type' => TRUE]]),
       'expected_diff' => HTMLRestrictions::emptySet(),
       'expected_intersection' => 'a',
       'expected_union' => 'b',
