@@ -34,7 +34,10 @@
     </div>
   {% endif %}
 
-  {{ description }}
+  {%- if description.content -%}
+    <div{{ description.attributes.addClass('description-details') }}>{{ description.content }}</div>
+  {%- endif -%}
+
   {{ children }}
   {{ value }}
 </details>

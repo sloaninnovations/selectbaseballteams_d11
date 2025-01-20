@@ -74,8 +74,12 @@
           {{ errors }}
         </div>
       {% endif %}
-      {%- if description -%}
-        <div class="claro-details__description{{ disabled ? ' is-disabled' }}">{{ description }}</div>
+      {%- if description.content -%}
+        {% set description_classes = [
+          'claro-details__description',
+          disabled ? 'is-disabled',
+        ] %}
+        <div{{ description.attributes.addClass(description_classes) }}>{{ description.content }}</div>
       {%- endif -%}
       {%- if children -%}
         {{ children }}

@@ -49,8 +49,8 @@
         {{ errors }}
       </div>
     {% endif %}
-    {%- if description -%}
-      <div class="olivero-details__description">{{ description }}</div>
+    {%- if description.content -%}
+      <div{{ description.attributes.addClass('olivero-details__description') }}>{{ description.content }}</div>
     {%- endif -%}
     {%- if children -%}
       {{ children }}

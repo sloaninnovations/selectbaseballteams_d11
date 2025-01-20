@@ -262,7 +262,15 @@ function template_preprocess_details(&$variables): void {
   if (is_string($variables['title']) && $variables['title'] !== '') {
     $variables['title'] = ['#markup' => $variables['title']];
   }
-  $variables['description'] = (!empty($element['#description'])) ? $element['#description'] : '';
+  if (!empty($element['#attributes']['id']) && !empty($element['#description'])) {
+    $description_id = $element['#attributes']['id'] . '--description';
+    $description_attributes['id'] = $description_id;
+    $variables['description']['attributes'] = new Attribute($description_attributes);
+    $variables['description']['content'] = $element['#description'];
+
+    // Add the description's id to the details aria attributes.
+    $variables['attributes']['aria-describedby'] = $description_id;
+  }
   $variables['children'] = (isset($element['#children'])) ? $element['#children'] : '';
   $variables['value'] = (isset($element['#value'])) ? $element['#value'] : '';
   $variables['required'] = !empty($element['#required']) ? $element['#required'] : NULL;
