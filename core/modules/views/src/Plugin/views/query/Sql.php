@@ -1329,13 +1329,6 @@ class Sql extends QueryPluginBase {
    *   Provide a countQuery if this is true, otherwise provide a normal query.
    */
   public function query($get_count = FALSE) {
-    // Check query distinct value.
-    if (empty($this->noDistinct) && $this->distinct && !empty($this->fields)) {
-      $base_field_alias = $this->addField($this->view->storage->get('base_table'), $this->view->storage->get('base_field'));
-      $this->addGroupBy($base_field_alias);
-      $distinct = TRUE;
-    }
-
     /**
      * An optimized count query includes just the base field instead of all the fields.
      * Determine of this query qualifies by checking for a groupby or distinct.
@@ -1364,10 +1357,6 @@ class Sql extends QueryPluginBase {
     // Add the tags added to the view itself.
     foreach ($this->tags as $tag) {
       $query->addTag($tag);
-    }
-
-    if (!empty($distinct)) {
-      $query->distinct();
     }
 
     // Add all the tables to the query via joins. We assume all LEFT joins.
@@ -1409,6 +1398,12 @@ class Sql extends QueryPluginBase {
         $base_field = !$info['revision'] ? $entity_type->getKey('id') : $entity_type->getKey('revision');
         $this->addField($info['alias'], $base_field, '', $params);
       }
+    }
+    // Check query distinct value.
+    if (empty($this->noDistinct) && $this->distinct && !empty($this->fields)) {
+      $base_field_alias = $this->addField($this->view->storage->get('base_table'), $this->view->storage->get('base_field'));
+      $this->addGroupBy($base_field_alias);
+      $query->distinct();
     }
 
     // Add all fields to the query.
