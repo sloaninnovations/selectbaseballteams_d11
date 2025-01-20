@@ -1,0 +1,66 @@
+services:
+  _defaults:
+    autoconfigure: true
+  mailer.transport_factory.abstract:
+    abstract: true
+    class: Symfony\Component\Mailer\Transport\AbstractTransportFactory
+    arguments:
+      - '@Psr\EventDispatcher\EventDispatcherInterface'
+      - '@?Symfony\Contracts\HttpClient\HttpClientInterface'
+      - '@logger.channel.mail'
+  Symfony\Component\Mailer\Transport\AbstractTransportFactory: '@mailer.transport_factory.abstract'
+  mailer.transport_factory.native:
+    parent: mailer.transport_factory.abstract
+    class: Symfony\Component\Mailer\Transport\NativeTransportFactory
+    tags:
+      - { name: mailer.transport_factory }
+  mailer.transport_factory.null:
+    parent: mailer.transport_factory.abstract
+    class: Symfony\Component\Mailer\Transport\NullTransportFactory
+    tags:
+      - { name: mailer.transport_factory }
+  mailer.transport_factory.sendmail:
+    parent: mailer.transport_factory.abstract
+    class: Symfony\Component\Mailer\Transport\SendmailTransportFactory
+    tags:
+      - { name: mailer.transport_factory }
+  mailer.transport_factory_decorator.sendmail_command_validation:
+    class: Drupal\Core\Mailer\Transport\SendmailCommandValidationTransportFactory
+    decorates: mailer.transport_factory.sendmail
+    arguments: ['@.inner']
+    public: false
+  mailer.transport_factory.smtp:
+    parent: mailer.transport_factory.abstract
+    class: Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory
+    tags:
+      - { name: mailer.transport_factory, priority: -100 }
+  mailer.transport_factory_collection:
+    class: Drupal\Core\Mailer\TransportFactoryCollection
+    public: false
+    tags:
+      - { name: service_collector, tag: mailer.transport_factory, call: addTransportFactory }
+  Drupal\Core\Mailer\TransportFactoryCollection: '@mailer.transport_factory_collection'
+  mailer.transport_factory:
+    class: Symfony\Component\Mailer\Transport
+    arguments: ['@Drupal\Core\Mailer\TransportFactoryCollection']
+  Symfony\Component\Mailer\Transport: '@mailer.transport_factory'
+  mailer.transport_factory_adapter:
+    class: Drupal\Core\Mailer\TransportFactoryAdapter
+    autowire: true
+    public: false
+  Drupal\Core\Mailer\Transport\ConfiguredTransportFactoryInterface: '@mailer.transport_factory_adapter'
+  mailer.transport:
+    class: Symfony\Component\Mailer\Transport\TransportInterface
+    factory: ['@Drupal\Core\Mailer\Transport\ConfiguredTransportFactoryInterface', 'createTransport']
+  Symfony\Component\Mailer\Transport\TransportInterface: '@mailer.transport'
+  mailer.messenger.message_handler:
+    class: Symfony\Component\Mailer\Messenger\MessageHandler
+    autowire: true
+    public: false
+    tags:
+      - { name: messenger.message_handler }
+  Symfony\Component\Mailer\Messenger\MessageHandler: '@mailer.messenger.message_handler'
+  mailer.mailer:
+    class: Symfony\Component\Mailer\Mailer
+    autowire: true
+  Symfony\Component\Mailer\MailerInterface: '@mailer.mailer'
