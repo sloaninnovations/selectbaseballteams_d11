@@ -364,10 +364,6 @@ function olivero_preprocess_field(&$variables): void {
   if (in_array($variables['field_type'], $rich_field_types, TRUE)) {
     $variables['attributes']['class'][] = 'text-content';
   }
-
-  if ($variables['field_type'] == 'image' && $variables['element']['#view_mode'] == 'full' && !$variables["element"]["#is_multiple"] && $variables['field_name'] !== 'user_picture') {
-    $variables['attributes']['class'][] = 'wide-content';
-  }
 }
 
 /**
