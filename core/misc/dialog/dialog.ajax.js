@@ -12,6 +12,40 @@
    * @prop {Drupal~behaviorAttach} attach
    *   Attaches the behaviors for dialog ajax functionality.
    */
+
+  function makeDialogAjaxAware(dialog) {
+    const originalClose = dialog.close;
+    // Overwrite the close method to remove the dialog on closing.
+    dialog.close = function (event, ...args) {
+      originalClose.apply(dialog, [event, ...args]);
+      // Check if the opener element is inside an AJAX container.
+      const $element = $(event.target);
+      const ajaxContainer = $element.data('uiDialog')
+        ? $element
+            .data('uiDialog')
+            .opener.closest('[data-drupal-ajax-container]')
+        : [];
+
+      // If the opener element was in an ajax container, and focus is on the
+      // body element, we can assume focus was lost. To recover, focus is
+      // moved to the first focusable element in the container.
+      if (
+        ajaxContainer.length &&
+        (document.activeElement === document.body ||
+          $(document.activeElement).not(':visible'))
+      ) {
+        const focusableChildren = focusable(ajaxContainer[0]);
+        if (focusableChildren.length > 0) {
+          setTimeout(() => {
+            focusableChildren[0].focus();
+          }, 0);
+        }
+      }
+
+      $(event.target).remove();
+    };
+  }
+
   Drupal.behaviors.dialog = {
     attach(context, settings) {
       const $context = $(context);
@@ -50,36 +84,10 @@
         }, 0);
       }
 
-      const originalClose = settings.dialog.close;
-      // Overwrite the close method to remove the dialog on closing.
-      settings.dialog.close = function (event, ...args) {
-        originalClose.apply(settings.dialog, [event, ...args]);
-        // Check if the opener element is inside an AJAX container.
-        const $element = $(event.target);
-        const ajaxContainer = $element.data('uiDialog')
-          ? $element
-              .data('uiDialog')
-              .opener.closest('[data-drupal-ajax-container]')
-          : [];
-
-        // If the opener element was in an ajax container, and focus is on the
-        // body element, we can assume focus was lost. To recover, focus is
-        // moved to the first focusable element in the container.
-        if (
-          ajaxContainer.length &&
-          (document.activeElement === document.body ||
-            $(document.activeElement).not(':visible'))
-        ) {
-          const focusableChildren = focusable(ajaxContainer[0]);
-          if (focusableChildren.length > 0) {
-            setTimeout(() => {
-              focusableChildren[0].focus();
-            }, 0);
-          }
-        }
-
-        $(event.target).remove();
-      };
+      if (!settings.dialogAjaxAware) {
+        settings.dialogAjaxAware = true;
+        makeDialogAjaxAware(settings.dialog);
+      }
     },
 
     /**
@@ -178,7 +186,8 @@
     }
 
     // Bind dialogButtonsChange.
-    $dialog.on('dialogButtonsChange', () => {
+    // Use .off() to prevent binding twice when the dialog was already open.
+    $dialog.off('dialogButtonsChange').on('dialogButtonsChange', () => {
       const buttons = Drupal.behaviors.dialog.prepareDialogButtons($dialog);
       $dialog.dialog('option', 'buttons', buttons);
     });
@@ -273,7 +282,8 @@
   window.addEventListener('dialog:aftercreate', (event) => {
     const $element = $(event.target);
     const dialog = event.dialog;
-    $element.on('click.dialog', '.dialog-cancel', (e) => {
+    // Use .off() to prevent binding twice when the dialog was already open.
+    $element.off('click.dialog').on('click.dialog', '.dialog-cancel', (e) => {
       dialog.close('cancel');
       e.preventDefault();
       e.stopPropagation();
