@@ -165,10 +165,6 @@ We need it root to calculate the size of the displace in .dialog-off-canvas-main
   --admin-toolbar-z-index-popover: var(--drupal-admin-z-index-popover, 601);
   --admin-toolbar-z-index-footer: var(--drupal-admin-z-index-footer, 701);
   --admin-toolbar-z-index-tooltip: var(--drupal-admin-z-index-tooltip, 801);
-
-  /* Top bar navigation */
-  --admin-top-bar-color-green: var(--drupal-admin-top-bar-color-green, #bdee63);
-  --admin-top-bar-color-gray: var(--drupal-admin-top-bar-color-gray, #eeeef2);
 }
 /**
   * Transitions.

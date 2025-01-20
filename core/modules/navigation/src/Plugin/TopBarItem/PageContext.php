@@ -79,65 +79,53 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
       return $build;
     }
 
-    $items[] = [
-      '#markup' => $entity->label(),
-      '#wrapper_attributes' => ['class' => ['context-title', 'top-bar-context-item']],
+    $build += [
+      [
+        '#type' => 'component',
+        '#component' => 'navigation:title',
+        '#props' => [
+          'icon' => 'file',
+          'html_tag' => 'span',
+          'modifiers' => ['ellipsis', 'xs'],
+          'extra_classes' => ['top-bar__title'],
+        ],
+        '#slots' => [
+          'content' => $entity->label(),
+        ],
+      ],
     ];
 
     if ($status = $this->getStatus($entity)) {
-      $items[] = [
-        '#markup' => $status,
-        '#wrapper_attributes' => [
-          'class' => ['context-status', $this->getStatusClass($entity), 'top-bar-context-item'],
+      $label = $status == 'success' ? $this->t('Published') : $this->t('Unpublished');
+      $build += [
+        '#type' => 'component',
+        '#component' => 'navigation:badge',
+        '#props' => [
+          'status' => $status,
+        ],
+        '#slots' => [
+          'label' => (string) $label,
         ],
       ];
     }
-
-    $build += [
-      '#theme' => 'item_list',
-      '#items' => $items,
-      '#attributes' => [
-        'class' => ['navigation-top-bar-context'],
-      ],
-    ];
 
     return $build;
   }
 
   /**
-   * Retrieves the published status of the given entity.
+   * Retrieves the status of the given entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity for which the status is being retrieved.
    *
    * @return string|null
-   *   The translated status if available. NULL otherwise.
+   *   The status if available. NULL otherwise.
    */
   protected function getStatus(EntityInterface $entity): ?string {
     if (!$entity instanceof EntityPublishedInterface) {
       return NULL;
     }
-    return (string) ($entity->isPublished() ? $this->t('Published') : $this->t('Unpublished'));
-  }
-
-  /**
-   * Determines the CSS class to represent the status of an entity.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity whose status class is to be determined.
-   *
-   * @return string|null
-   *   The CSS class representing the status of the entity. NULL otherwise.
-   *
-   * @throws \InvalidArgumentException
-   *   If the provided entity does not implement EntityPublishedInterface.
-   *   Child classes may override this method to provide more complete coverage.
-   */
-  protected function getStatusClass(EntityInterface $entity): ?string {
-    if (!$entity instanceof EntityPublishedInterface) {
-      return NULL;
-    }
-    return $entity->isPublished() ? 'top-bar-published' : 'top-bar-unpublished';
+    return (string) ($entity->isPublished() ? 'success' : 'info');
   }
 
 }
