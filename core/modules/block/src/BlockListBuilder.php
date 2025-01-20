@@ -130,6 +130,25 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
     $form['#attached']['library'][] = 'block/drupal.block.admin';
     $form['#attributes']['class'][] = 'clearfix';
 
+    $form['filters'] = [
+      '#type' => 'fieldset',
+      '#attributes' => [
+        'class' => ['js-show', 'block-filter-fields'],
+      ],
+    ];
+
+    $form['filters']['search_blocks'] = [
+      '#type' => 'search',
+      '#title' => $this->t('Filter'),
+      '#placeholder' => $this->t('Enter a part of the block name to filter by.'),
+      '#description' => "<a tabindex='0' class='js-input-filter-goto-element' id='goto-filtered'>go to next element</a>",
+      '#attributes' => [
+        'class' => ['block-element-filter', 'block-filter-region-text'],
+        'title' => $this->t('Enter a part of the block name to filter by.'),
+        'tabindex' => 0,
+      ],
+    ];
+
     // Build the form tree.
     $form['blocks'] = $this->buildBlocksForm();
 
@@ -179,6 +198,9 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
       ],
       '#attributes' => [
         'id' => 'blocks',
+        'class' => [
+          'list-blocks',
+        ],
       ],
     ];
 
@@ -217,8 +239,38 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
         '#attributes' => [
           'class' => ['region-title', 'region-title-' . $region],
           'no_striping' => TRUE,
+          'data-region' => $region,
         ],
       ];
+
+      $link = [
+        '#type' => 'link',
+        '#title' => $this->t('Place block <span class="visually-hidden">in the %region region</span>', ['%region' => $title]),
+        '#url' => Url::fromRoute('block.admin_library', ['theme' => $this->getThemeName()], ['query' => ['region' => $region]]),
+        '#attributes' => [
+          'class' => ['use-ajax', 'button', 'button--small'],
+          'data-dialog-type' => 'modal',
+          'data-dialog-options' => Json::encode([
+            'width' => 880,
+          ]),
+        ],
+      ];
+
+      $showFilteredContainer = [
+        '#type' => "button",
+        '#value' => $this->t('Show filtered'),
+        '#prefix' => "<div class='wrap-toggle-blocks-filtered' data-toggle-region='{$region}'>",
+        '#suffix' => "</div>",
+        '#attributes' => [
+          'class' => [
+            'toggle-blocks-filtered-input',
+          ],
+          'role' => 'switch',
+          'aria-checked' => FALSE,
+          'aria-label' => $this->t("make blocks on @region filtered visible", ['@region' => $title]),
+        ],
+      ];
+
       $form['region-' . $region]['title'] = [
         '#theme_wrappers' => [
           'container' => [
@@ -226,18 +278,28 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
           ],
         ],
         '#prefix' => $title,
-        '#type' => 'link',
-        '#title' => $this->t('Place block <span class="visually-hidden">in the %region region</span>', ['%region' => $title]),
-        '#url' => Url::fromRoute('block.admin_library', ['theme' => $this->getThemeName()], ['query' => ['region' => $region]]),
+        'link' => $link,
+        'filter' => $showFilteredContainer,
         '#wrapper_attributes' => [
           'colspan' => 5,
         ],
+      ];
+
+      $form['region-' . $region . '-filter'] = [
         '#attributes' => [
-          'class' => ['use-ajax', 'button', 'button--small'],
-          'data-dialog-type' => 'modal',
-          'data-dialog-options' => Json::encode([
-            'width' => 880,
-          ]),
+          'class' => [
+            'js-region-filter-quantity',
+            'region-' . $region . '-filter',
+            empty($blocks[$region]) ? 'region-empty' : 'region-populated',
+          ],
+          'data-region-message' => $region,
+        ],
+      ];
+
+      $form['region-' . $region . '-filter']['filter'] = [
+        '#markup' => '<em data-drupal-selector="region-filtered-quantity-' . $region . '"></em>',
+        '#wrapper_attributes' => [
+          'colspan' => 5,
         ],
       ];
 
@@ -248,6 +310,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
             'region-' . $region . '-message',
             empty($blocks[$region]) ? 'region-empty' : 'region-populated',
           ],
+          'data-region-message' => $region,
         ],
       ];
       $form['region-' . $region . '-message']['message'] = [
@@ -264,6 +327,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
           $form[$entity_id] = [
             '#attributes' => [
               'class' => ['draggable'],
+              'data-parent-region' => $region,
             ],
           ];
           $form[$entity_id]['#attributes']['class'][] = $info['status'] ? 'block-enabled' : 'block-disabled';
@@ -288,6 +352,8 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
 
           $form[$entity_id]['type'] = [
             '#markup' => $info['category'],
+            '#prefix' => "<span data-block-category='" . $info['category'] . "'>",
+            '#suffix' => '</span>',
           ];
           $form[$entity_id]['region-theme']['region'] = [
             '#type' => 'select',
@@ -372,7 +438,10 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    if (empty($form_state->getValue('blocks'))) {
+    $blocks = array_filter($form_state->getValue('blocks'), function ($block) {
+      return !empty($block['region']);
+    });
+    if (empty($blocks)) {
       $form_state->setErrorByName('blocks', $this->t('No blocks settings to update.'));
     }
 

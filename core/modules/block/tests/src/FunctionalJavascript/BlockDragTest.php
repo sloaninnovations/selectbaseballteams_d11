@@ -80,7 +80,7 @@ class BlockDragTest extends WebDriverTestBase {
     $pageTitle->dragTo($heroRegion);
     $this->assertSession()->assert(
       $page->find('css', 'tr[data-drupal-selector="edit-blocks-region-hero-message"] td')->getText() !== 'No blocks in this region',
-      "Region here shouldn't be empty"
+      "Region hero shouldn't be empty"
     );
 
   }

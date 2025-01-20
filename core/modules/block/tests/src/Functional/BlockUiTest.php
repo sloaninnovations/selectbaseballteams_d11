@@ -71,14 +71,14 @@ class BlockUiTest extends BrowserTestBase {
     $this->blockValues = [
       [
         'label' => 'Tools',
-        'tr' => '6',
+        'tr' => '8',
         'plugin_id' => 'system_menu_block:tools',
         'settings' => ['region' => 'sidebar_second', 'id' => 'tools'],
         'test_weight' => '-1',
       ],
       [
         'label' => 'Powered by Drupal',
-        'tr' => '17',
+        'tr' => '24',
         'plugin_id' => 'system_powered_by_block',
         'settings' => ['region' => 'footer', 'id' => 'powered'],
         'test_weight' => '0',

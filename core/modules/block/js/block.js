@@ -83,6 +83,55 @@
       }
 
       /**
+       * When dragging a row that display the quantity of item filtered.
+       *
+       * Make sure to jump this row to be not draggable.
+       *
+       * @param {Drupal.tableDrag.row} rowObject
+       *   Drupal table drag row dropped.
+       */
+      function swapFilterRow(rowObject) {
+        // Prevent swap recursion after row filtered quantity swapped.
+        if (
+          rowObject.filterRowSwapped === true &&
+          rowObject.direction === 'up'
+        ) {
+          return;
+        }
+        rowObject.filterRowSwapped = false;
+        let direction = 'before';
+        // Move the element after or before the region that display the quantity of filtered.
+        const previousElement =
+          rowObject.element.previousElementSibling || null;
+        const nextElement = rowObject.element.nextElementSibling || null;
+
+        // Prevent the swap of the first row of the table.
+        if (
+          rowObject.direction === 'up' &&
+          previousElement?.previousElementSibling === null
+        ) {
+          rowObject.filterRowSwapped = true;
+          rowObject.swap('after', previousElement);
+          return;
+        }
+
+        // Swap only the filtered blocks quantity row.
+        if (
+          (nextElement &&
+            nextElement.classList.contains('js-region-filter-quantity')) ||
+          (previousElement &&
+            previousElement.classList.contains('js-region-filter-quantity'))
+        ) {
+          let el = previousElement;
+          if (rowObject.direction === 'down') {
+            direction = 'after';
+            el = nextElement;
+          }
+          rowObject.swap(direction, el);
+        }
+      }
+
+      /**
        * Function to check empty regions and toggle classes based on this.
        *
        * @param {jQuery} table
@@ -117,6 +166,23 @@
             $this.removeClass('region-empty').addClass('region-populated');
           }
         });
+      }
+
+      /**
+       * Function to update parentRegion attribute of row dropped.
+       *
+       * @param {Drupal.tableDrag.row} rowObject
+       *   Row dropped to be updated.
+       * @param boolean onlyVisible
+       *   Flag to prevAll only visible regions.
+       */
+      function updateParentRegionName(rowObject, onlyVisible = true) {
+        const $rowObject = $(rowObject.element);
+        const regionSelector = `.region-title${onlyVisible ? ':visible' : ''}`;
+        const newRegion = $rowObject.prevAll(regionSelector).data('region');
+        if (newRegion !== undefined) {
+          rowObject.element.dataset.parentRegion = newRegion;
+        }
       }
 
       /**
@@ -169,6 +235,8 @@
       tableDrag.row.prototype.onSwap = function (swappedRow) {
         checkEmptyRegions(table, this);
         updateLastPlaced(table, this);
+        updateParentRegionName(this);
+        swapFilterRow(this);
       };
 
       // Add a handler so when a row is dropped, update fields dropped into
@@ -176,13 +244,19 @@
       tableDrag.onDrop = function () {
         const dragObject = this;
         const $rowElement = $(dragObject.rowObject.element);
-        // Use "region-message" row instead of "region" row because
-        // "region-{region_name}-message" is less prone to regexp match errors.
-        const regionRow = $rowElement.prevAll('tr.region-message').get(0);
-        const regionName = regionRow.className.replace(
-          /([^ ]+[ ]+)*region-([^ ]+)-message([ ]+[^ ]+)*/,
-          '$2',
-        );
+        let regionName = $rowElement
+          .prevAll('tr.region-title:visible')
+          .data('region');
+        if (regionName === undefined) {
+          // If there is no region attribute on the row.
+          // Use "region-message" row instead of "region" row because
+          // "region-{region_name}-message" is less prone to regexp match errors.
+          const regionRow = $rowElement.prevAll('tr.region-message').get(0);
+          regionName = regionRow.className.replace(
+            /([^ ]+[ ]+)*region-([^ ]+)-message([ ]+[^ ]+)*/,
+            '$2',
+          );
+        }
         const regionField = $rowElement.find('select.block-region-select');
         // Check whether the newly picked region is available for this block.
         if (regionField.find(`option[value=${regionName}]`).length === 0) {
@@ -209,8 +283,14 @@
             .addClass(`block-weight-${regionName}`);
           regionField[0].value = regionName;
         }
-
         updateBlockWeights(table, regionName);
+        const params = {
+          detail: {
+            regionName,
+          },
+        };
+        const onDropEvent = new CustomEvent('blocksDropped', params);
+        dragObject.rowObject.element.dispatchEvent(onDropEvent);
       };
 
       // Add the behavior to each region select list.
@@ -236,7 +316,9 @@
           else {
             regionMessage.after(row);
           }
+          updateParentRegionName(tableDrag.rowObject, false);
           updateBlockWeights(table, select[0].value);
+          swapFilterRow(tableDrag.rowObject);
           // Modify empty regions with added or removed fields.
           checkEmptyRegions(table, tableDrag.rowObject);
           // Update last placed block indication.
@@ -250,6 +332,10 @@
             tableDrag.changed = true;
           }
           // Remove focus from selectbox.
+          document
+            .querySelectorAll('.select.block-region-select')
+            .forEach((sel) => sel.classList.remove('last-selected-item'));
+          select.removeClass('last-selected-item');
           select.trigger('blur');
         },
       );

@@ -1,6 +1,7 @@
 /* Block listing page */
 .region-title__action {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   margin-left: 1em; /* LTR */
 }
 [dir="rtl"] .region-title__action {
@@ -45,3 +46,137 @@ a.block-demo-backlink:hover {
   opacity: 0.675;
   background: #fcfcfa;
 }
+
+/* Block list row filtered quantity display. */
+.js-region-filter-quantity {
+  display: none;
+  color: var(--color-gray-600);
+}
+.js-region-filter-quantity.js-show-filtered-quantity {
+  display: table-row;
+}
+
+/* Make the fieldset of the input filter stick */
+.block-filter-fields {
+  position: sticky;
+  z-index: 100;
+  top: var(--drupal-displace-offset-top, 0);
+  height: 132px;
+}
+
+/* Make thead on block list table stick on scrolling position great then
+ * toolbar menu and fields of the filter.
+ */
+.list-blocks thead {
+  position: sticky;
+  z-index: 100;
+  top: calc(var(--drupal-displace-offset-top, 0px) + 134px);
+  box-shadow: var(--details-box-shadow);
+}
+
+/* Ensure that fieldset has margin to 0. */
+.form-item.filter-block,
+.fieldset.filter-block {
+  margin-top: 0;
+}
+
+/* Control visibility of the eye button blocks visibility control */
+.wrap-toggle-blocks-filtered {
+  display: none;
+}
+.wrap-toggle-blocks-filtered::before {
+  display: inline-block;
+  width: var(--space-s);
+  height: var(--space-s);
+  margin-top: calc(var(--space-m) / -2);
+  margin-right: var(--space-xs);
+  margin-left: var(--space-xs);
+  content: "";
+  cursor: pointer;
+  transition: transform var(--details-transform-transition-duration) ease-in 0s;
+  text-align: center;
+  background: url(../images/eye-open.svg) no-repeat center;
+  background-size: contain;
+}
+.wrap-toggle-blocks-filtered-opened::before {
+  background: url(../images/eye-close.svg) no-repeat center;
+}
+.wrap-toggle-blocks-filtered .toggle-blocks-filtered-input.button {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  font-size: var(--font-size-xs);
+}
+
+.wrap-toggle-blocks-filtered .toggle-blocks-filtered-input.button:focus {
+  outline: var(--focus-outline);
+  box-shadow: var(--focus-box-shadow);
+}
+.wrap-toggle-blocks-filtered.region-filtered {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.js-form-item-search-blocks.form-item--search-blocks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.js-form-item-search-blocks.form-item--search-blocks label {
+  width: 100%;
+}
+
+.block-filter-region-text {
+  margin-right: 10px;
+}
+
+/* Goto to element appears when any value type */
+.js-input-filter-goto-element {
+  display: none;
+  margin: 0;
+  padding: 0;
+  color: #55565c;
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.js-input-filter-goto-element:hover {
+  color: #55565c;
+}
+
+.js-input-filter-goto-element.has-block-results:focus {
+  outline: var(--focus-outline);
+  box-shadow: var(--focus-box-shadow);
+}
+
+.js-input-filter-goto-element.has-block-results {
+  position: relative;
+  padding-right: 19px;
+  cursor: pointer;
+  color: #55565c;
+}
+
+.js-input-filter-goto-element.has-block-results::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-block;
+  width: var(--space-m);
+  height: var(--space-m);
+  content: "";
+  background: url(../images/arrow-down.svg) no-repeat center;
+}
+
+/* Make sure of the disabled block has the success style when filtered. */
+.block-disabled.js-filter-block-visible.color-success {
+  opacity: 1;
+  color: #325e1c;
+  background-color: #f3faef;
+}
+
+
