@@ -77,7 +77,7 @@ class HookCollectorPass implements CompilerPassInterface {
   public function process(ContainerBuilder $container): void {
     $collector = static::collectAllHookImplementations($container->getParameter('container.modules'), $container);
     $map = [];
-    $preprocessWithLevels = [];
+    $preprocessForSuggestions = [];
     $container->register(ProceduralCall::class, ProceduralCall::class)
       ->addArgument($collector->includes);
     $groupIncludes = [];
@@ -97,7 +97,7 @@ class HookCollectorPass implements CompilerPassInterface {
       $priority = 0;
       foreach ($moduleImplements as $module => $v) {
         if (is_string($hook) && str_starts_with($hook, 'preprocess_') && str_contains($hook, '__')) {
-          $preprocessWithLevels[] = $module . '_' . $hook;
+          $preprocessForSuggestions[] = $module . '_' . $hook;
         }
         foreach ($collector->implementations[$hook][$module] as $class => $method_hooks) {
           if ($container->has($class)) {
@@ -120,7 +120,7 @@ class HookCollectorPass implements CompilerPassInterface {
       }
     }
     $container->setParameter('hook_implementations_map', $map);
-    $container->setParameter('preprocess_with_levels', $preprocessWithLevels);
+    $container->setParameter('preprocess_for_suggestions', $preprocessForSuggestions);
   }
 
   /**

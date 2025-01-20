@@ -166,7 +166,7 @@ class Registry implements DestructableInterface {
    *
    * @var array
    */
-  protected $preprocessWithLevels;
+  protected $preprocessForSuggestions;
 
   /**
    * Constructs a \Drupal\Core\Theme\Registry object.
@@ -191,10 +191,10 @@ class Registry implements DestructableInterface {
    *   The kernel.
    * @param string $theme_name
    *   (optional) The name of the theme for which to construct the registry.
-   * @param array $preprocess_with_levels
+   * @param array $preprocess_for_suggestions
    *   (optional) Grouped preprocess functions from modules.
    */
-  public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ThemeInitializationInterface $theme_initialization, CacheBackendInterface $runtime_cache, ModuleExtensionList $module_list, protected HttpKernelInterface $kernel, $theme_name = NULL, array $preprocess_with_levels = []) {
+  public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ThemeInitializationInterface $theme_initialization, CacheBackendInterface $runtime_cache, ModuleExtensionList $module_list, protected HttpKernelInterface $kernel, $theme_name = NULL, array $preprocess_for_suggestions = []) {
     $this->root = $root;
     $this->cache = $cache;
     $this->lock = $lock;
@@ -204,7 +204,7 @@ class Registry implements DestructableInterface {
     $this->runtimeCache = $runtime_cache;
     $this->moduleList = $module_list;
     $this->themeName = $theme_name;
-    $this->preprocessWithLevels = $preprocess_with_levels;
+    $this->preprocessForSuggestions = $preprocess_for_suggestions;
   }
 
   /**
@@ -932,7 +932,7 @@ class Registry implements DestructableInterface {
       $theme_functions = $functions['user'];
     }
 
-    $theme_functions = array_merge($theme_functions, $this->preprocessWithLevels ?? []);
+    $theme_functions = array_merge($theme_functions, $this->preprocessForSuggestions ?? []);
 
     $grouped_functions = [];
     // Splitting user defined functions into groups by the first prefix.
