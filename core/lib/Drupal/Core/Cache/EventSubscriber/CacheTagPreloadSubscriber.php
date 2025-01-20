@@ -20,6 +20,7 @@ class CacheTagPreloadSubscriber implements EventSubscriberInterface {
    * Preloads common cache tags.
    *
    * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   *   The request event.
    */
   public function onRequest(RequestEvent $event): void {
     if ($event->isMainRequest()) {
