@@ -93,8 +93,6 @@ class TextFormat extends RenderElementBase {
       '#process',
       // Ensure #pre_render functions will be run.
       '#pre_render',
-      // Description is handled by theme_text_format_wrapper().
-      '#description',
       // Ensure proper ordering of children.
       '#weight',
       // Properties already processed for the parent element.
