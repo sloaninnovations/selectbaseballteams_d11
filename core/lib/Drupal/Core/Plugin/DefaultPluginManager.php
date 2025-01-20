@@ -58,7 +58,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    *
    * Set to FALSE if the plugins are in the top level of the namespace.
    *
-   * @var string|bool
+   * @var string|false
    */
   protected $subdir;
 

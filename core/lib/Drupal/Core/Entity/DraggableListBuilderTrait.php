@@ -29,7 +29,7 @@ trait DraggableListBuilderTrait {
   /**
    * Name of the entity's weight field or FALSE if no field is provided.
    *
-   * @var string|bool
+   * @var string|false
    */
   protected $weightKey = FALSE;
 

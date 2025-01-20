@@ -67,7 +67,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * The entity langcode key.
    *
-   * @var string|bool
+   * @var string|false
    */
   protected $langcodeKey = FALSE;
 

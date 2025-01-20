@@ -33,9 +33,9 @@ interface IconFinderInterface {
    * @param string $uri
    *   The URI to process, only local path allowed.
    *
-   * @return string|bool
+   * @return string|false
    *   The file content.
    */
-  public function getFileContents(string $uri): string|bool;
+  public function getFileContents(string $uri): string|false;
 
 }

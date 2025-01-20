@@ -111,7 +111,7 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFileContents(string $uri): string|bool {
+  public function getFileContents(string $uri): string|false {
     $url = parse_url($uri);
     if (isset($url['scheme']) || isset($url['host'])) {
       return FALSE;
