@@ -36,14 +36,14 @@ class Result extends AreaPluginBase {
     $item_list = [
       '#theme' => 'item_list',
       '#items' => [
-        '@start -- the initial record number in the set',
-        '@end -- the last record number in the set',
-        '@total -- the total records in the set',
-        '@label -- the human-readable name of the view',
-        '@per_page -- the number of items per page',
-        '@current_page -- the current page number',
-        '@current_record_count -- the current page record count',
-        '@page_count -- the total page count',
+        '@start -- ' . $this->t('the initial record number in the set'),
+        '@end -- ' . $this->t('the last record number in the set'),
+        '@total -- ' . $this->t('the total records in the set'),
+        '@label -- ' . $this->t('the human-readable name of the view'),
+        '@per_page -- ' . $this->t('the number of items per page'),
+        '@current_page -- ' . $this->t('the current page number'),
+        '@current_record_count -- ' . $this->t('the current page record count'),
+        '@page_count -- ' . $this->t('the total page count'),
       ],
     ];
     $list = \Drupal::service('renderer')->render($item_list);
