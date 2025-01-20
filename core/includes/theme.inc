@@ -1061,7 +1061,7 @@ function template_preprocess_maintenance_task_list(&$variables): void {
  * See the @link themeable Default theme implementations topic @endlink for
  * details.
  *
- * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is
  *   no replacement, default preprocess variables are added for all theme hooks
  *   directly in \Drupal\Core\Theme\ThemeManager.
  *
