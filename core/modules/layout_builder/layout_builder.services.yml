@@ -67,4 +67,5 @@ services:
   Drupal\layout_builder\Controller\LayoutBuilderHtmlEntityFormController: '@layout_builder.controller.entity_form'
   layout_builder.element.prepare_layout:
     class: Drupal\layout_builder\EventSubscriber\PrepareLayout
+    public: false
     arguments: ['@layout_builder.tempstore_repository', '@messenger']
