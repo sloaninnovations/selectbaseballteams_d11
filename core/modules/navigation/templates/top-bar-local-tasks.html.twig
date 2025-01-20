@@ -11,11 +11,11 @@
 {% set dropdown_id = 'admin-local-tasks'|clean_unique_id %}
 
 {% if featured_local_task %}
-  {#  The featured_local_task.task is a render array and the text passed to the parent
-  component needs to be an string. Hence we are rendering the text and passing
-  it to the component.#}
+  {% set link = featured_local_task.task['#link'] %}
   {% include 'navigation:toolbar-button' with {
-    text: featured_local_task.task|render,
+    text: link['#title'],
+    html_tag: 'a',
+    attributes: create_attribute().setAttribute('href', link['#url']|render|default(null)),
     modifiers: ['main-action'],
     icon: featured_local_task.icon,
   } only %}
