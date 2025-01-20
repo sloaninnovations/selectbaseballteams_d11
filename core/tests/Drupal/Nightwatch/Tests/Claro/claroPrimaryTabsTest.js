@@ -33,8 +33,8 @@ module.exports = {
       .assert.not.visible(mobileToggle);
   },
   'Verify mobile tab display and click functionality': (browser) => {
-    browser
-      .window.setSize(699, 800)
+    browser.window
+      .setSize(699, 800)
       .drupalRelativeURL('/node/1')
       .waitForElementVisible(primaryTabsWrapper)
       .assert.visible(activeTab)
