@@ -14,8 +14,8 @@ use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
 use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
 use Drupal\navigation\RenderCallbacks;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Drupal\navigation\TopBarItemManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Hook implementations for navigation.
@@ -225,6 +225,42 @@ class NavigationHooks {
     if (array_key_exists('layout_builder', $info)) {
       $info['layout_builder']['#pre_render'][] = [RenderCallbacks::class, 'alterLayoutBuilder'];
     }
+  }
+
+  /**
+   * Implements hook_navigation_content_top().
+   */
+  #[Hook('navigation_content_top')]
+  public function navigationWorkspaces(): array {
+    // This navigation item requires the Workspaces UI module.
+    if (!\Drupal::moduleHandler()->moduleExists('workspaces_ui')) {
+      return [];
+    }
+
+    $current_user = \Drupal::currentUser();
+    if (!$current_user->hasPermission('administer workspaces')
+      && !$current_user->hasPermission('view own workspace')
+      && !$current_user->hasPermission('view any workspace')
+    ) {
+      return [];
+    }
+
+    return [
+      'workspace' => [
+        // @phpstan-ignore-next-line
+        '#lazy_builder' => ['navigation.workspaces_lazy_builders:renderNavigationLinks', []],
+        '#create_placeholder' => TRUE,
+        '#lazy_builder_preview' => [
+          '#type' => 'component',
+          '#component' => 'navigation:toolbar-button',
+          '#props' => [
+            'html_tag' => 'a',
+            'text' => $this->t('Workspace'),
+          ],
+        ],
+        '#weight' => -1000,
+      ],
+    ];
   }
 
   /**

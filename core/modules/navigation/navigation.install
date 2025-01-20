@@ -24,7 +24,7 @@ function navigation_install(bool $is_syncing): void {
 /**
  * Implements hook_requirements().
  */
-function navigation_requirements($phase) {
+function navigation_requirements($phase): array {
   $requirements = [];
 
   if ($phase === 'runtime') {
