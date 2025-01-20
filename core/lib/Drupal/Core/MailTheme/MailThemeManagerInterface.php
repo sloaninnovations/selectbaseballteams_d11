@@ -34,6 +34,7 @@ interface MailThemeManagerInterface {
    *   The callback to be executed.
    *
    * @return Result
+   *   The result returned by the callback.
    */
   public function executeInMailTheme(MailTemplateId $templateId, callable $function): mixed;
 
