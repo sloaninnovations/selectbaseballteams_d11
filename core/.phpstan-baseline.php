@@ -19204,32 +19204,30 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\FunctionalJavascript\\\\ManageDisplayTest\\:\\:assertFieldDoesNotExistOnOverview\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 2,
+	'count' => 1,
 	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionalJavascript/ManageDisplayTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\FunctionalJavascript\\\\ManageDisplayTest\\:\\:assertFieldExistsOnOverview\\(\\) has no return type specified\\.$#',
-	'count' => 2,
 	'identifier' => 'missingType.return',
-	'count' => 2,
+	'count' => 1,
 	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionalJavascript/ManageDisplayTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\FunctionalJavascript\\\\ManageDisplayTest\\:\\:fieldUIAddExistingField\\(\\) has no return type specified\\.$#',
-	'count' => 2,
 	'identifier' => 'missingType.return',
-	'count' => 2,
+	'count' => 1,
 	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionalJavascript/ManageDisplayTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\FunctionalJavascript\\\\ManageDisplayTest\\:\\:fieldUIAddNewField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 2,
+	'count' => 1,
 	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionalJavascript/ManageDisplayTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field_ui\\\\FunctionalJavascript\\\\ManageDisplayTest\\:\\:fieldUIDeleteField\\(\\) has no return type specified\\.$#',
-	'count' => 2,
+	'count' => 1,
 	'path' => __DIR__ . '/modules/field_ui/tests/src/FunctionalJavascript/ManageDisplayTest.php',
 ];
 $ignoreErrors[] = [
