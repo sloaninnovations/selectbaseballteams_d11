@@ -7,7 +7,7 @@ namespace Drupal\Tests;
 /**
  * Value object to store performance information collected from requests.
  *
- * @see Drupal\Tests\PerformanceTestTrait::collectPerformanceData().
+ * @see \Drupal\Tests\PerformanceTestTrait::collectPerformanceData().
  */
 class PerformanceData {
 
@@ -79,9 +79,11 @@ class PerformanceData {
   protected int $cacheTagInvalidationCount = 0;
 
   /**
-   * The number of cache tag lookup queries.
+   * The grouped cache tag lookups.
+   *
+   * @var string[]
    */
-  protected int $cacheTagLookupQueryCount = 0;
+  protected array $cacheTagGroupedLookups = [];
 
   /**
    * The original return value.
@@ -372,13 +374,23 @@ class PerformanceData {
   }
 
   /**
-   * Sets the cache tag lookup query count.
+   * Sets the grouped cache tag lookups.
    *
-   * @param int $count
-   *   The number of cache tag lookup queries recorded.
+   * @param string[] $groupedLookups
+   *   Grouped cache tag lookups by query.
    */
-  public function setCacheTagLookupQueryCount(int $count): void {
-    $this->cacheTagLookupQueryCount = $count;
+  public function setCacheTagGroupedLookups(array $groupedLookups): void {
+    $this->cacheTagGroupedLookups = $groupedLookups;
+  }
+
+  /**
+   * Gets the grouped cache tag lookups.
+   *
+   * @@return string[]
+   *   Grouped cache tag lookups by query.
+   */
+  public function getCacheTagGroupedLookups(): array {
+    return $this->cacheTagGroupedLookups;
   }
 
   /**
@@ -388,7 +400,7 @@ class PerformanceData {
    *   The number of cache tag lookup queries recorded.
    */
   public function getCacheTagLookupQueryCount(): int {
-    return $this->cacheTagLookupQueryCount;
+    return count($this->cacheTagGroupedLookups);
   }
 
   /**
