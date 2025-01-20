@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\navigation\Plugin\TopBarItem;
 
+use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -112,7 +113,7 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
       $edit_route = "entity.$entity_type.edit_form";
       // For core entities, the local task name matches the route name. If
       // needed, we could iterate over the items and check the actual route.
-      if (isset($local_tasks['tasks'][$edit_route])) {
+      if (isset($local_tasks['tasks'][$edit_route]) && $local_tasks['tasks'][$edit_route]['#access']?->isAllowed()) {
         $featured_local_task = [
           'route' => $edit_route,
           'task' => $local_tasks['tasks'][$edit_route],
