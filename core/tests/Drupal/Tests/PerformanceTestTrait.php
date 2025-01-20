@@ -132,7 +132,7 @@ trait PerformanceTestTrait {
       $cache_tag_is_valid_count = 0;
       $cache_tag_invalidation_count = 0;
       $cache_tag_checksum_count = 0;
-      $cache_tag_lookup_query_count = 0;
+      $cache_tag_lookup_query_count = [];
       foreach ($performance_test_data['database_events'] as $event) {
         $normalized_query = static::normalizeQuery($event->queryString, $this->databasePrefix);
 
@@ -143,7 +143,7 @@ trait PerformanceTestTrait {
         }
         // Keep track of cache tag lookup queries.
         elseif (str_starts_with($normalized_query, 'SELECT "tag", "invalidations" FROM "cachetags"')) {
-          $cache_tag_lookup_query_count++;
+          $cache_tag_lookup_query_count[] = array_values($event->args);
         }
       }
       $cache_operations = [];
@@ -175,7 +175,7 @@ trait PerformanceTestTrait {
       $performance_data->setCacheTagIsValidCount($cache_tag_is_valid_count);
       $performance_data->setCacheTagInvalidationCount($cache_tag_invalidation_count);
       $performance_data->setCacheOperations($cache_operations);
-      $performance_data->setCacheTagLookupQueryCount($cache_tag_lookup_query_count);
+      $performance_data->setCacheTagGroupedLookups($cache_tag_lookup_query_count);
     }
 
     return $performance_data;
