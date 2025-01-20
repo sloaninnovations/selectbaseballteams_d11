@@ -5,6 +5,8 @@ namespace Drupal\workspaces;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Drupal\Core\Update\UpdateKernel;
+use Drupal\workspaces\WorkspacesEntityRepository;
+use Drupal\workspaces_parallel\Service\ParallelWorkspaceEntityRepository;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -48,6 +50,12 @@ class WorkspacesServiceProvider extends ServiceProviderBase {
           $definition->clearTag('workspace_negotiator');
         }
       }
+    }
+
+    // Replace the entity repository, for parallel workspace support.
+    if ($container->hasDefinition('entity.repository')) {
+      $definition = $container->getDefinition('entity.repository');
+      $definition->setClass(WorkspacesEntityRepository::class);
     }
   }
 

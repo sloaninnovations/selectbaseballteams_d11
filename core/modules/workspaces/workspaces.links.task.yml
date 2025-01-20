@@ -15,3 +15,8 @@ entity.workspace.delete_form:
   route_name: entity.workspace.delete_form
   base_route: entity.workspace.canonical
   weight: 10
+workspaces.settings:
+  route_name: workspaces.settings
+  title: 'Settings'
+  weight: 20
+  base_route: entity.workspace.collection

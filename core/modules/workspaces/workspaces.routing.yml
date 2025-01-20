@@ -59,3 +59,11 @@ workspaces.switch_to_live:
     _access: 'FALSE'
     _user_is_logged_in: 'TRUE'
     _has_active_workspace: 'TRUE'
+
+workspaces.settings:
+  path: 'admin/config/workflow/workspaces/settings'
+  defaults:
+    _title: 'Workspaces settings'
+    _form: 'Drupal\workspaces\Form\WorkspacesSettingsForm'
+  requirements:
+    _permission: 'administer workspaces'

@@ -2,6 +2,7 @@
 
 namespace Drupal\workspaces\Plugin\Validation\Constraint;
 
+use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\workspaces\WorkspaceAssociationInterface;
@@ -21,6 +22,7 @@ class EntityWorkspaceConflictConstraintValidator extends ConstraintValidator imp
     protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly WorkspaceManagerInterface $workspaceManager,
     protected readonly WorkspaceAssociationInterface $workspaceAssociation,
+    protected readonly ConfigFactory $configFactory,
   ) {}
 
   /**
@@ -31,6 +33,7 @@ class EntityWorkspaceConflictConstraintValidator extends ConstraintValidator imp
       $container->get('entity_type.manager'),
       $container->get('workspaces.manager'),
       $container->get('workspaces.association'),
+      $container->get('config.factory'),
     );
   }
 
@@ -38,8 +41,10 @@ class EntityWorkspaceConflictConstraintValidator extends ConstraintValidator imp
    * {@inheritdoc}
    */
   public function validate($entity, Constraint $constraint): void {
+    $config = $this->configFactory->get('workspaces.settings');
+
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
-    if (isset($entity) && !$entity->isNew()) {
+    if (isset($entity) && !$entity->isNew() && !$config->get('parallel')) {
       $active_workspace = $this->workspaceManager->getActiveWorkspace();
 
       // If the entity is tracked in a workspace, it can only be edited in
