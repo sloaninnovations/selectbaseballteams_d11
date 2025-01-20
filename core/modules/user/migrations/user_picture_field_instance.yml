@@ -14,6 +14,7 @@ source:
       file_extensions: 'png gif jpg jpeg webp'
       alt_field: false
       title_field: false
+      resize_policy: 'resize_larger_images'
       min_resolution: ''
       alt_field_required: false
       title_field_required: false

@@ -4,6 +4,8 @@
  * @file
  */
 
+use Drupal\image\ImageConfigUpdater;
+use Drupal\field\FieldConfigInterface;
 use Drupal\image\Entity\ImageStyle;
 
 /**
@@ -158,4 +160,12 @@ function image_filter_keyword($anchor, $current_size, $new_size) {
     default:
       return $anchor;
   }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for 'field_config'.
+ */
+function image_field_config_presave(FieldConfigInterface $field): void {
+  $config_updater = \Drupal::classResolver(ImageConfigUpdater::class);
+  $config_updater->updateField($field);
 }

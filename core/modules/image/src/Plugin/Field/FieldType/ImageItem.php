@@ -10,6 +10,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Image\ImageResizePolicy;
 use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -86,6 +87,7 @@ class ImageItem extends FileItem {
       'title_field' => 0,
       'title_field_required' => 0,
       'max_resolution' => '',
+      'resize_policy' => ImageResizePolicy::ResizeLargerImages->value,
       'min_resolution' => '',
       'default_image' => [
         'uuid' => NULL,
@@ -216,40 +218,13 @@ class ImageItem extends FileItem {
 
     $settings = $this->getSettings();
 
-    // Add maximum and minimum dimensions settings.
-    $max_resolution = explode('x', $settings['max_resolution']) + ['', ''];
-    $element['max_resolution'] = [
-      '#type' => 'item',
-      '#title' => $this->t('Maximum image dimensions'),
-      '#element_validate' => [[static::class, 'validateResolution']],
-      '#weight' => 4.1,
-      '#description' => $this->t('The maximum allowed image size expressed as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction. If a larger image is uploaded, it will be resized to reflect the given width and height. Resizing images on upload will cause the loss of <a href="http://wikipedia.org/wiki/Exchangeable_image_file_format">EXIF data</a> in the image.'),
-    ];
-    $element['max_resolution']['x'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Maximum width'),
-      '#title_display' => 'invisible',
-      '#default_value' => $max_resolution[0],
-      '#min' => 1,
-      '#field_suffix' => ' × ',
-      '#prefix' => '<div class="form--inline clearfix">',
-    ];
-    $element['max_resolution']['y'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Maximum height'),
-      '#title_display' => 'invisible',
-      '#default_value' => $max_resolution[1],
-      '#min' => 1,
-      '#field_suffix' => ' ' . $this->t('pixels'),
-      '#suffix' => '</div>',
-    ];
-
+    // Add minimum and maximum dimensions settings.
     $min_resolution = explode('x', $settings['min_resolution']) + ['', ''];
     $element['min_resolution'] = [
       '#type' => 'item',
       '#title' => $this->t('Minimum image dimensions'),
       '#element_validate' => [[static::class, 'validateResolution']],
-      '#weight' => 4.2,
+      '#weight' => 4.1,
       '#description' => $this->t('The minimum allowed image size expressed as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction. If a smaller image is uploaded, it will be rejected.'),
     ];
     $element['min_resolution']['x'] = [
@@ -269,6 +244,63 @@ class ImageItem extends FileItem {
       '#min' => 1,
       '#field_suffix' => ' ' . $this->t('pixels'),
       '#suffix' => '</div>',
+    ];
+    $max_resolution = explode('x', $settings['max_resolution']) + ['', ''];
+    $element['max_resolution'] = [
+      '#type' => 'item',
+      '#title' => $this->t('Maximum image dimensions'),
+      '#element_validate' => [[static::class, 'validateResolution']],
+      '#weight' => 4.2,
+      '#description' => $this->t('The maximum allowed image size expressed as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction.'),
+    ];
+    $element['max_resolution']['x'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Maximum width'),
+      '#title_display' => 'invisible',
+      '#default_value' => $max_resolution[0],
+      '#min' => 1,
+      '#field_suffix' => ' × ',
+      '#prefix' => '<div class="form--inline clearfix">',
+    ];
+    $element['max_resolution']['y'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Maximum height'),
+      '#title_display' => 'invisible',
+      '#default_value' => $max_resolution[1],
+      '#min' => 1,
+      '#field_suffix' => ' ' . $this->t('pixels'),
+      '#suffix' => '</div>',
+    ];
+    $resize_visibility = [
+      ':input[name="settings[max_resolution][x]"]' => ['!value' => ''],
+      ':input[name="settings[max_resolution][y]"]' => ['!value' => ''],
+    ];
+    $element['resize'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Images exceeding maximum dimensions'),
+      '#weight' => 4.3,
+      '#open' => TRUE,
+      '#tree' => TRUE,
+      '#process' => [
+        [
+          '\Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem',
+          'formProcessMergeParent',
+        ],
+      ],
+      '#states' => [
+        'visible' => $resize_visibility,
+      ],
+    ];
+    $element['resize']['resize_policy'] = [
+      '#type' => 'radios',
+      '#default_value' => $settings['resize_policy'] ?? ImageResizePolicy::ResizeLargerImages->value,
+      '#options' => [
+        ImageResizePolicy::ResizeLargerImages->value => $this->t('Resize proportionally'),
+        ImageResizePolicy::RejectLargerImagesWithError->value => $this->t('Reject'),
+      ],
+      '#states' => [
+        'visible' => $resize_visibility,
+      ],
     ];
 
     // Remove the description option.
