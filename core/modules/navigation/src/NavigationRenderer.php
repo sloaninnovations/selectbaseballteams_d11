@@ -295,6 +295,7 @@ final class NavigationRenderer {
           '#title' => $link['title'],
           '#url' => $link['url'],
           '#options' => $link['localized_options'],
+          '#attributes' => $link['attributes'] ?? [],
         ],
         '#access' => $local_task['#access'],
       ];
@@ -321,7 +322,7 @@ final class NavigationRenderer {
    * @return bool
    *   TRUE if the content entity route condition is met, FALSE otherwise.
    */
-  protected function meetsContentEntityRoutesCondition(): bool {
+  public function meetsContentEntityRoutesCondition(): bool {
     return array_key_exists($this->routeMatch->getRouteObject()->getPath(), $this->getContentEntityPaths());
   }
 

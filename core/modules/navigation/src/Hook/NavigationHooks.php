@@ -7,10 +7,12 @@ use Drupal\navigation\RenderCallbacks;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
 use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Url;
 use Drupal\navigation\TopBarItemManagerInterface;
 
 /**
@@ -82,7 +84,12 @@ class NavigationHooks {
   public function theme($existing, $type, $theme, $path) : array {
     $items['top_bar'] = ['render element' => 'element'];
     $items['top_bar_local_tasks'] = ['variables' => ['local_tasks' => []]];
-    $items['top_bar_local_task'] = ['variables' => ['link' => []]];
+    $items['top_bar_local_task'] = [
+      'variables' => [
+        'link' => [],
+        'attributes' => [],
+      ],
+    ];
     $items['big_pipe_interface_preview__navigation_shortcut_lazy_builder_lazyLinks__Shortcuts'] = [
       'variables' => [
         'callback' => NULL,
@@ -197,6 +204,29 @@ class NavigationHooks {
   public function elementInfoAlter(array &$info): void {
     if (array_key_exists('layout_builder', $info)) {
       $info['layout_builder']['#pre_render'][] = [RenderCallbacks::class, 'alterLayoutBuilder'];
+    }
+  }
+
+  /**
+   * Implements hook_menu_local_tasks_alter().
+   */
+  #[Hook('menu_local_tasks_alter')]
+  public function menuLocalTasksAlter(array &$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
+    $navigation_renderer = \Drupal::service('navigation.renderer');
+    if ($navigation_renderer->meetsContentEntityRoutesCondition()) {
+      // Add a new local task for content entity pages.
+      $data['tabs'][0]['preview_editable_area'] = [
+        '#theme' => 'menu_local_task',
+        '#link' => [
+          'title' => t('Preview editable areas'),
+          'url' => Url::fromUri("internal:#editable-areas"),
+          'attributes' => [
+            'class' => ['navigation-contextual-link'],
+          ],
+          'localized_options' => [],
+        ],
+        '#access' => \Drupal::currentUser()->hasPermission('access contextual links'),
+      ];
     }
   }
 

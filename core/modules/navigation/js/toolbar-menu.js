@@ -131,5 +131,36 @@
         });
       },
     };
+
+    /**
+     * Toggle contextual menu links.
+     *
+     * @type {Drupal~behavior}
+     *
+     * @prop {Drupal~behaviorAttach} attach
+     *  Attach event into the navigation contextual link.
+     */
+    Drupal.behaviors.toggleContextualLinks = {
+      attach: (context) => {
+        const showText = Drupal.t('Preview editable areas');
+        const hideText = Drupal.t('Hide editable areas');
+        const toggleContextualItems = (el) =>
+          el.classList.toggle('visually-hidden');
+        once(
+          'preview-editable-areas',
+          '.navigation-contextual-link',
+          context,
+        ).forEach((link) => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            link.textContent =
+              link.textContent === showText ? hideText : showText;
+            document
+              .querySelectorAll('.contextual button')
+              .forEach(toggleContextualItems);
+          });
+        });
+      },
+    };
   }
 )(Drupal, once);
