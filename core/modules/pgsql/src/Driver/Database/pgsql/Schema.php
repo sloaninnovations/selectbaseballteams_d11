@@ -216,7 +216,7 @@ EOD;
   /**
    * Resets information about table blobs, sequences and serial fields.
    *
-   * @param $table
+   * @param string $table
    *   The non-prefixed name of the table.
    */
   protected function resetTableInformation($table) {
@@ -338,9 +338,9 @@ EOD;
   /**
    * Creates a safe SQL string for a field for table creation or alteration.
    *
-   * @param $name
+   * @param string $name
    *   Name of the field.
-   * @param $spec
+   * @param array $spec
    *   The field specification, as per the schema data structure format.
    */
   protected function createFieldSql($name, $spec) {
@@ -381,7 +381,7 @@ EOD;
   /**
    * Set database-engine specific properties for a field.
    *
-   * @param $field
+   * @param array $field
    *   A field description array, as specified in the schema documentation.
    */
   protected function processField($field) {
@@ -471,6 +471,9 @@ EOD;
     return $map;
   }
 
+  /**
+   * Creates the SQL key for the given fields.
+   */
   protected function _createKeySql($fields) {
     $return = [];
     foreach ($fields as $field) {
@@ -1020,12 +1023,18 @@ EOD;
     $this->resetTableInformation($table);
   }
 
+  /**
+   * Creates a statement for an SQL index for the given fields.
+   */
   protected function _createIndexSql($table, $name, $fields) {
     $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} (';
     $query .= $this->_createKeySql($fields) . ')';
     return $query;
   }
 
+  /**
+   * Adds keys for an SQL table.
+   */
   protected function _createKeys($table, $new_keys) {
     if (isset($new_keys['primary key'])) {
       $this->addPrimaryKey($table, $new_keys['primary key']);
@@ -1064,7 +1073,7 @@ EOD;
    *
    * The hash is modified to according to  @link https://www.postgresql.org/docs/current/sql-syntax-lexical.html PostgreSQL Lexical Structure@endlink.
    *
-   * @param $data
+   * @param string $data
    *   String to be hashed.
    *
    * @return string

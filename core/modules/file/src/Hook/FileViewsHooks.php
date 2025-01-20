@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\file\Hook;
 
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\field\FieldStorageConfigInterface;
+use Drupal\views\FieldViewsDataProvider;
 
 /**
  * Hook implementations for file.
@@ -14,7 +16,9 @@ use Drupal\Core\Hook\Attribute\Hook;
 class FileViewsHooks {
 
   public function __construct(
-    private readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly EntityFieldManagerInterface $entityFieldManager,
+    protected readonly ?FieldViewsDataProvider $fieldViewsDataProvider,
   ) {}
 
   /**
@@ -23,11 +27,11 @@ class FileViewsHooks {
    * Views integration for file fields. Adds a file relationship to the default
    * field data.
    *
-   * @see views_field_default_views_data()
+   * @see FieldViewsDataProvider::defaultFieldImplementation()
    */
   #[Hook('field_views_data')]
   public function fieldViewsData(FieldStorageConfigInterface $field_storage): array {
-    $data = views_field_default_views_data($field_storage);
+    $data = $this->fieldViewsDataProvider->defaultFieldImplementation($field_storage);
     foreach ($data as $table_name => $table_data) {
       // Add the relationship only on the fid field.
       $data[$table_name][$field_storage->getName() . '_target_id']['relationship'] = [
@@ -56,7 +60,7 @@ class FileViewsHooks {
     $pseudo_field_name = 'reverse_' . $field_name . '_' . $entity_type_id;
     /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
     $table_mapping = $this->entityTypeManager->getStorage($entity_type_id)->getTableMapping();
-    [$label] = views_entity_field_label($entity_type_id, $field_name);
+    [$label] = $this->entityFieldManager->getFieldLabels($entity_type_id, $field_name);
     $data['file_managed'][$pseudo_field_name]['relationship'] = [
       'title' => t('@entity using @field', [
         '@entity' => $entity_type->getLabel(),
