@@ -155,6 +155,7 @@ class LanguageAddForm extends LanguageFormBase {
       // Translate the label to the current language, this is consistent with
       // the label in the form select, see
       // \Drupal\language\ConfigurableLanguageManager::getStandardLanguageListWithoutConfigured().
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $label = $this->t($standard_languages[$langcode][0]);
       $direction = $standard_languages[$langcode][2] ?? ConfigurableLanguage::DIRECTION_LTR;
     }
