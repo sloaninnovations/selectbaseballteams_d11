@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\navigation\Plugin\TopBarItem;
 
-use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -117,7 +116,7 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
         $featured_local_task = [
           'route' => $edit_route,
           'task' => $local_tasks['tasks'][$edit_route],
-          'icon' => 'edit',
+          'icon' => 'pencil',
         ];
       }
     }

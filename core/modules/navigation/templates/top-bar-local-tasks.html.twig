@@ -16,13 +16,13 @@
     text: link['#title'],
     html_tag: 'a',
     attributes: create_attribute().setAttribute('href', link['#url']|render|default(null)),
-    modifiers: ['main-action'],
+    modifiers: ['primary'],
     icon: featured_local_task.icon,
   } only %}
 {% endif %}
 
 {% include 'navigation:toolbar-button' with {
-  icon: 'kebab',
+  icon: 'dots',
   attributes: create_attribute(
     {
       'aria-expanded': 'false',

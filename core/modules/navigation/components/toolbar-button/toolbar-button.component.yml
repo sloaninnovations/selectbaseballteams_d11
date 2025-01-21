@@ -32,11 +32,12 @@ props:
           - dark
           - expand--down
           - expand--side
+          - large-icon
           - large
           - non-interactive
+          - primary
           - small-offset
           - weight--400
-          - main-action
     extra_classes:
       type: array
       title: Extra classes.

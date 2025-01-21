@@ -103,7 +103,7 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
     $this->verifyDynamicPageCache($this->node->toUrl(), 'HIT');
     $this->assertSession()->elementExists('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]");
     $this->assertSession()->elementTextEquals('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]//span", "Edit");
-    $this->assertSession()->elementAttributeContains('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[2]", 'class', 'toolbar-button--icon--kebab');
+    $this->assertSession()->elementAttributeContains('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[2]", 'class', 'toolbar-button--icon--dots');
 
     // Find all the dropdown links and check if the top bar is there as well.
     $toolbar_links = $this->mink->getSession()->getPage()->find('xpath', '//*[@id="admin-local-tasks"]/ul');
@@ -112,7 +112,7 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
       $this->clickLink($toolbar_link->getText());
       $this->assertSession()->elementExists('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]");
       $this->assertSession()->elementTextEquals('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]//span", "Edit");
-      $this->assertSession()->elementAttributeContains('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[2]", 'class', 'toolbar-button--icon--kebab');
+      $this->assertSession()->elementAttributeContains('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[2]", 'class', 'toolbar-button--icon--dots');
     }
 
     // Regular tabs are visible for user that cannot access to navigation.

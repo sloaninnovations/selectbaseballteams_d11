@@ -21,6 +21,8 @@
   /* Active child variables. */
   --toolbar-button-has-active-child-bg: var(--admin-toolbar-color-gray-050);
   --toolbar-button-has-active-child-color: var(--admin-toolbar-color-gray-950);
+  /* Icon */
+  --toolbar-button-icon-size: var(--admin-toolbar-space-20);
 }
 
 .toolbar-button {
@@ -101,6 +103,14 @@
   }
 }
 
+.toolbar-button--primary {
+  --toolbar-button-color: var(--admin-toolbar-color-white);
+  --toolbar-button-bg: var(--admin-toolbar-color-blue-450);
+  --toolbar-button-hover-color: var(--admin-toolbar-color-white);
+  --toolbar-button-hover-bg: var(--admin-toolbar-color-blue-600);
+  --toolbar-button-focus-color: var(--admin-toolbar-color-white);
+}
+
 .toolbar-button--small-offset {
   --toolbar-button-outline-offset: calc(-1 * var(--admin-toolbar-space-4));
 }
@@ -120,8 +130,8 @@
     background-position-y: calc(100% - (100% * var(--icon, 0)));
     background-size: 100% 200%;
     font-size: calc(0.75 * var(--admin-toolbar-rem));
-    inline-size: var(--admin-toolbar-space-20);
-    block-size: var(--admin-toolbar-space-20);
+    inline-size: var(--toolbar-button-icon-size);
+    block-size: var(--toolbar-button-icon-size);
     mask-repeat: no-repeat;
     mask-position: center center;
     mask-size: 100% auto;
@@ -203,36 +213,6 @@
   }
 }
 
-.toolbar-button--main-action {
-  position: relative;
-  padding: 0;
-  list-style: none;
-  color: var(--admin-toolbar-color-white);
-  background-color: var(--admin-toolbar-top-bar-action-color);
-
-  &::before {
-    position: absolute;
-    inset-inline-start: var(--admin-toolbar-space-12);
-    inline-size: var(--admin-toolbar-space-16);
-    block-size: var(--admin-toolbar-space-16);
-  }
-
-  .toolbar-button__label {
-    z-index: 1;
-  }
-
-  .toolbar-dropdown__link {
-    color: var(--admin-toolbar-color-white);
-    padding-inline: var(--admin-toolbar-space-36) var(--admin-toolbar-space-12);
-
-    &:hover {
-      text-decoration: none;
-      color: inherit;
-      background-color: transparent;
-    }
-  }
-}
-
 .toolbar-button--icon--announcements-feed-announcement {
   --icon: url(./assets/announcement.svg);
   &::before {
@@ -258,6 +238,10 @@
   --icon: url(./assets/cross.svg);
 }
 
+.toolbar-button--icon--dots {
+  --icon: url(./assets/dots.svg);
+}
+
 .toolbar-button--icon--entity-user-collection {
   --icon: url(./assets/people.svg);
 }
@@ -268,10 +252,6 @@
 
 .toolbar-button--icon--edit {
   --icon: url(./assets/edit.svg);
-}
-
-.toolbar-button--icon--kebab {
-  --icon: url(./assets/kebab.svg);
 }
 
 .toolbar-button--icon--navigation-blocks {
