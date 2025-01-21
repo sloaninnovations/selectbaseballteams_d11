@@ -4,6 +4,15 @@
  */
 
 (function ($, Drupal) {
+  function getUrlWithOp(url, newOp) {
+    // Replace the operation parameter instead of just appending it to
+    // avoid problems with CDNs that modify query string ordering.
+    if (url.indexOf('op=do_nojs') !== -1) {
+      return url.replace('op=do_nojs', `op=${newOp}`);
+    }
+    return `${url}&op=${newOp}`;
+  }
+
   /**
    * Attaches the batch behavior to progress bars.
    *
@@ -19,7 +28,7 @@
       function updateCallback(progress, status, pb) {
         if (progress === '100') {
           pb.stopMonitoring();
-          window.location = `${batch.uri}&op=finished`;
+          window.location = getUrlWithOp(batch.uri, 'finished');
         }
       }
 
@@ -36,7 +45,7 @@
           errorCallback,
         );
         progressBar.setProgress(-1, batch.initMessage);
-        progressBar.startMonitoring(`${batch.uri}&op=do`, 10);
+        progressBar.startMonitoring(getUrlWithOp(batch.uri, 'do'), 10);
         // Remove HTML from no-js progress bar.
         $progress.empty();
         // Append the JS progressbar element.
