@@ -38812,18 +38812,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/system_test/src/MockFileTransfer.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Function _system_test_first_shutdown_function\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/system_test/system_test.module',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function _system_test_second_shutdown_function\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/system_test/system_test.module',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\tabledrag_test\\\\Form\\\\TableDragTestForm\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

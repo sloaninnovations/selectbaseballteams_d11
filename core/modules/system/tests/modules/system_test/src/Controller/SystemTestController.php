@@ -18,6 +18,7 @@ use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\system_test\ShutdownHelper;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -335,7 +336,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * A simple page callback which adds a register shutdown function.
    */
   public function shutdownFunctions($arg1, $arg2) {
-    drupal_register_shutdown_function('_system_test_first_shutdown_function', $arg1, $arg2);
+    drupal_register_shutdown_function([(new ShutdownHelper()), 'firstShutdownFunction'], $arg1, $arg2);
     // If using PHP-FPM then fastcgi_finish_request() will have been fired
     // preventing further output to the browser which means that the escaping of
     // the exception message can not be tested.
