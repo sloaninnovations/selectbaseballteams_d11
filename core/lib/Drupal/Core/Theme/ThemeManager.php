@@ -270,6 +270,11 @@ class ThemeManager implements ThemeManagerInterface {
       }
     }
 
+    // Invoke initial preprocess.
+    if (!empty($info['initial preprocess']) && is_callable($info['initial preprocess'])) {
+      call_user_func_array($info['initial preprocess'], [&$variables, $hook, $info]);
+    }
+
     // Invoke preprocess hooks.
     // By default $info['preprocess functions'] should always be set, but it's
     // good to check it if default Registry service implementation is

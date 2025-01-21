@@ -227,6 +227,7 @@ class ThemeCommonElements {
       ],
       'container' => [
         'render element' => 'element',
+        'initial preprocess' => [static::class, 'preprocessContainer'],
       ],
       // From field system.
       'field' => [
@@ -247,6 +248,35 @@ class ThemeCommonElements {
         ],
       ],
     ];
+  }
+
+  /**
+   * Prepares variables for container templates.
+   *
+   * Default template: container.html.twig.
+   *
+   * @param array $variables
+   *   An associative array containing:
+   *   - element: An associative array containing the properties of the element.
+   *     Properties used: #id, #attributes, #children.
+   */
+  public static function preprocessContainer(&$variables): void {
+    $variables['has_parent'] = FALSE;
+    $element = $variables['element'];
+    // Ensure #attributes is set.
+    $element += ['#attributes' => []];
+
+    // Special handling for form elements.
+    if (isset($element['#array_parents'])) {
+      // Assign an html ID.
+      if (!isset($element['#attributes']['id'])) {
+        $element['#attributes']['id'] = $element['#id'];
+      }
+      $variables['has_parent'] = TRUE;
+    }
+
+    $variables['children'] = $element['#children'];
+    $variables['attributes'] = $element['#attributes'];
   }
 
 }
