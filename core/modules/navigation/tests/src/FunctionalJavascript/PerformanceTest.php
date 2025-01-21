@@ -77,7 +77,7 @@ class PerformanceTest extends PerformanceTestBase {
       'CacheSetCount' => 2,
       'CacheDeleteCount' => 0,
       'CacheTagChecksumCount' => 2,
-      'CacheTagIsValidCount' => 29,
+      'CacheTagIsValidCount' => 28,
       'CacheTagInvalidationCount' => 0,
       'ScriptCount' => 2,
       'ScriptBytes' => 215500,
