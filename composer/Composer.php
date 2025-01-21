@@ -110,6 +110,7 @@ class Composer {
    *   A branch name, e.g. 8.9.x or 9.0.x.
    */
   public static function drupalVersionBranch(): string {
+    // @phpstan-ignore constant.deprecated
     return preg_replace('#\.[0-9]+-dev#', '.x-dev', \Drupal::VERSION);
   }
 

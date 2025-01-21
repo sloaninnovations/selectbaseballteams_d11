@@ -174,7 +174,7 @@ MISSING_CORE_VERSION_REQUIREMENT;
       ],
     ]);
     $info_values = $this->infoParser->parse(vfsStream::url('modules/fixtures/missing_core_version_requirement.info.txt'));
-    $this->assertSame($info_values['core_version_requirement'], \Drupal::VERSION);
+    $this->assertSame($info_values['core_version_requirement'], \Drupal::version());
   }
 
   /**
@@ -204,7 +204,7 @@ COMMON;
       ]);
       $info_values = $this->infoParser->parse(vfsStream::url("modules/fixtures/$filename"));
       $this->assertEquals('A simple string', $info_values['simple_string'], 'Simple string value was parsed correctly.');
-      $this->assertEquals(\Drupal::VERSION, $info_values['version'], 'Constant value was parsed correctly.');
+      $this->assertEquals(\Drupal::version(), $info_values['version'], 'Constant value was parsed correctly.');
       $this->assertEquals('dummyClassName::method', $info_values['double_colon'], 'Value containing double-colon was parsed correctly.');
       $this->assertFalse($info_values['core_incompatible']);
     }
@@ -232,9 +232,9 @@ CORE;
       ],
     ]);
     $info_values = $this->infoParser->parse(vfsStream::url("core/fixtures/$filename"));
-    $this->assertEquals(\Drupal::VERSION, $info_values['version'], 'Constant value was parsed correctly.');
+    $this->assertEquals(\Drupal::version(), $info_values['version'], 'Constant value was parsed correctly.');
     $this->assertFalse($info_values['core_incompatible']);
-    $this->assertEquals(\Drupal::VERSION, $info_values['core_version_requirement']);
+    $this->assertEquals(\Drupal::version(), $info_values['core_version_requirement']);
   }
 
   /**
@@ -271,7 +271,7 @@ CORE_INCOMPATIBILITY;
    */
   public static function providerCoreIncompatibility() {
     // Remove possible stability suffix to properly parse 11.0-dev.
-    $version = preg_replace('/-dev$/', '', \Drupal::VERSION);
+    $version = preg_replace('/-dev$/', '', \Drupal::version());
     [$major, $minor] = explode('.', $version, 2);
 
     $next_minor = $minor + 1;

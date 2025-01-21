@@ -99,7 +99,7 @@ class DbDumpCommand extends DbCommandBase {
     }
     $script = $this->getTemplate();
     // Substitute in the version.
-    $script = str_replace('{{VERSION}}', \Drupal::VERSION, $script);
+    $script = str_replace('{{VERSION}}', \Drupal::version(), $script);
     // Substitute in the tables.
     $script = str_replace('{{TABLES}}', trim($tables), $script);
     return trim($script);

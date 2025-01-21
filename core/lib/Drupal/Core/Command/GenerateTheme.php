@@ -252,7 +252,7 @@ class GenerateTheme extends Command {
       'info' => [
         'name' => $name,
         'description' => $description,
-        'core_version_requirement' => '^' . explode('.', \Drupal::VERSION)[0],
+        'core_version_requirement' => '^' . explode('.', \Drupal::version())[0],
         'version' => '1.0.0',
         'generator' => "{$theme->getName()}:$version",
       ],
@@ -312,7 +312,7 @@ class GenerateTheme extends Command {
       $source_version = 'unknown-version';
     }
     if ($source_version === 'VERSION') {
-      $source_version = \Drupal::VERSION;
+      $source_version = \Drupal::version();
     }
 
     // A version in the generator string like "9.4.0-dev" is not very helpful.

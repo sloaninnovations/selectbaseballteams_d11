@@ -20,7 +20,7 @@ if (PHP_SAPI !== 'cli') {
 
 $classloader = require_once __DIR__ . '/../../autoload.php';
 
-$application = new Application('drupal', \Drupal::VERSION);
+$application = new Application('drupal', \Drupal::version());
 
 $application->add(new QuickStartCommand());
 $application->add(new InstallCommand($classloader));

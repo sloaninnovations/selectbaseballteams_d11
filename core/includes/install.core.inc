@@ -1977,7 +1977,7 @@ function install_check_translations($langcode, $server_pattern) {
     $translations_directory_exists = TRUE;
   }
 
-  $version = \Drupal::VERSION;
+  $version = \Drupal::version();
   // For dev releases, remove the '-dev' part and trust the translation server
   // to fall back to the latest stable release for that branch.
   // @see locale_translation_build_projects()

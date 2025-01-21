@@ -82,7 +82,7 @@ function system_requirements($phase): array {
   if ($phase == 'runtime') {
     $requirements['drupal'] = [
       'title' => t('Drupal'),
-      'value' => \Drupal::VERSION,
+      'value' => \Drupal::version(),
       'severity' => REQUIREMENT_INFO,
       'weight' => -10,
     ];
@@ -1083,7 +1083,7 @@ function system_requirements($phase): array {
           count($core_incompatible_extensions['module']),
         'The following module is installed, but it is incompatible with Drupal @version:',
         'The following modules are installed, but they are incompatible with Drupal @version:',
-        ['@version' => \Drupal::VERSION]
+        ['@version' => \Drupal::version()]
         ),
         new PluralTranslatableMarkup(
           count($core_incompatible_extensions['module']),
@@ -1099,7 +1099,7 @@ function system_requirements($phase): array {
           count($core_incompatible_extensions['theme']),
           'The following theme is installed, but it is incompatible with Drupal @version:',
           'The following themes are installed, but they are incompatible with Drupal @version:',
-          ['@version' => \Drupal::VERSION]
+          ['@version' => \Drupal::version()]
         ),
         new PluralTranslatableMarkup(
           count($core_incompatible_extensions['theme']),

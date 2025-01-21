@@ -199,7 +199,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
     // running them on a tagged release at the same stability as specified in
     // static::MINIMUM_STABILITY, in order to verify that everything will work
     // if/when we make such a release.
-    $simulated_core_version = \Drupal::VERSION;
+    $simulated_core_version = \Drupal::version();
     $simulated_core_version_suffix = (static::MINIMUM_STABILITY === 'stable' ? '' : '-' . static::MINIMUM_STABILITY . '99');
     $simulated_core_version = str_replace('-dev', $simulated_core_version_suffix, $simulated_core_version);
     Composer::setDrupalVersion($this->getWorkspaceDirectory(), $simulated_core_version);
@@ -422,12 +422,7 @@ JSON;
    *   One of: "dev", "alpha", "beta", "RC", "stable".
    */
   protected function getCoreStability() {
-    $version = \Drupal::VERSION;
-    // If the current version is x.y-dev then this is the equivalent of the main
-    // branch and should be treated as a dev release.
-    if (preg_match('/^(\d)+\.(\d)+-dev$/', $version)) {
-      return 'dev';
-    }
+    $version = \Drupal::version();
     $stability = VersionParser::parseStability($version);
     if ($stability === 'dev') {
       // Strip off "-dev";
@@ -456,7 +451,7 @@ JSON;
 
         // We expect a pre-release, because:
         // - A tag should not be of "dev" stability.
-        // - After a "stable" release is made, \Drupal::VERSION is incremented,
+        // - After a "stable" release is made, \Drupal::version() is incremented,
         //   so there should not be a stable release on that new version.
         $stability = VersionParser::parseStability(trim($process->getOutput()));
         $this->assertContains($stability, ['alpha', 'beta', 'RC']);

@@ -152,7 +152,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $this->assertEquals($path . '/css/example.css', $library['css'][0]['data']);
 
     // Ensures that VERSION is replaced by the current core version.
-    $this->assertEquals(\Drupal::VERSION, $library['version']);
+    $this->assertEquals(\Drupal::version(), $library['version']);
 
     // Ensure that the expected FileCache entry exists.
     $cache = FileCacheFactory::get('library_parser')->get($path . '/example_module.libraries.yml');
@@ -302,9 +302,9 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $this->assertEquals('9.8.7.6', $libraries['versioned']['css'][0]['version']);
     $this->assertEquals('9.8.7.6', $libraries['versioned']['js'][0]['version']);
 
-    $this->assertEquals(\Drupal::VERSION, $libraries['core-versioned']['version']);
-    $this->assertEquals(\Drupal::VERSION, $libraries['core-versioned']['css'][0]['version']);
-    $this->assertEquals(\Drupal::VERSION, $libraries['core-versioned']['js'][0]['version']);
+    $this->assertEquals(\Drupal::version(), $libraries['core-versioned']['version']);
+    $this->assertEquals(\Drupal::version(), $libraries['core-versioned']['css'][0]['version']);
+    $this->assertEquals(\Drupal::version(), $libraries['core-versioned']['js'][0]['version']);
   }
 
   /**

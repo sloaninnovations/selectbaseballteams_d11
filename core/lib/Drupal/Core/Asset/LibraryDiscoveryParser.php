@@ -166,7 +166,7 @@ class LibraryDiscoveryParser {
       if (isset($library['version'])) {
         // @todo Retrieve version of a non-core extension.
         if ($library['version'] === 'VERSION') {
-          $library['version'] = \Drupal::VERSION;
+          $library['version'] = \Drupal::version();
         }
         // Remove 'v' prefix from external library versions.
         elseif (is_string($library['version']) && $library['version'][0] === 'v') {

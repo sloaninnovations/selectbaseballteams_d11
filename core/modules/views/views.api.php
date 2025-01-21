@@ -688,7 +688,7 @@ function hook_field_views_data_views_data_alter(array &$data, FieldStorageConfig
 function hook_views_query_substitutions(ViewExecutable $view): array {
   // Example from views_views_query_substitutions().
   return [
-    '***CURRENT_VERSION***' => \Drupal::VERSION,
+    '***CURRENT_VERSION***' => \Drupal::version(),
     '***CURRENT_TIME***' => \Drupal::time()->getRequestTime(),
     '***LANGUAGE_language_content***' => \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId(),
     PluginBase::VIEWS_QUERY_LANGUAGE_SITE_DEFAULT => \Drupal::languageManager()->getDefaultLanguage()->getId(),

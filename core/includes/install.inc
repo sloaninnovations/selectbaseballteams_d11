@@ -119,7 +119,7 @@ function drupal_install_profile_distribution_name() {
  *
  * @return string
  *   Distribution version defined in the profile's .info.yml file.
- *   Defaults to \Drupal::VERSION if no version is explicitly provided by the
+ *   Defaults to \Drupal::version() if no version is explicitly provided by the
  *   installation profile.
  *
  * @see install_profile_info()
@@ -129,7 +129,7 @@ function drupal_install_profile_distribution_version() {
   // installation state (it might not be saved anywhere yet).
   if (InstallerKernel::installationAttempted()) {
     global $install_state;
-    return $install_state['profile_info']['version'] ?? \Drupal::VERSION;
+    return $install_state['profile_info']['version'] ?? \Drupal::version();
   }
   // At all other times, we load the profile via standard methods.
   else {

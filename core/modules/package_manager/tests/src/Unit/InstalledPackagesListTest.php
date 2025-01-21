@@ -96,37 +96,37 @@ class InstalledPackagesListTest extends UnitTestCase {
     $data = [
       'drupal/core' => InstalledPackage::createFromArray([
         'name' => 'drupal/core',
-        'version' => \Drupal::VERSION,
+        'version' => \Drupal::version(),
         'type' => 'drupal-core',
         'path' => __DIR__,
       ]),
       'drupal/core-dev' => InstalledPackage::createFromArray([
         'name' => 'drupal/core-dev',
-        'version' => \Drupal::VERSION,
+        'version' => \Drupal::version(),
         'type' => 'metapackage',
         'path' => NULL,
       ]),
       'drupal/core-dev-pinned' => InstalledPackage::createFromArray([
         'name' => 'drupal/core-dev-pinned',
-        'version' => \Drupal::VERSION,
+        'version' => \Drupal::version(),
         'type' => 'metapackage',
         'path' => NULL,
       ]),
       'drupal/core-composer-scaffold' => InstalledPackage::createFromArray([
         'name' => 'drupal/core-composer-scaffold',
-        'version' => \Drupal::VERSION,
+        'version' => \Drupal::version(),
         'type' => 'composer-plugin',
         'path' => __DIR__,
       ]),
       'drupal/core-project-message' => [
         'name' => 'drupal/core-project-message',
-        'version' => \Drupal::VERSION,
+        'version' => \Drupal::version(),
         'type' => 'composer-plugin',
         'path' => __DIR__,
       ],
       'drupal/core-vendor-hardening' => InstalledPackage::createFromArray([
         'name' => 'drupal/core-vendor-hardening',
-        'version' => \Drupal::VERSION,
+        'version' => \Drupal::version(),
         'type' => 'composer-plugin',
         'path' => __DIR__,
       ]),
@@ -154,7 +154,7 @@ class InstalledPackagesListTest extends UnitTestCase {
     $this->assertArrayHasKey('drupal/core', $list->getCorePackages());
     $data['drupal/core-recommended'] = InstalledPackage::createFromArray([
       'name' => 'drupal/core-recommended',
-      'version' => \Drupal::VERSION,
+      'version' => \Drupal::version(),
       'type' => 'metapackage',
       'path' => NULL,
     ]);

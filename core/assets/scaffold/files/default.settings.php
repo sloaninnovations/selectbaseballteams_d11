@@ -296,7 +296,7 @@ $settings['hash_salt'] = '';
  * custom code that changes the container, changing this identifier will also
  * allow the container to be invalidated as soon as code is deployed.
  */
-# $settings['deployment_identifier'] = \Drupal::VERSION;
+# $settings['deployment_identifier'] = \Drupal::version();
 
 /**
  * Access control for update.php script.

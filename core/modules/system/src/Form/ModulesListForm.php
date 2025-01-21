@@ -344,11 +344,11 @@ class ModulesListForm extends FormBase {
     if ($module->info['core_incompatible']) {
       $compatible = FALSE;
       $reasons[] = $this->t('This version is not compatible with Drupal @core_version and should be replaced.', [
-        '@core_version' => \Drupal::VERSION,
+        '@core_version' => \Drupal::version(),
       ]);
       $row['#requires']['core'] = $this->t('Drupal Core (@core_requirement) (<span class="admin-missing">incompatible with</span> version @core_version)', [
         '@core_requirement' => $module->info['core_version_requirement'] ?? $module->info['core'],
-        '@core_version' => \Drupal::VERSION,
+        '@core_version' => \Drupal::version(),
       ]);
     }
 

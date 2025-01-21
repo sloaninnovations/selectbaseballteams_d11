@@ -68,7 +68,7 @@ class LocaleStringTest extends KernelTestBase {
     // Check version handling and updating.
     $this->assertEquals('none', $source->version);
     $string = $this->storage->findTranslation(['lid' => $source->lid]);
-    $this->assertEquals(\Drupal::VERSION, $string->version);
+    $this->assertEquals(\Drupal::version(), $string->version);
 
     // Create translation and find it by lid and source.
     $langcode = 'es';

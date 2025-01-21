@@ -54,7 +54,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
     $this->sourceDatabase = Database::getConnection('default', 'migrate_drupal_ui');
 
     // Get the current major version.
-    [$this->destinationSiteVersion] = explode('.', \Drupal::VERSION, 2);
+    [$this->destinationSiteVersion] = explode('.', \Drupal::version(), 2);
 
     // Log in as user 1. Migrations in the UI can only be performed as user 1.
     $this->drupalLogin($this->rootUser);

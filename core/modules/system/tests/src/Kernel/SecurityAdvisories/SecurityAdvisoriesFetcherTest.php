@@ -198,7 +198,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
           'is_psa' => 1,
           'type' => 'core',
           'project' => 'drupal',
-          'insecure' => [\Drupal::VERSION],
+          'insecure' => [\Drupal::version()],
         ],
       ],
       'core:exact:non-psa' => [
@@ -206,7 +206,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
           'is_psa' => 0,
           'type' => 'core',
           'project' => 'drupal',
-          'insecure' => [\Drupal::VERSION],
+          'insecure' => [\Drupal::version()],
         ],
       ],
       'core:not-exact:psa' => [
@@ -542,14 +542,14 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
       'type' => 'core',
       'title' => 'Oh no🙀! Advisory 1',
       'project' => 'drupal',
-      'insecure' => [\Drupal::VERSION],
+      'insecure' => [\Drupal::version()],
     ];
     $feed_item_2 = [
       'is_psa' => 1,
       'type' => 'core',
       'title' => 'Oh no😱! Advisory 2',
       'project' => 'drupal',
-      'insecure' => [\Drupal::VERSION],
+      'insecure' => [\Drupal::version()],
     ];
     $this->setFeedItems([$feed_item_1, $feed_item_2]);
     $advisories = $this->getAdvisories();
@@ -631,7 +631,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
       'is_psa' => 1,
       'type' => 'core',
       'project' => 'drupal',
-      'insecure' => [\Drupal::VERSION],
+      'insecure' => [\Drupal::version()],
       'title' => 'SA title',
       'link' => 'http://example.com',
     ];

@@ -21,7 +21,7 @@ class ComponentsTaggedReleaseTest extends ComposerBuildTestBase {
    * Highly arbitrary version and constraint expectations.
    *
    * @return array
-   *   - First element is the tag that should be applied to \Drupal::version.
+   *   - First element is the tag that should be applied to \Drupal::version().
    *   - Second element is the resulting constraint which should be present in
    *     the component core dependencies.
    */

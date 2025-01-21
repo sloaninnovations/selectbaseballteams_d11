@@ -50,7 +50,7 @@ class ClientFactory {
       'verify' => TRUE,
       'timeout' => 30,
       'headers' => [
-        'User-Agent' => 'Drupal/' . \Drupal::VERSION . ' (+https://www.drupal.org/) ' . Utils::defaultUserAgent(),
+        'User-Agent' => 'Drupal/' . \Drupal::version() . ' (+https://www.drupal.org/) ' . Utils::defaultUserAgent(),
       ],
       'handler' => $this->stack,
       // Security consideration: prevent Guzzle from using environment variables

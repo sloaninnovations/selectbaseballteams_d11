@@ -25,7 +25,7 @@ class InstallerExistingInstallationTest extends InstallerTestBase {
     $this->assertSession()->pageTextContains('Drupal already installed');
 
     // Verify that Drupal version is not displayed.
-    $this->assertSession()->pageTextNotContains(\Drupal::VERSION);
+    $this->assertSession()->pageTextNotContains(\Drupal::version());
 
     // Delete settings.php and attempt to reinstall again.
     unlink($this->siteDirectory . '/settings.php');

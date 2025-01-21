@@ -191,7 +191,7 @@ class UpdateScriptTest extends BrowserTestBase {
     \Drupal::state()->set('update_script_test.system_info_alter', ['dependencies' => ['node (<7.x-0.0-dev)']]);
     $this->drupalGet($this->updateUrl, ['external' => TRUE]);
     $this->assertSession()->assertEscaped('Node (Version <7.x-0.0-dev required)');
-    $this->assertSession()->responseContains('Update script test requires this module and version. Currently using Node version ' . \Drupal::VERSION);
+    $this->assertSession()->responseContains('Update script test requires this module and version. Currently using Node version ' . \Drupal::version());
 
     // Test that issues with modules that themes depend on are properly
     // displayed.
@@ -207,7 +207,7 @@ class UpdateScriptTest extends BrowserTestBase {
     \Drupal::state()->set('test_theme_depending_on_modules.system_info_alter', ['dependencies' => ['test_module_required_by_theme (<7.x-0.0-dev)']]);
     $this->drupalGet($this->updateUrl, ['external' => TRUE]);
     $this->assertSession()->assertEscaped('Test Module Required by Theme (Version <7.x-0.0-dev required)');
-    $this->assertSession()->responseContains('Test Theme Depending on Modules requires this module and version. Currently using Test Module Required by Theme version ' . \Drupal::VERSION);
+    $this->assertSession()->responseContains('Test Theme Depending on Modules requires this module and version. Currently using Test Module Required by Theme version ' . \Drupal::version());
 
     // Ensure that when a theme is updated to depend on an unavailable module,
     // errors are displayed in the same manner as modules depending on other
@@ -283,8 +283,8 @@ class UpdateScriptTest extends BrowserTestBase {
    * Date provider for testExtensionCompatibilityChange().
    */
   public static function providerExtensionCompatibilityChange() {
-    $incompatible_module_message = "The following module is installed, but it is incompatible with Drupal " . \Drupal::VERSION . ":";
-    $incompatible_theme_message = "The following theme is installed, but it is incompatible with Drupal " . \Drupal::VERSION . ":";
+    $incompatible_module_message = "The following module is installed, but it is incompatible with Drupal " . \Drupal::version() . ":";
+    $incompatible_theme_message = "The following theme is installed, but it is incompatible with Drupal " . \Drupal::version() . ":";
     return [
       'module: core_version_requirement key incompatible' => [
         [

@@ -43,12 +43,12 @@ class InfoParserDynamic implements InfoParserInterface {
         // Core extensions do not need to specify core compatibility: they are
         // by definition compatible so a sensible default is used. Core
         // modules are allowed to provide these for testing purposes.
-        $parsed_info['core_version_requirement'] = \Drupal::VERSION;
+        $parsed_info['core_version_requirement'] = \Drupal::version();
       }
       elseif (isset($parsed_info['package']) && $parsed_info['package'] === 'Testing') {
         // Modules in the testing package are exempt as well. This makes it
         // easier for contrib to use test modules.
-        $parsed_info['core_version_requirement'] = \Drupal::VERSION;
+        $parsed_info['core_version_requirement'] = \Drupal::version();
       }
       else {
         // Non-core extensions must specify core compatibility.
@@ -59,13 +59,13 @@ class InfoParserDynamic implements InfoParserInterface {
     // Determine if the extension is compatible with the current version of
     // Drupal core.
     try {
-      $parsed_info['core_incompatible'] = !Semver::satisfies(\Drupal::VERSION, $parsed_info['core_version_requirement']);
+      $parsed_info['core_incompatible'] = !Semver::satisfies(\Drupal::version(), $parsed_info['core_version_requirement']);
     }
     catch (\UnexpectedValueException) {
       throw new InfoParserException("The 'core_version_requirement' constraint ({$parsed_info['core_version_requirement']}) is not a valid value in $filename");
     }
     if (isset($parsed_info['version']) && $parsed_info['version'] === 'VERSION') {
-      $parsed_info['version'] = \Drupal::VERSION;
+      $parsed_info['version'] = \Drupal::version();
     }
     $parsed_info += [ExtensionLifecycle::LIFECYCLE_IDENTIFIER => ExtensionLifecycle::STABLE];
     $lifecycle = $parsed_info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];

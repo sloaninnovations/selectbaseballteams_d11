@@ -111,7 +111,7 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
     }
 
     // Get the major Drupal version.
-    [$version] = explode('.', \Drupal::VERSION);
+    [$version] = explode('.', \Drupal::version());
 
     // Attach default meta tags.
     $meta_default = [

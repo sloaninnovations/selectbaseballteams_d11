@@ -268,7 +268,7 @@ final class SecurityAdvisoriesFetcher {
    */
   protected function getProjectExistingVersion(SecurityAdvisory $sa): ?string {
     if ($sa->isCoreAdvisory()) {
-      return \Drupal::VERSION;
+      return \Drupal::version();
     }
     $extension_info = $this->getMatchingExtensionInfo($sa);
     return $extension_info['version'] ?? NULL;

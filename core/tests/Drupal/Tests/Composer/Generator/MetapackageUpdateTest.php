@@ -72,7 +72,7 @@ class MetapackageUpdateTest extends TestCase {
     // The generated json is the "expected", what we think the loaded
     // json would contain, if the current patch is generated correctly
     // (metapackages updated when composer.lock is updated).
-    $version = str_replace('.0-dev', '.x-dev', \Drupal::VERSION);
+    $version = str_replace('.0-dev', '.x-dev', \Drupal::version());
     $message = <<< __EOT__
 The rebuilt version of $path does not match what is in the source tree.
 

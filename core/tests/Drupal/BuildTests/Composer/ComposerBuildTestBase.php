@@ -37,7 +37,7 @@ abstract class ComposerBuildTestBase extends BuildTestBase {
 
     // Read back the Drupal version that was set and assert it matches
     // expectations
-    $this->executeCommand("php -r 'include \"$drupal_php_path\"; print \Drupal::VERSION;'");
+    $this->executeCommand("php -r 'include \"$drupal_php_path\"; print \Drupal::version();'");
     $this->assertCommandSuccessful();
     $this->assertCommandOutputContains($expectedVersion);
   }

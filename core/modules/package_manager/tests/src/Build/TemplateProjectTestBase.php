@@ -116,7 +116,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
       'drupal/core-vendor-hardening' => $version,
     ]);
 
-    // Change the \Drupal::VERSION constant and put placeholder text in the
+    // Change the \Drupal::version() constant and put placeholder text in the
     // README so we can ensure that we really updated to the correct version. We
     // also change the default site configuration files so we can ensure that
     // these are updated as well, despite `sites/default` being write-protected.

@@ -1,5 +1,6 @@
 <?php
 
+use Composer\InstalledVersions;
 use Drupal\Core\DependencyInjection\ContainerNotInitializedException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -74,8 +75,12 @@ class Drupal {
 
   /**
    * The current system version.
+   *
+   * @deprecated in drupal:11.0.9 and is removed from drupal:12.0.0.
+   * Use \Drupal::version() instead.
+   * @see https://www.drupal.org/node/3481012
    */
-  const VERSION = '11.2-dev';
+  const VERSION = '11.0-dev';
 
   /**
    * Core API compatibility.
@@ -750,6 +755,15 @@ class Drupal {
    */
   public static function messenger() {
     return static::getContainer()->get('messenger');
+  }
+
+  /**
+   * Returns current system version.
+   *
+   * @return string
+   */
+  public static function version() {
+    return InstalledVersions::getPrettyVersion('drupal/core');
   }
 
 }

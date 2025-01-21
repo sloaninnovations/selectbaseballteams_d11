@@ -34,7 +34,7 @@ class AdvisoryTestController {
       return new Response('', 404, $headers);
     }
     $contents = file_get_contents($file);
-    $contents = str_replace('[CORE_VERSION]', \Drupal::VERSION, $contents);
+    $contents = str_replace('[CORE_VERSION]', \Drupal::version(), $contents);
     return new JsonResponse($contents, 200, $headers, TRUE);
   }
 

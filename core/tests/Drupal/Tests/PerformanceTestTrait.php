@@ -470,7 +470,7 @@ trait PerformanceTestTrait {
       ResourceAttributes::SERVICE_NAMESPACE => 'Drupal',
       ResourceAttributes::SERVICE_NAME => $service_name,
       ResourceAttributes::SERVICE_INSTANCE_ID => 1,
-      ResourceAttributes::SERVICE_VERSION => \Drupal::VERSION,
+      ResourceAttributes::SERVICE_VERSION => \Drupal::version(),
       ResourceAttributes::DEPLOYMENT_ENVIRONMENT_NAME => 'local',
     ])));
 

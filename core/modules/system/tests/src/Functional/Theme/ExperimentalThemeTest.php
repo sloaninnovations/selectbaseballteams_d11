@@ -43,8 +43,8 @@ class ExperimentalThemeTest extends BrowserTestBase {
   public function testExperimentalConfirmForm(): void {
     // Only experimental themes should be marked as such with a parenthetical.
     $this->drupalGet('admin/appearance');
-    $this->assertSession()->responseContains(sprintf('Experimental test %s                (experimental theme)', \Drupal::VERSION));
-    $this->assertSession()->responseContains(sprintf('Experimental dependency test %s', \Drupal::VERSION));
+    $this->assertSession()->responseContains(sprintf('Experimental test %s                (experimental theme)', \Drupal::version()));
+    $this->assertSession()->responseContains(sprintf('Experimental dependency test %s', \Drupal::version()));
 
     // First, test installing a non-experimental theme with no dependencies.
     // There should be no confirmation form and no experimental theme warning.
@@ -75,8 +75,8 @@ class ExperimentalThemeTest extends BrowserTestBase {
     $this->cssSelect('a[title="Set Experimental test as default theme"]')[0]->click();
     $this->assertSession()->pageTextNotContains('Experimental themes are provided for testing purposes only. Use at your own risk.');
     $this->assertSession()->pageTextContains('Experimental test is now the default theme.');
-    $this->assertSession()->pageTextNotContains(sprintf('Experimental test %s                (experimental theme)', \Drupal::VERSION));
-    $this->assertSession()->responseContains(sprintf('Experimental test %s                (default theme, administration theme, experimental theme)', \Drupal::VERSION));
+    $this->assertSession()->pageTextNotContains(sprintf('Experimental test %s                (experimental theme)', \Drupal::version()));
+    $this->assertSession()->responseContains(sprintf('Experimental test %s                (default theme, administration theme, experimental theme)', \Drupal::version()));
 
     // Uninstall the theme.
     $this->config('system.theme')->set('default', 'test_theme')->save();
@@ -111,15 +111,15 @@ class ExperimentalThemeTest extends BrowserTestBase {
     // Enable the theme and confirm that it worked.
     $this->submitForm([], 'Continue');
     $this->assertSession()->pageTextContains('The Experimental dependency test theme has been installed.');
-    $this->assertSession()->responseContains(sprintf('Experimental test %s                (experimental theme)', \Drupal::VERSION));
-    $this->assertSession()->responseContains(sprintf('Experimental dependency test %s', \Drupal::VERSION));
+    $this->assertSession()->responseContains(sprintf('Experimental test %s                (experimental theme)', \Drupal::version()));
+    $this->assertSession()->responseContains(sprintf('Experimental dependency test %s', \Drupal::version()));
 
     // Setting it as the default should not ask for another confirmation.
     $this->cssSelect('a[title="Set Experimental dependency test as default theme"]')[0]->click();
     $this->assertSession()->pageTextNotContains('Experimental themes are provided for testing purposes only. Use at your own risk.');
     $this->assertSession()->pageTextContains('Experimental dependency test is now the default theme.');
-    $this->assertSession()->responseContains(sprintf('Experimental test %s                (experimental theme)', \Drupal::VERSION));
-    $this->assertSession()->responseContains(sprintf('Experimental dependency test %s                (default theme, administration theme)', \Drupal::VERSION));
+    $this->assertSession()->responseContains(sprintf('Experimental test %s                (experimental theme)', \Drupal::version()));
+    $this->assertSession()->responseContains(sprintf('Experimental dependency test %s                (default theme, administration theme)', \Drupal::version()));
 
     // Uninstall the theme.
     $this->config('system.theme')->set('default', 'test_theme')->save();

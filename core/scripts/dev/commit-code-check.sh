@@ -71,7 +71,7 @@ if [[ "$DRUPALCI" == "1" ]]; then
   red=""
   green=""
   reset=""
-  DRUPAL_VERSION=$(php -r "include 'vendor/autoload.php'; print preg_replace('#\.[0-9]+-dev#', '.x', \Drupal::VERSION);")
+  DRUPAL_VERSION=$(php -r "include 'vendor/autoload.php'; print preg_replace('#\.[0-9]+-dev#', '.x', \Drupal::version());")
   GIT="sudo -u www-data git"
 else
   red=$(tput setaf 1 && tput bold)

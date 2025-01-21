@@ -80,7 +80,7 @@ final class AnnounceFetcher {
    *   Return True if the version matches Drupal version.
    */
   protected static function isRelevantItem(string $version): bool {
-    return !empty($version) && Semver::satisfies(\Drupal::VERSION, $version);
+    return !empty($version) && Semver::satisfies(\Drupal::version(), $version);
   }
 
   /**
