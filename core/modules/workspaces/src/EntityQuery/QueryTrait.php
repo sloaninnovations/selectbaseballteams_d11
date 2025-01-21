@@ -59,7 +59,7 @@ trait QueryTrait {
   public function prepare() {
     // Latest revision queries have to return the latest workspace-specific
     // revisions.
-    if ($this->latestRevision && $this->workspaceManager->hasActiveWorkspace() && $this->workspaceManager->isEntityTypeSupported($this->entityType)) {
+    if ($this->latestRevision && $this->workspaceInfo->isEntityTypeSupported($this->entityType) && $this->workspaceManager->hasActiveWorkspace()) {
       $this->allRevisions = FALSE;
       $this->latestRevision = FALSE;
     }
