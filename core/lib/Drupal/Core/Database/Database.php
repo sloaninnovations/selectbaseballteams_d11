@@ -522,6 +522,21 @@ abstract class Database {
     // @todo https://www.drupal.org/project/drupal/issues/3250999. Refactor when
     // all database drivers are provided by modules.
     $url_components = parse_url($url);
+
+    // The function parse_url() can fail for MongoDB. With MongoDB there are
+    // multiple hosts. URLs with multiple hosts are not supported by
+    // parse_url(). Get the host names and replace them with a placeholder
+    // hostname and run parse_url() again.
+    if ($url_components === FALSE) {
+      // The host names are the ones between the character "@" and the character "/".
+      preg_match('/\@(.*)\//', $url, $matches);
+      if (isset($matches[1])) {
+        $hosts = $matches[1];
+        $url = str_replace($hosts, 'placeholder_host', $url);
+        $url_components = parse_url($url);
+      }
+    }
+
     $url_component_query = $url_components['query'] ?? '';
     parse_str($url_component_query, $query);
 
@@ -558,7 +573,7 @@ abstract class Database {
 
     $additional_class_loader->register(TRUE);
 
-    $options = $connection_class::createConnectionOptionsFromUrl($url, $root);
+    $options = $connection_class::createConnectionOptionsFromUrl($url, $root, $hosts ?? '');
 
     // Add the necessary information to autoload code.
     // @see \Drupal\Core\Site\Settings::initialize()

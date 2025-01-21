@@ -152,7 +152,7 @@ class DbLogController extends ControllerBase {
       'variables',
       'link',
     ]);
-    $query->leftJoin('users_field_data', 'ufd', '[w].[uid] = [ufd].[uid]');
+    $query->leftJoin('users', 'ufd', $query->joinCondition()->compare('w.uid', 'ufd.uid'));
 
     $this->addFilterToQuery($request, $query);
 
@@ -229,8 +229,8 @@ class DbLogController extends ControllerBase {
   public function eventDetails($event_id) {
     $query = $this->database->select('watchdog', 'w')
       ->fields('w')
-      ->condition('w.wid', $event_id);
-    $query->leftJoin('users', 'u', '[u].[uid] = [w].[uid]');
+      ->condition('w.wid', (int) $event_id);
+    $query->leftJoin('users', 'u', $query->joinCondition()->compare('u.uid', 'w.uid'));
     $query->addField('u', 'uid', 'uid');
     $dblog = $query->execute()->fetchObject();
 
@@ -434,13 +434,13 @@ class DbLogController extends ControllerBase {
     ];
 
     $count_query = $this->database->select('watchdog');
-    $count_query->addExpression('COUNT(DISTINCT([message]))');
+    $count_query->addExpressionCountDistinct('message');
     $count_query->condition('type', $type);
 
     $query = $this->database->select('watchdog', 'w')
       ->extend(PagerSelectExtender::class)
       ->extend(TableSortExtender::class);
-    $query->addExpression('COUNT([wid])', 'count');
+    $query->addExpressionCount('wid', 'count');
     $query = $query
       ->fields('w', ['message', 'variables'])
       ->condition('w.type', $type)

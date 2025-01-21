@@ -121,6 +121,7 @@ csrftoken
 csslintrc
 csstools
 cweagans
+daffie
 datelist
 daterange
 datestamp

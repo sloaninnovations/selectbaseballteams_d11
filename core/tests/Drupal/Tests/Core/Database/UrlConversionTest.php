@@ -8,7 +8,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Tests\UnitTestCase;
 
-// cspell:ignore dummydb
+// cspell:ignore dummydb replicaset dbrs
 
 /**
  * Tests for database URL to/from database connection array conversions.
@@ -272,6 +272,224 @@ class UrlConversionTest extends UnitTestCase {
         ],
         FALSE,
       ],
+      'MongoDB with replicaset and a single host without port' => [
+        'mongodb://test_user:test_pass@test_host/test_database?replicaset=dbrs',
+        [
+          'driver' => 'mongodb',
+          'username' => 'test_user',
+          'password' => 'test_pass',
+          'hosts' => [
+            [
+              'host' => 'test_host',
+            ],
+          ],
+          'database' => 'test_database',
+          'replicaset' => 'dbrs',
+          'namespace' => 'Drupal\mongodb\Driver\Database\mongodb',
+          'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+        ],
+        FALSE,
+      ],
+      'MongoDB with replicaset and a single host with port' => [
+        'mongodb://test_user:test_pass@test_host:3306/test_database?replicaSet=dbrs',
+        [
+          'driver' => 'mongodb',
+          'username' => 'test_user',
+          'password' => 'test_pass',
+          'hosts' => [
+            [
+              'host' => 'test_host',
+              'port' => 3306,
+            ],
+          ],
+          'database' => 'test_database',
+          'replicaset' => 'dbrs',
+          'namespace' => 'Drupal\mongodb\Driver\Database\mongodb',
+          'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+        ],
+        FALSE,
+      ],
+      'MongoDB with replicaset and multiple hosts without ports' => [
+        'mongodb://test_user:test_pass@test_host1,test_host2,test_host3/test_database?replicaset=dbrs',
+        [
+          'driver' => 'mongodb',
+          'username' => 'test_user',
+          'password' => 'test_pass',
+          'hosts' => [
+            [
+              'host' => 'test_host1',
+            ],
+            [
+              'host' => 'test_host2',
+            ],
+            [
+              'host' => 'test_host3',
+            ],
+          ],
+          'database' => 'test_database',
+          'replicaset' => 'dbrs',
+          'namespace' => 'Drupal\mongodb\Driver\Database\mongodb',
+          'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+        ],
+        FALSE,
+      ],
+      'MongoDB with replicaset and multiple hosts with port' => [
+        'mongodb://test_user:test_pass@test_host1,test_host2:27018,test_host3/test_database?replicaset=dbrs',
+        [
+          'driver' => 'mongodb',
+          'username' => 'test_user',
+          'password' => 'test_pass',
+          'hosts' => [
+            [
+              'host' => 'test_host1',
+            ],
+            [
+              'host' => 'test_host2',
+              'port' => 27018,
+            ],
+            [
+              'host' => 'test_host3',
+            ],
+          ],
+          'database' => 'test_database',
+          'replicaset' => 'dbrs',
+          'namespace' => 'Drupal\mongodb\Driver\Database\mongodb',
+          'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+        ],
+        FALSE,
+      ],
+      'MongoDB with replicaset and multiple hosts with ports' => [
+        'mongodb://test_user:test_pass@test_host1:27017,test_host2:27018,test_host3:27019/test_database?replicaset=dbrs',
+        [
+          'driver' => 'mongodb',
+          'username' => 'test_user',
+          'password' => 'test_pass',
+          'hosts' => [
+            [
+              'host' => 'test_host1',
+              'port' => 27017,
+            ],
+            [
+              'host' => 'test_host2',
+              'port' => 27018,
+            ],
+            [
+              'host' => 'test_host3',
+              'port' => 27019,
+            ],
+          ],
+          'database' => 'test_database',
+          'replicaset' => 'dbrs',
+          'namespace' => 'Drupal\mongodb\Driver\Database\mongodb',
+          'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+        ],
+        FALSE,
+      ],
+      'MongoDB with replicaset, multiple hosts with port and module' => [
+        'mongodb://test_user:test_pass@test_host1,test_host2:27018,test_host3/test_database?module=mongodb&replicaset=dbrs',
+        [
+          'driver' => 'mongodb',
+          'username' => 'test_user',
+          'password' => 'test_pass',
+          'hosts' => [
+            [
+              'host' => 'test_host1',
+            ],
+            [
+              'host' => 'test_host2',
+              'port' => 27018,
+            ],
+            [
+              'host' => 'test_host3',
+            ],
+          ],
+          'database' => 'test_database',
+          'replicaset' => 'dbrs',
+          'namespace' => 'Drupal\mongodb\Driver\Database\mongodb',
+          'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+        ],
+        FALSE,
+      ],
+      'MongoDB with replicaset, multiple hosts with ports and module' => [
+        'mongodb://test_user:test_pass@test_host1:27017,test_host2:27018,test_host3:27019/test_database?module=mongodb&replicaset=dbrs',
+        [
+          'driver' => 'mongodb',
+          'username' => 'test_user',
+          'password' => 'test_pass',
+          'hosts' => [
+            [
+              'host' => 'test_host1',
+              'port' => 27017,
+            ],
+            [
+              'host' => 'test_host2',
+              'port' => 27018,
+            ],
+            [
+              'host' => 'test_host3',
+              'port' => 27019,
+            ],
+          ],
+          'database' => 'test_database',
+          'replicaset' => 'dbrs',
+          'namespace' => 'Drupal\mongodb\Driver\Database\mongodb',
+          'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+        ],
+        FALSE,
+      ],
+      'MongoDB with replicaSet, multiple hosts with ports and module' => [
+        'mongodb://test_user:test_pass@test_host1:27017,test_host2:27018,test_host3:27019/test_database?module=mongodb&replicaSet=dbrs',
+        [
+          'driver' => 'mongodb',
+          'username' => 'test_user',
+          'password' => 'test_pass',
+          'hosts' => [
+            [
+              'host' => 'test_host1',
+              'port' => 27017,
+            ],
+            [
+              'host' => 'test_host2',
+              'port' => 27018,
+            ],
+            [
+              'host' => 'test_host3',
+              'port' => 27019,
+            ],
+          ],
+          'database' => 'test_database',
+          'replicaset' => 'dbrs',
+          'namespace' => 'Drupal\mongodb\Driver\Database\mongodb',
+          'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+        ],
+        FALSE,
+      ],
+      'MongoDB with prefix, replicaset and multiple hosts with port' => [
+        'mongodb://test_user:test_pass@test_host1,test_host2:27018,test_host3/test_database?replicaset=dbrs#bar',
+        [
+          'driver' => 'mongodb',
+          'username' => 'test_user',
+          'password' => 'test_pass',
+          'hosts' => [
+            [
+              'host' => 'test_host1',
+            ],
+            [
+              'host' => 'test_host2',
+              'port' => 27018,
+            ],
+            [
+              'host' => 'test_host3',
+            ],
+          ],
+          'database' => 'test_database',
+          'prefix' => 'bar',
+          'replicaset' => 'dbrs',
+          'namespace' => 'Drupal\mongodb\Driver\Database\mongodb',
+          'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+        ],
+        FALSE,
+      ],
     ];
   }
 
@@ -458,6 +676,108 @@ class UrlConversionTest extends UnitTestCase {
     ];
     $expected_url9 = 'DriverTestMysql://test_user:test_pass@test_host:3306/test_database?module=driver_test';
 
+    $info10 = [
+      'database' => 'test_database',
+      'username' => 'test_user',
+      'password' => 'test_pass',
+      'prefix' => '',
+      'hosts' => [
+        [
+          'host' => 'test_host',
+          'port' => 5432,
+        ],
+      ],
+      'replicaSet' => 'dbrs',
+      'driver' => 'mongodb',
+      'namespace' => 'Drupal\\mongodb\\Driver\\Database\\mongodb',
+      'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+    ];
+    $expected_url10 = 'mongodb://test_user:test_pass@test_host:5432/test_database?module=mongodb&replicaSet=dbrs';
+
+    $info11 = [
+      'database' => 'test_database',
+      'username' => 'test_user',
+      'password' => 'test_pass',
+      'prefix' => '',
+      'hosts' => [
+        [
+          'host' => 'test_host',
+        ],
+      ],
+      'replicaSet' => 'dbrs',
+      'driver' => 'mongodb',
+      'namespace' => 'Drupal\\mongodb\\Driver\\Database\\mongodb',
+      'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+    ];
+    $expected_url11 = 'mongodb://test_user:test_pass@test_host/test_database?module=mongodb&replicaSet=dbrs';
+
+    $info12 = [
+      'database' => 'test_database',
+      'username' => 'test_user',
+      'password' => 'test_pass',
+      'prefix' => 'bar',
+      'hosts' => [
+        [
+          'host' => 'test_host',
+        ],
+      ],
+      'replicaSet' => 'dbrs',
+      'driver' => 'mongodb',
+      'namespace' => 'Drupal\\mongodb\\Driver\\Database\\mongodb',
+      'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+    ];
+    $expected_url12 = 'mongodb://test_user:test_pass@test_host/test_database?module=mongodb&replicaSet=dbrs#bar';
+
+    $info13 = [
+      'database' => 'test_database',
+      'username' => 'test_user',
+      'password' => 'test_pass',
+      'prefix' => '',
+      'hosts' => [
+        [
+          'host' => 'test_host1',
+          'port' => 27017,
+        ],
+        [
+          'host' => 'test_host2',
+          'port' => 27018,
+        ],
+        [
+          'host' => 'test_host3',
+          'port' => 27019,
+        ],
+      ],
+      'replicaSet' => 'dbrs',
+      'driver' => 'mongodb',
+      'namespace' => 'Drupal\\mongodb\\Driver\\Database\\mongodb',
+      'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+    ];
+    $expected_url13 = 'mongodb://test_user:test_pass@test_host1:27017,test_host2:27018,test_host3:27019/test_database?module=mongodb&replicaSet=dbrs';
+
+    $info14 = [
+      'database' => 'test_database',
+      'username' => 'test_user',
+      'password' => 'test_pass',
+      'prefix' => '',
+      'hosts' => [
+        [
+          'host' => 'test_host1',
+        ],
+        [
+          'host' => 'test_host2',
+          'port' => 27018,
+        ],
+        [
+          'host' => 'test_host3',
+        ],
+      ],
+      'replicaset' => 'dbrs',
+      'driver' => 'mongodb',
+      'namespace' => 'Drupal\\mongodb\\Driver\\Database\\mongodb',
+      'autoload' => 'core/modules/mongodb/src/Driver/Database/mongodb/',
+    ];
+    $expected_url14 = 'mongodb://test_user:test_pass@test_host1,test_host2:27018,test_host3/test_database?module=mongodb&replicaSet=dbrs';
+
     return [
       [$info1, $expected_url1],
       [$info2, $expected_url2],
@@ -468,6 +788,11 @@ class UrlConversionTest extends UnitTestCase {
       [$info7, $expected_url7],
       [$info8, $expected_url8],
       [$info9, $expected_url9],
+      [$info10, $expected_url10],
+      [$info11, $expected_url11],
+      [$info12, $expected_url12],
+      [$info13, $expected_url13],
+      [$info14, $expected_url14],
     ];
   }
 

@@ -65,7 +65,7 @@ class ViewsTestQueryAccessHooks {
     if (isset($tables[$data_table]) && !isset($tables[$base_table])) {
       $data_table_alias = $tables[$data_table]['alias'];
       $id_key = $entity_type->getKey('id');
-      $base_table = $query->innerJoin($base_table, NULL, "[$data_table_alias].[$id_key] = [$base_table].[$id_key]");
+      $base_table = $query->innerJoin($base_table, NULL, $query->joinCondition()->compare("$data_table_alias.$id_key", "$base_table.$id_key"));
     }
 
     // Figure out the column name of the UUID field and add a condition on that.

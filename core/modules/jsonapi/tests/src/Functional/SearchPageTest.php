@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\jsonapi\JsonApiSpec;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\search\Entity\SearchPage;
 
@@ -104,7 +105,7 @@ class SearchPageTest extends ConfigEntityResourceTestBase {
           ],
           'dependencies' => [
             'module' => [
-              'node',
+              (Database::getConnection()->driver() == 'mongodb' ? 'mongodb' : 'node'),
             ],
           ],
           'label' => 'Search of magnetic activity of the Sun',

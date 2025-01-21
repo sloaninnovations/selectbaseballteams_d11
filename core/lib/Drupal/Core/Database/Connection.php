@@ -1311,6 +1311,9 @@ abstract class Connection {
    * @param string $root
    *   The root directory of the Drupal installation. Some database drivers,
    *   like for example SQLite, need this information.
+   * @param string $hosts
+   *   (optional) The host names when there are multiple host names. The host
+   *   name in the $url has been replaced with a placeholder.
    *
    * @return array
    *   The connection options.
@@ -1325,7 +1328,7 @@ abstract class Connection {
    *
    * @see \Drupal\Core\Database\Database::convertDbUrlToConnectionInfo()
    */
-  public static function createConnectionOptionsFromUrl($url, $root) {
+  public static function createConnectionOptionsFromUrl($url, $root, $hosts = '') {
     $url_components = parse_url($url);
     if (!isset($url_components['scheme'], $url_components['host'], $url_components['path'])) {
       throw new \InvalidArgumentException("The database connection URL '$url' is invalid. The minimum requirement is: 'driver://host/database'");
