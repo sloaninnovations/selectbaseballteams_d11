@@ -78,8 +78,8 @@
     }
 
     const term = autocomplete.extractLastTerm(event.target.value);
-    // Abort search if the first character is in firstCharacterBlacklist.
-    if (term.length > 0 && options.firstCharacterBlacklist.includes(term[0])) {
+    // Abort search if the first character is in firstCharacterDenyList.
+    if (term.length > 0 && options.firstCharacterDenyList.includes(term[0])) {
       return false;
     }
     // Only search when the term is at least the minimum length.
@@ -215,8 +215,16 @@
           const blacklist = $autocomplete.attr(
             'data-autocomplete-first-character-blacklist',
           );
+          Drupal.deprecatedProperty({
+            deprecatedProperty: 'blacklist',
+            message:
+              'The blacklist constant is been deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use denyList instead. See https://www.drupal.org/node/3472016.',
+          });
+          const denyList = $autocomplete.attr(
+            'data-autocomplete-first-character-denylist',
+          );
           $.extend(autocomplete.options, {
-            firstCharacterBlacklist: blacklist || '',
+            firstCharacterDenyList: denyList || '',
           });
           // Use jQuery UI Autocomplete on the textfield.
           $autocomplete.autocomplete(autocomplete.options).each(function () {
@@ -268,7 +276,7 @@
       renderItem,
       minLength: 1,
       // Custom options, used by Drupal.autocomplete.
-      firstCharacterBlacklist: '',
+      firstCharacterDenyList: '',
       // Custom options, indicate IME usage status.
       isComposing: false,
     },
