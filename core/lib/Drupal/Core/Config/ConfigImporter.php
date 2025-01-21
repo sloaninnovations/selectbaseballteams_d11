@@ -679,6 +679,7 @@ class ConfigImporter {
       else {
         $context['message'] = $this->t('Synchronizing configuration: @op @name in @collection.', ['@op' => $operation['op'], '@name' => $operation['name'], '@collection' => $operation['collection']]);
       }
+      \Drupal::logger('config')->info($context['message']);
       $processed_count = 0;
       foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
         foreach (['delete', 'create', 'rename', 'update'] as $op) {
