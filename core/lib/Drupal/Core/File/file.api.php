@@ -135,9 +135,7 @@ function hook_file_mimetype_mapping_alter(&$mapping) {
  *
  * @param array $info
  *   An associative array of archivers, keyed by archiver ID. Each value
- *   consists of the plugin definition and meta information. The meta
- *   information such as 'class' and 'provider' are added during the discovery
- *   phase.
+ *   consists of the plugin definition for that archiver.
  *
  * @see \Drupal\Core\Archiver\ArchiverManager
  * @see \Drupal\Core\Archiver\Attribute\Archiver
