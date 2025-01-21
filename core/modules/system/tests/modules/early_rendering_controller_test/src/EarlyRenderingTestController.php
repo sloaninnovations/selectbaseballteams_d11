@@ -147,4 +147,8 @@ class EarlyRenderingTestController extends ControllerBase {
     return new CacheableTestDomainObject();
   }
 
+  public function withArgument(string $argument): Response {
+    return new Response($argument);
+  }
+
 }
