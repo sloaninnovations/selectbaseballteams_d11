@@ -1,5 +1,5 @@
 table.sticky-header thead {
   position: sticky;
-  z-index: 500;
+  z-index: 50;
   top: var(--drupal-displace-offset-top, 0);
 }
