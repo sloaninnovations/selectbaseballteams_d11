@@ -56,6 +56,8 @@ services:
   system.file_event.subscriber:
     class: Drupal\system\EventSubscriber\SecurityFileUploadEventSubscriber
     arguments: ['@config.factory']
+  Drupal\system\EventSubscriber\UpdateEmptyAdminTheme:
+    autowire: true
   logger.channel.system:
     parent: logger.channel_base
     arguments: ['system']

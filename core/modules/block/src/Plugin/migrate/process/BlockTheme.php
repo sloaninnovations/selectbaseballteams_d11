@@ -78,7 +78,7 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
     // If the source block is assigned to a region in the source admin theme,
     // then assign it to the destination admin theme.
     if ($admin_theme && strtolower($theme) == strtolower($admin_theme)) {
-      return $this->themeConfig->get('admin');
+      return $this->themeConfig->get('admin') ?? $theme;
     }
 
     // We couldn't map it to a D8 theme so just return the incoming theme.

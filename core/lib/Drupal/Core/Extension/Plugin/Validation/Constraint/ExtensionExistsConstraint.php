@@ -9,7 +9,7 @@ use Drupal\Core\Validation\Attribute\Constraint;
 use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
- * Checks that the value is the name of an installed extension.
+ * Checks that the value is the name of an extension.
  */
 #[Constraint(
   id: 'ExtensionExists',
@@ -22,14 +22,28 @@ class ExtensionExistsConstraint extends SymfonyConstraint {
    *
    * @var string
    */
-  public string $moduleMessage = "Module '@name' is not installed.";
+  public string $moduleNotFoundMessage = "Module '@name' was not found.";
+
+  /**
+   * The error message for a existent but not installed module.
+   *
+   * @var string
+   */
+  public string $moduleNotInstalledMessage = "Module '@name' is not installed.";
 
   /**
    * The error message for a non-existent theme.
    *
    * @var string
    */
-  public string $themeMessage = "Theme '@name' is not installed.";
+  public string $themeNotFoundMessage = "Theme '@name' was not found.";
+
+  /**
+   * The error message for a existent but not installed theme.
+   *
+   * @var string
+   */
+  public string $themeNotInstalledMessage = "Theme '@name' is not installed.";
 
   /**
    * The type of extension to look for. Can be 'module' or 'theme'.
@@ -37,6 +51,13 @@ class ExtensionExistsConstraint extends SymfonyConstraint {
    * @var string
    */
   public string $type;
+
+  /**
+   * Whether the extension must be installed.
+   *
+   * @var bool
+   */
+  public bool $mustBeInstalled = TRUE;
 
   /**
    * {@inheritdoc}

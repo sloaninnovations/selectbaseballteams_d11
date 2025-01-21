@@ -53,12 +53,10 @@ abstract class NodeTitleTestBase extends NodeTestBase {
   public function testNodeWithTitle0(): void {
     $theme = $this->getTheme();
     if ($theme !== $this->defaultTheme) {
-      $system_theme_config = $this->container->get('config.factory')
-        ->getEditable('system.theme');
-      $system_theme_config
+      \Drupal::service('theme_installer')->install([$theme]);
+      $this->config('system.theme')
         ->set('default', $theme)
         ->save();
-      \Drupal::service('theme_installer')->install([$theme]);
     }
 
     // Create "Basic page" content with title 0.

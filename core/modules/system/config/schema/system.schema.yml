@@ -253,13 +253,29 @@ system.rss:
 system.theme:
   type: config_object
   label: 'Theme settings'
+  constraints:
+    FullyValidatable: ~
   mapping:
     admin:
       type: string
       label: 'Administration theme'
+      nullable: true
+      constraints:
+        ExtensionName: []
+        ExtensionExists: theme
+      # @see \Drupal\user\Theme\AdminNegotiator::determineActiveTheme()
+      requiredKey: false
     default:
       type: string
       label: 'Default theme'
+      constraints:
+        ExtensionName: []
+        ExtensionExists:
+          type: theme
+          # This configuration is validated while installing the theme, so it doesn't
+          # have to be installed, but it should exist in the file system.
+          # @see \Drupal\Core\Extension\ThemeInstaller::install()
+          mustBeInstalled: false
 
 system.menu.*:
   type: config_entity

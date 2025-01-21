@@ -5,8 +5,8 @@ declare(strict_types = 1);
 namespace Drupal\Core\Extension\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Extension\ThemeExtensionList;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -16,31 +16,10 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class ExtensionExistsConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
-  /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected ModuleHandlerInterface $moduleHandler;
-
-  /**
-   * The theme handler service.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected ThemeHandlerInterface $themeHandler;
-
-  /**
-   * Constructs a ExtensionExistsConstraintValidator object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler service.
-   */
-  public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler) {
-    $this->moduleHandler = $module_handler;
-    $this->themeHandler = $theme_handler;
+  public function __construct(
+    protected readonly ModuleExtensionList $moduleExtensionList,
+    protected readonly ThemeExtensionList $themeExtensionList,
+  ) {
   }
 
   /**
@@ -48,8 +27,8 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('module_handler'),
-      $container->get('theme_handler')
+      $container->get(ModuleExtensionList::class),
+      $container->get(ThemeExtensionList::class),
     );
   }
 
@@ -71,8 +50,13 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
         if ($extension_name === 'core') {
           return;
         }
-        if (!$this->moduleHandler->moduleExists($extension_name)) {
-          $this->context->addViolation($constraint->moduleMessage, $variables);
+        if ($constraint->mustBeInstalled) {
+          if (!array_key_exists($extension_name, $this->moduleExtensionList->getAllInstalledInfo())) {
+            $this->context->addViolation($constraint->moduleNotInstalledMessage, $variables);
+          }
+        }
+        elseif (!$this->moduleExtensionList->exists($extension_name)) {
+          $this->context->addViolation($constraint->moduleNotFoundMessage, $variables);
         }
         break;
 
@@ -81,8 +65,13 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
         if ($extension_name === NULL) {
           return;
         }
-        if (!$this->themeHandler->themeExists($extension_name)) {
-          $this->context->addViolation($constraint->themeMessage, $variables);
+        if ($constraint->mustBeInstalled) {
+          if (!array_key_exists($extension_name, $this->themeExtensionList->getAllInstalledInfo())) {
+            $this->context->addViolation($constraint->themeNotInstalledMessage, $variables);
+          }
+        }
+        elseif (!$this->themeExtensionList->exists($extension_name)) {
+          $this->context->addViolation($constraint->themeNotFoundMessage, $variables);
         }
         break;
 

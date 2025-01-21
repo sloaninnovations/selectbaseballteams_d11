@@ -78,6 +78,18 @@ function system_post_update_convert_empty_country_and_timezone_settings_to_null(
 }
 
 /**
+ * Load the config and save to trigger event listener.
+ *
+ * This ensures that, if the admin theme is not defined, it will be converted to
+ * NULL.
+ *
+ * @see \Drupal\system\EventSubscriber\UpdateEmptyAdminTheme
+ */
+function system_post_update_set_theme_admin_to_null() {
+  \Drupal::configFactory()->getEditable('system.theme')->save();
+}
+
+/**
  * Uninstall the sdc module if installed.
  */
 function system_post_update_sdc_uninstall() {
