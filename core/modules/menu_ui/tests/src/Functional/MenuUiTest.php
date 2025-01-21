@@ -645,7 +645,7 @@ class MenuUiTest extends BrowserTestBase {
     $this->assertSession()->checkboxChecked('edit-enabled-value');
 
     $this->assertSession()->fieldValueEquals('description[0][value]', '');
-    $this->assertSession()->fieldValueEquals('weight[0][value]', 0);
+    $this->assertSession()->fieldValueEquals('weight[0][value]', '0');
   }
 
   /**

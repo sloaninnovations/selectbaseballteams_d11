@@ -69,12 +69,12 @@ class PagerTest extends ViewTestBase {
     $this->submitForm($edit, 'Apply');
 
     $items_per_page = $this->assertSession()->fieldExists("pager_options[items_per_page]");
-    $this->assertSession()->fieldValueEquals("pager_options[items_per_page]", 10);
+    $this->assertSession()->fieldValueEquals("pager_options[items_per_page]", '10');
     $this->assertSame('number', $items_per_page->getAttribute('type'));
     $this->assertEquals(0, $items_per_page->getAttribute('min'));
 
     $offset = $this->assertSession()->fieldExists("pager_options[offset]");
-    $this->assertSession()->fieldValueEquals("pager_options[offset]", 0);
+    $this->assertSession()->fieldValueEquals("pager_options[offset]", '0');
     $this->assertSame('number', $offset->getAttribute('type'));
     $this->assertEquals(0, $offset->getAttribute('min'));
 
@@ -85,7 +85,7 @@ class PagerTest extends ViewTestBase {
     $this->submitForm($edit, 'Apply');
 
     $offset = $this->assertSession()->fieldExists("pager_options[offset]");
-    $this->assertSession()->fieldValueEquals("pager_options[offset]", 0);
+    $this->assertSession()->fieldValueEquals("pager_options[offset]", '0');
     $this->assertSame('number', $offset->getAttribute('type'));
     $this->assertEquals(0, $offset->getAttribute('min'));
 
@@ -96,12 +96,12 @@ class PagerTest extends ViewTestBase {
     $this->submitForm($edit, 'Apply');
 
     $items_per_page = $this->assertSession()->fieldExists("pager_options[items_per_page]");
-    $this->assertSession()->fieldValueEquals("pager_options[items_per_page]", 10);
+    $this->assertSession()->fieldValueEquals("pager_options[items_per_page]", '10');
     $this->assertSame('number', $items_per_page->getAttribute('type'));
     $this->assertEquals(0, $items_per_page->getAttribute('min'));
 
     $offset = $this->assertSession()->fieldExists("pager_options[offset]");
-    $this->assertSession()->fieldValueEquals("pager_options[offset]", 0);
+    $this->assertSession()->fieldValueEquals("pager_options[offset]", '0');
     $this->assertSame('number', $offset->getAttribute('type'));
     $this->assertEquals(0, $offset->getAttribute('min'));
 
@@ -109,7 +109,7 @@ class PagerTest extends ViewTestBase {
     $this->assertSession()->fieldValueEquals("pager_options[pagination_heading_level]", 'h4');
 
     $id = $this->assertSession()->fieldExists("pager_options[id]");
-    $this->assertSession()->fieldValueEquals("pager_options[id]", 0);
+    $this->assertSession()->fieldValueEquals("pager_options[id]", '0');
     $this->assertSame('number', $id->getAttribute('type'));
     $this->assertEquals(0, $id->getAttribute('min'));
 
@@ -119,7 +119,7 @@ class PagerTest extends ViewTestBase {
     $this->assertEquals(0, $total_pages->getAttribute('min'));
 
     $quantity = $this->assertSession()->fieldExists("pager_options[quantity]");
-    $this->assertSession()->fieldValueEquals("pager_options[quantity]", 9);
+    $this->assertSession()->fieldValueEquals("pager_options[quantity]", '9');
     $this->assertSame('number', $quantity->getAttribute('type'));
     $this->assertEquals(0, $quantity->getAttribute('min'));
 
@@ -197,17 +197,17 @@ class PagerTest extends ViewTestBase {
     $this->assertSession()->fieldNotExists('override[dropdown]');
 
     $items_per_page = $this->assertSession()->fieldExists("pager_options[items_per_page]");
-    $this->assertSession()->fieldValueEquals("pager_options[items_per_page]", 20);
+    $this->assertSession()->fieldValueEquals("pager_options[items_per_page]", '20');
     $this->assertSame('number', $items_per_page->getAttribute('type'));
     $this->assertEquals(0, $items_per_page->getAttribute('min'));
 
     $offset = $this->assertSession()->fieldExists("pager_options[offset]");
-    $this->assertSession()->fieldValueEquals("pager_options[offset]", 0);
+    $this->assertSession()->fieldValueEquals("pager_options[offset]", '0');
     $this->assertSame('number', $offset->getAttribute('type'));
     $this->assertEquals(0, $offset->getAttribute('min'));
 
     $id = $this->assertSession()->fieldExists("pager_options[id]");
-    $this->assertSession()->fieldValueEquals("pager_options[id]", 0);
+    $this->assertSession()->fieldValueEquals("pager_options[id]", '0');
     $this->assertSame('number', $id->getAttribute('type'));
     $this->assertEquals(0, $id->getAttribute('min'));
 

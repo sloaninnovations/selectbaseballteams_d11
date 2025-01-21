@@ -61,7 +61,7 @@ class FilterNumericWebTest extends UITestBase {
 
     $this->drupalGet('admin/structure/views/nojs/handler/test_view/default/filter/age');
     foreach ($edit as $name => $value) {
-      $this->assertSession()->fieldValueEquals($name, $value);
+      $this->assertSession()->fieldValueEquals($name, (string) $value);
     }
 
     $this->drupalGet('admin/structure/views/view/test_view');

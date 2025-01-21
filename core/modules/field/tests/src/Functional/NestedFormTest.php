@@ -118,10 +118,10 @@ class NestedFormTest extends FieldTestBase {
 
     // Display the 'combined form'.
     $this->drupalGet('test-entity/nested/1/2');
-    $this->assertSession()->fieldValueEquals('field_single[0][value]', 1);
-    $this->assertSession()->fieldValueEquals('field_unlimited[0][value]', 2);
-    $this->assertSession()->fieldValueEquals('entity_2[field_single][0][value]', 10);
-    $this->assertSession()->fieldValueEquals('entity_2[field_unlimited][0][value]', 11);
+    $this->assertSession()->fieldValueEquals('field_single[0][value]', '1');
+    $this->assertSession()->fieldValueEquals('field_unlimited[0][value]', '2');
+    $this->assertSession()->fieldValueEquals('entity_2[field_single][0][value]', '10');
+    $this->assertSession()->fieldValueEquals('entity_2[field_unlimited][0][value]', '11');
 
     // Submit the form and check that the entities are updated accordingly.
     $edit = [
@@ -177,8 +177,8 @@ class NestedFormTest extends FieldTestBase {
     // 'Add more' button in the first entity:
     $this->drupalGet('test-entity/nested/1/2');
     $this->submitForm([], 'field_unlimited_add_more');
-    $this->assertSession()->fieldValueEquals('field_unlimited[0][value]', 3);
-    $this->assertSession()->fieldValueEquals('field_unlimited[1][value]', 2);
+    $this->assertSession()->fieldValueEquals('field_unlimited[0][value]', '3');
+    $this->assertSession()->fieldValueEquals('field_unlimited[1][value]', '2');
     $this->assertSession()->fieldValueEquals('field_unlimited[2][value]', '');
     $this->assertSession()->fieldValueEquals('field_unlimited[3][value]', '');
     // 'Add more' button in the first entity (changing field values):
@@ -188,9 +188,9 @@ class NestedFormTest extends FieldTestBase {
       'entity_2[field_unlimited][2][value]' => 15,
     ];
     $this->submitForm($edit, 'entity_2_field_unlimited_add_more');
-    $this->assertSession()->fieldValueEquals('entity_2[field_unlimited][0][value]', 13);
-    $this->assertSession()->fieldValueEquals('entity_2[field_unlimited][1][value]', 14);
-    $this->assertSession()->fieldValueEquals('entity_2[field_unlimited][2][value]', 15);
+    $this->assertSession()->fieldValueEquals('entity_2[field_unlimited][0][value]', '13');
+    $this->assertSession()->fieldValueEquals('entity_2[field_unlimited][1][value]', '14');
+    $this->assertSession()->fieldValueEquals('entity_2[field_unlimited][2][value]', '15');
     $this->assertSession()->fieldValueEquals('entity_2[field_unlimited][3][value]', '');
     // Save the form and check values are saved correctly.
     $this->submitForm([], 'Save');

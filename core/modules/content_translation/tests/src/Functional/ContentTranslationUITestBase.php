@@ -178,7 +178,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
     // fields with the values from the different source language.
     $this->drupalGet($add_url);
     $this->submitForm($edit, 'Change');
-    $this->assertSession()->fieldValueEquals("{$this->fieldName}[0][value]", $values[$source_langcode][$this->fieldName][0]['value']);
+    $this->assertSession()->fieldValueEquals("{$this->fieldName}[0][value]", (string) $values[$source_langcode][$this->fieldName][0]['value']);
 
     // Add another translation and mark the other ones as outdated.
     $values[$langcode] = $this->getNewEntityValues($langcode);
@@ -255,19 +255,19 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
       $this->drupalGet($url);
       if ($added_langcode == $langcode) {
         // Verify that the retranslate flag is not checked by default.
-        $this->assertSession()->fieldValueEquals('content_translation[retranslate]', FALSE);
+        $this->assertSession()->checkboxNotChecked('content_translation[retranslate]');
         $this->assertSession()->elementNotExists('xpath', '//details[@id="edit-content-translation" and @open="open"]');
       }
       else {
         // Verify that the translate flag is checked by default.
-        $this->assertSession()->fieldValueEquals('content_translation[outdated]', TRUE);
+        $this->assertSession()->checkboxChecked('content_translation[outdated]');
         $this->assertSession()->elementExists('xpath', '//details[@id="edit-content-translation" and @open="open"]');
         $edit = ['content_translation[outdated]' => FALSE];
         $this->drupalGet($url);
         $this->submitForm($edit, $this->getFormSubmitAction($entity, $added_langcode));
         $this->drupalGet($url);
         // Verify that retranslate flag is now shown.
-        $this->assertSession()->fieldValueEquals('content_translation[retranslate]', FALSE);
+        $this->assertSession()->checkboxNotChecked('content_translation[retranslate]');
         $storage = $this->container->get('entity_type.manager')
           ->getStorage($this->entityTypeId);
         $storage->resetCache([$this->entityId]);
@@ -303,7 +303,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
     // Check that the last published translation cannot be unpublished.
     $this->drupalGet($entity->toUrl('edit-form'));
     $this->assertSession()->fieldDisabled('content_translation[status]');
-    $this->assertSession()->fieldValueEquals('content_translation[status]', TRUE);
+    $this->assertSession()->checkboxChecked('content_translation[status]');
   }
 
   /**

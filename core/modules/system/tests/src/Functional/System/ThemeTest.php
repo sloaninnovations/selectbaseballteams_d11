@@ -263,7 +263,7 @@ class ThemeTest extends BrowserTestBase {
     ];
     $this->drupalGet('admin/appearance/settings/olivero');
     $this->submitForm($edit, 'Save configuration');
-    $this->assertSession()->fieldValueEquals('default_logo', FALSE);
+    $this->assertSession()->checkboxNotChecked('default_logo');
     $this->assertSession()->fieldValueEquals('logo_path', 'core/misc/druplicon.png');
 
     // Make sure the logo and favicon settings are not available when the file

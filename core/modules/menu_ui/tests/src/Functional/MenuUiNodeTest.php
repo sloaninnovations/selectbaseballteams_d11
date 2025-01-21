@@ -212,7 +212,7 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->assertSession()->linkExists($node_title);
     // Check if menu weight is 17.
     $this->drupalGet('node/' . $node->id() . '/edit');
-    $this->assertSession()->fieldValueEquals('edit-menu-weight', 17);
+    $this->assertSession()->fieldValueEquals('edit-menu-weight', '17');
     // Verify that the menu link title field has correct maxlength in node edit
     // form.
     $this->assertSession()->responseMatches('/<input .* id="edit-menu-title" .* maxlength="' . $title_max_length . '" .* \/>/');

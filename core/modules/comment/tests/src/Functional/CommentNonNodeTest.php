@@ -429,7 +429,7 @@ class CommentNonNodeTest extends BrowserTestBase {
     $this->assertSession()->checkboxNotChecked('edit-default-value-input-comment-0-status-0');
     $this->assertSession()->checkboxChecked('edit-default-value-input-comment-0-status-1');
     $this->assertSession()->checkboxNotChecked('edit-default-value-input-comment-0-status-2');
-    $this->assertSession()->fieldValueEquals('settings[anonymous]', CommentInterface::ANONYMOUS_MAY_CONTACT);
+    $this->assertSession()->fieldValueEquals('settings[anonymous]', (string) CommentInterface::ANONYMOUS_MAY_CONTACT);
 
     // Add a new comment-type.
     $bundle = CommentType::create([

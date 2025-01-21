@@ -147,8 +147,7 @@ class WebAssert extends MinkWebAssert {
    */
   public function buttonExists($button, ?TraversableElement $container = NULL) {
     if (!is_string($button)) {
-      // @todo Trigger deprecation in
-      //   https://www.drupal.org/project/drupal/issues/3421105.
+      @trigger_error('Passing a non-string into $button for ' . __METHOD__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3495920', E_USER_DEPRECATED);
       $button = (string) $button;
     }
     $container = $container ?: $this->session->getPage();
@@ -951,17 +950,16 @@ class WebAssert extends MinkWebAssert {
    */
   public function responseHeaderEquals($name, $value) {
     if (!is_string($name)) {
-      // @todo Trigger deprecation in
-      //   https://www.drupal.org/project/drupal/issues/3421105.
+      @trigger_error('Passing a non-string into $name for ' . __METHOD__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3495920', E_USER_DEPRECATED);
       $name = (string) $name;
     }
     if ($value === NULL) {
-      // @todo Trigger deprecation in
-      //   https://www.drupal.org/project/drupal/issues/3421105.
+      @trigger_error('Passing NULL into $value for ' . __METHOD__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ::responseHeaderDoesNotExist() instead. See https://www.drupal.org/node/3495920', E_USER_DEPRECATED);
       $this->responseHeaderDoesNotExist($name);
       return;
     }
     if (!is_string($value)) {
+      @trigger_error('Passing a non-string into $value for ' . __METHOD__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3495920', E_USER_DEPRECATED);
       $value = (string) $value;
     }
     parent::responseHeaderEquals($name, $value);
@@ -972,8 +970,7 @@ class WebAssert extends MinkWebAssert {
    */
   public function pageTextContains($text) {
     if (!is_string($text)) {
-      // @todo Trigger deprecation in
-      //   https://www.drupal.org/project/drupal/issues/3421105.
+      @trigger_error('Passing a non-string into $text for ' . __METHOD__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3495920', E_USER_DEPRECATED);
       $text = (string) $text;
     }
     parent::pageTextContains($text);
@@ -984,8 +981,7 @@ class WebAssert extends MinkWebAssert {
    */
   public function fieldValueEquals(string $field, $value, ?TraversableElement $container = NULL) {
     if (!is_string($value)) {
-      // @todo Trigger deprecation in
-      //   https://www.drupal.org/project/drupal/issues/3421105.
+      @trigger_error('Passing a non-string into $value for ' . __METHOD__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. If the field being checked is a checkbox, use \Behat\Mink\WebAssert::checkbox[Not]Checked(). See https://www.drupal.org/node/3495920', E_USER_DEPRECATED);
       $value = (string) $value;
     }
     parent::fieldValueEquals($field, $value, $container);

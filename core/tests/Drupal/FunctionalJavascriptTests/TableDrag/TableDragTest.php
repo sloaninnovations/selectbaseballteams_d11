@@ -537,7 +537,7 @@ class TableDragTest extends WebDriverTestBase {
     if (!$skip_missing || $row->find('hidden_field_selector', ['hidden_field', $parent_name])) {
       $this->assertSession()->hiddenFieldValueEquals($parent_name, $parent, $row);
     }
-    $this->assertSession()->fieldValueEquals("table[$id][weight]", $weight, $row);
+    $this->assertSession()->fieldValueEquals("table[$id][weight]", (string) $weight, $row);
     $this->assertSession()->elementsCount('xpath', static::$indentationXpathSelector, $indentation, $row);
     // A row is marked as changed when the related markup is present.
     if ($changed !== NULL) {

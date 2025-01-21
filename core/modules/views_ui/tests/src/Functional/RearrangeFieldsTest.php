@@ -53,7 +53,7 @@ class RearrangeFieldsTest extends UITestBase {
     $this->drupalGet('admin/structure/views/nojs/rearrange/' . $view_name . '/default/field');
 
     foreach ($fields as $idx => $field) {
-      $this->assertSession()->fieldValueEquals('edit-fields-' . $field . '-weight', $idx + 1);
+      $this->assertSession()->fieldValueEquals('edit-fields-' . $field . '-weight', (string) ($idx + 1));
     }
   }
 

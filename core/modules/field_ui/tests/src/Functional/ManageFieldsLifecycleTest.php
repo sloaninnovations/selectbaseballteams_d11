@@ -156,7 +156,7 @@ class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
     $this->submitForm([], 'Save settings');
     $this->drupalGet($field_edit_path);
     $this->assertSession()->fieldValueEquals('field_storage[subform][cardinality]', 'number');
-    $this->assertSession()->fieldValueEquals('field_storage[subform][cardinality_number]', 6);
+    $this->assertSession()->fieldValueEquals('field_storage[subform][cardinality_number]', '6');
 
     // Add two entries in the body.
     $edit = ['title[0][value]' => 'Cardinality', 'body[0][value]' => 'Body 1', 'body[1][value]' => 'Body 2'];
@@ -186,8 +186,8 @@ class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
     $this->submitForm($edit, 'Update settings');
     $this->submitForm([], 'Save settings');
     $this->drupalGet($field_edit_path);
-    $this->assertSession()->fieldValueEquals('field_storage[subform][cardinality]', FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
-    $this->assertSession()->fieldValueEquals('field_storage[subform][cardinality_number]', 1);
+    $this->assertSession()->fieldValueEquals('field_storage[subform][cardinality]', (string) FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    $this->assertSession()->fieldValueEquals('field_storage[subform][cardinality_number]', '1');
 
     // Assert that you can't set the cardinality to a lower number then the
     // highest delta of this field but can set it to the same.

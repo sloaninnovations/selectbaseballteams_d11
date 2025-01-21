@@ -136,8 +136,7 @@ if (typeof Drupal !== 'undefined') {
 }
 JS);
         if (!is_string($value) && strtolower($element->name()) === 'input' && in_array(strtolower($element->attribute('type')), ['text', 'number', 'radio'], TRUE)) {
-          // @todo Trigger deprecation in
-          //   https://www.drupal.org/project/drupal/issues/3421105.
+          @trigger_error('Passing a non-string into $value for inputs of type text, number or radio in \Drupal\FunctionalJavascriptTests\DrupalSelenium2Driver::setValue is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3495920', E_USER_DEPRECATED);
           $value = (string) $value;
         }
 

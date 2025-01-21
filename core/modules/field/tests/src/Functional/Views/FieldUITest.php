@@ -75,7 +75,7 @@ class FieldUITest extends FieldTestBase {
     $random_number = rand(100, 400);
     $this->submitForm(['options[settings][trim_length]' => $random_number], 'Apply');
     $this->drupalGet($url);
-    $this->assertSession()->fieldValueEquals('options[settings][trim_length]', $random_number);
+    $this->assertSession()->fieldValueEquals('options[settings][trim_length]', (string) $random_number);
 
     // Save the view and test whether the settings are saved.
     $this->drupalGet('admin/structure/views/view/test_view_fieldapi');

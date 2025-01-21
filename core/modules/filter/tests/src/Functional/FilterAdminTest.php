@@ -141,7 +141,7 @@ class FilterAdminTest extends BrowserTestBase {
 
     // Verify default weight of the text format.
     $this->drupalGet('admin/config/content/formats');
-    $this->assertSession()->fieldValueEquals("formats[$format_id][weight]", 0);
+    $this->assertSession()->fieldValueEquals("formats[$format_id][weight]", '0');
 
     // Change the weight of the text format.
     $edit = [
@@ -149,7 +149,7 @@ class FilterAdminTest extends BrowserTestBase {
     ];
     $this->drupalGet('admin/config/content/formats');
     $this->submitForm($edit, 'Save');
-    $this->assertSession()->fieldValueEquals("formats[$format_id][weight]", 5);
+    $this->assertSession()->fieldValueEquals("formats[$format_id][weight]", '5');
 
     // Edit text format.
     $this->drupalGet('admin/config/content/formats');
@@ -161,7 +161,7 @@ class FilterAdminTest extends BrowserTestBase {
 
     // Verify that the custom weight of the text format has been retained.
     $this->drupalGet('admin/config/content/formats');
-    $this->assertSession()->fieldValueEquals("formats[$format_id][weight]", 5);
+    $this->assertSession()->fieldValueEquals("formats[$format_id][weight]", '5');
 
     // Disable text format.
     $this->assertSession()->linkByHrefExists('admin/config/content/formats/manage/' . $format_id . '/disable');
@@ -235,8 +235,8 @@ class FilterAdminTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->addressEquals('admin/config/content/formats/manage/' . $restricted);
     $this->drupalGet('admin/config/content/formats/manage/' . $restricted);
-    $this->assertSession()->fieldValueEquals('filters[' . $second_filter . '][weight]', 1);
-    $this->assertSession()->fieldValueEquals('filters[' . $first_filter . '][weight]', 2);
+    $this->assertSession()->fieldValueEquals('filters[' . $second_filter . '][weight]', '1');
+    $this->assertSession()->fieldValueEquals('filters[' . $first_filter . '][weight]', '2');
     $this->assertSession()->elementExists('xpath', "//select[@name='filters[" . $second_filter . "][weight]']/following::select[@name='filters[" . $first_filter . "][weight]']");
 
     $filter_format = FilterFormat::load($restricted);
@@ -345,7 +345,7 @@ class FilterAdminTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->addressEquals('admin/config/content/formats/manage/' . $basic);
     $this->drupalGet('admin/config/content/formats/manage/' . $basic);
-    $this->assertSession()->fieldValueEquals('filters[filter_html][settings][allowed_html]', $edit['filters[filter_html][settings][allowed_html]']);
+    $this->assertSession()->fieldValueEquals('filters[filter_html][settings][allowed_html]', (string) $edit['filters[filter_html][settings][allowed_html]']);
 
     // Full HTML.
     $edit = [];
@@ -355,7 +355,7 @@ class FilterAdminTest extends BrowserTestBase {
     $this->assertSession()->addressEquals('admin/config/content/formats/manage/' . $full);
     $this->assertSession()->statusMessageContains("The text format {$format->label()} has been updated.", 'status');
     $this->drupalGet('admin/config/content/formats/manage/' . $full);
-    $this->assertSession()->fieldValueEquals('roles[' . RoleInterface::AUTHENTICATED_ID . ']', $edit['roles[' . RoleInterface::AUTHENTICATED_ID . ']']);
+    $this->assertSession()->fieldValueEquals('roles[' . RoleInterface::AUTHENTICATED_ID . ']', (string) $edit['roles[' . RoleInterface::AUTHENTICATED_ID . ']']);
 
     // Filter order.
     $edit = [];
@@ -365,8 +365,8 @@ class FilterAdminTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->addressEquals('admin/config/content/formats/manage/' . $basic);
     $this->drupalGet('admin/config/content/formats/manage/' . $basic);
-    $this->assertSession()->fieldValueEquals('filters[' . $second_filter . '][weight]', $edit['filters[' . $second_filter . '][weight]']);
-    $this->assertSession()->fieldValueEquals('filters[' . $first_filter . '][weight]', $edit['filters[' . $first_filter . '][weight]']);
+    $this->assertSession()->fieldValueEquals('filters[' . $second_filter . '][weight]', (string) $edit['filters[' . $second_filter . '][weight]']);
+    $this->assertSession()->fieldValueEquals('filters[' . $first_filter . '][weight]', (string) $edit['filters[' . $first_filter . '][weight]']);
   }
 
   /**

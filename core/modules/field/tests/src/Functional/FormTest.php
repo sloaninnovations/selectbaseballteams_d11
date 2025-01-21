@@ -149,7 +149,7 @@ class FormTest extends FieldTestBase {
     // Display edit form.
     $this->drupalGet('entity_test/manage/' . $id . '/edit');
     // Check that the widget is displayed with the correct default value.
-    $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", $value);
+    $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", (string) $value);
     // Verify that no extraneous widget is displayed.
     $this->assertSession()->fieldNotExists("{$field_name}[1][value]");
 
@@ -194,7 +194,7 @@ class FormTest extends FieldTestBase {
     // Display creation form.
     $this->drupalGet('entity_test/add');
     // Test that the default value is displayed correctly.
-    $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", $default);
+    $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", (string) $default);
 
     // Try to submit an empty value.
     $edit = [
@@ -309,15 +309,15 @@ class FormTest extends FieldTestBase {
     // Press 'add more' button -> 4 widgets
     $this->submitForm($edit, 'Add another item');
     for ($delta = 0; $delta <= $delta_range; $delta++) {
-      $this->assertSession()->fieldValueEquals("{$field_name}[$delta][value]", $values[$delta]);
-      $this->assertSession()->fieldValueEquals("{$field_name}[$delta][_weight]", $weights[$delta]);
+      $this->assertSession()->fieldValueEquals("{$field_name}[$delta][value]", (string) $values[$delta]);
+      $this->assertSession()->fieldValueEquals("{$field_name}[$delta][_weight]", (string) $weights[$delta]);
     }
     ksort($pattern);
     $pattern = implode('.*', array_values($pattern));
     // Verify that the widgets are displayed in the correct order.
     $this->assertSession()->responseMatches("|$pattern|s");
     $this->assertSession()->fieldValueEquals("{$field_name}[$delta][value]", '');
-    $this->assertSession()->fieldValueEquals("{$field_name}[$delta][_weight]", $delta);
+    $this->assertSession()->fieldValueEquals("{$field_name}[$delta][_weight]", (string) $delta);
     // Verify that no extraneous widget is displayed.
     $this->assertSession()->fieldNotExists("{$field_name}[" . ($delta + 1) . '][value]');
 
@@ -563,7 +563,7 @@ class FormTest extends FieldTestBase {
 
     // Display edit form.
     $this->drupalGet($entity_type . '/manage/' . $id . '/edit');
-    $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", 99);
+    $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", '99');
 
     // Update the entity.
     $value = mt_rand(1, 127);

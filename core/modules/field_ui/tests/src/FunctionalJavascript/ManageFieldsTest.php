@@ -243,7 +243,7 @@ class ManageFieldsTest extends WebDriverTestBase {
     $assert_session->waitForElementRemoved('xpath', $default_input_2->getXpath());
     // Ensure the first input retains its value.
     $assert_session->fieldValueEquals($default_input_1_name, 'There can be only one!');
-    $cardinality->setValue(2);
+    $cardinality->setValue('2');
     $assert_session->waitForField($default_input_2_name);
     // Ensure when the second input is added again it does not retain its value.
     $assert_session->fieldValueEquals($default_input_2_name, '');

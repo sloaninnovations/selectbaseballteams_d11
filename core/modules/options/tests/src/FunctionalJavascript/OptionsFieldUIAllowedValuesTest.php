@@ -110,7 +110,7 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
         $this->assertAllowValuesRowCount($expected_rows);
         $enter_element_name = $key_element_name;
         $this->assertHasFocusByAttribute('name', $key_element_name);
-        $page->fillField($key_element_name, $option_key);
+        $page->fillField($key_element_name, (string) $option_key);
         $this->assertSession()->assertWaitOnAjaxRequest();
       }
       else {

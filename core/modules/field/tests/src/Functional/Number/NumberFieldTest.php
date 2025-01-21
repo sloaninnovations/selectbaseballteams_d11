@@ -454,7 +454,7 @@ class NumberFieldTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains("Saved {$field->getLabel()} configuration.");
     // Check if the minimum value was actually set.
     $this->drupalGet($field_configuration_url);
-    $this->assertSession()->fieldValueEquals('edit-settings-min', $minimum_value);
+    $this->assertSession()->fieldValueEquals('edit-settings-min', (string) $minimum_value);
   }
 
 }

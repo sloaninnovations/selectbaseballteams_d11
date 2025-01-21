@@ -173,10 +173,10 @@ class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendi
     // and disabled for moderated bundles.
     $this->drupalGet($settings_url);
     $field_name = "settings[{$this->entityTypeId}][{$this->bundle}][settings][content_translation][untranslatable_fields_hide]";
-    $this->assertSession()->fieldValueEquals($field_name, 1);
+    $this->assertSession()->fieldValueEquals($field_name, '1');
     $this->assertSession()->fieldDisabled($field_name);
     $this->submitForm([$settings_key => 0], 'Save configuration');
-    $this->assertSession()->fieldValueEquals($field_name, 1);
+    $this->assertSession()->fieldValueEquals($field_name, '1');
     $this->assertSession()->fieldDisabled($field_name);
 
     // Verify that the untranslatable fields warning message is not displayed

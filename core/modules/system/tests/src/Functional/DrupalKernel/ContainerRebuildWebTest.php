@@ -31,7 +31,7 @@ class ContainerRebuildWebTest extends BrowserTestBase {
 
     // Ensure the parameter is not set.
     $this->drupalGet('<front>');
-    $assert->responseHeaderEquals('container_rebuild_indicator', NULL);
+    $assert->responseHeaderDoesNotExist('container_rebuild_indicator');
 
     $this->writeSettings(['settings' => ['deployment_identifier' => (object) ['value' => 'new-identifier', 'required' => TRUE]]]);
 
@@ -48,14 +48,14 @@ class ContainerRebuildWebTest extends BrowserTestBase {
 
     // Ensure that parameter is not set.
     $this->drupalGet('<front>');
-    $assert->responseHeaderEquals('container_rebuild_test_parameter', NULL);
+    $assert->responseHeaderDoesNotExist('container_rebuild_test_parameter');
 
     // Ensure that after setting the parameter, without a container rebuild the
     // parameter is still not set.
     $this->writeSettings(['settings' => ['container_rebuild_test_parameter' => (object) ['value' => 'rebuild_me', 'required' => TRUE]]]);
 
     $this->drupalGet('<front>');
-    $assert->responseHeaderEquals('container_rebuild_test_parameter', NULL);
+    $assert->responseHeaderDoesNotExist('container_rebuild_test_parameter');
 
     // Ensure that after container invalidation the parameter is set.
     \Drupal::service('kernel')->invalidateContainer();

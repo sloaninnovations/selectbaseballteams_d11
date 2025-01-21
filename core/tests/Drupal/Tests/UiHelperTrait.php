@@ -76,11 +76,11 @@ trait UiHelperTrait {
     // Get the form.
     if (isset($form_html_id)) {
       $form = $assert_session->elementExists('xpath', "//form[@id='$form_html_id']");
-      $submit_button = $assert_session->buttonExists($submit, $form);
+      $submit_button = $assert_session->buttonExists((string) $submit, $form);
       $action = $form->getAttribute('action');
     }
     else {
-      $submit_button = $assert_session->buttonExists($submit);
+      $submit_button = $assert_session->buttonExists((string) $submit);
       $form = $assert_session->elementExists('xpath', './ancestor::form', $submit_button);
       $action = $form->getAttribute('action');
     }

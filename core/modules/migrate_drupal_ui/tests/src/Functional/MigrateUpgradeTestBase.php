@@ -187,7 +187,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
     $this->assertNotEmpty($entity_types);
     foreach ($entity_types as $entity_type) {
       $label = $entity_type_manager->getDefinition($entity_type)->getPluralLabel();
-      $session->pageTextContains($label);
+      $session->pageTextContains((string) $label);
     }
     $session->pageTextContainsOnce('content items');
     $session->pageTextContains('Check whether there is translated content of these types:');

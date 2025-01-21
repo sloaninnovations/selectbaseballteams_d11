@@ -66,10 +66,10 @@ class RegionalSettingsFormTest extends BrowserTestBase {
     $assert_session->pageTextContains('The configuration options have been saved.');
     // Check if values are properly displayed on form.
     $assert_session->fieldValueEquals('site_default_country', 'US');
-    $assert_session->fieldValueEquals('date_first_day', 4);
+    $assert_session->fieldValueEquals('date_first_day', '4');
     $assert_session->fieldValueEquals('date_default_timezone', 'America/Chicago');
     $assert_session->checkboxNotChecked('empty_timezone_message');
-    $assert_session->fieldValueEquals('user_default_timezone', 2);
+    $assert_session->fieldValueEquals('user_default_timezone', '2');
     $assert_session->checkboxChecked('configurable_timezones');
 
     // Also check saved configuration.

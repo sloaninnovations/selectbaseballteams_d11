@@ -140,7 +140,7 @@ class CorsIntegrationTest extends BrowserTestBase {
     // Fire a request from an origin that isn't allowed.
     $this->drupalGet('/test-page', [], ['Origin' => 'http://non-valid.com']);
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->responseHeaderEquals('Access-Control-Allow-Origin', NULL);
+    $this->assertSession()->responseHeaderDoesNotExist('Access-Control-Allow-Origin');
     $this->assertSession()->responseHeaderContains('Vary', 'Origin');
 
     // Specify a valid origin.

@@ -58,7 +58,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
       $effect_path = $admin_path . '/manage/' . $style_name . '/effects/' . $uuid;
       $this->drupalGet($effect_path);
       $this->assertSession()->fieldValueEquals('data[test_parameter]', '100');
-      $page->findField('data[test_parameter]')->setValue(111);
+      $page->findField('data[test_parameter]')->setValue('111');
       $ajax_value = $page->find('css', '#ajax-value')->getText();
       $this->assertSame('Ajax value bar', $ajax_value);
       $this->getSession()->getPage()->pressButton('Ajax refresh');
@@ -78,13 +78,13 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->drupalGet($admin_path . '/manage/' . $style_name . '/effects/' . $uuid);
     $this->assertSession()->fieldValueEquals('data[test_parameter]', '111');
     $field = $page->findField('data[test_parameter]');
-    $field->setValue(200);
+    $field->setValue('200');
     $page->pressButton('Ajax refresh');
     $this->assertSession()->assertExpectedAjaxRequest(1);
-    $field->setValue(300);
+    $field->setValue('300');
     $page->pressButton('Ajax refresh');
     $this->assertSession()->assertExpectedAjaxRequest(2);
-    $field->setValue(400);
+    $field->setValue('400');
     $page->pressButton('Ajax refresh');
     $this->assertSession()->assertExpectedAjaxRequest(3);
     $page->pressButton('Update effect');
