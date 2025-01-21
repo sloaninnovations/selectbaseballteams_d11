@@ -25,7 +25,13 @@
     <h3>{{ title }}</h3>
   {% endif %}
 
-  <{{ list.type }}{{ list.attributes }}>
+  {% set list_attributes = (list.attributes) ?: create_attribute() %}
+  {% if list.type == 'ol' %}
+    {# Increment ordered list numbers on views paged results. #}
+    {% set start = view.pager.current_page * view.pager.options.items_per_page + 1 %}
+    {% set list_attributes = list_attributes.setAttribute('start', start) %}
+  {% endif %}
+  <{{ list.type }}{{ list_attributes }}>
 
     {% for row in rows %}
       <li{{ row.attributes }}>
