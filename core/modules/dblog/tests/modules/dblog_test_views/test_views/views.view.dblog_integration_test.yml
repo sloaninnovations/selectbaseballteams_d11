@@ -21,7 +21,7 @@ display:
       access:
         type: perm
         options:
-          perm: 'access site reports'
+          perm: 'access dblog reports'
       cache:
         type: tag
         options: {  }
