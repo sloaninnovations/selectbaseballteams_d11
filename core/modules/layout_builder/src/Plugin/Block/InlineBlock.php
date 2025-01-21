@@ -240,8 +240,8 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
           'reusable' => FALSE,
         ]);
       }
-      if ($this->blockContent instanceof RefinableDependentAccessInterface && $dependee = $this->getAccessDependency()) {
-        $this->blockContent->setAccessDependency($dependee);
+      if ($this->blockContent instanceof RefinableDependentAccessInterface && $dependency = $this->getAccessDependency()) {
+        $this->blockContent->setAccessDependency($dependency);
       }
     }
     return $this->blockContent;

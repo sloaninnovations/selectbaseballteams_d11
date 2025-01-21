@@ -46,15 +46,15 @@ class FormHelperTest extends UnitTestCase {
       ],
       // Example from https://www.drupal.org/node/1464758
       'disabled' => [
-        '[name="menu[options][dependee_1]"]' => ['value' => 'ON'],
+        '[name="menu[options][dependency_1]"]' => ['value' => 'ON'],
         [
-          ['[name="menu[options][dependee_2]"]' => ['value' => 'ON']],
-          ['[name="menu[options][dependee_3]"]' => ['value' => 'ON']],
+          ['[name="menu[options][dependency_2]"]' => ['value' => 'ON']],
+          ['[name="menu[options][dependency_3]"]' => ['value' => 'ON']],
         ],
         [
-          ['[name="menu[options][dependee_4]"]' => ['value' => 'ON']],
+          ['[name="menu[options][dependency_4]"]' => ['value' => 'ON']],
           'xor',
-          ['[name="menu[options][dependee_5]"]' => ['value' => 'ON']],
+          ['[name="menu[options][dependency_5]"]' => ['value' => 'ON']],
         ],
       ],
     ];
@@ -69,15 +69,15 @@ class FormHelperTest extends UnitTestCase {
         ':input[name="options[type]"]' => ['value' => 'default tab'],
       ],
       'disabled' => [
-        '[name="options[options][dependee_1]"]' => ['value' => 'ON'],
+        '[name="options[options][dependency_1]"]' => ['value' => 'ON'],
         [
-          ['[name="options[options][dependee_2]"]' => ['value' => 'ON']],
-          ['[name="options[options][dependee_3]"]' => ['value' => 'ON']],
+          ['[name="options[options][dependency_2]"]' => ['value' => 'ON']],
+          ['[name="options[options][dependency_3]"]' => ['value' => 'ON']],
         ],
         [
-          ['[name="options[options][dependee_4]"]' => ['value' => 'ON']],
+          ['[name="options[options][dependency_4]"]' => ['value' => 'ON']],
           'xor',
-          ['[name="options[options][dependee_5]"]' => ['value' => 'ON']],
+          ['[name="options[options][dependency_5]"]' => ['value' => 'ON']],
         ],
       ],
     ];

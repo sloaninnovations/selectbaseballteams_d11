@@ -104,7 +104,7 @@ class ThemeUiTest extends BrowserTestBase {
     }
     $this->assertUninstallableTheme($expected_required_list_items, $theme_name);
 
-    // Enable the first group of dependee modules.
+    // Enable the first group of dependent modules.
     $first_module_form_post = [];
     foreach ($first_modules as $module) {
       $first_module_form_post["modules[$module][enable]"] = 1;
@@ -124,7 +124,7 @@ class ThemeUiTest extends BrowserTestBase {
     }
     $this->assertUninstallableTheme($expected_required_list_items, $theme_name);
 
-    // Enable the second group of dependee modules.
+    // Enable the second group of dependent modules.
     $second_module_form_post = [];
     foreach ($second_modules as $module) {
       $second_module_form_post["modules[$module][enable]"] = 1;
@@ -139,8 +139,8 @@ class ThemeUiTest extends BrowserTestBase {
     $assert_session->addressEquals('admin/appearance');
     $assert_session->pageTextContains("The $theme_name theme has been installed");
 
-    // Confirm that the dependee modules can't be uninstalled because an enabled
-    // theme depends on them.
+    // Confirm that the dependent modules can't be uninstalled because an
+    // enabled theme depends on them.
     $this->drupalGet('admin/modules/uninstall');
     foreach ($all_dependent_modules as $attribute) {
       $assert_session->elementExists('css', "[name=\"uninstall[$attribute]\"][disabled]");
