@@ -6,6 +6,8 @@
 
 use Drupal\image\Entity\ImageStyle;
 
+// cspell:ignore itok
+
 /**
  * The name of the query parameter for image derivative tokens.
  */

@@ -1,4 +1,5 @@
 # Schema for configuration files of the Image module.
+# cspell:ignore itok
 
 image.style.*:
   type: config_entity

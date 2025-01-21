@@ -10,6 +10,8 @@ use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\BrowserTestBase;
 
+// cspell:ignore itok
+
 /**
  * Tests access control for downloading image styles.
  *

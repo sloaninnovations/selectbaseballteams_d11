@@ -31,6 +31,8 @@ use Drupal\image\ImageStyleStorage;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 
+// cspell:ignore itok
+
 /**
  * Defines an image style configuration entity.
  */
