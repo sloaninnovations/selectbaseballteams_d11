@@ -127,6 +127,13 @@ tr .form-item,
   background-position: right top;
 }
 
+/* Add some spacing so that the focus ring and suffix don't overlap. */
+
+.field-suffix {
+  margin-inline-start: var(--sp0-25);
+  white-space: nowrap;
+}
+
 /**
  * Form actions.
  */
