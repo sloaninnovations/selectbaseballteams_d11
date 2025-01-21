@@ -22,6 +22,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\Template\Attribute;
 use Drupal\file\FileInterface;
+use Drupal\file\FileMigrationDependencyManagerInterface;
 use Drupal\file\IconMimeTypes;
 use Drupal\file\Upload\FileUploadHandlerInterface;
 use Drupal\file\Upload\FormUploadedFile;
@@ -764,4 +765,13 @@ function file_system_settings_submit(array &$form, FormStateInterface $form_stat
   $config = \Drupal::configFactory()->getEditable('file.settings')
     ->set('filename_sanitization', $form_state->getValue('filename_sanitization'));
   $config->save();
+}
+
+/**
+ * Implements hook_migration_plugins_alter().
+ */
+function file_migration_plugins_alter(array &$migrations) {
+  $file_migration_dependency_manager = \Drupal::service('file.migration.dependency.manager');
+  assert($file_migration_dependency_manager instanceof FileMigrationDependencyManagerInterface);
+  $file_migration_dependency_manager->addFileMigrationDependencies($migrations, ['file', 'image']);
 }

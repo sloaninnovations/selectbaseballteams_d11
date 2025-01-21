@@ -32,6 +32,11 @@ services:
     class: Drupal\file\Validation\FileValidator
     arguments: ['@file.recursive_validator', '@validation.constraint', '@event_dispatcher', '@module_handler']
   Drupal\file\Validation\FileValidatorInterface: '@file.validator'
+  file.migration.dependency.manager:
+    class: Drupal\file\FileMigrationDependencyManager
+    arguments: ['@entity_type.manager']
+    calls:
+      - [setMigrateFieldPluginManager, ['@?plugin.manager.migrate.field']]
   file.input_stream_file_writer:
     class: Drupal\file\Upload\InputStreamFileWriter
     arguments: ['@file_system']
