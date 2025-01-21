@@ -57,7 +57,7 @@ class CacheableExceptionTest extends UnitTestCase {
     $this->assertSame($message, $exception->getMessage());
     $this->assertSame($status_code, $exception->getStatusCode());
     $this->assertSame($expected_headers, $exception->getHeaders());
-    $this->assertSame($previous, $exception->getThrowable());
+    $this->assertSame($previous, $exception->getPrevious());
     $this->assertSame(123, $exception->getCode());
   }
 
