@@ -361,6 +361,7 @@ default:
         composer update --optimize-autoloader;
         composer outdated;
       fi
+    - echo 'opcache.jit_buffer_size=2G' > /usr/local/etc/php/conf.d/jit.ini
     - vendor/bin/phpstan --version
     # Rely on PHPStan caching to execute analysis multiple times without performance drawback.
     # Output a copy in junit.
@@ -397,6 +398,7 @@ default:
         composer update --optimize-autoloader;
         composer outdated;
       fi
+    - echo 'opcache.jit_buffer_size=2G' > /usr/local/etc/php/conf.d/jit.ini
     - vendor/bin/phpcs --version
     - composer phpcs -- -s --report-full --report-summary --report-\\Micheh\\PhpCodeSniffer\\Report\\Gitlab=phpcs-quality-report.json
   artifacts:
