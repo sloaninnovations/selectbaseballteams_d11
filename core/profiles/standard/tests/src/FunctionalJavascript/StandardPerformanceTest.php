@@ -128,6 +128,19 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $expected = [
       'QueryCount' => 36,
       'CacheGetCount' => 122,
+      'CacheGetCountByBin' => [
+        'page' => 1,
+        'config' => 37,
+        'data' => 8,
+        'access_policy' => 1,
+        'bootstrap' => 7,
+        'dynamic_page_cache' => 2,
+        'discovery' => 38,
+        'default' => 6,
+        'render' => 35,
+        'entity' => 2,
+        'menu' => 2,
+      ],
       'CacheSetCount' => 45,
       'CacheDeleteCount' => 0,
       'CacheTagChecksumCount' => 37,
@@ -169,6 +182,15 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 3450,
     ];
     $this->assertMetrics($expected, $performance_data);
+    $expected_default_cache_cids = [
+      'core.extension.list.theme',
+      'views_data:node_field_data:en',
+      'views_data:en',
+      'views_data:views:en',
+      'views_data:node:en',
+      'theme_registry:stark',
+    ];
+    $this->assertSame($expected_default_cache_cids, $performance_data->getCacheOperations()['get']['default']);
 
     // Test node page.
     $performance_data = $this->collectPerformanceData(function () {
