@@ -9,6 +9,7 @@ use Drupal\Core\Field\FieldException;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\Tests\EntityTrait;
 
 /**
  * Create field entities by attaching fields to entities.
@@ -18,6 +19,8 @@ use Drupal\field\Entity\FieldConfig;
  * @group field
  */
 class FieldCrudTest extends FieldKernelTestBase {
+
+  use EntityTrait;
 
   /**
    * The field storage entity.
@@ -175,8 +178,7 @@ class FieldCrudTest extends FieldKernelTestBase {
     // any violation.
     $entity = EntityTest::create();
     $entity->set($field_name, 1);
-    $violations = $entity->validate();
-    $this->assertCount(0, $violations, 'No violations found when in-range value passed.');
+    $this->assertEntityValid($entity, 'No violations found when in-range value passed.');
 
     // Check that a value that is specifically restricted triggers both
     // violations.
