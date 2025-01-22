@@ -5,11 +5,11 @@ namespace Drupal\update;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
-use Drupal\Core\State\StateInterface;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\PrivateKey;
 use Drupal\Core\Queue\QueueFactory;
+use Drupal\Core\State\StateInterface;
 
 /**
  * Process project update information.
@@ -90,9 +90,9 @@ class UpdateProcessor implements UpdateProcessorInterface {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    * @param \Drupal\Core\Queue\QueueFactory $queue_factory
-   *   The queue factory
+   *   The queue factory.
    * @param \Drupal\update\UpdateFetcherInterface $update_fetcher
-   *   The update fetcher service
+   *   The update fetcher service.
    * @param \Drupal\Core\State\StateInterface $state_store
    *   The state service.
    * @param \Drupal\Core\PrivateKey $private_key
@@ -245,6 +245,9 @@ class UpdateProcessor implements UpdateProcessorInterface {
     foreach ($xml as $k => $v) {
       $data[$k] = (string) $v;
     }
+    // Decode entities from XML.
+    $data['title'] = html_entity_decode($data['title'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
     $data['releases'] = [];
     if (isset($xml->releases)) {
       foreach ($xml->releases->children() as $release) {
