@@ -85,6 +85,12 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @see ::addSavepoint()
    * @see ::releaseSavepoint()
    * @see ::rollbackSavepoint()
+   *
+   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
+   *   TransactionManager to start a transaction then call ::yield() or
+   *   ::rollback() on it.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   protected array $savepoints = [];
 
@@ -226,13 +232,19 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       // mimic MySQL and SQLite transactions which don't fail if a single query
       // fails. This is important for tables that are created on demand. For
       // example, \Drupal\Core\Cache\DatabaseBackend.
-      $this->addSavepoint();
+      if ($this->inTransaction()) {
+        $savepoint = $this->startTransaction('mimic_implicit_commit');
+      }
       try {
         $return = parent::query($query, $args, $options);
-        $this->releaseSavepoint();
+        if (isset($savepoint)) {
+          $savepoint->yield();
+        }
       }
       catch (\Exception $e) {
-        $this->rollbackSavepoint();
+        if (isset($savepoint)) {
+          $savepoint->rollback();
+        }
         throw $e;
       }
     }
@@ -377,8 +389,15 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @param string $savepoint_name
    *   A string representing the savepoint name. By default,
    *   "mimic_implicit_commit" is used.
+   *
+   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
+   *   TransactionManager to start a transaction then call ::yield() or
+   *   ::rollback() on it.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public function addSavepoint($savepoint_name = 'mimic_implicit_commit') {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use TransactionManager to start a transaction then call ::yield() or ::rollback() on it. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     if ($this->inTransaction()) {
       $this->savepoints[$savepoint_name] = $this->startTransaction($savepoint_name);
     }
@@ -390,8 +409,15 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @param string $savepoint_name
    *   A string representing the savepoint name. By default,
    *   "mimic_implicit_commit" is used.
+   *
+   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
+   *   TransactionManager to start a transaction then call ::yield() or
+   *   ::rollback() on it.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public function releaseSavepoint($savepoint_name = 'mimic_implicit_commit') {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use TransactionManager to start a transaction then call ::yield() or ::rollback() on it. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     if ($this->inTransaction() && $this->transactionManager()->has($savepoint_name)) {
       unset($this->savepoints[$savepoint_name]);
     }
@@ -403,8 +429,15 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @param string $savepoint_name
    *   A string representing the savepoint name. By default,
    *   "mimic_implicit_commit" is used.
+   *
+   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
+   *   TransactionManager to start a transaction then call ::yield() or
+   *   ::rollback() on it.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public function rollbackSavepoint($savepoint_name = 'mimic_implicit_commit') {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use TransactionManager to start a transaction then call ::yield() or ::rollback() on it. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     if ($this->inTransaction() && $this->transactionManager()->has($savepoint_name)) {
       $this->savepoints[$savepoint_name]->rollBack();
       unset($this->savepoints[$savepoint_name]);

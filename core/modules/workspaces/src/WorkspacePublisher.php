@@ -84,6 +84,7 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
           }
         }
       });
+      $transaction->yield();
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
