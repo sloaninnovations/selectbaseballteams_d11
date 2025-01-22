@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Render\Element;
 
+use Drupal\Component\Utility\Html as HtmlUtility;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
-use Drupal\Component\Utility\Html as HtmlUtility;
 
 /**
  * Provides a form element for a set of radio buttons.
@@ -40,6 +40,31 @@ class Radios extends FormElementBase {
 
   /**
    * {@inheritdoc}
+   *
+   * Overwrite setAttributes to remove unnecessary attributes from the
+   * fieldset for radio groups. These are applied to the child radio
+   * elements instead.
+   */
+  public static function setAttributes(&$element, $class = []): void {
+    if (!empty($class)) {
+      if (!isset($element['#attributes']['class'])) {
+        $element['#attributes']['class'] = [];
+      }
+      $element['#attributes']['class'] = array_merge($element['#attributes']['class'], $class);
+    }
+    // This function is invoked from form element theme functions, but the
+    // rendered form element may not necessarily have been processed by
+    // \Drupal::formBuilder()->doBuildForm().
+    if (!empty($element['#required'])) {
+      $element['#attributes']['class'][] = 'required';
+    }
+    if (isset($element['#parents']) && isset($element['#errors']) && !empty($element['#validated'])) {
+      $element['#attributes']['class'][] = 'error';
+    }
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function getInfo() {
     return [
@@ -50,6 +75,7 @@ class Radios extends FormElementBase {
       '#theme_wrappers' => ['radios'],
       '#pre_render' => [
         [static::class, 'preRenderCompositeFormElement'],
+        [static::class, 'preRenderRadiosFormElement'],
       ],
     ];
   }
@@ -87,8 +113,22 @@ class Radios extends FormElementBase {
           '#error_no_message' => TRUE,
           '#weight' => $weight,
         ];
+
+        // Only add the required attribute to radio buttons.
+        // @see https://stackoverflow.com/questions/34300154
+        if (!empty($element['#required'])) {
+          $element[$key]['#attributes']['required'] = 'required';
+        }
       }
     }
+    return $element;
+  }
+
+  /**
+   * Adds role "radiogroup" to radios fieldset wrapper.
+   */
+  public static function preRenderRadiosFormElement(array $element): array {
+    $element['#attributes']['role'] = 'radiogroup';
     return $element;
   }
 
