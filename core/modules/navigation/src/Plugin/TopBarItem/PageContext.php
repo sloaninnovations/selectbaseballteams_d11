@@ -9,7 +9,6 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -44,6 +43,8 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
    *   The entity type manager service.
    * @param \Drupal\navigation\EntityRouteHelper $entityRouteHelper
    *   The entity route helper service.
+   * @param \Drupal\content_moderation\ModerationInformationInterface $moderationInformation
+   *   The moderation information service.
    */
   public function __construct(
     array $configuration,
