@@ -2,6 +2,7 @@
 
 namespace Drupal\workspaces\Hook;
 
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\workspaces\ViewsQueryAlter;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\ViewExecutable;
@@ -177,6 +178,14 @@ class WorkspacesHooks {
     if (\Drupal::service('workspaces.information')->isEntityTypeSupported($entity->getEntityType())) {
       \Drupal::service('workspaces.association')->deleteAssociations(NULL, $entity->getEntityTypeId(), [$entity->id()], [$entity->getRevisionId()]);
     }
+  }
+
+  /**
+   * Implements hook_entity_query_tag__TAG_alter().
+   */
+  #[Hook('entity_query_tag__latest_translated_affected_revision_alter')]
+  public function entityQueryTagLatestTranslatedAffectedRevisionAlter(QueryInterface $query): void {
+    \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityQueryTagLatestTranslatedAffectedRevisionAlter($query);
   }
 
   /**
