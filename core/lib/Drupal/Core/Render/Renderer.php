@@ -455,8 +455,47 @@ class Renderer implements RendererInterface {
     // has an empty #children attribute, render the children now. This is the
     // same process as Renderer::render() but is inlined for speed.
     if ((!$theme_is_implemented || isset($elements['#render_children'])) && empty($elements['#children'])) {
+      $fibers = [];
+      // @todo use revolt.
       foreach ($children as $key) {
-        $elements['#children'] .= $this->doRender($elements[$key]);
+        $fibers[$key] = new \Fiber(fn() => $this->doRender($elements[$key]));
+      }
+      $rendered_children = [];
+      $iterations = 0;
+      while (count($fibers) > 0) {
+        foreach ($fibers as $key => $fiber) {
+          try {
+            if (!$fiber->isStarted()) {
+              $fiber->start();
+            }
+            elseif ($fiber->isSuspended()) {
+              $fiber->resume();
+            }
+            // If the Fiber hasn't terminated by this point, move onto the next
+            // placeholder, we'll resume this Fiber again when we get back here.
+            if (!$fiber->isTerminated()) {
+              // If we've gone through the placeholders once already, and they're
+              // still not finished, then start to allow code higher up the stack
+              // to get on with something else.
+              if ($iterations) {
+                $fiber = \Fiber::getCurrent();
+                if ($fiber !== NULL) {
+                  $fiber->suspend();
+                }
+              }
+              continue;
+            }
+            $rendered_children[$key] = $fiber->getReturn();
+            unset($fibers[$key]);
+          }
+          catch (\Throwable $e) {
+            throw $e;
+          }
+        }
+        $iterations++;
+      }
+      foreach ($children as $key) {
+        $elements['#children'] .= $rendered_children[$key];
       }
       $elements['#children'] = Markup::create($elements['#children']);
     }
