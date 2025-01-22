@@ -97,12 +97,20 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
    *   The configuration importer.
    */
   protected function validateModules(ConfigImporter $config_importer) {
+    global $install_state;
     $core_extension = $config_importer->getStorageComparer()->getSourceStorage()->read('core.extension');
 
     // Get the install profile from the site's configuration.
     $current_core_extension = $config_importer->getStorageComparer()->getTargetStorage()->read('core.extension');
     $install_profile = $current_core_extension['profile'] ?? NULL;
     $new_install_profile = $core_extension['profile'] ?? NULL;
+
+    // If the install profile is not set in configuration and the site install
+    // is in process, try to set it from the install state.
+    if (empty($core_extension['profile']) && !empty($install_state['parameters']['profile'])) {
+      $install_profile = $install_state['parameters']['profile'];
+      $new_install_profile = $install_profile;
+    }
 
     // Ensure the profile is not changing.
     if ($install_profile !== $new_install_profile) {
@@ -120,11 +128,6 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
           '%new_profile' => $new_install_profile,
         ]));
       }
-    }
-    elseif ($new_install_profile && !isset($core_extension['module'][$new_install_profile])) {
-      $config_importer->logError($this->t('The install profile %profile is not in the list of installed modules.', [
-        '%profile' => $new_install_profile,
-      ]));
     }
 
     // Get a list of modules with dependency weights as values.
