@@ -2,6 +2,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\destination;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -313,7 +314,20 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
       }
     }
     foreach ($empty_destinations as $field_name) {
-      $entity->$field_name = NULL;
+      // $field_name can be something like field_name/property.
+      $parts = explode(Row::PROPERTY_SEPARATOR, $field_name);
+      $mainFieldName = array_shift($parts);
+
+      $field = $entity->$mainFieldName;
+      if ($field instanceof TypedDataInterface) {
+        $values = $field->getValue();
+
+        // For multivalued fields, empty the property on each existing value.
+        foreach (array_keys($values) as $delta) {
+          NestedArray::setValue($values, array_merge([$delta], $parts), NULL);
+        }
+        $field->setValue($values);
+      }
     }
 
     $this->setRollbackAction($row->getIdMap(), $rollback_action);
