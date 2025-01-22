@@ -9,6 +9,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -200,6 +201,13 @@ function workspaces_entity_revision_delete(EntityInterface $entity) {
     \Drupal::service('workspaces.association')
       ->deleteAssociations(NULL, $entity->getEntityTypeId(), [$entity->id()], [$entity->getRevisionId()]);
   }
+}
+
+/**
+ * Implements hook_entity_query_tag__TAG_alter().
+ */
+function workspaces_entity_query_tag__latest_translated_affected_revision_alter(QueryInterface $query): void {
+  \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityQueryTagLatestTranslatedAffectedRevisionAlter($query);
 }
 
 /**
