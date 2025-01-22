@@ -1794,6 +1794,21 @@ function template_preprocess_menu_local_action(&$variables): void {
 }
 
 /**
+ * Prepares variables for local tasks templates.
+ *
+ * Default template: menu-local-tasks.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - primary: HTML list items representing primary tasks.
+ *   - secondary: HTML list items representing secondary tasks.
+ */
+function template_preprocess_menu_local_tasks(array &$variables): void {
+  $variables['primary_attributes'] = new Attribute($variables['primary_attributes']);
+  $variables['secondary_attributes'] = new Attribute($variables['secondary_attributes']);
+}
+
+/**
  * Callback for usort() within template_preprocess_field_multiple_value_form().
  *
  * Sorts using ['_weight']['#value']

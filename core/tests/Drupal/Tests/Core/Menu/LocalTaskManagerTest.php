@@ -70,7 +70,7 @@ class LocalTaskManagerTest extends UnitTestCase {
   /**
    * The cache backend used in the test.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $cacheBackend;
 
@@ -106,7 +106,7 @@ class LocalTaskManagerTest extends UnitTestCase {
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
     $this->pluginDiscovery = $this->createMock('Drupal\Component\Plugin\Discovery\DiscoveryInterface');
     $this->factory = $this->createMock('Drupal\Component\Plugin\Factory\FactoryInterface');
-    $this->cacheBackend = $this->prophesize('Drupal\Core\Cache\CacheBackendInterface');
+    $this->cacheBackend = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
     $this->accessManager = $this->createMock('Drupal\Core\Access\AccessManagerInterface');
     $this->routeMatch = $this->createMock('Drupal\Core\Routing\RouteMatchInterface');
     $this->account = $this->createMock('Drupal\Core\Session\AccountInterface');
@@ -252,7 +252,16 @@ class LocalTaskManagerTest extends UnitTestCase {
       ->method('getCurrentLanguage')
       ->willReturn(new Language(['id' => 'en']));
 
-    $this->manager = new LocalTaskManager($this->argumentResolver, $request_stack, $this->routeMatch, $this->routeProvider, $module_handler, $this->cacheBackend->reveal(), $language_manager, $this->accessManager, $this->account);
+    $this->account->expects($this->any())
+      ->method('getPreferredAdminLangcode')
+      ->willReturn('en');
+
+    $translation = $this->createMock('Drupal\Core\StringTranslation\TranslationManager');
+    $translation->expects($this->any())
+      ->method('setDefaultLangcode')
+      ->willReturn('en');
+
+    $this->manager = new LocalTaskManager($this->argumentResolver, $request_stack, $this->routeMatch, $this->routeProvider, $module_handler, $this->cacheBackend, $language_manager, $this->accessManager, $this->account, $translation);
 
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'discovery');
     $property->setValue($this->manager, $this->pluginDiscovery);
@@ -430,7 +439,7 @@ class LocalTaskManagerTest extends UnitTestCase {
 
     // Ensure that all cacheability metadata is merged together.
     $this->assertEqualsCanonicalizing(['tag.example1', 'tag.example2'], $cacheability->getCacheTags());
-    $this->assertEqualsCanonicalizing(['context.example1', 'context.example2', 'route', 'user.permissions'], $cacheability->getCacheContexts());
+    $this->assertEqualsCanonicalizing(['context.example1', 'context.example2', 'languages:language_interface', 'route', 'user.permissions'], $cacheability->getCacheContexts());
   }
 
   protected function setupFactoryAndLocalTaskPlugins(array $definitions, $active_plugin_id): void {
@@ -471,7 +480,7 @@ class LocalTaskManagerTest extends UnitTestCase {
 
     $cache_context_manager = $this->prophesize(CacheContextsManager::class);
 
-    foreach ([NULL, ['user.permissions'], ['route'], ['route', 'context.example1'], ['context.example1', 'route'], ['route', 'context.example1', 'context.example2'], ['context.example1', 'context.example2', 'route'], ['route', 'context.example1', 'context.example2', 'user.permissions']] as $argument) {
+    foreach ([NULL, ['user.permissions'], ['route'], ['route', 'context.example1'], ['context.example1', 'route', 'languages:language_interface'], ['route', 'context.example1', 'languages:language_interface'], ['route', 'context.example1', 'languages:language_interface', 'context.example2'], ['route', 'context.example1', 'languages:language_interface', 'context.example2'], ['context.example1', 'context.example2', 'languages:language_interface', 'route'], ['route', 'context.example1', 'languages:language_interface', 'context.example2', 'user.permissions']] as $argument) {
       $cache_context_manager->assertValidTokens($argument)->willReturn(TRUE);
     }
 
