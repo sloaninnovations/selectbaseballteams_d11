@@ -299,7 +299,6 @@ class EntityOperations implements ContainerInjectionInterface {
    *
    * @see \hook_entity_query_tag__TAG_alter()
    */
-  #[Hook('entity_query_tag__latest_translated_affected_revision_alter')]
   public function entityQueryTagLatestTranslatedAffectedRevisionAlter(QueryInterface $query): void {
     $entity_type = $this->entityTypeManager->getDefinition($query->getEntityTypeId());
     if (!$this->workspaceInfo->isEntityTypeSupported($entity_type) || !$this->workspaceManager->hasActiveWorkspace()) {
