@@ -47,8 +47,8 @@
 }
 
 .toolbar-title--icon--file {
-  --icon: url(./assets/file.svg)
+  --icon: url(./assets/file.svg);
 }
 .toolbar-title--icon--database {
-  --icon: url(./assets/database.svg)
+  --icon: url(./assets/database.svg);
 }
