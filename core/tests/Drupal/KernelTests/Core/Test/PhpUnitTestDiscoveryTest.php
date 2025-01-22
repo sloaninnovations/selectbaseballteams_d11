@@ -93,7 +93,7 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
     $internalList = array_unique($internalList);
     asort($internalList);
 
-    $this->assertEquals(array_values($phpUnitList), array_values($internalList));
+    $this->assertEquals(implode("\n", $phpUnitList), implode("\n", $internalList));
   }
 
 }
