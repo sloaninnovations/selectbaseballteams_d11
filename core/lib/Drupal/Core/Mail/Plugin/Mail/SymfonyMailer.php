@@ -10,6 +10,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
@@ -138,8 +139,11 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
         ->subject($message['subject'])
         ->text($message['body']);
 
-      $mailer = $this->getMailer();
-      $mailer->send($email);
+      // Disable logging, it's verbose and throws exceptions
+      // on transport shutdown.
+      // @see https://www.drupal.org/project/drupal/issues/3420372
+      $this->logger = new NullLogger();
+      $this->getMailer()->send($email);
       return TRUE;
     }
     catch (\Exception $e) {
