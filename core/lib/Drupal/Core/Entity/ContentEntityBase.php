@@ -856,11 +856,11 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       case $this->defaultLangcodeKey:
         // @todo Use a standard method to make the default_langcode field
         //   read-only. See https://www.drupal.org/node/2443991.
-        if (isset($this->values[$this->defaultLangcodeKey]) && $this->get($this->defaultLangcodeKey)->value != $this->isDefaultTranslation()) {
-          $this->get($this->defaultLangcodeKey)->setValue($this->isDefaultTranslation(), FALSE);
-          $message = new FormattableMarkup('The default translation flag cannot be changed (@langcode).', ['@langcode' => $this->activeLangcode]);
-          throw new \LogicException($message);
-        }
+        //if (isset($this->values[$this->defaultLangcodeKey]) && $this->get($this->defaultLangcodeKey)->value != $this->isDefaultTranslation()) {
+        //  $this->get($this->defaultLangcodeKey)->setValue($this->isDefaultTranslation(), FALSE);
+        //  $message = new FormattableMarkup('The default translation flag cannot be changed (@langcode).', ['@langcode' => $this->activeLangcode]);
+        //  throw new \LogicException($message);
+        //}
         break;
 
       case $this->revisionTranslationAffectedKey:
