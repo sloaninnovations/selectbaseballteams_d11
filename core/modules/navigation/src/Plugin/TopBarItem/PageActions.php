@@ -78,20 +78,22 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
       return $build;
     }
 
-    $local_tasks = $this->navigationRenderer->getLocalTasks();
-    $featured_local_task = $this->getFeaturedLocalTask($local_tasks);
-    if (isset($featured_local_task)) {
-      unset($local_tasks['tasks'][$featured_local_task['route']]);
-    }
+    $page_actions = $this->navigationRenderer->getLocalTasks();
+    $featured_page_actions = $this->getFeaturedPageActions($page_actions);
+
+    // Filter actions to exclude featured ones from the main array.
+    $page_actions['page_actions'] = array_filter($page_actions['page_actions'],
+      static fn ($action_route) =>!array_key_exists($action_route, $featured_page_actions),
+    ARRAY_FILTER_USE_KEY);
 
     $build += [
-      '#theme' => 'top_bar_local_tasks',
-      '#local_tasks' => $local_tasks['tasks'],
-      '#featured_local_task' => $featured_local_task,
+      '#theme' => 'top_bar_page_actions',
+      '#page_actions' => $page_actions['page_actions'],
+      '#featured_page_actions' => $featured_page_actions,
     ];
 
-    assert($local_tasks['cacheability'] instanceof CacheableMetadata);
-    $local_tasks['cacheability']->applyTo($build);
+    assert($page_actions['cacheability'] instanceof CacheableMetadata);
+    $page_actions['cacheability']->applyTo($build);
 
     return $build;
   }
@@ -99,14 +101,14 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
   /**
    * Gets the featured local task.
    *
-   * @param array $local_tasks
+   * @param array $page_actions
    *   The array of local tasks for the current page.
    *
    * @return array|null
    *   The featured local task definition if available. NULL otherwise.
    */
-  protected function getFeaturedLocalTask(array $local_tasks): ?array {
-    $featured_local_task = NULL;
+  protected function getFeaturedPageActions(array $page_actions): ?array {
+    $featured_page_actions = [];
     $current_route_name = $this->routeMatch->getRouteName();
     $canonical_pattern = '/^entity\.(.+?)\.canonical$/';
     if (preg_match($canonical_pattern, $current_route_name, $matches)) {
@@ -114,15 +116,14 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
       $edit_route = "entity.$entity_type.edit_form";
       // For core entities, the local task name matches the route name. If
       // needed, we could iterate over the items and check the actual route.
-      if (isset($local_tasks['tasks'][$edit_route]) && $local_tasks['tasks'][$edit_route]['#access']?->isAllowed()) {
-        $featured_local_task = [
-          'route' => $edit_route,
-          'task' => $local_tasks['tasks'][$edit_route],
+      if (isset($page_actions['page_actions'][$edit_route]) && $page_actions['page_actions'][$edit_route]['#access']?->isAllowed()) {
+        $featured_page_actions[$edit_route] = [
+          'page_action' => $page_actions['page_actions'][$edit_route],
           'icon' => 'pencil',
         ];
       }
     }
-    return $featured_local_task;
+    return $featured_page_actions;
   }
 
 }

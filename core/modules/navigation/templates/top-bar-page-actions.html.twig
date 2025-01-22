@@ -1,25 +1,25 @@
 {#
 /**
  * @file
- * Default theme implementation for navigation top bar local tasks.
+ * Default theme implementation for navigation top bar page actions.
  *
  * Available variables:
- * - local_tasks: Array of local tasks for the current route.
- * - featured_local_task: The local task to show featured before the dropdown.
+ * - page_actions: Array of page actions for the current route.
+ * - featured_page_actions: The page actions to show featured before the dropdown.
  */
 #}
-{% set dropdown_id = 'admin-local-tasks'|clean_unique_id %}
+{% set dropdown_id = 'top-bar-page-actions'|clean_unique_id %}
 
-{% if featured_local_task %}
-  {% set link = featured_local_task.task['#link'] %}
+{% for featured_page_action in featured_page_actions %}
+  {% set link = featured_page_action.page_action['#link'] %}
   {% include 'navigation:toolbar-button' with {
     text: link['#title'],
     html_tag: 'a',
     attributes: create_attribute().setAttribute('href', link['#url']|render|default(null)),
     modifiers: ['primary'],
-    icon: featured_local_task.icon,
+    icon: featured_page_action.icon,
   } only %}
-{% endif %}
+{% endfor %}
 
 {% include 'navigation:toolbar-button' with {
   icon: 'dots',
@@ -34,8 +34,8 @@
 
 <div class="toolbar-dropdown__menu" id={{ dropdown_id }}>
   <ul class="toolbar-dropdown__list">
-    {% for local_task in local_tasks %}
-      {{ local_task }}
+    {% for page_action in page_actions %}
+      {{ page_action }}
     {% endfor %}
   </ul>
 </div>
