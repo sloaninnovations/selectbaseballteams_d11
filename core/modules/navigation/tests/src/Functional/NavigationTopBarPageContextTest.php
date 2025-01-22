@@ -74,17 +74,17 @@ class NavigationTopBarPageContextTest extends BrowserTestBase {
     $test_page_url = Url::fromRoute('test_page_test.test_page');
     $this->drupalGet($test_page_url);
     // Ensure the top bar item is not present.
-    $this->assertSession()->elementNotExists('css', '.navigation-top-bar-context');
+    $this->assertSession()->elementNotExists('css', '.top-bar .top-bar__context .toolbar-title');
 
     // Test the PageContext output for the published node.
     $this->drupalGet($node->toUrl());
-    $this->assertSession()->statusCodeEquals(200);
-    // Ensure the top bar exists
-    $this->assertSession()->elementExists('css', '.navigation-top-bar-context');
-    // Check the node title
-    $this->assertSession()->pageTextContains('No easy twist on the bow');
-    // Check the CSS class for published status
-    $this->assertSession()->elementContains('css', '.context-status.top-bar-published', 'Published');
+    // Ensure the top bar exists and is valid.
+    $this->assertSession()->elementTextEquals('css', '.top-bar .top-bar__context .toolbar-title', 'No easy twist on the bow');
+    $this->assertSession()->elementTextEquals('css', '.top-bar .top-bar__context .toolbar-badge', 'Published');
+    $this->drupalGet($node->toUrl('edit-form'));
+    // Ensure the top bar exists and is valid.
+    $this->assertSession()->elementTextEquals('css', '.top-bar .top-bar__context .toolbar-title', 'No easy twist on the bow');
+    $this->assertSession()->elementTextEquals('css', '.top-bar .top-bar__context .toolbar-badge', 'Published');
 
     // Unpublish the node.
     $node->setUnpublished();
@@ -92,10 +92,13 @@ class NavigationTopBarPageContextTest extends BrowserTestBase {
 
     // Test the PageContext output for the unpublished node.
     $this->drupalGet($node->toUrl());
-    // Check the node title
-    $this->assertSession()->pageTextContains('No easy twist on the bow');
-    // Check the CSS class for unpublished status
-    $this->assertSession()->elementContains('css', '.context-status.top-bar-unpublished', 'Unpublished');
+    // Ensure the top bar exists and is valid.
+    $this->assertSession()->elementTextEquals('css', '.top-bar .top-bar__context .toolbar-title', 'No easy twist on the bow');
+    $this->assertSession()->elementTextEquals('css', '.top-bar .top-bar__context .toolbar-badge', 'Unpublished');
+    $this->drupalGet($node->toUrl('edit-form'));
+    // Ensure the top bar exists and is valid.
+    $this->assertSession()->elementTextEquals('css', '.top-bar .top-bar__context .toolbar-title', 'No easy twist on the bow');
+    $this->assertSession()->elementTextEquals('css', '.top-bar .top-bar__context .toolbar-badge', 'Unpublished');
   }
 
 }

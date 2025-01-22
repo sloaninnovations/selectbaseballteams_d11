@@ -95,16 +95,15 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
       ],
     ];
 
-    if ($status = $this->getStatus($entity)) {
-      $label = $status == 'success' ? $this->t('Published') : $this->t('Unpublished');
+    if ($label = $this->getBadgeLabel($entity)) {
       $build += [
         '#type' => 'component',
         '#component' => 'navigation:badge',
         '#props' => [
-          'status' => $status,
+          'status' => $this->getBadgeStatus($entity) ?? 'info',
         ],
         '#slots' => [
-          'label' => (string) $label,
+          'label' => $label,
         ],
       ];
     }
@@ -113,19 +112,36 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
   }
 
   /**
-   * Retrieves the status of the given entity.
+   * Retrieves the badge label for the given entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity for which the label is being retrieved.
+   *
+   * @return string|null
+   *   The translated status if available. NULL otherwise.
+   *   The status if available. NULL otherwise.
+   */
+  protected function getBadgeLabel(EntityInterface $entity): ?string {
+    if (!$entity instanceof EntityPublishedInterface) {
+      return NULL;
+    }
+    return (string) ($entity->isPublished() ? $this->t('Published') : $this->t('Unpublished'));
+  }
+
+  /**
+   * Retrieves the badge status for the given entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity for which the status is being retrieved.
    *
    * @return string|null
-   *   The status if available. NULL otherwise.
+   *   The badge status if available. NULL otherwise.
    */
-  protected function getStatus(EntityInterface $entity): ?string {
+  protected function getBadgeStatus(EntityInterface $entity): ?string {
     if (!$entity instanceof EntityPublishedInterface) {
       return NULL;
     }
-    return (string) ($entity->isPublished() ? 'success' : 'info');
+    return $entity->isPublished() ? 'success' : 'info';
   }
 
 }
