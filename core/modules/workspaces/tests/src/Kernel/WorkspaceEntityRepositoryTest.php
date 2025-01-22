@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
 
 /**
@@ -17,6 +18,7 @@ use Drupal\workspaces\Entity\Workspace;
  */
 class WorkspaceEntityRepositoryTest extends KernelTestBase {
 
+  use UserCreationTrait;
   use WorkspaceTestTrait;
 
   /**
