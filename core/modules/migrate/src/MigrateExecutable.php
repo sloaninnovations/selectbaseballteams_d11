@@ -148,7 +148,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
    */
   public function import() {
     // Only begin the import operation if the migration is currently idle.
-    if ($this->migration->getStatus() !== MigrationInterface::STATUS_IDLE) {
+    if (!$this->migration->allowsConcurrency() && $this->migration->getStatus() !== MigrationInterface::STATUS_IDLE) {
       $this->message->display($this->t('Migration @id is busy with another operation: @status',
         [
           '@id' => $this->migration->id(),

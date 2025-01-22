@@ -309,4 +309,11 @@ interface MigrationInterface extends PluginInspectionInterface, DerivativeInspec
    */
   public function isAuditable();
 
+  /**
+   * Allow migrations to be run concurrently.
+   *
+   * @return bool
+   */
+  public function allowsConcurrency(): bool;
+
 }

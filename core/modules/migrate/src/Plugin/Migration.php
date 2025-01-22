@@ -221,6 +221,16 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   protected $audit = FALSE;
 
   /**
+   * Whether the migration allows concurrency.
+   *
+   * Normally, migrations won't run if the migration status is not idle but in
+   * cases where individual items from the migration are split up (e.g.
+   * using a queue) and processed concurrently, enabling this setting
+   * will ignore this check.
+   */
+  protected bool $allow_concurrency = FALSE;
+
+  /**
    * These migrations, if run, must be executed before this migration.
    *
    * These are different from the configuration dependencies. Migration
@@ -739,6 +749,13 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
    */
   public function isAuditable() {
     return (bool) $this->audit;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function allowsConcurrency(): bool {
+    return $this->allow_concurrency;
   }
 
 }
