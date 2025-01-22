@@ -215,6 +215,7 @@ variables:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline" && $PERFORMANCE_TEST != "1"
       changes:
         - core/tests/PHPStan/*
+        - core/tests/PHPStan/**/*
         - composer/Metapackage/PinnedDevDependencies/composer.json
     - when: manual
       allow_failure: true
