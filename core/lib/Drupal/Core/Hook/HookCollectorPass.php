@@ -140,7 +140,7 @@ class HookCollectorPass implements CompilerPassInterface {
     $modules = array_map(fn ($x) => preg_quote($x, '/'), array_keys($module_filenames));
     // Longer modules first.
     usort($modules, fn($a, $b) => strlen($b) - strlen($a));
-    $module_preg = '/^(?<function>(?<module>' . implode('|', $modules) . ')_(?!preprocess_)(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
+    $module_preg = '/^(?<function>(?<module>' . implode('|', $modules) . ')_(?!preprocess_)(?!.+update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
     $collector = new static();
     foreach ($module_filenames as $module => $info) {
       $skip_procedural = FALSE;
@@ -217,6 +217,25 @@ class HookCollectorPass implements CompilerPassInterface {
               break;
             }
             if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && preg_match($module_preg, $function, $matches)) {
+              // Skip hooks that are not supported by the new hook system, they
+              // do not need to be added to the BC layer. Note that is different
+              // than static::checkForProceduralOnlyHooks(). requirements is
+              // allowed and only update hooks are considered as dynamic
+              // exclusion, since post updates are not expected to be parsed
+              // hooks might start with preprocess. Also, update hooks are
+              // checked as ends with, since the regular expression sometimes
+              // attributes them to the wrong module, resulting in a prefix.
+              $staticDenyHooks = [
+                'install',
+                'schema',
+                'uninstall',
+                'update_last_removed',
+                'install_tasks',
+                'install_tasks_alter',
+              ];
+              if (in_array($matches['hook'], $staticDenyHooks)) {
+                continue;
+              }
               $implementations[] = ['function' => $function, 'module' => $matches['module'], 'hook' => $matches['hook']];
             }
           }
