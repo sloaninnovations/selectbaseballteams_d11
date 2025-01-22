@@ -93,7 +93,7 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
     }
     // Append the query.
     if ($options['query']) {
-      $uri .= '?' . UrlHelper::buildQuery($options['query']);
+      $uri .= '?' . UrlHelper::buildQuery($options['query'], '', TRUE);
     }
     // Reassemble.
     $url = $uri . $options['fragment'];

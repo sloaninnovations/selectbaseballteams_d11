@@ -32,6 +32,9 @@ class UrlHelper {
    * @param string $parent
    *   (optional) Internal use only. Used to build the $query array key for
    *   nested items. Defaults to an empty string.
+   * @param string $is_external
+   *   (optional) Determine if the processing query is part of external link
+   *   and remove empty query parameters.
    *
    * @return string
    *   A string encoded with rawurlencode() which can be used as or appended to
@@ -39,7 +42,7 @@ class UrlHelper {
    *
    * @ingroup php_wrappers
    */
-  public static function buildQuery(array $query, $parent = '') {
+  public static function buildQuery(array $query, $parent = '', $is_external = FALSE) {
     $params = [];
 
     foreach ($query as $key => $value) {
@@ -50,7 +53,7 @@ class UrlHelper {
         $params[] = static::buildQuery($value, $key);
       }
       // If a query parameter value is NULL, only append its key.
-      elseif (!isset($value)) {
+      elseif (!isset($value)|| ($is_external && empty($value) && strlen($value) == 0)) {
         $params[] = $key;
       }
       else {
