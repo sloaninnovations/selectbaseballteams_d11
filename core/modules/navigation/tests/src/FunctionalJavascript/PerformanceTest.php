@@ -80,7 +80,7 @@ class PerformanceTest extends PerformanceTestBase {
         'access_policy' => 1,
         'bootstrap' => 5,
         'dynamic_page_cache' => 2,
-        'discovery' => 10,
+        'discovery' => 11,
         'default' => 2,
         'render' => 23,
         'menu' => 1,
