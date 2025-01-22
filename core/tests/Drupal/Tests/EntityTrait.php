@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -30,9 +31,18 @@ trait EntityTrait {
    *   The reloaded entity.
    */
   protected function reloadEntity(EntityInterface $entity): EntityInterface {
-    $controller = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-    $controller->resetCache([$entity->id()]);
-    return $controller->load($entity->id());
+    // This method needs to get services from the Drupal object, as
+    // $this->container may have stale copies.
+    if ($entity instanceof ConfigEntityInterface) {
+      // Config entities need the config factory to have its cache cleared too.
+      \Drupal::service('entity_type.manager')->clearCachedDefinitions();
+      \Drupal::service('config.factory')->clearStaticCache();
+      \Drupal::service('config.factory')->reset();
+    }
+
+    $storage = \Drupal::service('entity_type.manager')->getStorage($entity->getEntityTypeId());
+    $storage->resetCache([$entity->id()]);
+    return $storage->load($entity->id());
   }
 
   /**
