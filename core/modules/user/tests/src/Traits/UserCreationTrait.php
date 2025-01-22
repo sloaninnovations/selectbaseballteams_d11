@@ -123,6 +123,8 @@ trait UserCreationTrait {
    *
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user account object.
+   *
+   * @return void
    */
   protected function setCurrentUser(AccountInterface $account) {
     \Drupal::currentUser()->setAccount($account);
@@ -309,6 +311,8 @@ trait UserCreationTrait {
    *   The user role entity to alter.
    * @param array $permissions
    *   (optional) A list of permission names to grant.
+   *
+   * @return void
    */
   protected function grantPermissions(RoleInterface $role, array $permissions) {
     foreach ($permissions as $permission) {
