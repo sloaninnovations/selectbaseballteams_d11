@@ -175,6 +175,13 @@ class KernelTestBaseTest extends KernelTestBase {
     }
   }
 
+  public function testDrupalGet() {
+    $this->enableModules(['system', 'user']);
+
+    $content = $this->drupalGet('/user/login');
+    $this->assertStringContainsString('Log in', $content);
+  }
+
   /**
    * @covers ::render
    */
