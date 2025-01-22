@@ -53,7 +53,7 @@ class BlockAddTest extends WebDriverTestBase {
     $assert_session->elementTextNotContains('css', '.vertical-tabs__menu-item-title', $summary_text);
 
     // Search for the "Pages" tab link and click it
-    $tab = $this->getSession()->getPage()->find('css', 'a[href="#edit-visibility-request-path"]')->click();
+    $this->getSession()->getPage()->find('css', 'a[href="#edit-visibility-request-path"]')->click();
     // Check that the corresponding form section is open and visible.
     $form_section = $this->getSession()->getPage()->find('css', '#edit-visibility-request-path');
     $this->assertNotEmpty($form_section, 'The "Pages" form section exists.');
