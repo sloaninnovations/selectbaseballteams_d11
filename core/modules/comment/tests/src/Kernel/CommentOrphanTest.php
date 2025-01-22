@@ -64,7 +64,7 @@ class CommentOrphanTest extends EntityKernelTestBase {
 
     // Create comment field.
     $this->entityTypeManager->getStorage('field_storage_config')->create([
-      'type' => 'text_long',
+      'type' => 'comment',
       'entity_type' => 'node',
       'field_name' => 'comment',
     ])->save();

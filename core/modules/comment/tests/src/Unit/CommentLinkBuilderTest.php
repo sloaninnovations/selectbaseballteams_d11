@@ -281,11 +281,33 @@ class CommentLinkBuilderTest extends UnitTestCase {
     if (empty($this->timestamp)) {
       $this->timestamp = time();
     }
-    $field_item = (object) [
-      'status' => $comment_status,
-      'comment_count' => $comment_count,
-      'last_comment_timestamp' => $this->timestamp,
-    ];
+    $field_item = $this->getMockBuilder('\Drupal\Core\Field\FieldItemListInterface')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $field_item->expects($this->any())
+      ->method('__get')
+      ->willReturnMap([
+        ['status', $comment_status],
+        ['comment_count', $comment_count],
+        ['last_comment_timestamp', $this->timestamp],
+      ]);
+    $field_item->expects($this->any())
+      ->method('access')
+      ->willReturnCallback(function ($operation, $account) {
+        switch ($operation) {
+          case 'view only':
+            return $account->hasPermission('access comments');
+
+          case 'view':
+            return $account->hasPermission('access comments') || $account->hasPermission('post comments');
+
+          case 'create':
+            return $account->hasPermission('post comments');
+
+          default:
+            return FALSE;
+        }
+      });
     $node->expects($this->any())
       ->method('get')
       ->with('comment')
