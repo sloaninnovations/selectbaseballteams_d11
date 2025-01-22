@@ -285,6 +285,7 @@ class UrlHelperTest extends TestCase {
         [
           'path' => 'http://www.example.com/my/path',
           'query' => [],
+          'query_raw' => NULL,
           'fragment' => '',
         ],
       ],
@@ -295,7 +296,33 @@ class UrlHelperTest extends TestCase {
           'query' => [
             'destination' => 'home',
           ],
+          'query_raw' => 'destination=home',
           'fragment' => 'footer',
+        ],
+      ],
+      'query parameters with characters not allowed in PHP variable names' => [
+        'http://www.example.com/my/path?single.value=&single value=&single_value=&multi.value[first]=&multi.value[second]=&multi value[third]=&multi value[fourth]=&multi_value[fifth]=&multi_value[sixth]=',
+        [
+          'path' => 'http://www.example.com/my/path',
+          'query' => [
+            'single.value' => '',
+            'single value' => '',
+            'single_value' => '',
+            'multi.value' => [
+              'first' => '',
+              'second' => '',
+            ],
+            'multi value' => [
+              'third' => '',
+              'fourth' => '',
+            ],
+            'multi_value' => [
+              'fifth' => '',
+              'sixth' => '',
+            ],
+          ],
+          'query_raw' => 'single.value=&single value=&single_value=&multi.value[first]=&multi.value[second]=&multi value[third]=&multi value[fourth]=&multi_value[fifth]=&multi_value[sixth]=',
+          'fragment' => '',
         ],
       ],
       'absolute fragment, no query' => [
@@ -303,6 +330,7 @@ class UrlHelperTest extends TestCase {
         [
           'path' => 'http://www.example.com/my/path',
           'query' => [],
+          'query_raw' => NULL,
           'fragment' => 'footer',
         ],
       ],
@@ -311,6 +339,7 @@ class UrlHelperTest extends TestCase {
         [
           'path' => '',
           'query' => [],
+          'query_raw' => NULL,
           'fragment' => '',
         ],
       ],
@@ -319,6 +348,7 @@ class UrlHelperTest extends TestCase {
         [
           'path' => '',
           'query' => [],
+          'query_raw' => NULL,
           'fragment' => '',
         ],
       ],
@@ -329,6 +359,7 @@ class UrlHelperTest extends TestCase {
           'query' => [
             'destination' => 'home',
           ],
+          'query_raw' => 'destination=home',
           'fragment' => 'footer',
         ],
       ],
@@ -337,6 +368,7 @@ class UrlHelperTest extends TestCase {
         [
           'path' => '/my/path',
           'query' => [],
+          'query_raw' => NULL,
           'fragment' => 'footer',
         ],
       ],
@@ -348,6 +380,7 @@ class UrlHelperTest extends TestCase {
             'destination' => 'home',
             'search' => 'http://www.example.com/search?limit=10',
           ],
+          'query_raw' => 'destination=home&search=http://www.example.com/search?limit=10',
           'fragment' => 'footer',
         ],
       ],
@@ -361,6 +394,7 @@ class UrlHelperTest extends TestCase {
             'referer' => 'http://www.example.com/my/path?destination=home',
             'other' => '',
           ],
+          'query_raw' => 'destination=home&search=http://www.example.com/search?limit=10&referer=http://www.example.com/my/path?destination=home&other',
           'fragment' => 'footer',
         ],
       ],
@@ -373,6 +407,7 @@ class UrlHelperTest extends TestCase {
             'search' => 'http://www.example.com/search?limit=10',
             'referer' => 'http://www.example.com/my/path?destination=home&other',
           ],
+          'query_raw' => 'destination=home&search=http://www.example.com/search?limit=10&referer=http%3A%2F%2Fwww.example.com%2Fmy%2Fpath%3Fdestination%3Dhome%26other',
           'fragment' => 'footer',
         ],
       ],
@@ -672,6 +707,36 @@ class UrlHelperTest extends TestCase {
       ['bar/', 'http://example.com/foo'],
       ['http://', 'http://example.com/foo'],
     ];
+  }
+
+  /**
+   * Tests the parseQueryString method.
+   */
+  public function testParseQueryString() {
+    // Test simple query string parsing.
+    $query = 'name=john&age=25';
+    $expected = [
+      'name' => 'john',
+      'age' => '25',
+    ];
+    $this->assertEquals($expected, UrlHelper::parseQueryString($query));
+
+    // Test with periods in parameter names.
+    $query = 'first.name=Aaron&last.name=Wolfe';
+    $expected = [
+      'first.name' => 'Aaron',
+      'last.name' => 'Wolfe',
+    ];
+    $this->assertEquals($expected, UrlHelper::parseQueryString($query));
+
+    // Test with multiple identical keys.
+    $query = 'module=AR&type=CAMPS&age=6&age=7&age=8&age=9&age=10';
+    $expected = [
+      'module' => 'AR',
+      'type' => 'CAMPS',
+      'age' => [6, 7, 8, 9, 10],
+    ];
+    $this->assertEquals($expected, UrlHelper::parseQueryString($query));
   }
 
 }
