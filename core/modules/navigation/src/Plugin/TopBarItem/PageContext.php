@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\navigation\Plugin\TopBarItem;
 
+use Drupal\content_moderation\ModerationInformationInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -46,8 +49,9 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
     array $configuration,
     $plugin_id,
     $plugin_definition,
-    private EntityTypeManagerInterface $entityTypeManager,
-    private EntityRouteHelper $entityRouteHelper,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityRouteHelper $entityRouteHelper,
+    protected ?ModerationInformationInterface $moderationInformation = NULL,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -61,7 +65,8 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
     $plugin_id,
     $plugin_definition,
     $container->get(EntityTypeManagerInterface::class),
-    $container->get(EntityRouteHelper::class)
+    $container->get(EntityRouteHelper::class),
+    $container->get('content_moderation.moderation_information', ContainerInterface::NULL_ON_INVALID_REFERENCE)
     );
   }
 
@@ -122,6 +127,18 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
    *   The status if available. NULL otherwise.
    */
   protected function getBadgeLabel(EntityInterface $entity): ?string {
+    if ($entity instanceof ContentEntityInterface && $this->moderationInformation && $this->moderationInformation->isModeratedEntity($entity)) {
+      $state_label = $this->moderationInformation
+        ->getWorkflowForEntity($entity)
+        ->getTypePlugin()
+        ->getState($entity->get('moderation_state')->value)
+        ->label();
+      if ($this->moderationInformation->hasPendingRevision($entity) && $entity->isDefaultRevision()) {
+        $state_label = $this->t('@state_label (Draft available)', ['@state_label' => $state_label]);
+      }
+      return (string) $state_label;
+    }
+
     if (!$entity instanceof EntityPublishedInterface) {
       return NULL;
     }
