@@ -463,6 +463,7 @@ function install_begin_request($class_loader, &$install_state) {
 
   $profile = _install_select_profile($install_state);
   if ($profile !== NULL) {
+    $container->setParameter('install_profile', $profile);
     $install_state['parameters']['profile'] = $profile;
     install_load_profile($install_state);
     if (isset($install_state['profile_info']['distribution']['install']['theme'])) {
