@@ -39,6 +39,12 @@ class DevelopmentSettingsPass implements CompilerPassInterface {
         }
       }
     }
+
+    if (!$development_settings->get('enable_mailer_transport_verbose_logs', FALSE)) {
+      if ($container->has('logger.channel.mailer_transport_verbose')) {
+        $container->removeDefinition('logger.channel.mailer_transport_verbose');
+      }
+    }
   }
 
 }

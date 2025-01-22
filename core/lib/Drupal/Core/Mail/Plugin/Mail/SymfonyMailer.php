@@ -77,22 +77,23 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
   protected const SKIP_HEADERS = ['content-type', 'content-transfer-encoding'];
 
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $container->get('logger.channel.mail')
-    );
+    $logger = $container->has('logger.channel.mailer_transport_verbose') ?
+      $container->get('logger.channel.mailer_transport_verbose') : NULL;
+    return new static($logger);
   }
 
   /**
    * Symfony mailer constructor.
    *
    * @param \Psr\Log\LoggerInterface $logger
-   *   The logger service.
+   *   The logger service. Transport logging is quite verbose, only specify in
+   *   order when troubleshooting transports.
    * @param \Symfony\Component\Mailer\MailerInterface $mailer
    *   The mailer service. Only specify an instance in unit tests, pass NULL in
    *   production.
    */
   public function __construct(
-    protected LoggerInterface $logger,
+    protected ?LoggerInterface $logger = NULL,
     protected ?MailerInterface $mailer = NULL,
   ) {
   }

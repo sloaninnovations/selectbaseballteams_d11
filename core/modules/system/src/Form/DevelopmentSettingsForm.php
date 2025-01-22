@@ -106,6 +106,13 @@ class DevelopmentSettingsForm extends FormBase {
       ];
     }
 
+    $form['enable_mailer_transport_verbose_logs'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Symfony mailer verbose logs'),
+      '#description' => $this->t("Enable verbose logs on experimental Symfony mailer backend."),
+      '#default_value' => $development_settings->get('enable_mailer_transport_verbose_logs', FALSE),
+    ];
+
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
@@ -145,7 +152,20 @@ class DevelopmentSettingsForm extends FormBase {
       $development_settings->deleteMultiple(array_keys($twig_development));
     }
 
-    if ($invalidate_container || $disable_rendered_output_cache_bins_previous !== $disable_rendered_output_cache_bins) {
+    $enable_mailer_transport_verbose_logs_previous = $development_settings->get('enable_mailer_transport_verbose_logs', FALSE);
+    $enable_mailer_transport_verbose_logs = (bool) $form_state->getValue('enable_mailer_transport_verbose_logs');
+    if ($enable_mailer_transport_verbose_logs) {
+      $development_settings->set('enable_mailer_transport_verbose_logs', TRUE);
+    }
+    else {
+      $development_settings->delete('enable_mailer_transport_verbose_logs');
+    }
+
+    if (
+      $invalidate_container ||
+      $disable_rendered_output_cache_bins_previous !== $disable_rendered_output_cache_bins ||
+      $enable_mailer_transport_verbose_logs_previous !== $enable_mailer_transport_verbose_logs
+    ) {
       $this->kernel->invalidateContainer();
     }
 

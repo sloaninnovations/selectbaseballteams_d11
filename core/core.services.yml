@@ -547,6 +547,9 @@ services:
   logger.channel.mail:
     parent: logger.channel_base
     arguments: ['mail']
+  logger.channel.mailer_transport_verbose:
+    parent: logger.channel_base
+    arguments: ['mailer_transport_verbose']
   logger.channel.menu:
     parent: logger.channel_base
     arguments: ['menu']
