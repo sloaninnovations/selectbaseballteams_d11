@@ -84,7 +84,7 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
         '#type' => 'component',
         '#component' => 'navigation:title',
         '#props' => [
-          'icon' => 'file',
+          'icon' => 'database',
           'html_tag' => 'span',
           'modifiers' => ['ellipsis', 'xs'],
           'extra_classes' => ['top-bar__title'],
