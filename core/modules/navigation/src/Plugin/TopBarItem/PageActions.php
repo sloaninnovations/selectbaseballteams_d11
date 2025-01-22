@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the Page Actions basic top bar item.
+ *
+ * @internal
  */
 #[TopBarItem(
   id: 'page_actions',
