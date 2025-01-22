@@ -358,8 +358,8 @@ default:
     - composer validate
     - composer install --optimize-autoloader
     - if [ -n "$COMPOSER_UPDATE" ]; then
-      composer update --optimize-autoloader;
-      composer outdated;
+        composer update --optimize-autoloader;
+        composer outdated;
       fi
     - vendor/bin/phpstan --version
     # Rely on PHPStan caching to execute analysis multiple times without performance drawback.
