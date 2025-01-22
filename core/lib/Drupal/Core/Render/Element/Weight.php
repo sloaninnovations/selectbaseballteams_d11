@@ -39,6 +39,10 @@ class Weight extends FormElementBase {
       '#process' => [
         [static::class, 'processWeight'],
         [static::class, 'processAjaxForm'],
+        [static::class, 'processGroup'],
+      ],
+      '#pre_render' => [
+        [static::class, 'preRenderGroup'],
       ],
     ];
   }
