@@ -20,10 +20,11 @@ class WebDriverTestBaseTest extends UnitTestCase {
    * @testWith [false, null]
    *           [false, ""]
    *           ["", "", ""]
-   *           ["[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":true,\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]", "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":true,\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]"]
-   *           ["[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":false,\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]", "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":false,\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]"]
-   *           ["[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"args\":[\"--headless\"],\"w3c\":false}},\"http:\\/\\/localhost:4444\"]", "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]"]
-   *           ["[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":false}},\"http:\\/\\/localhost:4444\"]", "[\"chrome\",{\"browserName\":\"chrome\"},\"http:\\/\\/localhost:4444\"]"]
+   *           ["[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":true,\"args\":[\"--headless\"]},\"w3c\":true},\"http:\\/\\/localhost:4444\"]", "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":true,\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]"]
+   *           ["[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":false,\"args\":[\"--headless\"]},\"w3c\":false},\"http:\\/\\/localhost:4444\"]", "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":false,\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]"]
+   *           ["[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"args\":[\"--headless\"],\"w3c\":false},\"w3c\":false},\"http:\\/\\/localhost:4444\"]", "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]"]
+   *           ["[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":false},\"w3c\":false},\"http:\\/\\/localhost:4444\"]", "[\"chrome\",{\"browserName\":\"chrome\"},\"http:\\/\\/localhost:4444\"]"]
+   *           ["[\"chrome\",{\"browserName\":\"chrome\",\"w3c\":true,\"goog:chromeOptions\":{\"w3c\":true}},\"http:\\/\\/localhost:4444\"]", "[\"chrome\",{\"browserName\":\"chrome\",\"w3c\":true},\"http:\\/\\/localhost:4444\"]"]
    *
    * @covers ::getMinkDriverArgs
    */
