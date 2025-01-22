@@ -4,7 +4,7 @@ _meta:
   uuid: 7f1dd75a-0be2-4d3b-be5d-9d1a868b9267
   bundle: page
   default_langcode: en
-  depends:
+  dependencies:
     # This user does not actually exist; this lets us test that the node
     # will be assigned to user 1 during the import.
     e2b1b3fb-27ea-41ec-b70f-dbf2907fb658: user

@@ -57,7 +57,13 @@ final class Finder {
         ],
       ];
 
-      foreach ($decoded['_meta']['depends'] ?? [] as $dependency_uuid => $entity_type) {
+      // Check for whether the 'depends' or 'dependencies' key is used or exists.
+      $dependencies_key = $decoded['_meta']['depends'] ?? $decoded['_meta']['dependencies'] ?? [];
+      if (isset($decoded['_meta']['depends'])) {
+        @trigger_error('The "depends" key is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Use the "dependencies" key instead. See https://www.drupal.org/node/3494759', E_USER_DEPRECATED);
+      }
+
+      foreach ($dependencies_key as $dependency_uuid => $entity_type) {
         $graph[$dependency_uuid]['edges'][$uuid] = TRUE;
         $graph[$dependency_uuid]['uuid'] = $dependency_uuid;
       }

@@ -4,7 +4,7 @@ _meta:
   uuid: e1714f23-70c0-4493-8e92-af1901771921
   bundle: article
   default_langcode: en
-  depends:
+  dependencies:
     94503467-be7f-406c-9795-fc25baa22203: user
     550f86ad-aa11-4047-953f-636d42889f85: taxonomy_term
 default:

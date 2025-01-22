@@ -138,6 +138,8 @@ class ContentImportTest extends BrowserTestBase {
   public function testImportEntityThatAlreadyExists(Existing $existing): void {
     $this->drupalCreateUser(values: ['uuid' => '94503467-be7f-406c-9795-fc25baa22203']);
 
+    $this->expectDeprecation('The "depends" key is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Use the "dependencies" key instead. See https://www.drupal.org/node/3494759');
+
     if ($existing === Existing::Error) {
       $this->expectException(ImportException::class);
       $this->expectExceptionMessage('user 94503467-be7f-406c-9795-fc25baa22203 already exists.');
@@ -158,6 +160,7 @@ class ContentImportTest extends BrowserTestBase {
     $importer->setLogger($logger);
     $importer->importContent(new Finder($this->contentDir));
 
+    $this->expectDeprecation('The "depends" key is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Use the "dependencies" key instead. See https://www.drupal.org/node/3494759');
     $this->assertContentWasImported();
     // We should see a warning about importing a file entity associated with a
     // file that doesn't exist.
