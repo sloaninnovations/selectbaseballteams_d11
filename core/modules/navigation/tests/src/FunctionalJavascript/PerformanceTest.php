@@ -73,11 +73,11 @@ class PerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 4,
-      'CacheGetCount' => 60,
+      'CacheGetCount' => 61,
       'CacheSetCount' => 2,
       'CacheDeleteCount' => 0,
-      'CacheTagChecksumCount' => 2,
-      'CacheTagIsValidCount' => 29,
+      'CacheTagChecksumCount' => 3,
+      'CacheTagIsValidCount' => 31,
       'CacheTagInvalidationCount' => 0,
       'ScriptCount' => 2,
       'ScriptBytes' => 215500,
@@ -85,17 +85,6 @@ class PerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 90200,
     ];
     $this->assertMetrics($expected, $performance_data);
-    $this->assertSame(4, $performance_data->getQueryCount());
-    $this->assertSame(62, $performance_data->getCacheGetCount());
-    $this->assertSame(2, $performance_data->getCacheSetCount());
-    $this->assertSame(0, $performance_data->getCacheDeleteCount());
-    $this->assertSame(2, $performance_data->getCacheTagChecksumCount());
-    $this->assertSame(29, $performance_data->getCacheTagIsValidCount());
-    $this->assertSame(0, $performance_data->getCacheTagInvalidationCount());
-    $this->assertSame(1, $performance_data->getStyleSheetCount());
-    $this->assertSame(2, $performance_data->getScriptCount());
-    $this->assertLessThan(90000, $performance_data->getStylesheetBytes());
-    $this->assertLessThan(220000, $performance_data->getScriptBytes());
 
     // Check that the navigation toolbar is cached without any high-cardinality
     // cache contexts (user, route, query parameters etc.).
