@@ -210,7 +210,10 @@ system.performance:
           label: 'Aggregate CSS files'
         gzip:
           type: boolean
-          label: 'Compress CSS files'
+          label: 'Compress CSS files with gzip'
+        brotli:
+          type: boolean
+          label: 'Compress CSS files with Brotli'
     fast_404:
       type: mapping
       label: 'Fast 404 settings'
@@ -237,6 +240,9 @@ system.performance:
         gzip:
           type: boolean
           label: 'Compress JavaScript files.'
+        brotli:
+          type: boolean
+          label: 'Compress JavaScript files with Brotli'
 
 system.rss:
   type: config_object
