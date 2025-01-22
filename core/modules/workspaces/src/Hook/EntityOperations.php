@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\workspaces\Hook;
 
-use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
