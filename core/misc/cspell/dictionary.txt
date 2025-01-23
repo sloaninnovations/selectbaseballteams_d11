@@ -456,6 +456,7 @@ splitbuttons
 squaresmall
 squiz
 squizlabs
+srclang
 srcset
 ssess
 starterkit

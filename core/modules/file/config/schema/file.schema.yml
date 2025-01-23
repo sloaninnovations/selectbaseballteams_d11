@@ -146,6 +146,12 @@ field.formatter.settings.file_video:
       constraints:
         Range:
           min: 1
+    poster:
+      type: string
+      label: 'Poster'
+    poster_image_style:
+      type: string
+      label: 'Poster image style'
 
 field.formatter.settings.file_default:
   type: mapping
