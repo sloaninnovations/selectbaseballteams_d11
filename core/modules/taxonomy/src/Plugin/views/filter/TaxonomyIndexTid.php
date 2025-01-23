@@ -189,10 +189,11 @@ class TaxonomyIndexTid extends ManyToOne {
 
     if ($this->options['type'] == 'textfield') {
       $terms = $this->value ? Term::loadMultiple(($this->value)) : [];
+      $show_id = !empty($this->options['show_id']);
       $form['value'] = [
         '#title' => $this->options['limit'] ? $this->t('Select terms from vocabulary @voc', ['@voc' => $vocabulary->label()]) : $this->t('Select terms'),
         '#type' => 'textfield',
-        '#default_value' => EntityAutocomplete::getEntityLabels($terms),
+        '#default_value' => EntityAutocomplete::getEntityLabels($terms, $show_id),
       ];
 
       if ($this->options['limit']) {
@@ -201,6 +202,9 @@ class TaxonomyIndexTid extends ManyToOne {
         $form['value']['#selection_settings']['target_bundles'] = [$vocabulary->id()];
         $form['value']['#tags'] = TRUE;
         $form['value']['#process_default_value'] = FALSE;
+        if (!$show_id) {
+          $form['value']['#attributes']['data-drupal-autocomplete-hide-ids'] = '';
+        }
       }
     }
     else {

@@ -115,7 +115,7 @@ class EntityAutocomplete extends Textfield {
 
         // Extract the labels from the passed-in entity objects, taking access
         // checks into account.
-        return static::getEntityLabels($element['#default_value']);
+        return static::getEntityLabels($element['#default_value'], $element['#show_id'] ?? TRUE);
       }
     }
 
@@ -365,15 +365,18 @@ class EntityAutocomplete extends Textfield {
    *
    * @param \Drupal\Core\Entity\EntityInterface[] $entities
    *   An array of entity objects.
+   * @param bool $show_id
+   *   If the label should show the entity id.
    *
    * @return string
    *   A string of entity labels separated by commas.
    */
-  public static function getEntityLabels(array $entities) {
+  public static function getEntityLabels(array $entities, $show_id = TRUE) {
     /** @var \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository */
     $entity_repository = \Drupal::service('entity.repository');
 
     $entity_labels = [];
+    $entity_ids = [];
     foreach ($entities as $entity) {
       // Set the entity in the correct language for display.
       $entity = $entity_repository->getTranslationFromContext($entity);
@@ -383,12 +386,22 @@ class EntityAutocomplete extends Textfield {
       $label = ($entity->access('view label')) ? $entity->label() : t('- Restricted access -');
 
       // Take into account "autocreated" entities.
-      if (!$entity->isNew()) {
+      if (!$entity->isNew() && $show_id) {
         $label .= ' (' . $entity->id() . ')';
       }
 
       // Labels containing commas or quotes must be wrapped in quotes.
       $entity_labels[] = Tags::encode($label);
+      $entity_ids[] = ($entity->access('view label')) ? $entity->id() : -1;
+    }
+
+    $duplicates = array_diff_assoc($entity_labels, array_unique($entity_labels));
+    if (!$show_id && count($duplicates) > 0) {
+      foreach ($entity_labels as $key => $value) {
+        if (in_array($value, $duplicates) && $entity_ids[$key] > 0) {
+          $entity_labels[$key] .= ' (' . $entity_ids[$key] . ')';
+        }
+      }
     }
 
     return implode(', ', $entity_labels);
