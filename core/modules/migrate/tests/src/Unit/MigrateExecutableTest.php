@@ -391,6 +391,8 @@ class MigrateExecutableTest extends MigrateTestCase {
       'test' => 'test destination',
       'test1' => 'test1 destination',
       'test2' => NULL,
+      'test3' => NULL,
+      'test4' => NULL,
     ];
     $row = new Row();
     $plugins = [];
@@ -409,7 +411,21 @@ class MigrateExecutableTest extends MigrateTestCase {
       $this->assertSame($value, $row->getDestinationProperty($key));
     }
     $this->assertCount(2, $row->getDestination());
-    $this->assertSame(['test2'], $row->getEmptyDestinationProperties());
+    $this->assertSame(['test2', 'test3', 'test4'], array_values($row->getEmptyDestinationProperties()));
+
+    // Setting the destination property should remove it from the empty
+    // destination.
+    $row->setDestinationProperty('test2', 'test2 value');
+    $this->assertSame(['test3', 'test4'], array_values($row->getEmptyDestinationProperties()));
+    // Ensures that setting an empty value does not remove it from the empty
+    // destinations properties.
+    $row->setDestinationProperty('test3', NULL);
+    $this->assertSame(['test3', 'test4'], array_values($row->getEmptyDestinationProperties()));
+    // Ensures that a destination property can be removed.
+    $row->unsetEmptyDestinationProperty('test3');
+    $this->assertSame(['test4'], array_values($row->getEmptyDestinationProperties()));
+    $row->unsetEmptyDestinationProperty('test4');
+    $this->assertSame([], $row->getEmptyDestinationProperties());
   }
 
   /**

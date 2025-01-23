@@ -232,6 +232,9 @@ class Row {
    */
   public function setDestinationProperty($property, $value) {
     $this->rawDestination[$property] = $value;
+    if ($value !== NULL) {
+      $this->unsetEmptyDestinationProperty($property);
+    }
     NestedArray::setValue($this->destination, explode(static::PROPERTY_SEPARATOR, $property), $value, TRUE);
   }
 
@@ -253,7 +256,17 @@ class Row {
    *   The destination property.
    */
   public function setEmptyDestinationProperty($property) {
-    $this->emptyDestinationProperties[] = $property;
+    $this->emptyDestinationProperties[$property] = $property;
+  }
+
+  /**
+   * Unsets a destination from being empty.
+   *
+   * @param string $property
+   *   The destination property.
+   */
+  public function unsetEmptyDestinationProperty($property): void {
+    unset($this->emptyDestinationProperties[$property]);
   }
 
   /**
