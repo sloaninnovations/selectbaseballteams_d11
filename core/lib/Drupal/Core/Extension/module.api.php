@@ -68,7 +68,7 @@ use Drupal\Core\Utility\UpdateException;
  * This hook has intentionally not been deprecated since removing
  * implementations will break modules with code in $module.$group.inc files.
  *
- * $module.$group.inc themselves have been deprecated so modules supporting
+ * $module.$group.inc themselves have been deprecated, so modules supporting
  * drupal 12.0.0 will have removed all code from $module.$group.inc files.
  *
  * Once a module requires 12.0.0 as a minimum version of Drupal the module can
