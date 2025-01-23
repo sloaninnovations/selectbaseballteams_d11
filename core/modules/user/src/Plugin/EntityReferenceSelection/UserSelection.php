@@ -92,7 +92,7 @@ class UserSelection extends DefaultSelection {
     return [
       'filter' => [
         'type' => '_none',
-        'role' => NULL,
+        'role' => [],
       ],
       'include_anonymous' => TRUE,
     ] + parent::defaultConfiguration();
