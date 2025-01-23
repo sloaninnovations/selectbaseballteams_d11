@@ -15,7 +15,9 @@ class ImageRequirements {
 
   use StringTranslationTrait;
 
-  public function __construct(protected readonly ImageToolkitManager $imageToolkitManager) {}
+  public function __construct(
+    protected readonly ImageToolkitManager $imageToolkitManager,
+  ) {}
 
   /**
    * Implements hook_runtime_requirements().
