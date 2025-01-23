@@ -592,6 +592,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->initializeRequestGlobals($request);
 
     // Put the request on the stack.
+    // It will be popped out in
+    // \Drupal\Core\EventSubscriber\StackMiddlewareSubscriber::onKernelTerminate()
     $this->container->get('request_stack')->push($request);
 
     // Set the allowed protocols.
