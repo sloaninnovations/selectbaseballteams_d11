@@ -554,12 +554,9 @@ uids
 unban
 uncacheable
 uncategorized
-undoable
-unfieldable
 ungroup
 ungroupable
 unindexed
-uninstallations
 unminified
 unmoderated
 unpromote
