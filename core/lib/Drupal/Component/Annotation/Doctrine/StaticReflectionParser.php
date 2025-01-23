@@ -189,6 +189,7 @@ class StaticReflectionParser
                 $contents = $matches[0];
             }
         }
+        $contents = preg_replace('/{((?>[^{}]++|(?R))*)}/', '', $contents);
         $tokenParser = new TokenParser($contents);
         $docComment  = '';
         $last_token  = false;
