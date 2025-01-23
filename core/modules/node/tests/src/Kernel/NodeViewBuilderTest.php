@@ -58,6 +58,7 @@ class NodeViewBuilderTest extends EntityKernelTestBase {
       'type' => 'article',
       'name' => 'Article',
     ]);
+    $type->setPreviewMode('custom_view_mode');
     $type->save();
 
     $this->installSchema('node', 'node_access');
@@ -98,6 +99,42 @@ class NodeViewBuilderTest extends EntityKernelTestBase {
     $build = $this->viewBuilder->view($pending_revision, 'teaser');
     $output = (string) $this->renderer->renderInIsolation($build);
     $this->assertStringContainsString("title=\"$draft_title\"", $output);
+  }
+
+  /**
+   * Tests that node links are displayed correctly in view modes.
+   */
+  public function testBuildLinks() {
+    $account = User::create([
+      'name' => $this->randomString(),
+    ]);
+    $account->save();
+
+    $title = $this->randomMachineName();
+    $node = Node::create([
+      'type' => 'article',
+      'title' => $title,
+      'uid' => $account->id(),
+    ]);
+    $node->save();
+
+    // Read more links are displayed in teaser and custom view modes.
+    $build = $this->viewBuilder->view($node, 'teaser');
+    $output = (string) $this->renderer->renderPlain($build);
+    $this->assertStringContainsString("title=\"$title\"", $output);
+
+    $build = $this->viewBuilder->view($node, 'custom_view_mode');
+    $output = (string) $this->renderer->renderPlain($build);
+    $this->assertStringContainsString("title=\"$title\"", $output);
+
+    // Read more links are not displayed in default and full view modes.
+    $build = $this->viewBuilder->view($node, 'default');
+    $output = (string) $this->renderer->renderPlain($build);
+    $this->assertStringNotContainsString("title=\"$title\"", $output);
+
+    $build = $this->viewBuilder->view($node, 'full');
+    $output = (string) $this->renderer->renderPlain($build);
+    $this->assertStringNotContainsString("title=\"$title\"", $output);
   }
 
 }
