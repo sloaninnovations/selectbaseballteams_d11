@@ -8,11 +8,13 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
- * Requirements for the update_script_test module.
+ * Requirements for the Update Script Test module.
  */
 class UpdateScriptTestRequirements {
 
-  public function __construct(protected readonly ConfigFactoryInterface $configFactory) {}
+  public function __construct(
+    protected readonly ConfigFactoryInterface $configFactory,
+  ) {}
 
   /**
    * Implements hook_update_requirements().

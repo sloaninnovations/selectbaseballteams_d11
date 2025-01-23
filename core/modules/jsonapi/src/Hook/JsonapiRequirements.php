@@ -11,7 +11,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 
 /**
- * Requirements for the jsonapi module.
+ * Requirements for the JSON:API module.
  */
 class JsonapiRequirements {
 
@@ -43,7 +43,7 @@ class JsonapiRequirements {
         'value' => $this->t('Limited'),
         'severity' => REQUIREMENT_INFO,
         'description' => $this->t('Some multilingual features currently do not work well with JSON:API. See the <a href=":jsonapi-docs">JSON:API multilingual support documentation</a> for more information on the current status of multilingual support.', [
-          ':jsonapi-docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/translations',
+          ':jsonapi-docs' => 'https://www.drupal.org/docs/core-modules-and-themes/core-modules/jsonapi-module/translations',
         ]),
       ];
     }
@@ -52,7 +52,7 @@ class JsonapiRequirements {
       'value' => $this->t('Limited'),
       'severity' => REQUIREMENT_INFO,
       'description' => $this->t('Revision support is currently read-only and only for the "Content" and "Media" entity types in JSON:API. See the <a href=":jsonapi-docs">JSON:API revision support documentation</a> for more information on the current status of revision support.', [
-        ':jsonapi-docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/revisions',
+        ':jsonapi-docs' => 'https://www.drupal.org/docs/core-modules-and-themes/core-modules/jsonapi-module/revisions',
       ]),
     ];
     $requirements['jsonapi_read_only_mode'] = [
@@ -63,7 +63,7 @@ class JsonapiRequirements {
     if (!$this->configFactory->get('jsonapi.settings')->get('read_only')) {
       $requirements['jsonapi_read_only_mode']['value'] = $this->t('All (create, read, update, delete)');
       $requirements['jsonapi_read_only_mode']['description'] = $this->t('It is recommended to <a href=":configure-url">configure</a> JSON:API to only accept all operations if the site requires it. <a href=":docs">Learn more about securing your site with JSON:API.</a>', [
-        ':docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/security-considerations',
+        ':docs' => 'https://www.drupal.org/docs/core-modules-and-themes/core-modules/jsonapi-module/security-considerations',
         ':configure-url' => Url::fromRoute('jsonapi.settings')->toString(),
       ]);
     }

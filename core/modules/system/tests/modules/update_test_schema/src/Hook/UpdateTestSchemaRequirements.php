@@ -9,7 +9,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Url;
 
 /**
- * Requirements for the update_test_schema module.
+ * Requirements for the Update Test Schema module.
  */
 class UpdateTestSchemaRequirements {
 

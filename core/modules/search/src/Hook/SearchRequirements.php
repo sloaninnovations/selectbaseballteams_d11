@@ -9,7 +9,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\search\SearchPageRepositoryInterface;
 
 /**
- * Requirements for the search module.
+ * Requirements for the Search module.
  */
 class SearchRequirements {
 

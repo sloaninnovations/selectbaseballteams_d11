@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 
 /**
- * Requirements for the locale module.
+ * Requirements for the Locale module.
  */
 class LocaleRequirements {
 

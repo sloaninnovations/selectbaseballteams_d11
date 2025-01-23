@@ -12,7 +12,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 
 /**
- * Requirements for the node module.
+ * Requirements for the Node module.
  */
 class NodeRequirements {
 
@@ -35,7 +35,7 @@ class NodeRequirements {
     // implement hook_node_grants().
     $grant_count = $this->entityTypeManager->getAccessControlHandler('node')->countGrants();
     if ($grant_count != 1 || $this->moduleHandler->hasImplementations('node_grants')) {
-      $value = $this->translation->formatPlural($grant_count, 'One permission in use', '@count permissions in use', ['@count' => $grant_count]);
+      $value = $this->translation->formatPlural($grant_count, '@count permission in use', '@count permissions in use', ['@count' => $grant_count]);
     }
     else {
       $value = $this->t('Disabled');

@@ -10,7 +10,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
- * Requirements for the user module.
+ * Requirements for the User module.
  */
 class UserRequirements {
 

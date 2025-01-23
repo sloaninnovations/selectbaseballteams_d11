@@ -9,13 +9,15 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
- * Requirements for the demo_umami module.
+ * Requirements for the Demo: Umami Food Magazine (Experimental) profile.
  */
 class DemoUmamiRequirements {
 
   use StringTranslationTrait;
 
-  public function __construct(protected readonly ProfileExtensionList $profileExtensionList) {}
+  public function __construct(
+    protected readonly ProfileExtensionList $profileExtensionList,
+  ) {}
 
   /**
    * Implements hook_runtime_requirements().

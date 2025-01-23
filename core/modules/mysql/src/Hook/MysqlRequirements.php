@@ -10,7 +10,7 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
- * Requirements for the mysql module.
+ * Requirements for the MySQL module.
  */
 class MysqlRequirements {
 
