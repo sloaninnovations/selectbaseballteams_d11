@@ -264,6 +264,7 @@ final class NavigationRenderer {
       return $this->localTasks;
     }
     $entity_local_tasks = $this->localTaskManager->getLocalTasks($this->routeMatch->getRouteName());
+    uasort($entity_local_tasks['tabs'], [SortArray::class, 'sortByWeightProperty']);
     foreach ($entity_local_tasks['tabs'] as $local_task_name => $local_task) {
       // Exclude current route local task, since it is not going to be included
       // in the page actions link list.
