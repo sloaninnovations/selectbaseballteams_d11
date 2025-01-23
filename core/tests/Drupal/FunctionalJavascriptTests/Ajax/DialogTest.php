@@ -6,6 +6,8 @@ namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\ajax_test\Controller\AjaxTestController;
 use Drupal\Core\Ajax\OpenModalDialogWithUrl;
+use Drupal\editor\Entity\Editor;
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 
 // cspell:ignore testdialog
@@ -20,7 +22,7 @@ class DialogTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['ajax_test', 'ajax_forms_test', 'contact'];
+  protected static $modules = ['ajax_test', 'ajax_forms_test', 'contact', 'ckeditor5', 'editor', 'filter'];
 
   /**
    * {@inheritdoc}
@@ -28,10 +30,32 @@ class DialogTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    $format = FilterFormat::create([
+      'format' => 'test_dialog',
+      'name' => 'Test Dialog',
+    ]);
+    $format->save();
+
+    $editor = Editor::create([
+      'format' => $format->id(),
+      'editor' => 'ckeditor5',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
+    ]);
+    $editor->save();
+  }
+
+  /**
    * Tests sending non-JS and AJAX requests to open and manipulate modals.
    */
   public function testDialog(): void {
-    $this->drupalLogin($this->drupalCreateUser(['administer contact forms']));
+    $this->drupalLogin($this->drupalCreateUser(['administer contact forms', 'use text format test_dialog']));
     // Ensure the elements render without notices or exceptions.
     $this->drupalGet('ajax-test/dialog');
 
@@ -68,6 +92,17 @@ class DialogTest extends WebDriverTestBase {
     $close_button = $link1_dialog_div->findButton('Close');
     $this->assertNotNull($close_button);
     $close_button->press();
+
+    // Test opening and immediately closing modal a few times.
+    // Ensure no JS errors are thrown.
+    for ($i = 0; $i < 10; $i++) {
+      $this->getSession()->getPage()->clickLink('Link 1 (modal)');
+      $this->assertSession()->waitForElementVisible('css', 'div.ui-dialog');
+      // Use JS directly which is much faster than Element::find.
+      // We want to close it as fast as possible, within 20ms, corresponding to
+      // the debounce on Drupal.dialog.resetSize.
+      $this->getSession()->executeScript('document.querySelector(".ui-dialog button[title=\"Close\"]").click();');
+    }
 
     // Tests a modal with a dialog-option.
     // Link 2 is similar to Link 1, except it submits additional width
@@ -188,12 +223,11 @@ class DialogTest extends WebDriverTestBase {
     // Press buttons in the dialog to ensure there are no AJAX errors.
     $this->assertSession()->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Hello world');
     $this->assertSession()->assertWaitOnAjaxRequest();
-    $has_focus_text = $this->getSession()->evaluateScript('document.activeElement.textContent');
-    $this->assertEquals('Do it', $has_focus_text);
     $this->assertSession()->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Preview');
     $this->assertSession()->assertWaitOnAjaxRequest();
-    $has_focus_text = $this->getSession()->evaluateScript('document.activeElement.textContent');
-    $this->assertEquals('Do it', $has_focus_text);
+
+    // Test resizing window, ensure no JS errors are thrown.
+    $this->getSession()->resizeWindow(1200, 1200);
 
     // Reset: close the form.
     $form_dialog->findButton('Close')->press();

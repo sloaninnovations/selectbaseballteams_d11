@@ -35,6 +35,11 @@ class AjaxTestForm extends FormBase {
       '#markup' => '<p>' . $this->t("Ajax Form contents description.") . '</p>',
     ];
 
+    $form['ck_element'] = [
+      '#type' => 'text_format',
+      '#format' => 'test_dialog',
+    ];
+
     $form['actions'] = [
       '#type' => 'actions',
     ];
