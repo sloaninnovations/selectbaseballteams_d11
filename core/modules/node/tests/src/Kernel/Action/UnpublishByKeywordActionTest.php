@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\action\Kernel;
+namespace Drupal\Tests\node\Kernel\Action;
 
 use Drupal\Core\Render\RenderContext;
 use Drupal\KernelTests\KernelTestBase;
@@ -11,14 +11,14 @@ use Drupal\node\Entity\NodeType;
 use Drupal\system\Entity\Action;
 
 /**
- * @group action
+ * @group node
  */
 class UnpublishByKeywordActionTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['action', 'node', 'system', 'user', 'field'];
+  protected static $modules = ['node', 'system', 'user', 'field'];
 
   /**
    * {@inheritdoc}
