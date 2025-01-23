@@ -79,7 +79,11 @@
 
 @media screen and (min-width: 60em) {
   td.module-list__module {
-    width: 25%;
+    width: 20%;
+  }
+  td.module-list__version {
+    width: 5%;
+    white-space: nowrap;
   }
 }
 

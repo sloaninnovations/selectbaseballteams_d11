@@ -207,6 +207,15 @@ class ModulesListForm extends FormBase {
 
     // Add a wrapper around every package.
     foreach (Element::children($form['modules']) as $package) {
+      // Ensure that the Core packages comes first.
+      $checkVars = ['Core', 'Core (Experimental)', 'Field types', 'Migration', 'Multilingual', 'Web services', 'Core - Migration'];
+      if (in_array($package, $checkVars)) {
+        // A core module is found.
+        $weight = -10;
+      }
+      else {
+        $weight = NULL;
+      }
       $form['modules'][$package] += [
         '#type' => 'details',
         // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
@@ -214,8 +223,7 @@ class ModulesListForm extends FormBase {
         '#open' => TRUE,
         '#theme' => 'system_modules_details',
         '#attributes' => ['class' => ['package-listing']],
-        // Ensure that the "Core" package comes first.
-        '#weight' => $package == 'Core' ? -10 : NULL,
+        '#weight' => $weight,
       ];
     }
 

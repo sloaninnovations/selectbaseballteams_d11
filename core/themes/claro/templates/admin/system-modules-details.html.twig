@@ -29,6 +29,7 @@
     <tr>
       <th class="checkbox visually-hidden">{{ 'Installed'|t }}</th>
       <th class="name visually-hidden">{{ 'Name'|t }}</th>
+      <th class="version visually-hidden">{{ 'Version'|t }}</th>
       <th class="description visually-hidden priority-low">{{ 'Description'|t }}</th>
     </tr>
   </thead>
@@ -40,6 +41,11 @@
         </td>
         <td class="module-list__module">
           <label id="{{ module.id }}" for="{{ module.enable_id }}" class="module-list__module-name table-filter-text-source">{{ module.name }}</label>
+        </td>
+        <td class="module-list__version">
+        {% if module.version %}
+          {{ '@module-version'|t({'@module-version': module.version }) }}
+        {% endif %}
         </td>
         <td class="expand priority-low module-list__description">
           <details class="js-form-wrapper form-wrapper module-list__module-details claro-details" id="{{ module.enable_id }}-description">
