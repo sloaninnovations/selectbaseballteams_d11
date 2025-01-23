@@ -89,6 +89,19 @@ namespace Drupal\Core\Hook\Attribute;
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Hook {
+  /**
+   * The hook prefix such as `form`.
+   *
+   * @var string
+   */
+  public const string PREFIX = '';
+
+  /**
+   * The hook suffix such as `alter`.
+   *
+   * @var string
+   */
+  public const string SUFFIX = '';
 
   /**
    * Constructs a Hook attribute object.
@@ -109,7 +122,9 @@ class Hook {
     public string $hook,
     public string $method = '',
     public ?string $module = NULL,
-  ) {}
+  ) {
+    $this->hook = implode('_', array_filter([static::PREFIX, $hook, static::SUFFIX]));
+  }
 
   /**
    * Set the method the hook should apply to.
