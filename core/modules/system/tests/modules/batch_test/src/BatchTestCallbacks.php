@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\batch_test;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -12,6 +13,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  * Batch callbacks for testing batches.
  */
 class BatchTestCallbacks {
+  use StringTranslationTrait;
 
   /**
    * Implements callback_batch_operation().
@@ -191,7 +193,7 @@ class BatchTestCallbacks {
     if (!$success) {
       // A fatal error occurred during the processing.
       $error_operation = reset($operations);
-      $messages[] = t('An error occurred while processing @op with arguments:<br />@args', ['@op' => $error_operation[0], '@args' => print_r($error_operation[1], TRUE)]);
+      $messages[] = $this->t('An error occurred while processing @op with arguments:<br />@args', ['@op' => $error_operation[0], '@args' => print_r($error_operation[1], TRUE)]);
     }
 
     // Use item list template to render the messages.
