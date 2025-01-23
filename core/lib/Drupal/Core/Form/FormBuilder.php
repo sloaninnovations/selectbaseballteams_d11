@@ -990,7 +990,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
     // Add the aria-describedby attribute to associate the form control with its
     // description.
-    if (!empty($element['#description'])) {
+    if (!empty($element['#description']) && !Element::isComposite($element)) {
       $element['#attributes']['aria-describedby'] = $element['#id'] . '--description';
     }
     // Handle input elements.

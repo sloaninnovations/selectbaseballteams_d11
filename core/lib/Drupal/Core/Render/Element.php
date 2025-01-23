@@ -200,6 +200,19 @@ class Element {
   }
 
   /**
+   * Determines if an element is a composite type.
+   *
+   * @param array $element
+   *   The element to check for a composite type.
+   *
+   * @return bool
+   *   TRUE if the element is a composite type, otherwise FALSE.
+   */
+  public static function isComposite(array $element) {
+    return isset($element['#type']) && in_array($element['#type'], ['radios', 'checkboxes']);
+  }
+
+  /**
    * Checks if a candidate is a render array.
    *
    * @param mixed $candidate
