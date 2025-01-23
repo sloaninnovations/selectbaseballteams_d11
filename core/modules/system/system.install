@@ -63,7 +63,7 @@ const DRUPAL_CORE_REMOVED_THEME_LIST = [
 /**
  * Implements hook_requirements().
  */
-function system_requirements($phase) {
+function system_requirements($phase): array {
   global $install_state;
 
   // Get the current default PHP requirements for this version of Drupal.
@@ -1759,4 +1759,25 @@ function system_update_11102(): TranslatableMarkup|null {
     return $equivalent_update->toSkipMessage();
   }
   return NULL;
+}
+
+/**
+ * Add the [alias] field to the {router} table.
+ */
+function system_update_11201(): void {
+  $schema = \Drupal::database()->schema();
+
+  if ($schema->tableExists('router') && !$schema->fieldExists('router', 'alias')) {
+    $spec = [
+      'fields' => [
+        'alias' => [
+          'description' => 'The alias of the route, if applicable.',
+          'type' => 'varchar_ascii',
+          'length' => 255,
+        ],
+      ],
+    ];
+    $schema->addField('router', 'alias', $spec['fields']['alias']);
+    $schema->addIndex('router', 'alias', ['alias'], $spec);
+  }
 }
