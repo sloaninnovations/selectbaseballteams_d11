@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Unit;
 
 use Drupal\Component\Utility\Html;
+use Drupal\migrate\MemoryManagerInterface;
 use Drupal\migrate\Plugin\MigrateDestinationInterface;
 use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
@@ -42,6 +43,13 @@ class MigrateExecutableTest extends MigrateTestCase {
   protected $message;
 
   /**
+   * The mocked memory manager.
+   *
+   * @var \Drupal\migrate\MemoryManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $memoryManager;
+
+  /**
    * The tested migrate executable.
    *
    * @var \Drupal\Tests\migrate\Unit\TestMigrateExecutable
@@ -73,7 +81,8 @@ class MigrateExecutableTest extends MigrateTestCase {
     $this->migration = $this->getMigration();
     $this->message = $this->createMock('Drupal\migrate\MigrateMessageInterface');
     $this->eventDispatcher = $this->createMock('Symfony\Contracts\EventDispatcher\EventDispatcherInterface');
-    $this->executable = new TestMigrateExecutable($this->migration, $this->message, $this->eventDispatcher);
+    $this->memoryManager = $this->createMock(MemoryManagerInterface::class);
+    $this->executable = new TestMigrateExecutable($this->migration, $this->message, $this->eventDispatcher, $this->memoryManager);
     $this->executable->setStringTranslation($this->getStringTranslationStub());
   }
 
@@ -122,6 +131,9 @@ class MigrateExecutableTest extends MigrateTestCase {
       ->method('getDestinationPlugin')
       ->willReturn($destination);
 
+    $this->memoryManager->method('ensureMemory')
+      ->willReturn(TRUE);
+
     $this->assertSame(MigrationInterface::RESULT_COMPLETED, $this->executable->import());
   }
 
@@ -145,6 +157,9 @@ class MigrateExecutableTest extends MigrateTestCase {
 
     $this->idMap->expects($this->never())
       ->method('saveIdMapping');
+
+    $this->memoryManager->method('ensureMemory')
+      ->willReturn(TRUE);
 
     $this->assertSame(MigrationInterface::RESULT_COMPLETED, $this->executable->import());
   }
@@ -189,6 +204,9 @@ class MigrateExecutableTest extends MigrateTestCase {
     $this->migration
       ->method('getDestinationPlugin')
       ->willReturn($destination);
+
+    $this->memoryManager->method('ensureMemory')
+      ->willReturn(TRUE);
 
     $this->assertSame(MigrationInterface::RESULT_COMPLETED, $this->executable->import());
   }
@@ -238,6 +256,9 @@ class MigrateExecutableTest extends MigrateTestCase {
     $this->idMap->expects($this->never())
       ->method('lookupDestinationIds');
 
+    $this->memoryManager->method('ensureMemory')
+      ->willReturn(TRUE);
+
     $this->assertSame(MigrationInterface::RESULT_COMPLETED, $this->executable->import());
   }
 
@@ -258,6 +279,9 @@ class MigrateExecutableTest extends MigrateTestCase {
     $this->migration
       ->method('getDestinationPlugin')
       ->willReturn($destination);
+
+    $this->memoryManager->method('ensureMemory')
+      ->willReturn(TRUE);
 
     $this->assertSame(MigrationInterface::RESULT_COMPLETED, $this->executable->import());
   }
@@ -468,7 +492,10 @@ class MigrateExecutableTest extends MigrateTestCase {
       ->method('getDestinationPlugin')
       ->willReturn($destination->reveal());
 
-    $executable = new TestMigrateExecutable($migration, $this->message, $this->eventDispatcher);
+    $this->memoryManager
+      ->method('ensureMemory')
+      ->willReturn(TRUE);
+    $executable = new TestMigrateExecutable($migration, $this->message, $this->eventDispatcher, $this->memoryManager);
 
     $this->assertEquals($expected_result, $executable->rollback());
   }

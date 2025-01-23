@@ -28172,24 +28172,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate/tests/src/Unit/TestMigrateExecutable.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Unit\\\\TestMigrateExecutable\\:\\:setMemoryLimit\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/tests/src/Unit/TestMigrateExecutable.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Unit\\\\TestMigrateExecutable\\:\\:setMemoryThreshold\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/tests/src/Unit/TestMigrateExecutable.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Unit\\\\TestMigrateExecutable\\:\\:setMemoryUsage\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/tests/src/Unit/TestMigrateExecutable.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\migrate\\\\Unit\\\\TestMigrateExecutable\\:\\:setSource\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

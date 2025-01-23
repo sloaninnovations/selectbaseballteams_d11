@@ -183,4 +183,19 @@ final class MigrateEvents {
    */
   const IDMAP_MESSAGE = 'migrate.idmap_message';
 
+  /**
+   * Name of the event fired when the memory limit is reached.
+   *
+   * This event allows modules to perform an action when the limit is reached.
+   * The event listener method receives a
+   * \Drupal\migrate\Event\MigrateMemoryLimitEvent.
+   *
+   * @Event
+   *
+   * @see \Drupal\migrate\Event\MigrateMemoryLimitEvent
+   *
+   * @var string
+   */
+  const MEMORY_LIMIT = 'migration.memory_limit';
+
 }
