@@ -368,6 +368,8 @@ function template_preprocess_form(&$variables): void {
   if (empty($element['#attributes']['accept-charset'])) {
     $element['#attributes']['accept-charset'] = "UTF-8";
   }
+  // Disable client-side html5 validation, since it is not fully accessible.
+  $element['#attributes']['novalidate'] = TRUE;
   $variables['attributes'] = $element['#attributes'];
   $variables['children'] = $element['#children'];
 }
