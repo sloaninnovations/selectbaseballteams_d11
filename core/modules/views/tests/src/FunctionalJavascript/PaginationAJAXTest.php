@@ -82,7 +82,8 @@ class PaginationAJAXTest extends WebDriverTestBase {
 
     // Make sure that the view_path is set correctly.
     $expected_view_path = '/test-content-ajax';
-    $this->assertEquals($expected_view_path, current($settings['views']['ajaxViews'])['view_path']);
+    $currentAjaxView = current($settings['views']['ajaxViews']);
+    $this->assertEquals($expected_view_path, $currentAjaxView['view_path']);
 
     // Set the number of items displayed per page to 5 using the exposed pager.
     $page->selectFieldOption('edit-items-per-page', '5');
@@ -110,7 +111,7 @@ class PaginationAJAXTest extends WebDriverTestBase {
     $this->assertNoDuplicateAssetsOnPage();
 
     // Test that no unwanted parameters are added to the URL.
-    $this->assertEquals('?status=All&type=All&title=&items_per_page=5&order=changed&sort=asc&page=2', $link->getAttribute('href'));
+    $this->assertEquals('?selector=' . $currentAjaxView['selector'] . '&status=All&type=All&title=&items_per_page=5&order=changed&sort=asc&page=2', $link->getAttribute('href'));
 
     $this->clickLink('Go to page 3');
     $session_assert->assertWaitOnAjaxRequest();
