@@ -1,0 +1,6 @@
+services:
+  menu_link_content_invalidation_tracker.cache_invalidator_logger:
+    class: Drupal\menu_link_content_invalidation_tracker\EventSubscriber\CacheInvalidationLogger
+    arguments: ['@menu_link_content_invalidation_tracker.cache_invalidator_logger.inner']
+    decorates: cache_tags.invalidator
+    decoration_priority: 10

@@ -230,9 +230,26 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    */
   public function save(array $link) {
     $affected_menus = $this->doSave($link);
-    $this->resetDefinitions();
-    $cache_tags = Cache::buildTags('config:system.menu', $affected_menus, '.');
-    $this->cacheTagsInvalidator->invalidateTags($cache_tags);
+    // If a menu changed, reset the definitions.
+    foreach ($affected_menus as $affected_menu) {
+      if (isset($affected_menu['changed'])) {
+        $this->resetDefinitions();
+      }
+    }
+    // Invalidate any menus with changed items.
+    $cache_tags = [];
+    foreach ($affected_menus as $affected_menu => $values) {
+      if (isset($values['changed'])) {
+        $cache_tags = [
+          ...$cache_tags,
+          ...Cache::buildTags('config:system.menu', [$affected_menu], '.'),
+        ];
+      }
+    }
+    if (!empty($cache_tags)) {
+      $this->cacheTagsInvalidator->invalidateTags($cache_tags);
+    }
+
     return $affected_menus;
   }
 
@@ -245,8 +262,10 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *
    * @return array
    *   The menu names affected by the save operation. This will be one menu
-   *   name if the link is saved to the sane menu, or two if it is saved to a
-   *   new menu.
+   *   name if the link is saved to the same menu, or two if it is saved to a
+   *   new menu. If there are no changes, then the menu name will also be the
+   *   value of the menu name key. If there are changes, the changed link
+   *   will be the value of the menu name key.
    *
    * @throws \Exception
    *   Thrown if the storage back-end does not exist and could not be created.
@@ -282,6 +301,8 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       if (array_diff_assoc($fields, $original) == [] && array_diff_assoc($original, $fields) == ['mlid' => $link['mlid']]) {
         return $affected_menus;
       }
+      // Add the link that was changed to the original menu.
+      $affected_menus[$original['menu_name']] = ['changed' => $link];
     }
 
     try {
@@ -294,7 +315,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
         $fields = $this->preSave($link, []);
       }
       // We may be moving the link to a new menu.
-      $affected_menus[$fields['menu_name']] = $fields['menu_name'];
+      $affected_menus[$fields['menu_name']] = ['changed' => $link];
       $query = $this->connection->update($this->table, $this->options);
       $query->condition('mlid', $link['mlid']);
       $query->fields($fields)
