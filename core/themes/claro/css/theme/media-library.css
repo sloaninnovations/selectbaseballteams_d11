@@ -759,7 +759,7 @@
 .media-library-item__remove.button:hover,
 .media-library-item__remove.button:focus {
   position: absolute;
-  z-index: 1;
+  z-index: 10;
   top: 0.625rem;
   overflow: hidden;
   width: 1.5rem;
