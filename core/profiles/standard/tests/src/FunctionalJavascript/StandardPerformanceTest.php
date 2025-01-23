@@ -133,11 +133,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'config' => 37,
         'data' => 8,
         'access_policy' => 1,
-        'bootstrap' => 7,
+        'bootstrap' => 8,
         'dynamic_page_cache' => 2,
         'discovery' => 38,
-        'default' => 6,
         'render' => 35,
+        'default' => 5,
         'entity' => 2,
         'menu' => 2,
       ],
@@ -183,7 +183,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
     ];
     $this->assertMetrics($expected, $performance_data);
     $expected_default_cache_cids = [
-      'core.extension.list.theme',
       'views_data:node_field_data:en',
       'views_data:en',
       'views_data:views:en',
