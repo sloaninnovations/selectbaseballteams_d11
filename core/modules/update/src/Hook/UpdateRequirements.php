@@ -101,7 +101,7 @@ class UpdateRequirements {
    * @see update_requirements()
    * @see update_calculate_project_data()
    */
-  public function requirementCheck($project, $type): array {
+  protected function requirementCheck($project, $type): array {
     $requirement = [];
     if ($type == 'core') {
       $requirement['title'] = $this->t('Drupal core update status');
