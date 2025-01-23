@@ -5,6 +5,7 @@ namespace Drupal\Core\DependencyInjection;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 /**
  * Defines a trait for automatically wiring dependencies from the container.
@@ -33,11 +34,21 @@ trait AutowireTrait {
           $service = (string) $attribute->newInstance()->value;
         }
 
-        if (!$container->has($service)) {
-          throw new AutowiringFailedException($service, sprintf('Cannot autowire service "%s": argument "$%s" of method "%s::_construct()", you should configure its value explicitly.', $service, $parameter->getName(), static::class));
+        if (str_starts_with($service, '%') && str_ends_with($service, '%')) {
+          try {
+            $args[] = $container->getParameter(substr($service, 1, -1));
+          }
+          catch (ParameterNotFoundException $e) {
+            throw new AutowiringFailedException($service, $e->getMessage(), 0, $e);
+          }
         }
+        else {
+          if (!$container->has($service)) {
+            throw new AutowiringFailedException($service, sprintf('Cannot autowire service "%s": argument "$%s" of method "%s::_construct()", you should configure its value explicitly.', $service, $parameter->getName(), static::class));
+          }
 
-        $args[] = $container->get($service);
+          $args[] = $container->get($service);
+        }
       }
     }
 
