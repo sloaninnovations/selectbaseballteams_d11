@@ -73,7 +73,7 @@ variables:
   CI_PARALLEL_NODE_TOTAL: $CI_NODE_TOTAL
 
 .with-database: &with-database
-  name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:dev
+  name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:production
   alias: database
 
 .with-chrome: &with-chrome
