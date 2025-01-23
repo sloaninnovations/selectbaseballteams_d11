@@ -88,7 +88,11 @@ class File extends DrupalSqlBase {
    */
   protected function initializeIterator() {
     $this->publicPath = $this->variableGet('file_public_path', 'sites/default/files');
-    $this->privatePath = $this->variableGet('file_private_path', NULL);
+    // @todo: FIX https://www.drupal.org/project/drupal/issues/3123350
+    // This is a quickfix!!
+    // Never prepend the old file_private path as it makes private file migrations hard / impossible!
+    $this->privatePath = NULL;
+    // Before: $this->privatePath = $this->variableGet('file_private_path', NULL);
     return parent::initializeIterator();
   }
 
