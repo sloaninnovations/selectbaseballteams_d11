@@ -45,7 +45,7 @@ class ConfigImporterEvent extends Event {
    * @return array
    *   An array of config changes that are yet to be imported.
    *
-   * @see \Drupal\Core\Config\StorageComparerInterface::getChangelist()
+   * @see \Drupal\Core\Config\StorageComparer::getChangelist()
    */
   public function getChangelist($op = NULL, $collection = StorageInterface::DEFAULT_COLLECTION) {
     return $this->configImporter->getStorageComparer()->getChangelist($op, $collection);
