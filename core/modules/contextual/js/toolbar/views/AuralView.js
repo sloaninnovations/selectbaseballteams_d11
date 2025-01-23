@@ -105,7 +105,7 @@
         // is loaded.
         if (
           !this.announcedOnce &&
-          event.keyCode === 9 &&
+          event.key === 'Tab' &&
           !this.model.get('isViewing')
         ) {
           this.announceTabbingConstraint();
@@ -113,7 +113,7 @@
           this.announcedOnce = true;
         }
         // Respond to the ESC key. Exit out of edit mode.
-        if (event.keyCode === 27) {
+        if (event.key === 'Escape') {
           this.model.set('isViewing', true);
         }
       },
