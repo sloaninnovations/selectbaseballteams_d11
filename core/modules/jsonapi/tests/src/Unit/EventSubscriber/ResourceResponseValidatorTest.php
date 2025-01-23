@@ -40,6 +40,17 @@ class ResourceResponseValidatorTest extends UnitTestCase {
       $this->fail('The JSON Schema validator is missing. You can install it with `composer require justinrainbow/json-schema`.');
     }
 
+  }
+
+  /**
+   * Set up the subscriber with the given validation setting.
+   *
+   * @param bool $enable_validation
+   *   Enable response validation.
+   *
+   * @return void
+   */
+  public function setUpSubscriber(bool $enable_validation): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
     $module = $this->prophesize(Extension::class);
     $module_path = dirname(__DIR__, 4);
@@ -48,7 +59,8 @@ class ResourceResponseValidatorTest extends UnitTestCase {
     $subscriber = new ResourceResponseValidator(
       $this->prophesize(LoggerInterface::class)->reveal(),
       $module_handler->reveal(),
-      ''
+      '',
+      ['validate_schema' => $enable_validation]
     );
     $subscriber->setValidator();
     $this->subscriber = $subscriber;
@@ -58,7 +70,10 @@ class ResourceResponseValidatorTest extends UnitTestCase {
    * @covers ::validateResponse
    * @dataProvider validateResponseProvider
    */
-  public function testValidateResponse($request, $response, $expected, $description): void {
+  public function testValidateResponse($request, $response, $expected, $description, $enable_validation): void {
+
+    $this->setUpSubscriber($enable_validation);
+
     // Expose protected ResourceResponseSubscriber::validateResponse() method.
     $object = new \ReflectionObject($this->subscriber);
     $method = $object->getMethod('validateResponse');
@@ -96,6 +111,7 @@ EOD
         ,
         'expected' => TRUE,
         'description' => 'Response validation flagged a valid response.',
+        'enable_validation' => TRUE,
       ],
       // Test validation failure: no "type" in "data".
       [
@@ -113,6 +129,7 @@ EOD
         ,
         'expected' => FALSE,
         'description' => 'Response validation failed to flag an invalid response.',
+        'enable_validation' => TRUE,
       ],
       // Test validation failure: "errors" at the root level.
       [
@@ -132,28 +149,39 @@ EOD
         ,
         'expected' => FALSE,
         'description' => 'Response validation failed to flag an invalid response.',
+        'enable_validation' => TRUE,
       ],
       // Test validation of an empty response passes.
       [
         'json' => NULL,
         'expected' => TRUE,
         'description' => 'Response validation flagged a valid empty response.',
+        'enable_validation' => TRUE,
       ],
       // Test validation fails on empty object.
       [
         'json' => '{}',
         'expected' => FALSE,
         'description' => 'Response validation flags empty array as invalid.',
+        'enable_validation' => TRUE,
+      ],
+      // Test validation can be disabled.
+      [
+        'json' => '{}',
+        'expected' => TRUE,
+        'description' => 'Response validation disabled doesn\'t flags empty array as invalid.',
+        'enable_validation' => FALSE,
       ],
     ];
 
     $test_cases = array_map(function ($input) use ($defaults) {
-      [$json, $expected, $description, $route_name, $resource_type] = array_values($input + $defaults);
+      [$json, $expected, $description, $enable_validation, $route_name, $resource_type] = array_values($input + $defaults);
       return [
         static::createRequest($route_name, $resource_type),
         static::createResponse($json),
         $expected,
         $description,
+        $enable_validation,
       ];
     }, $test_data);
 

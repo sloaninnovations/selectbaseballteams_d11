@@ -58,6 +58,16 @@ class ResourceResponseValidator implements EventSubscriberInterface {
   protected $appRoot;
 
   /**
+   * Validate the schema of the response with json-schema.
+   *
+   * Validates the structure of the response if json-schema is installed
+   * and no other validator is set.
+   *
+   * @var bool
+   */
+  protected bool $validateResponseSchema = FALSE;
+
+  /**
    * Constructs a ResourceResponseValidator object.
    *
    * @param \Psr\Log\LoggerInterface $logger
@@ -66,11 +76,14 @@ class ResourceResponseValidator implements EventSubscriberInterface {
    *   The module handler.
    * @param string $app_root
    *   The application's root file path.
+   * @param array $jsonapi_config
+   *   The JSON:API configuration.
    */
-  public function __construct(LoggerInterface $logger, ModuleHandlerInterface $module_handler, $app_root) {
+  public function __construct(LoggerInterface $logger, ModuleHandlerInterface $module_handler, $app_root, array $jsonapi_config = []) {
     $this->logger = $logger;
     $this->moduleHandler = $module_handler;
     $this->appRoot = $app_root;
+    $this->validateResponseSchema = (isset($jsonapi_config['validate_schema']) && $jsonapi_config['validate_schema']);
   }
 
   /**
@@ -88,7 +101,7 @@ class ResourceResponseValidator implements EventSubscriberInterface {
     if ($validator) {
       $this->validator = $validator;
     }
-    elseif (class_exists(Validator::class)) {
+    elseif ($this->validateResponseSchema && class_exists(Validator::class)) {
       $this->validator = new Validator();
     }
   }

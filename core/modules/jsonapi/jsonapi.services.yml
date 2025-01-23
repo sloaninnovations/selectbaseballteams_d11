@@ -1,5 +1,8 @@
 parameters:
   jsonapi.base_path: /jsonapi
+  jsonapi.config:
+    # Validate generate response schema if \JsonSchema\Validator class is available.
+    validate_schema: false
 
 services:
   _defaults:
@@ -216,7 +219,7 @@ services:
     arguments: ['@jsonapi.serializer']
   jsonapi.resource_response_validator.subscriber:
     class: Drupal\jsonapi\EventSubscriber\ResourceResponseValidator
-    arguments: ['@logger.channel.jsonapi', '@module_handler', '%app.root%']
+    arguments: ['@logger.channel.jsonapi', '@module_handler', '%app.root%', '%jsonapi.config%']
     calls:
       - [setValidator, []]
   jsonapi.maintenance_mode_subscriber:
