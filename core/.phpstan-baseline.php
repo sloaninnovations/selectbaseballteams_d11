@@ -8,6 +8,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../composer/Generator/PackageGenerator.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Composer\\\\Plugin\\\\ProjectMessage\\\\Message\\:\\:getText\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/../composer/Plugin/ProjectMessage/Message.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Composer\\\\Plugin\\\\ProjectMessage\\\\MessagePlugin\\:\\:displayPostCreateMessage\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
