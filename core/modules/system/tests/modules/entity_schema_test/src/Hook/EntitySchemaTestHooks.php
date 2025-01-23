@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\entity_schema_test\Hook;
 
 use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\entity_test\FieldStorageDefinition;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -16,6 +17,8 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for entity_schema_test.
  */
 class EntitySchemaTestHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_entity_type_alter().
@@ -41,40 +44,43 @@ class EntitySchemaTestHooks {
    * Implements hook_entity_base_field_info().
    */
   #[Hook('entity_base_field_info')]
-  public function entityBaseFieldInfo(EntityTypeInterface $entity_type) {
+  public function entityBaseFieldInfo(EntityTypeInterface $entity_type): array {
     if ($entity_type->id() == 'entity_test_update') {
-      $definitions['custom_base_field'] = BaseFieldDefinition::create('string')->setName('custom_base_field')->setLabel(t('A custom base field'));
+      $definitions['custom_base_field'] = BaseFieldDefinition::create('string')->setName('custom_base_field')->setLabel($this->t('A custom base field'));
       if (\Drupal::state()->get('entity_schema_update')) {
         $definitions += EntityTestMulRev::baseFieldDefinitions($entity_type);
         // And add a revision log.
-        $definitions['revision_log'] = BaseFieldDefinition::create('string_long')->setLabel(t('Revision log message'))->setDescription(t('The log entry explaining the changes in this revision.'))->setRevisionable(TRUE);
+        $definitions['revision_log'] = BaseFieldDefinition::create('string_long')->setLabel($this->t('Revision log message'))->setDescription($this->t('The log entry explaining the changes in this revision.'))->setRevisionable(TRUE);
       }
       return $definitions;
     }
+    return [];
   }
 
   /**
    * Implements hook_entity_field_storage_info().
    */
   #[Hook('entity_field_storage_info')]
-  public function entityFieldStorageInfo(EntityTypeInterface $entity_type) {
+  public function entityFieldStorageInfo(EntityTypeInterface $entity_type): array {
     if ($entity_type->id() == 'entity_test_update') {
-      $definitions['custom_bundle_field'] = FieldStorageDefinition::create('string')->setName('custom_bundle_field')->setLabel(t('A custom bundle field'))->setRevisionable(TRUE)->setTargetEntityTypeId($entity_type->id());
+      $definitions['custom_bundle_field'] = FieldStorageDefinition::create('string')->setName('custom_bundle_field')->setLabel($this->t('A custom bundle field'))->setRevisionable(TRUE)->setTargetEntityTypeId($entity_type->id());
       return $definitions;
     }
+    return [];
   }
 
   /**
    * Implements hook_entity_bundle_field_info().
    */
   #[Hook('entity_bundle_field_info')]
-  public function entityBundleFieldInfo(EntityTypeInterface $entity_type, $bundle) {
+  public function entityBundleFieldInfo(EntityTypeInterface $entity_type, $bundle): array {
     if ($entity_type->id() == 'entity_test_update' && $bundle == 'custom') {
       /** @var \Drupal\Core\Field\FieldStorageDefinitionInterface $custom_bundle_field_storage */
       $custom_bundle_field_storage = $this->entityFieldStorageInfo($entity_type)['custom_bundle_field'];
       $definitions[$custom_bundle_field_storage->getName()] = FieldDefinition::createFromFieldStorageDefinition($custom_bundle_field_storage);
       return $definitions;
     }
+    return [];
   }
 
   /**

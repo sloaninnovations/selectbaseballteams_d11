@@ -24,6 +24,9 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class RendererTest extends RendererTestBase {
 
+  /**
+   * The expected theme variables.
+   */
   protected $defaultThemeVars = [
     '#cache' => [
       'contexts' => [
