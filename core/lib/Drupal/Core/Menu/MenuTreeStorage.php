@@ -280,7 +280,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       // - MenuTreeStorage::preSave() removes the 'mlid' from $fields.
       // - The order of the keys in $original and $fields is different.
       if (array_diff_assoc($fields, $original) == [] && array_diff_assoc($original, $fields) == ['mlid' => $link['mlid']]) {
-        return $affected_menus;
+        return [];
       }
     }
 
