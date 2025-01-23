@@ -72,7 +72,7 @@ use Drupal\Core\Utility\UpdateException;
  * drupal 12.0.0 will have removed all code from $module.$group.inc files.
  *
  * Once a module requires 12.0.0 as a minimum version of Drupal the module can
- * safely remove hook_hook_info implementations.
+ * safely remove hook_hook_info() implementations.
  *
  * @return array
  *   An associative array whose keys are hook names and whose values are an
