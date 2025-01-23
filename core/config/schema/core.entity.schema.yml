@@ -185,6 +185,9 @@ field.widget.settings.string_textfield:
     placeholder:
       type: label
       label: 'Placeholder'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field.widget.settings.string_textarea:
   type: mapping
@@ -196,6 +199,9 @@ field.widget.settings.string_textarea:
     placeholder:
       type: label
       label: 'Placeholder'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field.widget.settings.uri:
   type: mapping
@@ -218,10 +224,17 @@ field.widget.settings.email_default:
     size:
       type: integer
       label: 'Size of email field'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field.widget.settings.datetime_timestamp:
   type: mapping
   label: 'Datetime timestamp display format settings'
+  mapping:
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field.widget.settings.boolean_checkbox:
   type: mapping
@@ -242,6 +255,9 @@ field.widget.settings.number:
     placeholder:
       type: label
       label: 'Placeholder'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field.widget.settings.checkbox:
   type: mapping
@@ -275,6 +291,9 @@ field.widget.settings.entity_reference_autocomplete_tags:
     placeholder:
       type: label
       label: 'Placeholder'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field.widget.settings.entity_reference_autocomplete:
   type: mapping
@@ -292,6 +311,9 @@ field.widget.settings.entity_reference_autocomplete:
     placeholder:
       type: label
       label: 'Placeholder'
+    add_more:
+      type: boolean
+      label: 'Show add more button'
 
 field.formatter.settings.boolean:
   type: mapping
