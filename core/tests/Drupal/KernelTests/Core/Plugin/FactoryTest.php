@@ -26,6 +26,10 @@ class FactoryTest extends PluginTestBase {
     $plugin = $this->testPluginManager->createInstance('user_login', ['title' => 'Enter your login name and password']);
     $this->assertSame('Drupal\\plugin_test\\Plugin\\plugin_test\\mock_block\\MockUserLoginBlock', get_class($plugin), 'Correct plugin class instantiated with default factory.');
     $this->assertSame('Enter your login name and password', $plugin->getTitle(), 'Plugin instance correctly configured.');
+    $title = $this->randomMachineName();
+    $plugin = $this->testPluginManager->createInstance('Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserLoginBlock', ['title' => $title]);
+    $this->assertSame('Drupal\\plugin_test\\Plugin\\plugin_test\\mock_block\\MockUserLoginBlock', get_class($plugin), 'Correct plugin class instantiated with default factory.');
+    $this->assertSame($title, $plugin->getTitle(), 'Plugin instance correctly configured.');
 
     // Ensure that attempting to instantiate non-existing plugins throws a
     // PluginException.
@@ -62,7 +66,7 @@ class FactoryTest extends PluginTestBase {
     // PluginException. Test this for a non-existing base plugin, a non-existing
     // derivative plugin, and a base plugin that may not be used without
     // deriving.
-    foreach (['non_existing', 'menu:non_existing', 'menu'] as $invalid_id) {
+    foreach (['non_existing', 'menu:non_existing', 'menu', 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockMenuBlock'] as $invalid_id) {
       try {
         $this->mockBlockManager->createInstance($invalid_id);
         $this->fail('Drupal\Component\Plugin\Exception\ExceptionInterface expected');

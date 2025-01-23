@@ -58,6 +58,10 @@ abstract class PluginTestBase extends KernelTestBase {
         'label' => 'User login',
         'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserLoginBlock',
       ],
+      'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserLoginBlock' => [
+        'label' => 'User login',
+        'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserLoginBlock',
+      ],
     ];
     $this->mockBlockExpectedDefinitions = [
       'user_login' => [

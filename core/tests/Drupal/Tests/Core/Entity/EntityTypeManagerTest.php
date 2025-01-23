@@ -137,9 +137,11 @@ class EntityTypeManagerTest extends UnitTestCase {
    */
   public function testHasHandler($entity_type_id, $expected): void {
     $apple = $this->prophesize(EntityTypeInterface::class);
+    $apple->id()->willReturn('apple');
     $apple->hasHandlerClass('storage')->willReturn(TRUE);
 
     $banana = $this->prophesize(EntityTypeInterface::class);
+    $banana->id()->willReturn('banana');
     $banana->hasHandlerClass('storage')->willReturn(FALSE);
 
     $this->setUpEntityTypeDefinitions([
@@ -398,11 +400,15 @@ class EntityTypeManagerTest extends UnitTestCase {
    * @dataProvider providerTestGetDefinition
    */
   public function testGetDefinition($entity_type_id, $expected): void {
-    $entity = $this->prophesize(EntityTypeInterface::class);
+    $apple = $this->prophesize(EntityTypeInterface::class);
+    $apple->id()->willReturn('apple');
+
+    $banana = $this->prophesize(EntityTypeInterface::class);
+    $banana->id()->willReturn('banana');
 
     $this->setUpEntityTypeDefinitions([
-      'apple' => $entity,
-      'banana' => $entity,
+      'apple' => $apple,
+      'banana' => $banana,
     ]);
 
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id, FALSE);

@@ -89,7 +89,7 @@ class StaticDiscoveryDecoratorTest extends TestCase {
     // Mock a decorated object.
     $mock_decorated = $this->createMock(DiscoveryInterface::class);
     // Return our definitions from getDefinitions().
-    $mock_decorated->expects($this->once())
+    $mock_decorated->expects($this->atMost(2))
       ->method('getDefinitions')
       ->willReturn($definitions);
 

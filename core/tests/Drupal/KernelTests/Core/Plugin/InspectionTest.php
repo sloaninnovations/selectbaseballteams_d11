@@ -20,7 +20,7 @@ class InspectionTest extends PluginTestBase {
    * Ensure the test plugins correctly implement getPluginId() and getPluginDefinition().
    */
   public function testInspection(): void {
-    foreach (['user_login'] as $id) {
+    foreach (['user_login', 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserLoginBlock'] as $id) {
       $plugin = $this->testPluginManager->createInstance($id);
       $expected_definition = $this->testPluginExpectedDefinitions[$id];
       $this->assertSame($id, $plugin->getPluginId());
