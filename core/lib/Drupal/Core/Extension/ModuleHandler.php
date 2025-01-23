@@ -340,6 +340,8 @@ class ModuleHandler implements ModuleHandlerInterface {
     $this->load($module);
     $function = $module . '_' . $hook;
     if (function_exists($function) && !(new \ReflectionFunction($function))->getAttributes(LegacyHook::class)) {
+      $this->deprecatedProcedural($hook, $module, $function);
+
       return $function(... $args);
     }
 
@@ -573,6 +575,44 @@ class ModuleHandler implements ModuleHandlerInterface {
       }
     }
     return $this->invokeMap[$hook] ?? [];
+  }
+
+  /**
+   * Detect deprecated procedural implementations.
+   *
+   * @param $hook
+   *   The hook being called.
+   * @param $module
+   *   The module implementing the hook.
+   * @param $function
+   *   The function being called.
+   */
+  protected function deprecatedProcedural(string $hook, string $module, string $function): void {
+    $proceduralOnlyHooks = [
+      'hook_info',
+      'install',
+      'module_implements_alter',
+      'requirements',
+      'schema',
+      'uninstall',
+      'update_last_removed',
+    ];
+
+    $proceduralExceptions = [
+      'system_theme',
+      'system_page_attachments',
+      'module_handler_test_fake_hook',
+    ];
+
+    $notProceduralOnly = !in_array($hook, $proceduralOnlyHooks);
+    $notSystemException = !in_array($function, $proceduralExceptions);
+    $notOtherException = !preg_match('/^(post_update_|theme_suggestions|preprocess_|process_|update_\d+$)/', $hook);
+
+    if ($notProceduralOnly && $notSystemException && $notOtherException) {
+      $message = "Procedural implementations of hook_$hook() is deprecated: ";
+      $description = "Convert $function in $module to use a Hook class";
+      @trigger_error($message . $description, E_USER_DEPRECATED);
+    }
   }
 
 }
