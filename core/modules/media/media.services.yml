@@ -4,6 +4,8 @@ parameters:
 services:
   _defaults:
     autoconfigure: true
+  Drupal\media\EventSubscriber\ResponseSubscriber:
+    arguments: ['@config.factory']
   plugin.manager.media.source:
     class: Drupal\media\MediaSourceManager
     parent: default_plugin_manager
