@@ -32,11 +32,6 @@ class TestController extends ControllerBase {
           'title' => $this->t('Administer content'),
         ]),
       ],
-      '#attached' => [
-        'library' => [
-          'core/drupal.dialog.ajax',
-        ],
-      ],
     ];
 
     return $build;

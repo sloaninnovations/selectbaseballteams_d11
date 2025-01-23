@@ -270,7 +270,6 @@ class ConfigTranslationController extends ControllerBase {
         // Even if the mapper contains multiple language codes, the source
         // configuration can still be edited.
         '#access' => ($langcode == $original_langcode) || $operations_access,
-        '#attached' => ['library' => ['core/drupal.dialog.ajax']],
       ];
     }
     return $page;
