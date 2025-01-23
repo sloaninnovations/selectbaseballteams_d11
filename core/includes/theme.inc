@@ -250,9 +250,12 @@ function theme_get_setting($setting_name, $theme = NULL) {
       /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
       $file_url_generator = \Drupal::service('file_url_generator');
 
+      /** @var \Drupal\Core\Theme\ActiveTheme $active_theme */
+      $active_theme = \Drupal::service('theme.initialization')->getActiveThemeByName($theme);
+
       // Generate the path to the logo image.
       if ($cache[$theme]->get('logo.use_default')) {
-        $logo = \Drupal::service('theme.initialization')->getActiveThemeByName($theme)->getLogo();
+        $logo = $active_theme->getLogo();
         $cache[$theme]->set('logo.url', $file_url_generator->generateString($logo));
       }
       elseif ($logo_path = $cache[$theme]->get('logo.path')) {
@@ -263,7 +266,7 @@ function theme_get_setting($setting_name, $theme = NULL) {
       if ($cache[$theme]->get('features.favicon')) {
         $favicon_path = $cache[$theme]->get('favicon.path');
         if ($cache[$theme]->get('favicon.use_default')) {
-          if (file_exists($favicon = $theme_object->getPath() . '/favicon.ico')) {
+          if (file_exists($favicon = $active_theme->getFavicon())) {
             $cache[$theme]->set('favicon.url', $file_url_generator->generateString($favicon));
           }
           else {

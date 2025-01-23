@@ -119,4 +119,70 @@ class ThemeSettingsTest extends KernelTestBase {
     $this->assertEquals($expected, theme_get_setting('logo.url', 'test_theme'));
   }
 
+  /**
+   * Tests default favicon configuration can be overridden.
+   */
+  public function testFaviconConfig() {
+    /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
+    $theme_installer = $this->container->get('theme_installer');
+    $theme_installer->install(['olivero']);
+    /** @var \Drupal\Core\Extension\ThemeHandler $theme_handler */
+    $theme_handler = $this->container->get('theme_handler');
+    $theme = $theme_handler->getTheme('olivero');
+
+    // Tests default behavior.
+    $expected = '/' . $theme->getPath() . '/favicon.ico';
+    $this->assertEquals($expected, theme_get_setting('favicon.url', 'olivero'));
+
+    $theme_installer->install(['stark']);
+    $theme = $theme_handler->getTheme('stark');
+
+    $config = $this->config('stark.settings');
+
+    drupal_static_reset('theme_get_setting');
+
+    // Test when the theme does not have a favicon configured.
+    $expected = '/core/misc/favicon.ico';
+    $this->assertEquals($expected, theme_get_setting('favicon.url', 'stark'));
+
+    drupal_static_reset('theme_get_setting');
+
+    $values = [
+      'default_favicon' => FALSE,
+      'favicon_path' => 'public://favicon_with_scheme.png',
+    ];
+    theme_settings_convert_to_config($values, $config)->save();
+
+    // Tests favicon path with scheme.
+    /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
+    $file_url_generator = \Drupal::service('file_url_generator');
+    $expected = $file_url_generator->generateString('public://favicon_with_scheme.png');
+    $this->assertEquals($expected, theme_get_setting('favicon.url', 'stark'));
+
+    $values = [
+      'default_favicon' => FALSE,
+      'favicon_path' => $theme->getPath() . '/favicon_relative_path.ico',
+    ];
+    theme_settings_convert_to_config($values, $config)->save();
+
+    drupal_static_reset('theme_get_setting');
+
+    // Tests relative path.
+    $expected = '/' . $theme->getPath() . '/favicon_relative_path.ico';
+    $this->assertEquals($expected, theme_get_setting('favicon.url', 'stark'));
+
+    $theme_installer->install(['test_theme']);
+    \Drupal::configFactory()
+      ->getEditable('system.theme')
+      ->set('default', 'test_theme')
+      ->save();
+    $theme = $theme_handler->getTheme('test_theme');
+
+    drupal_static_reset('theme_get_setting');
+
+    // Tests favicon set in test_theme.info.yml.
+    $expected = '/' . $theme->getPath() . '/images/favicon2.svg';
+    $this->assertEquals($expected, theme_get_setting('favicon.url', 'test_theme'));
+  }
+
 }
