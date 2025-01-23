@@ -26,7 +26,7 @@ class SelectComplexTest extends DatabaseTestBase {
    */
   public function testDefaultJoin(): void {
     $query = $this->connection->select('test_task', 't');
-    $people_alias = $query->join('test', 'p', '[t].[pid] = [p].[id]');
+    $people_alias = $query->join('test', 'p', $query->joinCondition()->compare('t.pid', 'p.id'));
     $name_field = $query->addField($people_alias, 'name', 'name');
     $query->addField('t', 'task', 'task');
     $priority_field = $query->addField('t', 'priority', 'priority');
@@ -52,7 +52,7 @@ class SelectComplexTest extends DatabaseTestBase {
    */
   public function testLeftOuterJoin(): void {
     $query = $this->connection->select('test', 'p');
-    $people_alias = $query->leftJoin('test_task', 't', '[t].[pid] = [p].[id]');
+    $people_alias = $query->leftJoin('test_task', 't', $query->joinCondition()->compare('t.pid', 'p.id'));
     $name_field = $query->addField('p', 'name', 'name');
     $query->addField($people_alias, 'task', 'task');
     $query->addField($people_alias, 'priority', 'priority');
@@ -333,7 +333,7 @@ class SelectComplexTest extends DatabaseTestBase {
    */
   public function testJoinTwice(): void {
     $query = $this->connection->select('test')->fields('test');
-    $alias = $query->join('test', 'test', '[test].[job] = [%alias].[job]');
+    $alias = $query->join('test', 'test', $query->joinCondition()->compare('test.job', '%alias.job'));
     $query->addField($alias, 'name', 'other_name');
     $query->addField($alias, 'job', 'other_job');
     $query->where("[$alias].[name] <> [test].[name]");
@@ -357,16 +357,16 @@ class SelectComplexTest extends DatabaseTestBase {
     $query->condition('priority', 100, '<');
 
     $subquery = $this->connection->select('test', 'tp');
-    $subquery->join('test_one_blob', 'tpb', '[tp].[id] = [tpb].[id]');
-    $subquery->join('node', 'n', '[tp].[id] = [n].[nid]');
+    $subquery->join('test_one_blob', 'tpb', $subquery->joinCondition()->compare('tp.id', 'tpb.id'));
+    $subquery->join('node', 'n', $subquery->joinCondition()->compare('tp.id', 'n.nid'));
     $subquery->addTag('node_access');
     $subquery->addMetaData('account', $account);
     $subquery->addField('tp', 'id');
     $subquery->condition('age', 5, '>');
     $subquery->condition('age', 500, '<');
 
-    $query->leftJoin($subquery, 'sq', '[tt].[pid] = [sq].[id]');
-    $query->join('test_one_blob', 'tb3', '[tt].[pid] = [tb3].[id]');
+    $query->leftJoin($subquery, 'sq', $query->joinCondition()->compare('tt.pid', 'sq.id'));
+    $query->join('test_one_blob', 'tb3', $query->joinCondition()->compare('tt.pid', 'tb3.id'));
 
     // Construct the query string.
     // This is the same sequence that SelectQuery::execute() goes through.
@@ -403,7 +403,7 @@ class SelectComplexTest extends DatabaseTestBase {
   public function testJoinConditionObject(): void {
     // Same test as testDefaultJoin, but with a Condition object.
     $query = $this->connection->select('test_task', 't');
-    $join_cond = ($this->connection->condition('AND'))->where('[t].[pid] = [p].[id]');
+    $join_cond = ($query->joinCondition())->where('[t].[pid] = [p].[id]');
     $people_alias = $query->join('test', 'p', $join_cond);
     $name_field = $query->addField($people_alias, 'name', 'name');
     $query->addField('t', 'task', 'task');
@@ -427,7 +427,7 @@ class SelectComplexTest extends DatabaseTestBase {
     // Test a condition object that creates placeholders.
     $t1_name = 'John';
     $t2_name = 'George';
-    $join_cond = ($this->connection->condition('AND'))
+    $join_cond = ($query->joinCondition())
       ->condition('t1.name', $t1_name)
       ->condition('t2.name', $t2_name);
     $query = $this->connection->select('test', 't1');
