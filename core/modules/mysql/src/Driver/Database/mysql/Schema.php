@@ -445,6 +445,9 @@ class Schema extends DatabaseSchema {
       if (isset($e->getPrevious()->errorInfo[1]) && $e->getPrevious()->errorInfo[1] === 4111 && isset($keys_new['primary key']) && $this->indexExists($table, 'PRIMARY') && $this->findPrimaryKeyColumns($table) === ['my_row_id']) {
         $this->executeDdlStatement($query . ', DROP COLUMN [my_row_id]');
       }
+      elseif ($e->getPrevious() instanceof \mysqli_sql_exception && $e->getPrevious()->getCode() === 4111 && isset($keys_new['primary key']) && $this->indexExists($table, 'PRIMARY') && $this->findPrimaryKeyColumns($table) === ['my_row_id']) {
+        $this->connection->query($query . ', DROP COLUMN [my_row_id]');
+      }
       else {
         throw $e;
       }

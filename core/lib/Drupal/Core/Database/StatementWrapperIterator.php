@@ -64,6 +64,18 @@ class StatementWrapperIterator implements \Iterator, StatementInterface {
   }
 
   /**
+   * Determines if the client-level database statement object exists.
+   *
+   * This method should normally be used only within database driver code.
+   *
+   * @return bool
+   *   TRUE if the client statement exists, FALSE otherwise.
+   */
+  public function hasClientStatement(): bool {
+    return isset($this->clientStatement);
+  }
+
+  /**
    * Returns the client-level database statement object.
    *
    * This method should normally be used only within database driver code.
