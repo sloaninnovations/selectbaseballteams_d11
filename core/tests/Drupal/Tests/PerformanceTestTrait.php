@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\performance_test\Cache\CacheTagOperation;
 use OpenTelemetry\API\Trace\SpanKind;
@@ -679,6 +680,15 @@ trait PerformanceTestTrait {
       'CacheTagIsValidCount' => $performance_data->getCacheTagIsValidCount(),
       'CacheTagInvalidationCount' => $performance_data->getCacheTagInvalidationCount(),
     ];
+  }
+
+  /**
+   * Clears all cache bins.
+   */
+  protected function clearCaches(): void {
+    foreach (Cache::getBins() as $bin) {
+      $bin->deleteAll();
+    }
   }
 
 }
