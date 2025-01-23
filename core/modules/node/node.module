@@ -7,6 +7,8 @@
 use Drupal\Component\Utility\Environment;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
@@ -64,7 +66,7 @@ function node_title_list(StatementInterface $result, $title = NULL) {
  * @return int
  *   One of the MARK constants.
  */
-function node_mark($nid, $timestamp) {
+function node_mark($nid, $timestamp): int {
   if (\Drupal::currentUser()->isAnonymous() || !\Drupal::moduleHandler()->moduleExists('history')) {
     return MARK_READ;
   }
@@ -83,10 +85,10 @@ function node_mark($nid, $timestamp) {
  *
  * This list can include types that are queued for addition or deletion.
  *
- * @return string[]
+ * @return array[]
  *   An array of node type labels, keyed by the node type name.
  */
-function node_type_get_names() {
+function node_type_get_names(): array {
   return array_map(function ($bundle_info) {
     return $bundle_info['label'];
   }, \Drupal::service('entity_type.bundle.info')->getBundleInfo('node'));
@@ -192,12 +194,20 @@ function node_add_body_field(NodeTypeInterface $type, $label = 'Body') {
  * @return bool
  *   TRUE if this is a full page view, otherwise FALSE.
  */
-function node_is_page(NodeInterface $node) {
+function node_is_page(NodeInterface $node): bool {
   $route_match = \Drupal::routeMatch();
-  if ($route_match->getRouteName() == 'entity.node.canonical') {
+  if ($route_match->getRouteName() == 'entity.node.canonical' || $route_match->getRouteName() == 'entity.node.revision') {
     $page_node = $route_match->getParameter('node');
+    // The Node's node parameter is typically a Node object.
+    if (is_a($page_node, 'Drupal\node\Entity\Node')) {
+      $nid = $page_node->id();
+    }
+    // The Node Revision's node parameter is typically a string.
+    elseif (is_string($page_node)) {
+      $nid = $page_node;
+    }
   }
-  return (!empty($page_node) ? $page_node->id() == $node->id() : FALSE);
+  return (!empty($nid) ? $nid == $node->id() : FALSE);
 }
 
 /**
@@ -674,5 +684,62 @@ function node_reindex_node_search($nid) {
   if (\Drupal::moduleHandler()->moduleExists('search')) {
     // Reindex node context indexed by the node module search plugin.
     \Drupal::service('search.index')->markForReindex('node_search', $nid);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for comment entities.
+ */
+function node_comment_insert($comment): void {
+  // Reindex the node when comments are added.
+  if ($comment->getCommentedEntityTypeId() == 'node') {
+    node_reindex_node_search($comment->getCommentedEntityId());
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for comment entities.
+ */
+function node_comment_update($comment): void {
+  // Reindex the node when comments are changed.
+  if ($comment->getCommentedEntityTypeId() == 'node') {
+    node_reindex_node_search($comment->getCommentedEntityId());
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for comment entities.
+ */
+function node_comment_delete($comment): void {
+  // Reindex the node when comments are deleted.
+  if ($comment->getCommentedEntityTypeId() == 'node') {
+    node_reindex_node_search($comment->getCommentedEntityId());
+  }
+}
+
+/**
+ * Implements hook_config_translation_info_alter().
+ */
+function node_config_translation_info_alter(&$info): void {
+  $info['node_type']['class'] = 'Drupal\node\ConfigTranslation\NodeTypeMapper';
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function node_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
+  if ($route_name === 'entity.node.revision') {
+    // Show the same local tasks on node revision pages as the ones displayed
+    // on node canonical pages.
+    $node_canonical_local_tasks = \Drupal::service('plugin.manager.menu.local_task')
+      ->getLocalTasks('entity.node.canonical');
+    $local_tasks['tabs'][0] = $node_canonical_local_tasks['tabs'];
+    // Mark the version history local task as active when viewing a node
+    // revision.
+    foreach ($local_tasks['tabs'][0] as $route_name => &$tab) {
+      $tab['#active'] = $route_name === 'entity.node.version_history';
+    }
+    $cacheability = CacheableMetadata::createFromObject($cacheability)
+      ->merge($node_canonical_local_tasks['cacheability']);
   }
 }
