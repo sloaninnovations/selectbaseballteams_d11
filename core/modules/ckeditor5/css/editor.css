@@ -29,3 +29,7 @@
 .ck-toolbar__items .ck.ck-button.ck-on {
   border: 1px solid var(--ck-color-button-on-color);
 }
+
+.ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline.ck-focused {
+  word-break: break-word !important;
+}
