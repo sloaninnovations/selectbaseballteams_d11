@@ -9,7 +9,6 @@ use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
 
 // cspell:ignore nocdata
-
 /**
  * Fetches and caches oEmbed resources.
  */
@@ -74,9 +73,106 @@ class ResourceFetcher implements ResourceFetcherInterface {
       throw new ResourceException('The oEmbed resource could not be decoded.', $url);
     }
 
+    $this->convertToHighResolutionThumbnail($data);
+
     $this->cacheBackend->set($cache_id, $data);
 
     return $this->createResource($data, $url);
+  }
+
+  /**
+   * Convert the embed data to a high resolution thumbnail.
+   *
+   * @param array $data
+   *   The embed data altered by reference.
+   *
+   * @todo Convert to a hook or event for others to update to a high resolution.
+   * @todo Set the width and height of the high resolution image.
+   */
+  protected function convertToHighResolutionThumbnail(array &$data): void {
+    $provider_name = $data['provider_name'] ?? NULL;
+    $high_resolution_thumbnail_url = NULL;
+    if ($provider_name === 'Vimeo') {
+      $high_resolution_thumbnail_url = $this->getVimeoHighResolutionThumbnailUrl($data);
+    }
+    elseif ($provider_name === 'YouTube') {
+      $high_resolution_thumbnail_url = $this->getYouTubeHighResolutionThumbnailUrl($data);
+    }
+
+    if ($high_resolution_thumbnail_url) {
+      $data['thumbnail_url'] = $high_resolution_thumbnail_url;
+    }
+  }
+
+  /**
+   * Get the YouTube high resolution thumbnail.
+   *
+   * @param array $data
+   *   The embed data.
+   *
+   * @return string|null
+   *   The URL for the high resolution thumbnail.
+   */
+  protected function getYouTubeHighResolutionThumbnailUrl(array $data): ?string {
+    if (empty($data['thumbnail_url'])) {
+      return NULL;
+    }
+
+    $high_quality_thumbnail = preg_replace('@(hq)(\w+\.[^\.]+)$@Ui', 'maxres$2', $data['thumbnail_url']);
+    if ($high_quality_thumbnail === $data['thumbnail_url']) {
+      return NULL;
+    }
+
+    try {
+      $response = $this->httpClient->request('GET', $high_quality_thumbnail, [
+        RequestOptions::TIMEOUT => 5,
+        RequestOptions::HTTP_ERRORS => FALSE,
+      ]);
+
+      if ($response->getStatusCode() === 200) {
+        return $high_quality_thumbnail;
+      }
+    }
+    catch (\Throwable $e) {
+      // Any error, use the default thumbnail.
+    }
+
+    return NULL;
+  }
+
+  /**
+   * Get the Vimeo high resolution thumbnail.
+   *
+   * @param array $data
+   *   The embed data.
+   *
+   * @return string|null
+   *   The URL for the high resolution thumbnail.
+   */
+  protected function getVimeoHighResolutionThumbnailUrl(array $data): ?string {
+    if (empty($data['video_id'])) {
+      return NULL;
+    }
+
+    $vimeo_url = 'https://vimeo.com/api/v2/video/' . $data['video_id'] . '.xml';
+    try {
+      $response = $this->httpClient->request('GET', $vimeo_url, [
+        RequestOptions::TIMEOUT => 5,
+        RequestOptions::HTTP_ERRORS => FALSE,
+      ]);
+      $content = (string) $response->getBody();
+      $parsed_data = $this->parseResourceXml($content, $vimeo_url);
+      if ($parsed_data &&
+          !empty($parsed_data['video']['thumbnail_large']) &&
+          is_string($parsed_data['video']['thumbnail_large'])) {
+        return (string) $parsed_data['video']['thumbnail_large'];
+      }
+    }
+    catch (\Throwable $e) {
+      // Any error use the default thumbnail.
+    }
+
+    return NULL;
   }
 
   /**
