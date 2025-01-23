@@ -62,9 +62,9 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
     }
     elseif ($operation == 'update') {
       $account = $this->prepareUser($account);
-      $file_uid = $entity->get('uid')->getValue();
+      $file_uid = $entity->getOwnerId();
       // Only the file owner can update the file entity.
-      if (isset($file_uid[0]['target_id']) && $account->id() == $file_uid[0]['target_id']) {
+      if ($account->id() === $file_uid) {
         return AccessResult::allowed();
       }
       return AccessResult::forbidden('Only the file owner can update the file entity.');
