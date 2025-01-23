@@ -2,13 +2,20 @@
 
 namespace Drupal\Core\Theme;
 
+use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\Extension\Extension;
-use Drupal\Core\Extension\ModuleExtensionList;
 
 /**
  * Determines which component should be used.
  */
 class ComponentNegotiator {
+
+  use DeprecatedServicePropertyTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $deprecatedProperties = ['moduleExtensionList' => 'extension.list.module'];
 
   /**
    * Holds the component IDs from previous negotiations.
@@ -22,12 +29,9 @@ class ComponentNegotiator {
    *
    * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
    *   The theme manager.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
-   *   The module extension list.
    */
   public function __construct(
     protected ThemeManagerInterface $themeManager,
-    protected ModuleExtensionList $moduleExtensionList,
   ) {
   }
 
