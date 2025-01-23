@@ -65,6 +65,21 @@ function locale_translation_build_projects() {
       }
     }
 
+    // Check for the `module://` prefix in the translation server pattern and
+    // replace it to the current module path.
+    if (
+      isset($data['info']['interface translation server pattern'])
+      && str_starts_with($data['info']['interface translation server pattern'], 'module://')
+      ) {
+      $modulePath = \Drupal::service('module_handler')->getModule($name)->getPath();
+      $data['info']['interface translation server pattern'] =
+        str_replace(
+          'module://',
+          $modulePath . '/',
+          $data['info']['interface translation server pattern']
+        );
+    }
+
     // For every project store information.
     $data += [
       'name' => $name,
