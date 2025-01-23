@@ -69,7 +69,7 @@ interface RouteProviderInterface {
    *   The list of names to retrieve, In case of null, the provider will
    *   determine what routes to return
    *
-   * @return \Symfony\Component\Routing\Route[]
+   * @return \Symfony\Component\Routing\Route|\Symfony\Component\Routing\Alias[]
    *   Iterable list with the keys being the names from the $names array
    */
   public function getRoutesByNames($names);

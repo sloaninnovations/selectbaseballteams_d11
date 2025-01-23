@@ -415,7 +415,8 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    */
   public function getAllRoutes() {
     $select = $this->connection->select($this->tableName, 'router')
-      ->fields('router', ['name', 'route']);
+      ->fields('router', ['name', 'route'])
+      ->isNull('alias');
     $routes = $select->execute()->fetchAllKeyed();
 
     $result = [];
