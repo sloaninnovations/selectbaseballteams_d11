@@ -231,6 +231,13 @@
 .path-admin .toolbar-bar .home-toolbar-tab {
   display: block;
 }
+.toolbar-tab--inert {
+  display: none !important;
+}
+.toolbar-tab--inert {
+  /* Important is required as this is set to display: block with very high
+   specificity. */
+}
 /* Anti flicker styling. */
 .toolbar-anti-flicker.toolbar-loading.toolbar-fixed body {
   padding-top: 2.4375rem;
