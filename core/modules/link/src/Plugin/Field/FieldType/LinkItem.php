@@ -23,6 +23,20 @@ use Drupal\link\LinkItemInterface;
   description: new TranslatableMarkup("Stores a URL string, optional varchar link text, and optional blob of attributes to assemble a link."),
   default_widget: "link_default",
   default_formatter: "link",
+  column_groups: [
+    "uri" => [
+      "label" => new TranslatableMarkup("Uri"),
+      "require_all_groups_for_translation" => TRUE,
+    ],
+    "title" => [
+      "label" => new TranslatableMarkup("Title"),
+      "translatable" => TRUE,
+    ],
+    "options" => [
+      "label" => new TranslatableMarkup("Options"),
+      "translatable" => TRUE,
+    ],
+  ],
   constraints: [
     "LinkType" => [],
     "LinkAccess" => [],
