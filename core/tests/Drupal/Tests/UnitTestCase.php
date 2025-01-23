@@ -19,9 +19,13 @@ use Symfony\Component\VarDumper\VarDumper;
 /**
  * Provides a base class and helpers for Drupal unit tests.
  *
- * Module tests extending BrowserTestBase must exist in the
- * Drupal\Tests\your_module\Functional namespace and live in the
- * modules/your_module/tests/src/Functional directory.
+ * Module tests extending UnitTestCase must exist in the
+ * Drupal\Tests\your_module\Unit namespace and live in the
+ * modules/your_module/tests/src/Unit directory.
+ *
+ * Tests for core/lib/Drupal classes extending UnitTestCase must exist in the
+ * \Drupal\Tests\Core namespace and live in the core/lib/tests/Drupal/Tests/Core
+ * directory.
  *
  * Using Symfony's dump() function in Unit tests will produce output on the
  * command line.
@@ -135,32 +139,6 @@ abstract class UnitTestCase extends TestCase {
   }
 
   /**
-   * Returns a stub config storage that returns the supplied configuration.
-   *
-   * @param array $configs
-   *   An associative array of configuration settings whose keys are
-   *   configuration object names and whose values are key => value arrays
-   *   for the configuration object in question.
-   *
-   * @return \Drupal\Core\Config\StorageInterface
-   *   A mocked config storage.
-   */
-  public function getConfigStorageStub(array $configs) {
-    $config_storage = $this->createMock('Drupal\Core\Config\NullStorage');
-    $config_storage->expects($this->any())
-      ->method('listAll')
-      ->willReturn(array_keys($configs));
-
-    foreach ($configs as $name => $config) {
-      $config_storage->expects($this->any())
-        ->method('read')
-        ->with($this->equalTo($name))
-        ->willReturn($config);
-    }
-    return $config_storage;
-  }
-
-  /**
    * Returns a stub translation manager that just returns the passed string.
    *
    * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\StringTranslation\TranslationInterface
@@ -171,6 +149,7 @@ abstract class UnitTestCase extends TestCase {
     $translation->expects($this->any())
       ->method('translate')
       ->willReturnCallback(function ($string, array $args = [], array $options = []) use ($translation) {
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         return new TranslatableMarkup($string, $args, $options, $translation);
       });
     $translation->expects($this->any())

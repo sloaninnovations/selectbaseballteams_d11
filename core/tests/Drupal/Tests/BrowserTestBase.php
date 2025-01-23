@@ -34,6 +34,10 @@ use Symfony\Component\VarDumper\VarDumper;
  * Drupal\Tests\your_module\Functional namespace and live in the
  * modules/your_module/tests/src/Functional directory.
  *
+ * Tests for core/lib/Drupal classes extending BrowserTestBase must exist in the
+ * \Drupal\FunctionalTests\Core namespace and live in the
+ * core/tests/Drupal/FunctionalTests directory.
+ *
  * Tests extending this base class should only translate text when testing
  * translation functionality. For example, avoid wrapping test text with t()
  * or TranslatableMarkup().
@@ -81,14 +85,6 @@ abstract class BrowserTestBase extends TestCase {
    */
   protected $timeLimit = 500;
 
-  /**
-   * The translation file directory for the test environment.
-   *
-   * This is set in BrowserTestBase::prepareEnvironment().
-   *
-   * @var string
-   */
-  protected $translationFilesDirectory;
 
   /**
    * The config importer that can be used in a test.

@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\navigation\Functional;
 
+use Drupal\Core\Url;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
-use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
 
 /**
  * Tests the top bar functionality.
  *
  * @group navigation
  */
-class NavigationTopBarTest extends BrowserTestBase {
+class NavigationTopBarTest extends PageCacheTagsTestBase {
 
   /**
    * {@inheritdoc}
@@ -23,6 +24,7 @@ class NavigationTopBarTest extends BrowserTestBase {
     'layout_builder',
     'field_ui',
     'file',
+    'test_page_test',
   ];
 
   /**
@@ -76,29 +78,50 @@ class NavigationTopBarTest extends BrowserTestBase {
    * Tests the top bar visibility.
    */
   public function testTopBarVisibility(): void {
-    $this->drupalGet($this->node->toUrl());
+    // Test page does not include the Top Bar.
+    $test_page_url = Url::fromRoute('test_page_test.test_page');
+    $this->verifyDynamicPageCache($test_page_url, 'MISS');
+    $this->verifyDynamicPageCache($test_page_url, 'HIT');
+    $this->assertSession()->elementNotExists('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button");
 
+    $this->verifyDynamicPageCache($this->node->toUrl(), 'MISS');
+    $this->verifyDynamicPageCache($this->node->toUrl(), 'HIT');
     // Top Bar is not visible if the feature flag module is disabled.
-    $this->assertSession()->elementNotExists('xpath', "//div[contains(@class, 'top-bar__content')]/button/span");
+    $this->assertSession()->elementNotExists('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button");
     $this->assertSession()->elementExists('xpath', '//div[@id="block-tabs"]');
 
     \Drupal::service('module_installer')->install(['navigation_top_bar']);
 
+    // Test page does not include the Top Bar.
+    $test_page_url = Url::fromRoute('test_page_test.test_page');
+    $this->verifyDynamicPageCache($test_page_url, 'MISS');
+    $this->verifyDynamicPageCache($test_page_url, 'HIT');
+    $this->assertSession()->elementNotExists('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button");
+
     // Top Bar is visible once the feature flag module is enabled.
-    $this->drupalGet($this->node->toUrl());
-    $this->assertSession()->elementExists('xpath', "//div[contains(@class, 'top-bar__content')]/button/span");
-    $this->assertSession()->elementTextEquals('xpath', "//div[contains(@class, 'top-bar__content')]/button/span", 'More actions');
-    $this->assertSession()->elementNotExists('xpath', '//div[@id="block-tabs"]');
+    $this->verifyDynamicPageCache($this->node->toUrl(), 'MISS');
+    $this->verifyDynamicPageCache($this->node->toUrl(), 'HIT');
+    $this->assertSession()->elementExists('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]");
+    $this->assertSession()->elementTextEquals('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/a[contains(@class, 'toolbar-button--icon--thin-pencil')]", "Edit");
+    $this->assertSession()->elementAttributeContains('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]", 'class', 'toolbar-button--icon--dots');
 
     // Find all the dropdown links and check if the top bar is there as well.
-    $toolbar_links = $this->mink->getSession()->getPage()->find('xpath', '//*[@id="admin-local-tasks"]/ul');
+    $toolbar_links = $this->mink->getSession()->getPage()->find('xpath', '//*[@id="top-bar-page-actions"]/ul');
 
     foreach ($toolbar_links->findAll('css', 'li') as $toolbar_link) {
       $this->clickLink($toolbar_link->getText());
-      $this->assertSession()->elementExists('xpath', "//div[contains(@class, 'top-bar__content')]/button/span");
-      $this->assertSession()->elementTextEquals('xpath', "//div[contains(@class, 'top-bar__content')]/button/span", 'More actions');
-      $this->assertSession()->elementNotExists('xpath', '//div[@id="block-tabs"]');
+      $this->assertSession()->elementExists('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]");
+      $this->assertSession()->elementAttributeContains('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]", 'class', 'toolbar-button--icon--dots');
     }
+
+    // Regular tabs are visible for user that cannot access to navigation.
+    $this->drupalLogin($this->drupalCreateUser([
+      'bypass node access',
+    ]));
+
+    $this->drupalGet($this->node->toUrl());
+    $this->assertSession()->elementNotExists('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button");
+    $this->assertSession()->elementExists('xpath', '//div[@id="block-tabs"]');
   }
 
 }

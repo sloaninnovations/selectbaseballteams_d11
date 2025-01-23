@@ -12,7 +12,7 @@ use Drupal\user\RoleInterface;
 /**
  * Implements hook_requirements().
  */
-function node_requirements($phase) {
+function node_requirements($phase): array {
   $requirements = [];
   if ($phase === 'runtime') {
     // Only show rebuild button if there are either 0, or 2 or more, rows
@@ -40,7 +40,7 @@ function node_requirements($phase) {
 /**
  * Implements hook_schema().
  */
-function node_schema() {
+function node_schema(): array {
   $schema['node_access'] = [
     'description' => 'Identifies which realm/grant pairs a user must possess in order to view, update, or delete specific nodes.',
     'fields' => [
@@ -157,6 +157,6 @@ function node_uninstall(): void {
 /**
  * Implements hook_update_last_removed().
  */
-function node_update_last_removed() {
+function node_update_last_removed(): int {
   return 8700;
 }

@@ -35,7 +35,7 @@ function image_uninstall(): void {
 /**
  * Implements hook_requirements().
  */
-function image_requirements($phase) {
+function image_requirements($phase): array {
   if ($phase != 'runtime') {
     return [];
   }
@@ -73,6 +73,6 @@ function image_requirements($phase) {
 /**
  * Implements hook_update_last_removed().
  */
-function image_update_last_removed() {
+function image_update_last_removed(): int {
   return 8201;
 }

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Code required only when comparing available updates to existing data.
  */
 
 use Drupal\Core\Extension\ExtensionVersion;
+use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\Utility\Error;
 use Drupal\update\ProjectRelease;
 use Drupal\update\UpdateFetcherInterface;
@@ -19,10 +19,11 @@ use Drupal\update\ProjectCoreCompatibility;
  * installed versions, and other information that is required before we can
  * compare against the available releases to produce the status report.
  *
- * @param $projects
+ * @param array $projects
  *   Array of project information from
  *   \Drupal\update\UpdateManager::getProjects().
  */
+#[StopProceduralHookScan]
 function update_process_project_info(&$projects) {
   foreach ($projects as $key => $project) {
     // Assume an official release until we see otherwise.
@@ -201,9 +202,9 @@ function update_calculate_project_data($available) {
  * NOTE: This function *must* set a value for $project_data['status'] before
  * returning, or the rest of the Update Manager will break in unexpected ways.
  *
- * @param $project_data
+ * @param array $project_data
  *   An array containing information about a specific project.
- * @param $available
+ * @param array $available
  *   Data about available project releases of a specific project.
  */
 function update_calculate_project_update_status(&$project_data, $available) {

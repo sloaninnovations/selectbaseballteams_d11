@@ -5,6 +5,7 @@
  * Install, update, and uninstall functions for the Update Manager module.
  */
 
+use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\update\ProjectSecurityData;
@@ -32,7 +33,7 @@ use Drupal\update\UpdateManagerInterface;
  * @see _update_cron_notify()
  * @see \Drupal\update\UpdateManagerInterface
  */
-function update_requirements($phase) {
+function update_requirements($phase): array {
   $requirements = [];
   if ($phase == 'runtime') {
     if ($available = update_get_available(FALSE)) {
@@ -73,6 +74,7 @@ function update_requirements($phase) {
 /**
  * Implements hook_install().
  */
+#[StopProceduralHookScan]
 function update_install(): void {
   $queue = \Drupal::queue('update_fetch_tasks', TRUE);
   $queue->createQueue();
@@ -95,10 +97,10 @@ function update_uninstall(): void {
  * This is shared for both core and contrib to generate the right elements in
  * the array for hook_requirements().
  *
- * @param $project
+ * @param array $project
  *   Array of information about the project we're testing as returned by
  *   update_calculate_project_data().
- * @param $type
+ * @param string $type
  *   What kind of project this is ('core' or 'contrib').
  *
  * @return array
@@ -172,6 +174,6 @@ function _update_requirement_check($project, $type) {
 /**
  * Implements hook_update_last_removed().
  */
-function update_update_last_removed() {
+function update_update_last_removed(): int {
   return 8001;
 }

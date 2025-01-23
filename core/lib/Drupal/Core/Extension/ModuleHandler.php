@@ -200,9 +200,11 @@ class ModuleHandler implements ModuleHandlerInterface {
     // Load all includes so the legacy section of invoke can handle hooks in includes.
     $hook_collector->loadAllIncludes();
     // Register procedural implementations.
-    foreach ($hook_collector->getImplementations() as $hook => $class_implementations) {
-      foreach ($class_implementations[ProceduralCall::class] ?? [] as $method => $hook_data) {
-        $this->invokeMap[$hook][$hook_data['module']][] = $method;
+    foreach ($hook_collector->getImplementations() as $hook => $moduleImplements) {
+      foreach ($moduleImplements as $module => $classImplements) {
+        foreach ($classImplements[ProceduralCall::class] ?? [] as $method) {
+          $this->invokeMap[$hook][$module][] = $method;
+        }
       }
     }
   }
@@ -402,7 +404,7 @@ class ModuleHandler implements ModuleHandlerInterface {
     // Most of the time, $type is passed as a string, so for performance,
     // normalize it to that. When passed as an array, usually the first item in
     // the array is a generic type, and additional items in the array are more
-    // specific variants of it, as in the case of array('form', 'form_FORM_ID').
+    // specific variants of it, as in the case of ['form', 'form_FORM_ID'].
     if (is_array($type)) {
       $cid = implode(',', $type);
       $extra_types = $type;
@@ -565,6 +567,7 @@ class ModuleHandler implements ModuleHandlerInterface {
       }
       if (isset($this->groupIncludes[$hook])) {
         foreach ($this->groupIncludes[$hook] as $include) {
+          @trigger_error('Autoloading hooks in the file (' . $include . ') is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Move the functions in this file to either the .module file or other appropriate location. See https://www.drupal.org/node/3489765', E_USER_DEPRECATED);
           include_once $include;
         }
       }

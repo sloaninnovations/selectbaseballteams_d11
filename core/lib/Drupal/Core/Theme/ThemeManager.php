@@ -131,13 +131,6 @@ class ThemeManager implements ThemeManagerInterface {
 
     $active_theme = $this->getActiveTheme();
 
-    // If called before all modules are loaded, we do not necessarily have a
-    // full theme registry to work with, and therefore cannot process the theme
-    // request properly. See also \Drupal\Core\Theme\Registry::get().
-    if (!$this->moduleHandler->isLoaded() && !defined('MAINTENANCE_MODE')) {
-      throw new \Exception('The theme implementations may not be rendered until all modules are loaded.');
-    }
-
     $theme_registry = $this->themeRegistry->getRuntime();
 
     // If an array of hook candidates were passed, use the first one that has an
@@ -424,7 +417,7 @@ class ThemeManager implements ThemeManagerInterface {
     // Most of the time, $type is passed as a string, so for performance,
     // normalize it to that. When passed as an array, usually the first item in
     // the array is a generic type, and additional items in the array are more
-    // specific variants of it, as in the case of array('form', 'form_FORM_ID').
+    // specific variants of it, as in the case of ['form', 'form_FORM_ID'].
     if (is_array($type)) {
       $extra_types = $type;
       $type = array_shift($extra_types);

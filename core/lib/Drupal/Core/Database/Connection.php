@@ -325,7 +325,8 @@ abstract class Connection {
   /**
    * Returns the prefix of the tables.
    *
-   * @return string $prefix
+   * @return string
+   *   The table prefix.
    */
   public function getPrefix(): string {
     return $this->prefix;
@@ -395,6 +396,7 @@ abstract class Connection {
    *   The name of the table in question.
    *
    * @return string
+   *   The fully qualified table name.
    */
   public function getFullQualifiedTableName($table) {
     $options = $this->getConnectionOptions();
@@ -781,7 +783,7 @@ abstract class Connection {
    *   for query_alter hook implementations.
    * @param string $alias
    *   (optional) The alias of the base table of this query.
-   * @param $options
+   * @param array $options
    *   An array of options on the query.
    *
    * @return \Drupal\Core\Database\Query\SelectInterface
@@ -1110,6 +1112,7 @@ abstract class Connection {
    * @throws \LogicException
    *   If the transaction manager is undefined or unavailable.
    */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn, Drupal.Commenting.FunctionComment.Missing
   protected function driverTransactionManager(): TransactionManagerInterface {
     throw new \LogicException('The database driver has no TransactionManager implementation');
   }
@@ -1185,6 +1188,7 @@ abstract class Connection {
    * override this method.
    *
    * @return string
+   *   The version of the database server.
    */
   public function version() {
     return $this->connection->getAttribute(\PDO::ATTR_SERVER_VERSION);
@@ -1197,6 +1201,7 @@ abstract class Connection {
    * override this method.
    *
    * @return string
+   *   The version of the database client.
    */
   public function clientVersion() {
     return $this->connection->getAttribute(\PDO::ATTR_CLIENT_VERSION);
@@ -1219,6 +1224,7 @@ abstract class Connection {
    * Returns the name of the database engine accessed by this driver.
    *
    * @return string
+   *   The database engine name.
    */
   abstract public function databaseType();
 
