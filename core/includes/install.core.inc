@@ -1873,7 +1873,8 @@ function install_finish_translations(&$install_state) {
   // installed, their translations will be downloaded (if required) and imported
   // using a batch.
   $projects = locale_translation_build_projects();
-  $languages = \Drupal::languageManager()->getLanguages();
+  // Fetch only translatable languages.
+  $languages = locale_translatable_language_list();
   $batches = [];
   if (count($projects) > 1) {
     $options = _locale_translation_default_update_options();
