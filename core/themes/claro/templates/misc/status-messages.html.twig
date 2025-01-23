@@ -59,7 +59,7 @@
                   <li class="messages__item">{{ message }}</li>
                 {% endfor %}
               </ul>
-            {% else %}
+            {% elseif messages|length == 1 %}
               {{ messages|first }}
             {% endif %}
           </div>
