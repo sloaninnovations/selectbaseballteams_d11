@@ -23,6 +23,8 @@ class ContentTranslationSynchronizedFieldsConstraint extends SymfonyConstraint {
    *
    * In this case "elements" refers to "field properties". It is what we are
    * using in the UI elsewhere.
+   *
+   * @var string
    */
   public $defaultRevisionMessage = 'Non-translatable field elements can only be changed when updating the current revision.';
 
@@ -31,6 +33,8 @@ class ContentTranslationSynchronizedFieldsConstraint extends SymfonyConstraint {
    *
    * In this case "elements" refers to "field properties". It is what we are
    * using in the UI elsewhere.
+   *
+   * @var string
    */
   public $defaultTranslationMessage = 'Non-translatable field elements can only be changed when updating the original language.';
 

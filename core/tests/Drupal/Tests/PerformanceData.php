@@ -73,6 +73,8 @@ class PerformanceData {
 
   /**
    * The original return value.
+   *
+   * @var mixed
    */
   protected $returnValue;
 
