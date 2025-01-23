@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\ajax_forms_test\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\ajax_forms_test\Callbacks;
 use Drupal\Core\Form\FormStateInterface;
@@ -142,12 +144,26 @@ class AjaxFormsTestSimpleForm extends FormBase {
         'event' => 'change',
       ],
     ];
+    $form['textfield_focus_tests']['textfield_4'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield 4',
+      '#ajax' => [
+        'callback' => [static::class, 'textfieldInsertHtmlCallback'],
+        'event' => 'input',
+      ],
+    ];
 
     return $form;
   }
 
   public static function textfieldCallback($form) {
     return $form;
+  }
+
+  public static function textfieldInsertHtmlCallback($form): AjaxResponse {
+    $response = new AjaxResponse();
+    $response->addCommand(new HtmlCommand('.form-item-textfield-4', $form['textfield_focus_tests']['textfield_4']));
+    return $response;
   }
 
   /**
