@@ -242,7 +242,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
         '#type' => 'textfield',
         '#title' => !$exposed ? $this->t('Value') : '',
         '#size' => 30,
-        '#default_value' => $this->value['value'],
+        '#default_value' => $this->value['value'] ?? $this->value,
       ];
       if (!empty($this->options['expose']['placeholder'])) {
         $form['value']['value']['#attributes']['placeholder'] = $this->options['expose']['placeholder'];
@@ -254,7 +254,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
         ];
       }
       if ($exposed && !isset($user_input[$identifier]['value'])) {
-        $user_input[$identifier]['value'] = $this->value['value'];
+        $user_input[$identifier]['value'] = $this->value['value'] ?? $this->value;
         $form_state->setUserInput($user_input);
       }
     }
@@ -265,13 +265,13 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
         '#type' => 'textfield',
         '#title' => !$exposed ? $this->t('Value') : '',
         '#size' => 30,
-        '#default_value' => $this->value['value'],
+        '#default_value' => $this->value['value'] ?? $this->value,
       ];
       if (!empty($this->options['expose']['placeholder'])) {
         $form['value']['#attributes']['placeholder'] = $this->options['expose']['placeholder'];
       }
       if ($exposed && !isset($user_input[$identifier])) {
-        $user_input[$identifier] = $this->value['value'];
+        $user_input[$identifier] = $this->value['value'] ?? $this->value;
         $form_state->setUserInput($user_input);
       }
     }
@@ -377,7 +377,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
    * Filters by a simple operator.
    */
   protected function opSimple($field) {
-    $this->query->addWhere($this->options['group'], $field, $this->value['value'], $this->operator);
+    $this->query->addWhere($this->options['group'], $field, $this->value['value'] ?? $this->value, $this->operator);
   }
 
   /**
@@ -401,7 +401,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
    *   The expression pointing to the queries field, for example "foo.bar".
    */
   protected function opRegex($field) {
-    $this->query->addWhere($this->options['group'], $field, $this->value['value'], 'REGEXP');
+    $this->query->addWhere($this->options['group'], $field, $this->value['value'] ?? $this->value, 'REGEXP');
   }
 
   /**
@@ -430,7 +430,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
     if (in_array($this->operator, $this->operatorValues(2))) {
       $output .= ' ' . $this->t('@min and @max', ['@min' => $this->value['min'], '@max' => $this->value['max']]);
     }
-    elseif (in_array($this->operator, $this->operatorValues(1))) {
+    elseif (in_array($this->operator, $this->operatorValues(1)) && isset($this->value['value'])) {
       $output .= ' ' . $this->value['value'];
     }
     return $output;
