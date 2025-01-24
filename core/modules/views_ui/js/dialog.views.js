@@ -36,6 +36,7 @@
         this.style.overflow = 'auto';
       });
     }
+    $(window).trigger('resize.dialogResize');
   }
 
   /**

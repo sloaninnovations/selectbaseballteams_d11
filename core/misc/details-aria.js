@@ -24,6 +24,7 @@
           $summary.attr({
             'aria-expanded': open,
           });
+          $(window).trigger('resize.dialogResize');
         },
       );
     },
