@@ -114,45 +114,14 @@ class ImageStyleDownloadController extends FileDownloadController {
     $image_uri = $this->streamWrapperManager->normalizeUri($image_uri);
     $sample_image_uri = $scheme . '://' . $this->config('image.settings')->get('preview_image');
 
-    if ($this->streamWrapperManager->isValidScheme($scheme)) {
-      $normalized_target = $this->streamWrapperManager->getTarget($image_uri);
-      if ($normalized_target !== FALSE) {
-        if (!in_array($scheme, Settings::get('file_sa_core_2023_005_schemes', []))) {
-          $parts = explode('/', $normalized_target);
-          if (array_intersect($parts, ['.', '..'])) {
-            throw new NotFoundHttpException();
-          }
-        }
-      }
-    }
+    // Check if normalized target scheme is valid.
+    $this->checkNormalizedScheme($scheme, $image_uri);
 
-    // Check that the style is defined and the scheme is valid.
-    $valid = !empty($image_style) && $this->streamWrapperManager->isValidScheme($scheme);
+    // Check if token is valid.
+    $token_is_valid = $this->checkToken($request, $image_uri, $scheme, $target, $image_style);
 
-    // Also validate the derivative token. Sites which require image
-    // derivatives to be generated without a token can set the
-    // 'image.settings:allow_insecure_derivatives' configuration to TRUE to
-    // bypass this check, but this will increase the site's vulnerability
-    // to denial-of-service attacks. To prevent this variable from leaving the
-    // site vulnerable to the most serious attacks, a token is always required
-    // when a derivative of a style is requested.
-    // The $target variable for a derivative of a style has
-    // styles/<style_name>/... as structure, so we check if the $target variable
-    // starts with styles/.
-    $token = $request->query->get(IMAGE_DERIVATIVE_TOKEN, '');
-    $token_is_valid = hash_equals($image_style->getPathToken($image_uri), $token)
-      || hash_equals($image_style->getPathToken($scheme . '://' . $target), $token);
-    if (!$this->config('image.settings')->get('allow_insecure_derivatives') || str_starts_with(ltrim($target, '\/'), 'styles/')) {
-      $valid = $valid && $token_is_valid;
-    }
-
-    if (!$valid) {
-      // Return a 404 (Page Not Found) rather than a 403 (Access Denied) as the
-      // image token is for DDoS protection rather than access checking. 404s
-      // are more likely to be cached (e.g. at a proxy) which enhances
-      // protection from DDoS.
-      throw new NotFoundHttpException();
-    }
+    // Throw 404 if generation isn't authorized
+    $this->authorizedDerivativeGeneration($image_style, $scheme, $target, $token_is_valid);
 
     $derivative_uri = $image_style->buildUri($image_uri);
     $derivative_scheme = $this->streamWrapperManager->getScheme($derivative_uri);
@@ -161,15 +130,8 @@ class ImageStyleDownloadController extends FileDownloadController {
       throw new AccessDeniedHttpException("The scheme for this image doesn't match the scheme for the original image");
     }
 
-    if ($token_is_valid) {
-      $is_public = ($scheme !== 'private');
-    }
-    else {
-      $core_schemes = ['public', 'private', 'temporary'];
-      $additional_public_schemes = array_diff(Settings::get('file_additional_public_schemes', []), $core_schemes);
-      $public_schemes = array_merge(['public'], $additional_public_schemes);
-      $is_public = in_array($derivative_scheme, $public_schemes, TRUE);
-    }
+    // Check if is public scheme.
+    $is_public = $this->isSchemePublic($token_is_valid, $scheme, $derivative_scheme);
 
     $headers = [];
 
@@ -310,6 +272,125 @@ class ImageStyleDownloadController extends FileDownloadController {
     }
 
     return $original_uri;
+  }
+
+  /**
+   * Factorization of ImageStyleDownloadController::deliver Line 114-124.
+   *
+   * @param string $scheme
+   *   Target Scheme.
+   * @param string $image_uri
+   *   Original image uri.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *   Thrown when the file request is invalid.
+   */
+  protected function checkNormalizedScheme($scheme, $image_uri): void {
+
+    if ($this->streamWrapperManager->isValidScheme($scheme)) {
+      $normalized_target = $this->streamWrapperManager->getTarget($image_uri);
+      if ($normalized_target !== FALSE) {
+        if (!in_array($scheme, Settings::get('file_sa_core_2023_005_schemes', []))) {
+          $parts = explode('/', $normalized_target);
+          if (array_intersect($parts, ['.', '..'])) {
+            throw new NotFoundHttpException();
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Factorization of ImageStyleDownloadController::deliver Line 139-142.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   HTTPS request.
+   * @param string $image_uri
+   *   Original image uri.
+   * @param string $scheme
+   *   Target Scheme.
+   * @param string $target
+   *   Target File.
+   * @param \Drupal\image\ImageStyleInterface $image_style
+   *   Image Style.
+   *
+   * @return bool
+   *   ITOK Token ins valid.
+   */
+  protected function checkToken(Request $request, $image_uri, $scheme, $target, ImageStyleInterface $image_style) {
+    $token = $request->query->get(IMAGE_DERIVATIVE_TOKEN, '');
+    $token_is_valid = hash_equals($image_style->getPathToken($image_uri), $token)
+      || hash_equals($image_style->getPathToken($scheme . '://' . $target), $token);
+    return $token_is_valid;
+  }
+
+  /**
+   * Factorization of ImageStyleDownloadController::deliver Line 126-152.
+   *
+   * @param \Drupal\image\ImageStyleInterface $image_style
+   *   ImageStyle used.
+   * @param string $scheme
+   *   Target Scheme.
+   * @param string $target
+   *   Target File.
+   * @param bool $token_is_valid
+   *   ITOK token is valid.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *   Thrown when the file request is invalid.
+   */
+  protected function authorizedDerivativeGeneration(ImageStyleInterface $image_style, $scheme, $target, $token_is_valid): void {
+
+    // Check that the style is defined and the scheme is valid.
+    $valid = !empty($image_style) && $this->streamWrapperManager->isValidScheme($scheme);
+    // Also validate the derivative token. Sites which require image
+    // derivatives to be generated without a token can set the
+    // 'image.settings:allow_insecure_derivatives' configuration to TRUE to
+    // bypass this check, but this will increase the site's vulnerability
+    // to denial-of-service attacks. To prevent this variable from leaving the
+    // site vulnerable to the most serious attacks, a token is always required
+    // when a derivative of a style is requested.
+    // The $target variable for a derivative of a style has
+    // styles/<style_name>/... as structure, so we check if the $target variable
+    // starts with styles/.
+    if (!$this->config('image.settings')->get('allow_insecure_derivatives') || str_starts_with(ltrim($target, '\/'), 'styles/')) {
+      $valid = $valid && $token_is_valid;
+    }
+
+    if (!$valid) {
+      // Return a 404 (Page Not Found) rather than a 403 (Access Denied) as the
+      // image token is for DDoS protection rather than access checking. 404s
+      // are more likely to be cached (e.g. at a proxy) which enhances
+      // protection from DDoS.
+      throw new NotFoundHttpException();
+    }
+  }
+
+  /**
+   * Factorization of ImageStyleDownloadController::deliver Line 157-165.
+   *
+   * @param bool $token_is_valid
+   *   ITOK token is valid.
+   * @param string $scheme
+   *   Target Scheme.
+   * @param string $derivative_scheme
+   *   Derivative Scheme.
+   *
+   * @return bool
+   *   Scheme is public.
+   */
+  protected function isSchemePublic($token_is_valid, $scheme, $derivative_scheme) {
+    if ($token_is_valid) {
+      $is_public = ($scheme !== 'private');
+    }
+    else {
+      $core_schemes = ['public', 'private', 'temporary'];
+      $additional_public_schemes = array_diff(Settings::get('file_additional_public_schemes', []), $core_schemes);
+      $public_schemes = array_merge(['public'], $additional_public_schemes);
+      $is_public = in_array($derivative_scheme, $public_schemes, TRUE);
+    }
+
+    return $is_public;
   }
 
 }
