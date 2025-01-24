@@ -15,7 +15,7 @@ function block_content_update_last_removed(): int {
 /**
  * Removes the "area_text_custom" plugin from block content view configuration.
  */
-function block_content_update_10301() {
+function block_content_update_10301(): int {
   $view = \Drupal::entityTypeManager()->getStorage('view')->load('block_content');
 
   if ($view) {
@@ -35,4 +35,5 @@ function block_content_update_10301() {
       \Drupal::logger('block_content')->notice('The obsolete "area_text_custom" plugin has been removed from the block_content view.');
     }
   }
+  return \Drupal\Core\Update\UpdateHook::RESULT_OK;
 }
