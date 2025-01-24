@@ -72,14 +72,20 @@ class ListingEmpty extends AreaPluginBase {
     if (!$empty || !empty($this->options['empty'])) {
       $message = $this->t('There are no content blocks available.');
 
-      // Construct the "Add a content block" link.
-      $add_link = $this->t('Add a <a href=":url">content block</a>.', [
-        ':url' => Url::fromRoute('block_content.add_page')->toString(),
-      ]);
+      // Construct the "Add a content block" link
+      // only if the user has the proper access.
       $access_result = $this->accessManager->checkNamedRoute('block_content.add_page', [], $this->currentUser, TRUE);
+      if ($access_result->isAllowed()) {
+        // Only show the link if the user has permission.
+        $add_link = $this->t('Add a <a href=":url">content block</a>.', [
+          ':url' => Url::fromRoute('block_content.add_page')->toString(),
+        ]);
+        // Combine the message and the link.
+        $message .= ' ' . $add_link;
+      }
 
       $element = [
-        '#markup' => $message . ' ' . $add_link,
+        '#markup' => $message,
         '#cache' => [
           'contexts' => $access_result->getCacheContexts(),
           'tags' => $access_result->getCacheTags(),
