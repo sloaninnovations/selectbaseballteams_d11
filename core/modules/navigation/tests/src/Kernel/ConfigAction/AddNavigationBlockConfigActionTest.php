@@ -79,7 +79,7 @@ class AddNavigationBlockConfigActionTest extends KernelTestBase {
     $this->assertCount(4, $components);
     $component = array_values($components)[$computed_delta];
     $this->assertSame('content', $component->getRegion());
-    $this->assertEquals($data['configuration'], $component->get('configuration'));
+    $this->assertEquals($data['configuration'], $component->getConfiguration());
   }
 
   /**
