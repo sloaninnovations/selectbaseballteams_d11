@@ -80,6 +80,13 @@ function navigation_update_11003(array &$sandbox): void {
       'id' => 'navigation-user-links',
       'label' => 'Navigation user links',
       'description' => 'User links to be used in Navigation',
+      'dependencies' => [
+        'enforced' => [
+          'module' => [
+            'navigation',
+          ],
+        ],
+      ],
       'locked' => TRUE,
     ])->save();
 }
