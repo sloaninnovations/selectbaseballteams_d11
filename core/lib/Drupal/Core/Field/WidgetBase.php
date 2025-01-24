@@ -182,7 +182,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
         break;
 
       default:
-        $max = $cardinality - 1;
+        $max = $cardinality;
         break;
     }
 
@@ -194,6 +194,13 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $elements = [];
 
     for ($delta = 0; $delta <= $max; $delta++) {
+      if ($is_multiple && $delta != 0 && $delta == $max) {
+        continue;
+      }
+      elseif (empty($is_multiple) && $max == 1 && $delta == $max) {
+        continue;
+      }
+
       // Add a new empty item if it doesn't exist yet at this delta.
       if (!isset($items[$delta])) {
         $items->appendItem();
@@ -327,7 +334,13 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
 
     // Increment the items count.
     $field_state = static::getWidgetState($parents, $field_name, $form_state);
-    $field_state['items_count']++;
+    if ($element['#cardinality_multiple'] == 'true' && $field_state['items_count'] == 0) {
+      $field_state['items_count'] = 2;
+    }
+    else {
+      $field_state['items_count']++;
+    }
+
     static::setWidgetState($parents, $field_name, $form_state, $field_state);
 
     $form_state->setRebuild();
@@ -351,7 +364,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     }
 
     // Add a DIV around the delta receiving the Ajax effect.
-    $delta = $element['#max_delta'];
+    $delta = $element['#max_delta'] - 1;
     // Construct an attribute to add to div for use as selector to set the focus on.
     $button_parent = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
     $focus_attribute = 'data-drupal-selector="field-' . $button_parent['#field_name'] . '-more-focus-target"';
