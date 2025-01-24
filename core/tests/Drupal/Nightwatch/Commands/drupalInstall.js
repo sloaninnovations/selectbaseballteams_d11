@@ -51,6 +51,12 @@ exports.command = function drupalInstall(
       path: url.pathname,
     });
   } catch (error) {
+    // PHP in some cases outputs syntax errors to the stdout instead of stderr,
+    // with empty error text in the error.message. To workaround this, printing
+    // the output to the console.
+    if (error.stdout) {
+      console.log('Output:', error.stdout.toString());
+    }
     this.assert.fail(error);
   }
 
