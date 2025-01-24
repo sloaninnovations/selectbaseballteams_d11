@@ -68,7 +68,14 @@ function navigation_update_11002(array &$sandbox): void {
  * Creates the Navigation user links menu.
  */
 function navigation_update_11003(array &$sandbox): void {
-  \Drupal::entityTypeManager()->getStorage('menu')
+  $menu_storage = \Drupal::entityTypeManager()->getStorage('menu');
+
+  // Do not create the new menu if already exists.
+  if ($menu_storage->load('navigation-user-links')) {
+    return;
+  }
+
+  $menu_storage
     ->create([
       'id' => 'navigation-user-links',
       'label' => 'Navigation user links',
