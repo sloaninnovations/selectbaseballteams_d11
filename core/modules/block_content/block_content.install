@@ -5,8 +5,6 @@
  * Install, update and uninstall functions for the block_content module.
  */
 
-use Drupal\Core\Update\UpdateHook;
-
 /**
  * Implements hook_update_last_removed().
  */
@@ -37,5 +35,5 @@ function block_content_update_10301(): int {
       \Drupal::logger('block_content')->notice('The obsolete "area_text_custom" plugin has been removed from the block_content view.');
     }
   }
-  return UpdateHook::RESULT_OK;
+  return 0;
 }
