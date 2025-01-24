@@ -395,7 +395,8 @@ class Registry implements DestructableInterface {
       $cache = $cached->data;
     }
     else {
-      if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install') {
+      // @todo Remove cron check if it is removed from install https://www.drupal.org/project/drupal/issues/2422681
+      if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install' && !\Drupal::service('lock')->lockMayBeAvailable('cron')) {
         // System is still set here so preprocess can be updated in install.
         $this->processExtension($cache, 'system', 'install', 'system', $this->moduleList->getPath('system'));
       }
