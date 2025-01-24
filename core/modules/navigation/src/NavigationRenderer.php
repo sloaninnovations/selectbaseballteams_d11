@@ -223,7 +223,7 @@ final class NavigationRenderer {
       '#access' => $this->currentUser->hasPermission('access navigation'),
       '#cache' => [
         'keys' => ['top_bar'],
-        'contexts' => ['user.permissions'],
+        'contexts' => ['user.permissions', 'route'],
       ],
     ];
   }
