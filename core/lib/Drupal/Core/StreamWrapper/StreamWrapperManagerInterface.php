@@ -185,19 +185,21 @@ interface StreamWrapperManagerInterface {
   public static function getTarget($uri);
 
   /**
-   * Normalizes a URI by making it syntactically correct.
+   * Normalizes a given URI or file path.
    *
-   * A stream is referenced as "scheme://target".
+   * This method supports both URIs and file paths.
    *
    * The following actions are taken:
    * - Remove trailing slashes from target
-   * - Trim erroneous leading slashes from target. e.g. ":///" becomes "://".
+   * - Trim erroneous leading slashes from target.
+   *   e.g. "https://example.com///path" becomes "https://example.com/path".
+   * - Converting schemes (http to https or vice versa).
    *
    * @param string $uri
-   *   String reference containing the URI to normalize.
+   *   The URI or file path to normalize.
    *
    * @return string
-   *   The normalized URI.
+   *   The normalized URI or file path.
    */
   public function normalizeUri($uri);
 
