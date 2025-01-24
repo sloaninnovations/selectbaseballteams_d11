@@ -10,7 +10,6 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\LegacyHook;
-use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -137,17 +136,13 @@ class HookCollectorPass implements CompilerPassInterface {
    * * @todo Pass only $container when ModuleHandler->add is removed https://www.drupal.org/project/drupal/issues/3481778
    */
   public static function collectAllHookImplementations(array $module_filenames, ?ContainerBuilder $container = NULL): static {
-    $modules = array_map(fn ($x) => preg_quote($x, '/'), array_keys($module_filenames));
+    $modules = [... array_keys($module_filenames), 'template'];
     // Longer modules first.
     usort($modules, fn($a, $b) => strlen($b) - strlen($a));
-    $module_preg = '/^(?<function>(?<module>' . implode('|', $modules) . ')_(?!preprocess_)(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
+    $module_preg = '/^(?<function>(?<module>' . implode('|', $modules) . ')_(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
     $collector = new static();
     foreach ($module_filenames as $module => $info) {
-      $skip_procedural = FALSE;
-      if ($container?->hasParameter("$module.hooks_converted")) {
-        $skip_procedural = $container->getParameter("$module.hooks_converted");
-      }
-      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $module_preg, $skip_procedural);
+      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $module_preg, FALSE);
     }
     return $collector;
   }
@@ -213,9 +208,6 @@ class HookCollectorPass implements CompilerPassInterface {
           $parser = new StaticReflectionParser('', $finder);
           $implementations = [];
           foreach ($parser->getMethodAttributes() as $function => $attributes) {
-            if (StaticReflectionParser::hasAttribute($attributes, StopProceduralHookScan::class)) {
-              break;
-            }
             if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && preg_match($module_preg, $function, $matches)) {
               $implementations[] = ['function' => $function, 'module' => $matches['module'], 'hook' => $matches['hook']];
             }
@@ -377,7 +369,7 @@ class HookCollectorPass implements CompilerPassInterface {
       'install_tasks_alter',
     ];
 
-    if (in_array($hook->hook, $staticDenyHooks) || preg_match('/^(post_update_|preprocess_|update_\d+$)/', $hook->hook)) {
+    if (in_array($hook->hook, $staticDenyHooks) || preg_match('/^(post_update_|update_\d+$)/', $hook->hook)) {
       throw new \LogicException("The hook $hook->hook on class $class does not support attributes and must remain procedural.");
     }
   }
