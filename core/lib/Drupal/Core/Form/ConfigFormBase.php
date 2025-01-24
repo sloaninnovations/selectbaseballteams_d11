@@ -176,16 +176,27 @@ abstract class ConfigFormBase extends FormBase {
         $form_state->disableCache();
       }
 
-      foreach ($target->propertyPaths as $property_path) {
-        if (isset($map[$target->configName][$property_path])) {
-          throw new \LogicException(sprintf('Two #config_targets both target "%s" in the "%s" config: `%s` and `%s`.',
-            $property_path,
-            $target->configName,
-            '$form[\'' . implode("']['", $map[$target->configName][$property_path]) . '\']',
-            '$form[\'' . implode("']['", $element['#array_parents']) . '\']',
-          ));
+      // Ensure $element['#array_parents'] is an array.
+      $parents = isset($element['#array_parents']) ? (array) $element['#array_parents'] : [];
+      // Handle special case for text_format elements.
+      if (isset($element['#type']) && $element['#type'] === 'text_format') {
+        $text_format_target = $target->configName;
+        // Ensure we use arrays for property paths.
+        $map[$text_format_target . '.value'] = $parents;
+        $map[$text_format_target . '.format'] = $parents;
+      }
+      else {
+        foreach ($target->propertyPaths as $property_path) {
+          if (isset($map[$target->configName][$property_path])) {
+            throw new \LogicException(sprintf('Two #config_targets both target "%s" in the "%s" config: `%s` and `%s`.',
+              $property_path,
+              $target->configName,
+              '$form[\'' . implode("']['", $map[$target->configName][$property_path]) . '\']',
+              '$form[\'' . implode("']['", $element['#array_parents']) . '\']',
+            ));
+          }
+          $map[$target->configName][$property_path] = $element['#array_parents'];
         }
-        $map[$target->configName][$property_path] = $element['#array_parents'];
       }
       $form_state->set(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP, $map);
     }
@@ -330,6 +341,24 @@ abstract class ConfigFormBase extends FormBase {
     $map = $form_state->get(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP);
 
     foreach ($map[$config->getName()] as $array_parents) {
+      // Ensure $array_parents is always an array.
+      $parents = is_array($array_parents) ? $array_parents : [$array_parents];
+      // Retrieve the form element using the array_parents.
+      $element = $form;
+      foreach ($parents as $parent) {
+        if (isset($element[$parent])) {
+          $element = $element[$parent];
+        }
+        else {
+          // Skip this iteration if the parent path is not found.
+          continue 2;
+        }
+      }
+
+      // Ensure the element has the #config_target property set.
+      if (!isset($element['#config_target'])) {
+        continue;
+      }
       $target = ConfigTarget::fromForm($array_parents, $form);
       if ($target->configName !== $config->getName()) {
         continue;
