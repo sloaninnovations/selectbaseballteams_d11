@@ -443,13 +443,44 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
     foreach ($this->translations as $langcode => $data) {
       if ($this->hasTranslation($langcode)) {
         $translation = $this->getTranslation($langcode);
+        $translation_original = $this->original && $this->original->hasTranslation($langcode) ? $this->original->getTranslation($langcode) : NULL;
         // Try to set fields provided by the media source and mapped in
         // media type config.
         foreach ($translation->bundle->entity->getFieldMap() as $metadata_attribute_name => $entity_field_name) {
-          // Only save value in the entity if the field is empty or if the
-          // source field changed.
-          if ($translation->hasField($entity_field_name) && ($translation->get($entity_field_name)->isEmpty() || $translation->hasSourceFieldChanged())) {
-            $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
+          if ($translation->hasField($entity_field_name)) {
+            // Get the new field item, if it is empty, we can set the meta data
+            // right away and continue:
+            $new_field_item = $translation->get($entity_field_name);
+            if ($new_field_item->isEmpty()) {
+              $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
+              continue;
+            }
+            if (!$translation->hasSourceFieldChanged()) {
+              // The source field hasn't changed. Simply continue to the
+              // next metadata attribute:
+              continue;
+            }
+            // Get the new field item value (it can't be empty here):
+            $new_value = $new_field_item->getValue();
+
+            // Get the old value from the translation original if it is available.
+            $old_value = NULL;
+            if ($translation_original) {
+              $old_value = $translation_original->get($entity_field_name)->getValue();
+            }
+            // If this is a new translation then use the value of the field
+            // from the original entity.
+            elseif ($this->original && $this->original->hasField($entity_field_name)) {
+              $old_value = $this->original->get($entity_field_name)->getValue();
+            }
+
+            // Only save the field value when the field is not actively being
+            // changed. For this, perform a strict comparison only when the old
+            // value is not empty (the new value can not be empty).
+            if (empty($old_value) || $new_value === $old_value) {
+              $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
+            }
+
           }
         }
 
