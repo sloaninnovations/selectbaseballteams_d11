@@ -238,12 +238,12 @@ class ImageHooks {
   /**
    * Implements hook_entity_presave().
    *
-   * Transforms default image of image field from array into single value at save.
+   * Transforms the default image of an image field from an array into a single value at save.
    */
   #[Hook('entity_presave')]
   public function entityPresave(EntityInterface $entity) {
-    // Get the default image settings, return if not saving an image field storage
-    // or image field entity.
+    // Get the default image settings, return if not saving an image field
+    // or an image field entity.
     $default_image = [];
     if (($entity instanceof FieldStorageConfigInterface || $entity instanceof FieldConfigInterface) && $entity->getType() == 'image') {
       $default_image = $entity->getSetting('default_image');
@@ -300,7 +300,7 @@ class ImageHooks {
         \Drupal::service('file.usage')->delete($file_old, 'image', 'default_image', $field_storage->uuid());
       }
     }
-    // If the upload destination changed, then move the file.
+    // If the upload destination has changed, move the file to the new destination.
     if ($file_new && StreamWrapperManager::getScheme($file_new->getFileUri()) != $field_storage->getSetting('uri_scheme')) {
       $directory = $field_storage->getSetting('uri_scheme') . '://default_images/';
       \Drupal::service('file_system')->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
@@ -321,7 +321,7 @@ class ImageHooks {
     $prior_instance = $field->getOriginal();
     $uuid_new = $field->getSetting('default_image')['uuid'];
     $uuid_old = $prior_instance->getSetting('default_image')['uuid'];
-    // If the old and new files do not match, update the default accordingly.
+    // If the old and new files do not match, update the default image accordingly.
     $file_new = $uuid_new ? \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid_new) : FALSE;
     if ($uuid_new != $uuid_old) {
       // Save the new file, if present.
@@ -330,12 +330,12 @@ class ImageHooks {
         $file_new->save();
         \Drupal::service('file.usage')->add($file_new, 'image', 'default_image', $field->uuid());
       }
-      // Delete the old file, if present.
+      // Delete the old file, if it is present.
       if ($uuid_old && ($file_old = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid_old))) {
         \Drupal::service('file.usage')->delete($file_old, 'image', 'default_image', $field->uuid());
       }
     }
-    // If the upload destination changed, then move the file.
+    // If the upload destination has changed, move the file to the new destination.
     if ($file_new && StreamWrapperManager::getScheme($file_new->getFileUri()) != $field_storage->getSetting('uri_scheme')) {
       $directory = $field_storage->getSetting('uri_scheme') . '://default_images/';
       \Drupal::service('file_system')->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
@@ -371,7 +371,7 @@ class ImageHooks {
     }
     // The value of a managed_file element can be an array if #extended == TRUE.
     $uuid = $field->getSetting('default_image')['uuid'];
-    // Remove the default image when the instance is deleted.
+    // Remove the default image whenever the instance is deleted.
     if ($uuid && ($file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid))) {
       \Drupal::service('file.usage')->delete($file, 'image', 'default_image', $field->uuid());
     }
