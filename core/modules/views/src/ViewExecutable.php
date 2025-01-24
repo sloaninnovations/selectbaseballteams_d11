@@ -745,6 +745,43 @@ class ViewExecutable {
       $this->initDisplay();
 
       $this->exposed_input = $this->request->query->all();
+      // Allow AJAX requests on exposed filters.
+      if ($this->request->isMethod('post') && $this->request->request->get('_triggering_element_name')) {
+        $post_form_data = $this->request->request->all();
+        $exposed_field_names = [];
+        // Go through each handler and let it generate its exposed widget.
+        foreach ($this->display_handler->handlers as $type => $value) {
+          /** @var \Drupal\views\Plugin\views\ViewsHandlerInterface $handler */
+          foreach ($this->$type as $handler) {
+            if ($handler->canExpose() && $handler->isExposed()) {
+              // Pick up POST data for all the exposed handlers.
+              if (!empty($handler->options['expose']['use_operator']) && !empty($handler->options['expose']['operator_id'])) {
+                $exposed_field_names[] = $handler->options['expose']['operator_id'];
+              }
+              if (!empty($handler->options['expose']['identifier'])) {
+                if ($handler->isAGroup()) {
+                  $exposed_field_names[] = $handler->options['group_info']['identifier'];
+                }
+                else {
+                  $exposed_field_names[] = $handler->options['expose']['identifier'];
+                }
+              }
+            }
+          }
+        }
+        foreach ($exposed_field_names as $exposed_field_name) {
+          foreach ($post_form_data as $post_form_key => $post_form_value) {
+            if ($post_form_key === $exposed_field_name || str_starts_with($post_form_key, "{$exposed_field_name}_")) {
+              // Pick up the exposed field and any extra variations starting
+              // with the same field name.
+              $this->exposed_input += [
+                $post_form_key => $post_form_value,
+              ];
+            }
+          }
+        }
+      }
+
       // Unset items that are definitely not our input:
       foreach (['page', 'q'] as $key) {
         if (isset($this->exposed_input[$key])) {
