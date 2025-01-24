@@ -67,9 +67,16 @@ class Cron implements CronInterface {
     protected TimeInterface $time,
     array $queue_config,
   ) {
-    $this->queueConfig = $queue_config + [
-      'suspendMaximumWait' => 30.0,
-    ];
+    if ($queue_config) {
+      $this->queueConfig = $queue_config + [
+        'suspendMaximumWait' => 30.0,
+      ];
+    }
+    else {
+      $this->queueConfig = [
+        'suspendMaximumWait' => 30.0,
+      ];
+    }
   }
 
   /**
