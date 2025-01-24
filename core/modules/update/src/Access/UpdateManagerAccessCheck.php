@@ -43,7 +43,7 @@ class UpdateManagerAccessCheck implements AccessInterface {
     @trigger_error('The ' . __METHOD__ . ' method is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3458658', E_USER_DEPRECATED);
     // Uncacheable because the access result depends on a Settings key-value
     // pair, and can therefore change at any time.
-    return AccessResult::allowedIf($this->settings->get('allow_authorize_operations', TRUE))->setCacheMaxAge(0);
+    return AccessResult::allowedIf($this->settings->get('allow_authorize_operations', TRUE))->addCacheContexts(['settings']);
   }
 
 }
