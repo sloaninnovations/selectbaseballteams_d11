@@ -27,7 +27,7 @@ function twig_extension(): string {
 /**
  * Implements hook_render_template().
  */
-function twig_render_template($template_file, array $variables): MarkupInterface {
+function twig_render_template($template_file, array $variables): string|MarkupInterface {
   /** @var \Twig\Environment $twig_service */
   $twig_service = \Drupal::service('twig');
   try {
