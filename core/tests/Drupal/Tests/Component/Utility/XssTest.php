@@ -573,6 +573,14 @@ class XssTest extends TestCase {
   }
 
   /**
+   * Checks that \Drupal\Component\Utility\Xss::filterAdmin() correctly allows additional tags.
+   */
+  public function testFilterXSSAdminWithAdditionalTags(): void {
+    $value = Xss::filterAdmin('<style /><iframe /><frame /><frameset /><meta /><link /><embed /><applet /><param /><layer /><video />', ['iframe']);
+    $this->assertEquals('<iframe />', $value, 'Admin HTML filter -- should allow some specific tags.');
+  }
+
+  /**
    * Tests the loose, admin HTML filter.
    *
    * @param string $value

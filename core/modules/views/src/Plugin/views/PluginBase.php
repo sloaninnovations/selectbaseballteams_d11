@@ -354,6 +354,8 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
    *   Array of token => replacement_value items.
    *
    * @return string
+   *
+   * @see static::sanitizeTextContent()
    */
   protected function viewsTokenReplace($text, $tokens) {
     if (!strlen($text)) {
@@ -361,7 +363,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
       return '';
     }
     if (empty($tokens)) {
-      return Xss::filterAdmin($text);
+      return static::sanitizeTextContent($text);
     }
 
     $twig_tokens = [];
@@ -412,7 +414,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
         '#context' => $twig_tokens,
         '#post_render' => [
           function ($children, $elements) {
-            return Xss::filterAdmin($children);
+            return static::sanitizeTextContent($children);
           },
         ],
       ];
@@ -424,7 +426,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
       return (string) $this->getRenderer()->renderInIsolation($build);
     }
     else {
-      return Xss::filterAdmin($text);
+      return static::sanitizeTextContent($text);
     }
   }
 
@@ -666,6 +668,22 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
     }
 
     return $this->renderer;
+  }
+
+  /**
+   * Returns a XSS sanitized text.
+   *
+   * It includes support for additional tags which might be potentially used
+   * in content.
+   *
+   * @param string $text
+   *   The text to sanitize.
+   *
+   * @return string
+   *   The XSS sanitized text.
+   */
+  protected static function sanitizeTextContent(string $text): string {
+    return Xss::filterAdmin($text, ['video', 'source', 'track', 'iframe']);
   }
 
 }

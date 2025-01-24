@@ -111,6 +111,8 @@ class Xss {
    *
    * @param string $string
    *   The string to apply the filter to.
+   * @param array $additional_tags
+   *   Additional tags that can be used inside the HTML. Defaults to empty array.
    *
    * @return string
    *   The filtered string.
@@ -119,8 +121,8 @@ class Xss {
    *
    * @see \Drupal\Component\Utility\Xss::getAdminTagList()
    */
-  public static function filterAdmin($string) {
-    return static::filter($string, static::$adminTags);
+  public static function filterAdmin($string, array $additional_tags = []) {
+    return static::filter($string, array_merge(static::$adminTags, $additional_tags));
   }
 
   /**
