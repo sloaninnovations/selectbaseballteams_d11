@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit;
 
+use Drupal\Core\EventDispatcher\EventDispatcherFactoryInterface;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\MigrateException;
@@ -1007,7 +1008,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       'prefix' => 'prefix',
     ];
     $pdo = Connection::open($connection_options);
-    $this->database = new Connection($pdo, $connection_options);
+    $this->database = new Connection($pdo, $connection_options, $this->createMock(EventDispatcherFactoryInterface::class));
     $qualified_map_table = $this->getIdMap()->getQualifiedMapTableName();
     // The SQLite driver is a special flower. It will prefix tables with
     // PREFIX.TABLE, instead of the standard PREFIXTABLE.

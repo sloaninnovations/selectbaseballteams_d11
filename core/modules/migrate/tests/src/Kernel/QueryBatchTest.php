@@ -10,6 +10,7 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\TestTools\Random;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests query batching.
@@ -233,7 +234,7 @@ class QueryBatchTest extends KernelTestBase {
     // closed.
     $connection_options = ['database' => ':memory:'];
     $pdo = Connection::open($connection_options);
-    $connection = new Connection($pdo, $connection_options);
+    $connection = new Connection($pdo, $connection_options, $this->container->get(EventDispatcherInterface::class));
 
     // Create the tables and fill them with data.
     foreach ($source_data as $table => $rows) {

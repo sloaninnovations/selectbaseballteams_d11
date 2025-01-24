@@ -9,6 +9,7 @@ use Drupal\Core\Database\Query\SelectExtender;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests the Select query extender classes.
@@ -124,7 +125,7 @@ class SelectExtenderTest extends KernelTestBase {
     $additional_class_loader->register(TRUE);
 
     $mock_pdo = $this->createMock(StubPDO::class);
-    $connection = new StubConnection($mock_pdo, ['namespace' => $namespace]);
+    $connection = new StubConnection($mock_pdo, ['namespace' => $namespace], ['', ''], $this->container->get(EventDispatcherInterface::class));
 
     // Tests the method \Drupal\Core\Database\Query\Select::extend().
     $select = $connection->select('test')->extend($extend);
