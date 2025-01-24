@@ -6,6 +6,8 @@ use Drupal\Component\Plugin\Attribute\AttributeInterface;
 use Drupal\Component\Plugin\Attribute\Plugin;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\FileCache\FileCacheInterface;
+use Drupal\Component\Utility\ClassDependenciesParser;
+use Drupal\Component\Utility\ClassDependenciesParserInterface;
 
 /**
  * Defines a discovery mechanism to find plugins with attributes.
@@ -13,6 +15,8 @@ use Drupal\Component\FileCache\FileCacheInterface;
 class AttributeClassDiscovery implements DiscoveryInterface {
 
   use DiscoveryTrait;
+
+  protected const CLASS_DEPENDENCIES_PARSER_CLASS = ClassDependenciesParser::class;
 
   /**
    * The file cache object.
@@ -71,8 +75,11 @@ class AttributeClassDiscovery implements DiscoveryInterface {
             if ($fileinfo->getExtension() === 'php') {
               if ($cached = $this->fileCache->get($fileinfo->getPathName())) {
                 if (isset($cached['id'])) {
-                  // Explicitly unserialize this to create a new object instance.
-                  $definitions[$cached['id']] = unserialize($cached['content']);
+                  $dependencies = !empty($cached['dependencies']) ? unserialize($cached['dependencies']) : [];
+                  if (!is_array($dependencies) || !static::CLASS_DEPENDENCIES_PARSER_CLASS::hasMissingDependencies($dependencies)) {
+                    // Explicitly unserialize this to create a new object instance.
+                    $definitions[$cached['id']] = unserialize($cached['content']);
+                  }
                 }
                 continue;
               }
@@ -81,14 +88,17 @@ class AttributeClassDiscovery implements DiscoveryInterface {
               $sub_path = $sub_path ? str_replace(DIRECTORY_SEPARATOR, '\\', $sub_path) . '\\' : '';
               $class = $namespace . '\\' . $sub_path . $fileinfo->getBasename('.php');
               try {
-                ['id' => $id, 'content' => $content] = $this->parseClass($class, $fileinfo);
+                ['id' => $id, 'content' => $content, 'dependencies' => $dependencies] = $this->parseClass($class, $fileinfo);
                 if ($id) {
                   $definitions[$id] = $content;
                   // Explicitly serialize this to create a new object instance.
-                  $this->fileCache->set($fileinfo->getPathName(), ['id' => $id, 'content' => serialize($content)]);
+                  $this->fileCache->set($fileinfo->getPathName(), ['id' => $id, 'content' => serialize($content), 'dependencies' => serialize($dependencies)]);
                 }
-                else {
+                elseif (empty($dependencies)) {
                   // Store a NULL object, so that the file is not parsed again.
+                  // If there are dependencies, do not store, so that the class
+                  // can be parsed again later to check whether dependencies are
+                  // met.
                   $this->fileCache->set($fileinfo->getPathName(), [NULL]);
                 }
               }
@@ -134,6 +144,19 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    * @throws \Error
    */
   protected function parseClass(string $class, \SplFileInfo $fileinfo): array {
+    // Use PHPParser to check class does not have any missing dependencies
+    // (extended class, implemented interfaces, or used traits) which would
+    // make reflection throw exceptions or cause a fatal error.
+    $dependenciesParser = $this->getClassDependenciesParser($fileinfo);
+    if (!$dependenciesParser->hasClassAttribute($this->pluginDefinitionAttributeName)) {
+      return ['id' => NULL, 'content' => NULL, 'dependencies' => []];
+    }
+
+    if (($dependencies = $dependenciesParser->getClassDependencies()) &&
+         static::CLASS_DEPENDENCIES_PARSER_CLASS::hasMissingDependencies($dependencies)) {
+      return ['id' => NULL, 'content' => NULL, 'dependencies' => $dependencies];
+    }
+
     // @todo Consider performance improvements over using reflection.
     // @see https://www.drupal.org/project/drupal/issues/3395260.
     $reflection_class = new \ReflectionClass($class);
@@ -147,7 +170,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
       $id = $attribute->getId();
       $content = $attribute->get();
     }
-    return ['id' => $id, 'content' => $content];
+    return ['id' => $id, 'content' => $content, 'dependencies' => $dependencies];
   }
 
   /**
@@ -170,6 +193,20 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    */
   protected function getPluginNamespaces(): array {
     return $this->pluginNamespaces;
+  }
+
+  /**
+   * Gets the class dependencies parser for the plugin file.
+   *
+   * @param \SplFileInfo $fileinfo
+   *   The SPL file information for the class.
+   *
+   * @return \Drupal\Component\Utility\ClassDependenciesParserInterface
+   *   Parser that gets the dependencies for the plugin class.
+   */
+  protected function getClassDependenciesParser(\SplFileInfo $fileinfo): ClassDependenciesParserInterface {
+    $class = static::CLASS_DEPENDENCIES_PARSER_CLASS;
+    return new $class($fileinfo);
   }
 
 }

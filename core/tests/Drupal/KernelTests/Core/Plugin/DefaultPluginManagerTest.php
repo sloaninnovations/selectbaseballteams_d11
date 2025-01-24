@@ -8,7 +8,6 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\plugin_test\Plugin\Annotation\PluginExample as AnnotationPluginExample;
 use Drupal\plugin_test\Plugin\Attribute\PluginExample as AttributePluginExample;
-use org\bovigo\vfs\vfsStream;
 
 /**
  * Tests the default plugin manager.
@@ -62,20 +61,9 @@ class DefaultPluginManagerTest extends KernelTestBase {
     $this->assertArrayHasKey('example_3', $definitions);
     $this->assertArrayHasKey('example_4', $definitions);
     $this->assertArrayHasKey('example_5', $definitions);
+    $this->assertArrayNotHasKey("example_with_dependencies_attribute", $definitions);
 
     // Attributes only.
-    // \Drupal\Component\Plugin\Discovery\AttributeClassDiscovery does not
-    // support parsing classes that cannot be reflected. Therefore, we use VFS
-    // to create a directory remove plugin_test's plugins and remove the broken
-    // plugins.
-    vfsStream::setup('plugin_test');
-    $dir = vfsStream::create(['src' => ['Plugin' => ['plugin_test' => ['custom_annotation' => []]]]]);
-    $plugin_directory = $dir->getChild('src/' . $subdir);
-    vfsStream::copyFromFileSystem($base_directory . '/' . $subdir, $plugin_directory);
-    $plugin_directory->removeChild('ExtendingNonInstalledClass.php');
-    $plugin_directory->removeChild('UsingNonInstalledTraitClass.php');
-
-    $namespaces = new \ArrayObject(['Drupal\plugin_test' => vfsStream::url('plugin_test/src')]);
     $manager = new DefaultPluginManager($subdir, $namespaces, $module_handler, NULL, AttributePluginExample::class);
     $definitions = $manager->getDefinitions();
     $this->assertArrayNotHasKey('example_1', $definitions);
@@ -85,6 +73,25 @@ class DefaultPluginManagerTest extends KernelTestBase {
     $this->assertArrayHasKey('example_5', $definitions);
     $this->assertArrayNotHasKey('extending_non_installed_class', $definitions);
     $this->assertArrayNotHasKey('using_non_installed_trait', $definitions);
+    $this->assertArrayNotHasKey("example_with_dependencies_attribute", $definitions);
+
+    // Test that example with dependencies is discovered after module dependency
+    // is installed.
+    $this->container->get('module_installer')->install(['plugin_test_extended']);
+    // There is a new module handler instance after module install.
+    $module_handler = $this->container->get('module_handler');
+    $manager = new DefaultPluginManager($subdir, $namespaces, $module_handler, NULL, AttributePluginExample::class, AnnotationPluginExample::class);
+    $definitions = $manager->getDefinitions();
+    $this->assertArrayHasKey("example_with_dependencies_attribute", $definitions);
+
+    // Test that example with dependencies is not discovered after module
+    // dependency is back to being uninstalled.
+    $this->container->get('module_installer')->uninstall(['plugin_test_extended']);
+    // There is a new module handler instance after module uninstall.
+    $module_handler = $this->container->get('module_handler');
+    $manager = new DefaultPluginManager($subdir, $namespaces, $module_handler, NULL, AttributePluginExample::class, AnnotationPluginExample::class);
+    $definitions = $manager->getDefinitions();
+    $this->assertArrayNotHasKey("example_with_dependencies_attribute", $definitions);
   }
 
 }

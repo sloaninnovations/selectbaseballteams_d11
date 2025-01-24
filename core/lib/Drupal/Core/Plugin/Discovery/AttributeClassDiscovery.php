@@ -4,11 +4,14 @@ namespace Drupal\Core\Plugin\Discovery;
 
 use Drupal\Component\Plugin\Attribute\AttributeInterface;
 use Drupal\Component\Plugin\Discovery\AttributeClassDiscovery as ComponentAttributeClassDiscovery;
+use Drupal\Core\Utility\ClassDependenciesParser;
 
 /**
  * Defines a discovery mechanism to find plugins using attributes.
  */
 class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
+
+  protected const CLASS_DEPENDENCIES_PARSER_CLASS = ClassDependenciesParser::class;
 
   /**
    * A suffix to append to each PSR-4 directory associated with a base namespace.

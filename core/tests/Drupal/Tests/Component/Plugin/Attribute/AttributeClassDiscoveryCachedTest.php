@@ -46,8 +46,12 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
     $discovery_path = __DIR__ . "/../../../../../fixtures/plugins/Plugin";
     // File path that should be discovered within that directory.
     $file_path = $discovery_path . '/PluginNamespace/AttributeDiscoveryTest1.php';
-    // Define a file path within the directory that should not be discovered.
-    $non_discoverable_file_path = $discovery_path . '/PluginNamespace/AttributeDiscoveryTest2.php';
+    // Define file paths within the directory that should not be discovered.
+    $non_discoverable_file_paths = [
+      $discovery_path . '/PluginNamespace/AttributeDiscoveryTest2.php',
+      $discovery_path . '/PluginNamespace/AttributeDiscoveryTestMissingInterface.php',
+      $discovery_path . '/PluginNamespace/AttributeDiscoveryTestMissingTrait.php',
+    ];
 
     $discovery = new AttributeClassDiscovery(['com\example' => [$discovery_path]]);
     $this->assertEquals([
@@ -69,8 +73,12 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
       'class' => 'com\example\PluginNamespace\AttributeDiscoveryTest1',
     ], unserialize($file_cache->get($file_path)['content']));
 
-    // The plugin that extends a missing class should not be cached.
-    $this->assertNull($file_cache->get($non_discoverable_file_path));
+    // The plugins that extend a missing class, implement a missing interface,
+    // and use a missing trait should not be cached.
+    foreach ($non_discoverable_file_paths as $non_discoverable_file_path) {
+      $this->assertTrue(file_exists($non_discoverable_file_path));
+      $this->assertNull($file_cache->get($non_discoverable_file_path));
+    }
 
     // Change the file cache entry.
     // The file cache is keyed by the file path, and we'll add some known
