@@ -96,11 +96,6 @@ abstract class MenuLinkContentResourceTestBase extends EntityResourceTestBase {
           ],
         ],
       ],
-      'bundle' => [
-        [
-          'value' => 'menu_link_content',
-        ],
-      ],
     ];
   }
 
@@ -154,11 +149,6 @@ abstract class MenuLinkContentResourceTestBase extends EntityResourceTestBase {
       'langcode' => [
         [
           'value' => 'en',
-        ],
-      ],
-      'bundle' => [
-        [
-          'value' => 'menu_link_content',
         ],
       ],
       'description' => [
