@@ -916,7 +916,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     }
 
     // Check loading entities one by one. It is important to do these checks
-    // after the "multiple load" ones above so we can test with a fully warmed
+    // after the "multiple load" ones above so that we can test with a fully warmed
     // static cache.
     foreach ($expected_default_revisions as $expected_default_revision) {
       $entity_id = $expected_default_revision[$id_key];
@@ -1000,6 +1000,10 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     $expected_result = array_combine(array_column($expected_default_revisions, $revision_key), array_column($expected_default_revisions, $id_key));
     $this->assertEquals($expected_result, $result);
 
+    // Check the latest revision queries.
+    $result = $storage->getQuery()->accessCheck(FALSE)->latestRevision()->execute();
+    $this->assertEquals($expected_result, $result);
+
     // Check querying each revision individually.
     foreach ($expected_values as $expected_value) {
       $query = $storage->getQuery()->accessCheck(FALSE);
@@ -1008,8 +1012,8 @@ class WorkspaceIntegrationTest extends KernelTestBase {
         ->condition($entity_keys['label'], $expected_value[$label_key])
         ->condition($entity_keys['published'], (int) $expected_value[$published_key]);
 
-      // If the entity is not expected to be the default revision, we need to
-      // query all revisions if we want to find it.
+      // If the entity is not expected to be the default revision, it is necessary to
+      // query all revisions in order to find it.
       if (!$expected_value['default_revision']) {
         $query->allRevisions();
       }
@@ -1020,15 +1024,15 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   }
 
   /**
-   * Flattens the expectations array defined by testWorkspaces().
+   * The function flattens the expectations array defined by testWorkspaces().
    *
    * @param array $expected
-   *   An array as defined by testWorkspaces().
+   *   An array that is defined by testWorkspaces().
    * @param string $entity_type_id
    *   The ID of the entity type that is being tested.
    *
    * @return array
-   *   An array where all the entity IDs and revision IDs are merged inside each
+   *   An array in which all the entity IDs and revision IDs are merged inside each
    *   expected values array.
    */
   protected function flattenExpectedValues(array $expected, $entity_type_id): array {
@@ -1078,7 +1082,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   }
 
   /**
-   * Tests publishing with fields in dedicated table storage.
+   * Tests publication with fields in dedicated table storage.
    */
   public function testPublishWorkspaceDedicatedTableStorage(): void {
     $this->initializeWorkspacesModule();
@@ -1108,7 +1112,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
   }
 
   /**
-   * Tests workspace publishing is not sensitive to node access.
+   * Tests workspace publication is not sensitive to node access.
    *
    * The node_access_test module makes anonymous nodes unviewable,
    * so enable it and test getDifferringRevisionIdsOnTarget() with an anonymous
