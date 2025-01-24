@@ -708,7 +708,9 @@ function simpletest_script_setup_test_run_results_storage($new = FALSE) {
 
   // Create the test result schema.
   try {
-    $test_run_results_storage = new SimpletestTestRunResultsStorage(Database::getConnection('default', 'test-runner'));
+    $test_run_results_storage = new SimpletestTestRunResultsStorage(
+      Database::initializeConnection('test-runner', 'default', \Drupal::service('event_dispatcher')),
+    );
   }
   catch (\PDOException $e) {
     simpletest_script_print_error($databases['test-runner']['default']['driver'] . ': ' . $e->getMessage());

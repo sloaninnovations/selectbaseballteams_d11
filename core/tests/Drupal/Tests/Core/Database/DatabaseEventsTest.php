@@ -14,6 +14,7 @@ use Drupal\Core\Database\Exception\EventException;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * @coversDefaultClass \Drupal\Core\Database\Connection
@@ -33,7 +34,7 @@ class DatabaseEventsTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->connection = new StubConnection($this->createMock(StubPDO::class), []);
+    $this->connection = new StubConnection($this->createMock(StubPDO::class), [], ['', ''], new EventDispatcher());
   }
 
   /**

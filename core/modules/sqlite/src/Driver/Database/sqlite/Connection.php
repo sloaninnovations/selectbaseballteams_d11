@@ -9,6 +9,7 @@ use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * SQLite implementation of \Drupal\Core\Database\Connection.
@@ -75,8 +76,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * Constructs a \Drupal\sqlite\Driver\Database\sqlite\Connection object.
    */
-  public function __construct(\PDO $connection, array $connection_options) {
-    parent::__construct($connection, $connection_options);
+  public function __construct(\PDO $connection, array $connection_options, ?EventDispatcher $eventDispatcher = NULL) {
+    if ($eventDispatcher === NULL) {
+      @trigger_error('Not passing the $eventDispatcher parameter to ' . __METHOD__ . '() is deprecated in drupal:11.2.0 and is throwing an error from drupal:12.0.0. See https://www.drupal.org/node/7654312', E_USER_DEPRECATED);
+    }
+    parent::__construct($connection, $connection_options, $eventDispatcher);
 
     // Empty prefix means query the main database -- no need to attach anything.
     $prefix = $this->connectionOptions['prefix'] ?? '';

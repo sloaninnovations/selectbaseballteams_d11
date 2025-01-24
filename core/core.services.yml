@@ -456,13 +456,13 @@ services:
   Drupal\Core\Diff\DiffFormatter: '@diff.formatter'
   database:
     class: Drupal\Core\Database\Connection
-    factory: Drupal\Core\Database\Database::getConnection
-    arguments: [default]
+    factory: Drupal\Core\Database\Database::initializeConnection
+    arguments: ['default', 'default', '@event_dispatcher']
   Drupal\Core\Database\Connection: '@database'
   database.replica:
     class: Drupal\Core\Database\Connection
-    factory: Drupal\Core\Database\Database::getConnection
-    arguments: [replica]
+    factory: Drupal\Core\Database\Database::initializeConnection
+    arguments: ['default', 'replica', '@event_dispatcher']
   database.replica_kill_switch:
     class: Drupal\Core\Database\ReplicaKillSwitch
     arguments: ['@settings', '@datetime.time', '@session']
@@ -878,6 +878,7 @@ services:
   Drupal\Core\Routing\RouteMatchInterface: '@current_route_match'
   event_dispatcher:
     class: Symfony\Component\EventDispatcher\EventDispatcher
+    factory: Drupal\Component\EventDispatcher\EventDispatcherFactory::getInstance
   Psr\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   Symfony\Contracts\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   controller_resolver:
