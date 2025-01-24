@@ -58,7 +58,7 @@ class Checkboxes extends FormElementBase {
    * Processes a checkboxes form element.
    */
   public static function processCheckboxes(&$element, FormStateInterface $form_state, &$complete_form) {
-    $value = is_array($element['#value']) ? $element['#value'] : [];
+    $value = isset($element['#value']) ? (is_array($element['#value']) ? $element['#value'] : []) : [];
     $element['#tree'] = TRUE;
     if (count($element['#options']) > 0) {
       if (!isset($element['#default_value']) || $element['#default_value'] == 0) {
@@ -91,7 +91,7 @@ class Checkboxes extends FormElementBase {
           '#title' => $choice,
           '#return_value' => $key,
           '#default_value' => $default_value,
-          '#attributes' => $element['#attributes'],
+          '#attributes' => $element['#attributes'] ?? [],
           '#ajax' => $element['#ajax'] ?? NULL,
           // Errors should only be shown on the parent checkboxes element.
           '#error_no_message' => TRUE,
@@ -99,6 +99,30 @@ class Checkboxes extends FormElementBase {
         ];
       }
     }
+
+    if (!empty($element['#check_all']) && $element['#check_all']) {
+      $element['all_wrapper'] = [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['check-all']],
+        '#weight' => 0,
+      ];
+      $element['all_wrapper']['check_all'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'button',
+        '#value' => t('Check all / none'),
+        '#default_value' => FALSE,
+        '#attributes' => [
+          'class' => [
+            'button',
+            'button--small',
+            'button--check-all',
+          ],
+          'type' => 'button',
+        ],
+      ];
+      $element['#attached']['library'][] = 'core/drupal.checkboxes-check-all';
+    }
+
     return $element;
   }
 
