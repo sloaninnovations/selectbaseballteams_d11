@@ -36,11 +36,7 @@ class AliasRepository implements AliasRepositoryInterface {
       ->fields('base_table', ['path', 'alias']);
 
     if (!empty($preloaded)) {
-      $conditions = $this->connection->condition('OR');
-      foreach ($preloaded as $preloaded_item) {
-        $conditions->condition('base_table.path', $this->connection->escapeLike($preloaded_item), 'LIKE');
-      }
-      $select->condition($conditions);
+      $select->condition('base_table.path', $preloaded, 'IN');
     }
 
     $this->addLanguageFallback($select, $langcode);

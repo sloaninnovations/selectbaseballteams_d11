@@ -19,6 +19,9 @@ services:
     arguments: ['@database']
     tags:
       - { name: backend_overridable }
+  pgsql.path_alias.repository:
+    class: Drupal\path_alias\pgsql\AliasRepository
+    arguments: [ '@database' ]
   Drupal\path_alias\AliasRepositoryInterface: '@path_alias.repository'
   path_alias.whitelist:
     class: Drupal\path_alias\AliasWhitelist
