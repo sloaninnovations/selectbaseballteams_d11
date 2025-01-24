@@ -281,7 +281,7 @@ class PageCacheTest extends BrowserTestBase {
     $this->drupalGet('system-test/set-header', ['query' => ['name' => 'Foo', 'value' => 'bar']]);
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'UNCACHEABLE (request policy)');
     $this->assertSession()->responseHeaderNotContains('Vary', 'cookie');
-    $this->assertSession()->responseHeaderEquals('Cache-Control', 'must-revalidate, no-cache, private');
+    $this->assertSession()->responseHeaderEquals('Cache-Control', 'no-store, private');
     $this->assertSession()->responseHeaderEquals('Expires', 'Sun, 19 Nov 1978 05:00:00 GMT');
     $this->assertSession()->responseHeaderEquals('Foo', 'bar');
 
@@ -473,12 +473,12 @@ class PageCacheTest extends BrowserTestBase {
     // GET a URL, which would be marked as a cache miss if it were cacheable.
     $this->drupalGet('/system-test/respond-response');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'UNCACHEABLE (no cacheability)');
-    $this->assertSession()->responseHeaderEquals('Cache-Control', 'must-revalidate, no-cache, private');
+    $this->assertSession()->responseHeaderEquals('Cache-Control', 'no-store, private');
 
     // GET it again, verify it's still not cached.
     $this->drupalGet('/system-test/respond-response');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'UNCACHEABLE (no cacheability)');
-    $this->assertSession()->responseHeaderEquals('Cache-Control', 'must-revalidate, no-cache, private');
+    $this->assertSession()->responseHeaderEquals('Cache-Control', 'no-store, private');
 
     // GET a URL, which would be marked as a cache miss if it were cacheable.
     $this->drupalGet('/system-test/respond-public-response');
