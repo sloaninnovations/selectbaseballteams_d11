@@ -70,6 +70,13 @@ trait FunctionalTestSetupTrait {
   protected bool $usesSuperUserAccessPolicy;
 
   /**
+   * Path to SQL dump file.
+   *
+   * @var string
+   */
+  protected $dumpFile;
+
+  /**
    * Prepares site settings and services before installation.
    */
   protected function prepareSettings() {
@@ -739,6 +746,121 @@ trait FunctionalTestSetupTrait {
       \Drupal::unsetContainer();
     }
     return $database_types;
+  }
+
+  /**
+   * Installs Drupal using SQL dump.
+   */
+  protected function installDrupalFromDump() {
+
+    $this->restoreDatabase();
+
+    $this->initUserSession();
+    $this->prepareSettings();
+
+    $connection_info = Database::getConnectionInfo('default');
+
+    $databases['default']['default'] = (object) [
+      'value' => $connection_info['default'],
+      'required' => TRUE,
+    ];
+
+    $settings['databases'] = $databases;
+    $settings['settings']['hash_salt'] = (object) [
+      'value' => $this->databasePrefix,
+      'required' => TRUE,
+    ];
+
+    $settings['settings']['hash_salt'] = (object) [
+      'value' => $this->databasePrefix,
+      'required' => TRUE,
+    ];
+
+    $settings['settings']['file_public_path'] = (object) [
+      'value' => $this->publicFilesDirectory,
+      'required' => TRUE,
+    ];
+    $settings['settings']['file_private_path'] = (object) [
+      'value' => $this->privateFilesDirectory,
+      'required' => TRUE,
+    ];
+    $settings['settings']['file_temp_path'] = (object) [
+      'value' => $this->tempFilesDirectory,
+      'required' => TRUE,
+    ];
+
+    $this->writeSettings($settings);
+
+    // During tests, cacheable responses should get the debugging cacheability
+    // headers by default.
+    $this->setContainerParameter('http.response.debug_cacheability_headers', TRUE);
+
+    $autoloader = require './autoload.php';
+    $this->kernel = new DrupalKernel('prod', $autoloader);
+    $request = Request::createFromGlobals();
+    DrupalKernel::bootEnvironment();
+    $site_path = DrupalKernel::findSitePath($request);
+    $this->kernel->setSitePath($site_path);
+    Settings::initialize($this->kernel->getAppRoot(), $this->kernel->getSitePath(), $autoloader);
+    $this->kernel->boot()->preHandle($request);
+    $this->container = $this->kernel->getContainer();
+
+    // The value comes with the dump from previous installation.
+    \Drupal::configFactory()->getEditable('system.file')
+      ->set('path.temporary', $this->tempFilesDirectory)
+      ->save();
+    \Drupal::service('file_system')->prepareDirectory($this->tempFilesDirectory, FileSystemInterface::MODIFY_PERMISSIONS | FileSystemInterface::CREATE_DIRECTORY);
+
+    // Manually create the private directory.
+    \Drupal::service('file_system')->prepareDirectory($this->privateFilesDirectory, FileSystemInterface::CREATE_DIRECTORY);
+  }
+
+  /**
+   * Dumps database structure and contents of test site.
+   */
+  protected function dumpDatabase() {
+    $connection_info = Database::getConnectionInfo('default');
+
+    $user = $connection_info['default']['username'];
+    $pass = $connection_info['default']['password'];
+    $db = $connection_info['default']['database'];
+    $host = $connection_info['default']['host'];
+
+    switch ($connection_info['default']['driver']) {
+      case 'mysql':
+      case 'Drupal\mysql\Driver\Database\mysql':
+        $tables = \Drupal::database()
+          ->query("SHOW TABLES LIKE '$this->databasePrefix%'")
+          ->fetchCol();
+        $tables_param = implode(' ', $tables);
+        exec("mysqldump -u$user -p$pass -h $host $db $tables_param | sed 's/$this->databasePrefix/default_db_prefix_/' > {$this->dumpFile}");
+        break;
+
+      default:
+        throw new \LogicException("The database driver {$connection_info['default']['driver']} is not supported yet.");
+    }
+  }
+
+  /**
+   * Restores database structure and contents of test site.
+   */
+  protected function restoreDatabase() {
+    $connection_info = Database::getConnectionInfo('default');
+
+    $user = $connection_info['default']['username'];
+    $pass = $connection_info['default']['password'];
+    $db = $connection_info['default']['database'];
+    $host = $connection_info['default']['host'];
+
+    switch ($connection_info['default']['driver']) {
+      case 'mysql':
+      case 'Drupal\mysql\Driver\Database\mysql':
+        exec("sed 's/default_db_prefix_/$this->databasePrefix/' $this->dumpFile | mysql -u$user -p$pass -h $host $db");
+        break;
+
+      default:
+        throw new \LogicException("The database driver {$connection_info['default']['driver']} is not supported yet.");
+    }
   }
 
 }
