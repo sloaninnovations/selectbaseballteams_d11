@@ -2,6 +2,7 @@
 
 namespace Drupal\comment\Hook;
 
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\user\UserInterface;
@@ -333,7 +334,7 @@ class CommentHooks {
    * Implements hook_node_update_index().
    */
   #[Hook('node_update_index')]
-  public function nodeUpdateIndex(EntityInterface $node) {
+  public function nodeUpdateIndex(EntityInterface $node): MarkupInterface {
     $index_comments =& drupal_static('comment_node_update_index');
     if ($index_comments === NULL) {
       // Do not index in the following three cases:
