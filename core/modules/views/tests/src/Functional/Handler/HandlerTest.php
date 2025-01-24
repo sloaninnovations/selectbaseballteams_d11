@@ -348,7 +348,7 @@ class HandlerTest extends ViewTestBase {
     $field = $handler->field;
     $string = ':' . $table . '_' . $field;
 
-    // Make sure the placeholder variables are like expected.
+    // Make sure the placeholder variables contain the expected values.
     $this->assertEquals($string, $handler->getPlaceholder());
     $this->assertEquals($string . 1, $handler->getPlaceholder());
     $this->assertEquals($string . 2, $handler->getPlaceholder());
@@ -375,7 +375,7 @@ class HandlerTest extends ViewTestBase {
     $views_data = $this->viewsData();
     $views_data = $views_data['views_test_data'];
 
-    // Enable access to callback only field and deny for callback + arguments.
+    // Enable access only to the callback field and deny access for the callback and the arguments.
     $this->config('views_test_data.tests')->set('handler_access_callback', TRUE)->save();
     $this->config('views_test_data.tests')->set('handler_access_callback_argument', FALSE)->save();
     $view->initDisplay();
@@ -388,7 +388,7 @@ class HandlerTest extends ViewTestBase {
       }
     }
 
-    // Enable access to the callback + argument handlers and deny for callback.
+    // Enable access to the callback and the argument handlers and deny access for the callback.
     $this->config('views_test_data.tests')->set('handler_access_callback', FALSE)->save();
     $this->config('views_test_data.tests')->set('handler_access_callback_argument', TRUE)->save();
     $view->destroy();
