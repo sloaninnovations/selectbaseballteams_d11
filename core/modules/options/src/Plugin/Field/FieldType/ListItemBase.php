@@ -347,14 +347,16 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   public static function validateAllowedValues($element, FormStateInterface $form_state) {
     $items = array_filter(array_map(function ($item) use ($element) {
       $current_element = $element['table'][$item];
-      if ($current_element['item']['key']['#value'] !== NULL && $current_element['item']['label']['#value']) {
-        return $current_element['item']['key']['#value'] . '|' . $current_element['item']['label']['#value'];
+      $key = $current_element['item']['key']['#value'];
+      $value = isset($current_element['item']['label']['#value']) ? trim($current_element['item']['label']['#value']) : NULL;
+      if ($key !== NULL && $value !== NULL && $value !== '') {
+        return $key . '|' . $value;
       }
-      elseif ($current_element['item']['key']['#value']) {
-        return $current_element['item']['key']['#value'];
+      elseif ($key) {
+        return $key;
       }
-      elseif ($current_element['item']['label']['#value']) {
-        return $current_element['item']['label']['#value'];
+      elseif ($value) {
+        return $value;
       }
 
       return NULL;
