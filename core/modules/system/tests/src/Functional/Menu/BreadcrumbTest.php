@@ -119,7 +119,7 @@ class BreadcrumbTest extends BrowserTestBase {
     $trail += [
       'admin/structure/menu/manage/tools' => 'Tools',
     ];
-    $this->assertBreadcrumb("admin/structure/menu/link/node.add_page/edit", $trail);
+    $this->assertBreadcrumb("admin/structure/menu/link/entity.node.add_page/edit", $trail);
     $this->assertBreadcrumb('admin/structure/menu/manage/tools/add', $trail);
 
     // Verify Node administration breadcrumbs.

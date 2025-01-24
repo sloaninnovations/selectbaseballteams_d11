@@ -15,28 +15,18 @@ entity.node.delete_multiple_form:
     _entity_delete_multiple_access: 'node'
 
 node.add_page:
-  path: '/node/add'
-  defaults:
-    _title: 'Add content'
-    _controller: '\Drupal\node\Controller\NodeController::addPage'
-  options:
-    _node_operation_route: TRUE
-  requirements:
-    _entity_create_any_access: 'node'
+  alias: 'entity.node.add_page'
+  deprecated:
+    package: 'drupal/core'
+    version: '11.2.0'
+    message: 'The "%alias_id%" route is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Use the "entity.node.add_page" route instead. See https://www.drupal.org/node/2940083'
 
 node.add:
-  path: '/node/add/{node_type}'
-  defaults:
-    _entity_form: 'node.default'
-    _title_callback: '\Drupal\node\Controller\NodeController::addPageTitle'
-  requirements:
-    _entity_create_access: 'node:{node_type}'
-  options:
-    _node_operation_route: TRUE
-    parameters:
-      node_type:
-        type: entity:node_type
-        with_config_overrides: TRUE
+  alias: 'entity.node.add_form'
+  deprecated:
+    package: 'drupal/core'
+    version: '11.2.0'
+    message: 'The "%alias_id%" route is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Use the "entity.node.add_form" route instead. See https://www.drupal.org/node/2940083'
 
 entity.node.preview:
   path: '/node/preview/{node_preview}/{view_mode_id}'

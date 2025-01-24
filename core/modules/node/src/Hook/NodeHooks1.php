@@ -100,7 +100,7 @@ class NodeHooks1 {
         $help = $type->getHelp();
         return !empty($help) ? Xss::filterAdmin($help) : '';
 
-      case 'node.add':
+      case 'entity.node.add_form':
         $type = $route_match->getParameter('node_type');
         $help = $type->getHelp();
         return !empty($help) ? Xss::filterAdmin($help) : '';
