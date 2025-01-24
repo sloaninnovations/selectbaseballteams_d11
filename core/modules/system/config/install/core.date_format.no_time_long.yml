@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: no_time_long
+label: 'No time, long date'
+locked: false
+pattern: 'l, j F Y'
