@@ -1157,7 +1157,7 @@ class MenuUiTest extends BrowserTestBase {
     $this->drupalGet('admin/structure/menu/link/' . $item->getPluginId() . '/edit');
     $this->assertSession()->statusCodeEquals($response);
     if ($response == 200) {
-      $this->assertSession()->pageTextContains('Edit menu item');
+      $this->assertSession()->pageTextContains('Edit menu links');
     }
 
     // View add menu page.
