@@ -13616,12 +13616,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/comment/src/Hook/CommentHooks.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\comment\\\\Hook\\\\CommentHooks\\:\\:nodeUpdateIndex\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/Hook/CommentHooks.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\comment\\\\Hook\\\\CommentHooks\\:\\:userPredelete\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -16992,12 +16986,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/content_translation/tests/src/Unit/Menu/ContentTranslationLocalTasksTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function contextual_preprocess\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/contextual/contextual.module',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\contextual\\\\ContextualController\\:\\:create\\(\\) has no return type specified\\.$#',
@@ -32894,12 +32882,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/search/tests/modules/search_extra_type/src/Plugin/Search/SearchExtraTypeSearch.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\search_langcode_test\\\\Hook\\\\SearchLangcodeTestHooks\\:\\:searchPreprocess\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/modules/search_langcode_test/src/Hook/SearchLangcodeTestHooks.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\Rest\\\\SearchPageJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -35594,12 +35576,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/delay_cache_tags_invalidation/src/Hook/DelayCacheTagsInvalidationHooks.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Function deprecation_test_deprecated_hook\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/deprecation_test/deprecation_test.module',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to deprecated function deprecation_test_function\\(\\)\\:
 in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
   the deprecation message for deprecated_test_function\\(\\)\\.$#',
@@ -37912,31 +37888,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/module_autoload_test/src/SomeClass.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Function module_test_test_hook\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/module_test/module_test.file.inc',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function module_test_altered_test_hook\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/module_test/module_test.implementations.inc',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function module_test_load\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/module_test/module_test.module',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function module_test_modules_installed\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/module_test/module_test.module',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function module_test_modules_uninstalled\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/module_test/module_test.module',
@@ -40712,30 +40664,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/src/Unit/Routing/AdminRouteSubscriberTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function nyan_cat_extension\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/themes/engines/nyan_cat/nyan_cat.engine',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function nyan_cat_render_template\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/themes/engines/nyan_cat/nyan_cat.engine',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function test_subtheme_views_post_render\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/themes/test_subtheme/test_subtheme.theme',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function test_subtheme_views_pre_render\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/themes/test_subtheme/test_subtheme.theme',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function test_theme_depending_on_modules_post_update_module_install\\(\\) has no return type specified\\.$#',
@@ -60943,12 +60871,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/themes/claro/claro.theme',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Function claro_views_pre_render\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/claro/claro.theme',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\claro\\\\ClaroPreRender\\:\\:managedFile\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -60971,18 +60893,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/themes/claro/src/ClaroPreRender.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function twig_extension\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/engines/twig/twig.engine',
-];
-$ignoreErrors[] = [
-	'message' => '#^Function twig_render_template\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/engines/twig/twig.engine',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\olivero\\\\OliveroPreRender\\:\\:textFormat\\(\\) has no return type specified\\.$#',
