@@ -2,6 +2,7 @@
 
 namespace Drupal\rest\Plugin\rest\resource;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Access\AccessResultReasonInterface;
@@ -10,6 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityType;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -70,6 +72,13 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
   protected $linkRelationTypeManager;
 
   /**
+   * Time service used for retrieval of request time.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
    * Constructs a Drupal\rest\Plugin\rest\resource\EntityResource object.
    *
    * @param array $configuration
@@ -88,12 +97,15 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
    *   The config factory.
    * @param \Drupal\Component\Plugin\PluginManagerInterface $link_relation_type_manager
    *   The link relation type manager.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   Time service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, $serializer_formats, LoggerInterface $logger, ConfigFactoryInterface $config_factory, PluginManagerInterface $link_relation_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, $serializer_formats, LoggerInterface $logger, ConfigFactoryInterface $config_factory, PluginManagerInterface $link_relation_type_manager, TimeInterface $time) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
     $this->entityType = $entity_type_manager->getDefinition($plugin_definition['entity_type']);
     $this->configFactory = $config_factory;
     $this->linkRelationTypeManager = $link_relation_type_manager;
+    $this->time = $time;
   }
 
   /**
@@ -108,7 +120,8 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
       $container->getParameter('serializer.formats'),
       $container->get('logger.factory')->get('rest'),
       $container->get('config.factory'),
-      $container->get('plugin.manager.link_relation_type')
+      $container->get('plugin.manager.link_relation_type'),
+      $container->get('datetime.time')
     );
   }
 
@@ -250,6 +263,10 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
     // Validate the received data before saving.
     $this->validate($original_entity, $changed_fields);
     try {
+      if ($original_entity instanceof EntityChangedInterface) {
+        $original_entity->setChangedTime($this->time->getRequestTime());
+      }
+
       $original_entity->save();
       $this->logger->notice('Updated entity %type with ID %id.', ['%type' => $original_entity->getEntityTypeId(), '%id' => $original_entity->id()]);
 
