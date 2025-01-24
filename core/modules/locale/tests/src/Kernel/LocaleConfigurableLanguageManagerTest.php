@@ -31,6 +31,8 @@ class LocaleConfigurableLanguageManagerTest extends KernelTestBase {
     \Drupal::service('language.default')->set($default_language);
     \Drupal::service('string_translation')->setDefaultLangcode($default_language->getId());
 
+    \Drupal::cache('discovery')->deleteAll();
+
     $languages = \Drupal::service('language_manager')->getLanguages(LanguageInterface::STATE_ALL);
     $this->assertEquals(['default', 'und', 'zxx'], array_keys($languages));
 

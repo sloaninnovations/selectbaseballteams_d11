@@ -2,6 +2,7 @@
 
 namespace Drupal\language;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -291,27 +292,34 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
       // list if this method is invoked while the language module is installed
       // and the configuration entities for languages are not yet fully
       // imported.
-      $default = $this->getDefaultLanguage();
-      $languages = [$default->getId() => $default];
-      $languages += $this->getDefaultLockedLanguages($default->getWeight());
-
-      // Load configurable languages on top of the defaults. Ideally this could
-      // use the entity API to load and instantiate ConfigurableLanguage
-      // objects. However the entity API depends on the language system, so that
-      // would result in infinite loops. We use the configuration system
-      // directly and instantiate runtime Language objects. When language
-      // entities are imported those cover the default and locked languages, so
-      // site-specific configuration will prevail over the fallback values.
-      // Having them in the array already ensures if this is invoked in the
-      // middle of importing language configuration entities, the defaults are
-      // always present.
-      $config_ids = $this->configFactory->listAll('language.entity.');
-      foreach ($this->configFactory->loadMultiple($config_ids) as $config) {
-        $data = $config->get();
-        $data['name'] = $data['label'];
-        $languages[$data['id']] = new Language($data);
+      $cid = 'languages:' . $static_cache_id;
+      if ($cache = \Drupal::cache('discovery')->get($cid)) {
+        $languages = $cache->data;
       }
-      Language::sort($languages);
+      else {
+        $default = $this->getDefaultLanguage();
+        $languages = [$default->getId() => $default];
+        $languages += $this->getDefaultLockedLanguages($default->getWeight());
+
+        // Load configurable languages on top of the defaults. Ideally this could
+        // use the entity API to load and instantiate ConfigurableLanguage
+        // objects. However the entity API depends on the language system, so that
+        // would result in infinite loops. We use the configuration system
+        // directly and instantiate runtime Language objects. When language
+        // entities are imported those cover the default and locked languages, so
+        // site-specific configuration will prevail over the fallback values.
+        // Having them in the array already ensures if this is invoked in the
+        // middle of importing language configuration entities, the defaults are
+        // always present.
+        $config_ids = $this->configFactory->listAll('language.entity.');
+        foreach ($this->configFactory->loadMultiple($config_ids) as $config) {
+          $data = $config->get();
+          $data['name'] = $data['label'];
+          $languages[$data['id']] = new Language($data);
+        }
+        Language::sort($languages);
+        \Drupal::cache('discovery')->set($cid, $languages, Cache::PERMANENT, ['config:configurable_language_list']);
+      }
 
       // Filter the full list of languages based on the value of $flags.
       $this->languages[$static_cache_id][$flags] = $this->filterLanguages($languages, $flags);
