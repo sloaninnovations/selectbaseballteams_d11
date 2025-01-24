@@ -13,3 +13,11 @@ pager_test.query_parameters:
     _controller: '\Drupal\pager_test\Controller\PagerTestController::queryParameters'
   requirements:
     _access: 'TRUE'
+
+pager_test.ellipsis:
+  path: '/pager-test/ellipsis'
+  defaults:
+    _title: 'Pager with enough items to trigger ellipsis.'
+    _controller: '\Drupal\pager_test\Controller\PagerTestController::ellipsis'
+  requirements:
+    _access: 'TRUE'
