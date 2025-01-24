@@ -443,6 +443,15 @@ function locale_system_file_system_settings_submit(&$form, FormStateInterface $f
 }
 
 /**
+ * Create the interface translations directory.
+ */
+function locale_prepare_translations_directory(): void {
+  $directory = \Drupal::config('locale.settings')->get('translation.path');
+  $options = locale_translation_use_remote_source() ? FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS : FileSystemInterface::CREATE_DIRECTORY;
+  \Drupal::service('file_system')->prepareDirectory($directory, $options);
+}
+
+/**
  * Implements hook_preprocess_HOOK() for node templates.
  */
 function locale_preprocess_node(&$variables): void {

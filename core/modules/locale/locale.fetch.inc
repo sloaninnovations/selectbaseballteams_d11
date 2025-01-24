@@ -97,7 +97,7 @@ function locale_translation_batch_fetch_build($projects = [], $langcodes = [], $
  *   Array of batch operations.
  */
 function _locale_translation_fetch_operations($projects, $langcodes, $options) {
-  $operations = [];
+  $operations[] = ['locale_prepare_translations_directory', []];
 
   foreach ($projects as $project) {
     foreach ($langcodes as $langcode) {

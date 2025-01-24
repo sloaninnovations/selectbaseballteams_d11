@@ -160,6 +160,7 @@ class ImportForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
+    locale_prepare_translations_directory();
     $this->file = _file_save_upload_from_form($form['file'], $form_state, 0);
 
     // Ensure we have the file uploaded.

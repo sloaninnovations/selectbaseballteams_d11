@@ -102,11 +102,12 @@ class LocaleUpdateCronTest extends LocaleUpdateBase {
 
     // Check whether tasks are added to the queue.
     // Expected tasks:
+    // - locale_prepare_translations_directory
     // - locale_translation_batch_version_check
     // - locale_translation_batch_status_check
     // - locale_translation_batch_status_finished.
     $queue = \Drupal::queue('locale_translation', TRUE);
-    $this->assertEquals(3, $queue->numberOfItems(), 'Queue holds tasks for one project.');
+    $this->assertEquals(4, $queue->numberOfItems(), 'Queue holds tasks for one project.');
     $item = $queue->claimItem();
     $queue->releaseItem($item);
     $this->assertEquals('contrib_module_two', $item->data[1][0], 'Queue holds tasks for contrib module one.');
@@ -117,7 +118,7 @@ class LocaleUpdateCronTest extends LocaleUpdateBase {
 
     // Check whether no more tasks are added to the queue.
     $queue = \Drupal::queue('locale_translation', TRUE);
-    $this->assertEquals(3, $queue->numberOfItems(), 'Queue holds tasks for one project.');
+    $this->assertEquals(4, $queue->numberOfItems(), 'Queue holds tasks for one project.');
 
     // Ensure last checked is updated to a greater time than the initial value.
     sleep(1);
