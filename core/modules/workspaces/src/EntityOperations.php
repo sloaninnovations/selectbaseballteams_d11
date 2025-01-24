@@ -6,6 +6,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -287,6 +288,32 @@ class EntityOperations implements ContainerInjectionInterface {
     $active_workspace = $this->workspaceManager->getActiveWorkspace();
     if (!$this->workspaceInfo->isEntitySupported($entity) || !$this->workspaceInfo->isEntityDeletable($entity, $active_workspace)) {
       throw new \RuntimeException("This {$entity->getEntityType()->getSingularLabel()} can only be deleted in the Live workspace.");
+    }
+  }
+
+  /**
+   * Implements hook_entity_query_tag__TAG_alter().
+   *
+   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   *   The entity query.
+   *
+   * @see \hook_entity_query_tag__TAG_alter()
+   */
+  public function entityQueryTagLatestTranslatedAffectedRevisionAlter(QueryInterface $query): void {
+    $entity_type = $this->entityTypeManager->getDefinition($query->getEntityTypeId());
+    if (!$this->workspaceInfo->isEntityTypeSupported($entity_type) || !$this->workspaceManager->hasActiveWorkspace()) {
+      return;
+    }
+
+    $active_workspace = $this->workspaceManager->getActiveWorkspace();
+    $tracked_entities = $this->workspaceAssociation->getTrackedEntities($active_workspace->id());
+
+    if ($revision_id = array_search($query->getMetaData('entity_id'), $tracked_entities[$entity_type->id()])) {
+      $query->condition($entity_type->getKey('revision'), $revision_id, '<=');
+      $conditions = $query->orConditionGroup();
+      $conditions->condition($entity_type->getRevisionMetadataKey('workspace'), $active_workspace->id());
+      $conditions->condition($entity_type->getRevisionMetadataKey('revision_default'), TRUE);
+      $query->condition($conditions);
     }
   }
 
