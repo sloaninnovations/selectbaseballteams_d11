@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Serialization;
 
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Json;
 use PHPUnit\Framework\TestCase;
 
@@ -50,7 +51,7 @@ class JsonTest extends TestCase {
     // Characters that must be escaped.
     // We check for unescaped " separately.
     $this->htmlUnsafe = ['<', '>', '\'', '&'];
-    // The following are the encoded forms of: < > ' & "
+    // The following are the encoded forms of: < > ' & ".
     $this->htmlUnsafeEscaped = ['\u003C', '\u003E', '\u0027', '\u0026', '\u0022'];
   }
 
@@ -107,13 +108,49 @@ class JsonTest extends TestCase {
     foreach ($this->htmlUnsafe as $char) {
       $this->assertStringNotContainsString($char, $json, sprintf('A JSON encoded string does not contain %s.', $char));
     }
-    // Verify that JSON encoding escapes the HTML unsafe characters
+    // Verify that JSON encoding escapes the HTML unsafe characters.
     foreach ($this->htmlUnsafeEscaped as $char) {
       $this->assertStringContainsString($char, $json, sprintf('A JSON encoded string contains %s.', $char));
     }
     $json_decoded = Json::decode($json);
     $this->assertNotSame($source, $json, 'An array encoded in JSON is identical to the source.');
     $this->assertSame($source, $json_decoded, 'Encoding structured data to JSON and decoding back not results in the original data.');
+  }
+
+  /**
+   * Tests basic JSON encoding and decoding.
+   */
+  public function testJsonEncodingDecoding(): void {
+    $data = ['name' => 'Alice', 'age' => 30];
+    $encoded = Json::encode($data);
+    $decoded = Json::decode($encoded);
+
+    $this->assertEquals($data, $decoded);
+  }
+
+  /**
+   * Tests handling of invalid JSON data during decoding.
+   *
+   * @throws \Drupal\Component\Serialization\Exception\InvalidDataTypeException
+   */
+  public function testInvalidJsonDecoding(): void {
+    $invalidJson = 'Invalid JSON String';
+
+    $this->expectException(InvalidDataTypeException::class);
+    Json::decode($invalidJson);
+  }
+
+  /**
+   * Tests JSON encoding failure on circular references.
+   *
+   * @throws \Drupal\Component\Serialization\Exception\InvalidDataTypeException
+   */
+  public function testJsonEncodingFailure(): void {
+    $data = [];
+    $data['self'] = &$data;
+
+    $this->expectException(InvalidDataTypeException::class);
+    Json::encode($data);
   }
 
 }
