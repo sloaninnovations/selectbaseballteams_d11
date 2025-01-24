@@ -13,6 +13,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\link\LinkItemInterface;
+use Drupal\Core\Link;
 
 /**
  * Tests the new entity API for the link field type.
@@ -91,6 +92,13 @@ class LinkItemTest extends FieldKernelTestBase {
     ], $entity->field_test->first()->getUrl()->getOptions());
     $entity->name->value = $this->randomMachineName();
     $entity->save();
+
+    // Test the toLink method.
+    /** @var \Drupal\Core\Link $link */
+    $link = $entity->field_test[0]->toLink();
+    $this->assertInstanceOf(Link::class, $link);
+    $this->assertEquals($url, $link->getUrl()->toString());
+    $this->assertEquals($title, $link->getText());
 
     // Verify that the field value is changed.
     $id = $entity->id();
