@@ -2385,9 +2385,11 @@ function install_config_import_batch() {
   if ($system_site !== FALSE) {
     \Drupal::configFactory()->getEditable('system.site')->set('uuid', $system_site['uuid'])->save();
   }
+  // Dispatch the config import transformation event.
+  $import = \Drupal::service('config.import_transformer')->transform($sync);
 
   // Create the storage comparer and the config importer.
-  $storage_comparer = new StorageComparer($sync, \Drupal::service('config.storage'));
+  $storage_comparer = new StorageComparer($import, \Drupal::service('config.storage'));
   $storage_comparer->createChangelist();
   $config_importer = new ConfigImporter(
     $storage_comparer,
@@ -2459,7 +2461,10 @@ function install_config_download_translations(&$install_state) {
 function install_config_revert_install_changes() {
   global $install_state;
 
-  $storage_comparer = new StorageComparer(\Drupal::service('config.storage.sync'), \Drupal::service('config.storage'));
+  // Dispatch the config import transformation event.
+  $import = \Drupal::service('config.import_transformer')->transform(\Drupal::service('config.storage.sync'));
+
+  $storage_comparer = new StorageComparer($import, \Drupal::service('config.storage'));
   $storage_comparer->createChangelist();
   if ($storage_comparer->hasChanges()) {
     $config_importer = new ConfigImporter(
