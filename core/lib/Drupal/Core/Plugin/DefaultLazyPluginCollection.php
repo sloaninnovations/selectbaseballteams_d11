@@ -97,7 +97,7 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
   public function sortHelper($aID, $bID) {
     $a = $this->get($aID);
     $b = $this->get($bID);
-    return strnatcasecmp($a->getPluginId(), $b->getPluginId());
+    return strnatcasecmp($a->getPluginId() ?? '', $b->getPluginId() ?? '');
   }
 
   /**

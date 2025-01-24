@@ -97,7 +97,7 @@ class FilterPluginCollection extends DefaultLazyPluginCollection {
       return $a->weight <=> $b->weight;
     }
     if ($a->provider != $b->provider) {
-      return strnatcasecmp($a->provider, $b->provider);
+      return strnatcasecmp($a->provider ?? '', $b->provider ?? '');
     }
     return parent::sortHelper($aID, $bID);
   }

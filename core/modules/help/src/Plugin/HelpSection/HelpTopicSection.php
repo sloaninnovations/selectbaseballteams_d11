@@ -143,7 +143,7 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
         if ($a_label === $b_label) {
           return $a->getPluginId() <=> $b->getPluginId();
         }
-        return strnatcasecmp($a_label, $b_label);
+        return strnatcasecmp($a_label ?? '', $b_label ?? '');
       });
     }
     return $this->topLevelPlugins;

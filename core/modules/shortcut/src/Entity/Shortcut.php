@@ -189,7 +189,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
     $a_weight = $a->getWeight();
     $b_weight = $b->getWeight();
     if ($a_weight == $b_weight) {
-      return strnatcasecmp($a->getTitle(), $b->getTitle());
+      return strnatcasecmp($a->getTitle() ?? '', $b->getTitle() ?? '');
     }
     return $a_weight <=> $b_weight;
   }

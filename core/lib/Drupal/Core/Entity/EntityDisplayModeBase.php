@@ -64,8 +64,8 @@ abstract class EntityDisplayModeBase extends ConfigEntityBase implements EntityD
     /** @var \Drupal\Core\Entity\EntityDisplayModeInterface $a */
     /** @var \Drupal\Core\Entity\EntityDisplayModeInterface $b */
     // Sort by the type of entity the view mode is used for.
-    $a_type = $a->getTargetType();
-    $b_type = $b->getTargetType();
+    $a_type = $a->getTargetType() ?? '';
+    $b_type = $b->getTargetType() ?? '';
     $type_order = strnatcasecmp($a_type, $b_type);
     return $type_order != 0 ? $type_order : parent::sort($a, $b);
   }

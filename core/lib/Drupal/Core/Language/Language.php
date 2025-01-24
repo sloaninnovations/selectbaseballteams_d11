@@ -148,8 +148,8 @@ class Language implements LanguageInterface {
       $a_weight = $a->getWeight();
       $b_weight = $b->getWeight();
       if ($a_weight == $b_weight) {
-        $a_name = $a->getName();
-        $b_name = $b->getName();
+        $a_name = $a->getName() ?? '';
+        $b_name = $b->getName() ?? '';
         // If either name is a TranslatableMarkup object it can not be converted
         // to a string. This is because translation requires a sorted list of
         // languages thereby causing an infinite loop. Determine the order based

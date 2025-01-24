@@ -64,7 +64,7 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
       // First, sort everything alphabetically.
       uasort($workspaces, function (WorkspaceInterface $a, WorkspaceInterface $b) {
         assert(Inspector::assertStringable($a->label()) && Inspector::assertStringable($b->label()), 'Workspace labels are expected to be a string.');
-        return strnatcasecmp($a->label(), $b->label());
+        return strnatcasecmp($a->label() ?? '', $b->label() ?? '');
       });
 
       $tree_children = [];

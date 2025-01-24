@@ -176,7 +176,7 @@ class Action extends ConfigEntityBase implements ActionConfigEntityInterface, En
     $a_type = $a->getType();
     $b_type = $b->getType();
     if ($a_type != $b_type) {
-      return strnatcasecmp($a_type, $b_type);
+      return strnatcasecmp($a_type ?? '', $b_type ?? '');
     }
     return parent::sort($a, $b);
   }

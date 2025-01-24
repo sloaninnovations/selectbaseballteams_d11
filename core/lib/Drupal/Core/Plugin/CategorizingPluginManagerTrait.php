@@ -112,10 +112,12 @@ trait CategorizingPluginManagerTrait {
     // Sort the plugins first by category, then by label.
     $definitions = $definitions ?? $this->getDefinitions();
     uasort($definitions, function ($a, $b) use ($label_key) {
+      $a['category'] = $a['category'] ?? '';
+      $b['category'] = $b['category'] ?? '';
       if ((string) $a['category'] != (string) $b['category']) {
         return strnatcasecmp($a['category'], $b['category']);
       }
-      return strnatcasecmp($a[$label_key], $b[$label_key]);
+      return strnatcasecmp($a[$label_key] ?? '', $b[$label_key] ?? '');
     });
     return $definitions;
   }
