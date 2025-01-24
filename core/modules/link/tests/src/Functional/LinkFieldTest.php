@@ -405,7 +405,7 @@ class LinkFieldTest extends BrowserTestBase {
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'link',
-      'cardinality' => 3,
+      'cardinality' => 4,
     ]);
     $this->fieldStorage->save();
     FieldConfig::create([
@@ -436,16 +436,19 @@ class LinkFieldTest extends BrowserTestBase {
     // - The first field item uses a URL only.
     // - The second field item uses a URL and link text.
     // - The third field item uses a fragment-only URL with text.
+    // - The forth field item uses an over 80 character long URL with text.
     // For consistency in assertion code below, the URL is assigned to the title
     // variable for the first field.
     $this->drupalGet('entity_test/add');
     $url1 = 'http://www.example.com/content/articles/archive?author=John&year=2012#com';
     $url2 = 'http://www.example.org/content/articles/archive?author=John&year=2012#org';
     $url3 = '#net';
+    $url4 = 'http://www.example.com/content/articles/archive?author=John&year=2012&month=february#com';
     $title1 = $url1;
     // Intentionally contains an ampersand that needs sanitization on output.
     $title2 = 'A very long & strange example title that could break the nice layout of the site';
     $title3 = 'Fragment only';
+    $title4 = 'Longer than 80 characters';
     $edit = [
       "{$field_name}[0][uri]" => $url1,
       // Note that $title1 is not submitted.
@@ -454,6 +457,8 @@ class LinkFieldTest extends BrowserTestBase {
       "{$field_name}[1][title]" => $title2,
       "{$field_name}[2][uri]" => $url3,
       "{$field_name}[2][title]" => $title3,
+      "{$field_name}[3][uri]" => $url4,
+      "{$field_name}[3][title]" => $title4,
     ];
     // Assert label is shown.
     $this->assertSession()->pageTextContains('Read more about this entity');
@@ -505,6 +510,10 @@ class LinkFieldTest extends BrowserTestBase {
             $url = $url3;
             $title = isset($new_value) ? Unicode::truncate($title3, $new_value, FALSE, TRUE) : $title3;
             $this->assertStringContainsString('<a href="' . Html::escape($url) . '">' . Html::escape($title) . '</a>', $output);
+
+            $url = $url4;
+            $title = isset($new_value) ? Unicode::truncate($title4, $new_value, FALSE, TRUE) : $title4;
+            $this->assertStringContainsString('<a href="' . Html::escape($url) . '">' . Html::escape($title) . '</a>', $output);
             break;
 
           case 'rel':
@@ -512,6 +521,7 @@ class LinkFieldTest extends BrowserTestBase {
             $this->assertStringContainsString('<a href="' . Html::escape($url1) . '"' . $rel . '>' . Html::escape($title1) . '</a>', $output);
             $this->assertStringContainsString('<a href="' . Html::escape($url2) . '"' . $rel . '>' . Html::escape($title2) . '</a>', $output);
             $this->assertStringContainsString('<a href="' . Html::escape($url3) . '"' . $rel . '>' . Html::escape($title3) . '</a>', $output);
+            $this->assertStringContainsString('<a href="' . Html::escape($url4) . '"' . $rel . '>' . Html::escape($title4) . '</a>', $output);
             break;
 
           case 'target':
@@ -519,6 +529,7 @@ class LinkFieldTest extends BrowserTestBase {
             $this->assertStringContainsString('<a href="' . Html::escape($url1) . '"' . $target . '>' . Html::escape($title1) . '</a>', $output);
             $this->assertStringContainsString('<a href="' . Html::escape($url2) . '"' . $target . '>' . Html::escape($title2) . '</a>', $output);
             $this->assertStringContainsString('<a href="' . Html::escape($url3) . '"' . $target . '>' . Html::escape($title3) . '</a>', $output);
+            $this->assertStringContainsString('<a href="' . Html::escape($url4) . '"' . $target . '>' . Html::escape($title4) . '</a>', $output);
             break;
 
           case 'url_only':
@@ -527,20 +538,24 @@ class LinkFieldTest extends BrowserTestBase {
               $this->assertStringContainsString('<a href="' . Html::escape($url1) . '">' . Html::escape($title1) . '</a>', $output);
               $this->assertStringContainsString('<a href="' . Html::escape($url2) . '">' . Html::escape($title2) . '</a>', $output);
               $this->assertStringContainsString('<a href="' . Html::escape($url3) . '">' . Html::escape($title3) . '</a>', $output);
+              $this->assertStringContainsString('<a href="' . Html::escape($url4) . '">' . Html::escape($title4) . '</a>', $output);
             }
             else {
               if (empty($new_value['url_plain'])) {
                 $this->assertStringContainsString('<a href="' . Html::escape($url1) . '">' . Html::escape($url1) . '</a>', $output);
                 $this->assertStringContainsString('<a href="' . Html::escape($url2) . '">' . Html::escape($url2) . '</a>', $output);
                 $this->assertStringContainsString('<a href="' . Html::escape($url3) . '">' . Html::escape($url3) . '</a>', $output);
+                $this->assertStringContainsString('<a href="' . Html::escape($url4) . '">' . Html::escape($url4) . '</a>', $output);
               }
               else {
                 $this->assertStringNotContainsString('<a href="' . Html::escape($url1) . '">' . Html::escape($url1) . '</a>', $output);
                 $this->assertStringNotContainsString('<a href="' . Html::escape($url2) . '">' . Html::escape($url2) . '</a>', $output);
                 $this->assertStringNotContainsString('<a href="' . Html::escape($url3) . '">' . Html::escape($url3) . '</a>', $output);
+                $this->assertStringNotContainsString('<a href="' . Html::escape($url4) . '">' . Html::escape($url4) . '</a>', $output);
                 $this->assertStringContainsString(Html::escape($url1), $output);
                 $this->assertStringContainsString(Html::escape($url2), $output);
                 $this->assertStringContainsString(Html::escape($url3), $output);
+                $this->assertStringContainsString(Html::escape($url4), $output);
               }
             }
             break;
