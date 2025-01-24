@@ -52,7 +52,7 @@ class NavigationTopBarContentModerationTest extends ModerationStateTestBase {
   }
 
   /**
-   * Tests how page actions interact with Content Moderation.
+   * Tests the interaction of page actions and content moderation.
    */
   public function testContentModerationPageActions(): void {
     $this->drupalGet($this->node->toUrl());
