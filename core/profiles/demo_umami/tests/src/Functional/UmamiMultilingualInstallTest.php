@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\demo_umami\Functional;
 
+use Drupal\Core\Database\Database;
 use Drupal\FunctionalTests\Installer\InstallerTestBase;
 
 /**
@@ -31,6 +32,16 @@ class UmamiMultilingualInstallTest extends InstallerTestBase {
     $this->drupalGet('');
     // cSpell:disable-next-line
     $this->assertSession()->pageTextContains('Crema catalana');
+
+    // Confirm there are no errors for the a 'content_moderation_control' block.
+    $errors = Database::getConnection()->select('watchdog')
+      ->fields('watchdog', ['message', 'variables'])
+      ->condition('message', '%block plugin was not found', 'LIKE')
+      ->condition('variables', '%content_moderation_control%', 'LIKE')
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $this->assertSame(0, (int) $errors);
   }
 
   /**
