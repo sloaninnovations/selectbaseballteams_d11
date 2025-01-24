@@ -39,6 +39,7 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
     return [
       'title' => DRUPAL_OPTIONAL,
       'link_type' => LinkItemInterface::LINK_GENERIC,
+      'allowed_protocols' => [],
     ] + parent::defaultFieldSettings();
   }
 
@@ -104,6 +105,15 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
       ],
     ];
 
+    $allowed_protocols = $this->getSetting('allowed_protocols');
+    $element['allowed_protocols'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Allowed protocols'),
+      '#default_value' => !empty($allowed_protocols) ? implode(', ', $allowed_protocols) : '',
+      '#description' => $this->t('A comma-separated list of protocols to be allowed in external links in addition to the standard ones (e.g. "http", "https").'),
+      '#element_validate' => [[$this, 'validateSettingsFormElementAllowedProtocols']],
+    ];
+
     $element['title'] = [
       '#type' => 'radios',
       '#title' => $this->t('Allow link text'),
@@ -116,6 +126,16 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
     ];
 
     return $element;
+  }
+
+  /**
+   * Validate the format of the allowed_protocols list.
+   */
+  public static function validateSettingsFormElementAllowedProtocols($element, FormStateInterface $form_state, $form): void {
+    $allowed_protocols = array_map('trim', explode(',', $element['#value']));
+    $allowed_protocols = $allowed_protocols == [''] ? [] : $allowed_protocols;
+
+    $form_state->setValueForElement($element, $allowed_protocols);
   }
 
   /**

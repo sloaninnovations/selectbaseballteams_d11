@@ -255,6 +255,11 @@ class LinkFormatter extends FormatterBase {
     if (!empty($settings['target'])) {
       $options['attributes']['target'] = $settings['target'];
     }
+    // Add the field definition's allowed_protocols for any future validation.
+    $allowed_protocols = $this->fieldDefinition->getSetting('allowed_protocols');
+    if (!empty($allowed_protocols)) {
+      $options['allowed_protocols'] = $allowed_protocols;
+    }
     $url->setOptions($options);
 
     return $url;
