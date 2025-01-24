@@ -328,6 +328,14 @@ class ManagedFile extends FormElementBase {
       $element['upload']['#attributes']['accept'] = $element['#accept'];
     }
 
+    // #states uses label_for however the original element will not have label.
+    // Only the upload elements will have label. Therefore move the
+    // #states to upload element if it exists.
+    if (isset($element['#states'])) {
+      $element['upload']['#states'] = $element['#states'];
+      unset($element['#states']);
+    }
+
     // Indicate that $element['#title'] should be used as the HTML label for the
     // file upload field.
     $element['#label_for'] = $element['upload']['#id'];
