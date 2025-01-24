@@ -115,7 +115,6 @@ class Table extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#header' => [],
       '#rows' => [],
@@ -129,10 +128,10 @@ class Table extends FormElementBase {
       '#multiple' => TRUE,
       '#js_select' => TRUE,
       '#process' => [
-        [$class, 'processTable'],
+        [static::class, 'processTable'],
       ],
       '#element_validate' => [
-        [$class, 'validateTable'],
+        [static::class, 'validateTable'],
       ],
       // Properties for tabledrag support.
       // The value is a list of arrays that are passed to
@@ -142,7 +141,7 @@ class Table extends FormElementBase {
       '#tabledrag' => [],
       // Render properties.
       '#pre_render' => [
-        [$class, 'preRenderTable'],
+        [static::class, 'preRenderTable'],
       ],
       '#theme' => 'table',
     ];
@@ -383,6 +382,7 @@ class Table extends FormElementBase {
    *     $options array.
    *
    * @return array
+   *   Associative array of rendered child elements for a table.
    *
    * @see template_preprocess_table()
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()

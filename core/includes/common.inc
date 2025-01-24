@@ -55,6 +55,11 @@ const SAVED_UPDATED = 2;
 
 /**
  * Return status for saving which deleted an existing item.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+ *   There is no replacement.
+ *
+ * @see https://www.drupal.org/node/3328750
  */
 const SAVED_DELETED = 3;
 
@@ -212,7 +217,7 @@ function base_path() {
  * MenuForm::BuildOverviewForm for an example creating a table
  * containing parent relationships.
  *
- * @param $element
+ * @param array $element
  *   A form element to attach the tableDrag behavior to.
  * @param array $options
  *   These options are used to generate JavaScript settings necessary to
@@ -290,7 +295,7 @@ function drupal_attach_tabledrag(&$element, array $options) {
  * is rendered for the first time, as it will have no effect on subsequent
  * renderings of the parent tree.
  *
- * @param $element
+ * @param array $element
  *   The element to be hidden.
  *
  * @return array
@@ -320,7 +325,7 @@ function hide(&$element) {
  * is rendered for the first time, as it will have no effect on subsequent
  * renderings of the parent tree.
  *
- * @param $element
+ * @param array $element
  *   The element to be shown.
  *
  * @return array

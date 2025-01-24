@@ -31,8 +31,8 @@ class LanguageTestHooks {
    * Implements hook_language_types_info().
    */
   #[Hook('language_types_info')]
-  public function languageTypesInfo() {
-    if (\Drupal::state()->get('language_test.language_types')) {
+  public function languageTypesInfo(): array {
+    if (\Drupal::keyValue('language_test')->get('language_types')) {
       return [
         'test_language_type' => [
           'name' => t('Test'),
@@ -46,6 +46,7 @@ class LanguageTestHooks {
         ],
       ];
     }
+    return [];
   }
 
   /**
@@ -53,7 +54,7 @@ class LanguageTestHooks {
    */
   #[Hook('language_types_info_alter')]
   public function languageTypesInfoAlter(array &$language_types): void {
-    if (\Drupal::state()->get('language_test.content_language_type')) {
+    if (\Drupal::keyValue('language_test')->get('content_language_type')) {
       $language_types[LanguageInterface::TYPE_CONTENT]['locked'] = FALSE;
       unset($language_types[LanguageInterface::TYPE_CONTENT]['fixed']);
       // By default languages are not configurable. Make
@@ -72,7 +73,7 @@ class LanguageTestHooks {
    */
   #[Hook('language_negotiation_info_alter')]
   public function languageNegotiationInfoAlter(array &$negotiation_info): void {
-    if (\Drupal::state()->get('language_test.language_negotiation_info_alter')) {
+    if (\Drupal::keyValue('language_test')->get('language_negotiation_info_alter')) {
       unset($negotiation_info[LanguageNegotiationUI::METHOD_ID]);
     }
   }
