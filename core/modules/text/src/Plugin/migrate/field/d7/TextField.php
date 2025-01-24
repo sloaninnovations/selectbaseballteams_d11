@@ -2,8 +2,8 @@
 
 namespace Drupal\text\Plugin\migrate\field\d7;
 
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
-use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate_drupal\Attribute\MigrateField;
 use Drupal\migrate_drupal\Plugin\migrate\field\FieldPluginBase;
 
@@ -83,27 +83,39 @@ class TextField extends FieldPluginBase {
       }
     }
 
-    if (in_array($type, ['text', 'text_long'])) {
-      // If a text or text_long field has only plain text instances, migrate it
-      // to a string or string_long field.
-      if ($plain_text && !$filtered_text) {
-        $type = str_replace(['text', 'text_long'], ['string', 'string_long'], $type);
-      }
-      // If a text or text_long field has both plain text and filtered text
-      // instances, skip the row.
-      elseif ($plain_text && $filtered_text) {
-        $field_name = $row->getSourceProperty('field_name');
-        throw new MigrateSkipRowException("Can't migrate source field $field_name configured with both plain text and filtered text processing. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#plain-text");
-      }
-    }
-    elseif ($type == 'text_with_summary' && $plain_text) {
-      // If a text_with_summary field has plain text instances, skip the row
-      // since there's no such thing as a string_with_summary field.
-      $field_name = $row->getSourceProperty('field_name');
-      throw new MigrateSkipRowException("Can't migrate source field $field_name of type text_with_summary configured with plain text processing. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#plain-text");
+    // If a text or text_long field has only plain text instances, migrate it
+    // to a string or string_long field.
+    $types_mappable_to_string = ['text', 'text_long'];
+    if (in_array($type, $types_mappable_to_string) && $plain_text && !$filtered_text) {
+      $type = str_replace(['text', 'text_long'], ['string', 'string_long'], $type);
     }
 
+    // Types configured with both plain and formatted text instances will be
+    // migrated with 'text' and 'text_long'.
     return $type;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defineValueProcessPipeline(MigrationInterface $migration, $field_name, $data) {
+    $process = [
+      'plugin' => 'sub_process',
+      'source' => $field_name,
+      'process' => [
+        'value' => 'value',
+        // The 'summary' property will only be picked up when the destination
+        // field type is 'text_with_summary'.
+        'summary' => 'summary',
+        // The 'format' property is ignored for string and string_long types.
+        'format' => [
+          'plugin' => 'default_value',
+          'source' => 'format',
+          'default_value' => 'plain_text',
+        ],
+      ],
+    ];
+    $migration->mergeProcessOfProperty($field_name, $process);
   }
 
 }

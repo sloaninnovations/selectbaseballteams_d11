@@ -457,6 +457,40 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'content_translation_source' => 'en',
           'content_translation_outdated' => '0',
         ],
+      13 => [
+        'nid' => '12',
+        'vid' => '19',
+        'type' => 'article',
+        'langcode' => 'und',
+        'status' => '1',
+        'uid' => '3',
+        'title' => 'Article with content in text fields with conflicting text processing settings',
+        'created' => '1620825323',
+        'changed' => '1620825323',
+        'promote' => '1',
+        'sticky' => '0',
+        'default_langcode' => '1',
+        'revision_translation_affected' => '1',
+        'content_translation_source' => NULL,
+        'content_translation_outdated' => '0',
+      ],
+      14 => [
+        'nid' => '13',
+        'vid' => '20',
+        'type' => 'page',
+        'langcode' => 'und',
+        'status' => '1',
+        'uid' => '2',
+        'title' => 'Basic page with content in text fields with conflicting text processing settings',
+        'created' => '1620825477',
+        'changed' => '1620825477',
+        'promote' => '0',
+        'sticky' => '0',
+        'default_langcode' => '1',
+        'revision_translation_affected' => '1',
+        'content_translation_source' => NULL,
+        'content_translation_outdated' => '0',
+      ],
     ];
   }
 
@@ -995,6 +1029,38 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'content_translation_source' => 'en',
           'content_translation_outdated' => '0',
         ],
+      31 => [
+        'nid' => '12',
+        'vid' => '19',
+        'langcode' => 'und',
+        'status' => '1',
+        'uid' => '3',
+        'title' => 'Article with content in text fields with conflicting text processing settings',
+        'created' => '1620825323',
+        'changed' => '1620825323',
+        'promote' => '1',
+        'sticky' => '0',
+        'default_langcode' => '1',
+        'revision_translation_affected' => '1',
+        'content_translation_source' => NULL,
+        'content_translation_outdated' => '0',
+      ],
+      32 => [
+        'nid' => '13',
+        'vid' => '20',
+        'langcode' => 'und',
+        'status' => '1',
+        'uid' => '2',
+        'title' => 'Basic page with content in text fields with conflicting text processing settings',
+        'created' => '1620825477',
+        'changed' => '1620825477',
+        'promote' => '0',
+        'sticky' => '0',
+        'default_langcode' => '1',
+        'revision_translation_affected' => '1',
+        'content_translation_source' => NULL,
+        'content_translation_outdated' => '0',
+      ],
     ];
   }
 
@@ -1231,6 +1297,18 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
             'body' => '2nd',
             'field_tree' => 'is - lancewood',
             'revision_created' => '1568261548',
+          ],
+        // Node 12, revision 19, und.
+        31 =>
+          [
+            'log' => NULL,
+            'revision_created' => '1620825323',
+          ],
+        // Node 13, revision 20, und.
+        32 =>
+          [
+            'log' => NULL,
+            'revision_created' => '1620825477',
           ],
       ],
     ];

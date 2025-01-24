@@ -225,7 +225,7 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     $this->assertSame('is - High council', Term::load($term_ref)->getName());
 
     $term_ref = $translation->get('field_vocab_fixed')->target_id;
-    $this->assertNulL($term_ref);
+    $this->assertNull($term_ref);
 
     // Test that content_translation_source is set.
     $manager = $this->container->get('content_translation.manager');
@@ -290,6 +290,50 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
     $this->assertSame('1529615813', $node_is->getCreatedTime());
     $this->assertSame(1529615813, $node_is->getChangedTime());
     $this->assertFalse($node_is->isPublished());
+
+    // Test the migration of text fields with conflicting text processing
+    // settings.
+    $node = Node::load(12);
+    $this->assertEquals([
+      [
+        'value' => 'Text plain and filtered – here it is <em>plain</em>',
+        'format' => 'plain_text',
+      ],
+    ], $node->get('field_text_plain_filtered')->getValue());
+    $this->assertEquals([
+      [
+        'value' => 'Text long plain and filtered – here it is <em>plain</em>',
+        'format' => 'plain_text',
+      ],
+    ], $node->get('field_text_long_plain_filtered')->getValue());
+    $this->assertEquals([
+      [
+        'value' => 'Text summary plain and filtered – here it is <em>plain</em>',
+        'summary' => NULL,
+        'format' => 'plain_text',
+      ],
+    ], $node->get('field_text_sum_plain_filtered')->getValue());
+
+    $node = Node::load(13);
+    $this->assertEquals([
+      [
+        'value' => 'Text plain and filtered – here it is <em>filtered</em> (uses custom_text_format)',
+        'format' => 'custom_text_format',
+      ],
+    ], $node->get('field_text_plain_filtered')->getValue());
+    $this->assertEquals([
+      [
+        'value' => 'Text long plain and filtered – here it is <em>filtered</em> (uses full_html)',
+        'format' => 'full_html',
+      ],
+    ], $node->get('field_text_long_plain_filtered')->getValue());
+    $this->assertEquals([
+      [
+        'value' => 'Text summary plain and filtered – here it is <em>filtered</em> (uses plain_text)',
+        'summary' => NULL,
+        'format' => 'plain_text',
+      ],
+    ], $node->get('field_text_sum_plain_filtered')->getValue());
   }
 
 }

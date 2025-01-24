@@ -213,8 +213,8 @@ class MigrateFieldInstanceTest extends MigrateDrupal7TestBase {
     $this->assertEntity('node.article.field_text_plain', 'Text plain', 'string', FALSE, FALSE);
     $this->assertEntity('node.page.field_text_long_plain', 'Text long plain', 'string_long', FALSE, FALSE);
     $this->assertEntity('node.article.field_text_long_plain', 'Text long plain', 'string_long', FALSE, TRUE);
-    $this->assertNull(FieldConfig::load('node.page.field_text_sum_plain'));
-    $this->assertNull(FieldConfig::load('node.article.field_text_sum_plain'));
+    $this->assertEntity('node.page.field_text_sum_plain', 'Text summary plain', 'text_with_summary', FALSE, FALSE);
+    $this->assertEntity('node.article.field_text_sum_plain', 'Text summary plain', 'text_with_summary', FALSE, TRUE);
 
     // All text, text_long and text_with_summary field instances using a field
     // base that has only filtered text instances should be migrated to text,
@@ -227,35 +227,21 @@ class MigrateFieldInstanceTest extends MigrateDrupal7TestBase {
     $this->assertEntity('node.article.field_text_sum_filtered', 'Text summary filtered', 'text_with_summary', FALSE, TRUE);
 
     // All text, text_long and text_with_summary field instances using a field
-    // base that has both plain text and filtered text instances should not have
-    // been migrated.
-    $this->assertNull(FieldConfig::load('node.page.field_text_plain_filtered'));
-    $this->assertNull(FieldConfig::load('node.article.field_text_plain_filtered'));
-    $this->assertNull(FieldConfig::load('node.page.field_text_long_plain_filtered'));
-    $this->assertNull(FieldConfig::load('node.article.field_text_long_plain_filtered'));
-    $this->assertNull(FieldConfig::load('node.page.field_text_sum_plain_filtered'));
-    $this->assertNull(FieldConfig::load('node.article.field_text_sum_plain_filtered'));
+    // base that has both plain text and filtered text instances should also
+    // have been migrated.
+    $this->assertEntity('node.page.field_text_plain_filtered', 'Text plain and filtered', 'text', FALSE, FALSE);
+    $this->assertEntity('node.article.field_text_plain_filtered', 'Text plain and filtered', 'text', FALSE, TRUE);
+    $this->assertEntity('node.page.field_text_long_plain_filtered', 'Text long plain and filtered', 'text_long', FALSE, FALSE);
+    $this->assertEntity('node.article.field_text_long_plain_filtered', 'Text long plain and filtered', 'text_long', FALSE, TRUE);
+    $this->assertEntity('node.page.field_text_sum_plain_filtered', 'Text summary plain and filtered', 'text_with_summary', FALSE, FALSE);
+    $this->assertEntity('node.article.field_text_sum_plain_filtered', 'Text summary plain and filtered', 'text_with_summary', FALSE, TRUE);
 
-    // For each text field instances that were skipped, there should be a log
-    // message with the required steps to fix this.
+    // No text field instances are expected to be skipped.
     $migration = $this->getMigration('d7_field_instance');
     $errors = array_map(function ($message) {
       return $message->message;
     }, iterator_to_array($migration->getIdMap()->getMessages()));
-    $this->assertCount(8, $errors);
-    sort($errors);
-    $message = 'd7_field_instance:type: Can\'t migrate source field field_text_long_plain_filtered configured with both plain text and filtered text processing. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#plain-text';
-    $this->assertEquals($errors[0], $message);
-    $this->assertEquals($errors[1], $message);
-    $message = 'd7_field_instance:type: Can\'t migrate source field field_text_plain_filtered configured with both plain text and filtered text processing. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#plain-text';
-    $this->assertEquals($errors[2], $message);
-    $this->assertEquals($errors[3], $message);
-    $message = 'd7_field_instance:type: Can\'t migrate source field field_text_sum_plain of type text_with_summary configured with plain text processing. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#plain-text';
-    $this->assertEquals($errors[4], $message);
-    $this->assertEquals($errors[5], $message);
-    $message = 'd7_field_instance:type: Can\'t migrate source field field_text_sum_plain_filtered of type text_with_summary configured with plain text processing. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#plain-text';
-    $this->assertEquals($errors[6], $message);
-    $this->assertEquals($errors[7], $message);
+    $this->assertCount(0, $errors);
   }
 
 }

@@ -10016,6 +10016,42 @@ $connection->schema()->createTable('field_data_field_text_long_plain_filtered', 
   'mysql_character_set' => 'utf8',
 ));
 
+$connection->insert('field_data_field_text_long_plain_filtered')
+->fields(array(
+  'entity_type',
+  'bundle',
+  'deleted',
+  'entity_id',
+  'revision_id',
+  'language',
+  'delta',
+  'field_text_long_plain_filtered_value',
+  'field_text_long_plain_filtered_format',
+))
+->values(array(
+  'entity_type' => 'node',
+  'bundle' => 'article',
+  'deleted' => '0',
+  'entity_id' => '12',
+  'revision_id' => '19',
+  'language' => 'und',
+  'delta' => '0',
+  'field_text_long_plain_filtered_value' => 'Text long plain and filtered – here it is <em>plain</em>',
+  'field_text_long_plain_filtered_format' => NULL,
+))
+->values(array(
+  'entity_type' => 'node',
+  'bundle' => 'page',
+  'deleted' => '0',
+  'entity_id' => '13',
+  'revision_id' => '20',
+  'language' => 'und',
+  'delta' => '0',
+  'field_text_long_plain_filtered_value' => 'Text long plain and filtered – here it is <em>filtered</em> (uses full_html)',
+  'field_text_long_plain_filtered_format' => 'full_html',
+))
+->execute();
+
 $connection->schema()->createTable('field_data_field_text_plain', array(
   'fields' => array(
     'entity_type' => array(
@@ -10232,6 +10268,42 @@ $connection->schema()->createTable('field_data_field_text_plain_filtered', array
   ),
   'mysql_character_set' => 'utf8',
 ));
+
+$connection->insert('field_data_field_text_plain_filtered')
+->fields(array(
+  'entity_type',
+  'bundle',
+  'deleted',
+  'entity_id',
+  'revision_id',
+  'language',
+  'delta',
+  'field_text_plain_filtered_value',
+  'field_text_plain_filtered_format',
+))
+->values(array(
+  'entity_type' => 'node',
+  'bundle' => 'article',
+  'deleted' => '0',
+  'entity_id' => '12',
+  'revision_id' => '19',
+  'language' => 'und',
+  'delta' => '0',
+  'field_text_plain_filtered_value' => 'Text plain and filtered – here it is <em>plain</em>',
+  'field_text_plain_filtered_format' => NULL,
+))
+->values(array(
+  'entity_type' => 'node',
+  'bundle' => 'page',
+  'deleted' => '0',
+  'entity_id' => '13',
+  'revision_id' => '20',
+  'language' => 'und',
+  'delta' => '0',
+  'field_text_plain_filtered_value' => 'Text plain and filtered – here it is <em>filtered</em> (uses custom_text_format)',
+  'field_text_plain_filtered_format' => 'custom_text_format',
+))
+->execute();
 
 $connection->schema()->createTable('field_data_field_text_sum_filtered', array(
   'fields' => array(
@@ -10520,6 +10592,45 @@ $connection->schema()->createTable('field_data_field_text_sum_plain_filtered', a
   ),
   'mysql_character_set' => 'utf8',
 ));
+
+$connection->insert('field_data_field_text_sum_plain_filtered')
+->fields(array(
+  'entity_type',
+  'bundle',
+  'deleted',
+  'entity_id',
+  'revision_id',
+  'language',
+  'delta',
+  'field_text_sum_plain_filtered_value',
+  'field_text_sum_plain_filtered_summary',
+  'field_text_sum_plain_filtered_format',
+))
+->values(array(
+  'entity_type' => 'node',
+  'bundle' => 'article',
+  'deleted' => '0',
+  'entity_id' => '12',
+  'revision_id' => '19',
+  'language' => 'und',
+  'delta' => '0',
+  'field_text_sum_plain_filtered_value' => 'Text summary plain and filtered – here it is <em>plain</em>',
+  'field_text_sum_plain_filtered_summary' => '',
+  'field_text_sum_plain_filtered_format' => NULL,
+))
+->values(array(
+  'entity_type' => 'node',
+  'bundle' => 'page',
+  'deleted' => '0',
+  'entity_id' => '13',
+  'revision_id' => '20',
+  'language' => 'und',
+  'delta' => '0',
+  'field_text_sum_plain_filtered_value' => 'Text summary plain and filtered – here it is <em>filtered</em> (uses plain_text)',
+  'field_text_sum_plain_filtered_summary' => '',
+  'field_text_sum_plain_filtered_format' => 'plain_text',
+))
+->execute();
 
 $connection->schema()->createTable('field_data_field_training', array(
   'fields' => array(
@@ -16928,6 +17039,42 @@ $connection->schema()->createTable('field_revision_field_text_long_plain_filtere
   'mysql_character_set' => 'utf8',
 ));
 
+$connection->insert('field_revision_field_text_long_plain_filtered')
+->fields(array(
+  'entity_type',
+  'bundle',
+  'deleted',
+  'entity_id',
+  'revision_id',
+  'language',
+  'delta',
+  'field_text_long_plain_filtered_value',
+  'field_text_long_plain_filtered_format',
+))
+->values(array(
+  'entity_type' => 'node',
+  'bundle' => 'article',
+  'deleted' => '0',
+  'entity_id' => '12',
+  'revision_id' => '19',
+  'language' => 'und',
+  'delta' => '0',
+  'field_text_long_plain_filtered_value' => 'Text long plain and filtered – here it is <em>plain</em>',
+  'field_text_long_plain_filtered_format' => NULL,
+))
+->values(array(
+  'entity_type' => 'node',
+  'bundle' => 'page',
+  'deleted' => '0',
+  'entity_id' => '13',
+  'revision_id' => '20',
+  'language' => 'und',
+  'delta' => '0',
+  'field_text_long_plain_filtered_value' => 'Text long plain and filtered – here it is <em>filtered</em> (uses full_html)',
+  'field_text_long_plain_filtered_format' => 'full_html',
+))
+->execute();
+
 $connection->schema()->createTable('field_revision_field_text_plain', array(
   'fields' => array(
     'entity_type' => array(
@@ -17146,6 +17293,42 @@ $connection->schema()->createTable('field_revision_field_text_plain_filtered', a
   ),
   'mysql_character_set' => 'utf8',
 ));
+
+$connection->insert('field_revision_field_text_plain_filtered')
+->fields(array(
+  'entity_type',
+  'bundle',
+  'deleted',
+  'entity_id',
+  'revision_id',
+  'language',
+  'delta',
+  'field_text_plain_filtered_value',
+  'field_text_plain_filtered_format',
+))
+->values(array(
+  'entity_type' => 'node',
+  'bundle' => 'article',
+  'deleted' => '0',
+  'entity_id' => '12',
+  'revision_id' => '19',
+  'language' => 'und',
+  'delta' => '0',
+  'field_text_plain_filtered_value' => 'Text plain and filtered – here it is <em>plain</em>',
+  'field_text_plain_filtered_format' => NULL,
+))
+->values(array(
+  'entity_type' => 'node',
+  'bundle' => 'page',
+  'deleted' => '0',
+  'entity_id' => '13',
+  'revision_id' => '20',
+  'language' => 'und',
+  'delta' => '0',
+  'field_text_plain_filtered_value' => 'Text plain and filtered – here it is <em>filtered</em> (uses custom_text_format)',
+  'field_text_plain_filtered_format' => 'custom_text_format',
+))
+->execute();
 
 $connection->schema()->createTable('field_revision_field_text_sum_filtered', array(
   'fields' => array(
@@ -17437,6 +17620,45 @@ $connection->schema()->createTable('field_revision_field_text_sum_plain_filtered
   ),
   'mysql_character_set' => 'utf8',
 ));
+
+$connection->insert('field_revision_field_text_sum_plain_filtered')
+->fields(array(
+  'entity_type',
+  'bundle',
+  'deleted',
+  'entity_id',
+  'revision_id',
+  'language',
+  'delta',
+  'field_text_sum_plain_filtered_value',
+  'field_text_sum_plain_filtered_summary',
+  'field_text_sum_plain_filtered_format',
+))
+->values(array(
+  'entity_type' => 'node',
+  'bundle' => 'article',
+  'deleted' => '0',
+  'entity_id' => '12',
+  'revision_id' => '19',
+  'language' => 'und',
+  'delta' => '0',
+  'field_text_sum_plain_filtered_value' => 'Text summary plain and filtered – here it is <em>plain</em>',
+  'field_text_sum_plain_filtered_summary' => '',
+  'field_text_sum_plain_filtered_format' => NULL,
+))
+->values(array(
+  'entity_type' => 'node',
+  'bundle' => 'page',
+  'deleted' => '0',
+  'entity_id' => '13',
+  'revision_id' => '20',
+  'language' => 'und',
+  'delta' => '0',
+  'field_text_sum_plain_filtered_value' => 'Text summary plain and filtered – here it is <em>filtered</em> (uses plain_text)',
+  'field_text_sum_plain_filtered_summary' => '',
+  'field_text_sum_plain_filtered_format' => 'plain_text',
+))
+->execute();
 
 $connection->schema()->createTable('field_revision_field_training', array(
   'fields' => array(
@@ -50160,6 +50382,38 @@ $connection->insert('node')
   'tnid' => '0',
   'translate' => '0',
 ))
+->values(array(
+  'nid' => '12',
+  'vid' => '19',
+  'type' => 'article',
+  'language' => 'und',
+  'title' => 'Article with content in text fields with conflicting text processing settings',
+  'uid' => '3',
+  'status' => '1',
+  'created' => '1620825323',
+  'changed' => '1620825323',
+  'comment' => '1',
+  'promote' => '1',
+  'sticky' => '0',
+  'tnid' => '0',
+  'translate' => '0',
+))
+->values(array(
+  'nid' => '13',
+  'vid' => '20',
+  'type' => 'page',
+  'language' => 'und',
+  'title' => 'Basic page with content in text fields with conflicting text processing settings',
+  'uid' => '2',
+  'status' => '1',
+  'created' => '1620825477',
+  'changed' => '1620825477',
+  'comment' => '1',
+  'promote' => '0',
+  'sticky' => '0',
+  'tnid' => '0',
+  'translate' => '0',
+))
 ->execute();
 $connection->schema()->createTable('node_access', array(
   'fields' => array(
@@ -50350,6 +50604,22 @@ $connection->insert('node_comment_statistics')
   'last_comment_uid' => '1',
   'comment_count' => '0',
 ))
+->values(array(
+  'nid' => '12',
+  'cid' => '0',
+  'last_comment_timestamp' => '1620825323',
+  'last_comment_name' => NULL,
+  'last_comment_uid' => '3',
+  'comment_count' => '0',
+))
+->values(array(
+  'nid' => '13',
+  'cid' => '0',
+  'last_comment_timestamp' => '1620825477',
+  'last_comment_name' => NULL,
+  'last_comment_uid' => '2',
+  'comment_count' => '0',
+))
 ->execute();
 $connection->schema()->createTable('node_counter', array(
   'fields' => array(
@@ -50435,6 +50705,18 @@ $connection->insert('node_counter')
   'totalcount' => '2',
   'daycount' => '2',
   'timestamp' => '1504715438',
+))
+->values(array(
+  'nid' => '12',
+  'totalcount' => '1',
+  'daycount' => '1',
+  'timestamp' => '1620825323',
+))
+->values(array(
+  'nid' => '13',
+  'totalcount' => '1',
+  'daycount' => '1',
+  'timestamp' => '1620825477',
 ))
 ->execute();
 $connection->schema()->createTable('node_revision', array(
@@ -50730,6 +51012,30 @@ $connection->insert('node_revision')
   'title' => 'Page one',
   'log' => '',
   'timestamp' => '1568261721',
+  'status' => '1',
+  'comment' => '1',
+  'promote' => '0',
+  'sticky' => '0',
+))
+->values(array(
+  'nid' => '12',
+  'vid' => '19',
+  'uid' => '1',
+  'title' => 'Article with content in text fields with conflicting text processing settings',
+  'log' => '',
+  'timestamp' => '1620825323',
+  'status' => '1',
+  'comment' => '1',
+  'promote' => '1',
+  'sticky' => '0',
+))
+->values(array(
+  'nid' => '13',
+  'vid' => '20',
+  'uid' => '1',
+  'title' => 'Basic page with content in text fields with conflicting text processing settings',
+  'log' => '',
+  'timestamp' => '1620825477',
   'status' => '1',
   'comment' => '1',
   'promote' => '0',
