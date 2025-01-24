@@ -385,7 +385,7 @@ class TaxonomyIndexTid extends ManyToOne {
       return;
     }
 
-    if ($values = $form_state->getValue($identifier)) {
+    if (($values = $form_state->getValue($identifier)) && is_array($values)) {
       foreach ($values as $value) {
         $this->validated_exposed_input[] = $value['target_id'];
       }
