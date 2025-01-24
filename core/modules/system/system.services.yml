@@ -79,3 +79,7 @@ services:
     arguments: ['@datetime.time']
   system.access_route_alter_subscriber:
     class: Drupal\system\EventSubscriber\AccessRouteAlterSubscriber
+  logger.channel.file_system:
+    class: Drupal\Core\Logger\LoggerChannel
+    factory: ['@logger.factory', 'get']
+    arguments: ['file system']

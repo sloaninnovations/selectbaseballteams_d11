@@ -336,8 +336,14 @@ function system_preprocess_block(&$variables): void {
  *   The form element containing the name of the directory to check.
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The current state of the form.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Instead, your form
+ *   validation should check if the directory exists and is writable.
+ *
+ * @see https://www.drupal.org/node/3073687
  */
 function system_check_directory($form_element, FormStateInterface $form_state) {
+  @trigger_error('system_check_directory() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Instead, your form validation should check if the directory exists and is writable. See https://www.drupal.org/node/3073687', E_USER_DEPRECATED);
   $directory = $form_element['#value'];
   if (strlen($directory) == 0) {
     return $form_element;
