@@ -104,10 +104,13 @@
 .add-comment__picture-wrapper {
   inset-block-start: calc(var(--line-height-base) + var(--sp0-5));
 }
-
+.comment__picture-wrapper {
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
+}
 .add-comment__picture,
 .comment__picture {
-  position: absolute;
   inset-inline-start: 0;
   overflow: hidden;
   width: var(--sp2);
