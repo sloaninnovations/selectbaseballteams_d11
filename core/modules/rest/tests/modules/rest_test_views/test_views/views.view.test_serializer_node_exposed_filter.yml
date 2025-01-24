@@ -35,6 +35,7 @@ display:
         type: basic
       style:
         type: serializer
+        pager: 0
       row:
         type: data_field
       fields:
@@ -167,5 +168,6 @@ display:
         type: none
       style:
         type: serializer
+        pager: 0
       row:
         type: data_field

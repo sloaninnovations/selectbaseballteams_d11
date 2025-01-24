@@ -87,6 +87,7 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['formats'] = ['default' => []];
+    $options['pager'] = ['default' => FALSE];
 
     return $options;
   }
@@ -103,6 +104,12 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
       '#description' => $this->t('Request formats that will be allowed in responses. If none are selected all formats will be allowed.'),
       '#options' => $this->getFormatOptions(),
       '#default_value' => $this->options['formats'],
+    ];
+    $form['pager'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Add pager information'),
+      '#description' => $this->t('Pager information will be added to rest export. <b>Output structure will be changed.</b>'),
+      '#default_value' => $this->options['pager'],
     ];
   }
 
@@ -140,7 +147,52 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
     else {
       $content_type = !empty($this->options['formats']) ? reset($this->options['formats']) : 'json';
     }
-    return $this->serializer->serialize($rows, $content_type, ['views_style_plugin' => $this]);
+
+    $result = $rows;
+    $is_class_rest_export = get_class($this->displayHandler) === 'Drupal\rest\Plugin\views\display\RestExport';
+    if ($this->options['pager'] && $this->view->pager && $this->displayHandler && $is_class_rest_export) {
+      $result = $this->wrapRowsInPager($rows);
+    }
+
+    return $this->serializer->serialize($result, $content_type, ['views_style_plugin' => $this]);
+  }
+
+  /**
+   * Wraps an array of rows in another array with page info.
+   *
+   * @param array $rows
+   *   Array with the rows to wrap.
+   *
+   * @return array
+   *   An array with the following keys:
+   *   - rows: the original rows array.
+   *   - pager: the pager info, including the following keys:
+   *     - current_page: the current page number.
+   *     - total_items: the total items of the view.
+   *     - total_pages: the total number of pages of the view.
+   *     - total_items_per_page: the number of items displayed on each page.
+   */
+  protected function wrapRowsInPager(array $rows): array {
+    $pager = $this->view->pager;
+    $class = get_class($pager);
+    $current_page = $pager->getCurrentPage();
+    $items_per_page = $pager->getItemsPerPage();
+    $total_items = $pager->getTotalItems();
+
+    $total_pages = 0;
+    if (!in_array($class, ['Drupal\views\Plugin\views\pager\None', 'Drupal\views\Plugin\views\pager\Some'])) {
+      $total_pages = $pager->getPagerTotal();
+    }
+
+    return [
+      'rows' => $rows,
+      'pager' => [
+        'current_page' => intval($current_page),
+        'total_items' => intval($total_items),
+        'total_pages' => intval($total_pages),
+        'items_per_page' => intval($items_per_page),
+      ],
+    ];
   }
 
   /**
