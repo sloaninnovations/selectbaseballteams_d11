@@ -24,6 +24,11 @@ function layout_builder_test_node_view(array &$build, EntityInterface $entity, E
       '#markup' => 'Extra Field 2 is hidden by default.',
     ];
   }
+  if ($display->getComponent('layout_builder_test_empty')) {
+    $build['layout_builder_test_empty'] = [
+      '#cache' => [],
+    ];
+  }
 }
 
 /**

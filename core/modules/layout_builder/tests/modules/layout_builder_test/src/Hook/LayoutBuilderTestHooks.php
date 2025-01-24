@@ -57,6 +57,11 @@ class LayoutBuilderTestHooks {
       'weight' => 0,
       'visible' => FALSE,
     ];
+    $extra['node']['bundle_with_section_field']['display']['layout_builder_test_empty'] = [
+      'label' => t('Extra Field (empty)'),
+      'description' => t('Extra Field (empty) description'),
+      'weight' => 0,
+    ];
     return $extra;
   }
 
