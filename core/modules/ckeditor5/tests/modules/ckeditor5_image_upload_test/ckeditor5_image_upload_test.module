@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Implements hooks for the CKEditor 5 Image Upload Test module.
+ */
+
+use Drupal\file\FileInterface;
+
+/**
+ * Implements hook_file_validate().
+ */
+function ckeditor5_image_upload_test_file_validate(FileInterface $file): ?array {
+  $errors = [];
+  $filename = \Drupal::service('file_system')->realpath($file->getFileUri());
+  if (!file_exists($filename)) {
+    $errors[] = t("I'm sorry, I can't let you do that Dave.");
+  }
+  return $errors;
+}

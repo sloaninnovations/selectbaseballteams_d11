@@ -34,6 +34,7 @@ class ImageUploadTest extends BrowserTestBase {
     'editor',
     'filter',
     'ckeditor5',
+    'ckeditor5_image_upload_test',
   ];
 
   /**

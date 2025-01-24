@@ -10,6 +10,8 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Environment;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Entity\EntityConstraintViolationList;
+use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
@@ -111,6 +113,20 @@ class CKEditor5ImageController extends ControllerBase {
       throw new HttpException(503, sprintf('File "%s" is already locked for writing.', $file_uri), NULL, ['Retry-After' => 1]);
     }
 
+    // Begin building file entity.
+    $file = File::create([]);
+    $file->setOwnerId($this->currentUser->id());
+    $file->setFilename($prepared_filename);
+    $file->setMimeType($this->mimeTypeGuesser->guessMimeType($prepared_filename));
+
+    $file->setFileUri($temp_file_path);
+    $file->setSize(@filesize($temp_file_path));
+
+    $violations = $this->validate($file, $validators);
+    if ($violations->count() > 0) {
+      throw new UnprocessableEntityHttpException($violations->__toString());
+    }
+
     try {
       $uploadedFile = new FormUploadedFile($upload);
       $uploadResult = $this->fileUploadHandler->handleFileUpload($uploadedFile, $validators, $destination, FileExists::Rename);
@@ -124,6 +140,19 @@ class CKEditor5ImageController extends ControllerBase {
     catch (LockAcquiringException) {
       throw new HttpException(503, sprintf('File "%s" is already locked for writing.', $upload->getClientOriginalName()), NULL, ['Retry-After' => 1]);
     }
+
+    $file->setFileUri($file_uri);
+    $violations = $file->validate();
+
+    // Remove violations of inaccessible fields as they cannot stem from our
+    // changes.
+    $violations->filterByFieldAccess();
+
+    if ($violations->count() > 0) {
+      throw new UnprocessableEntityHttpException($violations->__toString());
+    }
+
+    $file->save();
 
     $this->lock->release($lock_id);
 
@@ -185,6 +214,44 @@ class CKEditor5ImageController extends ControllerBase {
     }
 
     return AccessResult::allowed();
+  }
+
+  /**
+   * Validates the file.
+   *
+   * @param \Drupal\file\FileInterface $file
+   *   The file entity to validate.
+   * @param array $validators
+   *   An array of upload validators to pass to the FileValidator.
+   *
+   * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface
+   *   The list of constraint violations, if any.
+   */
+  protected function validate(FileInterface $file, array $validators) {
+    $violations = new EntityConstraintViolationList($file);
+
+    // Validate the file based on the field definition configuration.
+    $violations->addAll($this->fileValidator->validate($file, $validators));
+
+    return $violations;
+  }
+
+  /**
+   * Prepares the filename to strip out any malicious extensions.
+   *
+   * @param string $filename
+   *   The file name.
+   * @param string $allowed_extensions
+   *   The allowed extensions.
+   *
+   * @return string
+   *   The prepared/munged filename.
+   */
+  protected function prepareFilename(string $filename, string $allowed_extensions): string {
+    $event = new FileUploadSanitizeNameEvent($filename, $allowed_extensions);
+    $this->eventDispatcher->dispatch($event);
+
+    return $event->getFilename();
   }
 
   /**

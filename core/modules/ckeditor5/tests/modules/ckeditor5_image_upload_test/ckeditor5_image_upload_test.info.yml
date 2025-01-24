@@ -1,0 +1,6 @@
+name: CKEditor 5 Image Upload Test
+type: module
+description: "Provides test hook implementation for CKEditor 5 to test image upload validation."
+package: Testing
+dependencies:
+  - drupal:ckeditor5
