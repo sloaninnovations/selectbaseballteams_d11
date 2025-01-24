@@ -14,7 +14,7 @@ use Drupal\Core\Database\TransactionNameNonUniqueException;
 use Drupal\Core\Database\TransactionOutOfOrderException;
 
 /**
- * Tests the transaction abstraction system.
+ * Tests the transactions, using the explicit Transaction::yield() method.
  *
  * We test nesting by having two transaction layers, an outer and inner. The
  * outer layer encapsulates the inner layer. Our transaction nesting abstraction
@@ -37,13 +37,25 @@ use Drupal\Core\Database\TransactionOutOfOrderException;
  * and mysqli (MySql) clients do not have a solution to check if a transaction
  * is active, and mysqli does not fail when rolling back and no transaction
  * active.
+ *
+ * @group Database
  */
-class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
+class TransactionYieldTest extends DatabaseTestBase {
 
   /**
    * Keeps track of the post-transaction callback action executed.
    */
   protected ?string $postTransactionCallbackAction = NULL;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    // Set the transaction manager to trigger warnings when appropriate.
+    $this->connection->transactionManager()->triggerWarningWhenYieldingOnVoidTransaction = TRUE;
+  }
 
   /**
    * Create a root Drupal transaction.
@@ -111,7 +123,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @param bool $ddl_statement
    *   Whether to execute a DDL statement during the inner transaction.
    */
-  protected function transactionOuterLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
+  protected function transactionOuterLayer(string $suffix, bool $rollback = FALSE, bool $ddl_statement = FALSE): void {
     $depth = $this->connection->transactionManager()->stackDepth();
     $txn = $this->connection->startTransaction();
 
@@ -136,7 +148,10 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
       // This rollback should propagate to the last savepoint.
       $txn->rollBack();
       $this->assertSame($depth, $this->connection->transactionManager()->stackDepth(), 'Transaction has rolled back to the last savepoint after calling rollBack().');
+      return;
     }
+
+    $txn->yield();
   }
 
   /**
@@ -152,7 +167,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @param bool $ddl_statement
    *   Whether to execute a DDL statement during the transaction.
    */
-  protected function transactionInnerLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
+  protected function transactionInnerLayer(string $suffix, bool $rollback = FALSE, bool $ddl_statement = FALSE): void {
     $depth = $this->connection->transactionManager()->stackDepth();
     // Start a transaction. If we're being called from ->transactionOuterLayer,
     // then we're already in a transaction. Normally, that would make starting
@@ -194,7 +209,10 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
       // This rollback should propagate to the last savepoint.
       $txn->rollBack();
       $this->assertSame($depth, $this->connection->transactionManager()->stackDepth(), 'Transaction has rolled back to the last savepoint after calling rollBack().');
+      return;
     }
+
+    $txn->yield();
   }
 
   /**
@@ -266,10 +284,94 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     // Insert a row.
     $this->insertRow('Syd');
 
-    // Commit root. Corresponds to 'COMMIT' on the database.
-    unset($transaction);
+    // Yield root. Corresponds to 'COMMIT' on the database.
+    $transaction->yield();
     $this->assertRowPresent('David');
     $this->assertRowAbsent('Roger');
+    $this->assertRowPresent('Syd');
+    $this->assertFalse($this->connection->inTransaction());
+    $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
+  }
+
+  /**
+   * Tests savepoint transaction commit after rollback.
+   */
+  public function testCommitAfterRollbackSameSavepoint(): void {
+    $transaction = $this->createRootTransaction();
+    $savepoint = $this->createFirstSavepointTransaction();
+
+    // Rollback savepoint. It should get released too. Corresponds to 'ROLLBACK
+    // TO savepoint_1' plus 'RELEASE savepoint_1' on the database.
+    $savepoint->rollBack();
+    $this->assertRowPresent('David');
+    $this->assertRowAbsent('Roger');
+    $this->assertTrue($this->connection->inTransaction());
+    $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
+
+    // Insert a row.
+    $this->insertRow('Syd');
+
+    // Try yielding savepoint. Should fail since it was released already.
+    try {
+      $savepoint->yield();
+      $this->fail('Expected TransactionOutOfOrderException was not thrown');
+    }
+    catch (\Exception $e) {
+      $this->assertInstanceOf(TransactionOutOfOrderException::class, $e);
+      $this->assertMatchesRegularExpression("/^Error attempting commit of .*\\\\savepoint_1\\. Active stack: .*\\\\drupal_transaction/", $e->getMessage());
+    }
+    $this->assertRowPresent('David');
+    $this->assertRowAbsent('Roger');
+    $this->assertRowPresent('Syd');
+    $this->assertTrue($this->connection->inTransaction());
+    $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
+
+    // Yield root. Corresponds to 'COMMIT' on the database.
+    $transaction->yield();
+    $this->assertRowPresent('David');
+    $this->assertRowAbsent('Roger');
+    $this->assertRowPresent('Syd');
+    $this->assertFalse($this->connection->inTransaction());
+    $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
+  }
+
+  /**
+   * Tests savepoint transaction rollback after commit.
+   */
+  public function testRollbackAfterCommitSameSavepoint(): void {
+    $transaction = $this->createRootTransaction();
+    $savepoint = $this->createFirstSavepointTransaction();
+
+    // Yield savepoint. It should get released too. Corresponds to 'RELEASE
+    // savepoint_1' on the database.
+    $savepoint->yield();
+    $this->assertRowPresent('David');
+    $this->assertRowPresent('Roger');
+    $this->assertTrue($this->connection->inTransaction());
+    $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
+
+    // Insert a row.
+    $this->insertRow('Syd');
+
+    // Try rolling back savepoint. Should fail since it was released already.
+    try {
+      $savepoint->rollback();
+      $this->fail('Expected TransactionOutOfOrderException was not thrown');
+    }
+    catch (\Exception $e) {
+      $this->assertInstanceOf(TransactionOutOfOrderException::class, $e);
+      $this->assertMatchesRegularExpression("/^Error attempting rollback of .*\\\\savepoint_1\\. Active stack: .*\\\\drupal_transaction/", $e->getMessage());
+    }
+    $this->assertRowPresent('David');
+    $this->assertRowPresent('Roger');
+    $this->assertRowPresent('Syd');
+    $this->assertTrue($this->connection->inTransaction());
+    $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
+
+    // Yield root. Corresponds to 'COMMIT' on the database.
+    $transaction->yield();
+    $this->assertRowPresent('David');
+    $this->assertRowPresent('Roger');
     $this->assertRowPresent('Syd');
     $this->assertFalse($this->connection->inTransaction());
     $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
@@ -338,6 +440,70 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   }
 
   /**
+   * Tests commit does not fail when committing after DDL.
+   */
+  public function testCommitAfterDdl(): void {
+    $transaction = $this->createRootTransaction();
+    $savepoint = $this->createFirstSavepointTransaction();
+
+    $this->executeDDLStatement();
+
+    $this->assertRowPresent('David');
+    $this->assertRowPresent('Roger');
+    if ($this->connection->supportsTransactionalDDL()) {
+      $this->assertTrue($this->connection->inTransaction());
+      $this->assertSame(2, $this->connection->transactionManager()->stackDepth());
+    }
+    else {
+      $this->assertFalse($this->connection->inTransaction());
+    }
+
+    $this->assertRowPresent('David');
+    $this->assertRowPresent('Roger');
+    if ($this->connection->supportsTransactionalDDL()) {
+      $savepoint->yield();
+      $this->assertTrue($this->connection->inTransaction());
+      $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
+    }
+    else {
+      set_error_handler(static function (int $errno, string $errstr): bool {
+        throw new \ErrorException($errstr);
+      });
+      try {
+        $savepoint->yield();
+      }
+      catch (\ErrorException $e) {
+        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+      }
+      finally {
+        restore_error_handler();
+      }
+      $this->assertFalse($this->connection->inTransaction());
+    }
+
+    if ($this->connection->supportsTransactionalDDL()) {
+      $transaction->yield();
+    }
+    else {
+      set_error_handler(static function (int $errno, string $errstr): bool {
+        throw new \ErrorException($errstr);
+      });
+      try {
+        $transaction->yield();
+      }
+      catch (\ErrorException $e) {
+        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+      }
+      finally {
+        restore_error_handler();
+      }
+    }
+    $this->assertRowPresent('David');
+    $this->assertRowPresent('Roger');
+    $this->assertFalse($this->connection->inTransaction());
+  }
+
+  /**
    * Tests a committed transaction.
    *
    * The behavior of this test should be identical for connections that support
@@ -367,7 +533,23 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $transaction = $this->createRootTransaction('', FALSE);
     $this->insertRow('row');
     $this->executeDDLStatement();
-    unset($transaction);
+    if ($this->connection->supportsTransactionalDDL()) {
+      $transaction->yield();
+    }
+    else {
+      set_error_handler(static function (int $errno, string $errstr): bool {
+        throw new \ErrorException($errstr);
+      });
+      try {
+        $transaction->yield();
+      }
+      catch (\ErrorException $e) {
+        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+      }
+      finally {
+        restore_error_handler();
+      }
+    }
     $this->assertRowPresent('row');
 
     // Even in different order.
@@ -375,7 +557,23 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $transaction = $this->createRootTransaction('', FALSE);
     $this->executeDDLStatement();
     $this->insertRow('row');
-    unset($transaction);
+    if ($this->connection->supportsTransactionalDDL()) {
+      $transaction->yield();
+    }
+    else {
+      set_error_handler(static function (int $errno, string $errstr): bool {
+        throw new \ErrorException($errstr);
+      });
+      try {
+        $transaction->yield();
+      }
+      catch (\ErrorException $e) {
+        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+      }
+      finally {
+        restore_error_handler();
+      }
+    }
     $this->assertRowPresent('row');
 
     // Even with stacking.
@@ -383,11 +581,39 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $transaction = $this->createRootTransaction('', FALSE);
     $transaction2 = $this->createFirstSavepointTransaction('', FALSE);
     $this->executeDDLStatement();
-    unset($transaction2);
+    if ($this->connection->supportsTransactionalDDL()) {
+      $transaction2->yield();
+    }
+    else {
+      set_error_handler(static function (int $errno, string $errstr): bool {
+        throw new \ErrorException($errstr);
+      });
+      try {
+        $transaction2->yield();
+      }
+      catch (\ErrorException $e) {
+        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+      }
+      finally {
+        restore_error_handler();
+      }
+    }
     $transaction3 = $this->connection->startTransaction();
     $this->insertRow('row');
-    unset($transaction3);
-    unset($transaction);
+    $transaction3->yield();
+    if ($this->connection->supportsTransactionalDDL()) {
+      $transaction->yield();
+    }
+    else {
+      try {
+        $transaction->yield();
+        $this->fail('TransactionOutOfOrderException was expected, but did not throw.');
+      }
+      catch (TransactionOutOfOrderException) {
+        // Just continue, this is out or order since $transaction3 started a
+        // new root.
+      }
+    }
     $this->assertRowPresent('row');
 
     // A transaction after a DDL statement should still work the same.
@@ -395,12 +621,39 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $transaction = $this->createRootTransaction('', FALSE);
     $transaction2 = $this->createFirstSavepointTransaction('', FALSE);
     $this->executeDDLStatement();
-    unset($transaction2);
+    if ($this->connection->supportsTransactionalDDL()) {
+      $transaction2->yield();
+    }
+    else {
+      set_error_handler(static function (int $errno, string $errstr): bool {
+        throw new \ErrorException($errstr);
+      });
+      try {
+        $transaction2->yield();
+      }
+      catch (\ErrorException $e) {
+        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+      }
+      finally {
+        restore_error_handler();
+      }
+    }
     $transaction3 = $this->connection->startTransaction();
     $this->insertRow('row');
     $transaction3->rollBack();
-    unset($transaction3);
-    unset($transaction);
+    if ($this->connection->supportsTransactionalDDL()) {
+      $transaction->yield();
+    }
+    else {
+      try {
+        $transaction->yield();
+        $this->fail('TransactionOutOfOrderException was expected, but did not throw.');
+      }
+      catch (TransactionOutOfOrderException) {
+        // Just continue, this is out or order since $transaction3 started a
+        // new root.
+      }
+    }
     $this->assertRowAbsent('row');
 
     // The behavior of a rollback depends on the type of database server.
@@ -412,7 +665,6 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
       $this->insertRow('row');
       $this->executeDDLStatement();
       $transaction->rollBack();
-      unset($transaction);
       $this->assertRowAbsent('row');
 
       // Including with stacking.
@@ -420,12 +672,11 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
       $transaction = $this->createRootTransaction('', FALSE);
       $transaction2 = $this->createFirstSavepointTransaction('', FALSE);
       $this->executeDDLStatement();
-      unset($transaction2);
+      $transaction2->yield();
       $transaction3 = $this->connection->startTransaction();
       $this->insertRow('row');
-      unset($transaction3);
+      $transaction3->yield();
       $transaction->rollBack();
-      unset($transaction);
       $this->assertRowAbsent('row');
     }
   }
@@ -463,7 +714,15 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
       restore_error_handler();
     }
 
-    unset($transaction);
+    try {
+      $transaction->yield();
+      $this->fail('TransactionOutOfOrderException was expected, but did not throw.');
+    }
+    catch (TransactionOutOfOrderException) {
+      // Just continue, the attempted rollback made the overall state to
+      // ClientConnectionTransactionState::RollbackFailed.
+    }
+
     $manager = $this->connection->transactionManager();
     $this->assertSame(0, $manager->stackDepth());
     $reflectedTransactionState = new \ReflectionMethod($manager, 'getConnectionTransactionState');
@@ -474,7 +733,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Inserts a single row into the testing table.
    */
-  protected function insertRow($name) {
+  protected function insertRow(string $name): void {
     $this->connection->insert('test')
       ->fields([
         'name' => $name,
@@ -485,7 +744,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Executes a DDL statement.
    */
-  protected function executeDDLStatement() {
+  protected function executeDDLStatement(): void {
     static $count = 0;
     $table = [
       'fields' => [
@@ -503,7 +762,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Starts over for a new test.
    */
-  protected function cleanUp() {
+  protected function cleanUp(): void {
     $this->connection->truncate('test')
       ->execute();
     $this->postTransactionCallbackAction = NULL;
@@ -549,10 +808,10 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $transaction2 = $this->createFirstSavepointTransaction('', FALSE);
     $this->insertRow('inner');
     // Pop the inner transaction.
-    unset($transaction2);
+    $transaction2->yield();
     $this->assertTrue($this->connection->inTransaction(), 'Still in a transaction after popping the inner transaction');
     // Pop the outer transaction.
-    unset($transaction);
+    $transaction->yield();
     $this->assertFalse($this->connection->inTransaction(), 'Transaction closed after popping the outer transaction');
     $this->assertRowPresent('outer');
     $this->assertRowPresent('inner');
@@ -565,11 +824,10 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $this->insertRow('inner');
     // Now rollback the inner transaction.
     $transaction2->rollBack();
-    unset($transaction2);
     $this->assertTrue($this->connection->inTransaction(), 'Still in a transaction after popping the outer transaction');
     // Pop the outer transaction, it should commit.
     $this->insertRow('outer-after-inner-rollback');
-    unset($transaction);
+    $transaction->yield();
     $this->assertFalse($this->connection->inTransaction(), 'Transaction closed after popping the inner transaction');
     $this->assertRowPresent('outer');
     $this->assertRowAbsent('inner');
@@ -688,7 +946,23 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
       ->execute();
 
     // Commit the transaction.
-    unset($transaction);
+    if ($this->connection->supportsTransactionalDDL()) {
+      $transaction->yield();
+    }
+    else {
+      set_error_handler(static function (int $errno, string $errstr): bool {
+        throw new \ErrorException($errstr);
+      });
+      try {
+        $transaction->yield();
+      }
+      catch (\ErrorException $e) {
+        $this->assertSame('Transaction::yield() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+      }
+      finally {
+        restore_error_handler();
+      }
+    }
 
     $saved_age = $this->connection->query('SELECT [age] FROM {test} WHERE [name] = :name', [':name' => 'David'])->fetchField();
     $this->assertEquals('24', $saved_age);
@@ -718,18 +992,18 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
 
     $this->insertRow('row');
 
-    // Commit a savepoint transaction. Corresponds to 'RELEASE SAVEPOINT
+    // Yield a savepoint transaction. Corresponds to 'RELEASE SAVEPOINT
     // savepoint_2' on the database.
-    unset($savepoint2);
+    $savepoint2->yield();
     // Since we have committed an intermediate savepoint Transaction object,
     // the savepoints created later have been dropped by the database already.
     $this->assertSame(2, $this->connection->transactionManager()->stackDepth());
     $this->assertRowPresent('row');
 
-    // Commit the remaining Transaction objects. The client transaction is
+    // Yield the remaining Transaction objects. The client transaction is
     // eventually committed.
-    unset($savepoint1);
-    unset($transaction);
+    $savepoint1->yield();
+    $transaction->yield();
     $this->assertFalse($this->connection->inTransaction());
     $this->assertRowPresent('row');
   }
@@ -749,21 +1023,20 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
 
     $this->insertRow('row');
 
-    // Commit the root transaction. Corresponds to 'COMMIT' on the database.
-    unset($transaction);
+    // Yield the root transaction. Corresponds to 'COMMIT' on the database.
+    $transaction->yield();
     // Since we have committed the outer (root) Transaction object, the inner
     // (savepoint) ones have been dropped by the database already, and we are
     // no longer in an active transaction state.
     $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
     $this->assertFalse($this->connection->inTransaction());
     $this->assertRowPresent('row');
-    // Unpile the inner (savepoint) Transaction object, it should be a no-op
-    // anyway given it was dropped by the database already, and removed from
+    // Trying to yield the inner (savepoint) Transaction object, throws an
+    // exception since it was dropped by the database already, and removed from
     // our transaction stack.
-    unset($savepoint2);
-    $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
-    $this->assertFalse($this->connection->inTransaction());
-    $this->assertRowPresent('row');
+    $this->expectException(TransactionOutOfOrderException::class);
+    $this->expectExceptionMessageMatches("/^Error attempting commit of .*\\\\savepoint_2\\. Active stack: .* empty/");
+    $savepoint2->yield();
   }
 
   /**
@@ -798,7 +1071,19 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $this->insertRow('row');
     $this->assertNull($this->postTransactionCallbackAction);
     $this->assertRowAbsent('rtcCommit');
+
+    // Callbacks are processed only when destructing the transaction.
+    // Executing a commit is not sufficient by itself.
+    $transaction->yield();
+    $this->assertNull($this->postTransactionCallbackAction);
+    $this->assertRowPresent('row');
+    $this->assertRowAbsent('rtcCommit');
+
+    // Destruct the transaction.
     unset($transaction);
+
+    // The post-transaction callback should now have inserted a 'rtcCommit'
+    // row.
     $this->assertSame('rtcCommit', $this->postTransactionCallbackAction);
     $this->assertRowPresent('row');
     $this->assertRowPresent('rtcCommit');
