@@ -105,7 +105,7 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line) {
 /**
  * Determines whether an error should be displayed.
  *
- * When in maintenance mode or when error_level is ERROR_REPORTING_DISPLAY_ALL,
+ * When in the installer or when error_level is ERROR_REPORTING_DISPLAY_ALL,
  * all errors should be displayed. For ERROR_REPORTING_DISPLAY_SOME, $error
  * will be examined to determine if it should be displayed.
  *
@@ -116,7 +116,9 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line) {
  *   TRUE if an error should be displayed.
  */
 function error_displayable($error = NULL) {
-  if (defined('MAINTENANCE_MODE')) {
+  // Always show errors if an installation is being attempted so that users are
+  // presented with errors immediately and do not have to consult server logs.
+  if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE === 'install' && InstallerKernel::installationAttempted()) {
     return TRUE;
   }
   $error_level = _drupal_get_error_level();
