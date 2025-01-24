@@ -44,7 +44,10 @@ function datetime_range_post_update_from_to_configuration(?array &$sandbox = NUL
         DateRangePlainFormatter::class,
       ];
 
-      if (!in_array($plugin_definition['class'], $daterange_formatter_classes, FALSE)) {
+      if (
+        !isset($plugin_definition['class']) ||
+        !in_array($plugin_definition['class'], $daterange_formatter_classes, FALSE)
+      ) {
         continue;
       }
 

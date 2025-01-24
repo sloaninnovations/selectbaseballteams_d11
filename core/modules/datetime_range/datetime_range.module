@@ -54,7 +54,10 @@ function datetime_range_entity_view_display_presave(EntityViewDisplayInterface $
       DateRangePlainFormatter::class,
     ];
 
-    if (!in_array($plugin_definition['class'], $daterange_formatter_classes, FALSE)) {
+    if (
+      !isset($plugin_definition['class']) ||
+      !in_array($plugin_definition['class'], $daterange_formatter_classes, FALSE)
+    ) {
       continue;
     }
 
