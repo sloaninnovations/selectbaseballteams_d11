@@ -253,13 +253,13 @@ class NavigationHooks {
    */
   #[Hook('js_settings_alter')]
   public function jsSettingsAlter(array &$settings, AttachedAssetsInterface $assets): void {
-    // Only needed to work in conjunction with Navigation's user-block library.
+    // If Navigation's user-block library is not installed, return.
     if (!in_array('navigation/internal.user-block', $assets->getLibraries())) {
       return;
     }
     // Provide the user name in drupalSettings to allow JavaScript code to
-    // customize the experience for the end user, rather than the server side,
-    // which would break the render cache.
+    // customize the experience for the end user by acting on the client side.
+    // This is preferable to acting on the server side because doing so would break the render cache.
     $settings['navigation']['user'] = $this->currentUser->getAccountName();
   }
 
