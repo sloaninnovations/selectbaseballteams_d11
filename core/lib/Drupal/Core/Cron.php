@@ -76,6 +76,12 @@ class Cron implements CronInterface {
    * {@inheritdoc}
    */
   public function run() {
+    // We can only run cron if the installation has been completed.
+    if (!$this->state->get('install_time')) {
+      $this->logger->warning('Attempting to run cron while the website is not fully installed.');
+      return FALSE;
+    }
+
     // Allow execution to continue even if the request gets cancelled.
     @ignore_user_abort(TRUE);
 
