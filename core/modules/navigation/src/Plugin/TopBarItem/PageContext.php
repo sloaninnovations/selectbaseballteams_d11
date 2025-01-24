@@ -129,6 +129,7 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
    */
   protected function getBadgeLabel(EntityInterface $entity): ?string {
     if ($entity instanceof ContentEntityInterface && $this->moderationInformation && $this->moderationInformation->isModeratedEntity($entity)) {
+      /** @var \Drupal\content_moderation\ModerationInformationInterface $state_label */
       $state_label = $this->moderationInformation
         ->getWorkflowForEntity($entity)
         ->getTypePlugin()
