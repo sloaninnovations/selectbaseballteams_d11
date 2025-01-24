@@ -106,7 +106,12 @@ function template_preprocess_responsive_image(&$variables): void {
   $breakpoints = array_reverse(\Drupal::service('breakpoint.manager')->getBreakpointsByGroup($responsive_image_style->getBreakpointGroup()));
   foreach ($responsive_image_style->getKeyedImageStyleMappings() as $breakpoint_id => $multipliers) {
     if (isset($breakpoints[$breakpoint_id])) {
-      $variables['sources'][] = _responsive_image_build_source_attributes($variables, $breakpoints[$breakpoint_id], $multipliers);
+      try {
+        $variables['sources'][] = _responsive_image_build_source_attributes($variables, $breakpoints[$breakpoint_id], $multipliers);
+      }
+      catch (LogicException $e) {
+        \Drupal::logger('responsive_image')->error($e->getMessage());
+      }
     }
   }
 
