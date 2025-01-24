@@ -169,6 +169,7 @@ endset
 endtrans
 enoki
 entityviewedit
+entrie
 errmode
 eslintcache
 español
@@ -579,6 +580,7 @@ updateprogress
 uploadprogress
 upscaling
 urandom
+usecases
 userinfo
 versionable
 vfsstream
