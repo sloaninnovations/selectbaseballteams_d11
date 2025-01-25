@@ -284,7 +284,21 @@ class PageCache implements HttpKernelInterface {
     // the returned value needs to be checked before calling getTimestamp.
     elseif ($expires = $response->getExpires()) {
       $date = $expires->getTimestamp();
-      $expire = ($date > $request_time) ? $date : Cache::PERMANENT;
+      if ($date > $request_time) {
+        $expire = $date;
+      }
+      elseif ($response->getEtag() && $expires == \DateTime::createFromFormat('j-M-Y H:i:s T', '19-Nov-1978 05:00:00 UTC')) {
+        // \Drupal\Core\EventSubscriber\FinishResponseSubscriber::onRespond()
+        // will set the expires to this date and remove the ETag if it
+        // determines the response is not cacheable. And given how this
+        // module is meant to work, we'll cache it permanently for anonymous
+        // users as expected until it's invalidated by a cache tag.
+        $expire = Cache::PERMANENT;
+      }
+      else {
+        // The expiry date is in the past. Ignore it.
+        return FALSE;
+      }
     }
     else {
       $expire = Cache::PERMANENT;
