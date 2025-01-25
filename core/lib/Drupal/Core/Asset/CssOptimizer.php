@@ -39,6 +39,11 @@ class CssOptimizer implements AssetOptimizerInterface {
    * {@inheritdoc}
    */
   public function optimize(array $css_asset) {
+    if ($css_asset['type'] == 'external' && empty($css_asset['minified'])) {
+      // Skip this external asset as is likely a cached include but has been
+      // fixed in the library to no longer be minified.
+      return '';
+    }
     if ($css_asset['type'] != 'file') {
       throw new \Exception('Only file CSS assets can be optimized.');
     }
