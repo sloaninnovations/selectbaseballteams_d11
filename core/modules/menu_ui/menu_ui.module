@@ -97,6 +97,10 @@ function menu_ui_get_menu_link_defaults(NodeInterface $node) {
     if ($id) {
       $menu_link = MenuLinkContent::load($id);
       $menu_link = \Drupal::service('entity.repository')->getTranslationFromContext($menu_link);
+      $menu_name = $menu_link->getMenuName();
+      if (is_null($menu_name)) {
+        $menu_name = $menu_link->bundle();
+      }
       $defaults = [
         'entity_id' => $menu_link->id(),
         'id' => $menu_link->getPluginId(),
@@ -104,7 +108,7 @@ function menu_ui_get_menu_link_defaults(NodeInterface $node) {
         'title_max_length' => $menu_link->getFieldDefinitions()['title']->getSetting('max_length'),
         'description' => $menu_link->getDescription(),
         'description_max_length' => $menu_link->getFieldDefinitions()['description']->getSetting('max_length'),
-        'menu_name' => $menu_link->getMenuName(),
+        'menu_name' => $menu_name,
         'parent' => $menu_link->getParentId(),
         'weight' => $menu_link->getWeight(),
       ];
