@@ -16,6 +16,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[Block(
   id: 'navigation_user',
   admin_label: new TranslatableMarkup('User'),
+  allow_in_navigation: TRUE,
 )]
 final class NavigationUserBlock extends BlockBase {
 
