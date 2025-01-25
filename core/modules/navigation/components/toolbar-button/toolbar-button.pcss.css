@@ -198,6 +198,8 @@
 }
 
 .toolbar-button--expand--down {
+  justify-content: center;
+
   &::after {
     transform: rotate(90deg);
 
@@ -209,11 +211,6 @@
   &[aria-expanded="true"] {
     &::after {
       transform: rotate(-90deg);
-    }
-    &:focus,
-    &:hover {
-      border-bottom-right-radius: 0;
-      border-bottom-left-radius: 0;
     }
   }
 }

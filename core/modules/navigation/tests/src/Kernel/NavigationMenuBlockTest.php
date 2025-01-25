@@ -334,23 +334,32 @@ class NavigationMenuBlockTest extends KernelTestBase {
     $items_query = [
       "//li[contains(@class,'toolbar-block__list-item')]/span/span[text()='title 1']",
       "//li[contains(@class,'toolbar-block__list-item')]/button/span[text()='title 2']",
-      "//li[contains(@class,'toolbar-menu__item--level-1')]/button/span[text()='title 3']",
+      "//li[contains(@class,'toolbar-menu__item--level-1')]/span[contains(@class, 'toolbar-button') and text()='title 3']",
+      "//li[contains(@class,'toolbar-menu__item--level-1')]/button[contains(@title, 'Expand title 3')]",
       "//li[contains(@class,'toolbar-menu__item--level-2')]/a[text()='title 4']",
       "//li[contains(@class,'toolbar-block__list-item')]/button/span[text()='title 5']",
       "//li[contains(@class,'toolbar-block__list-item')]/a/span[text()='title 6']",
       "//li[contains(@class,'toolbar-block__list-item')]/a[contains(@class, 'external-link')]",
       "//li[contains(@class,'toolbar-block__list-item')]/a[contains(@class, 'external-link')]",
       "//li[contains(@class,'toolbar-block__list-item')]/a[@target='_blank']",
-      "//li[contains(@class,'toolbar-menu__item--level-1')]/button/span[text()='title 7']",
+      "//li[contains(@class,'toolbar-menu__item--level-1')]/button[contains(@class, 'toolbar-button') and text()='title 7']",
+      "//li[contains(@class,'toolbar-menu__item--level-1')]/button[contains(@title, 'Expand title 7')]",
       "//li[contains(@class,'toolbar-block__list-item')]/button/span[text()='title 8']",
       "//li[contains(@class,'toolbar-menu__item--level-2')]/span[text()='title 10']",
-      "//li[contains(@class,'toolbar-menu__item--level-1')]/button/span[text()='title 11']",
+      "//li[contains(@class,'toolbar-menu__item--level-1')]/a[contains(@class, 'toolbar-button') and text()='title 11']",
+      "//li[contains(@class,'toolbar-menu__item--level-1')]/button[contains(@title, 'Expand title 11')]",
       "//li[contains(@class,'toolbar-menu__item--level-2')]/button[text()='title 12']",
     ];
     foreach ($items_query as $query) {
       $span = $xpath->query($query);
       $this->assertEquals(1, $span->length, $query);
     }
+
+    // Verify that there is no double title if the level 1 button and expand
+    // are split into two.
+    $query = "//li[contains(@class,'toolbar-menu__item--level-1')]/button/span[text()='title 3']";
+    $span = $xpath->query($query);
+    $this->assertEquals(0, $span->length, $query);
   }
 
   /**

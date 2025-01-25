@@ -32,6 +32,16 @@
   &:has(> [data-toolbar-menu-trigger][aria-expanded="true"]) {
     background: var(--admin-toolbar-color-gray-050);
   }
+
+  &:has(> a + button) {
+    display: grid;
+    grid-template-columns: auto var(--admin-toolbar-space-40);
+    gap: var(--admin-toolbar-space-8);
+
+    .toolbar-menu {
+      grid-column: 1 / -1;
+    }
+  }
 }
 
 .toolbar-menu--level-2 {

@@ -108,12 +108,23 @@
             ],
           } only %}
         {% else %}
+          {% if item.url %}
+            {% include 'navigation:toolbar-button' with {
+              attributes: item_link_attributes.setAttribute('href', item.url|render|default(null)),
+              text: item.title,
+              html_tag: 'a',
+              extra_classes: [
+                'toolbar-button'
+              ],
+            } only %}
+          {% endif %}
           {% include 'navigation:toolbar-button' with {
             attributes: create_attribute({
               'aria-expanded': 'false',
               'data-toolbar-menu-trigger': menu_level,
+              'title': 'Expand '|t ~ item.title,
             }),
-            text: item.title,
+            text: item.url ? '' : item.title,
             modifiers: ['expand--down'],
           } only %}
           <ul class="toolbar-menu toolbar-menu--level-{{ menu_level + 1 }}" inert>
