@@ -339,6 +339,95 @@
   };
 
   /**
+   * Helper function to remove redundant query keys from a URL string.
+   *
+   * If there's form data that are also present in the URL's querystring, then
+   * they'll be duplicated on form submission. This function helps reduce the
+   * length of the URL requested by removing those duplicates.
+   *
+   * @param {string} url
+   *   The original URL.
+   * @param {object} formData
+   *   The form data object.
+   * @param {object} options
+   *   The options object.
+   *
+   * @return {string}
+   *   The updated URL without the previous form data parameters.
+   */
+  Drupal.ajax.dedupeUrlParams = function (url, formData, options = null) {
+    const urlParts = url.split('?');
+    if (urlParts.length > 1) {
+      const urlSearchParams = new URLSearchParams(urlParts[1]);
+      if (formData !== null) {
+        Object.keys(formData).forEach((key) => {
+          // If the key is actually building up an array, allow that.
+          if (!key.endsWith('[]')) {
+            urlSearchParams.delete(key);
+          }
+        });
+        // Rebuild the querystring.
+        urlParts[1] = urlSearchParams.toString();
+      } else {
+        const deDupedUrlSearchParams = new URLSearchParams();
+        const parameters = [];
+        urlSearchParams.forEach((value, key) => {
+          parameters.push([key, value]);
+        });
+        const seenKeys = {};
+        parameters.filter((item) => {
+          const key = item[0];
+          if (seenKeys[key]) {
+            return false;
+          }
+          seenKeys[key] = true;
+          deDupedUrlSearchParams.set(key, urlSearchParams.get(key));
+          return true;
+        });
+        // Rebuild the querystring.
+        urlParts[1] = deDupedUrlSearchParams.toString();
+      }
+    }
+
+    return urlParts.join('?');
+  };
+
+  /**
+   * Helper function to merge two query strings, removing duplicates where relevant.
+   *
+   * @param {string} queryString
+   *   The original querystring.
+   * @param {string} additionalQueryString
+   *   The query string to add onto the query.
+   * @param {boolean} ignoreExisting
+   *   Whether to ignore existing parameters when merging.
+   *
+   * @return {URLSearchParams}
+   *   The updated query string as a URL search parameter object.
+   */
+  Drupal.ajax.mergeQueryStrings = function (
+    queryString,
+    additionalQueryString,
+    ignoreExisting = false,
+  ) {
+    const urlSearchParams = new URLSearchParams(queryString);
+    const additionalSearchParams = new URLSearchParams(additionalQueryString);
+    additionalSearchParams.forEach((value, key) => {
+      if (ignoreExisting && urlSearchParams.has(key)) {
+        return;
+      }
+      // Only append parameters if it's new or an array.
+      if (!urlSearchParams.has(key) || key.endsWith('[]')) {
+        urlSearchParams.append(key, value);
+      } else {
+        urlSearchParams.set(key, value);
+      }
+    });
+
+    return urlSearchParams;
+  };
+
+  /**
    * Settings for an Ajax object.
    *
    * @typedef {object} Drupal.Ajax~elementSettings
@@ -543,10 +632,25 @@
       beforeSubmit(formValues, elementSettings, options) {
         ajax.ajaxing = true;
         ajax.preCommandsFocusedElementSelector = null;
+        if (options.method.toUpperCase() === 'GET') {
+          // Stop duplicate form data from being added to the URL.
+          const optionsData =
+            typeof options.data === 'function'
+              ? options.data(formValues)
+              : options.data;
+          options.url = Drupal.ajax.dedupeUrlParams(
+            options.url,
+            optionsData,
+            options,
+          );
+        }
         return ajax.beforeSubmit(formValues, elementSettings, options);
       },
       beforeSend(xmlhttprequest, options) {
         ajax.ajaxing = true;
+        if (options.method.toUpperCase() === 'GET') {
+          options.url = Drupal.ajax.dedupeUrlParams(options.url, null, options);
+        }
         return ajax.beforeSend(xmlhttprequest, options);
       },
       success(response, status, xmlhttprequest) {
@@ -619,19 +723,18 @@
       ajax.options.data.dialogOptions = elementSettings.dialog;
     }
 
-    // Ensure that we have a valid URL by adding ? when no query parameter is
-    // yet available, otherwise append using &.
-    if (!ajax.options.url.includes('?')) {
-      ajax.options.url += '?';
-    } else {
-      ajax.options.url += '&';
-    }
     // If this element has a dialog type use if for the wrapper if not use 'ajax'.
     let wrapper = `drupal_${elementSettings.dialogType || 'ajax'}`;
     if (elementSettings.dialogRenderer) {
       wrapper += `.${elementSettings.dialogRenderer}`;
     }
-    ajax.options.url += `${Drupal.ajax.WRAPPER_FORMAT}=${wrapper}`;
+
+    // Specify the correct wrapper.
+    const urlParts = ajax.options.url.split('?');
+    const originalPath = urlParts[0];
+    const queryParams = new URLSearchParams(urlParts[1] || '');
+    queryParams.set(Drupal.ajax.WRAPPER_FORMAT, wrapper);
+    ajax.options.url = `${originalPath}?${queryParams.toString()}`;
 
     // Bind the ajaxSubmit function to the element event.
     $(ajax.element).on(elementSettings.event, function (event) {

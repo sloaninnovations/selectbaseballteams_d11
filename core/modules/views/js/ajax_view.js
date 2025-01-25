@@ -76,14 +76,19 @@
     // Check if there are any GET parameters to send to views.
     let queryString = window.location.search || '';
     if (queryString !== '') {
-      // Remove the question mark and Drupal path component if any.
-      queryString = queryString
-        .slice(1)
-        .replace(/q=[^&]+&?|&?render=[^&]+/, '');
+      const urlParts = ajaxPath.split('?');
+      ajaxPath = urlParts[0];
+      const queryParams = new URLSearchParams(queryString.slice(1));
+      // Delete special internal Drupal query strings.
+      queryParams.delete('q');
+      queryParams.delete('render');
+      queryString = queryParams.toString();
+      // Merge the query strings.
+      queryString = Drupal.ajax
+        .mergeQueryStrings(urlParts[1] || '', queryString)
+        .toString();
       if (queryString !== '') {
-        // If there is a '?' in ajaxPath, clean URL are on and & should be
-        // used to add parameters.
-        queryString = (/\?/.test(ajaxPath) ? '&' : '?') + queryString;
+        queryString = `?${queryString}`;
       }
     }
 
