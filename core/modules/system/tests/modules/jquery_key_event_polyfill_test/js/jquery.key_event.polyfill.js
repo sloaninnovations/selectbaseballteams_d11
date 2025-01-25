@@ -32,15 +32,18 @@
       button !== undefined &&
       mouseEventRegex.test(event.type)
     ) {
-      if (button && 1) {
+      // eslint-disable-next-line no-bitwise
+      if (button & 1) {
         return 1;
       }
 
-      if (button && 2) {
+      // eslint-disable-next-line no-bitwise
+      if (button & 2) {
         return 3;
       }
 
-      if (button && 4) {
+      // eslint-disable-next-line no-bitwise
+      if (button & 4) {
         return 2;
       }
 
