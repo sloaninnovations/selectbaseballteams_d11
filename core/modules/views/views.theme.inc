@@ -872,13 +872,25 @@ function template_preprocess_views_view_list(&$variables): void {
     $variables['list']['attributes'] = new Attribute(['class' => $class]);
   }
 
+  $type = $handler->options['type'];
+
+  if ($type === 'ol') {
+    $pager = $variables['view']->getPager();
+    if (empty($variables['list'])) {
+      $variables['list']['attributes'] = new Attribute(['start' => $variables['view']->getCurrentPage() * $pager->options['items_per_page'] + 1]);
+    }
+    else {
+      $variables['list']['attributes']['start'] = $variables['view']->getCurrentPage() * $pager->options['items_per_page'] + 1;
+    }
+  }
+
   // Fetch wrapper classes from handler options.
   if ($handler->options['wrapper_class']) {
     $wrapper_class = explode(' ', $handler->options['wrapper_class']);
     $variables['attributes']['class'] = array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', $wrapper_class);
   }
 
-  $variables['list']['type'] = $handler->options['type'];
+  $variables['list']['type'] = $type;
 
   template_preprocess_views_view_unformatted($variables);
 }
