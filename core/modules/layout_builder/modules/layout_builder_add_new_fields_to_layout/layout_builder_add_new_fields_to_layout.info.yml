@@ -1,0 +1,9 @@
+name: 'Layout Builder Add New Fields to Layout'
+type: module
+description: 'When enabled, this module adds new fields to layouts.'
+package: Core
+version: VERSION
+dependencies:
+  - drupal:layout_builder
+lifecycle: deprecated
+lifecycle_link: https://www.drupal.org/node/3422275
