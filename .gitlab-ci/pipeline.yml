@@ -57,6 +57,7 @@ default:
       job: '📔 Spell-checking'
 
 variables:
+  CI_DEBUG_SERVICES: "true"
   FF_NETWORK_PER_BUILD: 1
   SIMPLETEST_BASE_URL: http://localhost/subdirectory
   DB_DRIVER: mysql
