@@ -11,16 +11,26 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\PageCache\ResponsePolicyInterface;
 use Drupal\Core\Site\Settings;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Response subscriber to handle finished responses.
  */
 class FinishResponseSubscriber implements EventSubscriberInterface {
+
+  /**
+   * The character length limit for Drupal cache headers.
+   *
+   * This is used for the 'X-Drupal-Cache-Tags' and 'X-Drupal-Cache-Contexts'
+   * headers.
+   *
+   * @var int
+   */
+  protected const RESPONSE_HEADER_MAX_LENGTH = 8000;
 
   /**
    * A config object for the system performance configuration.
@@ -123,12 +133,21 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
       // Expose the cache contexts and cache tags associated with this page in a
       // X-Drupal-Cache-Contexts and X-Drupal-Cache-Tags header respectively.
       $response_cacheability = $response->getCacheableMetadata();
-      $cache_tags = $response_cacheability->getCacheTags();
-      sort($cache_tags);
-      $response->headers->set('X-Drupal-Cache-Tags', implode(' ', $cache_tags));
-      $cache_contexts = $this->cacheContextsManager->optimizeTokens($response_cacheability->getCacheContexts());
-      sort($cache_contexts);
-      $response->headers->set('X-Drupal-Cache-Contexts', implode(' ', $cache_contexts));
+
+      // If a header exceeds the maximum response header length then split the
+      // data across multiple headers. The additional headers add a suffix to
+      // the header name.
+      $add_header_with_long_value = static function (string $header_name, array $values) use ($response): void {
+        sort($values);
+        $values_as_string = implode(' ', $values);
+        foreach (explode("\n", wordwrap($values_as_string, static::RESPONSE_HEADER_MAX_LENGTH)) as $delta => $row) {
+          $response->headers->set($header_name . ($delta > 0 ? "-{$delta}" : ''), $row);
+        }
+      };
+
+      $add_header_with_long_value('X-Drupal-Cache-Tags', $response_cacheability->getCacheTags());
+      $add_header_with_long_value('X-Drupal-Cache-Contexts', $this->cacheContextsManager->optimizeTokens($response_cacheability->getCacheContexts()));
+
       $max_age_message = $response_cacheability->getCacheMaxAge();
       if ($max_age_message === 0) {
         $max_age_message = '0 (Uncacheable)';
@@ -174,13 +193,13 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    * not Cache-Control, then 'private, must-revalidate' (in exactly this order)
    * is returned.
    *
-   * @see \Symfony\Component\HttpFoundation\ResponseHeaderBag::computeCacheControlValue()
-   *
    * @param \Symfony\Component\HttpFoundation\Response $response
    *   The response object.
    *
    * @return bool
    *   TRUE when Cache-Control header was set explicitly on the given response.
+   *
+   * @see \Symfony\Component\HttpFoundation\ResponseHeaderBag::computeCacheControlValue()
    */
   protected function isCacheControlCustomized(Response $response) {
     // Symfony >= 3.2 explicitly removes the Cache-Control header for 301

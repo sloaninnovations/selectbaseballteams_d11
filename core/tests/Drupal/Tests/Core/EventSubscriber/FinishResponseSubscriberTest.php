@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\EventSubscriber;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\EventSubscriber\FinishResponseSubscriber;
 use Drupal\Core\Language\Language;
@@ -66,6 +68,9 @@ class FinishResponseSubscriberTest extends UnitTestCase {
    */
   protected $time;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -141,6 +146,101 @@ class FinishResponseSubscriberTest extends UnitTestCase {
     // 'X-Content-Type-Options' will be unconditionally set by core.
     $this->assertEquals(['nosniff'], $response->headers->all('X-Content-Type-Options'));
     $this->assertEquals(['DENY'], $response->headers->all('X-Frame-Options'));
+  }
+
+  /**
+   * Finish subscriber outputs tags, context, max-age if debug is on.
+   *
+   * @covers ::onRespond
+   */
+  public function testDebugHeaders(): void {
+    $finishSubscriber = new FinishResponseSubscriber(
+      $this->languageManager,
+      $this->getConfigFactoryStub(),
+      $this->requestPolicy,
+      $this->responsePolicy,
+      $this->cacheContextsManager,
+      $this->time,
+      TRUE
+    );
+
+    $this->languageManager->method('getCurrentLanguage')
+      ->willReturn(new Language(['id' => 'en']));
+
+    $this->cacheContextsManager->method('optimizeTokens')
+      ->willReturn(['context1', 'context2']);
+
+    $request = $this->createMock(Request::class);
+    $response = $this->createMock(CacheableResponse::class);
+    $response->headers = new ResponseHeaderBag();
+
+    // Set cache tags, context, max-age.
+    $cacheData = (new CacheableMetadata())
+      ->setCacheTags(['tag1', 'tag2'])
+      ->setCacheContexts(['context1', 'context2'])
+      ->setCacheMaxAge(123);
+    $response->expects($this->any())
+      ->method('getCacheableMetadata')
+      ->willReturn($cacheData);
+
+    $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+    $finishSubscriber->onRespond($event);
+
+    // Check that X-Drupal-Cache-Tags is in the response header.
+    $this->assertEquals(['tag1 tag2'], $response->headers->all('X-Drupal-Cache-Tags'));
+    $this->assertEquals(['context1 context2'], $response->headers->all('X-Drupal-Cache-Contexts'));
+    $this->assertEquals([123], $response->headers->all('X-Drupal-Cache-Max-Age'));
+  }
+
+  /**
+   * Tests that the subscriber splits long tags and context into multiple lines.
+   *
+   * @covers ::onRespond
+   */
+  public function testLargeTagsAndContexts(): void {
+    $finishSubscriber = new FinishResponseSubscriber(
+      $this->languageManager,
+      $this->getConfigFactoryStub(),
+      $this->requestPolicy,
+      $this->responsePolicy,
+      $this->cacheContextsManager,
+      $this->time,
+      TRUE
+    );
+
+    $this->languageManager->method('getCurrentLanguage')
+      ->willReturn(new Language(['id' => 'en']));
+
+    $request = $this->createMock(Request::class);
+    $response = $this->createMock(CacheableResponse::class);
+    $response->headers = new ResponseHeaderBag();
+
+    // Create a large tag over 8k.
+    for ($i = 0; $i < 430; $i++) {
+      $tags[] = 'large-tag-name-' . $i;
+    }
+
+    // For context, we'll make it over 16k.
+    for ($i = 0; $i < 860; $i++) {
+      $contexts[] = 'large-context-name-' . $i;
+    }
+    $this->cacheContextsManager->method('optimizeTokens')
+      ->willReturn($contexts);
+
+    $cacheData = (new CacheableMetadata())
+      ->setCacheTags($tags);
+
+    $response->expects($this->any())
+      ->method('getCacheableMetadata')
+      ->willReturn($cacheData);
+
+    $event = new ResponseEvent($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+    $finishSubscriber->onRespond($event);
+
+    // Check that X-Drupal-Cache-Tags has been split into two.
+    $this->assertNotEmpty($response->headers->all('X-Drupal-Cache-Tags-1'));
+    // Check that X-Drupal-Cache-Contexts has been split into three.
+    $this->assertNotEmpty($response->headers->all('X-Drupal-Cache-Contexts-2'));
   }
 
 }
