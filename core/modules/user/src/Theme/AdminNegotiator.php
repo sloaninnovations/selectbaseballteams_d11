@@ -32,6 +32,9 @@ class AdminNegotiator implements ThemeNegotiatorInterface {
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. The entity type manager is unused in the scope
+   * of the AdminNegotiator class thus it has to be removed.
    */
   protected $entityTypeManager;
 
@@ -64,8 +67,9 @@ class AdminNegotiator implements ThemeNegotiatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(RouteMatchInterface $route_match) {
-    return ($this->entityTypeManager->hasHandler('user_role', 'storage') && $this->user->hasPermission('view the administration theme') && $this->adminContext->isAdminRoute($route_match->getRouteObject()));
+  public function applies(RouteMatchInterface $route_match): bool {
+    $is_admin_route = $this->adminContext->isAdminRoute($route_match->getRouteObject());
+    return $is_admin_route && $this->user->hasPermission('view the administration theme');
   }
 
   /**
