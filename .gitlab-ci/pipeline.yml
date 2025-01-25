@@ -142,7 +142,7 @@ variables:
   variables:
     TESTSUITE: PHPUnit-FunctionalJavascript
     CONCURRENCY: 1
-    KUBERNETES_CPU_REQUEST: "16"
+    KUBERNETES_CPU_REQUEST: "32"
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
