@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\DependencyInjection\Compiler;
 
 use Drupal\Core\DependencyInjection\Compiler\AuthenticationProviderPass;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\State\StateInterface;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Serializer\Serializer;
@@ -24,6 +25,11 @@ class AuthenticationProviderPassTest extends UnitTestCase {
     $definition = new Definition(Serializer::class, [[], []]);
     $definition->setPublic(TRUE);
     $container->setDefinition('serializer', $definition);
+
+    $state_mock = $this->createMock(StateInterface::class);
+    $definition = new Definition($state_mock::class, [[], []]);
+    $definition->setPublic(TRUE);
+    $container->setDefinition('state', $definition);
 
     $definition = new Definition('TestClass');
     $definition->addTag('authentication_provider', ['provider_id' => 'bunny_auth']);
