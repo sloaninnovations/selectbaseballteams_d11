@@ -139,11 +139,11 @@ variables:
 
 '🖱️️️ PHPUnit Functional Javascript':
   <<: [ *with-composer, *run-tests, *default-job-settings ]
-  parallel: 32
+  parallel: 64
   variables:
     TESTSUITE: PHPUnit-FunctionalJavascript
-    CONCURRENCY: 2
-    KUBERNETES_CPU_REQUEST: "30"
+    CONCURRENCY: 1
+    KUBERNETES_CPU_REQUEST: "4"
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
