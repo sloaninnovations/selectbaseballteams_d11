@@ -56,7 +56,13 @@ abstract class WebDriverTestBase extends BrowserTestBase {
     }
     $this->minkDefaultDriverArgs = ['chrome', ['goog:chromeOptions' => ['w3c' => FALSE]], 'http://localhost:4444'];
 
-    return parent::initMink();
+    try {
+      return parent::initMink();
+    }
+    catch (\Exception $e) {
+      $this->mink = NULL;
+      throw $e;
+    }
   }
 
   /**
