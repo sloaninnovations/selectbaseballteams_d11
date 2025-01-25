@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalJavascriptTests;
 
-use Behat\Mink\Exception\DriverException;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Tests\BrowserTestBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
