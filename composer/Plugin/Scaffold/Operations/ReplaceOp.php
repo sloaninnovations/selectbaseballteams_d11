@@ -60,22 +60,51 @@ class ReplaceOp extends AbstractOperation {
   public function process(ScaffoldFilePath $destination, IOInterface $io, ScaffoldOptions $options) {
     $fs = new Filesystem();
     $destination_path = $destination->fullPath();
+    $interpolator = $destination->getInterpolator();
     // Do nothing if overwrite is 'false' and a file already exists at the
     // destination.
     if ($this->overwrite === FALSE && file_exists($destination_path)) {
-      $interpolator = $destination->getInterpolator();
       $io->write($interpolator->interpolate("  - Skip <info>[dest-rel-path]</info> because it already exists and overwrite is <comment>false</comment>."));
       return new ScaffoldResult($destination, FALSE);
     }
 
-    // Get rid of the destination if it exists, and make sure that
-    // the directory where it's going to be placed exists.
+    // Process destination permissions.
+    $this->processDestinationPermissions(dirname($destination_path), $io, $interpolator);
+
+    // Remove the destination if it exists,
+    // and ensure the destination directory exists.
     $fs->remove($destination_path);
     $fs->ensureDirectoryExists(dirname($destination_path));
+
     if ($options->symlink()) {
       return $this->symlinkScaffold($destination, $io);
     }
+
     return $this->copyScaffold($destination, $io);
+  }
+
+  /**
+   * Allow full control to the destination before the file manipulation.
+   *
+   * @param string $destination_path
+   *   Path to the destination file.
+   * @param \Composer\IO\IOInterface $io
+   *   IOInterface for output.
+   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath\Interpolator $interpolator
+   *   The interpolator for writing messages.
+   */
+  public function processDestinationPermissions(string $destination_path, IOInterface $io, $interpolator): void {
+    if (file_exists($destination_path)) {
+      try {
+        chmod($destination_path, 0744);
+      }
+      catch (\Exception $e) {
+        $io->write($interpolator->interpolate("Destination overwrite failed due to: " . $e->getMessage()));
+      }
+    }
+    else {
+      $io->write($interpolator->interpolate("Skipped setting permissions: $destination_path does not exist."));
+    }
   }
 
   /**
@@ -92,7 +121,8 @@ class ReplaceOp extends AbstractOperation {
   protected function copyScaffold(ScaffoldFilePath $destination, IOInterface $io) {
     $interpolator = $destination->getInterpolator();
     $this->source->addInterpolationData($interpolator);
-    if (file_put_contents($destination->fullPath(), $this->contents()) === FALSE) {
+    $success = file_put_contents($destination->fullPath(), $this->contents());
+    if ($success === FALSE) {
       throw new \RuntimeException($interpolator->interpolate("Could not copy source file <info>[src-rel-path]</info> to <info>[dest-rel-path]</info>!"));
     }
     $io->write($interpolator->interpolate("  - Copy <info>[dest-rel-path]</info> from <info>[src-rel-path]</info>"));
@@ -115,6 +145,9 @@ class ReplaceOp extends AbstractOperation {
     try {
       $fs = new Filesystem();
       $fs->relativeSymlink($this->source->fullPath(), $destination->fullPath());
+      if (!is_link($destination->fullPath())) {
+        throw new \RuntimeException($interpolator->interpolate("Failed to create symlink from <info>[src-rel-path]</info> to <info>[dest-rel-path]</info>."));
+      }
     }
     catch (\Exception $e) {
       throw new \RuntimeException($interpolator->interpolate("Could not symlink source file <info>[src-rel-path]</info> to <info>[dest-rel-path]</info>!"), [], $e);

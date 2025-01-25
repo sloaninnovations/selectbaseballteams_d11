@@ -25,6 +25,8 @@ class ReplaceOpTest extends TestCase {
     $source = $fixtures->sourcePath('drupal-assets-fixture', 'robots.txt');
     $options = ScaffoldOptions::create([]);
     $sut = new ReplaceOp($source, TRUE);
+    // Assert that destination directory exists.
+    $this->prepareDirectory(dirname($destination->fullPath()));
     // Assert that there is no target file before we run our test.
     $this->assertFileDoesNotExist($destination->fullPath());
     // Test the system under test.
@@ -48,6 +50,8 @@ class ReplaceOpTest extends TestCase {
     $source = $fixtures->sourcePath('empty-file', 'empty_file.txt');
     $options = ScaffoldOptions::create([]);
     $sut = new ReplaceOp($source, TRUE);
+    // Assert that destination directory exists.
+    $this->prepareDirectory(dirname($destination->fullPath()));
     // Assert that there is no target file before we run our test.
     $this->assertFileDoesNotExist($destination->fullPath());
     // Test the system under test.
@@ -59,6 +63,29 @@ class ReplaceOpTest extends TestCase {
     // Confirm that expected output was written to our io fixture.
     $output = $fixtures->getOutput();
     $this->assertStringContainsString('Copy [web-root]/empty_file.txt from assets/empty_file.txt', $output);
+  }
+
+  /**
+   * Ensures the specified directory exists and is writable.
+   *
+   * Creates the directory if it doesn’t already exist.
+   *
+   * @param string $path
+   *   The directory path to check or create.
+   *
+   * @throws \RuntimeException
+   *   If the directory cannot be created or isn’t writable.
+   */
+  public function prepareDirectory(string $path): void {
+    if (!is_dir($path)) {
+      if (!mkdir($path, 0744, TRUE) && !is_dir($path)) {
+        throw new \RuntimeException("Failed to create directory: $path");
+      }
+    }
+
+    if (!is_writable($path)) {
+      throw new \RuntimeException("Directory is not writable: $path");
+    }
   }
 
 }
