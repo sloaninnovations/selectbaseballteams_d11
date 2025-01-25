@@ -45,10 +45,10 @@ class NodeLinksTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->installConfig(['filter']);
-    $this->installConfig(['node']);
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
+    $this->installConfig(['filter']);
+    $this->installConfig(['node']);
 
     $this->setUpCurrentUser(permissions: [
       'access content',
