@@ -194,6 +194,8 @@ class LocalActionManagerTest extends UnitTestCase {
   }
 
   public static function getActionsForRouteProvider() {
+    $originalContainer = \Drupal::hasContainer() ? \Drupal::getContainer() : NULL;
+
     $cache_contexts_manager = (new Prophet())->prophesize(CacheContextsManager::class);
     $cache_contexts_manager->assertValidTokens(Argument::any())
       ->willReturn(TRUE);
@@ -374,6 +376,11 @@ class LocalActionManagerTest extends UnitTestCase {
         ],
       ],
     ];
+
+    // Restore the original container if needed.
+    if ($originalContainer) {
+      \Drupal::setContainer($originalContainer);
+    }
 
     return $data;
   }

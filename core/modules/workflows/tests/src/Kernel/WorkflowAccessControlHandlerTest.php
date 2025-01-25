@@ -123,6 +123,8 @@ class WorkflowAccessControlHandlerTest extends KernelTestBase {
    * @return array
    */
   public static function checkAccessProvider() {
+    $originalContainer = \Drupal::hasContainer() ? \Drupal::getContainer() : NULL;
+
     $container = new ContainerBuilder();
     $cache_contexts_manager = (new Prophet())->prophesize(CacheContextsManager::class);
     $cache_contexts_manager->assertValidTokens()->willReturn(TRUE);
@@ -130,7 +132,7 @@ class WorkflowAccessControlHandlerTest extends KernelTestBase {
     $container->set('cache_contexts_manager', $cache_contexts_manager);
     \Drupal::setContainer($container);
 
-    return [
+    $data = [
       'Admin view' => [
         'adminUser',
         'view',
@@ -274,6 +276,13 @@ class WorkflowAccessControlHandlerTest extends KernelTestBase {
         AccessResult::allowed()->addCacheContexts(['user.permissions']),
       ],
     ];
+
+    // Restore the original container if needed.
+    if ($originalContainer) {
+      \Drupal::setContainer($originalContainer);
+    }
+
+    return $data;
   }
 
 }
