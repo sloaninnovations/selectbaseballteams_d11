@@ -547,6 +547,22 @@ class EntityFieldManager implements EntityFieldManagerInterface {
           }
         }
 
+        // Complete the field map with extra bundle field info.
+        foreach ($this->fieldMap as $entity_type_id => $entity_field_map) {
+          $entity_type_bundles_list = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
+          foreach (array_keys($entity_type_bundles_list) as $bundle_id) {
+            if ($bundle_id != 'default') {
+              $bundle_field_definitions = $this->getFieldDefinitions($entity_type_id, $bundle_id);
+              foreach ($bundle_field_definitions as $bundle_field_name => $bundle_field_definition) {
+                if (!isset($entity_field_map[$bundle_field_name])) {
+                  $this->fieldMap[$entity_type_id][$bundle_field_name]['type'] = $bundle_field_definition->getType();
+                  $this->fieldMap[$entity_type_id][$bundle_field_name]['bundles'][$bundle_id] = $bundle_id;
+                }
+              }
+            }
+          }
+        }
+
         $this->cacheSet($cid, $this->fieldMap, Cache::PERMANENT, ['entity_types', 'entity_field_info']);
       }
     }
