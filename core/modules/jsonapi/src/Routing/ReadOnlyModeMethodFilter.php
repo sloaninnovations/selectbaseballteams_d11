@@ -22,11 +22,11 @@ class ReadOnlyModeMethodFilter implements FilterInterface {
   protected $inner;
 
   /**
-   * Whether JSON:API's read-only mode is enabled.
+   * The config factory.
    *
-   * @var bool
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $readOnlyModeIsEnabled;
+  protected $configFactory;
 
   /**
    * ReadOnlyModeMethodFilter constructor.
@@ -38,7 +38,7 @@ class ReadOnlyModeMethodFilter implements FilterInterface {
    */
   public function __construct(FilterInterface $inner, ConfigFactoryInterface $config_factory) {
     $this->inner = $inner;
-    $this->readOnlyModeIsEnabled = $config_factory->get('jsonapi.settings')->get('read_only');
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -53,7 +53,7 @@ class ReadOnlyModeMethodFilter implements FilterInterface {
     $all_supported_methods = array_merge(...$all_supported_methods);
     $collection = $this->inner->filter($collection, $request);
 
-    if (!$this->readOnlyModeIsEnabled) {
+    if (!$this->configFactory->get('jsonapi.settings')->get('read_only')) {
       return $collection;
     }
 
