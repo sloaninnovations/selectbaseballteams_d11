@@ -4,6 +4,7 @@ namespace Drupal\block_content\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -13,20 +14,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BlockContent extends DeriverBase implements ContainerDeriverInterface {
 
   /**
-   * The content block storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $blockContentStorage;
-
-  /**
    * Constructs a BlockContent object.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $block_content_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $blockContentStorage
    *   The content block storage.
+   * @param \Drupal\Core\Language\LanguageManagerInterface|null $languageManager
+   *   Language manager.
    */
-  public function __construct(EntityStorageInterface $block_content_storage) {
-    $this->blockContentStorage = $block_content_storage;
+  public function __construct(
+    protected EntityStorageInterface $blockContentStorage,
+    protected ?LanguageManagerInterface $languageManager = NULL,
+  ) {
+    if (!$this->languageManager) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $languageManager argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3417692', E_USER_DEPRECATED);
+      $this->languageManager = \Drupal::service('language_manager');
+    }
   }
 
   /**
@@ -35,7 +37,8 @@ class BlockContent extends DeriverBase implements ContainerDeriverInterface {
   public static function create(ContainerInterface $container, $base_plugin_id) {
     $entity_type_manager = $container->get('entity_type.manager');
     return new static(
-      $entity_type_manager->getStorage('block_content')
+      $entity_type_manager->getStorage('block_content'),
+      $container->get('language_manager'),
     );
   }
 
@@ -43,15 +46,28 @@ class BlockContent extends DeriverBase implements ContainerDeriverInterface {
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
-    $block_contents = $this->blockContentStorage->loadByProperties(['reusable' => TRUE]);
+    // We use an aggregate query here because we need access to UUID, info and
+    // type. An entity query would only return the ID, and then we would need
+    // to use ::loadMultiple to load every reusable block content entity. This
+    // has a performance impact. Using an aggregate query allows us to fetch
+    // the information we need to calculate the derivatives without the expense
+    // of loading the entities.
+    $block_contents = $this->blockContentStorage->getAggregateQuery()
+      ->condition('reusable', TRUE)
+      ->condition('langcode', $this->languageManager->getDefaultLanguage()->getId())
+      ->groupBy('uuid')
+      ->groupBy('info')
+      ->accessCheck(FALSE)
+      ->groupBy('type')
+      ->execute();
     // Reset the discovered definitions.
     $this->derivatives = [];
-    /** @var \Drupal\block_content\Entity\BlockContent $block_content */
     foreach ($block_contents as $block_content) {
-      $this->derivatives[$block_content->uuid()] = $base_plugin_definition;
-      $this->derivatives[$block_content->uuid()]['admin_label'] = $block_content->label() ?? ($block_content->type->entity->label() . ': ' . $block_content->id());
-      $this->derivatives[$block_content->uuid()]['config_dependencies']['content'] = [
-        $block_content->getConfigDependencyName(),
+      $uuid = $block_content['uuid'];
+      $this->derivatives[$uuid] = $base_plugin_definition;
+      $this->derivatives[$uuid]['admin_label'] = $block_content['info'];
+      $this->derivatives[$uuid]['config_dependencies']['content'] = [
+        sprintf('block_content:%s:%s', $block_content['type'], $block_content['uuid']),
       ];
     }
     return parent::getDerivativeDefinitions($base_plugin_definition);

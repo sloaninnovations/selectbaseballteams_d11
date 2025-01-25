@@ -57,7 +57,7 @@ class BlockContentDeriverTest extends KernelTestBase {
     $this->installEntitySchema('block_content');
 
     $this->blockContentStorage = \Drupal::entityTypeManager()->getStorage('block_content');
-    $this->blockContentDerivative = new DerivativeBlockContent($this->blockContentStorage);
+    $this->blockContentDerivative = new DerivativeBlockContent($this->blockContentStorage, \Drupal::service('language_manager'));
   }
 
   /**
@@ -118,7 +118,7 @@ class BlockContentDeriverTest extends KernelTestBase {
     $this->assertEquals('Basic prototype', $plugin->getPluginDefinition()['admin_label']);
 
     $plugin = $blockPluginManager->createInstance('block_content:' . $blockContentNoLabel->uuid());
-    $this->assertEquals('Basic Block: ' . $blockContentNoLabel->id(), $plugin->getPluginDefinition()['admin_label']);
+    $this->assertNull($plugin->getPluginDefinition()['admin_label']);
   }
 
 }
