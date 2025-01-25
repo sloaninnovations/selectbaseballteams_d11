@@ -38,6 +38,7 @@ while test $# -gt 0; do
       echo "--branch BRANCH           creates list of files to check by comparing against a branch"
       echo "--cached                  checks staged files"
       echo "--drupalci                a special mode for DrupalCI"
+      echo "--skipjs                  skip checks requiring JavaScript/Node dependencies, if unavailable"
       echo " "
       echo "Example usage: sh ./core/scripts/dev/commit-code-check.sh --branch 9.2.x"
       exit 0
@@ -56,6 +57,10 @@ while test $# -gt 0; do
       ;;
     --drupalci)
       DRUPALCI=1
+      shift
+      ;;
+    --skipjs)
+      SKIPJS=1
       shift
       ;;
     *)
@@ -166,7 +171,7 @@ for FILE in $FILES; do
   fi;
 
   # If JavaScript packages change, then rerun all JavaScript style checks.
-  if [[ $FILE == "core/package.json" || $FILE == "core/yarn.lock" ]]; then
+  if [[ ($FILE == "core/package.json" || $FILE == "core/yarn.lock") && $SKIPJS != "1" ]]; then
     ESLINT_CONFIG_PASSING_FILE_CHANGED=1;
     STYLELINT_CONFIG_FILE_CHANGED=1;
     JAVASCRIPT_PACKAGES_CHANGED=1;
@@ -206,26 +211,38 @@ cd "$TOP_LEVEL/core"
 
 # Ensure JavaScript development dependencies are installed.
 yarn --version
-yarn >/dev/null
-
-# Check all files for spelling in one go for better performance.
-if [[ $CSPELL_DICTIONARY_FILE_CHANGED == "1" ]] ; then
-  printf "\nRunning spellcheck on *all* files.\n"
-  yarn run spellcheck:core --no-must-find-files --no-progress
-else
-  # Check all files for spelling in one go for better performance. We pipe the
-  # list files in so we obey the globs set on the spellcheck:core command in
-  # core/package.json.
-  echo "${ABS_FILES}" | tr ' ' '\n' | yarn run spellcheck:core --no-must-find-files --file-list stdin
-fi
-
 if [ "$?" -ne "0" ]; then
-  # If there are failures set the status to a number other than 0.
-  FINAL_STATUS=1
-  printf "\nCSpell: ${red}failed${reset}\n"
+  if [ "$SKIPJS" != "1" ]; then
+    printf "Drupal's JavaScript development dependencies are not installed or cannot be resolved. Run 'yarn install' inside the core directory, or 'yarn check -s' to list other errors.\n"
+    exit 1;
+  else
+    printf "JavaScript development dependencies are not installed; these checks will be skipped.\n"
+  fi
 else
-  printf "\nCSpell: ${green}passed${reset}\n"
+  yarn >/dev/null
 fi
+
+if [[ $SKIPJS != "1" ]]; then
+  # Check all files for spelling in one go for better performance.
+  if [[ $CSPELL_DICTIONARY_FILE_CHANGED == "1" ]] ; then
+    printf "\nRunning spellcheck on *all* files.\n"
+    yarn run spellcheck:core --no-must-find-files --no-progress
+  else
+    # Check all files for spelling in one go for better performance. We pipe the
+    # list files in so we obey the globs set on the spellcheck:core command in
+    # core/package.json.
+    echo "${ABS_FILES}" | tr ' ' '\n' | yarn run spellcheck:core --no-must-find-files --file-list stdin
+  fi
+
+  if [ "$?" -ne "0" ]; then
+    # If there are failures set the status to a number other than 0.
+    FINAL_STATUS=1
+    printf "\nCSpell: ${red}failed${reset}\n"
+  else
+    printf "\nCSpell: ${green}passed${reset}\n"
+  fi
+fi
+
 cd "$TOP_LEVEL"
 
 # Add a separator line to make the output easier to read.
