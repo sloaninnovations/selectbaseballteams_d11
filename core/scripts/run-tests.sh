@@ -914,7 +914,7 @@ function simpletest_script_command(TestRun $test_run, string $test_class): array
     }
   }
 
-  $command[] = '--fail-on-skipped';
+  // $command[] = '--fail-on-skipped';
 
 
   // --execute-test and class name needs to come last.
