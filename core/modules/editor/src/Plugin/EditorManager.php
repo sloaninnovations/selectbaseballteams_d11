@@ -18,6 +18,20 @@ use Drupal\editor\Attribute\Editor;
 class EditorManager extends DefaultPluginManager {
 
   /**
+   * Static cache of attachments.
+   *
+   * @var array
+   */
+  protected array $attachments = ['library' => []];
+
+  /**
+   * Editors.
+   *
+   * @var array
+   */
+  protected array $editors = [];
+
+  /**
    * Constructs an EditorManager object.
    *
    * @param \Traversable $namespaces
@@ -60,11 +74,17 @@ class EditorManager extends DefaultPluginManager {
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()
    */
   public function getAttachments(array $format_ids) {
-    $attachments = ['library' => []];
+    $settings = $this->attachments['drupalSettings'] ?? [];
 
-    $settings = [];
     foreach ($format_ids as $format_id) {
+      // Check if editor had already been loaded for text format.
+      if (isset($this->editors[$format_id])) {
+        continue;
+      }
+
+      // Load editor; set to FALSE if no editor is assigned to text format.
       $editor = editor_load($format_id);
+      $editor = $this->editors[$format_id] = !is_null($editor) ? $editor : FALSE;
       if (!$editor) {
         continue;
       }
@@ -73,7 +93,7 @@ class EditorManager extends DefaultPluginManager {
       $plugin_definition = $plugin->getPluginDefinition();
 
       // Libraries.
-      $attachments['library'] = array_merge($attachments['library'], $plugin->getLibraries($editor));
+      $this->attachments['library'] = array_merge($this->attachments['library'], $plugin->getLibraries($editor));
 
       // Format-specific JavaScript settings.
       $settings['editor']['formats'][$format_id] = [
@@ -88,13 +108,13 @@ class EditorManager extends DefaultPluginManager {
     // Allow other modules to alter all JavaScript settings.
     $this->moduleHandler->alter('editor_js_settings', $settings);
 
-    if (empty($attachments['library']) && empty($settings)) {
+    if (empty($this->attachments['library']) && empty($settings)) {
       return [];
     }
 
-    $attachments['drupalSettings'] = $settings;
+    $this->attachments['drupalSettings'] = $settings;
 
-    return $attachments;
+    return $this->attachments;
   }
 
 }
