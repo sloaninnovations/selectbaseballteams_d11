@@ -55,7 +55,7 @@ class PagerParameters implements PagerParametersInterface {
    */
   public function getPagerQuery() {
     $query = $this->getPagerParameter();
-    return !empty($query) ? explode(',', $query) : [];
+    return $query !== '' ? array_map('intval', explode(',', $query)) : [];
   }
 
   /**
@@ -64,7 +64,11 @@ class PagerParameters implements PagerParametersInterface {
   public function getPagerParameter() {
     $request = $this->requestStack->getCurrentRequest();
     if ($request) {
-      return $request->query->get('page', '');
+      $params = $request->query->all();
+      $page = $params['page'] ?? '';
+      // The "page" can be an array so validate the type before casting,
+      // i.e., "?page[offset]=12"
+      return is_scalar($page) ? (string) $page : '';
     }
     return '';
   }
