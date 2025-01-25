@@ -426,7 +426,7 @@ abstract class BrowserTestBase extends TestCase {
     // Close any mink sessions as early as possible to free a new browser
     // session up for the next test method or test.
     if ($this->mink) {
-      $this->mink->stopSessions();
+      $this->mink->resetSessions();
     }
     parent::tearDown();
 
