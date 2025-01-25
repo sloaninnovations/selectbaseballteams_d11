@@ -93,7 +93,7 @@ variables:
     JAVA_OPTS: "-Dwebdriver.chrome.logfile=/builds/chromedriver.log"
     SE_NODE_OVERRIDE_MAX_SESSIONS: "true"
     SE_NODE_MAX_SESSIONS: "30"
-    SE_NODE_SESSION_TIMEOUT: "4"
+    SE_NODE_SESSION_TIMEOUT: "15"
     SE_SESSION_RETRY_INTERVAL: "2"
     SE_SESSION_REQUEST_TIMEOUT: "180"
     SE_START_XVFB: "false"
