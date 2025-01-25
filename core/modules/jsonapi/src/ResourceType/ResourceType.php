@@ -49,7 +49,7 @@ class ResourceType {
   /**
    * The class to which a payload converts to.
    *
-   * @var string
+   * @var string|null
    */
   protected $deserializationTargetClass;
 
@@ -140,7 +140,7 @@ class ResourceType {
   /**
    * Gets the deserialization target class.
    *
-   * @return string
+   * @return string|null
    *   The deserialization target class.
    */
   public function getDeserializationTargetClass() {
@@ -333,7 +333,7 @@ class ResourceType {
    *   An entity type ID.
    * @param string $bundle
    *   A bundle.
-   * @param string $deserialization_target_class
+   * @param string|null $deserialization_target_class
    *   The deserialization target class.
    * @param bool $internal
    *   (optional) Whether the resource type should be internal.

@@ -5,6 +5,7 @@ namespace Drupal\block;
 use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Component\Plugin\Exception\MissingValueContextException;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Condition\ConditionAccessResolverTrait;
@@ -152,12 +153,12 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
   /**
    * Merges cacheable metadata from conditions onto the access result object.
    *
-   * @param \Drupal\Core\Access\AccessResult $access
+   * @param \Drupal\Core\Access\AccessResultInterface $access
    *   The access result object.
    * @param \Drupal\Core\Condition\ConditionInterface[] $conditions
    *   List of visibility conditions.
    */
-  protected function mergeCacheabilityFromConditions(AccessResult $access, array $conditions) {
+  protected function mergeCacheabilityFromConditions(AccessResultInterface $access, array $conditions) {
     foreach ($conditions as $condition) {
       if ($condition instanceof CacheableDependencyInterface) {
         $access->addCacheTags($condition->getCacheTags());

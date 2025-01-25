@@ -53,7 +53,7 @@ trait StubTestTrait {
    *
    * @param string $entity_type_id
    *   The entity type we are stubbing.
-   * @param string $entity_id
+   * @param int $entity_id
    *   ID of the stubbed entity to validate.
    *
    * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface

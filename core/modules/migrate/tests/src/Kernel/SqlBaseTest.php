@@ -67,8 +67,8 @@ class SqlBaseTest extends MigrateTestBase {
     Database::addConnectionInfo($key, $target, Database::getConnectionInfo('default')['default']);
 
     // Validate we have injected our custom key and target.
-    $this->assertSame($sql_base->getDatabase()->getTarget(), $target);
-    $this->assertSame($sql_base->getDatabase()->getKey(), $key);
+    $this->assertSame($target, $sql_base->getDatabase()->getTarget());
+    $this->assertSame($key, $sql_base->getDatabase()->getKey());
 
     // Now test we can have SqlBase create the connection from an info array.
     $sql_base = new TestSqlBase([], $this->migration);

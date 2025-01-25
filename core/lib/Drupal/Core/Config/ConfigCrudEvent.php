@@ -29,7 +29,7 @@ class ConfigCrudEvent extends Event {
   /**
    * Gets configuration object.
    *
-   * @return \Drupal\Core\Config\StorableConfigBase
+   * @return \Drupal\Core\Config\Config
    *   The configuration object that caused the event to fire.
    */
   public function getConfig() {

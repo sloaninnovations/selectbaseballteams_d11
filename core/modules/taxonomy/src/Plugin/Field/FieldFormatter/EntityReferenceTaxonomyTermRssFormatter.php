@@ -29,6 +29,7 @@ class EntityReferenceTaxonomyTermRssFormatter extends EntityReferenceFormatterBa
     $parent_entity = $items->getEntity();
     $elements = [];
 
+    /** @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $items */
     foreach ($this->getEntitiesToView($items, $langcode) as $entity) {
       $parent_entity->rss_elements[] = [
         'key' => 'category',

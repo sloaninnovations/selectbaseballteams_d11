@@ -1058,7 +1058,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   public function loadAllChildren($id, $max_relative_depth = NULL) {
     $parameters = new MenuTreeParameters();
     $parameters->setRoot($id)->excludeRoot()->setMaxDepth($max_relative_depth)->onlyEnabledLinks();
-    $links = $this->loadLinks(NULL, $parameters);
+    $links = $this->loadLinks('', $parameters);
     foreach ($links as $id => $link) {
       $links[$id] = $this->prepareLink($link);
     }

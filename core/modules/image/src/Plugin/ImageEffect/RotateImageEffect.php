@@ -25,7 +25,7 @@ class RotateImageEffect extends ConfigurableImageEffectBase {
    */
   public function applyEffect(ImageInterface $image) {
     if (!empty($this->configuration['random'])) {
-      $degrees = abs((float) $this->configuration['degrees']);
+      $degrees = intval(abs((float) $this->configuration['degrees']));
       $this->configuration['degrees'] = rand(-$degrees, $degrees);
     }
 

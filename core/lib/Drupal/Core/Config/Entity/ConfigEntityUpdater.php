@@ -133,7 +133,7 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
       };
     }
 
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface[] $entities */
     $entities = $storage->loadMultiple(array_splice($sandbox[self::SANDBOX_KEY]['entities'], 0, $this->batchSize));
     foreach ($entities as $entity) {
       try {

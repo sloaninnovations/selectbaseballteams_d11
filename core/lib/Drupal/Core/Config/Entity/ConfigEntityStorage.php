@@ -347,7 +347,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   public function importUpdate($name, Config $new_config, Config $old_config) {
     $id = static::getIDFromConfigName($name, $this->entityType->getConfigPrefix());
     $entity = $this->load($id);
-    if (!$entity) {
+    if (!$entity instanceof ConfigEntityInterface) {
       throw new ConfigImporterException("Attempt to update non-existing entity '$id'.");
     }
     $entity->setSyncing(TRUE);

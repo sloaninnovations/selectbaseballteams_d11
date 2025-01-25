@@ -22,7 +22,7 @@ trait EntityReferenceFieldCreationTrait {
    * @param string $field_name
    *   The name of the field; if it already exists, a new instance of the existing
    *   field will be created.
-   * @param string $field_label
+   * @param string|null $field_label
    *   The label of the field.
    * @param string $target_entity_type
    *   The type of the referenced entity.

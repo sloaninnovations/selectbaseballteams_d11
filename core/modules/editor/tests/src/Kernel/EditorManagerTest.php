@@ -77,6 +77,7 @@ class EditorManagerTest extends KernelTestBase {
 
     // Case 3: a text editor available & associated (but associated only with
     // the 'Full HTML' text format).
+    /** @var \Drupal\editor_test\Plugin\Editor\UnicornEditor $unicorn_plugin */
     $unicorn_plugin = $this->editorManager->createInstance('unicorn');
     $editor = Editor::create([
       'format' => 'full_html',

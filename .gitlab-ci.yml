@@ -352,6 +352,9 @@ default:
   stage: 🪄 Lint
   variables:
     KUBERNETES_CPU_REQUEST: "4"
+  before_script:
+    - sudo apt-get update
+    - sudo apt-get install -y jq
   script:
     - *prepare-lint-directory
     - *phpstan-cache
@@ -373,6 +376,9 @@ default:
         # Generate a new baseline.
         echo "Generating an PHPStan baseline file (available as job artifact)."
         php vendor/bin/phpstan analyze --configuration=./core/phpstan.neon.dist --no-progress --generate-baseline=$CI_PROJECT_DIR/core/.phpstan-baseline.php || true
+        # Group by error message.
+        echo "Violations by number of occurrences"
+        jq '.[].description' phpstan-quality-report.json | sort | uniq -c | sort -nr
         exit $EXIT_CODE
       fi
 

@@ -65,7 +65,7 @@ class SubformStateTest extends UnitTestCase {
    *
    * @param string[] $parents
    *   The parents.
-   * @param string $expected
+   * @param string|string[] $expected
    *   The expected state values.
    */
   public function testGetValues(array $parents, $expected): void {
@@ -80,7 +80,8 @@ class SubformStateTest extends UnitTestCase {
     // Modify the retrieved values and confirm they are modified by reference in
     // the parent form state.
     $subform_state_values['fish'] = 'Jim';
-    $this->assertSame($subform_state_values, $subform_state->getValues());
+    $expected['fish'] = 'Jim';
+    $this->assertSame($expected, $subform_state->getValues());
   }
 
   /**

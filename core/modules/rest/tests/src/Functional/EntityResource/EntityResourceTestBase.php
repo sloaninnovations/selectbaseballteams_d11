@@ -589,6 +589,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $this->assertArrayHasKey('Link', $response->getHeaders());
       $link_relation_type_manager = $this->container->get('plugin.manager.link_relation_type');
       $expected_link_relation_headers = array_map(function ($relation_name) use ($link_relation_type_manager) {
+        /** @var \Drupal\Core\Http\LinkRelationTypeInterface $link_relation_type */
         $link_relation_type = $link_relation_type_manager->createInstance($relation_name);
         return $link_relation_type->isRegistered()
           ? $link_relation_type->getRegisteredName()

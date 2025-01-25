@@ -159,6 +159,7 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
     $view_mode = $this->getSetting('view_mode');
     $elements = [];
 
+    /** @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface $items */
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $entity) {
       // Due to render caching and delayed calls, the viewElements() method
       // will be called later in the rendering process through a '#pre_render'

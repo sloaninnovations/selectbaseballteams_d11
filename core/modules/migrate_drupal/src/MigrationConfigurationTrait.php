@@ -113,7 +113,7 @@ trait MigrationConfigurationTrait {
    *
    * @param string $database_state_key
    *   The state key.
-   * @param int $drupal_version
+   * @param string $drupal_version
    *   The version of Drupal we're getting the migrations for.
    *
    * @return \Drupal\migrate\Plugin\MigrationInterface[]

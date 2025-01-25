@@ -117,7 +117,7 @@ class ReplaceOp extends AbstractOperation {
       $fs->relativeSymlink($this->source->fullPath(), $destination->fullPath());
     }
     catch (\Exception $e) {
-      throw new \RuntimeException($interpolator->interpolate("Could not symlink source file <info>[src-rel-path]</info> to <info>[dest-rel-path]</info>!"), [], $e);
+      throw new \RuntimeException($interpolator->interpolate("Could not symlink source file <info>[src-rel-path]</info> to <info>[dest-rel-path]</info>!"), $e->getCode(), $e);
     }
     $io->write($interpolator->interpolate("  - Link <info>[dest-rel-path]</info> from <info>[src-rel-path]</info>"));
     return new ScaffoldResult($destination, $this->overwrite);

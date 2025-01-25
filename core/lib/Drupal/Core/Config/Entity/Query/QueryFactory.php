@@ -236,6 +236,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
     $saved_config = $event->getConfig();
     $entity_type_id = $this->configManager->getEntityTypeIdByName($saved_config->getName());
     if ($entity_type_id) {
+      /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type */
       $entity_type = $this->configManager->getEntityTypeManager()->getDefinition($entity_type_id);
       $this->updateConfigKeyStore($entity_type, $saved_config);
     }
@@ -251,6 +252,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
     $saved_config = $event->getConfig();
     $entity_type_id = $this->configManager->getEntityTypeIdByName($saved_config->getName());
     if ($entity_type_id) {
+      /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type */
       $entity_type = $this->configManager->getEntityTypeManager()->getDefinition($entity_type_id);
       $this->deleteConfigKeyStore($entity_type, $saved_config);
     }
