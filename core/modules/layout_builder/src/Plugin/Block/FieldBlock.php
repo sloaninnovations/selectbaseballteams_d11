@@ -213,7 +213,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
     }
 
     // Check to see if the field has any values or a default value.
-    if ($field->isEmpty() && !$this->entityFieldHasDefaultValue()) {
+    if ($field->isEmpty() && !$this->entityFieldHasDefaultValue() && $this->getConfiguration()['hide_for_empty']) {
       return $access->andIf(AccessResult::forbidden());
     }
     return $access;
@@ -225,6 +225,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   public function defaultConfiguration() {
     return [
       'label_display' => FALSE,
+      'hide_for_empty' => TRUE,
       'formatter' => [
         'label' => 'above',
         'type' => $this->pluginDefinition['default_formatter'],
@@ -271,6 +272,11 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
       '#suffix' => '</div>',
     ];
 
+    $form['hide_for_empty'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Hide for Empty'),
+      '#default_value' => $config['hide_for_empty'],
+    ];
     return $form;
   }
 
@@ -339,6 +345,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
     $this->configuration['formatter'] = $form_state->getValue('formatter');
+    $this->configuration['hide_for_empty'] = $form_state->getValue('hide_for_empty');
   }
 
   /**
