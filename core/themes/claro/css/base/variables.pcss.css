@@ -215,8 +215,6 @@
   --jui-dialog-box-shadow: 0 0 var(--space-m) calc(var(--space-m) / -4) var(--color-text);
   --jui-dialog--focus-outline: 2px dotted transparent;
   --jui-dialog--focus-box-shadow: 0 0 0 3px var(--color-focus);
-  --jui-dialog-z-index: 1260;
-  --jui-dialog-off-canvas-z-index: 501;
   /**
    * Progress bar.
    */

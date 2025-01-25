@@ -7,6 +7,10 @@
 /**
  * Component containers
  */
+:root {
+  --jui-dialog-z-index: 1260;
+  --jui-dialog-off-canvas-z-index: 501;
+}
 .ui-widget {
   background: none;
 }
