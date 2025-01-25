@@ -2,12 +2,13 @@
 
 namespace Drupal\views_ui;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\ElementInfoManagerInterface;
@@ -19,7 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * Form controller for the Views edit form.
@@ -209,7 +209,7 @@ class ViewEditForm extends ViewFormBase {
         }
       }
 
-      // Add the edit display content
+      // Add the edit display content.
       $tab_content = $this->getDisplayTab($view);
       $tab_content['#theme_wrappers'] = ['container'];
       $tab_content['#attributes'] = ['class' => ['views-display-tab']];
@@ -220,7 +220,6 @@ class ViewEditForm extends ViewFormBase {
         $tab_content['#attributes']['class'][] = 'views-display-deleted';
       }
       // Mark disabled displays as such.
-
       if ($view->getExecutable()->displayHandlers->has($display_id) && !$view->getExecutable()->displayHandlers->get($display_id)->isEnabled()) {
         $tab_content['#attributes']['class'][] = 'views-display-disabled';
       }
@@ -642,13 +641,13 @@ class ViewEditForm extends ViewFormBase {
    */
   public function submitDisplayUndoDelete($form, FormStateInterface $form_state) {
     $view = $this->entity;
-    // Create the new display
+    // Create the new display.
     $id = $form_state->get('display_id');
     $displays = $view->get('display');
     $displays[$id]['deleted'] = FALSE;
     $view->set('display', $displays);
 
-    // Store in cache
+    // Store in cache.
     $view->cacheSet();
 
     // Redirect to the top-level edit page.
@@ -664,10 +663,10 @@ class ViewEditForm extends ViewFormBase {
   public function submitDisplayEnable($form, FormStateInterface $form_state) {
     $view = $this->entity;
     $id = $form_state->get('display_id');
-    // setOption doesn't work because this would might affect upper displays
+    // setOption doesn't work because this would might affect upper displays.
     $view->getExecutable()->displayHandlers->get($id)->setOption('enabled', TRUE);
 
-    // Store in cache
+    // Store in cache.
     $view->cacheSet();
 
     // Redirect to the top-level edit page.
@@ -685,7 +684,7 @@ class ViewEditForm extends ViewFormBase {
     $id = $form_state->get('display_id');
     $view->getExecutable()->displayHandlers->get($id)->setOption('enabled', FALSE);
 
-    // Store in cache
+    // Store in cache.
     $view->cacheSet();
 
     // Redirect to the top-level edit page.
@@ -747,7 +746,7 @@ class ViewEditForm extends ViewFormBase {
     $element['#attributes']['class'] = ['views-display-top', 'clearfix'];
     $element['#attributes']['id'] = ['views-display-top'];
 
-    // Extra actions for the display
+    // Extra actions for the display.
     $element['extra_actions'] = [
       '#type' => 'dropbutton',
       '#attributes' => [
@@ -771,6 +770,16 @@ class ViewEditForm extends ViewFormBase {
         'reorder' => [
           'title' => $this->t('Reorder displays'),
           'url' => Url::fromRoute('views_ui.form_reorder_displays', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display_id]),
+          'attributes' => ['class' => ['views-ajax-link']],
+        ],
+        'enable' => [
+          'title' => $this->t('Enable View'),
+          'url' => Url::fromRoute('entity.view.enable', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display_id]),
+          'attributes' => ['class' => ['views-ajax-link']],
+        ],
+        'disable' => [
+          'title' => $this->t('Disable View'),
+          'url' => Url::fromRoute('entity.view.disable', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display_id]),
           'attributes' => ['class' => ['views-ajax-link']],
         ],
       ],
@@ -1078,7 +1087,7 @@ class ViewEditForm extends ViewFormBase {
       ];
     }
 
-    // Render the array of links
+    // Render the array of links.
     $build['#actions'] = [
       '#type' => 'dropbutton',
       '#links' => $actions,
