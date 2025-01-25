@@ -199,13 +199,13 @@ class TimestampAgoFormatter extends FormatterBase {
     if ($this->request->server->get('REQUEST_TIME') > $timestamp) {
       $result = $this->dateFormatter->formatTimeDiffSince($timestamp, $options);
       $build = [
-        '#markup' => new FormattableMarkup($this->getSetting('past_format'), ['@interval' => $result->getString()]),
+        '#markup' => new TranslatableMarkup($this->getSetting('past_format'), ['@interval' => $result->getString()]),
       ];
     }
     else {
       $result = $this->dateFormatter->formatTimeDiffUntil($timestamp, $options);
       $build = [
-        '#markup' => new FormattableMarkup($this->getSetting('future_format'), ['@interval' => $result->getString()]),
+        '#markup' => new TranslatableMarkup($this->getSetting('future_format'), ['@interval' => $result->getString()]),
       ];
     }
     CacheableMetadata::createFromObject($result)->applyTo($build);
