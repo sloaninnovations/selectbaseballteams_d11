@@ -106,11 +106,47 @@
       if (!input) {
         return;
       }
-      const tableSelector = input.getAttribute('data-table');
-      const $table = $(tableSelector);
-      const $rows = $table.find('tbody tr');
 
-      function hideEmptyPermissionHeader(index, row) {
+      // Get the table and rows to filter.
+      const tableSelector = input.getAttribute('data-table');
+      const table = document.querySelector(tableSelector);
+      const rows = table.querySelectorAll('tbody tr');
+
+      // Trigger the search only after user typed at least x characters.
+      const searchTriggerThreshold = 2;
+
+      // Debounce the search to avoid performance issues.
+      const debounceThreshold = 200;
+
+      // Case insensitive expression to find query at the beginning of a word.
+      const re = (query) => new RegExp(`\\b${query}`, 'i');
+
+      // Parse all permissions' names and write them to an array.
+      const sourceStrings = Array.from(
+        table.querySelectorAll('.table-filter-text-source'),
+      ).map((source) => {
+        return {
+          html: source,
+          normalizedText: source.textContent,
+        };
+      });
+
+      const updateTableRowVisibility = (row, visibility) => {
+        row.style.display = visibility ? '' : 'none';
+      };
+
+      const resetRowsVisibility = () => {
+        rows.forEach((row) => {
+          row.style.display = '';
+        });
+      };
+
+      // Store transitional information on filtered rows and query text.
+      let filteredRowsTransitional = rows;
+      let sourceStringsTransitional = sourceStrings;
+      let queryTransitional = '';
+
+      function hideEmptyPermissionHeader(row) {
         const tdsWithModuleClass = row.querySelectorAll('td.module');
         // Function to check if an element is visible (`display: block`).
         function isVisible(element) {
@@ -125,65 +161,80 @@
 
           // Check if the next visible sibling has the "module" class in any of
           // its `<td>` elements.
-          let nextVisibleSiblingHasModuleClass = false;
-          if (nextVisibleSibling) {
-            const nextSiblingTdsWithModuleClass =
-              nextVisibleSibling.querySelectorAll('td.module');
-            nextVisibleSiblingHasModuleClass =
-              nextSiblingTdsWithModuleClass.length > 0;
-          }
+          const nextVisibleSiblingHasModuleClass = nextVisibleSibling
+            ? nextVisibleSibling.querySelector('td.module') !== null
+            : false;
 
           // Check if this is the last visible row with class "module".
-          const isLastVisibleModuleRow =
-            !nextVisibleSibling || !isVisible(nextVisibleSibling);
+          const isLastVisibleModuleRow = !nextVisibleSibling;
 
-          // Hide the current row with class "module" if it meets the
-          // conditions.
-          $(row).toggle(
-            !nextVisibleSiblingHasModuleClass && !isLastVisibleModuleRow,
-          );
+          // Hide current row with class "module" if it meets the conditions.
+          row.style.display =
+            nextVisibleSiblingHasModuleClass || isLastVisibleModuleRow
+              ? 'none'
+              : '';
         }
       }
 
+      // The function being requested on each keystroke by the user.
       function filterPermissionList(e) {
-        const query = e.target.value;
-        if (query.length === 0) {
-          // Reset table when the textbox is cleared.
-          $rows.show();
-        }
-        // Case insensitive expression to find query at the beginning of a word.
-        const re = new RegExp(`\\b${query}`, 'i');
+        const rawQuery = e.target.value;
+        const query = re(rawQuery);
 
-        function showPermissionRow(index, row) {
-          const sources = row.querySelectorAll('.table-filter-text-source');
-          if (sources.length > 0) {
-            const textMatch = sources[0].textContent.search(re) !== -1;
-            $(row).closest('tr').toggle(textMatch);
+        // Stop immediately if nothing's changed.
+        if (rawQuery === queryTransitional) return;
+
+        // For performance, adjust the source strings to search from and rows sample.
+        if (rawQuery.search(re(queryTransitional)) === -1) {
+          filteredRowsTransitional = rows;
+          sourceStringsTransitional = sourceStrings;
+        }
+
+        // If the query length is below threshold, show all table rows.
+        if (query.length < searchTriggerThreshold) {
+          resetRowsVisibility();
+        }
+
+        // Else, hide rows that don't match the query.
+        else {
+          const updatedSourceStrings = [];
+          sourceStringsTransitional.forEach((source) => {
+            const textMatch = source.normalizedText.search(query) !== -1;
+            const closestTr = source.html.closest('tr');
+            updateTableRowVisibility(closestTr, textMatch);
+
+            if (textMatch) {
+              updatedSourceStrings.push(source);
+            }
+          });
+          sourceStringsTransitional = updatedSourceStrings;
+
+          // Update visible rows based on the text being searched for.
+          const visibleRows = Array.from(filteredRowsTransitional).filter(
+            (row) => row.style.display !== 'none',
+          );
+          visibleRows.forEach(hideEmptyPermissionHeader);
+
+          // Find elements with class "permission" within visible rows.
+          if (visibleRows.length) {
+            const tdsWithModuleOrPermissionClass = [];
+            visibleRows.forEach((row) => {
+              const tds = row.querySelectorAll('.permission');
+              tdsWithModuleOrPermissionClass.push(...tds);
+            });
+
+            Drupal.announce(
+              Drupal.formatPlural(
+                tdsWithModuleOrPermissionClass.length,
+                '1 permission is available in the modified list.',
+                '@count permissions are available in the modified list.',
+              ),
+            );
           }
         }
-        // Search over all rows.
-        $rows.show();
 
-        // Filter if the length of the query is at least 2 characters.
-        if (query.length >= 2) {
-          $rows.each(showPermissionRow);
-
-          // Hide the empty header if they don't have any visible rows.
-          const visibleRows = $table.find('tbody tr:visible');
-          visibleRows.each(hideEmptyPermissionHeader);
-          const rowsWithoutEmptyModuleName = $table.find('tbody tr:visible');
-          // Find elements with class "permission" within visible rows.
-          const tdsWithModuleOrPermissionClass =
-            rowsWithoutEmptyModuleName.find('.permission');
-
-          Drupal.announce(
-            Drupal.formatPlural(
-              tdsWithModuleOrPermissionClass.length,
-              '1 permission is available in the modified list.',
-              '@count permissions are available in the modified list.',
-            ),
-          );
-        }
+        // Updates the transitional information.
+        queryTransitional = rawQuery;
       }
 
       function preventEnterKey(event) {
@@ -193,12 +244,16 @@
         }
       }
 
-      if ($table.length) {
-        $(input).on({
-          keyup: debounce(filterPermissionList, 200),
-          click: debounce(filterPermissionList, 200),
-          keydown: preventEnterKey,
-        });
+      if (table) {
+        input.addEventListener(
+          'keyup',
+          debounce(filterPermissionList, debounceThreshold),
+        );
+        input.addEventListener(
+          'click',
+          debounce(filterPermissionList, debounceThreshold),
+        );
+        input.addEventListener('keydown', preventEnterKey);
       }
     },
   };
