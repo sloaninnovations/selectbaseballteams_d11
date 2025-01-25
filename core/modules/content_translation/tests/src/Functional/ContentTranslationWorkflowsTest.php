@@ -174,7 +174,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
     $add_translation_url = Url::fromRoute("entity.$this->entityTypeId.content_translation_add", [$this->entityTypeId => $id, 'source' => $default_langcode, 'target' => $this->langcodes[2]]);
     $edit = [
       'name[0][value]' => 'translation name',
-      'content_translation[status]' => FALSE,
+      'status[value]' => FALSE,
     ];
     $this->drupalGet($add_translation_url);
     $this->submitForm($edit, 'Save');
