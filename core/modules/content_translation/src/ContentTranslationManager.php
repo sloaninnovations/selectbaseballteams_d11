@@ -41,6 +41,8 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
   public function getTranslationHandler($entity_type_id) {
     return $this->entityTypeManager->getHandler($entity_type_id, 'translation');
@@ -48,6 +50,8 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
   public function getTranslationMetadata(EntityInterface $translation) {
     // We need a new instance of the metadata handler wrapping each translation.
@@ -58,6 +62,8 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function isSupported($entity_type_id) {
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
@@ -66,6 +72,8 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function getSupportedEntityTypes() {
     $supported_types = [];
@@ -79,14 +87,21 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function setEnabled($entity_type_id, $bundle, $value) {
     $config = $this->loadContentLanguageSettings($entity_type_id, $bundle);
-    $config->setThirdPartySetting('content_translation', 'enabled', $value)->save();
+    if ($config) {
+      $config->setThirdPartySetting('content_translation', 'enabled', $value)
+        ->save();
+    }
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function isEnabled($entity_type_id, $bundle = NULL) {
     $enabled = FALSE;
@@ -95,7 +110,7 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
       $bundles = !empty($bundle) ? [$bundle] : array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));
       foreach ($bundles as $bundle) {
         $config = $this->loadContentLanguageSettings($entity_type_id, $bundle);
-        if ($config->getThirdPartySetting('content_translation', 'enabled', FALSE)) {
+        if ($config && $config->getThirdPartySetting('content_translation', 'enabled', FALSE)) {
           $enabled = TRUE;
           break;
         }
@@ -107,11 +122,16 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function setBundleTranslationSettings($entity_type_id, $bundle, array $settings) {
     $config = $this->loadContentLanguageSettings($entity_type_id, $bundle);
-    $config->setThirdPartySetting('content_translation', 'bundle_settings', $settings)
-      ->save();
+    if ($config) {
+      $config->setThirdPartySetting('content_translation', 'bundle_settings', $settings)
+        ->save();
+    }
+    return [];
   }
 
   /**
@@ -119,7 +139,10 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
    */
   public function getBundleTranslationSettings($entity_type_id, $bundle) {
     $config = $this->loadContentLanguageSettings($entity_type_id, $bundle);
-    return $config->getThirdPartySetting('content_translation', 'bundle_settings', []);
+    if ($config) {
+      return $config->getThirdPartySetting('content_translation', 'bundle_settings', []);
+    }
+    return [];
   }
 
   /**
@@ -130,9 +153,12 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
    * @param string $bundle
    *   Bundle name.
    *
-   * @return \Drupal\language\Entity\ContentLanguageSettings
+   * @return \Drupal\Core\Entity\EntityInterface
    *   The content language config entity if one exists. Otherwise, returns
    *   default values.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   protected function loadContentLanguageSettings($entity_type_id, $bundle) {
     if ($entity_type_id == NULL || $bundle == NULL) {
@@ -140,7 +166,10 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
     }
     $config = $this->entityTypeManager->getStorage('language_content_settings')->load($entity_type_id . '.' . $bundle);
     if ($config == NULL) {
-      $config = $this->entityTypeManager->getStorage('language_content_settings')->create(['target_entity_type_id' => $entity_type_id, 'target_bundle' => $bundle]);
+      $config = $this->entityTypeManager->getStorage('language_content_settings')->create([
+        'target_entity_type_id' => $entity_type_id,
+        'target_bundle' => $bundle,
+      ]);
     }
     return $config;
   }
