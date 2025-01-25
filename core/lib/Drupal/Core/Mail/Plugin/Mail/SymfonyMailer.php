@@ -133,8 +133,13 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
         }
       }
 
+      // Parse the recipients into an array of addresses.
+      $recipients = array_map(function ($address) {
+        return trim($address);
+      }, str_getcsv($message['to']));
+
       $email
-        ->to($message['to'])
+        ->to(...$recipients)
         ->subject($message['subject'])
         ->text($message['body']);
 
