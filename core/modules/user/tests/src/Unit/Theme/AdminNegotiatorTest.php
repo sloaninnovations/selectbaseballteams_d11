@@ -13,7 +13,7 @@ use Drupal\user\Theme\AdminNegotiator;
 /**
  * Tests AdminNegotiator class.
  *
- * @group user_x
+ * @group user
  * @coversDefaultClass \Drupal\user\Theme\AdminNegotiator
  */
 class AdminNegotiatorTest extends UnitTestCase {
