@@ -108,7 +108,12 @@ class JoinTest extends RelationshipJoinTestBase {
     $this->assertEquals('LEFT', $join_info['join type'], 'Make sure the default join type is LEFT');
     $this->assertEquals($configuration['table'], $join_info['table']);
     $this->assertEquals('users_field_data', $join_info['alias']);
-    $this->assertEquals('views_test_data.uid = users_field_data.uid', $join_info['condition']);
+    if (\Drupal::database()->databaseType() === 'pgsql') {
+      $this->assertEquals('views_test_data.uid::text = users_field_data.uid::text', $join_info['condition']);
+    }
+    else {
+      $this->assertEquals('views_test_data.uid = users_field_data.uid', $join_info['condition']);
+    }
 
     // Set a different alias and make sure table info is as expected.
     $join = $this->manager->createInstance('standard', $configuration);
@@ -149,7 +154,13 @@ class JoinTest extends RelationshipJoinTestBase {
 
     $tables = $query->getTables();
     $join_info = $tables['users3'];
-    $this->assertStringContainsString("views_test_data.uid = users3.uid", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    if (\Drupal::database()->databaseType() === 'pgsql') {
+      $this->assertStringContainsString("views_test_data.uid::text = users3.uid::text", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    }
+    else {
+      $this->assertStringContainsString("views_test_data.uid = users3.uid", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    }
+
     $this->assertStringContainsString("users3.name = :views_join_condition_0", $join_info['condition'], 'Make sure the first extra join condition appears in the query and uses the first placeholder.');
     $this->assertStringContainsString("users3.name <> :views_join_condition_1", $join_info['condition'], 'Make sure the second extra join condition appears in the query and uses the second placeholder.');
     $this->assertEquals([$random_name_1, $random_name_2], array_values($join_info['arguments']), 'Make sure the arguments are in the right order');
@@ -175,7 +186,12 @@ class JoinTest extends RelationshipJoinTestBase {
 
     $tables = $query->getTables();
     $join_info = $tables['users4'];
-    $this->assertStringContainsString("views_test_data.uid = users4.uid", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    if (\Drupal::database()->databaseType() === 'pgsql') {
+      $this->assertStringContainsString("views_test_data.uid::text = users4.uid::text", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    }
+    else {
+      $this->assertStringContainsString("views_test_data.uid = users4.uid", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    }
     $this->assertStringContainsString("users4.name = :views_join_condition_2", $join_info['condition'], 'Make sure the first extra join condition appears in the query.');
     $this->assertStringContainsString("users4.name IN ( :views_join_condition_3[] )", $join_info['condition'], 'The IN condition for the join is properly formed.');
     $this->assertEquals([$random_name_2, $random_name_3, $random_name_4], $join_info['arguments'][':views_join_condition_3[]'], 'Make sure the IN arguments are still part of an array.');
@@ -202,7 +218,12 @@ class JoinTest extends RelationshipJoinTestBase {
 
     $tables = $query->getTables();
     $join_info = $tables['users5'];
-    $this->assertStringContainsString("views_test_data.uid = users5.uid", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    if (\Drupal::database()->databaseType() === 'pgsql') {
+      $this->assertStringContainsString("views_test_data.uid::text = users5.uid::text", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    }
+    else {
+      $this->assertStringContainsString("views_test_data.uid = users5.uid", $join_info['condition'], 'Make sure the join condition appears in the query.');
+    }
     $this->assertStringContainsString("users5.langcode = :views_join_condition_4", $join_info['condition'], 'Make sure the first extra join condition appears in the query.');
     $this->assertStringContainsString("views_test_data.status = :views_join_condition_5", $join_info['condition'], 'Make sure the second extra join condition appears in the query.');
     $this->assertStringContainsString("users5.name = views_test_data.name", $join_info['condition'], 'Make sure the third extra join condition appears in the query.');
@@ -242,7 +263,12 @@ class JoinTest extends RelationshipJoinTestBase {
     $this->assertEquals('LEFT', $join_info['join type']);
     $this->assertEquals($configuration['table'], $join_info['table']);
     $this->assertEquals('users_field_data', $join_info['alias']);
-    $this->assertEquals('views_test_data.uid <> users_field_data.uid', $join_info['condition']);
+    if (\Drupal::database()->databaseType() === 'pgsql') {
+      $this->assertEquals('views_test_data.uid::text <> users_field_data.uid::text', $join_info['condition']);
+    }
+    else {
+      $this->assertEquals('views_test_data.uid <> users_field_data.uid', $join_info['condition']);
+    }
   }
 
 }
