@@ -74,3 +74,12 @@ drupal.system.date:
     - core/drupalSettings
     - core/once
     - core/drupal.form
+
+assets.validate:
+  version: VERSION
+  js:
+    js/assets.validate.js: {}
+  dependencies:
+    - core/drupalSettings
+    - core/drupal.message
+    - core/once
