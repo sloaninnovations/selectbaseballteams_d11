@@ -1670,6 +1670,9 @@ function claro_preprocess_links__media_library_menu(array &$variables): void {
     $link['attributes']->addClass('media-library-menu__item');
     $link['link']['#options']['attributes']['class'][] = 'media-library-menu__link';
   }
+
+  // We want the links to be styled as vertical tabs.
+  $variables['#attached']['library'][] = 'core/drupal.vertical-tabs';
 }
 
 /**
