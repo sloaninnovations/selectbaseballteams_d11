@@ -41675,39 +41675,33 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\taxonomy\\\\Hook\\\\TaxonomyHooks\\:\\:entityOperation\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\taxonomy\\\\Hook\\\\TaxonomyEntityHooks\\:\\:entityOperation\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/src/Hook/TaxonomyHooks.php',
+	'path' => __DIR__ . '/modules/taxonomy/src/Hook/TaxonomyEntityHooks.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\taxonomy\\\\Hook\\\\TaxonomyHooks\\:\\:help\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\taxonomy\\\\Hook\\\\TaxonomyEntityHooks\\:\\:nodeInsert\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/src/Hook/TaxonomyHooks.php',
+	'path' => __DIR__ . '/modules/taxonomy/src/Hook/TaxonomyEntityHooks.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\taxonomy\\\\Hook\\\\TaxonomyHooks\\:\\:nodeInsert\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\taxonomy\\\\Hook\\\\TaxonomyEntityHooks\\:\\:nodePredelete\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/src/Hook/TaxonomyHooks.php',
+	'path' => __DIR__ . '/modules/taxonomy/src/Hook/TaxonomyEntityHooks.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\taxonomy\\\\Hook\\\\TaxonomyHooks\\:\\:nodePredelete\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\taxonomy\\\\Hook\\\\TaxonomyEntityHooks\\:\\:nodeUpdate\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/src/Hook/TaxonomyHooks.php',
+	'path' => __DIR__ . '/modules/taxonomy/src/Hook/TaxonomyEntityHooks.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\taxonomy\\\\Hook\\\\TaxonomyHooks\\:\\:nodeUpdate\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\taxonomy\\\\Hook\\\\TaxonomyEntityHooks\\:\\:taxonomyTermDelete\\(\\) has no return type specified\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/src/Hook/TaxonomyHooks.php',
-];
-$ignoreErrors[] = [
-	// identifier: missingType.return
-	'message' => '#^Method Drupal\\\\taxonomy\\\\Hook\\\\TaxonomyHooks\\:\\:taxonomyTermDelete\\(\\) has no return type specified\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/src/Hook/TaxonomyHooks.php',
+	'path' => __DIR__ . '/modules/taxonomy/src/Hook/TaxonomyEntityHooks.php',
 ];
 $ignoreErrors[] = [
 	// identifier: missingType.return
