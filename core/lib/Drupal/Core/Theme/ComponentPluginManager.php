@@ -305,6 +305,18 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     if (!empty($validation_errors)) {
       throw new IncompatibleComponentSchema(implode("\n", $validation_errors));
     }
+
+    // Sort the definitions by module weight, order for theme components
+    // is irrelevant here and determined at runtime.
+    $module_list = $this->getModuleExtensionList()->getList();
+    $sort_by_module_weight_and_name = static function (array $definition_a, array $definition_b) use ($module_list) {
+      $a_weight = $module_list[$definition_a['provider']]?->weight ?? -999;
+      $b_weight = $module_list[$definition_b['provider']]?->weight ?? -999;
+      return $a_weight !== $b_weight
+        ? $a_weight <=> $b_weight
+        : $definition_a['provider'] <=> $definition_b['provider'];
+    };
+    uasort($definitions, $sort_by_module_weight_and_name);
   }
 
   /**
