@@ -60,6 +60,13 @@ class LocalActionDefaultTest extends UnitTestCase {
   protected $routeProvider;
 
   /**
+   * The redirect destination.
+   *
+   * @var \Drupal\Core\Routing\RedirectDestinationInterface
+   */
+  protected $redirectDestination;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -67,13 +74,14 @@ class LocalActionDefaultTest extends UnitTestCase {
 
     $this->stringTranslation = $this->createMock('Drupal\Core\StringTranslation\TranslationInterface');
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
+    $this->redirectDestination = $this->createMock('Drupal\Core\Routing\RedirectDestinationInterface');
   }
 
   /**
    * Setups the local action default.
    */
   protected function setupLocalActionDefault(): void {
-    $this->localActionDefault = new LocalActionDefault($this->config, $this->pluginId, $this->pluginDefinition, $this->routeProvider);
+    $this->localActionDefault = new LocalActionDefault($this->config, $this->pluginId, $this->pluginDefinition, $this->routeProvider, $this->redirectDestination);
   }
 
   /**

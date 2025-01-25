@@ -7,6 +7,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -27,6 +28,13 @@ class LocalActionDefault extends PluginBase implements LocalActionInterface, Con
   protected $routeProvider;
 
   /**
+   * The redirect destination.
+   *
+   * @var \Drupal\Core\Routing\RedirectDestinationInterface
+   */
+  protected $redirectDestination;
+
+  /**
    * Constructs a LocalActionDefault object.
    *
    * @param array $configuration
@@ -37,11 +45,18 @@ class LocalActionDefault extends PluginBase implements LocalActionInterface, Con
    *   The plugin implementation definition.
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider to load routes by name.
+   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
+   *   The redirect destination.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, RedirectDestinationInterface $redirect_destination = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->routeProvider = $route_provider;
+    if (is_null($redirect_destination)) {
+      @trigger_error('The redirect.destination service must be passed to LocalActionDefault::__construct(), it is required before Drupal 11.0.0.', E_USER_DEPRECATED);
+      $redirect_destination = \Drupal::service('redirect.destination');
+    }
+    $this->redirectDestination = $redirect_destination;
   }
 
   /**
@@ -52,7 +67,8 @@ class LocalActionDefault extends PluginBase implements LocalActionInterface, Con
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('router.route_provider')
+      $container->get('router.route_provider'),
+      $container->get('redirect.destination')
     );
   }
 
@@ -119,7 +135,13 @@ class LocalActionDefault extends PluginBase implements LocalActionInterface, Con
    * {@inheritdoc}
    */
   public function getOptions(RouteMatchInterface $route_match) {
-    return (array) $this->pluginDefinition['options'];
+    $options = (array) $this->pluginDefinition['options'];
+
+    // Check if destination should be appended to the link.
+    if (!empty($options['add_destination'])) {
+      $options['query']['destination'] = $this->redirectDestination->get();
+    }
+    return $options;
   }
 
   /**

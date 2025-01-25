@@ -6,6 +6,7 @@ namespace Drupal\menu_test\Plugin\Menu\LocalAction;
 
 use Drupal\Core\Config\Config;
 use Drupal\Core\Menu\LocalActionDefault;
+use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,9 +41,11 @@ class TestLocalActionWithConfig extends LocalActionDefault {
    *   The route provider to load routes by name.
    * @param \Drupal\Core\Config\Config $config
    *   The 'menu_test.links.action' config.
+   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
+   *   The redirect destination.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, Config $config) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, Config $config, RedirectDestinationInterface $redirect_destination) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $redirect_destination);
 
     $this->config = $config;
   }
@@ -56,7 +59,8 @@ class TestLocalActionWithConfig extends LocalActionDefault {
       $plugin_id,
       $plugin_definition,
       $container->get('router.route_provider'),
-      $container->get('config.factory')->get('menu_test.links.action')
+      $container->get('config.factory')->get('menu_test.links.action'),
+      $container->get('redirect.destination')
     );
   }
 

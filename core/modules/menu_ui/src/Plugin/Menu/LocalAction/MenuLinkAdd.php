@@ -10,6 +10,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Modifies the 'Add link' local action to add a destination.
+ *
+ * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use the
+ * @see https://www.drupal.org/project/drupal/issues/3048498
+ * 'add_destination: true' option in declaration of action links.
  */
 class MenuLinkAdd extends LocalActionDefault {
 
@@ -18,7 +22,7 @@ class MenuLinkAdd extends LocalActionDefault {
    *
    * @var \Drupal\Core\Routing\RedirectDestinationInterface
    */
-  private $redirectDestination;
+  protected $redirectDestination;
 
   /**
    * Constructs a MenuLinkAdd object.
@@ -35,6 +39,7 @@ class MenuLinkAdd extends LocalActionDefault {
    *   The redirect destination.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, RedirectDestinationInterface $redirect_destination) {
+    @trigger_error("\Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use the 'add_destination: true' option in declaration of action links.", E_USER_DEPRECATED);
     parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider);
 
     $this->redirectDestination = $redirect_destination;

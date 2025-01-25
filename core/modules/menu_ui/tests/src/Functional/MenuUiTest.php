@@ -382,10 +382,19 @@ class MenuUiTest extends BrowserTestBase {
     $links[0]->click();
 
     // Test the 'Add link' local action.
+    $expected_destination = Url::fromRoute('entity.menu.edit_form', ['menu' => $menu_name])->toString();
+    // Check if Add link button has destination parameter.
+    $this->assertSession()->linkByHrefExists('admin/structure/menu/manage/' . $menu_name . '/add?destination=' . $expected_destination, 0, "The add menu link button URL does not have destination parameter");
+    // Click on the link.
     $this->clickLink('Add link');
+    // Test if destination parameter is in the URL.
+    $this->assertSession()->addressEquals('admin/structure/menu/manage/' . $menu_name . '/add?destination=' . $expected_destination);
+
     $link_title = $this->randomString();
     $this->submitForm(['link[0][uri]' => '/', 'title[0][value]' => $link_title], 'Save');
+    // Test destination redirect after link creation.
     $this->assertSession()->addressEquals(Url::fromRoute('entity.menu.edit_form', ['menu' => $menu_name]));
+
     // Test the 'Edit' operation.
     $this->clickLink('Edit');
     $this->assertSession()->fieldValueEquals('title[0][value]', $link_title);
