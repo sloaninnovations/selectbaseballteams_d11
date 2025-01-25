@@ -505,40 +505,119 @@
    */
   Drupal.behaviors.clickToSelect = {
     attach(context) {
-      once('field-click-to-select', '.js-click-to-select', context).forEach(
-        (clickToSelectEl) => {
-          const input = clickToSelectEl.querySelector('input');
-          if (input) {
-            Drupal.behaviors.clickToSelect.clickHandler(clickToSelectEl, input);
+      once(
+        'field-click-to-select',
+        '.js-click-to-select-container',
+        context,
+      ).forEach((container) => {
+        const itemClassName = 'js-click-to-select';
+        const items = container.querySelectorAll(`.${itemClassName}`);
+        items.forEach((item) => {
+          const input = item.querySelector('input');
+          if (!input) {
+            return;
           }
+
+          this.itemClickHandler(items, item, input);
+
+          // Adding grid-style keyboard navigation.
+          // For the reference https://www.w3.org/WAI/ARIA/apg/patterns/grid/
+          input.addEventListener('keydown', (event) => {
+            const columns = window
+              .getComputedStyle(container)
+              .getPropertyValue('grid-template-columns')
+              .split(' ').length;
+            if (columns > 1) {
+              const currentIndex = Array.from(items).indexOf(
+                document.activeElement.closest(`.${itemClassName}`),
+              );
+              let newIndex;
+              let isReachedEdge = false;
+
+              switch (event.key) {
+                case 'ArrowUp':
+                  newIndex = currentIndex - columns;
+                  if (newIndex < 0) {
+                    isReachedEdge = true;
+                  }
+                  break;
+                case 'ArrowDown':
+                  newIndex = currentIndex + columns;
+                  if (newIndex >= items.length) {
+                    isReachedEdge = true;
+                  }
+                  break;
+                case 'ArrowLeft':
+                  newIndex = currentIndex - 1;
+                  if ([columns - 1, -1].includes(newIndex % columns)) {
+                    isReachedEdge = true;
+                  }
+                  break;
+                case 'ArrowRight':
+                  newIndex = currentIndex + 1;
+                  if (
+                    newIndex % columns === 0 ||
+                    currentIndex + 1 === items.length
+                  ) {
+                    isReachedEdge = true;
+                  }
+                  break;
+                default:
+                  return;
+              }
+
+              if (isReachedEdge) {
+                event.preventDefault();
+              } else if (newIndex >= 0) {
+                this.selectHandler(
+                  items,
+                  items[newIndex],
+                  items[newIndex].querySelector('input'),
+                );
+                input.dispatchEvent(new Event('updateOptions'));
+                event.preventDefault();
+              }
+            }
+          });
+
           if (input.classList.contains('error')) {
-            clickToSelectEl.classList.add('error');
+            item.classList.add('error');
           }
+
           if (input.checked) {
-            this.selectHandler(clickToSelectEl, input);
+            this.selectHandler(items, item, input);
           }
-        },
-      );
+        });
+      });
     },
     // Adds click event listener to the field card.
-    clickHandler(clickToSelectEl, input) {
-      $(clickToSelectEl).on('click', (event) => {
-        const clickToSelect = event.target.closest('.js-click-to-select');
-        this.selectHandler(clickToSelect, input);
-        $(input).trigger('updateOptions');
+    itemClickHandler(items, item, input) {
+      item.addEventListener('click', (event) => {
+        // Checking if it's a real click and event is not triggered
+        // by keyboard navigation.
+        if (
+          event.type === 'click' &&
+          event.clientX !== 0 &&
+          event.clientY !== 0
+        ) {
+          this.selectHandler(items, item, input);
+          input.dispatchEvent(new Event('updateOptions'));
+        }
       });
     },
     // Handles adding and removing classes for the different states.
-    selectHandler(clickToSelect, input) {
-      $(input).on('focus', () => clickToSelect.classList.add('focus'));
-      $(input).on('blur', () => clickToSelect.classList.remove('focus'));
+    selectHandler(items, item, input) {
+      input.addEventListener('focus', () => {
+        item.classList.add('focus');
+      });
+      input.addEventListener('blur', () => item.classList.remove('focus'));
       input.checked = true;
-      document
-        .querySelectorAll('.js-click-to-select.selected')
-        .forEach((item) => {
-          item.classList.remove('selected');
+      [...items]
+        .filter((selected) => selected.classList.contains('selected'))
+        .forEach((selected) => {
+          selected.classList.remove('selected');
         });
-      clickToSelect.classList.add('selected');
+      item.classList.add('selected');
       // Ensure focus is added at the end of the process so wrap in
       // a timeout.
       setTimeout(() => {

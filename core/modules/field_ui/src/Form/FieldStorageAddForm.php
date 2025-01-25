@@ -226,7 +226,10 @@ class FieldStorageAddForm extends FormBase {
     $form['add'] = [
       '#type' => 'container',
       '#attributes' => [
-        'class' => 'add-field-container',
+        'class' => [
+          'js-click-to-select-container',
+          'add-field-container',
+        ],
       ],
     ];
     $form['add']['new_storage_type'] = $field_type_options_radios;
@@ -304,7 +307,10 @@ class FieldStorageAddForm extends FormBase {
     $form['group_field_options_wrapper']['fields'] = [
       '#type' => 'container',
       '#attributes' => [
-        'class' => ['group-field-options'],
+        'class' => [
+          'js-click-to-select-container',
+          'group-field-options',
+        ],
       ],
     ];
 
