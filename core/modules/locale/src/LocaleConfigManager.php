@@ -289,8 +289,8 @@ class LocaleConfigManager {
    * Gets configuration names associated with components.
    *
    * @param array $components
-   *   (optional) Array of component lists indexed by type. If not present or it
-   *   is an empty array, it will update all components.
+   *   An associative array containing component types as keys and lists of
+   *   components as values.
    *
    * @return array
    *   Array of configuration object names.
