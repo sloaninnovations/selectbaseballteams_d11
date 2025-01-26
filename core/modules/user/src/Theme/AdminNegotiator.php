@@ -4,6 +4,7 @@ namespace Drupal\user\Theme;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\AdminContext;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -14,6 +15,11 @@ use Drupal\Core\Theme\ThemeNegotiatorInterface;
  */
 class AdminNegotiator implements ThemeNegotiatorInterface {
   use DeprecatedServicePropertyTrait;
+
+  /**
+   * The service properties that should raise a deprecation error.
+   */
+  private array $deprecatedProperties = ['entityTypeManager' => 'entity_type.manager'];
 
   /**
    * The current user.
@@ -43,19 +49,27 @@ class AdminNegotiator implements ThemeNegotiatorInterface {
    *   The current user.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Routing\AdminContext $admin_context
+   * @param \Drupal\Core\Routing\AdminContext|EntityTypeManagerInterface $admin_context
    *   The route admin context to determine whether the route is an admin one.
    */
-  public function __construct(AccountInterface $user, ConfigFactoryInterface $config_factory, AdminContext $admin_context) {
+  public function __construct(AccountInterface $user, ConfigFactoryInterface $config_factory, AdminContext|EntityTypeManagerInterface $admin_context) {
     $this->user = $user;
     $this->configFactory = $config_factory;
-    $this->adminContext = $admin_context;
+
+    if ($admin_context instanceof EntityTypeManagerInterface) {
+      $deprecated_service_name = EntityTypeManagerInterface::class;
+      @trigger_error("Passing the $deprecated_service_name (entity_type.manager service) to AdminNegotiator is deprecated and will be removed in drupal:12.0.0.", E_USER_DEPRECATED);
+      $this->adminContext = func_get_arg(3);
+    }
+    else {
+      $this->adminContext = $admin_context;
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function applies(RouteMatchInterface $route_match): bool {
+  public function applies(RouteMatchInterface $route_match) {
     $is_admin_route = $this->adminContext->isAdminRoute($route_match->getRouteObject());
     return $is_admin_route && $this->user->hasPermission('view the administration theme');
   }

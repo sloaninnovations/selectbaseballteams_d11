@@ -118,7 +118,7 @@ class CronRunTest extends BrowserTestBase {
    * Make sure the cron UI reads from the state storage.
    */
   public function testCronUI(): void {
-    $admin_user = $this->drupalCreateUser(admin: TRUE);
+    $admin_user = $this->drupalCreateUser(['administer site configuration']);
     $this->drupalLogin($admin_user);
     \Drupal::state()->delete('system.cron_last');
     $this->drupalGet('admin/config/system/cron');
