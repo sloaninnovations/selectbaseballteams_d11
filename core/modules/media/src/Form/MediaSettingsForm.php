@@ -115,6 +115,23 @@ class MediaSettingsForm extends ConfigFormBase {
       '#config_target' => 'media.settings:standalone_url',
       '#description' => $this->t("Allow users to access @media-entities at /media/{id}.", ['@media-entities' => $this->entityTypeManager->getDefinition('media')->getPluralLabel()]),
     ];
+
+    // Issue #3151977: details for recursive depth protection.
+    $form['recursive_protection'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Recursive protection'),
+      '#open' => TRUE,
+    ];
+
+    // Issue #3151977: : setting for the amount of media embeds we
+    // allow on a single entity.
+    $form['recursive_protection']['recursive_render_depth'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Media embed recursive render depth'),
+      '#config_target' => 'media.settings:recursive_render_depth',
+      '#description' => $this->t('Enter the number of media embeds allowed before it will stop rendering on a single entity.'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 

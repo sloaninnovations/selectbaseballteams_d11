@@ -3,6 +3,7 @@
 namespace Drupal\media\Plugin\Filter;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -98,6 +99,13 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
   protected static $recursiveRenderDepth = [];
 
   /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactory
+   */
+  protected $configFactory;
+
+  /**
    * Constructs a MediaEmbed object.
    *
    * @param array $configuration
@@ -118,8 +126,10 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
    *   The renderer.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   The logger factory.
+   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   *   The config factory.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityRepositoryInterface $entity_repository, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, EntityTypeBundleInfoInterface $bundle_info, RendererInterface $renderer, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityRepositoryInterface $entity_repository, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, EntityTypeBundleInfoInterface $bundle_info, RendererInterface $renderer, LoggerChannelFactoryInterface $logger_factory, ConfigFactory $config_factory) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityRepository = $entity_repository;
     $this->entityTypeManager = $entity_type_manager;
@@ -127,6 +137,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
     $this->entityTypeBundleInfo = $bundle_info;
     $this->renderer = $renderer;
     $this->loggerFactory = $logger_factory;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -142,7 +153,8 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
       $container->get('entity_display.repository'),
       $container->get('entity_type.bundle.info'),
       $container->get('renderer'),
-      $container->get('logger.factory')
+      $container->get('logger.factory'),
+      $container->get('config.factory'),
     );
   }
 
@@ -219,44 +231,62 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
     // @see \Drupal\filter\Element\ProcessedText::preRenderText()
     $recursive_render_id = $media->uuid();
     if (isset(static::$recursiveRenderDepth[$recursive_render_id])) {
-      static::$recursiveRenderDepth[$recursive_render_id]++;
+      static::$recursiveRenderDepth[$recursive_render_id]['depth']++;
     }
     else {
-      static::$recursiveRenderDepth[$recursive_render_id] = 1;
+      static::$recursiveRenderDepth[$recursive_render_id]['depth'] = 1;
     }
+
+    // Issue #3151977: get the recursive max depth from media settings,
+    // if not set, we are defaulting it to 20.
+    $recursive_render_depth = $this->configFactory->get('media.settings')->get('recursive_render_depth');
+
+    // Issue #3151977: if there is no recursive depth in settings, set
+    // it to the default value of 20.
+    if ($recursive_render_depth == NULL) {
+      $recursive_render_depth = EntityReferenceEntityFormatter::RECURSIVE_RENDER_LIMIT;
+    }
+
     // Protect ourselves from recursive rendering: return an empty render array.
-    if (static::$recursiveRenderDepth[$recursive_render_id] > EntityReferenceEntityFormatter::RECURSIVE_RENDER_LIMIT) {
+    if (static::$recursiveRenderDepth[$recursive_render_id]['depth'] > $recursive_render_depth) {
       $this->loggerFactory->get('media')->error('During rendering of embedded media: recursive rendering detected for %entity_id. Aborting rendering.', [
         '%entity_id' => $media->id(),
       ]);
       return [];
     }
 
-    $build = $this->entityTypeManager
-      ->getViewBuilder('media')
-      ->view($media, $view_mode, $langcode);
+    // Issue #3151977: If we are on the first embedded media item,
+    // set render object, so that we can use the render object over
+    // and over again.
+    if (static::$recursiveRenderDepth[$recursive_render_id]['depth'] == 1) {
 
-    // Allows other modules to treat embedded media items differently.
-    $build['#embed'] = TRUE;
+      static::$recursiveRenderDepth[$recursive_render_id]['object'] = $this->entityTypeManager
+        ->getViewBuilder('media')
+        ->view($media, $view_mode, $langcode);
 
-    // There are a few concerns when rendering an embedded media entity:
-    // - entity access checking happens not during rendering but during routing,
-    //   and therefore we have to do it explicitly here for the embedded entity.
-    $build['#access'] = $media->access('view', NULL, TRUE);
-    // - caching an embedded media entity separately is unnecessary; the host
-    //   entity is already render cached.
-    unset($build['#cache']['keys']);
-    // - Contextual Links do not make sense for embedded entities; we only allow
-    //   the host entity to be contextually managed.
-    $build['#pre_render'][] = static::class . '::disableContextualLinks';
-    // - default styling may break captioned media embeds; attach asset library
-    //   to ensure captions behave as intended. Do not set this at the root
-    //   level of the render array, otherwise it will be attached always,
-    //   instead of only when #access allows this media to be viewed and hence
-    //   only when media is actually rendered.
-    $build[':media_embed']['#attached']['library'][] = 'media/filter.caption';
+      // Allows other modules to treat embedded media items differently.
+      static::$recursiveRenderDepth[$recursive_render_id]['object']['#embed'] = TRUE;
 
-    return $build;
+      // There are a few concerns when rendering an embedded media entity:
+      // - entity access checking happens not during rendering but during routing,
+      //   and therefore we have to do it explicitly here for the embedded entity.
+      static::$recursiveRenderDepth[$recursive_render_id]['object']['#access'] = $media->access('view', NULL, TRUE);
+      // - caching an embedded media entity separately is unnecessary; the host
+      //   entity is already render cached.
+      unset(static::$recursiveRenderDepth[$recursive_render_id]['object']['#cache']['keys']);
+      // - Contextual Links do not make sense for embedded entities; we only allow
+      //   the host entity to be contextually managed.
+      static::$recursiveRenderDepth[$recursive_render_id]['object']['#pre_render'][] = static::class . '::disableContextualLinks';
+      // - default styling may break captioned media embeds; attach asset library
+      //   to ensure captions behave as intended. Do not set this at the root
+      //   level of the render array, otherwise it will always be attached,
+      //   instead of only when #access allows this media to be viewed and hence
+      //   only when media is actually rendered.
+      static::$recursiveRenderDepth[$recursive_render_id]['object'][':media_embed']['#attached']['library'][] = 'media/filter.caption';
+    }
+
+    // Issue #3151977: now return the stored render object.
+    return static::$recursiveRenderDepth[$recursive_render_id]['object'];
   }
 
   /**

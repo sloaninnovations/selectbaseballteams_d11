@@ -15,6 +15,9 @@ media.settings:
     standalone_url:
       type: boolean
       label: 'Allow media items to be viewed standalone at /media/{id}'
+    recursive_render_depth:
+      type: integer
+      label: 'Override the internal render limit of 20'
 
 media.type.*:
   type: config_entity

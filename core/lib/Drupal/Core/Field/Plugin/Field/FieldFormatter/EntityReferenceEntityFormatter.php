@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
@@ -66,6 +67,13 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
   protected static $recursiveRenderDepth = [];
 
   /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactory
+   */
+  protected $configFactory;
+
+  /**
    * Constructs an EntityReferenceEntityFormatter instance.
    *
    * @param string $plugin_id
@@ -88,12 +96,15 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
+   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   *   The config factory.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, LoggerChannelFactoryInterface $logger_factory, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, LoggerChannelFactoryInterface $logger_factory, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, ConfigFactory $config_factory) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->loggerFactory = $logger_factory;
     $this->entityTypeManager = $entity_type_manager;
     $this->entityDisplayRepository = $entity_display_repository;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -110,7 +121,8 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
       $configuration['third_party_settings'],
       $container->get('logger.factory'),
       $container->get('entity_type.manager'),
-      $container->get('entity_display.repository')
+      $container->get('entity_display.repository'),
+      $container->get('config.factory'),
     );
   }
 
@@ -175,14 +187,24 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
         . $entity->id();
 
       if (isset(static::$recursiveRenderDepth[$recursive_render_id])) {
-        static::$recursiveRenderDepth[$recursive_render_id]++;
+        static::$recursiveRenderDepth[$recursive_render_id]['depth']++;
       }
       else {
-        static::$recursiveRenderDepth[$recursive_render_id] = 1;
+        static::$recursiveRenderDepth[$recursive_render_id]['depth'] = 1;
+      }
+
+      // Issue #3151977: get the recursive max depth from media settings,
+      // if not set, we are defaulting it to 20.
+      $recursive_render_depth = $this->configFactory->get('media.settings')->get('recursive_render_depth');
+
+      // Issue #3151977: if there is no recursive depth in settings, set it to the
+      // default value of 20.
+      if ($recursive_render_depth == NULL) {
+        $recursive_render_depth = static::RECURSIVE_RENDER_LIMIT;
       }
 
       // Protect ourselves from recursive rendering.
-      if (static::$recursiveRenderDepth[$recursive_render_id] > static::RECURSIVE_RENDER_LIMIT) {
+      if (static::$recursiveRenderDepth[$recursive_render_id]['depth'] > $recursive_render_depth) {
         $this->loggerFactory->get('entity')->error('Recursive rendering detected when rendering entity %entity_type: %entity_id, using the %field_name field on the %parent_entity_type:%parent_bundle %parent_entity_id entity. Aborting rendering.', [
           '%entity_type' => $entity->getEntityTypeId(),
           '%entity_id' => $entity->id(),
