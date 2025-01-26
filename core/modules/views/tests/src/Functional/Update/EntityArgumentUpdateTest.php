@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests the upgrade path for converting numeric arguments to entity_target_id.
@@ -14,6 +15,7 @@ use Drupal\views\Entity\View;
  *
  * @see views_post_update_views_data_argument_plugin_id()
  */
+#[IgnoreDeprecations]
 class EntityArgumentUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -30,6 +32,7 @@ class EntityArgumentUpdateTest extends UpdatePathTestBase {
    * Tests that numeric argument plugins are updated properly.
    */
   public function testViewsFieldPluginConversion(): void {
+    $this->expectDeprecation('The update to convert "numeric" arguments to "entity_target_id" for entity reference fields for view "test_entity_id_argument_update" is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3441945');
     $view = View::load('test_entity_id_argument_update');
     $data = $view->toArray();
     $this->assertEquals('numeric', $data['display']['default']['display_options']['arguments']['field_tags_target_id']['plugin_id']);
