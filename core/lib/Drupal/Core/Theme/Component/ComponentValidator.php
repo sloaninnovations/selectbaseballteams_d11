@@ -56,6 +56,8 @@ class ComponentValidator {
     // First ensure there are no name collisions between props and slots.
     $prop_names = array_keys($definition['props']['properties'] ?? []);
     $slot_names = array_keys($definition['slots'] ?? []);
+    // @todo Validate variants.
+    // $variants = array_keys($definition['variants'] ?? []);
     $collisions = array_intersect($prop_names, $slot_names);
     if ($collisions) {
       $message = sprintf(

@@ -26,6 +26,24 @@
         }
       }
     },
+    "variantDefinition": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]$": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "title": "Title"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description"
+            }
+          }
+        }
+      }
+    },
     "cssAttributes": {
       "type": [
         "object",
@@ -191,6 +209,9 @@
     },
     "slots": {
       "$ref": "#/$defs/slotDefinition"
+    },
+    "variants": {
+      "$ref": "#/$defs/variantDefinition"
     },
     "libraryOverrides": {
       "$ref": "#/$defs/libraryDefinition"

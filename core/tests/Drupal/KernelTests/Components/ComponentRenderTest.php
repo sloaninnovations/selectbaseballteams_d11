@@ -45,6 +45,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
     $this->checkSlots();
     $this->checkInvalidSlot();
     $this->checkEmptyProps();
+    $this->checkVariants();
   }
 
   /**
@@ -350,6 +351,23 @@ class ComponentRenderTest extends ComponentKernelTestBase {
       $crawler->filter('#sdc-wrapper')->innerText(),
       'This is a test string.'
     );
+  }
+
+  /**
+   * Ensure that components variants render.
+   */
+  public function checkVariants(): void {
+    $build = [
+      '#type' => 'component',
+      '#component' => 'sdc_test:my-cta',
+      '#variant' => 'red',
+      '#props' => [
+        'text' => 'Test link',
+      ],
+    ];
+    $crawler = $this->renderComponentRenderArray($build);
+    $this->assertNotEmpty($crawler->filter('#sdc-wrapper a[data-component-id="sdc_test:my-cta"][data-component-variant="red"]'));
+    $this->assertNotEmpty($crawler->filter('#sdc-wrapper a[data-component-id="sdc_test:my-cta"][data-component-variant="red"][class*="red"]'));
   }
 
   /**
