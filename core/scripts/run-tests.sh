@@ -913,10 +913,6 @@ function simpletest_script_command(TestRun $test_run, string $test_class): array
       $command[] = '--' . $arg;
     }
   }
-
-  // $command[] = '--fail-on-skipped';
-
-
   // --execute-test and class name needs to come last.
   $command[] = '--execute-test';
   $command[] = $test_class;
@@ -1267,7 +1263,7 @@ function simpletest_script_reporter_write_xml_results(TestRunResultsStorageInter
         }
         $test_class = $result->test_class;
         if (!isset($xml_files[$test_class])) {
-          $doc = new DOMDocument('1.0', 'utf-8');
+          $doc = new DOMDocument('1.0');
           $root = $doc->createElement('testsuite');
           $root = $doc->appendChild($root);
           $xml_files[$test_class] = ['doc' => $doc, 'suite' => $root];

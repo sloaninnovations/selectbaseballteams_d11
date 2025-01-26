@@ -57,7 +57,6 @@ default:
       job: '📔 Spell-checking'
 
 variables:
-  CI_DEBUG_SERVICES: "true"
   FF_NETWORK_PER_BUILD: 1
   SIMPLETEST_BASE_URL: http://localhost/subdirectory
   DB_DRIVER: mysql
@@ -88,16 +87,16 @@ variables:
     - "--allowed-origins=*"
 
 .with-selenium-chrome: &with-selenium-chrome
-  name: selenium/standalone-chrome:132.0
+  name: selenium/standalone-chrome:127.0
   alias: selenium
   variables:
     JAVA_OPTS: "-Dwebdriver.chrome.logfile=/builds/chromedriver.log"
     SE_NODE_OVERRIDE_MAX_SESSIONS: "true"
     SE_NODE_MAX_SESSIONS: "16"
     SE_SESSION_RETRY_INTERVAL: "1"
+    SE_SESSION_REQUEST_TIMEOUT: "60"
     SE_START_XVFB: "true"
     SE_START_VNC: "false"
-    SE_OPTS: "--log-level FINE"
 
 .run-tests: &run-tests
   script:

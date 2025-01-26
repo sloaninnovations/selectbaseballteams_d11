@@ -30,8 +30,6 @@ class CommandsTest extends WebDriverTestBase {
     $session = $this->getSession();
     $page = $this->getSession()->getPage();
 
-    $this->assertEquals('yes', 'no');
-
     $form_path = 'ajax_forms_test_ajax_commands_form';
     $web_user = $this->drupalCreateUser(['access content']);
     $this->drupalLogin($web_user);
