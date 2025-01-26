@@ -2,7 +2,7 @@
 
 namespace Drupal\Core\Field;
 
-use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -16,8 +16,11 @@ class BaseFieldOverrideAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    $access = parent::checkAccess($entity, $operation, $account);
-    return $access->orIf(AccessResult::allowedIfHasPermission($account, 'administer ' . $entity->getTargetEntityTypeId() . ' fields'));
+    return parent::checkAccess($entity, $operation, $account)
+      ->orAllowedIf(function (CacheableMetadata $cacheability) use ($account, $entity) {
+        $cacheability->addCacheContexts(['user.permissions']);
+        return $account->hasPermission('administer ' . $entity->getTargetEntityTypeId() . ' fields');
+      });
   }
 
 }

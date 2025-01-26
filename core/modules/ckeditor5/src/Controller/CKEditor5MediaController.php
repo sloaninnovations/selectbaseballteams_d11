@@ -7,6 +7,7 @@ namespace Drupal\ckeditor5\Controller;
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -153,11 +154,13 @@ class CKEditor5MediaController extends ControllerBase {
     if (!$media) {
       throw new NotFoundHttpException();
     }
-    $filters = $editor->getFilterFormat()->filters();
 
-    return AccessResult::allowedIf($filters->has('media_embed') && $filters->get('media_embed')->status)
-      ->andIf($media->access('view', $this->currentUser, TRUE))
-      ->addCacheableDependency($editor->getFilterFormat());
+    return $media->access('view', $this->currentUser, TRUE)
+      ->andAllowedIf(function (CacheableMetadata $cacheability) use ($editor) {
+        $filters = $editor->getFilterFormat()->filters();
+        $cacheability->addCacheableDependency($editor->getFilterFormat());
+        return $filters->has('media_embed') && $filters->get('media_embed')->status;
+      });
   }
 
   /**

@@ -10,8 +10,10 @@ use Drupal\Core\Access\AccessResultNeutral;
 use Drupal\Core\Access\AccessResultReasonInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\ExpectationFailedException;
 
 /**
  * @coversDefaultClass \Drupal\Core\Access\AccessResult
@@ -262,6 +264,211 @@ class AccessResultTest extends UnitTestCase {
     $this->assertFalse($access->isNeutral());
     $this->assertEquals('forbidden message', $access->getReason());
     $this->assertDefaultCacheability($access);
+  }
+
+  /**
+   * @covers ::andAllowedIf
+   *
+   * @dataProvider andAllowedIfDataProvider
+   */
+  public function testAndAllowedIf(AccessResult $access_result, bool $closure_returns, bool $is_closure_call_expected, bool $cache_merge_expected = TRUE): void {
+    self::assertAndOrIfClosureResult($access_result->andAllowedIf((new AndOrIfClosureTester($closure_returns, $is_closure_call_expected))(...)), $is_closure_call_expected, $cache_merge_expected);
+  }
+
+  /**
+   * @return \Generator{string, array<AccessResult,bool,bool,?bool>}
+   */
+  public static function andAllowedIfDataProvider(): \Generator {
+    yield 'forbidden with closure return true' => [
+      AccessResult::forbidden(),
+      TRUE,
+      FALSE,
+    ];
+    yield 'forbidden with closure return false' => [
+      AccessResult::forbidden(),
+      FALSE,
+      FALSE,
+    ];
+    yield 'neutral with closure return true' => [
+      AccessResult::neutral(),
+      TRUE,
+      FALSE,
+    ];
+    yield 'neutral with closure return false' => [
+      AccessResult::neutral(),
+      FALSE,
+      FALSE,
+    ];
+    yield 'allowed with closure return true' => [
+      AccessResult::allowed(),
+      TRUE,
+      TRUE,
+    ];
+    yield 'allowed with closure return false' => [
+      AccessResult::allowed(),
+      FALSE,
+      TRUE,
+    ];
+  }
+
+  /**
+   * @covers ::andForbiddenIf
+   *
+   * @dataProvider andForbiddenIfDataProvider
+   */
+  public function testAndForbiddenIf(AccessResult $access_result, bool $closure_returns, bool $is_closure_call_expected, bool $cache_merge_expected = TRUE): void {
+    self::assertAndOrIfClosureResult($access_result->andForbiddenIf((new AndOrIfClosureTester($closure_returns, $is_closure_call_expected))(...)), $is_closure_call_expected, $cache_merge_expected);
+  }
+
+  /**
+   * @return \Generator{string, array<AccessResult,bool,bool,?bool>}
+   */
+  public static function andForbiddenIfDataProvider(): \Generator {
+    yield 'forbidden with closure return true' => [
+      AccessResult::forbidden(),
+      TRUE,
+      FALSE,
+    ];
+    yield 'forbidden with closure return false' => [
+      AccessResult::forbidden(),
+      FALSE,
+      FALSE,
+    ];
+    yield 'neutral with closure return true' => [
+      AccessResult::neutral(),
+      TRUE,
+      TRUE,
+    ];
+    yield 'neutral with closure return false' => [
+      AccessResult::neutral(),
+      FALSE,
+      TRUE,
+      FALSE,
+    ];
+    yield 'allowed with closure return true' => [
+      AccessResult::allowed(),
+      TRUE,
+      TRUE,
+    ];
+    yield 'allowed with closure return false' => [
+      AccessResult::allowed(),
+      FALSE,
+      TRUE,
+    ];
+  }
+
+  /**
+   * @covers ::orAllowedIf
+   *
+   * @dataProvider orAllowedIfDataProvider
+   */
+  public function testOrAllowedIf(AccessResult $access_result, bool $closure_returns, bool $is_closure_call_expected, bool $cache_merge_expected = TRUE): void {
+    self::assertAndOrIfClosureResult($access_result->orAllowedIf((new AndOrIfClosureTester($closure_returns, $is_closure_call_expected))(...)), $is_closure_call_expected, $cache_merge_expected);
+  }
+
+  /**
+   * @return \Generator{string, array<AccessResult,bool,bool,?bool>}
+   */
+  public static function orAllowedIfDataProvider(): \Generator {
+    yield 'forbidden with closure return true' => [
+      AccessResult::forbidden(),
+      TRUE,
+      FALSE,
+    ];
+    yield 'forbidden with closure return false' => [
+      AccessResult::forbidden(),
+      FALSE,
+      FALSE,
+    ];
+    yield 'neutral with closure return true' => [
+      AccessResult::neutral(),
+      TRUE,
+      TRUE,
+    ];
+    yield 'neutral with closure return false' => [
+      AccessResult::neutral(),
+      FALSE,
+      TRUE,
+    ];
+    yield 'allowed with closure return true' => [
+      AccessResult::allowed(),
+      TRUE,
+      FALSE,
+    ];
+    yield 'allowed with closure return false' => [
+      AccessResult::allowed(),
+      FALSE,
+      FALSE,
+    ];
+  }
+
+  /**
+   * @covers ::orForbiddenIf
+   *
+   * @dataProvider orForbiddenIfDataProvider
+   */
+  public function testOrForbiddenIf(AccessResult $access_result, bool $closure_returns, bool $is_closure_call_expected, bool $cache_merge_expected = TRUE): void {
+    self::assertAndOrIfClosureResult($access_result->orForbiddenIf((new AndOrIfClosureTester($closure_returns, $is_closure_call_expected))(...)), $is_closure_call_expected, $cache_merge_expected);
+  }
+
+  /**
+   * @return \Generator{string, array<AccessResult,bool,bool,?bool>}
+   */
+  public static function orForbiddenIfDataProvider(): \Generator {
+    yield 'forbidden with closure return true' => [
+      AccessResult::forbidden(),
+      TRUE,
+      FALSE,
+    ];
+    yield 'forbidden with closure return false' => [
+      AccessResult::forbidden(),
+      FALSE,
+      FALSE,
+    ];
+    yield 'neutral with closure return true' => [
+      AccessResult::neutral(),
+      TRUE,
+      TRUE,
+    ];
+    yield 'neutral with closure return false' => [
+      AccessResult::neutral(),
+      FALSE,
+      TRUE,
+    ];
+    yield 'allowed with closure return true' => [
+      AccessResult::allowed(),
+      TRUE,
+      TRUE,
+    ];
+    yield 'allowed with closure return false' => [
+      AccessResult::allowed(),
+      FALSE,
+      TRUE,
+    ];
+  }
+
+  /**
+   * Asserts on the result of [and,or][Allowed,Forbidden]if calls.
+   *
+   * @param \Drupal\Core\Access\AccessResult $access_result
+   *   The result of the andAllowedIf(), andForbiddenIf(), orAllowedIf() or
+   *   orForbiddenIf() call.
+   * @param bool $is_closure_call_expected
+   *   Whether closure is expected to be called or not.
+   * @param bool $is_cache_merge_expected
+   *   Whether cacheability information merge is expected or not, expected
+   *   by default.
+   */
+  public static function assertAndOrIfClosureResult(AccessResult $access_result, bool $is_closure_call_expected, bool $is_cache_merge_expected = TRUE): void {
+    $expected_cache_contexts = $is_closure_call_expected && $is_cache_merge_expected ? Cache::mergeContexts($access_result->getCacheContexts(), AndOrIfClosureTester::CACHE_CONTEXTS) : $access_result->getCacheContexts();
+    $expected_cache_contexts_message = $expected_cache_contexts === [] ? 'No cache contexts bubbled up from closure.' : 'Expected cache contexts bubbled up from the closure.';
+    $expected_cache_tags = $is_closure_call_expected && $is_cache_merge_expected ? Cache::mergeTags($access_result->getCacheTags(), AndOrIfClosureTester::CACHE_TAGS) : $access_result->getCacheTags();
+    $expected_cache_tags_message = $expected_cache_tags === [] ? 'No cache tags bubbled up from closure.' : 'Expected cache tags bubbled up from the closure.';
+    $expected_max_age = $is_closure_call_expected && $is_cache_merge_expected ? Cache::mergeMaxAges($access_result->getCacheMaxAge(), AndOrIfClosureTester::CACHE_MAX_AGE) : $access_result->getCacheMaxAge();
+
+    self::assertEquals($expected_cache_contexts, $access_result->getCacheContexts(), $expected_cache_contexts_message);
+    self::assertEquals($expected_cache_tags, $access_result->getCacheTags(), $expected_cache_tags_message);
+    self::assertEquals($expected_max_age, $access_result->getCacheMaxAge());
   }
 
   /**
@@ -1036,6 +1243,39 @@ class UncacheableTestAccessResult implements AccessResultInterface {
     }
     else {
       return new static('NEUTRAL');
+    }
+  }
+
+}
+
+class AndOrIfClosureTester {
+
+  public const array CACHE_CONTEXTS = ['user'];
+
+  public const array CACHE_TAGS = ['foo'];
+
+  public const int CACHE_MAX_AGE = 1990;
+
+  private bool $called = FALSE;
+
+  public function __construct(private readonly bool $return, private readonly bool $isCallExpected) {
+  }
+
+  public function __invoke(CacheableMetadata $cacheability): bool {
+    $this->called = TRUE;
+    $cacheability->addCacheContexts(self::CACHE_CONTEXTS);
+    $cacheability->addCacheTags(self::CACHE_TAGS);
+    $cacheability->setCacheMaxAge(self::CACHE_MAX_AGE);
+    return $this->return;
+  }
+
+  public function __destruct() {
+    if ($this->isCallExpected && !$this->called) {
+      throw new ExpectationFailedException(sprintf('Expected %s to be called, but was not.', self::class));
+    }
+
+    if (!$this->isCallExpected && $this->called) {
+      throw new ExpectationFailedException(sprintf('Expected %s not to be called, but it was.', self::class));
     }
   }
 

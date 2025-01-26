@@ -4,6 +4,7 @@ namespace Drupal\Core\Access;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Session\AccountInterface;
@@ -81,6 +82,62 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
   }
 
   /**
+   * Optionally combines this access result with another using OR.
+   *
+   * @param Closure(\Drupal\Core\Cache\CacheableMetadata): bool $closure
+   *   The closure to allow access if it returns TRUE or neutral if FALSE. Will
+   *   only be called if the original access result can be influenced by the
+   *   outcome. Takes a CacheableMetadata argument where the closure can set
+   *   cacheable metadata.
+   *
+   * @return \Drupal\Core\Access\AccessResult
+   *   The original access result if it would be unaffected, or the outcome of
+   *   ::orIf() otherwise.
+   *
+   * @see \Drupal\Core\Access\AccessResult::orIf()
+   */
+  public function orAllowedIf(\Closure $closure) {
+    // The allowedIf method can only return allowed or neutral, neither of which
+    // can change the outcome of a forbidden or allowed result.
+    if ($this->isForbidden() || $this->isAllowed()) {
+      return $this;
+    }
+
+    // Now that we know the other result needs to be taken into account, we call
+    // the closure with cacheability and pass it on to orIf().
+    $cacheability = new CacheableMetadata();
+    return $this->orIf($this::allowedIf($closure($cacheability))->addCacheableDependency($cacheability));
+  }
+
+  /**
+   * Optionally combines this access result with another using AND.
+   *
+   * @param Closure(\Drupal\Core\Cache\CacheableMetadata): bool $closure
+   *   The closure to allow access if it returns TRUE or neutral if FALSE. Will
+   *   only be called if the original access result can be influenced by the
+   *   outcome. Takes a CacheableMetadata argument where the closure can set
+   *   cacheable metadata.
+   *
+   * @return \Drupal\Core\Access\AccessResult
+   *   The original access result if it would be unaffected, or the outcome of
+   *   ::andIf() otherwise.
+   *
+   * @see \Drupal\Core\Access\AccessResult::andIf()
+   */
+  public function andAllowedIf(\Closure $closure) {
+    // The allowedIf method can only return allowed or neutral, neither of which
+    // can change the outcome of a forbidden or neutral result.
+    if ($this->isForbidden() || $this->isNeutral()) {
+      return $this;
+    }
+
+    // Now that we know the other result needs to be taken into account, we call
+    // the closure with cacheability and pass it on to andIf().
+    $cacheability = new CacheableMetadata();
+    return $this->andIf($this::allowedIf($closure($cacheability))->addCacheableDependency($cacheability));
+  }
+
+  /**
    * Creates a forbidden or neutral access result.
    *
    * @param bool $condition
@@ -95,6 +152,62 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    */
   public static function forbiddenIf($condition, $reason = NULL) {
     return $condition ? static::forbidden($reason) : static::neutral();
+  }
+
+  /**
+   * Optionally combines this access result with another using OR.
+   *
+   * @param Closure(\Drupal\Core\Cache\CacheableMetadata): bool $closure
+   *   The closure to forbid access if it returns TRUE or neutral if FALSE. Will
+   *   only be called if the original access result can be influenced by the
+   *   outcome. Takes a CacheableMetadata argument where the closure can set
+   *   cacheable metadata.
+   *
+   * @return \Drupal\Core\Access\AccessResult
+   *   The original access result if it would be unaffected, or the outcome of
+   *   ::orIf() otherwise.
+   *
+   * @see \Drupal\Core\Access\AccessResult::orIf()
+   */
+  public function orForbiddenIf(\Closure $closure) {
+    // The forbiddenIf method can only return forbidden or neutral, neither of
+    // which can change the outcome of a forbidden result.
+    if ($this->isForbidden()) {
+      return $this;
+    }
+
+    // Now that we know the other result needs to be taken into account, we call
+    // the closure with cacheability and pass it on to orIf().
+    $cacheability = new CacheableMetadata();
+    return $this->orIf($this::forbiddenIf($closure($cacheability))->addCacheableDependency($cacheability));
+  }
+
+  /**
+   * Optionally combines this access result with another using AND.
+   *
+   * @param Closure(\Drupal\Core\Cache\CacheableMetadata): bool $closure
+   *   The closure to forbid access if it returns TRUE or neutral if FALSE. Will
+   *   only be called if the original access result can be influenced by the
+   *   outcome. Takes a CacheableMetadata argument where the closure can set
+   *   cacheable metadata.
+   *
+   * @return \Drupal\Core\Access\AccessResult
+   *   The original access result if it would be unaffected, or the outcome of
+   *   ::andIf() otherwise.
+   *
+   * @see \Drupal\Core\Access\AccessResult::andIf()
+   */
+  public function andForbiddenIf(\Closure $closure) {
+    // The forbiddenIf method can only return forbidden or neutral, neither of
+    // which can change the outcome of a forbidden result.
+    if ($this->isForbidden()) {
+      return $this;
+    }
+
+    // Now that we know the other result needs to be taken into account, we call
+    // the closure with cacheability and pass it on to andIf().
+    $cacheability = new CacheableMetadata();
+    return $this->andIf($this::forbiddenIf($closure($cacheability))->addCacheableDependency($cacheability));
   }
 
   /**
