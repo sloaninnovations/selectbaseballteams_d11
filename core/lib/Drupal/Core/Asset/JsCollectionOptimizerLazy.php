@@ -155,24 +155,32 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
   public function optimizeGroup(array $group): string {
     $data = '';
     $current_license = FALSE;
-    foreach ($group['items'] as $js_asset) {
-      // Ensure license information is available as a comment after
-      // optimization.
-      if ($js_asset['license'] !== $current_license) {
-        $data .= "/* @license " . $js_asset['license']['name'] . " " . $js_asset['license']['url'] . " */\n";
-      }
-      $current_license = $js_asset['license'];
-      // Optimize this JS file, but only if it's not yet minified.
-      if (isset($js_asset['minified']) && $js_asset['minified']) {
-        $data .= file_get_contents($js_asset['data']);
-      }
-      else {
-        $data .= $this->optimizer->optimize($js_asset);
-      }
-      // Append a ';' and a newline after each JS file to prevent them from
-      // running together.
-      $data .= ";\n";
+
+    // No preprocessing, single JS asset: just use the existing URI.
+    if ($group['type'] === 'file' && !$group['preprocess']) {
+      $data = file_get_contents($group['items'][0]['data']);
     }
+    else {
+      foreach ($group['items'] as $js_asset) {
+        // Ensure license information is available as a comment after
+        // optimization.
+        if ($js_asset['license'] !== $current_license) {
+          $data .= "/* @license " . $js_asset['license']['name'] . " " . $js_asset['license']['url'] . " */\n";
+        }
+        $current_license = $js_asset['license'];
+        // Optimize this JS file, but only if it's not yet minified.
+        if (isset($js_asset['minified']) && $js_asset['minified']) {
+          $data .= file_get_contents($js_asset['data']);
+        }
+        else {
+          $data .= $this->optimizer->optimize($js_asset);
+        }
+        // Append a ';' and a newline after each JS file to prevent them from
+        // running together.
+        $data .= ";\n";
+      }
+    }
+
     // Remove unwanted JS code that causes issues.
     return $this->optimizer->clean($data);
   }
