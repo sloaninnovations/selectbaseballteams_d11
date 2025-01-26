@@ -1,0 +1,95 @@
+# cspell:ignore cobertura testdox
+
+stages:
+  - 🗜️ Test
+
+#############
+# Templates #
+#############
+
+default:
+  interruptible: true
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - api_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+      - scheduler_failure
+
+.default-job-settings: &default-job-settings
+  stage: 🗜️ Test
+  parallel:
+    matrix:
+      - PHP_TARGET_IMAGE:
+        - "8.3"
+        - "8.4"
+  image:
+    name: $_CONFIG_DOCKERHUB_ROOT/php-$PHP_TARGET_IMAGE-ubuntu-apache:production
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "parent_pipeline" && $PERFORMANCE_TEST != "1"
+
+.with-composer: &with-composer
+  needs:
+    - pipeline: $PARENT_PIPELINE_ID
+      job: '🧹 PHP Coding standards (PHPCS)'
+
+variables:
+  FF_NETWORK_PER_BUILD: 1
+
+################
+# Jobs
+#
+# Jobs define what scripts are actually executed in each stage.
+#
+# The 'rules' keyword can also be used to define conditions for each job.
+#
+# Documentation: https://docs.gitlab.com/ee/ci/jobs/
+################
+
+'⚡️ PHPUnit Unit':
+  <<: [ *with-composer, *default-job-settings ]
+  variables:
+    TESTSUITE: PHPUnit-Unit
+    KUBERNETES_CPU_REQUEST: "2"
+    CONCURRENCY: 6
+  before_script:
+    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
+    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
+  script:
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --verbose --non-html --all
+  after_script:
+    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
+  artifacts:
+    when: always
+    expire_in: 6 mos
+    reports:
+      junit: ./sites/default/files/simpletest/phpunit-*.xml
+    paths:
+      - ./sites/default/files/simpletest/phpunit-*.xml
+
+'✅️ PHPStan Tests':
+  <<: [ *default-job-settings ]
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
+  # Run if PHPStan files have changed, or manually.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "parent_pipeline" && $PERFORMANCE_TEST != "1"
+      changes:
+        - core/tests/PHPStan/**/*
+        - composer/Metapackage/PinnedDevDependencies/composer.json
+    - when: manual
+      allow_failure: true
+  script:
+    - docker-php-ext-enable pcov
+    - cd core/tests/PHPStan
+    - composer install
+    - vendor/bin/phpunit tests --testdox --coverage-text --colors=always --coverage-cobertura=coverage.cobertura.xml --log-junit junit.xml
+  artifacts:
+    when: always
+    reports:
+      junit: core/tests/PHPStan/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: core/tests/PHPStan/coverage.cobertura.xml
