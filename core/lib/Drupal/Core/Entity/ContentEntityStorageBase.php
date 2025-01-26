@@ -482,8 +482,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
 
     if (!isset($this->latestRevisionIds[$entity_id][LanguageInterface::LANGCODE_DEFAULT])) {
       $result = $this->getQuery()
-        ->latestRevision()
+        ->allRevisions()
         ->condition($this->entityType->getKey('id'), $entity_id)
+        ->range(0, 1)
+        ->sort($this->entityType->getKey('revision'), 'DESC')
         ->accessCheck(FALSE)
         ->execute();
 
