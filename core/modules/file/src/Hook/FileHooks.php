@@ -7,6 +7,7 @@ use Drupal\file\Entity\File;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\user\UserInterface;
 
 /**
  * Hook implementations for file.
@@ -181,6 +182,21 @@ class FileHooks {
       '#default_value' => $config->get('filename_sanitization.lowercase'),
     ];
     $form['#submit'][] = 'file_system_settings_submit';
+  }
+
+  /**
+   * Implements hook_user_cancel().
+   */
+  #[Hook('user_cancel')]
+  public function userCancel(array $edit, UserInterface $account, string $method): void {
+    // Update files for cancelled user to belong to anonymous.
+    if ($method !== 'user_cancel_reassign') {
+      return;
+    }
+    \Drupal::database()->update('file_managed')
+      ->fields(['uid' => 0])
+      ->condition('uid', $account->id())
+      ->execute();
   }
 
 }
