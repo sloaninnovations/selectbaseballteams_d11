@@ -61,15 +61,38 @@ class RenderTest extends KernelTestBase {
   }
 
   /**
-   * Tests that we get an exception when we try to attach an illegal type.
+   * Tests that additional keys in #attached are allowed without exceptions.
    */
-  public function testProcessAttached(): void {
-    // Specify invalid attachments in a render array.
-    $build['#attached']['library'][] = 'core/drupal.states';
-    $build['#attached']['drupal_process_states'][] = [];
-    $renderer = $this->container->get('bare_html_page_renderer');
-    $this->expectException(\LogicException::class);
-    $renderer->renderBarePage($build, '', 'maintenance_page');
+  public function testAllowValidAttachedKeys(): void {
+    // Create a render array with arbitrary keys in #attached.
+    $build = [
+      '#markup' => 'Test content',
+      '#attached' => [
+        'library' => [
+          'core/drupal.states',
+        ],
+        'drupalSettings' => [
+          'myModule' => [
+            'setting' => 'value',
+          ],
+        ],
+        'csp' => [
+          'img-src' => [
+            'cdn.example.com',
+          ],
+        ],
+      ],
+    ];
+
+    // Render the page and assert that no exceptions are thrown.
+    try {
+      $renderer = $this->container->get('bare_html_page_renderer');
+      $renderer->renderBarePage($build, '', 'maintenance_page');
+      $this->assertTrue(TRUE, 'Rendered successfully with valid #attached keys.');
+    }
+    catch (\LogicException $e) {
+      $this->fail("An exception was thrown when rendering with valid #attached keys: " . $e->getMessage());
+    }
   }
 
   /**

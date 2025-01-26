@@ -29,10 +29,6 @@ namespace Drupal\Core\Render;
  * - library: (optional) Asset libraries.
  * - placeholders: (optional) Any placeholders.
  *
- * @todo If in Drupal 9, we remove attachments other than assets (libraries +
- *   drupalSettings), then we can look into unifying this with
- *   \Drupal\Core\Asset\AttachedAssetsInterface.
- *
  * @see \Drupal\Core\Render\AttachmentsTrait
  */
 interface AttachmentsInterface {
