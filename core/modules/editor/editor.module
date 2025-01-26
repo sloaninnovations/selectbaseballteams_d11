@@ -306,6 +306,32 @@ function _editor_get_formatted_text_fields(FieldableEntityInterface $entity) {
 }
 
 /**
+ * Get the entity reference revisions fields on an entity.
+ *
+ * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+ *   An entity whose fields to analyze.
+ *
+ * @return array
+ *   The names of the fields on this entity that entity reference revisions.
+ */
+function _editor_get_entity_reference_revisions(FieldableEntityInterface $entity, &$result = []) {
+  $field_definitions = $entity->getFieldDefinitions();
+  if (empty($field_definitions)) {
+    return $result;
+  }
+  foreach ($field_definitions as $field => $field_definition) {
+    if ($field_definition->getType() == 'entity_reference_revisions') {
+      $entity_reference_revisions = $entity->get($field)->entity;
+      $result[] = $entity_reference_revisions;
+      if ($entity_reference_revisions instanceof FieldableEntityInterface) {
+        _editor_get_entity_reference_revisions($entity_reference_revisions, $result);
+      }
+    }
+  }
+  return $result;
+}
+
+/**
  * Parse an HTML snippet for any linked file with data-entity-uuid attributes.
  *
  * @param string $text
