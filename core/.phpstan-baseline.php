@@ -31688,6 +31688,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Upsert.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\pgsql\\\\EntityQuery\\\\Condition\\:\\:translateCondition\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/pgsql/src/EntityQuery/Condition.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\pgsql\\\\Hook\\\\PgsqlHooks\\:\\:help\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
