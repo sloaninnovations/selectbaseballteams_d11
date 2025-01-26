@@ -1452,6 +1452,77 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   }
 
   /**
+   * Data provider for testSafeUnserialize.
+   *
+   * @return array
+   *   Array of test cases with input value and expected output.
+   */
+  public static function safeUnserializeDataProvider(): array {
+    $object = new \stdClass();
+    $object->property = 'value';
+
+    return [
+      'valid array' => [
+        'input' => serialize(['key' => 'value']),
+        'expected' => ['key' => 'value'],
+      ],
+      'empty string' => [
+        'input' => '',
+        'expected' => NULL,
+      ],
+      'null value' => [
+        'input' => NULL,
+        'expected' => NULL,
+      ],
+      'invalid serialized data' => [
+        'input' => 'invalid serialized data',
+        'expected' => NULL,
+      ],
+      'serialized false' => [
+        'input' => serialize(FALSE),
+        'expected' => FALSE,
+      ],
+      'serialized true' => [
+        'input' => serialize(TRUE),
+        'expected' => TRUE,
+      ],
+      'serialized integer' => [
+        'input' => serialize(123),
+        'expected' => 123,
+      ],
+      'serialized string' => [
+        'input' => serialize('test string'),
+        'expected' => 'test string',
+      ],
+      'serialized array' => [
+        'input' => serialize([1, 2, 3]),
+        'expected' => [1, 2, 3],
+      ],
+      'serialized object' => [
+        'input' => serialize($object),
+        'expected' => $object,
+      ],
+      'false value' => [
+        'input' => FALSE,
+        'expected' => FALSE,
+      ],
+    ];
+  }
+
+  /**
+   * Tests the safeUnserialize method with multiple cases.
+   *
+   * @dataProvider safeUnserializeDataProvider
+   */
+  public function testSafeUnserialize(mixed $input, mixed $expected): void {
+    $this->assertEquals(
+      $expected,
+      SqlContentEntityStorage::safeUnserialize($input),
+      "Testing input: $input"
+    );
+  }
+
+  /**
    * Sets up the module handler with no implementations.
    */
   protected function setUpModuleHandlerNoImplementations(): void {
