@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * Test module for language switcher tests issue #3362713.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_language_switch_links_alter().
+ */
+function language_switcher_test_language_switch_links_alter(&$links, string $type, Url $url): void {
+  // Return NULL to hide block at all.
+  $links = NULL;
+}
