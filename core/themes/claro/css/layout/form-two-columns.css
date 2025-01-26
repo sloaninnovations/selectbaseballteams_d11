@@ -43,3 +43,7 @@
     margin-block-start: var(--space-l);
   }
 }
+.layout-region--main,
+.layout-region--footer {
+  width: 100%;
+}

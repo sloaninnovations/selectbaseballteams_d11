@@ -453,9 +453,63 @@
           });
 
           const isOffCanvas = element.closest('#drupal-off-canvas');
+          const isInsideTabledrag = element.closest('table.draggable-table');
 
           if (isOffCanvas) {
             offCanvasCss(element);
+          }
+          if (isInsideTabledrag) {
+            // CKEditor 5 has difficulty determining if the toolbar is too wide
+            // for its container when that container is in a table - the table
+            // will readjust its width to accommodate the too-wide editor.
+            // To work around this, we temporarily hide the cell with the editor,
+            // get the widths of the sibling cells, then set the editor cell
+            // max-width to the row width minus the sibling widths. By setting
+            // this max-width, CKEditor 5 has the constraints necessary to see if
+            // it must collapse excess toolbar items.
+            // @see https://github.com/ckeditor/ckeditor5/issues/11334.
+            const editorFitInTable = () => {
+              const parentCell = element.closest('td');
+              const parentRow = element.closest('tr');
+              const parentTable = element.closest('table');
+              let maxWidth = parentTable.dataset.containerMaxWidth;
+
+              const isFirstRow = parentRow.rowIndex === 1;
+
+              const setContainerMaxWidth = (width, element) => {
+                if (width === 0) {
+                  element.style['max-width'] = `100%`;
+                } else {
+                  element.style['max-width'] = `${width}px`;
+                }
+              };
+
+              if (maxWidth && !isFirstRow) {
+                setContainerMaxWidth(maxWidth, parentCell);
+                return;
+              }
+
+              parentCell.dataset.drupalCkeditor5Cell = '';
+              isInsideTabledrag.dataset.drupalCalibrateWidth = '';
+
+              const widths = Array.from(
+                parentRow.cells,
+                (cell) => cell.getBoundingClientRect().width,
+              ).reduce((width, cellWidth) => width + cellWidth);
+
+              maxWidth = Math.trunc(
+                parentRow.getBoundingClientRect().width - widths,
+              );
+
+              parentTable.dataset.containerMaxWidth = maxWidth;
+
+              setContainerMaxWidth(maxWidth, parentCell);
+
+              delete isInsideTabledrag.dataset.drupalCalibrateWidth;
+              delete parentCell.dataset.drupalCkeditor5Cell;
+            };
+            editorFitInTable();
+            window.addEventListener('resize', debounce(editorFitInTable, 100));
           }
         })
         .catch((error) => {
