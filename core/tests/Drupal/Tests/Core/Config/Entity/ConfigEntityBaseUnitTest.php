@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Config\Entity;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Config\Entity\Exception\ConfigEntityDependencyException;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -19,6 +20,7 @@ use Drupal\Tests\Core\Plugin\Fixtures\TestConfigurablePlugin;
 use Drupal\Tests\UnitTestCase;
 use Drupal\TestTools\Random;
 use Prophecy\Argument;
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 
 /**
  * @coversDefaultClass \Drupal\Core\Config\Entity\ConfigEntityBase
@@ -711,6 +713,57 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       'Not syncing' => [FALSE, 'new_value'],
       'Syncing' => [TRUE, 'original_value'],
     ];
+  }
+
+  /**
+   * @covers ::addConfigEntityDependency
+   */
+  public function testAddConfigEntityDependency() {
+    $values = [
+      'id' => 'foo',
+      'langcode' => 'en',
+      'uuid' => 'c5b9ee60-bea5-4622-b89b-a63319d10b3d',
+    ];
+    $foo = $this->getMockForAbstractClass('\Drupal\Core\Config\Entity\ConfigEntityBase', [$values, $this->entityTypeId]);
+
+    $storage = $this->createMock(ConfigEntityStorageInterface::class);
+    $storage->expects($this->any())
+      ->method('load')
+      ->with('foo')
+      ->willReturn($foo);
+    $this->entityTypeManager->expects($this->any())
+      ->method('getStorage')
+      ->with($this->entityTypeId)
+      ->willReturn($storage);
+
+    $class = new \ReflectionClass($this->entity);
+    $method = $class->getMethod('addConfigEntityDependency');
+    $method->setAccessible(TRUE);
+    $method->invokeArgs($this->entity, [$this->entityTypeId, 'foo']);
+    $this->assertEquals(['config' => ['test_provider.' . $this->entityTypeId . '.foo']], $this->entity->getDependencies());
+  }
+
+  /**
+   * @covers ::addConfigEntityDependency
+   */
+  public function testAddConfigEntityDependencyException() {
+    $storage = $this->createMock(ConfigEntityStorageInterface::class);
+    // Behave as if the dependency does not exist.
+    $storage->expects($this->any())
+      ->method('load')
+      ->with('bar')
+      ->willReturn(NULL);
+    $this->entityTypeManager->expects($this->any())
+      ->method('getStorage')
+      ->with($this->entityTypeId)
+      ->willReturn($storage);
+    $this->expectException(ConfigEntityDependencyException::class);
+    $this->expectExceptionMessage("Cannot add the config entity dependency with ID 'bar' of type '{$this->entityTypeId}' to test_provider.{$this->entityTypeId}.{$this->id} as it does not exist");
+
+    $class = new \ReflectionClass($this->entity);
+    $method = $class->getMethod('addConfigEntityDependency');
+    $method->setAccessible(TRUE);
+    $method->invokeArgs($this->entity, [$this->entityTypeId, 'bar']);
   }
 
 }

@@ -5,6 +5,7 @@ namespace Drupal\Core\Config\Entity;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
+use Drupal\Core\Config\Entity\Exception\ConfigEntityDependencyException;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Core\Entity\EntityBase;
 use Drupal\Core\Config\ConfigDuplicateUUIDException;
@@ -618,6 +619,34 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     $return = parent::save();
     $this->trustedData = FALSE;
     return $return;
+  }
+
+  /**
+   * Helper function to add config entity dependencies.
+   *
+   * Using this method ensures that the error message contains helpful
+   * information to debug problems when an entity does not exist.
+   *
+   * @param string $entity_type_id
+   *   The entity type ID.
+   * @param string $id
+   *   The entity ID to add as a dependency.
+   *
+   * @return $this
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   *   Thrown if the entity type is invalid.
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   *   Thrown if the entity type is invalid.
+   * @throws \Drupal\Core\Config\Entity\Exception\ConfigEntityDependencyException
+   *   Thrown if the entity does not exist.
+   */
+  protected function addConfigEntityDependency($entity_type_id, $id) {
+    $entity = $this->entityTypeManager()->getStorage($entity_type_id)->load($id);
+    if (!$entity) {
+      throw new ConfigEntityDependencyException("Cannot add the config entity dependency with ID '{$id}' of type '{$entity_type_id}' to {$this->getConfigDependencyName()} as it does not exist");
+    }
+    return $this->addDependency('config', $entity->getConfigDependencyName());
   }
 
 }
