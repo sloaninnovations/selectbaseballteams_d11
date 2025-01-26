@@ -35,6 +35,7 @@ function options_allowed_values(FieldStorageDefinitionInterface $definition, ?Fi
   $cache_keys = [$definition->getTargetEntityTypeId(), $definition->getName()];
   if ($entity) {
     $cache_keys[] = 'entity';
+    $cache_keys[] = $entity->bundle();
   }
   $cache_id = implode(':', $cache_keys);
 
