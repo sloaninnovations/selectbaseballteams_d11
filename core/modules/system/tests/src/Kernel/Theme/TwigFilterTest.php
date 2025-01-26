@@ -6,6 +6,8 @@ namespace Drupal\Tests\system\Kernel\Theme;
 
 use Drupal\KernelTests\KernelTestBase;
 
+// cspell:ignore endapply
+
 /**
  * Tests Drupal's Twig filters.
  *
@@ -134,6 +136,30 @@ class TwigFilterTest extends KernelTestBase {
     foreach ($elements as $element) {
       $this->assertRaw($element['expected'], $element['message']);
     }
+  }
+
+  /**
+   * Tests Twig "spaceless" filter.
+   *
+   * The "spaceless" filter was deprecated in Twig 3.12. This is a test for the
+   * replacement spaceless filter provided by Drupal's Twig environment for
+   * backwards compatibility.
+   */
+  public function testSpacelessFilter(): void {
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = $this->container->get('renderer');
+
+    $element = [
+      '#type' => 'inline_template',
+      '#template' => <<<'EOT'
+{% apply spaceless %}
+<div>
+  <span>Use the spaceless filter to remove whitespace between HTML tags, not whitespace within HTML tags or whitespace in plain text.</span>
+</div>
+{% endapply %}
+EOT,
+    ];
+    $this->assertSame('<div><span>Use the spaceless filter to remove whitespace between HTML tags, not whitespace within HTML tags or whitespace in plain text.</span></div>', (string) $renderer->renderRoot($element));
   }
 
 }
