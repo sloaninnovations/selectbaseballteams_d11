@@ -279,7 +279,7 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function getLastAccessedTime() {
-    return $this->get('access')->value;
+    return $this->getFieldValue('access', 'value');
   }
 
   /**
@@ -309,7 +309,7 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function isActive() {
-    return $this->get('status')->value == 1;
+    return $this->getFieldValue('status', 'value') == 1;
   }
 
   /**
@@ -342,7 +342,7 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function getTimeZone() {
-    return $this->get('timezone')->value;
+    return $this->getFieldValue('timezone', 'value');
   }
 
   /**
@@ -398,7 +398,7 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function getAccountName() {
-    return $this->get('name')->value ?: '';
+    return $this->getFieldValue('name', 'value') ?: '';
   }
 
   /**
