@@ -17,7 +17,7 @@ class JqueryKeyeventPolyfillTestHooks {
   #[Hook('library_info_alter')]
   public function libraryInfoAlter(&$libraries, $module): void {
     if ($module == 'core' && isset($libraries['jquery'])) {
-      $libraries['jquery']['dependencies'][] = 'jquery_keyevent_polyfill_test/jquery.keyevent.polyfill';
+      $libraries['jquery']['js']['modules/system/tests/modules/jquery_keyevent_polyfill_test/js/jquery.keyevent.polyfill.js'] = [];
     }
   }
 

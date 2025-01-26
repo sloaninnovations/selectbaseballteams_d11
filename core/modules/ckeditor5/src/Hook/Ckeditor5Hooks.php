@@ -305,16 +305,7 @@ class Ckeditor5Hooks {
     // This file means CKEditor 5 translations are in use on the page.
     // @see locale_js_alter()
     $placeholder_file = 'core/assets/vendor/ckeditor5/translation.js';
-    // This file is used to get a weight that will make it possible to aggregate
-    // all translation files in a single aggregate.
-    $ckeditor_dll_file = 'core/assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js';
     if (isset($javascript[$placeholder_file])) {
-      // Use the placeholder file weight to set all the translations files weights
-      // so they can be aggregated together as expected.
-      $default_weight = $javascript[$placeholder_file]['weight'];
-      if (isset($javascript[$ckeditor_dll_file])) {
-        $default_weight = $javascript[$ckeditor_dll_file]['weight'];
-      }
       // The placeholder file is not a real file, remove it from the list.
       unset($javascript[$placeholder_file]);
       // When the locale module isn't installed there are no translations.
@@ -324,22 +315,11 @@ class Ckeditor5Hooks {
       $ckeditor5_language = _ckeditor5_get_langcode_mapping($language->getId());
       // Remove all CKEditor 5 translations files that are not in the current
       // language.
-      foreach ($javascript as $index => &$item) {
-        // This is not a CKEditor 5 translation file, skip it.
-        if (empty($item['ckeditor5_langcode'])) {
-          continue;
-        }
-        // This file is the correct translation for this page.
-        if ($item['ckeditor5_langcode'] === $ckeditor5_language) {
-          // Set the weight for the translation file to be able to have the
-          // translation files aggregated.
-          $item['weight'] = $default_weight;
-        }
-        else {
-          // Remove files that don't match the language requested.
-          unset($javascript[$index]);
-        }
-      }
+      $javascript = array_filter($javascript, function ($item) use ($ckeditor5_language) {
+        // Skip not a CKEditor 5 translation files. Remove files that don't match
+        // the language requested.
+        return empty($item['ckeditor5_langcode']) || $item['ckeditor5_langcode'] === $ckeditor5_language;
+      });
     }
   }
 
