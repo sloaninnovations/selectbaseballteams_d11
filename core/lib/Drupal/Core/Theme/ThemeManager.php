@@ -293,6 +293,12 @@ class ThemeManager implements ThemeManagerInterface {
       }
     }
 
+    // If the active theme changes during a page request,
+    // reset the directory variable so template_preprocess() runs again.
+    if (isset($variables['directory']) && $variables['directory'] !== $active_theme->getPath()) {
+      unset($variables['directory']);
+    }
+
     // In some cases, a template implementation may not have had
     // template_preprocess() run (for example, if the default implementation
     // is a function, but a template overrides that default implementation).
