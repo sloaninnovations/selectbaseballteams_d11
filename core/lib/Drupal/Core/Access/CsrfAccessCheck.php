@@ -24,12 +24,14 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CsrfAccessCheck implements RoutingAccessInterface {
 
+  use RoutePathGenerationTrait;
+
   /**
    * The CSRF token generator.
    *
    * @var \Drupal\Core\Access\CsrfTokenGenerator
    */
-  protected $csrfToken;
+  protected CsrfTokenGenerator $csrfToken;
 
   /**
    * Constructs a CsrfAccessCheck object.
@@ -55,18 +57,20 @@ class CsrfAccessCheck implements RoutingAccessInterface {
    *   The access result.
    */
   public function access(Route $route, Request $request, RouteMatchInterface $route_match) {
-    $parameters = $route_match->getRawParameters();
-    $path = ltrim($route->getPath(), '/');
-    // Replace the path parameters with values from the parameters array.
-    foreach ($parameters as $param => $value) {
-      $path = str_replace("{{$param}}", $value, $path);
-    }
-
+    $path = $this->generateRoutePath($route, $route_match->getRawParameters()->all());
     if ($this->csrfToken->validate($request->query->get('token', ''), $path)) {
       $result = AccessResult::allowed();
     }
     else {
-      $result = AccessResult::forbidden($request->query->has('token') ? "'csrf_token' URL query argument is invalid." : "'csrf_token' URL query argument is missing.");
+      // Allow access also for "legacy" CSRF tokens (those that were created from
+      // a partially wrong built route path and were valid before the bugfix).
+      $path = $this->generateLegacyRoutePath($route, $route_match->getRawParameters()->all());
+      if ($this->csrfToken->validate($request->query->get('token', ''), $path)) {
+        $result = AccessResult::allowed();
+      }
+      else {
+        $result = AccessResult::forbidden($request->query->has('token') ? "'csrf_token' URL query argument is invalid." : "'csrf_token' URL query argument is missing.");
+      }
     }
     // Not cacheable because the CSRF token is highly dynamic.
     return $result->setCacheMaxAge(0);
