@@ -65,4 +65,14 @@ class AjaxResponse extends JsonResponse implements AttachmentsInterface {
     return $this->commands;
   }
 
+  /**
+   * Merge ajax commands.
+   *
+   * @param array $commands
+   *   Merge ajax command(s) with the current one(s) in this class.
+   */
+  public function mergeCommands(array $commands): void {
+    $this->commands = array_merge($this->commands, $commands);
+  }
+
 }

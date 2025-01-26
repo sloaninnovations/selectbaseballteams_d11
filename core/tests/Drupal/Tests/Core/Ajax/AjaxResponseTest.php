@@ -38,6 +38,7 @@ class AjaxResponseTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Ajax\AjaxResponse::addCommand()
    * @see \Drupal\Core\Ajax\AjaxResponse::getCommands()
+   * @see \Drupal\Core\Ajax\AjaxResponse::mergeCommands()
    */
   public function testCommands(): void {
     $command_one = $this->createMock('Drupal\Core\Ajax\CommandInterface');
@@ -62,6 +63,22 @@ class AjaxResponseTest extends UnitTestCase {
     $this->assertSame(['command' => 'one'], $commands[1]);
     $this->assertSame(['command' => 'two'], $commands[2]);
     $this->assertSame(['command' => 'three'], $commands[0]);
+
+    // Merge new commands.
+    $command_four = $this->createMock('Drupal\Core\Ajax\CommandInterface');
+    $command_four->expects($this->once())
+      ->method('render')
+      ->willReturn(['command' => 'four']);
+
+    $this->ajaxResponse->mergeCommands([$command_four->render()]);
+
+    // Check that the commands are merged correctly.
+    $commands =& $this->ajaxResponse->getCommands();
+    $this->assertCount(4, $commands);
+    $this->assertSame(['command' => 'one'], $commands[1]);
+    $this->assertSame(['command' => 'two'], $commands[2]);
+    $this->assertSame(['command' => 'three'], $commands[0]);
+    $this->assertSame(['command' => 'four'], $commands[3]);
 
     // Remove one and change one element from commands and ensure the reference
     // worked as expected.
