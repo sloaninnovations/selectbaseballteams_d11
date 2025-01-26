@@ -377,7 +377,7 @@ abstract class FileTransfer {
    * Checks if a particular path is a directory.
    *
    * @param string $path
-   *   The path to check
+   *   The path to check.
    *
    * @return bool
    *   TRUE if the specified path is a directory, FALSE otherwise.
