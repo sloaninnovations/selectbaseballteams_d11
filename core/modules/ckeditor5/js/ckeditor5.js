@@ -352,26 +352,30 @@
      *   The element to attach the editor to.
      * @param {string} format
      *   The text format for the editor.
+     *
+     * @return {Promise<unknown>}
+     *   A promise that resolves when the editor has been attached.
      */
     attach(element, format) {
-      const { editorClassic } = CKEditor5;
-      const { toolbar, plugins, config, language } = format.editorSettings;
-      const extraPlugins = selectPlugins(plugins);
-      const pluginConfig = processConfig(config);
-      const editorConfig = {
-        extraPlugins,
-        toolbar,
-        ...pluginConfig,
-        // Language settings have a conflict between the editor localization
-        // settings and the "language" plugin.
-        language: { ...pluginConfig.language, ...language },
-      };
-      // Set the id immediately so that it is available when onChange is called.
-      const id = setElementId(element);
-      const { ClassicEditor } = editorClassic;
+      return new Promise((resolveEA, rejectEA) => {
+        const { editorClassic } = CKEditor5;
+        const { toolbar, plugins, config, language } = format.editorSettings;
+        const extraPlugins = selectPlugins(plugins);
+        const pluginConfig = processConfig(config);
+        const editorConfig = {
+          extraPlugins,
+          toolbar,
+          ...pluginConfig,
+          // Language settings have a conflict between the editor localization
+          // settings and the "language" plugin.
+          language: { ...pluginConfig.language, ...language },
+        };
+        // Set the id immediately so that it is available when onChange is called.
+        const id = setElementId(element);
+        const { ClassicEditor } = editorClassic;
 
-      ClassicEditor.create(element, editorConfig)
-        .then((editor) => {
+        ClassicEditor.create(element, editorConfig).then((editor) => {
+
           /**
            * Injects a temporary <p> into CKEditor and then calculates the entire
            * height of the amount of the <p> tags from the passed in rows value.
@@ -457,6 +461,8 @@
           if (isOffCanvas) {
             offCanvasCss(element);
           }
+
+          resolveEA(editor);
         })
         .catch((error) => {
           // eslint-disable-next-line no-console
@@ -465,7 +471,9 @@
           );
           // eslint-disable-next-line no-console
           console.error(error);
+          rejectEA(error);
         });
+      });
     },
 
     /**
