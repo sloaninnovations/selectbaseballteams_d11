@@ -168,6 +168,7 @@ endmacro
 endset
 endtrans
 enoki
+entityreference
 entityviewedit
 errmode
 eslintcache
