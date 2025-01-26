@@ -345,6 +345,7 @@ class NavigationMenuBlockTest extends KernelTestBase {
       "//li[contains(@class,'toolbar-block__list-item')]/button/span[text()='title 8']",
       "//li[contains(@class,'toolbar-menu__item--level-2')]/span[text()='title 10']",
       "//li[contains(@class,'toolbar-menu__item--level-1')]/button/span[text()='title 11']",
+      "//li[contains(@class,'toolbar-menu__item--level-2')]/a[@href='/example11' and text()='Overview']",
       "//li[contains(@class,'toolbar-menu__item--level-2')]/button[text()='title 12']",
     ];
     foreach ($items_query as $query) {
