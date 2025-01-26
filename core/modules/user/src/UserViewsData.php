@@ -80,7 +80,7 @@ class UserViewsData extends EntityViewsData {
     $data['users_field_data']['name']['filter']['help'] = $this->t('The user or author name. This filter does not check if the user exists and allows partial matching. Does not use autocomplete.');
 
     // Note that this field implements field level access control.
-    $data['users_field_data']['mail']['help'] = $this->t('Email address for a given user. This field is normally not shown to users, so be cautious when using it.');
+    $data['users_field_data']['mail']['help'] = $this->t('Caution! Security Implications. Not normally used.');
 
     $data['users_field_data']['langcode']['help'] = $this->t('Language of the translation of user information');
 
@@ -213,7 +213,7 @@ class UserViewsData extends EntityViewsData {
 
     $data['users']['user_bulk_form'] = [
       'title' => $this->t('Bulk update'),
-      'help' => $this->t('Add a form element that lets you run operations on multiple users.'),
+      'help' => $this->t('Run operations on multiple users.'),
       'field' => [
         'id' => 'user_bulk_form',
       ],

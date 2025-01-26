@@ -19,7 +19,7 @@ class CommentViewsHooks {
     // history table.
     $data['node']['new_comments'] = [
       'title' => t('New comments'),
-      'help' => t('The number of new comments on the node.'),
+      'help' => t('Number of new comments.'),
       'field' => [
         'id' => 'node_new_comments',
         'no group by' => TRUE,

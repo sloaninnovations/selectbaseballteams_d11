@@ -267,7 +267,7 @@ class CommentViewsData extends EntityViewsData {
 
     $data['comment_entity_statistics']['last_comment_timestamp'] = [
       'title' => $this->t('Last comment time'),
-      'help' => $this->t('Date and time of when the last comment was posted.'),
+      'help' => $this->t('Date and time when the last comment was posted.'),
       'field' => [
         'id' => 'comment_last_timestamp',
       ],
@@ -281,7 +281,7 @@ class CommentViewsData extends EntityViewsData {
 
     $data['comment_entity_statistics']['last_comment_name'] = [
       'title' => $this->t("Last comment author"),
-      'help' => $this->t('The name of the author of the last posted comment.'),
+      'help' => $this->t('Name of the author of the last comment.'),
       'field' => [
         'id' => 'comment_ces_last_comment_name',
         'no group by' => TRUE,
@@ -294,7 +294,7 @@ class CommentViewsData extends EntityViewsData {
 
     $data['comment_entity_statistics']['comment_count'] = [
       'title' => $this->t('Comment count'),
-      'help' => $this->t('The number of comments an entity has.'),
+      'help' => $this->t('Number of comments.'),
       'field' => [
         'id' => 'numeric',
       ],
@@ -311,7 +311,7 @@ class CommentViewsData extends EntityViewsData {
 
     $data['comment_entity_statistics']['last_updated'] = [
       'title' => $this->t('Updated/commented date'),
-      'help' => $this->t('The most recent of last comment posted or entity updated time.'),
+      'help' => $this->t('Most recent comment.'),
       'field' => [
         'id' => 'comment_ces_last_updated',
         'no group by' => TRUE,
@@ -341,7 +341,7 @@ class CommentViewsData extends EntityViewsData {
 
     $data['comment_entity_statistics']['last_comment_uid'] = [
       'title' => $this->t('Last comment uid'),
-      'help' => $this->t('The User ID of the author of the last comment of an entity.'),
+      'help' => $this->t('The User ID of the author of the last comment.'),
       'relationship' => [
         'title' => $this->t('Last comment author'),
         'base' => 'users',

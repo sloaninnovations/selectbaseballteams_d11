@@ -57,7 +57,7 @@ class NodeViewsData extends EntityViewsData {
 
     $data['node']['node_bulk_form'] = [
       'title' => $this->t('Node operations bulk form'),
-      'help' => $this->t('Add a form element that lets you run operations on multiple nodes.'),
+      'help' => $this->t('Run operations on multiple nodes.'),
       'field' => [
         'id' => 'node_bulk_form',
       ],
@@ -317,7 +317,7 @@ class NodeViewsData extends EntityViewsData {
 
         $data['node_search_index']['score'] = [
           'title' => $this->t('Score'),
-          'help' => $this->t('The score of the search item. This will not be used if the search filter is not also present.'),
+          'help' => $this->t('The score of the search item if the search filter is present.'),
           'field' => [
             'id' => 'search_score',
             'float' => TRUE,

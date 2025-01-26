@@ -25,7 +25,7 @@ class TaxonomyViewsHooks {
       ],
       'field' => [
         'title' => t('All taxonomy terms'),
-        'help' => t('Display all taxonomy terms associated with a node from specified vocabularies.'),
+        'help' => t('Terms from a specified vocabulary.'),
         'id' => 'taxonomy_index_tid',
         'no group by' => TRUE,
         'click sortable' => FALSE,
