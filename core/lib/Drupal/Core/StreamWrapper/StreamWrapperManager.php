@@ -162,6 +162,8 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
       'type' => $class::getType(),
       'service_id' => $service_id,
     ];
+
+    $this->registerWrapper($scheme, $class, $class::getType());
   }
 
   /**
