@@ -1280,7 +1280,7 @@ abstract class Connection {
    * Extracts the SQLSTATE error from a PDOException.
    *
    * @param \Exception $e
-   *   The exception
+   *   The exception.
    *
    * @return string
    *   The five character error code.

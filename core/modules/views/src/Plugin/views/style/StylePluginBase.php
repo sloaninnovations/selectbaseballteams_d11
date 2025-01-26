@@ -650,7 +650,7 @@ abstract class StylePluginBase extends PluginBase {
    * Renders all of the fields for a given style and store them on the object.
    *
    * @param array $result
-   *   The result array from $view->result
+   *   The result array from $view->result.
    */
   protected function renderFields(array $result) {
     if (!$this->usesFields()) {
@@ -758,7 +758,7 @@ abstract class StylePluginBase extends PluginBase {
    * @see self::render()
    *
    * @param array $data
-   *   The element to #pre_render
+   *   The element to #pre_render.
    *
    * @return array
    *   The processed element.

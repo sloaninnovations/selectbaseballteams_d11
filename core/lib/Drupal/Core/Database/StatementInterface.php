@@ -74,7 +74,7 @@ interface StatementInterface extends \Traversable {
    *   An option depending of the fetch mode specified by $mode:
    *   - for \PDO::FETCH_COLUMN, the index of the column to fetch
    *   - for \PDO::FETCH_CLASS, the name of the class to create
-   *   - for \PDO::FETCH_INTO, the object to add the data to
+   *   - for \PDO::FETCH_INTO, the object to add the data to.
    * @param array $a2
    *   If $mode is \PDO::FETCH_CLASS, the optional arguments to pass to the
    *   constructor.
