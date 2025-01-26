@@ -57,6 +57,9 @@ services:
     class: Drupal\layout_builder\InlineBlockUsage
     arguments: ['@database']
   Drupal\layout_builder\InlineBlockUsageInterface: '@inline_block.usage'
+  layout_builder.component_visibility_subscriber:
+    class: Drupal\layout_builder\EventSubscriber\SectionComponentVisibility
+    arguments: ['@context.handler', '@plugin.manager.condition']
   layout_builder.controller.entity_form:
     # Override the entity form controller to handle the entity layout_builder
     # operation.
