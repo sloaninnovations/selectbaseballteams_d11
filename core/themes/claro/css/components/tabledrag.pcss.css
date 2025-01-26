@@ -251,6 +251,16 @@ body.drag-y {
   background: none !important;
   line-height: 0;
 
+  &::before {
+    display: block;
+    visibility: hidden;
+    width: 100%;
+    height: 100%;
+    content: "";
+    background: url(../../images/src/indentation.svg) no-repeat center center;
+    background-size: cover;
+  }
+
   @nest .tabledrag-cell-content & {
     /* Fixes Safari bug (16.1 at least) where table rows are overly large when
       using indentation (e.g. re-ordering menu items. */
@@ -264,6 +274,12 @@ body.drag-y {
   @nest [dir="rtl"] & {
     float: right;
   }
+}
+
+[dir="rtl"] .indentation {
+  right: calc(var(--space-xs) * -0.5);
+  left: auto;
+  float: right;
 }
 
 /**
