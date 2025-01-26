@@ -513,6 +513,7 @@ class SystemHooks {
         return ['Cache-Control' => 'public'];
       }
     }
+    return NULL;
   }
 
   /**

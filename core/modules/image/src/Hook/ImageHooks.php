@@ -214,6 +214,7 @@ class ImageHooks {
         'Content-Length' => $image->getFileSize(),
       ];
     }
+    return NULL;
   }
 
   /**
