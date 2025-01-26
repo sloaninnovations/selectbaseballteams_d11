@@ -11,6 +11,10 @@ namespace Drupal\Core\TypedData;
  * When implementing this interface which extends Traversable, make sure to list
  * IteratorAggregate or Iterator before this interface in the implements clause.
  *
+ * @template T of \Drupal\Core\TypedData\TypedDataInterface
+ * @extends \Drupal\Core\TypedData\TraversableTypedDataInterface<int, T>
+ * @extends \ArrayAccess<int,T>
+ *
  * @see \Drupal\Core\TypedData\ListDefinitionInterface
  *
  * @ingroup typed_data
@@ -47,7 +51,7 @@ interface ListInterface extends TraversableTypedDataInterface, \ArrayAccess, \Co
    * @param int $index
    *   Index of the item to return.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface|null
+   * @return ?T
    *   The item at the specified position in this list, or NULL if no item
    *   exists at that position.
    *
@@ -83,7 +87,7 @@ interface ListInterface extends TraversableTypedDataInterface, \ArrayAccess, \Co
   /**
    * Returns the first item in this list.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface|null
+   * @return ?T
    *   The first item in this list, or NULL if there are no items.
    *
    * @throws \Drupal\Core\TypedData\Exception\MissingDataException
@@ -94,7 +98,7 @@ interface ListInterface extends TraversableTypedDataInterface, \ArrayAccess, \Co
   /**
    * Returns the last item in this list.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface|null
+   * @return ?T
    *   The last item in this list, or NULL if there are no items.
    */
   public function last(): ?TypedDataInterface;
@@ -105,7 +109,7 @@ interface ListInterface extends TraversableTypedDataInterface, \ArrayAccess, \Co
    * @param mixed $value
    *   The value of the new item.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @return T
    *   The item that was appended.
    */
   public function appendItem($value = NULL);

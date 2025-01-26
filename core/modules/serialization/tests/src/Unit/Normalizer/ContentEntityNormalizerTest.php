@@ -14,6 +14,7 @@ use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\serialization\Normalizer\ContentEntityNormalizer;
 use Drupal\Tests\Core\Entity\ContentEntityBaseMockableClass;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Serializer;
 
@@ -150,14 +151,14 @@ class ContentEntityNormalizerTest extends UnitTestCase {
    *   The value that access() will return.
    * @param bool $internal
    *   The value that isInternal() will return.
-   * @param \Drupal\Core\Session\AccountInterface $user_context
+   * @param \Drupal\Core\Session\AccountInterface|null $user_context
    *   The user context used for the access check.
    *
-   * @return \Drupal\Core\Field\FieldItemListInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>&\PHPUnit\Framework\MockObject\MockObject
    */
-  protected function createMockFieldListItem($access, $internal, ?AccountInterface $user_context = NULL) {
+  protected function createMockFieldListItem(bool $access, bool $internal, ?AccountInterface $user_context = NULL): FieldItemListInterface&MockObject {
     $data_definition = $this->prophesize(DataDefinitionInterface::class);
-    $mock = $this->createMock('Drupal\Core\Field\FieldItemListInterface');
+    $mock = $this->createMock(FieldItemListInterface::class);
     $mock->expects($this->once())
       ->method('getDataDefinition')
       ->willReturn($data_definition->reveal());
