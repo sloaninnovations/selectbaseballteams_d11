@@ -47,7 +47,11 @@ field.field_settings.link:
     link_type:
       type: integer
       label: 'Allowed link type'
-
+    entity_bundles:
+      type: sequence
+      label: 'Allowed entity bundles for internal links'
+      sequence:
+        type: string
 field.value.link:
   type: mapping
   label: 'Default value'

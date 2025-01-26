@@ -6,10 +6,15 @@ use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Entity\Element\EntityAutocomplete;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\link\LinkItemInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -21,7 +26,37 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
   label: new TranslatableMarkup('Link'),
   field_types: ['link'],
 )]
-class LinkWidget extends WidgetBase {
+class LinkWidget extends WidgetBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * Service 'entity_type.manager'.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * Service 'entity_type.bundle.info'.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected $entityTypeBundleInfo;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+    $this->entityTypeManager = $entity_type_manager;
+    $this->entityTypeBundleInfo = $entity_type_bundle_info;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static($plugin_id, $plugin_definition, $configuration['field_definition'], $configuration['settings'], $configuration['third_party_settings'], $container->get('entity_type.manager'), $container->get('entity_type.bundle.info'));
+  }
 
   /**
    * {@inheritdoc}
@@ -137,7 +172,7 @@ class LinkWidget extends WidgetBase {
    *
    * Disallows saving inaccessible or untrusted URLs.
    */
-  public static function validateUriElement($element, FormStateInterface $form_state, $form) {
+  public function validateUriElement($element, FormStateInterface $form_state, $form) {
     $uri = static::getUserEnteredStringAsUri($element['#value']);
     $form_state->setValueForElement($element, $uri);
 
@@ -148,6 +183,47 @@ class LinkWidget extends WidgetBase {
     if (parse_url($uri, PHP_URL_SCHEME) === 'internal' && !in_array($element['#value'][0], ['/', '?', '#'], TRUE) && !str_starts_with($element['#value'], '<front>')) {
       $form_state->setError($element, new TranslatableMarkup('Manually entered paths should start with one of the following characters: / ? #'));
       return;
+    }
+
+    // Validates entity URIs.
+    if (parse_url($uri, PHP_URL_SCHEME) === 'entity') {
+      // Validation needed when 'entity_bundles' field setting is used.
+      if ($entity_bundles = $this->getFieldSetting('entity_bundles')) {
+        // Removes unspecified entity bundles.
+        $entity_bundles = array_filter($entity_bundles);
+        $params = Url::fromUri($uri)->getRouteParameters();
+        $entity_type = key($params);
+        $entity = $this->entityTypeManager->getStorage($entity_type)
+          ->load($params[$entity_type]);
+        // Validates that given entity exists.
+        if (empty($entity)) {
+          $form_state->setError(
+            $element, $this->t(
+              'Internal link contains invalid ID: @id', [
+                '@id' => $params[$entity_type],
+              ]
+            )
+          );
+          return;
+        }
+        // Validates against any entity bundles selected in the field settings.
+        if (!in_array($entity->bundle(), $entity_bundles)) {
+          // Gets human-readable entity bundle labels for error message.
+          $entity_bundle_info = array_intersect_key($this->entityTypeBundleInfo->getBundleInfo($entity_type), $entity_bundles);
+          $entity_bundle_labels = [];
+          foreach ($entity_bundle_info as $bundle_name => $bundle_info) {
+            $entity_bundle_labels[] = (!empty($bundle_info['label'])) ? $bundle_info['label'] : $bundle_name;
+          }
+          $form_state->setError(
+            $element, $this->t(
+              'For internal links, you may only reference entities of the following types: %entity_bundles', [
+                '%entity_bundles' => implode(', ', $entity_bundle_labels),
+              ]
+            )
+          );
+          return;
+        }
+      }
     }
   }
 
@@ -204,7 +280,7 @@ class LinkWidget extends WidgetBase {
       '#title' => $this->t('URL'),
       '#placeholder' => $this->getSetting('placeholder_url'),
       '#default_value' => $display_uri,
-      '#element_validate' => [[static::class, 'validateUriElement']],
+      '#element_validate' => [[$this, 'validateUriElement']],
       '#maxlength' => 2048,
       '#required' => $element['#required'],
       '#link_type' => $this->getFieldSetting('link_type'),
@@ -217,6 +293,24 @@ class LinkWidget extends WidgetBase {
       // @todo The user should be able to select an entity type. Will be fixed
       //   in https://www.drupal.org/node/2423093.
       $element['uri']['#target_type'] = 'node';
+      // If limiting entity bundles are used in the settings, update the query.
+      if ($entity_bundles = $this->getFieldSetting('entity_bundles')) {
+        // Massages array values into format selections settings array expects.
+        $entity_bundles = array_filter($entity_bundles);
+        // Updates selections settings to include limited entity bundle list.
+        if (!empty($entity_bundles)) {
+          $element['uri']['#selection_handler'] = 'default:node';
+          $element['uri']['#selection_settings'] = [
+            'target_bundles' => $entity_bundles,
+            'sort' => [
+              'field' => '_none',
+            ],
+            'auto_create' => FALSE,
+            'auto_create_bundle' => FALSE,
+            'match_operator' => 'CONTAINS',
+          ];
+        }
+      }
       // Disable autocompletion when the first character is '/', '#' or '?'.
       $element['uri']['#attributes']['data-autocomplete-first-character-blacklist'] = '/#?';
 

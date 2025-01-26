@@ -39,6 +39,7 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
     return [
       'title' => DRUPAL_OPTIONAL,
       'link_type' => LinkItemInterface::LINK_GENERIC,
+      'entity_bundles' => [],
     ] + parent::defaultFieldSettings();
   }
 
@@ -115,6 +116,30 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
       ],
     ];
 
+    // Gets a list of entity bundles.
+    // @todo Support entity types other than 'node' (https://www.drupal.org/node/2423093).
+    $entity_bundles = \Drupal::service('entity_type.bundle.info')
+      ->getBundleInfo('node');
+    $bundle_option_list = [];
+    foreach ($entity_bundles as $bundle_name => $bundle_info) {
+      $bundle_option_list[$bundle_name] = (!empty($bundle_info['label'])) ? $bundle_info['label'] : $bundle_name;
+    }
+    // Adds select input for choosing entity bundles to filter by.
+    $element['entity_bundles'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Allowed types of internal links'),
+      '#description' => $this->t('If internal links are being used, then select which types of internal links are allowed.'),
+      '#default_value' => $this->getSetting('entity_bundles') ?: [],
+      '#options' => $bundle_option_list,
+      '#multiple' => TRUE,
+      '#states' => [
+        'visible' => [
+          [':input[name="settings[link_type]"]' => ['value' => static::LINK_INTERNAL]],
+          'or',
+          [':input[name="settings[link_type]"]' => ['value' => static::LINK_GENERIC]],
+        ],
+      ],
+    ];
     return $element;
   }
 
