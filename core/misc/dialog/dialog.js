@@ -5,13 +5,17 @@
  * @see http://www.whatwg.org/specs/web-apps/current-work/multipage/commands.html#the-dialog-element
  */
 
-class DrupalDialogEvent extends Event {
-  constructor(type, dialog, settings = null) {
-    super(`dialog:${type}`, { bubbles: true });
-    this.dialog = dialog;
-    this.settings = settings;
+(function (Drupal) {
+  if (!Drupal.DialogEvent) {
+    Drupal.DialogEvent = class extends Event {
+      constructor(type, dialog, settings = null) {
+        super(`dialog:${type}`, { bubbles: true });
+        this.dialog = dialog;
+        this.settings = settings;
+      }
+    };
   }
-}
+})(Drupal || (Drupal = {}));
 
 (function ($, Drupal, drupalSettings, bodyScrollLock) {
   /**
@@ -86,7 +90,7 @@ class DrupalDialogEvent extends Event {
       }
 
       // Trigger a global event to allow scripts to bind events to the dialog.
-      const event = new DrupalDialogEvent('beforecreate', dialog, settings);
+      const event = new Drupal.DialogEvent('beforecreate', dialog, settings);
       domElement.dispatchEvent(event);
       $element.dialog(event.settings);
       dialog.open = true;
@@ -98,12 +102,12 @@ class DrupalDialogEvent extends Event {
       }
 
       domElement.dispatchEvent(
-        new DrupalDialogEvent('aftercreate', dialog, event.settings),
+        new Drupal.DialogEvent('aftercreate', dialog, event.settings),
       );
     }
 
     function closeDialog(value) {
-      domElement.dispatchEvent(new DrupalDialogEvent('beforeclose', dialog));
+      domElement.dispatchEvent(new Drupal.DialogEvent('beforeclose', dialog));
 
       // Unlocks the body when the dialog closes.
       bodyScrollLock.clearBodyLocks();
@@ -112,7 +116,7 @@ class DrupalDialogEvent extends Event {
       dialog.returnValue = value;
       dialog.open = false;
 
-      domElement.dispatchEvent(new DrupalDialogEvent('afterclose', dialog));
+      domElement.dispatchEvent(new Drupal.DialogEvent('afterclose', dialog));
     }
 
     dialog.show = () => {
