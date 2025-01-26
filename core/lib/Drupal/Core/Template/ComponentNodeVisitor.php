@@ -45,6 +45,9 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
     if (!$node instanceof ModuleNode) {
       return $node;
     }
+    if ($node->hasNode('parent')) {
+      return $node;
+    }
     $component = $this->getComponent($node);
     if (!$component) {
       return $node;
