@@ -495,6 +495,71 @@
   };
 
   /**
+   * Filters the add field list by the field type name or description.
+   *
+   * @type {Drupal~behavior}
+   */
+  Drupal.behaviors.addFieldFilterByText = {
+    attach() {
+      const [input] = once(
+        'add-field-filter-text',
+        '.js-add-field-filter-text',
+      );
+      if (!input) {
+        return;
+      }
+      const $table = $(input.getAttribute('data-container'));
+      let $rows;
+      let searching = false;
+
+      function filterRows(e) {
+        const query = e.target.value;
+        function showRow(index, row) {
+          const sources = row.querySelectorAll(
+            'label, .field-option__description',
+          );
+          let sourcesConcat = '';
+          // Concatenate the textContent of the elements in the row, with a
+          // space in between.
+          sources.forEach((item) => {
+            sourcesConcat += ` ${item.textContent}`;
+          });
+          // Make it case-insensitive.
+          const textMatch = sourcesConcat
+            .toLowerCase()
+            .includes(query.toLowerCase());
+          $(row).toggle(textMatch);
+        }
+
+        // Filter if the length of the query is at least 1 character.
+        if (query.length > 0) {
+          searching = true;
+          $rows.each(showRow);
+        } else if (searching) {
+          searching = false;
+          $rows.show();
+        }
+      }
+
+      function preventEnterKey(event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      }
+
+      if ($table.length) {
+        $rows = $table.find('.field-option');
+
+        $(input).on({
+          keyup: debounce(filterRows, 200),
+          keydown: preventEnterKey,
+        });
+      }
+    },
+  };
+
+  /**
    * Allows users to select an element which checks a radio button and
    * adds a class used for css styling on different states.
    *
