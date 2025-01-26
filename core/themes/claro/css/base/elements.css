@@ -253,3 +253,17 @@ img {
 .views-display-top > input.button {
   display: none;
 }
+
+@media screen and (max-width: 47.9375rem) {
+  .block-system-main-block {
+    overflow-x: scroll;
+    overflow-x: overlay;
+  }
+}
+
+@media screen and (max-width: 47.9375rem) {
+  #block-claro-content {
+    overflow-x: scroll;
+    overflow-x: overlay;
+  }
+}

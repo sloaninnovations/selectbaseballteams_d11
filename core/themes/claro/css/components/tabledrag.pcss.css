@@ -237,6 +237,10 @@ body.drag-y {
   &:empty {
     display: none;
   }
+  @media screen and (max-width: 767px) {
+    display: flex;
+    align-items: center;
+  }
 }
 
 /**

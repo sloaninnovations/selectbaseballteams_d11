@@ -258,6 +258,13 @@ body.drag-y {
   display: none;
 }
 
+@media screen and (max-width: 47.9375rem) {
+  .tabledrag-cell-content__item {
+    display: flex;
+    align-items: center;
+  }
+}
+
 /**
  * Indentation.
  */

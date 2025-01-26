@@ -25,3 +25,10 @@
     margin-block-end: var(--sp3);
   }
 }
+
+@media screen and (max-width: 47.9375rem) {
+  .block-system-main-block {
+    overflow-x: scroll;
+    overflow-x: overlay;
+  }
+}

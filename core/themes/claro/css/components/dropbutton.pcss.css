@@ -75,6 +75,9 @@
 
 .dropbutton--extrasmall {
   height: var(--dropbutton-extrasmall-toggle-size);
+  @media screen and (max-width: 767px) {
+    height: auto;
+  }
 }
 
 /**

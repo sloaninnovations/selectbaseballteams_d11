@@ -87,6 +87,12 @@
   height: var(--dropbutton-extrasmall-toggle-size);
 }
 
+@media screen and (max-width: 47.9375rem) {
+  .dropbutton--extrasmall {
+    height: auto;
+  }
+}
+
 /**
  * First dropbutton list item.
  */
