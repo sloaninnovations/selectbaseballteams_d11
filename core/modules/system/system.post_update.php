@@ -85,3 +85,14 @@ function system_post_update_sdc_uninstall() {
     \Drupal::service('module_installer')->uninstall(['sdc'], FALSE);
   }
 }
+
+/**
+ * Adds default value for the mail_notification config parameter.
+ */
+function system_post_update_mail_notification_setting() {
+  $config = \Drupal::configFactory()->getEditable('system.site');
+  // If the value doesn't exist it always returns NULL.
+  if (is_null($config->get('mail_notification'))) {
+    $config->set('mail_notification', NULL)->save();
+  }
+}
