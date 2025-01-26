@@ -190,4 +190,12 @@ interface ImageStyleInterface extends ConfigEntityInterface {
    */
   public function supportsUri($uri);
 
+  /**
+   * Returns the replacement ID for the image style.
+   *
+   * @return string|null
+   *   The replacement image style ID, or NULL if no replacement exists.
+   */
+  public function getReplacementID();
+
 }
