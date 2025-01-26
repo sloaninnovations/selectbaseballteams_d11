@@ -46,6 +46,8 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupal6TestBase {
       'settings' => [
         'size' => 60,
         'placeholder' => '',
+        'hide_help' => FALSE,
+        'hide_guidelines' => FALSE,
       ],
       'third_party_settings' => [],
     ];

@@ -19,6 +19,10 @@ use Drupal\Core\Url;
  * - #allowed_formats: (optional) An array of text format IDs that are available
  *   for this element. If omitted, all text formats that the current user has
  *   access to will be allowed.
+ * - #hide_help: (optional) Boolean indicating whether the help link about text
+ *   formats should be hidden or not.
+ * - #hide_guidelines: (optional) Boolean indicating whether the text formats
+ *   guidelines text should be hidden or not.
  *
  * Usage Example:
  * @code
@@ -177,6 +181,7 @@ class TextFormat extends RenderElementBase {
         'container__text_format_filter_guidelines',
       ],
       '#weight' => 20,
+      '#access' => empty($element['#hide_guidelines']),
     ];
     $options = [];
     foreach ($formats as $format) {
@@ -210,6 +215,7 @@ class TextFormat extends RenderElementBase {
         '#attributes' => ['target' => '_blank'],
       ],
       '#weight' => 0,
+      '#access' => empty($element['#hide_help']),
     ];
 
     $all_formats = filter_formats();
