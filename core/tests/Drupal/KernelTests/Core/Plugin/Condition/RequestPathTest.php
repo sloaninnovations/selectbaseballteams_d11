@@ -130,6 +130,11 @@ class RequestPathTest extends KernelTestBase {
 
     $this->assertFalse($condition->evaluate(), 'The system_path /my/pass/page4 fails for a missing path.');
 
+    // Test a missing ".php" path.
+    $this->currentPath->setPath('.php', $request);
+    $this->aliasManager->addAlias('/.php', '/my/fail/page5');
+    $this->assertFalse($condition->evaluate(), 'The system_path /my/pass/page5 fails for a missing path.');
+
     // Test a path of '/'.
     $this->aliasManager->addAlias('/', '/my/pass/page3');
     $this->currentPath->setPath('/', $request);
@@ -139,6 +144,16 @@ class RequestPathTest extends KernelTestBase {
     $this->assertTrue($condition->evaluate(), 'The system_path my/pass/page3 passes for wildcard paths.');
     $this->assertEquals('Return true on the following pages: /my/pass/*', $condition->summary(), 'The condition summary matches for a wildcard path');
 
+  }
+
+  /**
+   * Tests to ensure that slash is prepended when it is not present.
+   */
+  public function testRequestPathPrependSlash() {
+    $request = Request::create('test');
+    $this->requestStack->push($request);
+    $this->currentPath->setPath('test', $request);
+    $this->assertEquals('/test', $this->currentPath->getPath());
   }
 
 }

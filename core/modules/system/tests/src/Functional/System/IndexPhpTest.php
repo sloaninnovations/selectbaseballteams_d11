@@ -36,6 +36,12 @@ class IndexPhpTest extends BrowserTestBase {
 
     $this->drupalGet($index_php . '/user', ['external' => TRUE]);
     $this->assertSession()->statusCodeEquals(200);
+
+    // Test the page by requesting invalid paths.
+    $this->drupalGet('index.php.');
+    $this->assertSession()->statusCodeEquals(404);
+    $this->drupalGet('index.php.php');
+    $this->assertSession()->statusCodeEquals(404);
   }
 
 }

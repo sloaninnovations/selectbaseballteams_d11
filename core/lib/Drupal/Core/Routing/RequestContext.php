@@ -61,4 +61,24 @@ class RequestContext extends SymfonyRequestContext {
     $this->completeBaseUrl = $complete_base_url;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function setPathInfo(string $path_info): static {
+    return parent::setPathInfo(static::prependSlash($path_info));
+  }
+
+  /**
+   * Prepends a slash to the given path.
+   *
+   * @param string $path
+   *   The original path.
+   *
+   * @return string
+   *   The path with a leading slash.
+   */
+  public static function prependSlash($path) {
+    return '/' . ltrim($path, '/');
+  }
+
 }

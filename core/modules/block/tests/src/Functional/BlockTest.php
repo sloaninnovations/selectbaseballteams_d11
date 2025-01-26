@@ -83,6 +83,27 @@ class BlockTest extends BlockTestBase {
   }
 
   /**
+   * Tests block visibility with invalid paths.
+   */
+  public function testBlockVisibilityWithInvalidPaths() {
+    $block_name = 'system_powered_by_block';
+    // Create a random title for the block.
+    $title = $this->randomMachineName(8);
+    // Enable a standard block.
+    $default_theme = $this->config('system.theme')->get('default');
+    $this->drupalGet('admin/structure/block/add/' . $block_name . '/' . $default_theme);
+    $edit = [
+      'id' => strtolower($this->randomMachineName(8)),
+      'region' => 'sidebar_first',
+      'settings[label]' => $title,
+      'settings[label_display]' => TRUE,
+      'visibility[request_path][pages]' => '/user/*',
+    ];
+    $this->submitForm($edit, t('Save block'));
+    $this->assertSession()->pageTextContains('The block configuration has been saved.');
+  }
+
+  /**
    * Tests that visibility can be properly toggled.
    */
   public function testBlockToggleVisibility(): void {

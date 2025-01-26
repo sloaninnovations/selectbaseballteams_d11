@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Path;
 
+use Drupal\Core\Routing\RequestContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -46,14 +47,14 @@ class CurrentPathStack {
    *   (optional) The request.
    *
    * @return string
-   *   Returns the path, without leading slashes.
+   *   Returns the un-decoded path, with leading slashes.
    */
   public function getPath(?Request $request = NULL) {
     if (!isset($request)) {
       $request = $this->requestStack->getCurrentRequest();
     }
     if (!isset($this->paths[$request])) {
-      $this->paths[$request] = $request->getPathInfo();
+      $this->paths[$request] = RequestContext::prependSlash($request->getPathInfo());
     }
 
     return $this->paths[$request];
@@ -73,7 +74,7 @@ class CurrentPathStack {
     if (!isset($request)) {
       $request = $this->requestStack->getCurrentRequest();
     }
-    $this->paths[$request] = $path;
+    $this->paths[$request] = RequestContext::prependSlash($path);
 
     return $this;
   }
