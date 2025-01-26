@@ -1,0 +1,11 @@
+id: d7_custom_block_translation
+label: Content block translations
+migration_tags:
+  - Drupal 7
+  - Content
+source:
+  plugin: d7_block_custom_translation
+process: {}
+destination:
+  plugin: entity:block_content
+migration_dependencies: {}
