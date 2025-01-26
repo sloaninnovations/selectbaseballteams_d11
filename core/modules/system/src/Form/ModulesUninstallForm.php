@@ -106,7 +106,8 @@ class ModulesUninstallForm extends FormBase {
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
 
     // Get a list of all available modules that can be uninstalled.
-    $uninstallable = array_filter($this->moduleExtensionList->getList(), function ($module) {
+    $modules = $this->moduleExtensionList->getList();
+    $uninstallable = array_filter($modules, function ($module) {
        return empty($module->info['required']) && $module->status;
     });
 
@@ -199,7 +200,7 @@ class ModulesUninstallForm extends FormBase {
       // we can allow this module to be uninstalled.
       foreach (array_keys($module->required_by) as $dependent) {
         if ($this->updateRegistry->getInstalledVersion($dependent) !== $this->updateRegistry::SCHEMA_UNINSTALLED) {
-          $form['modules'][$module->getName()]['#required_by'][] = $dependent;
+          $form['modules'][$module->getName()]['#required_by'][] = $modules[$dependent]->info['name'];
           $form['uninstall'][$module->getName()]['#disabled'] = TRUE;
         }
       }
