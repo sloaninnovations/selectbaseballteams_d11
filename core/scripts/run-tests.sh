@@ -913,6 +913,10 @@ function simpletest_script_command(TestRun $test_run, string $test_class): array
       $command[] = '--' . $arg;
     }
   }
+
+  // $command[] = '--fail-on-skipped';
+
+
   // --execute-test and class name needs to come last.
   $command[] = '--execute-test';
   $command[] = $test_class;
