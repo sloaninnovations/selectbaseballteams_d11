@@ -1639,6 +1639,10 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $table_mapping = $this->getTableMapping();
     $table_name = $table_mapping->getDedicatedDataTableName($storage_definition, $storage_definition->isDeleted());
 
+    if (!$this->database->schema()->tableExists($table_name)) {
+      return [];
+    }
+
     // Get the entities which we want to purge first.
     $entity_query = $this->database->select($table_name, 't', ['fetch' => \PDO::FETCH_ASSOC]);
     $or = $entity_query->orConditionGroup();
