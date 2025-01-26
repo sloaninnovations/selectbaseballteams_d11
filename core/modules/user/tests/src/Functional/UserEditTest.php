@@ -259,4 +259,23 @@ class UserEditTest extends BrowserTestBase {
     $this->assertFalse($this->getSession()->getPage()->hasField('mail'));
   }
 
+  /**
+   * Tests that a user is not able to self-block when editing its own profile.
+   */
+  public function testAdminSelfBlocking(): void {
+    $admin = $this->drupalCreateUser(['administer users']);
+    $user = $this->drupalCreateUser();
+
+    $this->drupalLogin($admin);
+    $this->drupalGet("user/" . $admin->id() . "/edit");
+    // The status field must not be rendered when the user is editing itself.
+    // Therefore, radio buttons must not be present in order to prevent self-blocking.
+    $this->assertSession()->fieldNotExists("edit-status-0");
+
+    // Status field must be rendered only when editing other users, radio buttons must be present
+    $this->drupalGet("user/" . $user->id() . "/edit");
+    $this->assertTrue($this->getSession()->getPage()->hasField('edit-status-0'));
+    $this->assertTrue($this->getSession()->getPage()->hasField('edit-status-1'));
+  }
+
 }

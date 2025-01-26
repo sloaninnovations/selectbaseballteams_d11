@@ -188,6 +188,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       }
     }
 
+    // Hides field to avoid self-blocking when user editing its own profile
     if (!$self_register) {
       $status = $account->get('status')->value;
     }
@@ -200,7 +201,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#title' => $this->t('Status'),
       '#default_value' => $status,
       '#options' => [$this->t('Blocked'), $this->t('Active')],
-      '#access' => $account->status->access('edit'),
+      '#access' => $account->status->access('edit') && $user->id() !== $account->id(),
     ];
 
     $roles = Role::loadMultiple();
