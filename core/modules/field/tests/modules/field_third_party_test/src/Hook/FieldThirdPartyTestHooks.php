@@ -29,6 +29,19 @@ class FieldThirdPartyTestHooks {
   }
 
   /**
+   * Implements hook_field_widget_third_party_settings_form().
+   */
+  #[Hook('field_widget_third_party_settings_form')]
+  public function fieldWidgetThirdPartySettingsFormAdditionalImplementation(WidgetInterface $plugin, FieldDefinitionInterface $field_definition, $form_mode, $form, FormStateInterface $form_state): array {
+    $element['second_field_widget_third_party_settings_form'] = [
+      '#type' => 'number',
+      '#title' => t('Second 3rd party widget settings form'),
+      '#default_value' => $plugin->getThirdPartySetting('field_third_party_test', 'second_field_widget_third_party_settings_form'),
+    ];
+    return $element;
+  }
+
+  /**
    * Implements hook_field_widget_settings_summary_alter().
    */
   #[Hook('field_widget_settings_summary_alter')]
@@ -45,6 +58,19 @@ class FieldThirdPartyTestHooks {
       '#type' => 'textfield',
       '#title' => t('3rd party formatter settings form'),
       '#default_value' => $plugin->getThirdPartySetting('field_third_party_test', 'field_test_field_formatter_third_party_settings_form'),
+    ];
+    return $element;
+  }
+
+  /**
+   * Implements hook_field_formatter_third_party_settings_form().
+   */
+  #[Hook('field_formatter_third_party_settings_form')]
+  public function fieldFormatterThirdPartySettingsFormAdditionalImplementation(FormatterInterface $plugin, FieldDefinitionInterface $field_definition, $view_mode, $form, FormStateInterface $form_state): array {
+    $element['second_field_formatter_third_party_settings_form'] = [
+      '#type' => 'number',
+      '#title' => t('Second 3rd party formatter settings form'),
+      '#default_value' => $plugin->getThirdPartySetting('field_third_party_test', 'second_field_formatter_third_party_settings_form'),
     ];
     return $element;
   }
