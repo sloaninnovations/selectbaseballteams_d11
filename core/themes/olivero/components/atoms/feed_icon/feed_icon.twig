@@ -1,0 +1,8 @@
+<a{{ attributes.addClass('feed-icon').setAttribute('href', url) }}>
+  <span class="feed-icon__label">
+    {{ title }}
+  </span>
+  <span class="feed-icon__icon" aria-hidden="true">
+    {{ include (componentMetadata.path ~ '/images/rss.svg') }}
+  </span>
+</a>

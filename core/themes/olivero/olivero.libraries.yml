@@ -128,12 +128,6 @@ drupal.node.preview:
     theme:
       css/components/node-preview-container.css: {}
 
-feed:
-  version: VERSION
-  css:
-    theme:
-      css/components/feed.css: {}
-
 filter.theme:
   version: VERSION
   css:
