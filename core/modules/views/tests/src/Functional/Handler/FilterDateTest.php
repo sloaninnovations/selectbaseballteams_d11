@@ -301,6 +301,47 @@ class FilterDateTest extends ViewTestBase {
     $this->assertCount(2, $results);
     $this->assertEquals($this->nodes[2]->id(), $results[0]->getText());
     $this->assertEquals($this->nodes[3]->id(), $results[1]->getText());
+
+    // Tests the group filter with the "between" operator and checks for warnings related to undefined min and max values.
+    $this->drupalGet(path: 'admin/structure/views/nojs/handler/test_filter_date_between/default/filter/created');
+    $edit = [];
+    $edit['options[operator]'] = 'between';
+    $edit['options[value][type]'] = 'date';
+    $edit['options[value][value]'] = '';
+    $edit['options[value][min]'] = $this->dateFormatter->format(150000, 'custom', 'Y-m-d H:i:s');
+    $edit['options[value][max]'] = $this->dateFormatter->format(250000, 'custom', 'Y-m-d H:i:s');
+    $this->submitForm($edit, 'Apply');
+    $this->drupalGet('admin/structure/views/view/test_filter_date_between');
+    $this->submitForm([], 'Save');
+    $this->assertConfigSchemaByName('views.view.test_filter_date_between');
+
+    // Switch to grouped filters with a single filter where the operator value remains "between".
+    $this->drupalGet('admin/structure/views/nojs/handler/test_filter_date_between/default/filter/created');
+    $this->submitForm([], 'Grouped filters');
+    $edit = [];
+    $edit['options[group_info][group_items][1][title]'] = 'Group 1';
+    $edit['options[group_info][group_items][1][operator]'] = 'between';
+    $edit['options[group_info][group_items][1][value][min]'] = $this->dateFormatter->format(150000, 'custom', 'Y-m-d H:i:s');
+    $edit['options[group_info][group_items][1][value][max]'] = $this->dateFormatter->format(200000, 'custom', 'Y-m-d H:i:s');
+    $edit['options[group_info][group_items][2][title]'] = 'Group 2';
+    $edit['options[group_info][group_items][2][operator]'] = 'between';
+    $edit['options[group_info][group_items][2][value][min]'] = $this->dateFormatter->format(200000, 'custom', 'Y-m-d H:i:s');
+    $edit['options[group_info][group_items][2][value][max]'] = $this->dateFormatter->format(300000, 'custom', 'Y-m-d H:i:s');
+    $edit['options[group_info][group_items][3][title]'] = 'Group 3';
+    $edit['options[group_info][group_items][3][operator]'] = 'between';
+    $edit['options[group_info][group_items][3][value][min]'] = $this->dateFormatter->format(200000, 'custom', 'Y-m-d H:i:s');
+    $edit['options[group_info][group_items][3][value][max]'] = $this->dateFormatter->format(300000, 'custom', 'Y-m-d H:i:s');
+
+    $this->submitForm($edit, 'Apply');
+    $this->drupalGet('admin/structure/views/view/test_filter_date_between');
+    $this->submitForm([], 'Save');
+    $this->assertConfigSchemaByName('views.view.test_filter_date_between');
+
+    // Access the view display and check for warnings related to undefined min and max values.
+    $this->drupalGet($path);
+    $this->submitForm(['created' => 'All'], 'Apply');
+    $results = $this->cssSelect('.view-content .field-content');
+    $this->assertCount(4, $results);
   }
 
   /**
