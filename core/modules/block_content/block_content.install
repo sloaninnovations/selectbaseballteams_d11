@@ -11,3 +11,29 @@
 function block_content_update_last_removed(): int {
   return 10300;
 }
+
+/**
+ * Removes the "area_text_custom" plugin from block content view configuration.
+ */
+function block_content_update_10301(): int {
+  $view = \Drupal::entityTypeManager()->getStorage('view')->load('block_content');
+
+  if ($view) {
+    $changed = FALSE;
+
+    // Check and remove the "area_text_custom" plugin from the 'empty' section.
+    foreach ($view->get('display') as $display_id => $display) {
+      if (isset($display['display_options']['empty']['area_text_custom'])) {
+        unset($display['display_options']['empty']['area_text_custom']);
+        $view->set('display.' . $display_id . '.display_options.empty.area_text_custom', NULL);
+        $changed = TRUE;
+      }
+    }
+
+    if ($changed) {
+      $view->save();
+      \Drupal::logger('block_content')->notice('The obsolete "area_text_custom" plugin has been removed from the block_content view.');
+    }
+  }
+  return 0;
+}
