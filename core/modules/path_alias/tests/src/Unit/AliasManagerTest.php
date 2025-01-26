@@ -205,7 +205,7 @@ class AliasManagerTest extends UnitTestCase {
     // This needs to write out the cache.
     $this->cache->expects($this->once())
       ->method('set')
-      ->with($this->cacheKey, [$language->getId() => [$path]], (int) $_SERVER['REQUEST_TIME'] + (60 * 60 * 24));
+      ->with($this->cacheKey, [$language->getId() => ['path' => [$path], 'alias' => []]], (int) $_SERVER['REQUEST_TIME'] + (60 * 60 * 24));
 
     $this->aliasManager->writeCache();
   }
@@ -253,7 +253,7 @@ class AliasManagerTest extends UnitTestCase {
     // This needs to write out the cache.
     $this->cache->expects($this->once())
       ->method('set')
-      ->with($this->cacheKey, [$language->getId() => [$path]], (int) $_SERVER['REQUEST_TIME'] + (60 * 60 * 24));
+      ->with($this->cacheKey, [$language->getId() => ['path' => [$path], 'alias' => []]], (int) $_SERVER['REQUEST_TIME'] + (60 * 60 * 24));
 
     $this->aliasManager->writeCache();
   }
@@ -274,12 +274,12 @@ class AliasManagerTest extends UnitTestCase {
 
     // Use a set of cached paths where the tested path is in any position, not
     // only in the first one.
-    $cached_paths = [
-      $language->getId() => [
-        '/another/path',
-        $path,
-      ],
+
+    $cached_paths[$language->getId()]['path'] = [
+      '/another/path',
+      $path,
     ];
+
     $this->cache->expects($this->once())
       ->method('get')
       ->with($this->cacheKey)
@@ -294,8 +294,8 @@ class AliasManagerTest extends UnitTestCase {
       ->willReturn(TRUE);
 
     $this->aliasRepository->expects($this->once())
-      ->method('preloadPathAlias')
-      ->with($cached_paths[$language->getId()], $language->getId())
+      ->method('preloadAliases')
+      ->with($cached_paths[$language->getId()]['path'], $language->getId())
       ->willReturn([$path => $alias]);
 
     // LookupPathAlias should not be called.
@@ -327,7 +327,11 @@ class AliasManagerTest extends UnitTestCase {
     $language = $this->setUpCurrentLanguage();
     $cached_language = new Language(['id' => 'de']);
 
-    $cached_paths = [$cached_language->getId() => [$path]];
+    $cached_paths = [
+      $cached_language->getId() => [
+        'path' => [$path],
+      ],
+    ];
     $this->cache->expects($this->once())
       ->method('get')
       ->with($this->cacheKey)
@@ -344,7 +348,7 @@ class AliasManagerTest extends UnitTestCase {
     // The requested language is different than the cached, so this will
     // need to load.
     $this->aliasRepository->expects($this->never())
-      ->method('preloadPathAlias');
+      ->method('preloadAliases');
     $this->aliasRepository->expects($this->once())
       ->method('lookupBySystemPath')
       ->with($path, $language->getId())
@@ -354,9 +358,8 @@ class AliasManagerTest extends UnitTestCase {
     // Call it twice to test the static cache.
     $this->assertEquals($alias, $this->aliasManager->getAliasByPath($path));
 
-    // There is already a cache entry, so this should not write out to the
-    // cache.
-    $this->cache->expects($this->never())
+    // After calling lookupBySystemPath() cache must be updated.
+    $this->cache->expects($this->once())
       ->method('set');
     $this->aliasManager->writeCache();
   }
@@ -376,7 +379,12 @@ class AliasManagerTest extends UnitTestCase {
 
     $language = $this->setUpCurrentLanguage();
 
-    $cached_paths = [$language->getId() => [$cached_path, $path]];
+    $cached_paths = [
+      $language->getId() => [
+        'path' => [$cached_path, $path],
+      ],
+    ];
+
     $this->cache->expects($this->once())
       ->method('get')
       ->with($this->cacheKey)
@@ -391,8 +399,8 @@ class AliasManagerTest extends UnitTestCase {
       ->willReturn(TRUE);
 
     $this->aliasRepository->expects($this->once())
-      ->method('preloadPathAlias')
-      ->with($cached_paths[$language->getId()], $language->getId())
+      ->method('preloadAliases')
+      ->with($cached_paths[$language->getId()]['path'], $language->getId())
       ->willReturn([$cached_path => $cached_alias]);
 
     // LookupPathAlias() should not be called.
@@ -424,7 +432,8 @@ class AliasManagerTest extends UnitTestCase {
 
     $language = $this->setUpCurrentLanguage();
 
-    $cached_paths = [$language->getId() => [$cached_path]];
+    $cached_paths = [$language->getId() => ['path' => [$cached_path]]];
+
     $this->cache->expects($this->once())
       ->method('get')
       ->with($this->cacheKey)
@@ -439,8 +448,8 @@ class AliasManagerTest extends UnitTestCase {
       ->willReturn(TRUE);
 
     $this->aliasRepository->expects($this->once())
-      ->method('preloadPathAlias')
-      ->with($cached_paths[$language->getId()], $language->getId())
+      ->method('preloadAliases')
+      ->with($cached_paths[$language->getId()]['path'], $language->getId())
       ->willReturn([$cached_path => $cached_alias]);
 
     $this->aliasRepository->expects($this->once())
@@ -452,9 +461,8 @@ class AliasManagerTest extends UnitTestCase {
     // Call it twice to test the static cache.
     $this->assertEquals($path, $this->aliasManager->getAliasByPath($path));
 
-    // There is already a cache entry, so this should not write out to the
-    // cache.
-    $this->cache->expects($this->never())
+    // After calling lookupBySystemPath() cache must be updated.
+    $this->cache->expects($this->once())
       ->method('set');
     $this->aliasManager->writeCache();
   }
@@ -510,7 +518,12 @@ class AliasManagerTest extends UnitTestCase {
 
     $language = $this->setUpCurrentLanguage();
 
-    $cached_paths = [$language->getId() => [$cached_path, $cached_no_alias_path]];
+    $cached_paths = [
+      $language->getId() => [
+        'path' => [$cached_path, $cached_no_alias_path],
+      ],
+    ];
+
     $this->cache->expects($this->once())
       ->method('get')
       ->with($this->cacheKey)
@@ -525,8 +538,8 @@ class AliasManagerTest extends UnitTestCase {
       ->willReturn(TRUE);
 
     $this->aliasRepository->expects($this->once())
-      ->method('preloadPathAlias')
-      ->with($cached_paths[$language->getId()], $language->getId())
+      ->method('preloadAliases')
+      ->with($cached_paths[$language->getId()]['path'], $language->getId())
       ->willReturn([$cached_path => $cached_alias]);
 
     $this->aliasRepository->expects($this->once())
@@ -538,9 +551,8 @@ class AliasManagerTest extends UnitTestCase {
     // Call it twice to test the static cache.
     $this->assertEquals($new_alias, $this->aliasManager->getAliasByPath($path));
 
-    // There is already a cache entry, so this should not write out to the
-    // cache.
-    $this->cache->expects($this->never())
+    // After calling lookupBySystemPath cache must be updated
+    $this->cache->expects($this->once())
       ->method('set');
     $this->aliasManager->writeCache();
   }
@@ -560,6 +572,60 @@ class AliasManagerTest extends UnitTestCase {
       ->willReturn($language);
 
     return $language;
+  }
+
+  /**
+   * Test case when path has several aliases.
+   *
+   * @covers ::getAliasByPath
+   */
+  public function testGetAliasByPathWithMultipleAliases(): void {
+    $path_part1 = $this->randomMachineName();
+    $path_part2 = $this->randomMachineName();
+
+    $path = '/' . $path_part1 . '/' . $path_part2;
+
+    // One path can have many aliases.
+    $alias = [
+      0 => $this->randomMachineName(),
+      // Alias we will get from lookupBySystemPath().
+      1 => $this->randomMachineName(),
+    ];
+
+    $language = $this->setUpCurrentLanguage();
+
+    $this->aliasPrefixList->expects($this->any())
+      ->method('get')
+      ->with($path_part1)
+      ->willReturn(TRUE);
+
+    // Simulate a request so that the preloaded paths are fetched.
+    $this->aliasManager->setCacheKey($this->path);
+
+    // Don't from cache.
+    $this->cache->expects($this->any())
+      ->method('get')
+      ->with($this->cacheKey)
+      ->willReturn(FALSE);
+
+    $this->aliasRepository->expects($this->any())
+      ->method('lookupByAlias')
+      ->with($alias[0], $language->getId())
+      ->willReturn(['path' => $path]);
+
+    $this->aliasRepository->expects($this->any())
+      ->method('lookupBySystemPath')
+      ->with($path, $language->getId())
+      ->willReturn(['alias' => $alias[1]]);
+
+    // Get alias by path.
+    $this->assertEquals($alias[1], $this->aliasManager->getAliasByPath($path, $language->getId()));
+
+    // Get path for alias[0].
+    $this->assertEquals($path, $this->aliasManager->getPathByAlias($alias[0], $language->getId()));
+
+    // Get alias by path again.
+    $this->assertEquals($alias[1], $this->aliasManager->getAliasByPath($path, $language->getId()));
   }
 
 }
