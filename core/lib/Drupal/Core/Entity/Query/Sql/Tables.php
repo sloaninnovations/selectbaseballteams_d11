@@ -363,9 +363,31 @@ class Tables implements TablesInterface {
         // and the base table alias. This way, if the same entity table is
         // joined several times for different entity reference fields, each join
         // gets a unique alias.
-        $key = $index_prefix . ($base_table === 'base_table' ? $table : $base_table);
+        $key = $index_prefix . ($base_table === 'base_table' ? $table : $base_table) . $type;
         if (!isset($this->entityTables[$key])) {
-          $this->entityTables[$key] = $this->addJoin($type, $table, "[%alias].[$id_field] = [$base_table].[$id_field]", $langcode);
+          $tables = $this->sqlQuery->getTables();
+          if (isset($tables[$key])) {
+            $this->entityTables[$key] = $key;
+          }
+          elseif (
+            $type === 'INNER' &&
+            $base_table === 'base_table' &&
+            $tables['base_table']['table'] === $table
+          ) {
+            // When the above conditions are true this is a needless self join to
+            // the entity base table so don't add a join, and set the table alias
+            // correctly.
+            $this->entityTables[$key] = 'base_table';
+          }
+          elseif (
+            isset($tables[$table]) &&
+            $tables[$table]['join type'] === $type
+          ) {
+            $this->entityTables[$key] = $table;
+          }
+          else {
+            $this->entityTables[$key] = $this->addJoin($type, $table, "[%alias].[$id_field] = [$base_table].[$id_field]", $langcode);
+          }
         }
         return $this->entityTables[$key];
       }
