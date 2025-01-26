@@ -2,9 +2,8 @@
 
 namespace Drupal\Core\Menu;
 
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheCollector;
-use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
@@ -16,35 +15,27 @@ use Drupal\Core\Routing\RouteMatchInterface;
 class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface {
 
   /**
-   * The menu link plugin manager.
-   *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
-   */
-  protected $menuLinkManager;
-
-  /**
-   * The route match object for the current page.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
    * Constructs a \Drupal\Core\Menu\MenuActiveTrail object.
    *
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
+   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
    *   The menu link plugin manager.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   A route match object for finding the active link.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock backend.
+   * @param \Drupal\Core\Path\PathMatcherInterface $pathMatcher
+   *   The path.matcher service.
    */
-  public function __construct(MenuLinkManagerInterface $menu_link_manager, RouteMatchInterface $route_match, CacheBackendInterface $cache, LockBackendInterface $lock) {
+  public function __construct(
+    protected MenuLinkManagerInterface $menuLinkManager,
+    protected RouteMatchInterface $routeMatch,
+    protected $cache,
+    protected $lock,
+    protected PathMatcherInterface $pathMatcher,
+  ) {
     parent::__construct(NULL, $cache, $lock);
-    $this->menuLinkManager = $menu_link_manager;
-    $this->routeMatch = $route_match;
   }
 
   /**
@@ -122,6 +113,7 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
     // The menu links coming from the storage are already sorted by depth,
     // weight and ID.
     $found = NULL;
+    $links = [];
 
     $route_name = $this->routeMatch->getRouteName();
     // On a default (not custom) 403 page the route name is NULL. On a custom
@@ -132,10 +124,15 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
 
       // Load links matching this route.
       $links = $this->menuLinkManager->loadLinksByRoute($route_name, $route_parameters, $menu_name);
-      // Select the first matching link.
-      if ($links) {
-        $found = reset($links);
-      }
+    }
+
+    if ($this->pathMatcher->isFrontPage()) {
+      $links = array_merge($links, $this->menuLinkManager->loadLinksByRoute('<front>', [], $menu_name));
+    }
+
+    // Select the first matching link.
+    if ($links) {
+      $found = reset($links);
     }
     return $found;
   }
