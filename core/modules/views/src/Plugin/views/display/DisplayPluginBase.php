@@ -2394,6 +2394,10 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       $cache_plugin->alterCacheMetadata($cache_metadata);
     }
 
+    if ($this->ajaxEnabled()) {
+      $cache_metadata->addCacheContexts(['ajax']);
+    }
+
     return $cache_metadata;
   }
 
