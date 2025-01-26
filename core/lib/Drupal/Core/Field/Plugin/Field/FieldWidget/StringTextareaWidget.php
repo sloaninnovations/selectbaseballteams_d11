@@ -23,7 +23,7 @@ class StringTextareaWidget extends WidgetBase {
    */
   public static function defaultSettings() {
     return [
-      'rows' => '5',
+      'rows' => 5,
       'placeholder' => '',
     ] + parent::defaultSettings();
   }
