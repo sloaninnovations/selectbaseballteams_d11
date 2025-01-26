@@ -696,7 +696,7 @@
       'button, fieldset, optgroup, option, select, textarea, input';
     if (e.trigger) {
       $(e.target)
-        .closest('.js-form-item, .js-form-submit, .js-form-wrapper')
+        .closest('.js-form-item, .js-form-submit, .js-form-wrapper, .js-complex-form-item')
         .toggleClass('form-disabled', e.value)
         .find(tagsSupportDisable)
         .addBack(tagsSupportDisable)

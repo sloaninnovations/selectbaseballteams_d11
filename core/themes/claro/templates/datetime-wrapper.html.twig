@@ -6,17 +6,15 @@
  * @see template_preprocess_form_element()
  */
 #}
+{% if errors %}
 {%
-  set title_classes = [
-    'form-item__label',
-    required ? 'js-form-required',
-    required ? 'form-required',
-    errors ? 'has-error',
-  ]
+  set label_attributes = label_attributes.addClass('has-error')
 %}
-<div class="form-item form-datetime-wrapper">
-{% if title %}
-  <h4{{ title_attributes.addClass(title_classes) }}>{{ title }}</h4>
+{% endif %}
+
+<div class="form-item form-datetime-wrapper js-complex-form-item">
+{% if label_display in ['before', 'invisible'] %}
+  {{ label }}
 {% endif %}
 {{ content }}
 {% if errors %}
@@ -28,5 +26,8 @@
   <div{{ description_attributes.addClass('form-item__description') }}>
     {{ description }}
   </div>
+{% endif %}
+{% if label_display == 'after' %}
+  {{ label }}
 {% endif %}
 </div>
