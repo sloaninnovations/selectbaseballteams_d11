@@ -312,7 +312,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
       else {
         $discovery = new AnnotatedClassDiscovery($this->subdir, $this->namespaces, $this->pluginDefinitionAnnotationName, $this->additionalAnnotationNamespaces);
       }
-      $this->discovery = new ContainerDerivativeDiscoveryDecorator($discovery);
+      $this->discovery = new ContainerDerivativeDiscoveryDecorator($discovery, $this->moduleHandler, $this->alterHook);
     }
     return $this->discovery;
   }
