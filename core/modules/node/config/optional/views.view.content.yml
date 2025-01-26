@@ -441,6 +441,7 @@ display:
           entity_type: node
           entity_field: status
           plugin_id: boolean
+          accept_null: false
           operator: '='
           value: '1'
           group: 1

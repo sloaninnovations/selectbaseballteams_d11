@@ -423,6 +423,7 @@ display:
           entity_type: block_content
           entity_field: reusable
           plugin_id: boolean
+          accept_null: false
           operator: '='
           value: '1'
           group: 1
