@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\image\Kernel;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -13,6 +14,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
+use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Drupal\user\Entity\Role;
 
 /**
@@ -170,6 +172,24 @@ class ImageItemTest extends FieldKernelTestBase {
     $imageItem = $entity->image_test_generation->first()->getValue();
     $this->assertEquals('800', $imageItem['width']);
     $this->assertEquals('800', $imageItem['height']);
+
+    // Create a mock field definition with no file directory.
+    $definition = $this->createMock(FieldDefinitionInterface::class);
+    $definition->expects($this->any())
+      ->method('getSettings')
+      ->willReturn([
+        'file_extensions' => 'jpg',
+        'file_directory' => '',
+        'uri_scheme' => 'public',
+      ]);
+    // Generate sample value and check the URI format.
+    $value = ImageItem::generateSampleValue($definition);
+    $this->assertNotEmpty($value);
+    $file = File::load($value['target_id']);
+    $fileUri = $file->getFileUri();
+
+    // Confirm there are only two forward slashes.
+    $this->assertMatchesRegularExpression('#^public://[^/]#', $fileUri);
   }
 
   /**

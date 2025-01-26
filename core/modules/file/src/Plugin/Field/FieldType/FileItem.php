@@ -331,6 +331,7 @@ class FileItem extends EntityReferenceItem {
    */
   protected static function doGetUploadLocation(array $settings, $data = []) {
     $destination = trim($settings['file_directory'], '/');
+    $destination = $destination ? $destination . '/' : $destination;
 
     // Replace tokens. As the tokens might contain HTML we convert it to plain
     // text.
@@ -361,7 +362,7 @@ class FileItem extends EntityReferenceItem {
     \Drupal::service('file_system')->prepareDirectory($dirname, FileSystemInterface::CREATE_DIRECTORY);
 
     // Generate a file entity.
-    $destination = $dirname . '/' . $random->name(10, TRUE) . '.txt';
+    $destination = $dirname . $random->name(10) . '.txt';
     $data = $random->paragraphs(3);
     /** @var \Drupal\file\FileRepositoryInterface $file_repository */
     $file_repository = \Drupal::service('file.repository');
