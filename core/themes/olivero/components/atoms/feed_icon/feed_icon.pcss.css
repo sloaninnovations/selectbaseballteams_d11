@@ -1,9 +1,4 @@
-/**
- * @file
- * RSS feed.
- */
-
-@import "../base/media-queries.pcss.css";
+@import "../../css/base/media-queries.pcss.css";
 
 .feed-icon {
   display: flex;
