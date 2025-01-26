@@ -379,7 +379,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *   "mimic_implicit_commit" is used.
    */
   public function addSavepoint($savepoint_name = 'mimic_implicit_commit') {
-    if ($this->inTransaction()) {
+    if ($this->inTransaction() && !$this->transactionManager()->has($savepoint_name)) {
       $this->savepoints[$savepoint_name] = $this->startTransaction($savepoint_name);
     }
   }
