@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Template\Loader;
 
-use Drupal\Component\Discovery\YamlDirectoryDiscovery;
 use Drupal\Core\Render\Component\Exception\ComponentNotFoundException;
 use Drupal\Core\Theme\ComponentPluginManager;
 use Drupal\Core\Utility\Error;
@@ -122,12 +121,8 @@ class ComponentLoader implements LoaderInterface {
     catch (ComponentNotFoundException) {
       throw new LoaderError('Unable to find component');
     }
-    // If any of the templates, or the component definition, are fresh. Then the
-    // component is fresh.
-    $metadata_path = $component->getPluginDefinition()[YamlDirectoryDiscovery::FILE_KEY];
-    if ($file_is_fresh($metadata_path)) {
-      return TRUE;
-    }
+    // We only support refreshing templates.
+    // If the template is fresh. Then the component is fresh.
     return $file_is_fresh($component->getTemplatePath());
   }
 
