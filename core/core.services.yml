@@ -950,6 +950,11 @@ services:
     arguments: ['@kernel']
     tags:
       - { name: http_middleware, priority: 100 }
+  http_middleware.install:
+    class: Drupal\Core\StackMiddleware\Install
+    autowire: true
+    tags:
+      - { name: http_middleware, priority: 101 }
   http_middleware.session:
     class: Drupal\Core\StackMiddleware\Session
     autowire: true
