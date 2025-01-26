@@ -105,6 +105,8 @@ trait BrowserHtmlDebugTrait {
    *   current page content is used.
    *
    * @see \Drupal\Tests\Listeners\VerbosePrinter::printResult()
+   *
+   * @return void
    */
   protected function htmlOutput($message = NULL) {
     if (!$this->htmlOutputEnabled) {
@@ -123,6 +125,8 @@ trait BrowserHtmlDebugTrait {
 
   /**
    * Creates the directory to store browser output.
+   *
+   * @return void
    */
   protected function initBrowserOutputFile() {
     $browserOutputFile = getenv('BROWSERTEST_OUTPUT_FILE');
@@ -143,7 +147,7 @@ trait BrowserHtmlDebugTrait {
         file_put_contents($this->htmlOutputDirectory . '/.htaccess', "<IfModule mod_expires.c>\nExpiresActive Off\n</IfModule>\n");
       }
       $this->htmlOutputCounterStorage = $this->htmlOutputDirectory . '/' . $this->htmlOutputClassName . '.counter';
-      $this->htmlOutputTestId = str_replace('sites/simpletest/', '', $this->siteDirectory);
+      $this->htmlOutputTestId = str_replace(['sites/simpletest/', 'vfs://root/'], '', $this->siteDirectory);
       if (is_file($this->htmlOutputCounterStorage)) {
         $this->htmlOutputCounter = max(1, (int) file_get_contents($this->htmlOutputCounterStorage)) + 1;
       }
