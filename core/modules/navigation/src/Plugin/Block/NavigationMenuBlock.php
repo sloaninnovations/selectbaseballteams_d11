@@ -38,6 +38,7 @@ final class NavigationMenuBlock extends SystemMenuBlock implements ContainerFact
       $plugin_definition,
       $container->get('navigation.menu_tree'),
       $container->get('menu.active_trail'),
+      $container->get('language_manager'),
     );
   }
 
@@ -87,7 +88,7 @@ final class NavigationMenuBlock extends SystemMenuBlock implements ContainerFact
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ];
-    $tree = $this->menuTree->transform($tree, $manipulators);
+    $tree = $this->menuTree->transform($tree, $manipulators, $this);
     $build = $this->menuTree->build($tree);
     if (!empty($build)) {
       $build['#title'] = $this->configuration['label'];

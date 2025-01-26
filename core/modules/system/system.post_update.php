@@ -5,6 +5,9 @@
  * Post update functions for System.
  */
 
+use Drupal\block\BlockInterface;
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -75,6 +78,26 @@ function system_post_update_convert_empty_country_and_timezone_settings_to_null(
   if ($changed) {
     $system_date_settings->save();
   }
+}
+
+/**
+ * Set hide_untranslated_menu_links config.
+ */
+function system_post_update_implement_schema_for_hide_untranslated_menu_links(&$sandbox = NULL): void {
+  if (!\Drupal::moduleHandler()->moduleExists('block')) {
+    return;
+  }
+
+  \Drupal::classResolver(ConfigEntityUpdater::class)
+    ->update($sandbox, 'block', function (BlockInterface $block) {
+      if (strpos($block->getPluginId(), 'menu_block:') === 0) {
+        $block_settings = $block->get('settings');
+        $block_settings['hide_untranslated_menu_links'] = (bool) $block_settings['hide_untranslated_menu_links'];
+        $block->set('settings', $block_settings);
+        return TRUE;
+      }
+      return FALSE;
+    });
 }
 
 /**
