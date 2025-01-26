@@ -42,6 +42,11 @@ class LayoutBuilderAccessCheck implements AccessInterface {
       $access = $access->andIf(AccessResult::allowedIfHasPermission($account, 'configure any layout'));
     }
 
+    // Disables access to add_block routes if the section storage opts out.
+    if ($operation === 'add_block' && !($section_storage->getPluginDefinition()->get('allow_inline_blocks') ?? TRUE)) {
+      $access = $access->andIf(AccessResult::forbidden());
+    }
+
     if ($access instanceof RefinableCacheableDependencyInterface) {
       $access->addCacheableDependency($section_storage);
     }

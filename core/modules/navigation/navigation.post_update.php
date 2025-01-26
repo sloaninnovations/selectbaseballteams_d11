@@ -6,6 +6,8 @@
  */
 
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
+use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
 use Drupal\user\RoleInterface;
 
 /**
@@ -32,4 +34,17 @@ function navigation_post_update_update_permissions(array &$sandbox) {
  */
 function navigation_post_update_set_logo_dimensions_default(array &$sandbox) {
   // Empty post_update hook.
+}
+
+/**
+ * Flushes tempstore repository for navigation to reflect definition changes.
+ */
+function navigation_post_update_refresh_tempstore_repository(array &$sandbox): void {
+  /** @var \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager */
+  $section_storage_manager = \Drupal::service(SectionStorageManagerInterface::class);
+  /** @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository */
+  $layout_tempstore_repository = \Drupal::service(LayoutTempstoreRepositoryInterface::class);
+
+  $section_storage = $section_storage_manager->loadEmpty('navigation');
+  $layout_tempstore_repository->delete($section_storage);
 }
