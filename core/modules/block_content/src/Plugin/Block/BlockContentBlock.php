@@ -4,13 +4,16 @@ namespace Drupal\block_content\Plugin\Block;
 
 use Drupal\block_content\BlockContentUuidLookup;
 use Drupal\block_content\Plugin\Derivative\BlockContent;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\BlockManagerInterface;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -148,6 +151,15 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
     if (!$block) {
       return $form;
     }
+
+    if ($form_state->get('is_layout_builder')) {
+      $form['block_form'] = [
+        '#type' => 'container',
+        '#block' => $this->getEntity(),
+        '#form_mode' => 'edit',
+      ];
+    }
+
     $options = $this->entityDisplayRepository->getViewModeOptionsByBundle('block_content', $block->bundle());
 
     $form['view_mode'] = [
@@ -179,6 +191,79 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
       return $this->getEntity()->access('view', $account, TRUE);
     }
     return AccessResult::forbidden();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $is_lb = $form_state->get('is_layout_builder');
+    if ($is_lb) {
+      $form['messages'] = [
+        '#theme' => 'status_messages',
+        '#message_list' => [
+          'warning' => [
+            $this->t('This block is reusable! Any changes made will be applied globally.'),
+            // @todo Make better description.
+            $this->t('Any change made to this block will be immediately visible inside the entity.'),
+          ],
+        ],
+      ];
+    }
+
+    $form = parent::buildConfigurationForm($form, $form_state);
+
+    if ($is_lb) {
+      $form['block_form'] = [
+        '#type' => 'container',
+        '#block' => $this->getEntity(),
+      ];
+
+      $form_mode = 'edit';
+      EntityFormDisplay::collectRenderDisplay($this->getEntity(), $form_mode)
+        ->buildForm($this->getEntity(), $form['block_form'], $form_state);
+      $form['block_form']['revision_log']['#access'] = FALSE;
+      $form['block_form']['info']['#access'] = FALSE;
+      $form['block_form']['#form_mode'] = $form_mode;
+    }
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    parent::validateConfigurationForm($form, $form_state);
+    if (!$form_state->get('is_layout_builder')) {
+      return;
+    }
+
+    $block = $this->getEntity();
+    $block_form = $form['block_form'];
+    $form_display = EntityFormDisplay::collectRenderDisplay($block, $block_form['#form_mode']);
+    $complete_form_state = $form_state instanceof SubformStateInterface ? $form_state->getCompleteFormState() : $form_state;
+    $form_display->extractFormValues($block, $block_form, $complete_form_state);
+    $form_display->validateFormValues($block, $block_form, $complete_form_state);
+    // @todo Remove when https://www.drupal.org/project/drupal/issues/2948549 is closed.
+    $form_state->setTemporaryValue('block_form_parents', $block_form['#parents']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    parent::submitConfigurationForm($form, $form_state);
+    if (!$form_state->get('is_layout_builder')) {
+      return;
+    }
+
+    // @todo Remove when https://www.drupal.org/project/drupal/issues/2948549 is closed.
+    $block_form = NestedArray::getValue($form, $form_state->getTemporaryValue('block_form_parents'));
+    $form_display = EntityFormDisplay::collectRenderDisplay($this->getEntity(), $block_form['settings']['block_form']['#form_mode']);
+    $complete_form_state = $form_state instanceof SubformStateInterface ? $form_state->getCompleteFormState() : $form_state;
+    $form_display->extractFormValues($this->getEntity(), $block_form, $complete_form_state);
+    $this->getEntity()->save();
   }
 
   /**

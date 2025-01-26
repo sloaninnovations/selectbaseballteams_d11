@@ -197,6 +197,8 @@ class InlineBlockPrivateFilesTest extends InlineBlockTestBase {
     $this->assertNotEmpty($assert_session->waitForLink('Create content block'));
     $this->clickLink('Create content block');
     $assert_session->assertWaitOnAjaxRequest();
+    $page->pressButton('Create inline block');
+    $assert_session->assertWaitOnAjaxRequest();
     $assert_session->fieldValueEquals('Title', '');
     $page->findField('Title')->setValue($title);
     $this->attachFileToBlockForm($file);

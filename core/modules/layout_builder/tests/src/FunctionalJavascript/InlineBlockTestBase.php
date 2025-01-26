@@ -53,7 +53,10 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
 
     $this->drupalPlaceBlock('local_tasks_block');
 
-    $this->createContentType(['type' => 'bundle_with_section_field', 'new_revision' => TRUE]);
+    $this->createContentType([
+      'type' => 'bundle_with_section_field',
+      'new_revision' => TRUE,
+    ]);
     $this->createNode([
       'type' => 'bundle_with_section_field',
       'title' => 'The node title',
@@ -142,8 +145,10 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
    *   The title field value.
    * @param string $body
    *   The body field value.
+   * @param bool $reusable
+   *   Whether the block is reusable or not.
    */
-  protected function addInlineBlockToLayout($title, $body) {
+  protected function addInlineBlockToLayout($title, $body, $reusable = FALSE) {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $page->clickLink('Add block');
@@ -151,13 +156,34 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
     $this->assertNotEmpty($assert_session->waitForLink('Create content block'));
     $this->clickLink('Create content block');
     $assert_session->assertWaitOnAjaxRequest();
-    $textarea = $assert_session->waitForElement('css', '[name="settings[block_form][body][0][value]"]');
-    $this->assertNotEmpty($textarea);
-    $assert_session->fieldValueEquals('Title', '');
-    $page->findField('Title')->setValue($title);
-    $textarea->setValue($body);
-    $page->pressButton('Add block');
-    $this->assertDialogClosedAndTextVisible($body, static::INLINE_BLOCK_LOCATOR);
+    if ($reusable === FALSE) {
+      $page->pressButton('Create inline block');
+      $assert_session->assertWaitOnAjaxRequest();
+      $textarea = $assert_session->waitForElement('css', '[name="settings[block_form][body][0][value]"]');
+      $this->assertNotEmpty($textarea);
+      $assert_session->fieldValueEquals('Title', '');
+      $page->findField('Title')->setValue($title);
+      $textarea->setValue($body);
+      $page->pressButton('Add block');
+      $this->assertDialogClosedAndTextVisible($body, static::INLINE_BLOCK_LOCATOR);
+    }
+    else {
+      $page->pressButton('Create reusable block');
+      $assert_session->assertWaitOnAjaxRequest();
+      $textarea = $assert_session->waitForElement('css', '[name="settings[block_form][body][0][value]"]');
+      $this->assertNotEmpty($textarea);
+      $assert_session->fieldValueEquals('Title', '');
+      $page->findField('Title')->setValue($title);
+      $textarea->setValue($body);
+      $page->pressButton('Add block');
+      $this->assertDialogClosedAndTextVisible($body, static::INLINE_BLOCK_LOCATOR);
+      $page->findField('Admin Title')->setValue('Test Reusable block ' . $title);
+      $page->pressButton('Add block');
+      $this->assertDialogClosedAndTextVisible($body, static::INLINE_BLOCK_LOCATOR);
+      $this->clickLink('Add block');
+      $assert_session->assertWaitOnAjaxRequest();
+      $assert_session->pageTextContains('Test Reusable block ' . $title);
+    }
   }
 
   /**

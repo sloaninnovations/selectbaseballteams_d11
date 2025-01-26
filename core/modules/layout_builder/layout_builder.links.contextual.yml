@@ -27,3 +27,13 @@ layout_builder_block_remove:
       class: ['use-ajax']
       data-dialog-type: dialog
       data-dialog-renderer: off_canvas
+
+layout_builder_block_make_reusable:
+  title: 'Make block reusable'
+  route_name: 'layout_builder.make_reusable'
+  group: 'layout_builder_content_block'
+  options:
+    attributes:
+      class: ['use-ajax']
+      data-dialog-type: dialog
+      data-dialog-renderer: off_canvas

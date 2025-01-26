@@ -170,7 +170,8 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
         $title = $this->t('Add section <span class="visually-hidden">at start of layout</span>');
       }
       else {
-        $title = $this->t('Add section <span class="visually-hidden">between @first and @second</span>', ['@first' => $delta, '@second' => $delta + 1]);
+        $title = $this->t('Add section <span class="visually-hidden">between @first and @second</span>',
+          ['@first' => $delta, '@second' => $delta + 1]);
       }
     }
 
@@ -232,11 +233,13 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
     foreach ($layout_definition->getRegions() as $region => $info) {
       if (!empty($build[$region])) {
         foreach (Element::children($build[$region]) as $uuid) {
-          $build[$region][$uuid]['#attributes']['class'][] = 'js-layout-builder-block';
-          $build[$region][$uuid]['#attributes']['class'][] = 'layout-builder-block';
-          $build[$region][$uuid]['#attributes']['data-layout-block-uuid'] = $uuid;
-          $build[$region][$uuid]['#attributes']['data-layout-builder-highlight-id'] = $this->blockUpdateHighlightId($uuid);
-          $build[$region][$uuid]['#contextual_links'] = [
+          $component = &$build[$region][$uuid];
+
+          $component['#attributes']['class'][] = 'js-layout-builder-block';
+          $component['#attributes']['class'][] = 'layout-builder-block';
+          $component['#attributes']['data-layout-block-uuid'] = $uuid;
+          $component['#attributes']['data-layout-builder-highlight-id'] = $this->blockUpdateHighlightId($uuid);
+          $component['#contextual_links'] = [
             'layout_builder_block' => [
               'route_parameters' => [
                 'section_storage_type' => $storage_type,
@@ -254,13 +257,31 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
               ],
             ],
           ];
+
+          if (isset($component['#base_plugin_id'])
+            && $component['#base_plugin_id'] === 'inline_block'
+            && $component['content']['#block_content']?->isReusable() === FALSE) {
+            $component['#contextual_links']['layout_builder_content_block'] = [
+              'route_parameters' => [
+                'section_storage_type' => $storage_type,
+                'section_storage' => $storage_id,
+                'delta' => $delta,
+                'region' => $region,
+                'uuid' => $uuid,
+              ],
+              'metadata' => [
+                'operations' => 'reusable',
+              ],
+            ];
+          }
         }
       }
 
       $build[$region]['layout_builder_add_block']['link'] = [
         '#type' => 'link',
         // Add one to the current delta since it is zero-indexed.
-        '#title' => $this->t('Add block <span class="visually-hidden">in @section, @region region</span>', ['@section' => $section_label, '@region' => $region_labels[$region]]),
+        '#title' => $this->t('Add block <span class="visually-hidden">in @section, @region region</span>',
+          ['@section' => $section_label, '@region' => $region_labels[$region]]),
         '#url' => Url::fromRoute('layout_builder.choose_block',
           [
             'section_storage_type' => $storage_type,

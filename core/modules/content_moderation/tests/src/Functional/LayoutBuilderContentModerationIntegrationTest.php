@@ -181,7 +181,7 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
     $this->drupalGet("node/{$node->id()}/layout");
     $page->clickLink('Add block');
     $this->clickLink('Create content block');
-
+    $page->pressButton('Create inline block');
     $assert_session->fieldNotExists('settings[block_form][moderation_state][0][state]');
     $this->submitForm([
       'settings[label]' => 'Test inline block',

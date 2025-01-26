@@ -7,6 +7,7 @@ use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Ajax\AjaxFormHelperTrait;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\BaseFormIdInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -17,9 +18,12 @@ use Drupal\Core\Plugin\ContextAwarePluginAssignmentTrait;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Plugin\PluginFormFactoryInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\TempStore\SharedTempStoreFactory;
 use Drupal\layout_builder\Context\LayoutBuilderContextTrait;
 use Drupal\layout_builder\Controller\LayoutRebuildTrait;
 use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
+use Drupal\layout_builder\Plugin\Block\InlineBlock;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\layout_builder\SectionStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -102,6 +106,27 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
   protected $sectionStorage;
 
   /**
+   * The entity type manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
+
+  /**
+   * The shared tempstore factory.
+   *
+   * @var \Drupal\Core\TempStore\SharedTempStoreFactory
+   */
+  protected $tempStoreFactory;
+
+  /**
    * Constructs a new block form.
    *
    * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
@@ -114,13 +139,22 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
    *   The UUID generator.
    * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $plugin_form_manager
    *   The plugin form manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager service.
+   * @param \Drupal\Core\Session\AccountInterface $current_user
+   *   The current user.
+   * @param \Drupal\Core\TempStore\SharedTempStoreFactory $temp_store_factory
+   *   The shared tempstore factory.
    */
-  public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository, ContextRepositoryInterface $context_repository, BlockManagerInterface $block_manager, UuidInterface $uuid, PluginFormFactoryInterface $plugin_form_manager) {
+  public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository, ContextRepositoryInterface $context_repository, BlockManagerInterface $block_manager, UuidInterface $uuid, PluginFormFactoryInterface $plugin_form_manager, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, SharedTempStoreFactory $temp_store_factory) {
     $this->layoutTempstoreRepository = $layout_tempstore_repository;
     $this->contextRepository = $context_repository;
     $this->blockManager = $block_manager;
     $this->uuidGenerator = $uuid;
     $this->pluginFormFactory = $plugin_form_manager;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->currentUser = $current_user;
+    $this->tempStoreFactory = $temp_store_factory;
   }
 
   /**
@@ -132,7 +166,10 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
       $container->get('context.repository'),
       $container->get('plugin.manager.block'),
       $container->get('uuid'),
-      $container->get('plugin_form.factory')
+      $container->get('plugin_form.factory'),
+      $container->get('entity_type.manager'),
+      $container->get('current_user'),
+      $container->get('tempstore.shared')
     );
   }
 
@@ -167,11 +204,20 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
     $this->block = $component->getPlugin();
 
     $form_state->setTemporaryValue('gathered_contexts', $this->getPopulatedContexts($section_storage));
+    $form_state->set('is_layout_builder', TRUE);
 
     $form['#tree'] = TRUE;
     $form['settings'] = [];
     $subform_state = SubformState::createForSubform($form['settings'], $form, $form_state);
     $form['settings'] = $this->getPluginForm($this->block)->buildConfigurationForm($form['settings'], $subform_state);
+
+    if ($form_state->get('make_reusable')) {
+      $form['info'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Admin title'),
+        '#description' => $this->t('The title used to find and reuse this block later.'),
+      ];
+    }
 
     $form['actions']['submit'] = [
       '#type' => 'submit',
@@ -226,6 +272,26 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
     }
 
     $configuration = $this->block->getConfiguration();
+    // If the block got marked as reusable, then convert the inline_block plugin
+    // to a block_content plugin.
+    if ($this->block instanceof InlineBlock && $form_state->get('make_reusable')) {
+      $settings = $form_state->getValue('settings');
+
+      /** @var \Drupal\block_content\BlockContentInterface $block_content */
+      $block_content = $form['settings']['block_form']['#block'];
+      $block_content->setReusable();
+      $block_content->setInfo($form_state->getValue('info') ?: $settings['label']);
+      $block_content->save();
+
+      $this->block = $this->blockManager->createInstance('block_content:' . $block_content->uuid(), [
+        'view_mode' => $configuration['view_mode'],
+        'label' => $configuration['label'],
+        'type' => $block_content->bundle(),
+        'uuid' => $block_content->uuid(),
+        'label_display' => $settings['label_display'],
+      ]);
+      $configuration = $this->block->getConfiguration();
+    }
 
     $section = $this->sectionStorage->getSection($this->delta);
     $section->getComponent($this->uuid)->setConfiguration($configuration);
