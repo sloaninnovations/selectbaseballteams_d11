@@ -64,3 +64,15 @@ function views_post_update_views_data_argument_plugin_id(?array &$sandbox = NULL
     return $view_config_updater->needsEntityArgumentUpdate($view);
   });
 }
+
+/**
+ * Updates the format plural option for those views using aggregation.
+ */
+function views_post_update_format_plural(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsFormatPluralUpdate($view);
+  });
+}
