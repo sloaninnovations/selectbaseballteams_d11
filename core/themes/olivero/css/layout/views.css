@@ -17,6 +17,13 @@
   grid-template-rows: max-content;
 }
 
+.view .views-exposed-form,
+.view-content .views-exposed-form {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
 @media (min-width: 43.75rem) {
   .view,
   .view-content {

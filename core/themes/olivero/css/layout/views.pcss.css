@@ -11,6 +11,12 @@
   gap: var(--sp2);
   grid-template-rows: max-content;
 
+  .views-exposed-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
   @media (--md) {
     gap: var(--sp3);
   }
