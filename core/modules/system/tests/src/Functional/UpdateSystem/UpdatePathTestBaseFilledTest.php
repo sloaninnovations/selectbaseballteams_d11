@@ -344,7 +344,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       'content_translation',
       'contextual',
       'datetime',
-      'dblog',
       'editor',
       'field',
       'field_ui',

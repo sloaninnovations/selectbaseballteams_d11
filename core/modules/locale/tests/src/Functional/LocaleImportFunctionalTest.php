@@ -23,7 +23,7 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['locale', 'dblog'];
+  protected static $modules = ['locale'];
 
   /**
    * {@inheritdoc}
