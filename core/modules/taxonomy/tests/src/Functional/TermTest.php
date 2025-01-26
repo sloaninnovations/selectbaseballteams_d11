@@ -702,6 +702,25 @@ class TermTest extends TaxonomyTestBase {
     ];
     $this->assertBreadcrumb('taxonomy/term/' . $term->id() . '/delete', $trail);
     $this->assertSession()->assertEscaped($term->label());
+
+    // Edit the term and verify that breadcrumb is updated on term edit and
+    // delete pages.
+    $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');
+    $edit = [
+      'name[0][value]' => $this->randomMachineName(14),
+      'description[0][value]' => $this->randomMachineName(100),
+      'parent[]' => [0],
+    ];
+    $this->submitForm($edit, t('Save'));
+    $trail = [
+      '' => 'Home',
+      'taxonomy/term/' . $term->id() => $edit['name[0][value]'],
+    ];
+    $this->assertBreadcrumb('taxonomy/term/' . $term->id() . '/edit', $trail);
+    $this->assertSession()->assertEscaped($edit['name[0][value]']);
+
+    $this->assertBreadcrumb('taxonomy/term/' . $term->id() . '/delete', $trail);
+    $this->assertSession()->assertEscaped($edit['name[0][value]']);
   }
 
 }

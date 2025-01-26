@@ -400,6 +400,12 @@ function template_preprocess_datetime_form(&$variables): void {
  */
 function template_preprocess_datetime_wrapper(&$variables): void {
   $element = $variables['element'];
+  $element += [
+    '#title_display' => 'before',
+    '#wrapper_attributes' => [],
+    '#label_attributes' => [],
+  ];
+  $variables['attributes'] = $element['#wrapper_attributes'];
 
   if (!empty($element['#title'])) {
     $variables['title'] = $element['#title'];
@@ -408,6 +414,19 @@ function template_preprocess_datetime_wrapper(&$variables): void {
     if (is_string($variables['title']) && $variables['title'] !== '') {
       $variables['title'] = ['#markup' => $variables['title']];
     }
+  }
+  // Add label_display and label variables to template.
+  $variables['label_display'] = $element['#title_display'];
+  $variables['label'] = ['#theme' => 'form_element_label'];
+  $variables['label'] += array_intersect_key($element, array_flip(['#id', '#required', '#title', '#title_display']));
+  $variables['label']['#attributes'] = $element['#label_attributes'];
+
+  // Pass elements #type and #name to template.
+  if (!empty($element['#type'])) {
+    $variables['type'] = $element['#type'];
+  }
+  if (!empty($element['#name'])) {
+    $variables['name'] = $element['#name'];
   }
 
   // Suppress error messages.

@@ -360,6 +360,21 @@ class BreadcrumbTest extends BrowserTestBase {
     ];
     $this->assertBreadcrumb('user/' . $this->webUser->id() . '/edit', $trail, $this->webUser->getAccountName());
 
+    // Change own username and verify correct breadcrumb after account edit.
+    $this->drupalGet('user/' . $this->webUser->id() . '/edit');
+    $newUsername = $this->randomMachineName();
+    $edit = [];
+    $edit['name'] = $newUsername;
+    $this->submitForm($edit, t('Save'));
+
+    // Verify correct breadcrumb and page title when viewing own user account.
+    $trail = $home;
+    $this->assertBreadcrumb('user/' . $this->webUser->id(), $trail, $newUsername);
+    $trail += [
+      'user/' . $this->webUser->id() => $newUsername,
+    ];
+    $this->assertBreadcrumb('user/' . $this->webUser->id() . '/edit', $trail, $newUsername);
+
     // Create an only slightly privileged user being able to access site reports
     // but not administration pages.
     $this->webUser = $this->drupalCreateUser([
@@ -446,6 +461,36 @@ class BreadcrumbTest extends BrowserTestBase {
     catch (ExpectationFailedException) {
       $this->assertTrue(TRUE, $message);
     }
+  }
+
+  /**
+   * Tests breadcrumb cacheability.
+   */
+  public function testBreadcrumbCacheability() {
+    // Create an article.
+    $node = $this->drupalCreateNode([
+      'type' => 'article',
+      'title' => 'Article Foo',
+    ]);
+
+    // Edit the article's title and create a new revision.
+    $node->setTitle('Article Bar');
+    $node->setNewRevision(TRUE);
+    $node->save();
+
+    // Open the Revisions tab so the breadcrumb is cached.
+    $this->drupalGet('node/' . $node->id() . '/revisions');
+    $this->assertSession()->pageTextContains('Article Bar');
+
+    // Edit the article's title again and create a new revision.
+    $node->setTitle('Article Baz');
+    $node->setNewRevision(TRUE);
+    $node->save();
+
+    // Open the Revisions tab and check the breadcrumb.
+    $this->drupalGet('node/' . $node->id() . '/revisions');
+    $this->assertSession()->pageTextNotContains('Article Bar');
+    $this->assertSession()->pageTextContains('Article Baz');
   }
 
 }

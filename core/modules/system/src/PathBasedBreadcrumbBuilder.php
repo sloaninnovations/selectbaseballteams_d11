@@ -8,6 +8,7 @@ use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Controller\CacheableTitleResolverInterface;
 use Drupal\Core\Controller\TitleResolverInterface;
 use Drupal\Core\Link;
 use Drupal\Core\ParamConverter\ParamNotConvertedException;
@@ -179,7 +180,14 @@ class PathBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
         // the access result's cacheability metadata.
         $breadcrumb = $breadcrumb->addCacheableDependency($access);
         if ($access->isAllowed()) {
-          $title = $this->titleResolver->getTitle($route_request, $route_match->getRouteObject());
+          if ($this->titleResolver instanceof CacheableTitleResolverInterface) {
+            $cacheable_title = $this->titleResolver->getCacheableTitle($route_request, $route_match->getRouteObject());
+            $breadcrumb->addCacheableDependency($cacheable_title);
+            $title = $cacheable_title->getTitle();
+          }
+          else {
+            $title = $this->titleResolver->getTitle($route_request, $route_match->getRouteObject());
+          }
           if (!isset($title)) {
             // Fallback to using the raw path component as the title if the
             // route is missing a _title or _title_callback attribute.

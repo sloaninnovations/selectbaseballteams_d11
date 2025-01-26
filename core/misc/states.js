@@ -696,11 +696,13 @@
       'button, fieldset, optgroup, option, select, textarea, input';
     if (e.trigger) {
       $(e.target)
-        .closest('.js-form-item, .js-form-submit, .js-form-wrapper')
+        .closest('.js-form-item, .js-form-submit, .js-form-wrapper', '.js-complex-form-item')
         .toggleClass('form-disabled', e.value)
         .find(tagsSupportDisable)
         .addBack(tagsSupportDisable)
         .prop('disabled', e.value);
+      // Note: WebKit nightlies don't reflect that change correctly.
+      // See https://bugs.webkit.org/show_bug.cgi?id=23789
     }
   });
 
